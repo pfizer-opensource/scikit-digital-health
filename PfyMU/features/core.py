@@ -8,6 +8,9 @@ from numpy import ndarray, zeros, sum
 from pandas import DataFrame
 
 
+__all__ = ['Bank']
+
+
 class NotAFeatureError(Exception):
     """
     Custom error for indicating an attempt to add something that is not a feature to a features.Bank
