@@ -33,6 +33,8 @@ class InputTypeError(Exception):
 
 
 class Bank:
+    __slots__ = ('_feat_list', '_n_feats', '_eq_idx')
+
     def __init__(self):
         """
         A feature bank for ease in creating a table of features for a given signal
@@ -108,7 +110,7 @@ class Bank:
 
         # iterate over all the features and compute them, saving the result as desired in the feature table
         for i, dft in enumerate(self._feat_list):
-            dft.compute(x=x)  # compute the feature without returning it
+            dft.compute(x, fs)  # compute the feature without returning it
 
             feats[:, idx:idx + self._n_feats[i]] = dft.get_result()  # get the result
             if isinstance(signal, DataFrame):
@@ -221,7 +223,7 @@ class Feature:
         else:
             raise InputTypeError(f"signal must be a numpy.ndarray or pandas.DataFrame, not {type(signal)}")
 
-        self._compute(x)
+        self._compute(x, fs)
 
         if isinstance(signal, ndarray):
             return self._result
@@ -229,7 +231,7 @@ class Feature:
             return DataFrame(data=self._result, columns=[f'{self._name}_{i}' for i in columns])
 
     # PRIVATE METHODS
-    def _compute(self, x):
+    def _compute(self, x, fs):
         # if the result is already defined, don't need to compute again. Note that if calling from the public
         # Feature.compute() method, _result is automatically set to None for re-computation each time it is called
         if self._result is not None:
@@ -267,6 +269,8 @@ class Feature:
 
 
 class DeferredFeature:
+    __slots__ = ('parent', 'index', 'compute', 'n')  # limit attributes
+
     def __init__(self, parent, index):
         """
         An object for storing a feature for deferred computation. Stores the parent feature, as well as the desired
