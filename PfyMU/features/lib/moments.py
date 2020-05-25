@@ -32,7 +32,14 @@ class Mean(Feature):
         signal : {numpy.ndarray, pandas.DataFrame}
             ndarray (up to 3D) or DataFrame with the signal
         columns : array-like, optional
-            Columns to use if providing a """
+            Columns to use if providing a pandas dataframe
+            
+        Returns
+        -------
+        mean : {numpy.ndarray, pandas.DataFrame}
+            ndarray or DataFrame with the mean of the signal.
+        """
+        self.compute.__doc__ = doc  # overwrite the compute method doc
         super()._compute(x, *args)
 
         self._result = mean(x, axis=1)
