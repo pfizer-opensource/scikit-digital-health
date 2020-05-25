@@ -4,8 +4,10 @@ Core functionality for feature computation
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
-from numpy import ndarray, zeros, sum
+from numpy import ndarray, array, zeros, sum
 from pandas import DataFrame
+
+from PfyMU.features.utility import standardize_signal, compute_window_samples
 
 
 __all__ = ['Bank']
@@ -33,11 +35,28 @@ class InputTypeError(Exception):
 
 
 class Bank:
-    __slots__ = ('_feat_list', '_n_feats', '_eq_idx')
+    __slots__ = ('_feat_list', '_n_feats', '_eq_idx', 'wlen_s', 'wstep')
 
-    def __init__(self):
+    def __init__(self, window_length=None, window_step=1.0):
         """
-        A feature bank for ease in creating a table of features for a given signal
+        A feature bank for ease in creating a table of features for a given signal, applying the windowing as specified.
+
+        Parameters
+        ----------
+        window_length : float
+            Window length in seconds. If not provided (None), will do no windowing. Default is None
+        window_step : {float, int}
+            Window step - the spacing between the start of windows. This can be specified several different ways
+            (see Notes). Default is 1.0
+
+        Notes
+        -----
+        Computation of the window step depends on the type of input provided, and the range.
+        - `window_step` is a float in (0.0, 1.0]: specifies the fraction of a window to skip to get to the start of the
+        next window
+        - `window_step` is an integer > 1: specifies the number of samples to skip to get to the start of the next
+        window
+
 
         Examples
         --------
@@ -58,6 +77,10 @@ class Bank:
         # storage of the last instance of a particular class/instance, if it exists
         self._eq_idx = None
 
+        # windowing parameters
+        self.wlen_s = window_length
+        self.wstep = window_step
+
     def compute(self, signal, fs=None, columns=None):
         """
         Compute the features in the Bank.
@@ -68,7 +91,7 @@ class Bank:
             Either a numpy array (up to 3D), or a pandas.DataFrame containing the signal to be analyzed
         fs : float, optional
             Sampling frequency of the signal in Hz. Only required if the features in the Bank require
-            sampling frequency in the computation (see feature documentation).
+            sampling frequency in the computation (see feature documentation), or if windowing `signal`.
         columns : array-like, optional
             Columns to use from the pandas.DataFrame.
 
@@ -80,26 +103,18 @@ class Bank:
         if not self._feat_list:
             raise NoFeaturesError('No features to compute.')
 
-        # set shorthand/get values from dataframe
-        if isinstance(signal, ndarray):
-            x = signal
-        elif isinstance(signal, DataFrame):
-            feat_columns = []
-            if columns is not None:
-                x = signal[columns].values
-            else:
-                x = signal.values
+        # compute windowing # of samples if necessary
+        window_length, window_step = compute_window_samples(fs, self.wlen_s, self.wstep)
 
-        # TODO add windowing
+        # standardize the input signal, and perform windowing if desired
+        x, columns = standardize_signal(signal, window_length, window_step, columns)
+        feat_columns = []  # allocate if necessary
 
         # first get the number of features expected so the space can be allocated
         for dft in self._feat_list:
             # need this if statement to deal with ellipsis indices
             if dft.n == -1:
-                if x.ndim > 1:
-                    dft.n = x.shape[1]  # 1 should always be the number of axes
-                else:
-                    dft.n = 1
+                dft.n = x.shape[-1]  # number of axes is last
 
             self._n_feats.append(dft.n)
 
@@ -211,17 +226,8 @@ class Feature:
         # might be used multiple times but for different indices
         self._result = None
 
-        # set shorthand/get values from dataframe
-        if isinstance(signal, ndarray):
-            x = signal
-        elif isinstance(signal, DataFrame):
-            if columns is not None:
-                x = signal[columns].values
-            else:
-                x = signal.values
-                columns = signal.columns
-        else:
-            raise InputTypeError(f"signal must be a numpy.ndarray or pandas.DataFrame, not {type(signal)}")
+        # extract and standardize the data. No windowing in the public method here
+        x = standardize_signal(signal, window_length=None, step=None, columns=columns)
 
         self._compute(x, fs)
 
@@ -302,6 +308,9 @@ class DeferredFeature:
 
     def get_result(self):
         return self.parent._result[:, self.index]
+
+    def get_columns(self, columns):
+        return [f'{i}_{self.parent._name.lower()}' for i in array(columns)[self.index]]
 
     # FUNCTIONALITY METHODS
     def __eq__(self, other):
