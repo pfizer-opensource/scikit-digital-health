@@ -221,7 +221,7 @@ class Feature:
         feature : {numpy.ndarray, pandas.DataFrame}
             Computed feature, returned as the same type as the input signal
         """
-        # set the result to None, to force re-computation. publically should always be re-computing. The benefit
+        # set the result to None, to force re-computation. publicly should always be re-computing. The benefit
         # for avoiding re-computation comes for the feature Bank pipeline of computation, where the same result
         # might be used multiple times but for different indices
         self._result = None
