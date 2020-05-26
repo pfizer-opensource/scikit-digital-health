@@ -4,7 +4,7 @@ Features from statistical moments
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
-from numpy import mean
+from numpy import mean, std
 
 from PfyMU.features.core import Feature
 
@@ -45,3 +45,20 @@ class Mean(Feature):
         self._result = mean(x, axis=1)
 
 
+class StdDev(Feature):
+    def __init__(self):
+        """
+        Compute the signal standard deviation.
+
+        Examples
+        --------
+        >>> signal = np.arange(15).reshape((5, 3))
+        >>> features.StDev().compute(signal)
+        array([[4.74341649, 4.74341649, 4.74341649]])
+        """
+        super().__init__('StdDev', {})
+
+    def _compute(self, x, *args):
+        super()._compute(x, *args)
+
+        self._result = std(x, axis=1, ddof=1)
