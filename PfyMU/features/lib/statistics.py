@@ -1,9 +1,10 @@
 """
 Signal features based on statistics measures
 """
-from numpy import max, min, quantile, mean, std
+from numpy import max, min, quantile, mean, std, arange
 
 from PfyMU.features.core import Feature
+from PfyMU.features.lib._cython import cy_LinRegression
 
 
 class Range(Feature):
@@ -55,5 +56,24 @@ class RMS(Feature):
         super(RMS, self)._compute(x, fs)
 
         self._result = std(x - mean(x, axis=1, keepdims=True), axis=1, ddof=1)
+
+
+class LinearSlope(Feature):
+    def __init__(self):
+        """
+        Compute the linear slope for the signal
+
+        Methods
+        -------
+        compute(signal[, columns=None])
+        """
+        super(LinearSlope, self).__init__('LinearSlope', {})
+
+    def _compute(self, x, fs):
+        super(LinearSlope, self)._compute(x, fs)
+
+        t = arange(x.shape[1]) / fs
+
+        self._result, intercept = cy_LinRegression(t, x)
 
 
