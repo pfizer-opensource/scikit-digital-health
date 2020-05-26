@@ -1,0 +1,1 @@
+cdef void mean_1d(const double[:] x, double* mean)
