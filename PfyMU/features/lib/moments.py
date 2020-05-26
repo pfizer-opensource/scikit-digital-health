@@ -5,6 +5,7 @@ Lukas Adamowicz
 Pfizer DMTI 2020
 """
 from numpy import mean, std
+from scipy.stats import skew, kurtosis
 
 from PfyMU.features.core import Feature
 
@@ -13,6 +14,10 @@ class Mean(Feature):
     def __init__(self):
         """
         Compute the signal mean.
+
+        Methods
+        -------
+        compute(signal[, columns=None])
 
         Examples
         --------
@@ -24,22 +29,6 @@ class Mean(Feature):
         super().__init__('Mean', {})
 
     def _compute(self, x, *args):
-        doc = """
-        Compute the signal mean.
-        
-        Parameters
-        ----------
-        signal : {numpy.ndarray, pandas.DataFrame}
-            ndarray (up to 3D) or DataFrame with the signal
-        columns : array-like, optional
-            Columns to use if providing a pandas dataframe
-            
-        Returns
-        -------
-        mean : {numpy.ndarray, pandas.DataFrame}
-            ndarray or DataFrame with the mean of the signal.
-        """
-        self.compute.__doc__ = doc  # overwrite the compute method doc
         super()._compute(x, *args)
 
         self._result = mean(x, axis=1)
@@ -49,6 +38,10 @@ class StdDev(Feature):
     def __init__(self):
         """
         Compute the signal standard deviation.
+
+        Methods
+        -------
+        compute(signal[, columns=None])
 
         Examples
         --------
@@ -62,3 +55,37 @@ class StdDev(Feature):
         super()._compute(x, *args)
 
         self._result = std(x, axis=1, ddof=1)
+
+
+class Skewness(Feature):
+    def __init__(self):
+        """
+        Compute the skewness of a signal. NaN inputs will be propagated through to the result.
+
+        Methods
+        -------
+        compute(signal[, columns=None])
+        """
+        super().__init__('Skewness', {})
+
+    def _compute(self, x, *args):
+        super()._compute(x, *args)
+
+        self._result = skew(x, axis=1, bias=False)
+
+
+class Kurtosis(Feature):
+    def __init__(self):
+        """
+        Compute the kurtosis of a signal. NaN inputs will be propagated through to the result.
+
+        Methods
+        -------
+        compute(signal[, columns=None])
+        """
+        super().__init__('Kurtosis', {})
+
+    def _compute(self, x, *args):
+        super()._compute(x, *args)
+
+        self._result = kurtosis(x, axis=1, bias=False)
