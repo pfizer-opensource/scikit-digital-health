@@ -28,8 +28,8 @@ class Mean(Feature):
         """
         super().__init__('Mean', {})
 
-    def _compute(self, x, *args):
-        super()._compute(x, *args)
+    def _compute(self, x, fs):
+        super()._compute(x, fs)
 
         self._result = mean(x, axis=1)
 
@@ -51,8 +51,8 @@ class StdDev(Feature):
         """
         super().__init__('StdDev', {})
 
-    def _compute(self, x, *args):
-        super()._compute(x, *args)
+    def _compute(self, x, fs):
+        super()._compute(x, fs)
 
         self._result = std(x, axis=1, ddof=1)
 
@@ -68,8 +68,8 @@ class Skewness(Feature):
         """
         super().__init__('Skewness', {})
 
-    def _compute(self, x, *args):
-        super()._compute(x, *args)
+    def _compute(self, x, fs):
+        super()._compute(x, fs)
 
         self._result = skew(x, axis=1, bias=False)
 
@@ -85,7 +85,7 @@ class Kurtosis(Feature):
         """
         super().__init__('Kurtosis', {})
 
-    def _compute(self, x, *args):
-        super()._compute(x, *args)
+    def _compute(self, x, fs):
+        super()._compute(x, fs)
 
         self._result = kurtosis(x, axis=1, bias=False)
