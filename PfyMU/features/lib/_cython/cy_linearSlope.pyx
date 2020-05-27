@@ -8,18 +8,18 @@ from PfyMU.features.lib._cython.common cimport mean_1d
 
 
 cpdef covariance(const double[:] x, const double[:] y, int ddof):
-cdef Py_ssize_t n = x.size, i
+    cdef Py_ssize_t n = x.size, i
 
-cdef double kx = x[0], ky = y[0]
-cdef double Ex = 0., Ey = 0., Exy = 0., cov
+    cdef double kx = x[0], ky = y[0]
+    cdef double Ex = 0., Ey = 0., Exy = 0., cov
 
-for i in range(n):
-    Ex += (x[i] - kx)
-    Ey += (y[i] - ky)
-    Exy += (x[i] - kx) * (y[i] - ky)
+    for i in range(n):
+        Ex += (x[i] - kx)
+        Ey += (y[i] - ky)
+        Exy += (x[i] - kx) * (y[i] - ky)
 
-cov = (Exy - (Ex * Ey) / (n - ddof)) / (n - ddof)
-return cov
+    cov = (Exy - (Ex * Ey) / (n - ddof)) / (n - ddof)
+    return cov
 
 
 cpdef linregress(const double[:] x, const double[:] y):
@@ -33,7 +33,7 @@ cpdef linregress(const double[:] x, const double[:] y):
     cdef double slope, intercept
 
     mean_1d(x, &xmean)
-    mean_12(x, &ymean)
+    mean_1d(x, &ymean)
 
     # average sum of squares
     ssxm = covariance(x, x, 0)
