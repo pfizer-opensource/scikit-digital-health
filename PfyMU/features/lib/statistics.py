@@ -4,7 +4,7 @@ Signal features based on statistics measures
 from numpy import max, min, quantile, mean, std, arange
 
 from PfyMU.features.core import Feature
-from PfyMU.features.lib._cython import cy_LinRegression
+from PfyMU.features.lib import _cython
 
 
 class Range(Feature):
@@ -74,6 +74,6 @@ class LinearSlope(Feature):
 
         t = arange(x.shape[1]) / fs
 
-        self._result, intercept = cy_LinRegression(t, x)
+        self._result, intercept = _cython.LinRegression(t, x)
 
 
