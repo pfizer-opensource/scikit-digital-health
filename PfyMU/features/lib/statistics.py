@@ -77,3 +77,16 @@ class LinearSlope(Feature):
         self._result, intercept = _cython.LinRegression(t, x)
 
 
+class AutoregressiveCoefficients(Feature):
+    def __init__(self):
+        """
+        Compute the specified autoregressive coefficient
+
+        Methods
+        -------
+        compute(signal[, columns=None])
+        """
+        super(AutoregressiveCoefficients, self).__init__('AutoregressiveCoefficients', {})
+
+        raise NotImplementedError('Feature not yet implemented')
+
