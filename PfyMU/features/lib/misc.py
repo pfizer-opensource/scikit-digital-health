@@ -60,3 +60,30 @@ class RangeCountPercentage(Feature):
         super(RangeCountPercentage, self)._compute(x, fs)
 
         self._result = -_cython.RangeCount(x, self.rmin, self.rmax)
+
+
+class RatioBeyondRSigma(Feature):
+    def __init__(self, r=2.0):
+        """
+        Compute the percent of the signal that is farther than :math:`r\sigma(x)` away from the mean of the signal.
+
+        Parameters
+        ----------
+        r : float, optional
+            Number of standard deviations above or below the mean the range includes. Default is 2.0
+
+        Methods
+        -------
+        compute(signal[, columns=None])
+        """
+        super(RatioBeyondRSigma, self).__init__(
+            'RatioBeyondRSigma',
+            {'r': r}
+        )
+
+        self.r = r
+
+    def _compute(self, x, fs):
+        super(RatioBeyondRSigma, self)._compute(x, fs)
+
+        self._result = -_cython.RatioBeyondRSigma(x, self.r)
