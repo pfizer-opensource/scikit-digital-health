@@ -44,7 +44,7 @@ cpdef histogram(const double[:] signal, double[:] descriptor):
     return hist(signal, <int>(descriptor[2]), min_val, max_val, N)
 
 
-def cy_SignalEntropy(const double[:, :, :] signal):
+def SignalEntropy(const double[:, :, :] signal):
     cdef Py_ssize_t M = signal.shape[0], N = signal.shape[1], P = signal.shape[2]
 
     res = zeros((M, P), dtype=npy_double)
@@ -93,7 +93,7 @@ def cy_SignalEntropy(const double[:, :, :] signal):
     return res
 
 
-def cy_SampleEntropy(const double[:, :, :] signal, int M, double r):
+def SampleEntropy(const double[:, :, :] signal, int M, double r):
     cdef Py_ssize_t n = signal.shape[1], k = signal.shape[2], p = signal.shape[0]
     entropy = zeros((p, M, k), dtype=npy_double)
     cdef double[:, :, ::1] ent = entropy

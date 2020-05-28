@@ -8,7 +8,7 @@ from libc.math cimport sqrt
 from PfyMU.features.lib._cython.common cimport mean_1d, variance_1d
 
 
-cpdef cy_RootMeanVariance(const double[:, :, :] x):
+cpdef RootMeanVariance(const double[:, :, :] x):
     cdef Py_ssize_t m = x.shape[0], n = x.shape[1], p = x.shape[2], i, k
     cdef double[:] var = zeros(p, dtype=npy_double)
 
