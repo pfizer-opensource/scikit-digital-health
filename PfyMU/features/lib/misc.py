@@ -28,4 +28,35 @@ class ComplexityInvariantDistance(Feature):
         self.normalize = normalize
 
     def _compute(self, x, fs):
+        super(ComplexityInvariantDistance, self)._compute(x, fs)
         self._result = _cython.CID(x, self.normalize)
+
+
+class RangeCountPercentage(Feature):
+    def __init__(self, range_min=-1, range_max=1):
+        """
+        Compute the percent of the signal that falls between the minimum and maximum values
+
+        Parameters
+        ----------
+        range_min : {int, float}, optional
+            Minimum value of the range. Default value is -1.0
+        range_max : {int, float}, optional
+            Maximum value of the range. Default value is 1.0
+
+        Methods
+        -------
+        compute(signal[, columns=None])
+        """
+        super(RangeCountPercentage, self).__init__(
+            'RangeCountPercentage',
+            {'Range min': range_min, 'Range max': range_max}
+        )
+
+        self.rmin = range_min
+        self.rmax = range_max
+
+    def _compute(self, x, fs):
+        super(RangeCountPercentage, self)._compute(x, fs)
+
+        self._result = -_cython.RangeCount(x, self.rmin, self.rmax)
