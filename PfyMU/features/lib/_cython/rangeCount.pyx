@@ -5,7 +5,7 @@ cimport cython
 from numpy import zeros, double as np_double
 
 
-def cy_RangeCount(const double[:, :, :] x, double xmin, double xmax):
+def RangeCount(const double[:, :, :] x, double xmin, double xmax):
     cdef Py_ssize_t m = x.shape[0], n = x.shape[1], p = x.shape[2], i, j, k
     xcount = zeros((m, p), dtype=np_double)
     cdef double[:, :] count = xcount

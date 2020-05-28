@@ -33,7 +33,7 @@ cdef linspace(double start, double stop, int N):
     return arr
 
 
-cdef class cFrequencyFeatures:
+cdef class FrequencyFeatures:
     # private attributes
     cdef bint base_run
 

@@ -5,7 +5,7 @@ cimport cython
 from numpy import zeros, double as npy_double
 from libc.math cimport abs, fmax
 
-def cy_JerkMetric(const double[:, :, :] x, double fsample):
+def JerkMetric(const double[:, :, :] x, double fsample):
     cdef Py_ssize_t m = x.shape[0], n = x.shape[1], p = x.shape[2], i, j, k
     cdef double amplitude, scale, jsum
 
@@ -27,7 +27,7 @@ def cy_JerkMetric(const double[:, :, :] x, double fsample):
     return jerk_metric
 
 
-def cy_DimensionlessJerk(const double[:, :, :] x, unsigned int stype):
+def DimensionlessJerk(const double[:, :, :] x, unsigned int stype):
     # stype: 1 == 'velocity', 2 == 'acceleration', 3 == 'jerk'
     cdef Py_ssize_t m = x.shape[0], n = x.shape[1], p = x.shape[2], i, j, k
 

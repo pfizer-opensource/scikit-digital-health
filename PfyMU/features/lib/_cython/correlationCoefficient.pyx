@@ -7,7 +7,7 @@ from libc.math cimport sqrt
 from PfyMU.features.lib._cython.common cimport mean_1d
 
 
-def cy_CC3(const double[:, :, :] x):
+def CC3(const double[:, :, :] x):
     cdef Py_ssize_t m = x.shape[0], n = x.shape[1], i, j, k
     r_ = zeros((m, 3), dtype=npy_double)
 

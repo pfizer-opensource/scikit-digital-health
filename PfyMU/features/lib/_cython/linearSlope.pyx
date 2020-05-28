@@ -46,7 +46,7 @@ cpdef linregress(const double[:] x, const double[:] y):
     return slope, intercept
 
 
-cpdef cy_LinRegression(const double[:] x, const double[:, :, :] y):
+cpdef LinRegression(const double[:] x, const double[:, :, :] y):
     cdef Py_ssize_t m = y.shape[0], p = y.shape[2], i, k
 
     slp = zeros((m, p), dtype=npy_double)

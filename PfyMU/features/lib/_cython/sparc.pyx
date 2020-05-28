@@ -7,7 +7,7 @@ from numpy.fft import rfft
 from libc.math cimport log2, sqrt, ceil, abs, floor
 
 
-cpdef sparc(const double[:] x, double fsample, int padlevel, double fcut,
+cpdef sparc_1d(const double[:] x, double fsample, int padlevel, double fcut,
             double amp_thresh):
     cdef Py_ssize_t n = x.size, j, ixf, ixa0 = 0, ixa
     cdef double sal = 0., frange
@@ -42,7 +42,7 @@ cpdef sparc(const double[:] x, double fsample, int padlevel, double fcut,
     return sal
 
 
-cpdef cy_SPARC(const double[:, :, :] x, double fsample, int padlevel, double fcut,
+cpdef SPARC(const double[:, :, :] x, double fsample, int padlevel, double fcut,
                double amp_thresh):
     cdef Py_ssize_t m = x.shape[0], p = x.shape[2], i, k
 
@@ -51,6 +51,6 @@ cpdef cy_SPARC(const double[:, :, :] x, double fsample, int padlevel, double fcu
 
     for i in range(m):
         for k in range(p):
-            sal[i, k] = sparc(x[i, :, k], fsample, padlevel, fcut, amp_thresh)
+            sal[i, k] = sparc_1d(x[i, :, k], fsample, padlevel, fcut, amp_thresh)
 
     return sparclen

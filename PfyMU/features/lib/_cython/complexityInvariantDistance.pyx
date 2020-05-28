@@ -7,7 +7,7 @@ from libc.math cimport sqrt
 from PfyMU.features.lib._cython.common cimport mean_sd_1d
 
 
-cpdef cy_CID(const double[:, :, :] x, bint normalize):
+cpdef CID(const double[:, :, :] x, bint normalize):
     cdef Py_ssize_t m = x.shape[0], n = x.shape[1], p = x.shape[2], i, j, k
 
     dist = zeros((m, p), dtype=npy_double)
