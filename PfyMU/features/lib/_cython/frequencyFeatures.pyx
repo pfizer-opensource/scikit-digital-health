@@ -2,7 +2,6 @@
 # cython: boundscheck = False
 # cython: wraparound = False
 from numpy import fft, sum as nsum, less_equal, zeros, conjugate, argmax, real
-from numpy cimport ndarray
 cimport cython
 from libc.math cimport log, pow, exp, floor, ceil
 from signal_features._extensions.common cimport mean_1d
@@ -42,7 +41,7 @@ cdef class FrequencyFeatures:
     cdef double invlog2
     cdef double mean
 
-    cdef ndarray maxf, maxfv, df_ratio, spec_flat, spec_ent
+    cdef double[:, :] maxf, maxfv, df_ratio, spec_flat, spec_ent
 
     cdef int nfft, ihcut, ilcut
     cdef long[:, :] imax
@@ -51,10 +50,6 @@ cdef class FrequencyFeatures:
 
     cdef complex[:, :, :] sp_hat
     cdef double[:, :, :] sp_norm
-
-    # public/readonly attributes
-    cdef readonly double[:, :] max_f, max_f_val, dmnt_f_ratio
-    cdef readonly double[:, :] spectral_entropy, spectral_flatness
     
     def __init__(self):
         self.base_run = False
@@ -66,17 +61,11 @@ cdef class FrequencyFeatures:
         self.N = x.shape[1]
         self.P = x.shape[2]
 
-        self.max_f = zeros((self.M, self.P))
-        self.max_f_val = zeros((self.M, self.P))
-        self.dmnt_f_ratio = zeros((self.M, self.P))
-        self.spectral_flatness = zeros((self.M, self.P))
-        self.spectral_entropy = zeros((self.M, self.P))
-
-        self.maxf = self.max_f
-        self.maxfv = self.max_f_val
-        self.df_ratio = self.dmnt_f_ratio
-        self.spec_flat = self.spectral_flatness
-        self.spec_ent = self.spectral_entropy
+        self.maxf = zeros((self.M, self.P))
+        self.maxfv = zeros((self.M, self.P))
+        self.df_ratio = zeros((self.M, self.P))
+        self.spec_flat = zeros((self.M, self.P))
+        self.spec_ent = zeros((self.M, self.P))
 
         # function
         self.nfft = 2 ** (<int>(log(self.N) * self.invlog2))
@@ -108,7 +97,7 @@ cdef class FrequencyFeatures:
             for self.k in range(self.P):
                 self.maxf[self.i, self.k] = self.freq[self.imax[self.i, self.k]]
         
-        return self.max_f
+        return self.maxf
     
     cpdef get_max_freq_value(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
         if not self.base_run:
@@ -118,7 +107,7 @@ cdef class FrequencyFeatures:
             for self.k in range(self.P):
                 self.maxfv[self.i, self.k] = self.sp_norm[self.i, self.imax[self.i, self.k], self.k]
         
-        return self.max_f_val
+        return self.maxfv
     
     cpdef get_spectral_flatness(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
         if not self.base_run:
@@ -130,7 +119,7 @@ cdef class FrequencyFeatures:
                 mean_1d(self.sp_norm[self.i, self.k], &self.mean)
                 self.spec_flat[self.i, self.k] = 10. * log(gmean(self.sp_norm[self.i, :, self.k]) / self.mean) / log(10.0)
         
-        return self.spectral_flatness
+        return self.spec_flat
 
     cpdef get_dominant_freq_ratio(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
         if not self.base_run:
@@ -147,7 +136,7 @@ cdef class FrequencyFeatures:
                     if ((self.maxf[self.i, self.k] - 0.5) < self.freq[self.j] < (self.maxf[self.i, self.k] + 0.5)):
                         self.df_ratio[self.i, self.k] += self.sp_norm[self.i, self.j, self.k]
     
-        return self.dmnt_f_ratio
+        return self.df_ratio
     
     cpdef get_spectral_entropy(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
         if not self.base_run:
@@ -161,5 +150,5 @@ cdef class FrequencyFeatures:
             for self.k in range(self.P):
                 self.spec_ent[self.i, self.k] /= self.lic2
         
-        return self.spectral_entropy
+        return self.spec_ent
 
