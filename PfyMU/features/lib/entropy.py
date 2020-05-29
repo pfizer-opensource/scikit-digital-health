@@ -59,6 +59,7 @@ class SampleEntropy(Feature):
     def _compute(self, x, fs):
         super(SampleEntropy, self)._compute(x, fs)
 
+        # TODO check computation
         res = _cython.SampleEntropy(x, self.m, self.r)
 
         self._result = res[:, -1, :]
