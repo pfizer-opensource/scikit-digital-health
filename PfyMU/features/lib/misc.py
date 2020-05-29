@@ -4,8 +4,6 @@ Misc features
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
-from numpy import max, min, quantile, mean, std, arange
-
 from PfyMU.features.core import Feature
 from PfyMU.features.lib import _cython
 
