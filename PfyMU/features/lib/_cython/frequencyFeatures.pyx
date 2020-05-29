@@ -89,7 +89,7 @@ cdef class FrequencyFeatures:
         # TODO uncomment, figure out how to implement
         # self.base_run = True
 
-    cpdef get_max_freq(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
+    cpdef get_dominant_freq(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
         if not self.base_run:
             self._base_fn(x, fs, low_cut, hi_cut)
         
@@ -99,7 +99,7 @@ cdef class FrequencyFeatures:
         
         return self.maxf
     
-    cpdef get_max_freq_value(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
+    cpdef get_dominant_freq_value(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
         if not self.base_run:
             self._base_fn(x, fs, low_cut, hi_cut)
         
@@ -121,7 +121,7 @@ cdef class FrequencyFeatures:
         
         return self.spec_flat
 
-    cpdef get_dominant_freq_ratio(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
+    cpdef get_power(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
         if not self.base_run:
             self._base_fn(x, fs, low_cut, hi_cut)
 
