@@ -85,6 +85,10 @@ class PermutationEntropy(Feature):
             Time-delay to use in computing the sub-signals. Default is 1 sample.
         normalize : bool, optional
             Normalize the output between 0 and 1. Default is False.
+
+        Methods
+        -------
+        compute(signal, fs[, columns=None])
         """
         super(PermutationEntropy, self).__init__("PermutationEntropy", {'order': order, 'delay': delay,
                                                                         'normalize': normalize})
