@@ -11,6 +11,9 @@ from pandas import DataFrame
 from PfyMU.features.core import InputTypeError
 
 
+__all__ = ['compute_window_samples', 'get_windowed_view']
+
+
 class DimensionError(Exception):
     """
     Custom error for if the input signal has too many dimensions
