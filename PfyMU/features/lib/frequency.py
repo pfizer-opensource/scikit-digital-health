@@ -10,6 +10,9 @@ from PfyMU.features.core import Feature
 from PfyMU.features.lib import _cython
 
 
+__all__ = ['DominantFrequency', 'DominantFrequencyValue', 'PowerSpectralSum', 'SpectralFlatness', 'SpectralEntropy']
+
+
 class DominantFrequency(Feature):
     def __init__(self, low_cutoff=0.0, high_cutoff=5.0):
         """

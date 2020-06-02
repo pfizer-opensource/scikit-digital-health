@@ -10,6 +10,9 @@ from PfyMU.features.core import Feature
 from PfyMU.features.lib import _cython
 
 
+__all__ = ['JerkMetric', 'DimensionlessJerk', 'SPARC']
+
+
 class JerkMetric(Feature):
     def __init__(self, normalize=True):
         """

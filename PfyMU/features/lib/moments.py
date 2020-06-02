@@ -10,6 +10,9 @@ from scipy.stats import skew, kurtosis
 from PfyMU.features.core import Feature
 
 
+__all__ = ['Mean', 'MeanCrossRate', 'StdDev', 'Skewness', 'Kurtosis']
+
+
 class Mean(Feature):
     def __init__(self):
         """

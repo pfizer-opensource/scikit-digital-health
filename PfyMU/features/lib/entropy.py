@@ -11,6 +11,9 @@ from PfyMU.features.core import Feature
 from PfyMU.features.lib import _cython
 
 
+__all__ = ['SignalEntropy', 'SampleEntropy', 'PermutationEntropy']
+
+
 class SignalEntropy(Feature):
     def __init__(self):
         """

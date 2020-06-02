@@ -7,6 +7,9 @@ from PfyMU.features.core import Feature
 from PfyMU.features.lib import _cython
 
 
+__all__ = ['Range', 'IQR', 'RMS', 'LinearSlope']
+
+
 class Range(Feature):
     def __init__(self):
         """
