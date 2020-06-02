@@ -221,6 +221,11 @@ class Feature:
         feature : {numpy.ndarray, pandas.DataFrame}
             Computed feature, returned as the same type as the input signal
         """
+        # check fs
+        if fs is not None:
+            if not isinstance(fs, (float, int)):
+                raise ValueError("fs must be a float or int. If trying to specify columns, it is keyword-required")
+
         # set the result to None, to force re-computation. publicly should always be re-computing. The benefit
         # for avoiding re-computation comes for the feature Bank pipeline of computation, where the same result
         # might be used multiple times but for different indices
