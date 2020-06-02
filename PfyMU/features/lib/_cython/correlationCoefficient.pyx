@@ -4,7 +4,7 @@
 cimport cython
 from numpy import zeros, double as npy_double
 from libc.math cimport sqrt
-from PfyMU.features.lib._cython.common cimport mean_1d
+from .common cimport mean_1d
 
 
 def CC3(const double[:, :, :] x):

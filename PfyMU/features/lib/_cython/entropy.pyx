@@ -4,7 +4,7 @@
 cimport cython
 from numpy import zeros, double as npy_double, intc, nanmin, nanmax
 from libc.math cimport log, exp, ceil, sqrt, isnan
-from PfyMU.features.lib._cython.common cimport mean_sd_1d
+from .common cimport mean_sd_1d
 
 
 cpdef hist(const double[:] signal, int ncells, double min_val, double max_val, Py_ssize_t N):

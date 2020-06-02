@@ -4,7 +4,7 @@
 from numpy import fft, sum as nsum, less_equal, zeros, conjugate, argmax, real
 cimport cython
 from libc.math cimport log, pow, exp, floor, ceil
-from signal_features._extensions.common cimport mean_1d
+from .common cimport mean_1d
 
 
 cdef double gmean(const double[:] x):
