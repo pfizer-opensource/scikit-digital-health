@@ -203,7 +203,7 @@ class Feature:
         self._eq_params = eq_params
 
     # PUBLIC METHODS
-    def compute(self, signal, fs=None, columns=None):
+    def compute(self, signal, fs=None, *, columns=None):
         """
         Compute the feature.
 
