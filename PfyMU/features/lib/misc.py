@@ -8,6 +8,9 @@ from PfyMU.features.core import Feature
 from PfyMU.features.lib import _cython
 
 
+__all__ = ['ComplexityInvariantDistance', 'RangeCountPercentage', 'RatioBeyondRSigma']
+
+
 class ComplexityInvariantDistance(Feature):
     def __init__(self, normalize=True):
         """
