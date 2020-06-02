@@ -8,10 +8,14 @@ from numpy import ndarray, ascontiguousarray, round
 from numpy.lib.stride_tricks import as_strided
 from pandas import DataFrame
 
-from PfyMU.features.core import InputTypeError
-
-
 __all__ = ['compute_window_samples', 'get_windowed_view']
+
+
+class InputTypeError(Exception):
+    """
+    Custom exception for the wrong input type
+    """
+    pass
 
 
 class DimensionError(Exception):

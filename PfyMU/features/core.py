@@ -27,13 +27,6 @@ class NoFeaturesError(Exception):
     pass
 
 
-class InputTypeError(Exception):
-    """
-    Custom exception for the wrong input type
-    """
-    pass
-
-
 class Bank:
     __slots__ = ('_feat_list', '_n_feats', '_eq_idx', 'wlen_s', 'wstep')
 
