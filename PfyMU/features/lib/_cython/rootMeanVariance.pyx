@@ -5,7 +5,7 @@ cimport cython
 from numpy import zeros, double as npy_double, array
 from libc.math cimport sqrt
 
-from PfyMU.features.lib._cython.common cimport mean_1d, variance_1d
+from .common cimport mean_1d, variance_1d
 
 
 cpdef RootMeanVariance(const double[:, :, :] x):

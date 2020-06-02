@@ -4,7 +4,7 @@
 cimport cython
 from numpy import zeros, double as npy_double
 from libc.math cimport sqrt
-from PfyMU.features.lib._cython.common cimport mean_sd_1d
+from .common cimport mean_sd_1d
 
 
 cpdef CID(const double[:, :, :] x, bint normalize):

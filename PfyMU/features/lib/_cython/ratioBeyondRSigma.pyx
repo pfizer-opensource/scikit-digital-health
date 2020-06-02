@@ -4,7 +4,7 @@
 cimport cython
 from numpy import zeros, double as npy_double
 from libc.math cimport sqrt, pow, abs
-from PfyMU.features.lib._cython.common cimport mean_sd_1d
+from .common cimport mean_sd_1d
 
 
 def RatioBeyondRSigma(const double[:, :, :] x, double r):

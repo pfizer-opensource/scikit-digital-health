@@ -4,7 +4,7 @@
 cimport cython
 from numpy import zeros, double as npy_double, reshape
 from libc.math cimport sqrt
-from PfyMU.features.lib._cython.common cimport mean_1d
+from .common cimport mean_1d
 
 
 cpdef covariance(const double[:] x, const double[:] y, int ddof):
