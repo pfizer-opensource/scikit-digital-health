@@ -20,7 +20,7 @@ class Mean(Feature):
 
         Methods
         -------
-        compute(signal[, columns=None])
+        compute(signal[, columns=None, windowed=False])
 
         Examples
         --------
@@ -45,7 +45,7 @@ class MeanCrossRate(Feature):
 
         Methods
         -------
-        compute(signal[, columns=None])
+        compute(signal[, columns=None, windowed=False])
         """
         super(MeanCrossRate, self).__init__('MeanCrossRate', {})
 
@@ -65,7 +65,7 @@ class StdDev(Feature):
 
         Methods
         -------
-        compute(signal[, columns=None])
+        compute(signal[, columns=None, windowed=False])
 
         Examples
         --------
@@ -88,7 +88,7 @@ class Skewness(Feature):
 
         Methods
         -------
-        compute(signal[, columns=None])
+        compute(signal[, columns=None, windowed=False])
         """
         super().__init__('Skewness', {})
 
@@ -105,7 +105,7 @@ class Kurtosis(Feature):
 
         Methods
         -------
-        compute(signal[, columns=None])
+        compute(signal[, columns=None, windowed=False])
         """
         super().__init__('Kurtosis', {})
 

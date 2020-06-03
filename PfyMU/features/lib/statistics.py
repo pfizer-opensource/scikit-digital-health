@@ -17,7 +17,7 @@ class Range(Feature):
 
         Methods
         -------
-        compute(signal[, columns=None])
+        compute(signal[, columns=None, windowed=False])
         """
         super().__init__("Range", {})
 
@@ -34,7 +34,7 @@ class IQR(Feature):
 
         Methods
         -------
-        compute(signal[, columns=None])
+        compute(signal[, columns=None, windowed=False])
         """
         super(IQR, self).__init__("IQR", {})
 
@@ -51,7 +51,7 @@ class RMS(Feature):
 
         Methods
         -------
-        compute(signal[, columns=None])
+        compute(signal[, columns=None, windowed=False])
         """
         super(RMS, self).__init__('RMS', {})
 
@@ -68,7 +68,7 @@ class LinearSlope(Feature):
 
         Methods
         -------
-        compute(signal[, columns=None])
+        compute(signal[, columns=None, windowed=False])
         """
         super(LinearSlope, self).__init__('LinearSlope', {})
 
@@ -88,7 +88,7 @@ class AutoregressiveCoefficients(Feature):
 
         Methods
         -------
-        compute(signal[, columns=None])
+        compute(signal[, columns=None, windowed=False])
         """
         super(AutoregressiveCoefficients, self).__init__('AutoregressiveCoefficients', {})
 
@@ -103,7 +103,7 @@ class AutocovarianceIQR(Feature):
 
         Methods
         -------
-        compute(signal[, columns=None])
+        compute(signal[, columns=None, windowed=False])
         """
         super(AutocovarianceIQR, self).__init__('AutocovarianceIQR', {})
 
