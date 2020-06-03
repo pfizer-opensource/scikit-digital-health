@@ -33,7 +33,7 @@ class TestFeature:
         assert allclose(pred, truth)
 
     def test_dataframe(self, fs, df_acc, get_dataframe_truth):
-        df_truth = get_dataframe_truth
+        df_truth = get_dataframe_truth(self.feature._name)
 
         df_pred = self.feature.compute(df_acc, fs)
 
@@ -95,7 +95,7 @@ def win_acc():
 def df_acc():
     with resources.path('PfyMU.tests.data', 'sample_accelerometer.h5') as path:
         with h5py.File(path, 'r') as f:
-            acc = f['Accelerometer'][:, 1]
+            acc = f['Accelerometer'][()]
     ret = DataFrame(data=acc, columns=['x', 'y', 'z'])
     return ret
 
@@ -138,11 +138,11 @@ def get_3d_truth():
 
 
 @fixture(scope='package')
-def get_df_truth():
+def get_dataframe_truth():
     def get_df(name):
         with resources.path('PfyMU.tests.data', 'features_truth.h5') as path:
             with h5py.File(path, 'r') as f:
-                truth = f[name][()].reshape((1, 3))
+                truth = f[name][()]
 
         return DataFrame(data=truth, columns=[f'{name}_x', f'{name}_y', f'{name}_z'])
     return get_df
