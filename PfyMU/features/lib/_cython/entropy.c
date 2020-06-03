@@ -2541,7 +2541,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_histogram(__Pyx
   PyObject *__pyx_t_4 = NULL;
   PyObject *__pyx_t_5 = NULL;
   double __pyx_t_6;
-  long __pyx_t_7;
+  double __pyx_t_7;
   Py_ssize_t __pyx_t_8;
   Py_ssize_t __pyx_t_9;
   Py_ssize_t __pyx_t_10;
@@ -2572,7 +2572,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_histogram(__Pyx
  *     cdef Py_ssize_t N = signal.size
  *     cdef double min_val = nanmin(signal)             # <<<<<<<<<<<<<<
  *     cdef double max_val = nanmax(signal)
- *     cdef double delta = (max_val - min_val) / <long>(N - 1)
+ *     cdef double delta = (max_val - min_val) / <double>(N - 1)
  */
   __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_nanmin); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 36, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
@@ -2602,7 +2602,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_histogram(__Pyx
  *     cdef Py_ssize_t N = signal.size
  *     cdef double min_val = nanmin(signal)
  *     cdef double max_val = nanmax(signal)             # <<<<<<<<<<<<<<
- *     cdef double delta = (max_val - min_val) / <long>(N - 1)
+ *     cdef double delta = (max_val - min_val) / <double>(N - 1)
  * 
  */
   __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_nanmax); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 37, __pyx_L1_error)
@@ -2632,20 +2632,20 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_histogram(__Pyx
   /* "PfyMU/features/lib/_cython/entropy.pyx":38
  *     cdef double min_val = nanmin(signal)
  *     cdef double max_val = nanmax(signal)
- *     cdef double delta = (max_val - min_val) / <long>(N - 1)             # <<<<<<<<<<<<<<
+ *     cdef double delta = (max_val - min_val) / <double>(N - 1)             # <<<<<<<<<<<<<<
  * 
  *     descriptor[0] = min_val - delta / 2
  */
   __pyx_t_6 = (__pyx_v_max_val - __pyx_v_min_val);
-  __pyx_t_7 = ((long)(__pyx_v_N - 1));
+  __pyx_t_7 = ((double)(__pyx_v_N - 1));
   if (unlikely(__pyx_t_7 == 0)) {
     PyErr_SetString(PyExc_ZeroDivisionError, "float division");
     __PYX_ERR(0, 38, __pyx_L1_error)
   }
-  __pyx_v_delta = (__pyx_t_6 / ((double)__pyx_t_7));
+  __pyx_v_delta = (__pyx_t_6 / __pyx_t_7);
 
   /* "PfyMU/features/lib/_cython/entropy.pyx":40
- *     cdef double delta = (max_val - min_val) / <long>(N - 1)
+ *     cdef double delta = (max_val - min_val) / <double>(N - 1)
  * 
  *     descriptor[0] = min_val - delta / 2             # <<<<<<<<<<<<<<
  *     descriptor[1] = max_val - delta / 2
@@ -3041,7 +3041,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_4SignalEntropy
  *         for k in range(P):
  *             std = 0.             # <<<<<<<<<<<<<<
  *             mean = 0.
- *             mean_sd_1d(signal[i, :, j], &mean, &std)
+ *             mean_sd_1d(signal[i, :, k], &mean, &std)
  */
       __pyx_v_std = 0.;
 
@@ -3049,7 +3049,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_4SignalEntropy
  *         for k in range(P):
  *             std = 0.
  *             mean = 0.             # <<<<<<<<<<<<<<
- *             mean_sd_1d(signal[i, :, j], &mean, &std)
+ *             mean_sd_1d(signal[i, :, k], &mean, &std)
  * 
  */
       __pyx_v_mean = 0.;
@@ -3057,7 +3057,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_4SignalEntropy
       /* "PfyMU/features/lib/_cython/entropy.pyx":63
  *             std = 0.
  *             mean = 0.
- *             mean_sd_1d(signal[i, :, j], &mean, &std)             # <<<<<<<<<<<<<<
+ *             mean_sd_1d(signal[i, :, k], &mean, &std)             # <<<<<<<<<<<<<<
  * 
  *             if std == 0:
  */
@@ -3075,7 +3075,7 @@ __pyx_t_13.strides[0] = __pyx_v_signal.strides[1];
     __pyx_t_13.suboffsets[0] = -1;
 
 {
-    Py_ssize_t __pyx_tmp_idx = __pyx_v_j;
+    Py_ssize_t __pyx_tmp_idx = __pyx_v_k;
     Py_ssize_t __pyx_tmp_stride = __pyx_v_signal.strides[2];
         __pyx_t_13.data += __pyx_tmp_idx * __pyx_tmp_stride;
 }
@@ -3086,7 +3086,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_
       __pyx_t_13.data = NULL;
 
       /* "PfyMU/features/lib/_cython/entropy.pyx":65
- *             mean_sd_1d(signal[i, :, j], &mean, &std)
+ *             mean_sd_1d(signal[i, :, k], &mean, &std)
  * 
  *             if std == 0:             # <<<<<<<<<<<<<<
  *                 std = 1.  # ensure no division by 0
@@ -3105,7 +3105,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_
         __pyx_v_std = 1.;
 
         /* "PfyMU/features/lib/_cython/entropy.pyx":65
- *             mean_sd_1d(signal[i, :, j], &mean, &std)
+ *             mean_sd_1d(signal[i, :, k], &mean, &std)
  * 
  *             if std == 0:             # <<<<<<<<<<<<<<
  *                 std = 1.  # ensure no division by 0
