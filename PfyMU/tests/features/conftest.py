@@ -105,7 +105,7 @@ def get_1d_truth():
     def get_1d(name):
         with resources.path('PfyMU.tests.data', 'features_truth.h5') as path:
             with h5py.File(path, 'r') as f:
-                x_, y_, z_ = f[name].flatten()
+                x_, y_, z_ = f[name][()].flatten()
 
         xtr = x_.reshape((1, 1, 1))
         ytr = y_.reshape((1, 1, 1))
@@ -120,7 +120,7 @@ def get_2d_truth():
     def get_2d(name):
         with resources.path('PfyMU.tests.data', 'features_truth.h5') as path:
             with h5py.File(path, 'r') as f:
-                truth = f[name].reshape((1, 3))
+                truth = f[name][()].reshape((1, 3))
 
         return truth
     return get_2d
@@ -131,7 +131,7 @@ def get_3d_truth():
     def get_3d(name):
         with resources.path('PfyMU.tests.data', 'features_truth.h5') as path:
             with h5py.File(path, 'r') as f:
-                truth = f[name].reshape((1, 3))
+                truth = f[name][()].reshape((1, 3))
 
         return broadcast_to(truth, (4, 3))
     return get_3d
@@ -142,7 +142,7 @@ def get_df_truth():
     def get_df(name):
         with resources.path('PfyMU.tests.data', 'features_truth.h5') as path:
             with h5py.File(path, 'r') as f:
-                truth = f[name].reshape((1, 3))
+                truth = f[name][()].reshape((1, 3))
 
         return DataFrame(data=truth, columns=[f'{name}_x', f'{name}_y', f'{name}_z'])
     return get_df
