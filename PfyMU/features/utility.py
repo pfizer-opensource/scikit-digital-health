@@ -70,15 +70,21 @@ def standardize_signal(signal, window_length=None, step=None, columns=None):
         windowed = True
 
     # standardize to a 3D input
+    ret = tuple()
     if x.ndim == 1:
-        return x.reshape((1, -1, 1)), columns
+        ret += (x.reshape((1, -1, 1)), )
     elif x.ndim == 2:
         if windowed:
-            return x.reshape(x.shape + (-1, ))
+            ret += (x.reshape(x.shape + (1, )), )
         else:
-            return x.reshape((-1, ) + x.shape)
+            ret += (x.reshape((-1, ) + x.shape), )
     else:  # x is already 3D
-        return x
+        ret += (x, )
+
+    if isinstance(signal, DataFrame):
+        ret += (columns, )
+
+    return ret
 
 
 def compute_window_samples(fs, window_length, window_step):
