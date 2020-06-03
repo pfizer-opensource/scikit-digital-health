@@ -74,7 +74,7 @@ class Bank:
         self.wlen_s = window_length
         self.wstep = window_step
 
-    def compute(self, signal, fs=None, columns=None):
+    def compute(self, signal, fs=None, columns=None, windowed=False):
         """
         Compute the features in the Bank.
 
@@ -87,6 +87,8 @@ class Bank:
             sampling frequency in the computation (see feature documentation), or if windowing `signal`.
         columns : array-like, optional
             Columns to use from the pandas.DataFrame.
+        windowed : bool, optional
+            If the signal has already been windowed. Default is False.
 
         Returns
         -------
@@ -100,7 +102,8 @@ class Bank:
         window_length, window_step = compute_window_samples(fs, self.wlen_s, self.wstep)
 
         # standardize the input signal, and perform windowing if desired
-        x, columns = standardize_signal(signal, window_length, window_step, columns)
+        x, columns = standardize_signal(signal, windowed=windowed, window_length=window_length,
+                                        step=window_step, columns=columns)
         feat_columns = []  # allocate if necessary
 
         # first get the number of features expected so the space can be allocated
