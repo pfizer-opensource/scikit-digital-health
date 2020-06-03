@@ -25,7 +25,7 @@ class DimensionError(Exception):
     pass
 
 
-def standardize_signal(signal, window_length=None, step=None, columns=None):
+def standardize_signal(signal, windowed=False, window_length=None, step=None, columns=None):
     """
     Standardize an incoming signal to be consistent across conditions
 
@@ -33,6 +33,8 @@ def standardize_signal(signal, window_length=None, step=None, columns=None):
     ----------
     signal : {numpy.ndarray, pandas.DataFrame}
         Signal to be analyzed. Either ndarray (up to 3d), or a DataFrame.
+    windowed : bool, optional
+        The signal has already been windowed. Default is False.
     window_length : int, optional
         Window length in samples. If not provided (None), or input data is 3D, input data is assumed to be the signal on
         which to compute features.
@@ -64,8 +66,7 @@ def standardize_signal(signal, window_length=None, step=None, columns=None):
         raise InputTypeError(f"signal must be a numpy.ndarray or pandas.DataFrame, not {type(signal)}")
 
     # determine if going to window the signal
-    windowed = False  # keep track of if windowing occurred
-    if x.ndim < 3 and window_length is not None and step is not None:
+    if (not windowed) and (x.ndim < 3) and (window_length is not None) and (step is not None):
         x = get_windowed_view(x, window_length, step)
         windowed = True
 
