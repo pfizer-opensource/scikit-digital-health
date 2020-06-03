@@ -27,7 +27,7 @@ class DominantFrequency(Feature):
 
         Methods
         -------
-        compute(signal, fs[, columns=None])
+        compute(signal, fs[, columns=None, windowed=False])
         """
         super(DominantFrequency, self).__init__('DominantFrequency', {'low_cutoff': low_cutoff,
                                                                       'high_cutoff': high_cutoff})
@@ -57,7 +57,7 @@ class DominantFrequencyValue(Feature):
 
         Methods
         -------
-        compute(signal, fs[, columns=None])
+        compute(signal, fs[, columns=None, windowed=False])
         """
         super(DominantFrequencyValue, self).__init__('DominantFrequencyValue', {'low_cutoff': low_cutoff,
                                                                                 'high_cutoff': high_cutoff})
@@ -87,7 +87,7 @@ class PowerSpectralSum(Feature):
 
         Methods
         -------
-        compute(signal, fs[, columns=None])
+        compute(signal, fs[, columns=None, windowed=False])
         """
         super(PowerSpectralSum, self).__init__('PowerSpectralSum', {'low_cutoff': low_cutoff,
                                                                     'high_cutoff': high_cutoff})
@@ -118,7 +118,7 @@ class SpectralFlatness(Feature):
 
         Methods
         -------
-        compute(signal, fs[, columns=None])
+        compute(signal, fs[, columns=None, windowed=False])
         """
         super(SpectralFlatness, self).__init__('SpectralFlatness', {'low_cutoff': low_cutoff,
                                                                     'high_cutoff': high_cutoff})
@@ -149,7 +149,7 @@ class SpectralEntropy(Feature):
 
         Methods
         -------
-        compute(signal, fs[, columns=None])
+        compute(signal, fs[, columns=None, windowed=False])
         """
         super(SpectralEntropy, self).__init__('SpectralEntropy', {'low_cutoff': low_cutoff,
                                                                   'high_cutoff': high_cutoff})

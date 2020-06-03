@@ -20,7 +20,7 @@ class JerkMetric(Feature):
 
         Methods
         -------
-        compute(signal, fs[, columns=None])
+        compute(signal, fs[, columns=None, windowed=False])
         """
         super(JerkMetric, self).__init__('JerkMetric', {})
         self.normalize = normalize
@@ -45,7 +45,7 @@ class DimensionlessJerk(Feature):
 
         Methods
         -------
-        compute(signal[, columns=None])
+        compute(signal[, columns=None, windowed=False])
         """
         super(DimensionlessJerk, self).__init__('DimensionlessJerk', {'log': log, 'signal_type': signal_type})
 
@@ -84,7 +84,7 @@ class SPARC(Feature):
 
         Methods
         -------
-        compute(signal, fs[, columns=None])
+        compute(signal, fs[, columns=None, windowed=False])
 
 
         References

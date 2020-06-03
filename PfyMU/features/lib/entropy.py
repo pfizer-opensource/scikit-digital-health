@@ -21,7 +21,7 @@ class SignalEntropy(Feature):
 
         Methods
         -------
-        compute(signal[, columns=None])
+        compute(signal[, columns=None, windowed=False])
         """
         super(SignalEntropy, self).__init__('SignalEntropy', {})
 
@@ -46,7 +46,7 @@ class SampleEntropy(Feature):
 
         Methods
         -------
-        compute(signal[, columns=None])
+        compute(signal[, columns=None, windowed=False])
 
         Notes
         -----
@@ -88,7 +88,7 @@ class PermutationEntropy(Feature):
 
         Methods
         -------
-        compute(signal, fs[, columns=None])
+        compute(signal, fs[, columns=None, windowed=False])
         """
         super(PermutationEntropy, self).__init__("PermutationEntropy", {'order': order, 'delay': delay,
                                                                         'normalize': normalize})

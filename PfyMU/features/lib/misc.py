@@ -23,7 +23,7 @@ class ComplexityInvariantDistance(Feature):
 
         Methods
         -------
-        compute(signal[, columns=None])
+        compute(signal[, columns=None, windowed=False])
         """
         super(ComplexityInvariantDistance, self).__init__('ComplexityInvariantDistance', {'Normalize': normalize})
         self.normalize = normalize
@@ -47,7 +47,7 @@ class RangeCountPercentage(Feature):
 
         Methods
         -------
-        compute(signal[, columns=None])
+        compute(signal[, columns=None, windowed=False])
         """
         super(RangeCountPercentage, self).__init__(
             'RangeCountPercentage',
@@ -75,7 +75,7 @@ class RatioBeyondRSigma(Feature):
 
         Methods
         -------
-        compute(signal[, columns=None])
+        compute(signal[, columns=None, windowed=False])
         """
         super(RatioBeyondRSigma, self).__init__(
             'RatioBeyondRSigma',
