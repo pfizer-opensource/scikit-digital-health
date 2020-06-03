@@ -196,7 +196,7 @@ class Feature:
         self._eq_params = eq_params
 
     # PUBLIC METHODS
-    def compute(self, signal, fs=None, *, columns=None):
+    def compute(self, signal, fs=None, *, columns=None, windowed=False):
         """
         Compute the feature.
 
@@ -208,6 +208,8 @@ class Feature:
             Sampling frequency in Hz
         columns : array_like, optional
             Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
+        windowed : bool, optional
+            If the signal has already been windowed. Default is False.
 
         Returns
         -------
@@ -225,7 +227,7 @@ class Feature:
         self._result = None
 
         # extract and standardize the data. No windowing in the public method here
-        x, columns = standardize_signal(signal, window_length=None, step=None, columns=columns)
+        x, columns = standardize_signal(signal, windowed=windowed, window_length=None, step=None, columns=columns)
 
         self._compute(x, fs)
 
