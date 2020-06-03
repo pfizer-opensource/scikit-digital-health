@@ -35,7 +35,7 @@ cpdef histogram(const double[:] signal, double[:] descriptor):
     cdef Py_ssize_t N = signal.size
     cdef double min_val = nanmin(signal)
     cdef double max_val = nanmax(signal)
-    cdef double delta = (max_val - min_val) / <long>(N - 1)
+    cdef double delta = (max_val - min_val) / <double>(N - 1)
 
     descriptor[0] = min_val - delta / 2
     descriptor[1] = max_val - delta / 2
@@ -60,7 +60,7 @@ def SignalEntropy(const double[:, :, :] signal):
         for k in range(P):
             std = 0.
             mean = 0.
-            mean_sd_1d(signal[i, :, j], &mean, &std)
+            mean_sd_1d(signal[i, :, k], &mean, &std)
             
             if std == 0:
                 std = 1.  # ensure no division by 0
