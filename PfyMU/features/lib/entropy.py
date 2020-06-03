@@ -23,7 +23,7 @@ class SignalEntropy(Feature):
         -------
         compute(signal[, columns=None])
         """
-        super(SignalEntropy, self).__init__('SampleEntropy', {})
+        super(SignalEntropy, self).__init__('SignalEntropy', {})
 
     def _compute(self, x, fs):
         super(SignalEntropy, self)._compute(x, fs)
