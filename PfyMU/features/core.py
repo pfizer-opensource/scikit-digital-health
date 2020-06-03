@@ -225,7 +225,7 @@ class Feature:
         self._result = None
 
         # extract and standardize the data. No windowing in the public method here
-        x, *columns = standardize_signal(signal, window_length=None, step=None, columns=columns)
+        x, columns = standardize_signal(signal, window_length=None, step=None, columns=columns)
 
         self._compute(x, fs)
 
