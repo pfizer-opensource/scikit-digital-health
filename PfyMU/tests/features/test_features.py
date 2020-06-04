@@ -82,3 +82,20 @@ class TestDimensionlessJerk(TestFeature):
 
 class TestSPARC(TestFeature):
     feature = SPARC(padlevel=4, fc=10.0, amplitude_threshold=0.05)
+
+
+# STATISTICS FEATURES
+class TestRange(TestFeature):
+    feature = Range()
+
+
+class TestIQR(TestFeature):
+    feature = IQR()
+
+
+class TestRMS(TestFeature):
+    feature = RMS()
+
+
+class TestLinearSlope(TestFeature):
+    feature = LinearSlope()
