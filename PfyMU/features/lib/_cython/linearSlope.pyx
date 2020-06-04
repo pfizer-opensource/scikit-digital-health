@@ -33,7 +33,7 @@ cpdef linregress(const double[:] x, const double[:] y):
     cdef double slope, intercept
 
     mean_1d(x, &xmean)
-    mean_1d(x, &ymean)
+    mean_1d(y, &ymean)
 
     # average sum of squares
     ssxm = covariance(x, x, 0)
