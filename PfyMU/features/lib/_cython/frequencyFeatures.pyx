@@ -108,18 +108,6 @@ cdef class FrequencyFeatures:
                 self.maxfv[self.i, self.k] = self.sp_norm[self.i, self.imax[self.i, self.k], self.k]
         
         return self.maxfv
-    
-    cpdef get_spectral_flatness(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
-        if not self.base_run:
-            self._base_fn(x, fs, low_cut, hi_cut)
-        
-        for self.i in range(self.M):
-            for self.k in range(self.P):
-                self.mean = 0.
-                mean_1d(self.sp_norm[self.i, self.k], &self.mean)
-                self.spec_flat[self.i, self.k] = 10. * log(gmean(self.sp_norm[self.i, :, self.k]) / self.mean) / log(10.0)
-        
-        return self.spec_flat
 
     cpdef get_power(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
         if not self.base_run:
@@ -127,7 +115,7 @@ cdef class FrequencyFeatures:
 
         # TODO remove the base run setting
         self.base_run = True
-        _ = self.get_max_freq(x, fs, low_cut, hi_cut)
+        _ = self.get_dominant_freq(x, fs, low_cut, hi_cut)
         self.base_run = False  # turn off for now
         
         for self.i in range(self.M):
@@ -137,6 +125,18 @@ cdef class FrequencyFeatures:
                         self.df_ratio[self.i, self.k] += self.sp_norm[self.i, self.j, self.k]
     
         return self.df_ratio
+    
+    cpdef get_spectral_flatness(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
+        if not self.base_run:
+            self._base_fn(x, fs, low_cut, hi_cut)
+        
+        for self.i in range(self.M):
+            for self.k in range(self.P):
+                self.mean = 0.
+                mean_1d(self.sp_norm[self.i, :, self.k], &self.mean)
+                self.spec_flat[self.i, self.k] = 10. * log(gmean(self.sp_norm[self.i, :, self.k]) / self.mean) / log(10.0)
+        
+        return self.spec_flat
     
     cpdef get_spectral_entropy(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
         if not self.base_run:

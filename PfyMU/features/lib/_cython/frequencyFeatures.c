@@ -1100,8 +1100,8 @@ struct __pyx_vtabstruct_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_Frequ
   PyObject *(*_base_fn)(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch);
   PyObject *(*get_dominant_freq)(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch);
   PyObject *(*get_dominant_freq_value)(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch);
-  PyObject *(*get_spectral_flatness)(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch);
   PyObject *(*get_power)(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch);
+  PyObject *(*get_spectral_flatness)(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch);
   PyObject *(*get_spectral_entropy)(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch);
 };
 static struct __pyx_vtabstruct_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_vtabptr_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures;
@@ -1882,8 +1882,8 @@ static int __Pyx_InitStrings(__Pyx_StringTabEntry *t);
 static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures__base_fn(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut, int __pyx_skip_dispatch); /* proto*/
 static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_dominant_freq(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut, int __pyx_skip_dispatch); /* proto*/
 static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_dominant_freq_value(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut, int __pyx_skip_dispatch); /* proto*/
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_spectral_flatness(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut, int __pyx_skip_dispatch); /* proto*/
 static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_power(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut, int __pyx_skip_dispatch); /* proto*/
+static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_spectral_flatness(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut, int __pyx_skip_dispatch); /* proto*/
 static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_spectral_entropy(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut, int __pyx_skip_dispatch); /* proto*/
 static PyObject *__pyx_array_get_memview(struct __pyx_array_obj *__pyx_v_self); /* proto*/
 static char *__pyx_memoryview_get_item_pointer(struct __pyx_memoryview_obj *__pyx_v_self, PyObject *__pyx_v_index); /* proto*/
@@ -2037,7 +2037,6 @@ static const char __pyx_k_pyx_result[] = "__pyx_result";
 static const char __pyx_k_pyx_vtable[] = "__pyx_vtable__";
 static const char __pyx_k_MemoryError[] = "MemoryError";
 static const char __pyx_k_PickleError[] = "PickleError";
-static const char __pyx_k_get_max_freq[] = "get_max_freq";
 static const char __pyx_k_pyx_checksum[] = "__pyx_checksum";
 static const char __pyx_k_stringsource[] = "stringsource";
 static const char __pyx_k_pyx_getbuffer[] = "__pyx_getbuffer";
@@ -2132,7 +2131,6 @@ static PyObject *__pyx_n_u_fortran;
 static PyObject *__pyx_n_s_fs;
 static PyObject *__pyx_n_s_get_dominant_freq;
 static PyObject *__pyx_n_s_get_dominant_freq_value;
-static PyObject *__pyx_n_s_get_max_freq;
 static PyObject *__pyx_n_s_get_power;
 static PyObject *__pyx_n_s_get_spectral_entropy;
 static PyObject *__pyx_n_s_get_spectral_flatness;
@@ -2197,8 +2195,8 @@ static int __pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Frequen
 static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_2_base_fn(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut); /* proto */
 static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_4get_dominant_freq(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut); /* proto */
 static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_6get_dominant_freq_value(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut); /* proto */
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_8get_spectral_flatness(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut); /* proto */
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_10get_power(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut); /* proto */
+static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_8get_power(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut); /* proto */
+static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_10get_spectral_flatness(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut); /* proto */
 static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_12get_spectral_entropy(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut); /* proto */
 static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_14__reduce_cython__(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_16__setstate_cython__(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, PyObject *__pyx_v___pyx_state); /* proto */
@@ -4125,7 +4123,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
  * 
  *         return self.maxfv             # <<<<<<<<<<<<<<
  * 
- *     cpdef get_spectral_flatness(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
+ *     cpdef get_power(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
  */
   __Pyx_XDECREF(__pyx_r);
   if (unlikely(!__pyx_v_self->maxfv.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 110, __pyx_L1_error)}
@@ -4279,13 +4277,14 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
 /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":112
  *         return self.maxfv
  * 
- *     cpdef get_spectral_flatness(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):             # <<<<<<<<<<<<<<
+ *     cpdef get_power(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):             # <<<<<<<<<<<<<<
  *         if not self.base_run:
  *             self._base_fn(x, fs, low_cut, hi_cut)
  */
 
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_9get_spectral_flatness(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_spectral_flatness(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut, int __pyx_skip_dispatch) {
+static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_9get_power(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_power(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut, int __pyx_skip_dispatch) {
+  CYTHON_UNUSED PyObject *__pyx_v__ = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -4302,18 +4301,22 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
   Py_ssize_t __pyx_t_12;
   Py_ssize_t __pyx_t_13;
   Py_ssize_t __pyx_t_14;
-  Py_ssize_t __pyx_t_15;
+  int __pyx_t_15;
   Py_ssize_t __pyx_t_16;
   Py_ssize_t __pyx_t_17;
-  __Pyx_memviewslice __pyx_t_18 = { 0, 0, { 0 }, { 0 }, { 0 } };
-  double __pyx_t_19;
-  double __pyx_t_20;
+  Py_ssize_t __pyx_t_18;
+  Py_ssize_t __pyx_t_19;
+  Py_ssize_t __pyx_t_20;
   Py_ssize_t __pyx_t_21;
   Py_ssize_t __pyx_t_22;
+  double __pyx_t_23;
+  Py_ssize_t __pyx_t_24;
+  int __pyx_t_25;
+  Py_ssize_t __pyx_t_26;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("get_spectral_flatness", 0);
+  __Pyx_RefNannySetupContext("get_power", 0);
   /* Check if called by wrapper */
   if (unlikely(__pyx_skip_dispatch)) ;
   /* Check if overridden in Python */
@@ -4323,9 +4326,9 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_spectral_flatness); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 112, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_power); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 112, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_9get_spectral_flatness)) {
+      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_9get_power)) {
         __Pyx_XDECREF(__pyx_r);
         if (unlikely(!__pyx_v_x.memview)) { __Pyx_RaiseUnboundLocalError("x"); __PYX_ERR(0, 112, __pyx_L1_error) }
         __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_x, 3, (PyObject *(*)(char *)) __pyx_memview_get_double__const__, (int (*)(char *, PyObject *)) NULL, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 112, __pyx_L1_error)
@@ -4416,7 +4419,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
 
   /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":113
  * 
- *     cpdef get_spectral_flatness(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
+ *     cpdef get_power(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
  *         if not self.base_run:             # <<<<<<<<<<<<<<
  *             self._base_fn(x, fs, low_cut, hi_cut)
  * 
@@ -4425,11 +4428,11 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
   if (__pyx_t_11) {
 
     /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":114
- *     cpdef get_spectral_flatness(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
+ *     cpdef get_power(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
  *         if not self.base_run:
  *             self._base_fn(x, fs, low_cut, hi_cut)             # <<<<<<<<<<<<<<
  * 
- *         for self.i in range(self.M):
+ *         # TODO remove the base run setting
  */
     __pyx_t_1 = ((struct __pyx_vtabstruct_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self->__pyx_vtab)->_base_fn(__pyx_v_self, __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 114, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
@@ -4437,449 +4440,6 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
 
     /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":113
  * 
- *     cpdef get_spectral_flatness(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
- *         if not self.base_run:             # <<<<<<<<<<<<<<
- *             self._base_fn(x, fs, low_cut, hi_cut)
- * 
- */
-  }
-
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":116
- *             self._base_fn(x, fs, low_cut, hi_cut)
- * 
- *         for self.i in range(self.M):             # <<<<<<<<<<<<<<
- *             for self.k in range(self.P):
- *                 self.mean = 0.
- */
-  __pyx_t_12 = __pyx_v_self->M;
-  __pyx_t_13 = __pyx_t_12;
-  for (__pyx_t_14 = 0; __pyx_t_14 < __pyx_t_13; __pyx_t_14+=1) {
-    __pyx_v_self->i = __pyx_t_14;
-
-    /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":117
- * 
- *         for self.i in range(self.M):
- *             for self.k in range(self.P):             # <<<<<<<<<<<<<<
- *                 self.mean = 0.
- *                 mean_1d(self.sp_norm[self.i, self.k], &self.mean)
- */
-    __pyx_t_15 = __pyx_v_self->P;
-    __pyx_t_16 = __pyx_t_15;
-    for (__pyx_t_17 = 0; __pyx_t_17 < __pyx_t_16; __pyx_t_17+=1) {
-      __pyx_v_self->k = __pyx_t_17;
-
-      /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":118
- *         for self.i in range(self.M):
- *             for self.k in range(self.P):
- *                 self.mean = 0.             # <<<<<<<<<<<<<<
- *                 mean_1d(self.sp_norm[self.i, self.k], &self.mean)
- *                 self.spec_flat[self.i, self.k] = 10. * log(gmean(self.sp_norm[self.i, :, self.k]) / self.mean) / log(10.0)
- */
-      __pyx_v_self->mean = 0.;
-
-      /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":119
- *             for self.k in range(self.P):
- *                 self.mean = 0.
- *                 mean_1d(self.sp_norm[self.i, self.k], &self.mean)             # <<<<<<<<<<<<<<
- *                 self.spec_flat[self.i, self.k] = 10. * log(gmean(self.sp_norm[self.i, :, self.k]) / self.mean) / log(10.0)
- * 
- */
-      if (unlikely(!__pyx_v_self->sp_norm.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 119, __pyx_L1_error)}
-      __pyx_t_18.data = __pyx_v_self->sp_norm.data;
-      __pyx_t_18.memview = __pyx_v_self->sp_norm.memview;
-      __PYX_INC_MEMVIEW(&__pyx_t_18, 0);
-      {
-    Py_ssize_t __pyx_tmp_idx = __pyx_v_self->i;
-    Py_ssize_t __pyx_tmp_stride = __pyx_v_self->sp_norm.strides[0];
-        __pyx_t_18.data += __pyx_tmp_idx * __pyx_tmp_stride;
-}
-
-{
-    Py_ssize_t __pyx_tmp_idx = __pyx_v_self->k;
-    Py_ssize_t __pyx_tmp_stride = __pyx_v_self->sp_norm.strides[1];
-        __pyx_t_18.data += __pyx_tmp_idx * __pyx_tmp_stride;
-}
-
-__pyx_t_18.shape[0] = __pyx_v_self->sp_norm.shape[2];
-__pyx_t_18.strides[0] = __pyx_v_self->sp_norm.strides[2];
-    __pyx_t_18.suboffsets[0] = -1;
-
-__pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_1d(__pyx_t_18, (&__pyx_v_self->mean));
-      __PYX_XDEC_MEMVIEW(&__pyx_t_18, 1);
-      __pyx_t_18.memview = NULL;
-      __pyx_t_18.data = NULL;
-
-      /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":120
- *                 self.mean = 0.
- *                 mean_1d(self.sp_norm[self.i, self.k], &self.mean)
- *                 self.spec_flat[self.i, self.k] = 10. * log(gmean(self.sp_norm[self.i, :, self.k]) / self.mean) / log(10.0)             # <<<<<<<<<<<<<<
- * 
- *         return self.spec_flat
- */
-      if (unlikely(!__pyx_v_self->sp_norm.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 120, __pyx_L1_error)}
-      __pyx_t_18.data = __pyx_v_self->sp_norm.data;
-      __pyx_t_18.memview = __pyx_v_self->sp_norm.memview;
-      __PYX_INC_MEMVIEW(&__pyx_t_18, 0);
-      {
-    Py_ssize_t __pyx_tmp_idx = __pyx_v_self->i;
-    Py_ssize_t __pyx_tmp_stride = __pyx_v_self->sp_norm.strides[0];
-        __pyx_t_18.data += __pyx_tmp_idx * __pyx_tmp_stride;
-}
-
-__pyx_t_18.shape[0] = __pyx_v_self->sp_norm.shape[1];
-__pyx_t_18.strides[0] = __pyx_v_self->sp_norm.strides[1];
-    __pyx_t_18.suboffsets[0] = -1;
-
-{
-    Py_ssize_t __pyx_tmp_idx = __pyx_v_self->k;
-    Py_ssize_t __pyx_tmp_stride = __pyx_v_self->sp_norm.strides[2];
-        __pyx_t_18.data += __pyx_tmp_idx * __pyx_tmp_stride;
-}
-
-__pyx_t_19 = __pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_gmean(__pyx_t_18);
-      __PYX_XDEC_MEMVIEW(&__pyx_t_18, 1);
-      __pyx_t_18.memview = NULL;
-      __pyx_t_18.data = NULL;
-      if (unlikely(__pyx_v_self->mean == 0)) {
-        PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-        __PYX_ERR(0, 120, __pyx_L1_error)
-      }
-      __pyx_t_20 = (10. * log((__pyx_t_19 / __pyx_v_self->mean)));
-      __pyx_t_19 = log(10.0);
-      if (unlikely(__pyx_t_19 == 0)) {
-        PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-        __PYX_ERR(0, 120, __pyx_L1_error)
-      }
-      if (unlikely(!__pyx_v_self->spec_flat.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 120, __pyx_L1_error)}
-      __pyx_t_21 = __pyx_v_self->i;
-      __pyx_t_22 = __pyx_v_self->k;
-      *((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->spec_flat.data + __pyx_t_21 * __pyx_v_self->spec_flat.strides[0]) ) + __pyx_t_22 * __pyx_v_self->spec_flat.strides[1]) )) = (__pyx_t_20 / __pyx_t_19);
-    }
-  }
-
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":122
- *                 self.spec_flat[self.i, self.k] = 10. * log(gmean(self.sp_norm[self.i, :, self.k]) / self.mean) / log(10.0)
- * 
- *         return self.spec_flat             # <<<<<<<<<<<<<<
- * 
- *     cpdef get_power(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
- */
-  __Pyx_XDECREF(__pyx_r);
-  if (unlikely(!__pyx_v_self->spec_flat.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 122, __pyx_L1_error)}
-  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_self->spec_flat, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 122, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_r = __pyx_t_1;
-  __pyx_t_1 = 0;
-  goto __pyx_L0;
-
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":112
- *         return self.maxfv
- * 
- *     cpdef get_spectral_flatness(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):             # <<<<<<<<<<<<<<
- *         if not self.base_run:
- *             self._base_fn(x, fs, low_cut, hi_cut)
- */
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_XDECREF(__pyx_t_7);
-  __Pyx_XDECREF(__pyx_t_8);
-  __Pyx_XDECREF(__pyx_t_10);
-  __PYX_XDEC_MEMVIEW(&__pyx_t_18, 1);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_spectral_flatness", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = 0;
-  __pyx_L0:;
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* Python wrapper */
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_9get_spectral_flatness(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_9get_spectral_flatness(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
-  __Pyx_memviewslice __pyx_v_x = { 0, 0, { 0 }, { 0 }, { 0 } };
-  double __pyx_v_fs;
-  double __pyx_v_low_cut;
-  double __pyx_v_hi_cut;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("get_spectral_flatness (wrapper)", 0);
-  {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_x,&__pyx_n_s_fs,&__pyx_n_s_low_cut,&__pyx_n_s_hi_cut,0};
-    PyObject* values[4] = {0,0,0,0};
-    if (unlikely(__pyx_kwds)) {
-      Py_ssize_t kw_args;
-      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
-      switch (pos_args) {
-        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
-        CYTHON_FALLTHROUGH;
-        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
-        CYTHON_FALLTHROUGH;
-        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
-        CYTHON_FALLTHROUGH;
-        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
-        CYTHON_FALLTHROUGH;
-        case  0: break;
-        default: goto __pyx_L5_argtuple_error;
-      }
-      kw_args = PyDict_Size(__pyx_kwds);
-      switch (pos_args) {
-        case  0:
-        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_x)) != 0)) kw_args--;
-        else goto __pyx_L5_argtuple_error;
-        CYTHON_FALLTHROUGH;
-        case  1:
-        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_fs)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("get_spectral_flatness", 1, 4, 4, 1); __PYX_ERR(0, 112, __pyx_L3_error)
-        }
-        CYTHON_FALLTHROUGH;
-        case  2:
-        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_low_cut)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("get_spectral_flatness", 1, 4, 4, 2); __PYX_ERR(0, 112, __pyx_L3_error)
-        }
-        CYTHON_FALLTHROUGH;
-        case  3:
-        if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_hi_cut)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("get_spectral_flatness", 1, 4, 4, 3); __PYX_ERR(0, 112, __pyx_L3_error)
-        }
-      }
-      if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "get_spectral_flatness") < 0)) __PYX_ERR(0, 112, __pyx_L3_error)
-      }
-    } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
-      goto __pyx_L5_argtuple_error;
-    } else {
-      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
-      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
-      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
-      values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
-    }
-    __pyx_v_x = __Pyx_PyObject_to_MemoryviewSlice_dsdsds_double__const__(values[0], 0); if (unlikely(!__pyx_v_x.memview)) __PYX_ERR(0, 112, __pyx_L3_error)
-    __pyx_v_fs = __pyx_PyFloat_AsDouble(values[1]); if (unlikely((__pyx_v_fs == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 112, __pyx_L3_error)
-    __pyx_v_low_cut = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_low_cut == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 112, __pyx_L3_error)
-    __pyx_v_hi_cut = __pyx_PyFloat_AsDouble(values[3]); if (unlikely((__pyx_v_hi_cut == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 112, __pyx_L3_error)
-  }
-  goto __pyx_L4_argument_unpacking_done;
-  __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("get_spectral_flatness", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 112, __pyx_L3_error)
-  __pyx_L3_error:;
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_spectral_flatness", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __Pyx_RefNannyFinishContext();
-  return NULL;
-  __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_8get_spectral_flatness(((struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self), __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut);
-
-  /* function exit code */
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_8get_spectral_flatness(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut) {
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  PyObject *__pyx_t_1 = NULL;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("get_spectral_flatness", 0);
-  __Pyx_XDECREF(__pyx_r);
-  if (unlikely(!__pyx_v_x.memview)) { __Pyx_RaiseUnboundLocalError("x"); __PYX_ERR(0, 112, __pyx_L1_error) }
-  __pyx_t_1 = __pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_spectral_flatness(__pyx_v_self, __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 112, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_r = __pyx_t_1;
-  __pyx_t_1 = 0;
-  goto __pyx_L0;
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_spectral_flatness", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
-  __pyx_L0:;
-  __PYX_XDEC_MEMVIEW(&__pyx_v_x, 1);
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":124
- *         return self.spec_flat
- * 
- *     cpdef get_power(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):             # <<<<<<<<<<<<<<
- *         if not self.base_run:
- *             self._base_fn(x, fs, low_cut, hi_cut)
- */
-
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_11get_power(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_power(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut, int __pyx_skip_dispatch) {
-  CYTHON_UNUSED PyObject *__pyx_v__ = NULL;
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  PyObject *__pyx_t_1 = NULL;
-  PyObject *__pyx_t_2 = NULL;
-  PyObject *__pyx_t_3 = NULL;
-  PyObject *__pyx_t_4 = NULL;
-  PyObject *__pyx_t_5 = NULL;
-  PyObject *__pyx_t_6 = NULL;
-  PyObject *__pyx_t_7 = NULL;
-  PyObject *__pyx_t_8 = NULL;
-  int __pyx_t_9;
-  PyObject *__pyx_t_10 = NULL;
-  int __pyx_t_11;
-  Py_ssize_t __pyx_t_12;
-  Py_ssize_t __pyx_t_13;
-  Py_ssize_t __pyx_t_14;
-  int __pyx_t_15;
-  Py_ssize_t __pyx_t_16;
-  Py_ssize_t __pyx_t_17;
-  Py_ssize_t __pyx_t_18;
-  Py_ssize_t __pyx_t_19;
-  Py_ssize_t __pyx_t_20;
-  Py_ssize_t __pyx_t_21;
-  Py_ssize_t __pyx_t_22;
-  double __pyx_t_23;
-  Py_ssize_t __pyx_t_24;
-  int __pyx_t_25;
-  Py_ssize_t __pyx_t_26;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("get_power", 0);
-  /* Check if called by wrapper */
-  if (unlikely(__pyx_skip_dispatch)) ;
-  /* Check if overridden in Python */
-  else if (unlikely((Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0) || (Py_TYPE(((PyObject *)__pyx_v_self))->tp_flags & (Py_TPFLAGS_IS_ABSTRACT | Py_TPFLAGS_HEAPTYPE)))) {
-    #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
-    static PY_UINT64_T __pyx_tp_dict_version = __PYX_DICT_VERSION_INIT, __pyx_obj_dict_version = __PYX_DICT_VERSION_INIT;
-    if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
-      PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
-      #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_power); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 124, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_1);
-      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_11get_power)) {
-        __Pyx_XDECREF(__pyx_r);
-        if (unlikely(!__pyx_v_x.memview)) { __Pyx_RaiseUnboundLocalError("x"); __PYX_ERR(0, 124, __pyx_L1_error) }
-        __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_x, 3, (PyObject *(*)(char *)) __pyx_memview_get_double__const__, (int (*)(char *, PyObject *)) NULL, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 124, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_4 = PyFloat_FromDouble(__pyx_v_fs); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 124, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_5 = PyFloat_FromDouble(__pyx_v_low_cut); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 124, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_5);
-        __pyx_t_6 = PyFloat_FromDouble(__pyx_v_hi_cut); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 124, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_6);
-        __Pyx_INCREF(__pyx_t_1);
-        __pyx_t_7 = __pyx_t_1; __pyx_t_8 = NULL;
-        __pyx_t_9 = 0;
-        if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_7))) {
-          __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_7);
-          if (likely(__pyx_t_8)) {
-            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
-            __Pyx_INCREF(__pyx_t_8);
-            __Pyx_INCREF(function);
-            __Pyx_DECREF_SET(__pyx_t_7, function);
-            __pyx_t_9 = 1;
-          }
-        }
-        #if CYTHON_FAST_PYCALL
-        if (PyFunction_Check(__pyx_t_7)) {
-          PyObject *__pyx_temp[5] = {__pyx_t_8, __pyx_t_3, __pyx_t_4, __pyx_t_5, __pyx_t_6};
-          __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_9, 4+__pyx_t_9); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 124, __pyx_L1_error)
-          __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-          __Pyx_GOTREF(__pyx_t_2);
-          __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-          __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-          __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-        } else
-        #endif
-        #if CYTHON_FAST_PYCCALL
-        if (__Pyx_PyFastCFunction_Check(__pyx_t_7)) {
-          PyObject *__pyx_temp[5] = {__pyx_t_8, __pyx_t_3, __pyx_t_4, __pyx_t_5, __pyx_t_6};
-          __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_9, 4+__pyx_t_9); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 124, __pyx_L1_error)
-          __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-          __Pyx_GOTREF(__pyx_t_2);
-          __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-          __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-          __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-        } else
-        #endif
-        {
-          __pyx_t_10 = PyTuple_New(4+__pyx_t_9); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 124, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_10);
-          if (__pyx_t_8) {
-            __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_8); __pyx_t_8 = NULL;
-          }
-          __Pyx_GIVEREF(__pyx_t_3);
-          PyTuple_SET_ITEM(__pyx_t_10, 0+__pyx_t_9, __pyx_t_3);
-          __Pyx_GIVEREF(__pyx_t_4);
-          PyTuple_SET_ITEM(__pyx_t_10, 1+__pyx_t_9, __pyx_t_4);
-          __Pyx_GIVEREF(__pyx_t_5);
-          PyTuple_SET_ITEM(__pyx_t_10, 2+__pyx_t_9, __pyx_t_5);
-          __Pyx_GIVEREF(__pyx_t_6);
-          PyTuple_SET_ITEM(__pyx_t_10, 3+__pyx_t_9, __pyx_t_6);
-          __pyx_t_3 = 0;
-          __pyx_t_4 = 0;
-          __pyx_t_5 = 0;
-          __pyx_t_6 = 0;
-          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_10, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 124, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_2);
-          __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-        }
-        __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-        __pyx_r = __pyx_t_2;
-        __pyx_t_2 = 0;
-        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        goto __pyx_L0;
-      }
-      #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
-      __pyx_tp_dict_version = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
-      __pyx_obj_dict_version = __Pyx_get_object_dict_version(((PyObject *)__pyx_v_self));
-      if (unlikely(__pyx_type_dict_guard != __pyx_tp_dict_version)) {
-        __pyx_tp_dict_version = __pyx_obj_dict_version = __PYX_DICT_VERSION_INIT;
-      }
-      #endif
-      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
-    }
-    #endif
-  }
-
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":125
- * 
- *     cpdef get_power(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
- *         if not self.base_run:             # <<<<<<<<<<<<<<
- *             self._base_fn(x, fs, low_cut, hi_cut)
- * 
- */
-  __pyx_t_11 = ((!(__pyx_v_self->base_run != 0)) != 0);
-  if (__pyx_t_11) {
-
-    /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":126
- *     cpdef get_power(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
- *         if not self.base_run:
- *             self._base_fn(x, fs, low_cut, hi_cut)             # <<<<<<<<<<<<<<
- * 
- *         # TODO remove the base run setting
- */
-    __pyx_t_1 = ((struct __pyx_vtabstruct_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self->__pyx_vtab)->_base_fn(__pyx_v_self, __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 126, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-
-    /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":125
- * 
  *     cpdef get_power(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
  *         if not self.base_run:             # <<<<<<<<<<<<<<
  *             self._base_fn(x, fs, low_cut, hi_cut)
@@ -4887,104 +4447,37 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
  */
   }
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":129
+  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":117
  * 
  *         # TODO remove the base run setting
  *         self.base_run = True             # <<<<<<<<<<<<<<
- *         _ = self.get_max_freq(x, fs, low_cut, hi_cut)
+ *         _ = self.get_dominant_freq(x, fs, low_cut, hi_cut)
  *         self.base_run = False  # turn off for now
  */
   __pyx_v_self->base_run = 1;
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":130
+  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":118
  *         # TODO remove the base run setting
  *         self.base_run = True
- *         _ = self.get_max_freq(x, fs, low_cut, hi_cut)             # <<<<<<<<<<<<<<
+ *         _ = self.get_dominant_freq(x, fs, low_cut, hi_cut)             # <<<<<<<<<<<<<<
  *         self.base_run = False  # turn off for now
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_max_freq); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 130, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_7 = __pyx_memoryview_fromslice(__pyx_v_x, 3, (PyObject *(*)(char *)) __pyx_memview_get_double__const__, (int (*)(char *, PyObject *)) NULL, 0);; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 130, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_10 = PyFloat_FromDouble(__pyx_v_fs); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 130, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_10);
-  __pyx_t_6 = PyFloat_FromDouble(__pyx_v_low_cut); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 130, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_5 = PyFloat_FromDouble(__pyx_v_hi_cut); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 130, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_4 = NULL;
-  __pyx_t_9 = 0;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_4)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_4);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_2, function);
-      __pyx_t_9 = 1;
-    }
-  }
-  #if CYTHON_FAST_PYCALL
-  if (PyFunction_Check(__pyx_t_2)) {
-    PyObject *__pyx_temp[5] = {__pyx_t_4, __pyx_t_7, __pyx_t_10, __pyx_t_6, __pyx_t_5};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_9, 4+__pyx_t_9); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 130, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  } else
-  #endif
-  #if CYTHON_FAST_PYCCALL
-  if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
-    PyObject *__pyx_temp[5] = {__pyx_t_4, __pyx_t_7, __pyx_t_10, __pyx_t_6, __pyx_t_5};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_9, 4+__pyx_t_9); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 130, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  } else
-  #endif
-  {
-    __pyx_t_3 = PyTuple_New(4+__pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 130, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    if (__pyx_t_4) {
-      __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_4); __pyx_t_4 = NULL;
-    }
-    __Pyx_GIVEREF(__pyx_t_7);
-    PyTuple_SET_ITEM(__pyx_t_3, 0+__pyx_t_9, __pyx_t_7);
-    __Pyx_GIVEREF(__pyx_t_10);
-    PyTuple_SET_ITEM(__pyx_t_3, 1+__pyx_t_9, __pyx_t_10);
-    __Pyx_GIVEREF(__pyx_t_6);
-    PyTuple_SET_ITEM(__pyx_t_3, 2+__pyx_t_9, __pyx_t_6);
-    __Pyx_GIVEREF(__pyx_t_5);
-    PyTuple_SET_ITEM(__pyx_t_3, 3+__pyx_t_9, __pyx_t_5);
-    __pyx_t_7 = 0;
-    __pyx_t_10 = 0;
-    __pyx_t_6 = 0;
-    __pyx_t_5 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 130, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  }
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_1 = ((struct __pyx_vtabstruct_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self->__pyx_vtab)->get_dominant_freq(__pyx_v_self, __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 118, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
   __pyx_v__ = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":131
+  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":119
  *         self.base_run = True
- *         _ = self.get_max_freq(x, fs, low_cut, hi_cut)
+ *         _ = self.get_dominant_freq(x, fs, low_cut, hi_cut)
  *         self.base_run = False  # turn off for now             # <<<<<<<<<<<<<<
  * 
  *         for self.i in range(self.M):
  */
   __pyx_v_self->base_run = 0;
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":133
+  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":121
  *         self.base_run = False  # turn off for now
  * 
  *         for self.i in range(self.M):             # <<<<<<<<<<<<<<
@@ -4996,7 +4489,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
   for (__pyx_t_14 = 0; __pyx_t_14 < __pyx_t_13; __pyx_t_14+=1) {
     __pyx_v_self->i = __pyx_t_14;
 
-    /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":134
+    /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":122
  * 
  *         for self.i in range(self.M):
  *             for self.j in range(self.ihcut - self.ilcut):             # <<<<<<<<<<<<<<
@@ -5008,7 +4501,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
     for (__pyx_t_16 = 0; __pyx_t_16 < __pyx_t_15; __pyx_t_16+=1) {
       __pyx_v_self->j = __pyx_t_16;
 
-      /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":135
+      /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":123
  *         for self.i in range(self.M):
  *             for self.j in range(self.ihcut - self.ilcut):
  *                 for self.k in range(self.P):             # <<<<<<<<<<<<<<
@@ -5020,22 +4513,22 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
       for (__pyx_t_19 = 0; __pyx_t_19 < __pyx_t_18; __pyx_t_19+=1) {
         __pyx_v_self->k = __pyx_t_19;
 
-        /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":136
+        /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":124
  *             for self.j in range(self.ihcut - self.ilcut):
  *                 for self.k in range(self.P):
  *                     if ((self.maxf[self.i, self.k] - 0.5) < self.freq[self.j] < (self.maxf[self.i, self.k] + 0.5)):             # <<<<<<<<<<<<<<
  *                         self.df_ratio[self.i, self.k] += self.sp_norm[self.i, self.j, self.k]
  * 
  */
-        if (unlikely(!__pyx_v_self->maxf.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 136, __pyx_L1_error)}
+        if (unlikely(!__pyx_v_self->maxf.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 124, __pyx_L1_error)}
         __pyx_t_20 = __pyx_v_self->i;
         __pyx_t_21 = __pyx_v_self->k;
-        if (unlikely(!__pyx_v_self->freq.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 136, __pyx_L1_error)}
+        if (unlikely(!__pyx_v_self->freq.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 124, __pyx_L1_error)}
         __pyx_t_22 = __pyx_v_self->j;
         __pyx_t_23 = (*((double *) ( /* dim=0 */ (__pyx_v_self->freq.data + __pyx_t_22 * __pyx_v_self->freq.strides[0]) )));
         __pyx_t_11 = (((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->maxf.data + __pyx_t_20 * __pyx_v_self->maxf.strides[0]) ) + __pyx_t_21 * __pyx_v_self->maxf.strides[1]) ))) - 0.5) < __pyx_t_23);
         if (__pyx_t_11) {
-          if (unlikely(!__pyx_v_self->maxf.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 136, __pyx_L1_error)}
+          if (unlikely(!__pyx_v_self->maxf.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 124, __pyx_L1_error)}
           __pyx_t_22 = __pyx_v_self->i;
           __pyx_t_24 = __pyx_v_self->k;
           __pyx_t_11 = (__pyx_t_23 < ((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->maxf.data + __pyx_t_22 * __pyx_v_self->maxf.strides[0]) ) + __pyx_t_24 * __pyx_v_self->maxf.strides[1]) ))) + 0.5));
@@ -5043,23 +4536,23 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
         __pyx_t_25 = (__pyx_t_11 != 0);
         if (__pyx_t_25) {
 
-          /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":137
+          /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":125
  *                 for self.k in range(self.P):
  *                     if ((self.maxf[self.i, self.k] - 0.5) < self.freq[self.j] < (self.maxf[self.i, self.k] + 0.5)):
  *                         self.df_ratio[self.i, self.k] += self.sp_norm[self.i, self.j, self.k]             # <<<<<<<<<<<<<<
  * 
  *         return self.df_ratio
  */
-          if (unlikely(!__pyx_v_self->sp_norm.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 137, __pyx_L1_error)}
+          if (unlikely(!__pyx_v_self->sp_norm.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 125, __pyx_L1_error)}
           __pyx_t_21 = __pyx_v_self->i;
           __pyx_t_20 = __pyx_v_self->j;
           __pyx_t_24 = __pyx_v_self->k;
-          if (unlikely(!__pyx_v_self->df_ratio.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 137, __pyx_L1_error)}
+          if (unlikely(!__pyx_v_self->df_ratio.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 125, __pyx_L1_error)}
           __pyx_t_22 = __pyx_v_self->i;
           __pyx_t_26 = __pyx_v_self->k;
           *((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->df_ratio.data + __pyx_t_22 * __pyx_v_self->df_ratio.strides[0]) ) + __pyx_t_26 * __pyx_v_self->df_ratio.strides[1]) )) += (*((double *) ( /* dim=2 */ (( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->sp_norm.data + __pyx_t_21 * __pyx_v_self->sp_norm.strides[0]) ) + __pyx_t_20 * __pyx_v_self->sp_norm.strides[1]) ) + __pyx_t_24 * __pyx_v_self->sp_norm.strides[2]) )));
 
-          /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":136
+          /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":124
  *             for self.j in range(self.ihcut - self.ilcut):
  *                 for self.k in range(self.P):
  *                     if ((self.maxf[self.i, self.k] - 0.5) < self.freq[self.j] < (self.maxf[self.i, self.k] + 0.5)):             # <<<<<<<<<<<<<<
@@ -5071,23 +4564,23 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
     }
   }
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":139
+  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":127
  *                         self.df_ratio[self.i, self.k] += self.sp_norm[self.i, self.j, self.k]
  * 
  *         return self.df_ratio             # <<<<<<<<<<<<<<
  * 
- *     cpdef get_spectral_entropy(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
+ *     cpdef get_spectral_flatness(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
  */
   __Pyx_XDECREF(__pyx_r);
-  if (unlikely(!__pyx_v_self->df_ratio.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 139, __pyx_L1_error)}
-  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_self->df_ratio, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 139, __pyx_L1_error)
+  if (unlikely(!__pyx_v_self->df_ratio.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 127, __pyx_L1_error)}
+  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_self->df_ratio, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 127, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":124
- *         return self.spec_flat
+  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":112
+ *         return self.maxfv
  * 
  *     cpdef get_power(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):             # <<<<<<<<<<<<<<
  *         if not self.base_run:
@@ -5115,8 +4608,8 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_11get_power(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_11get_power(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_9get_power(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_9get_power(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_x = { 0, 0, { 0 }, { 0 }, { 0 } };
   double __pyx_v_fs;
   double __pyx_v_low_cut;
@@ -5154,23 +4647,23 @@ static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_fs)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("get_power", 1, 4, 4, 1); __PYX_ERR(0, 124, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("get_power", 1, 4, 4, 1); __PYX_ERR(0, 112, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_low_cut)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("get_power", 1, 4, 4, 2); __PYX_ERR(0, 124, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("get_power", 1, 4, 4, 2); __PYX_ERR(0, 112, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_hi_cut)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("get_power", 1, 4, 4, 3); __PYX_ERR(0, 124, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("get_power", 1, 4, 4, 3); __PYX_ERR(0, 112, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "get_power") < 0)) __PYX_ERR(0, 124, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "get_power") < 0)) __PYX_ERR(0, 112, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -5180,27 +4673,27 @@ static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
       values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
       values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
     }
-    __pyx_v_x = __Pyx_PyObject_to_MemoryviewSlice_dsdsds_double__const__(values[0], 0); if (unlikely(!__pyx_v_x.memview)) __PYX_ERR(0, 124, __pyx_L3_error)
-    __pyx_v_fs = __pyx_PyFloat_AsDouble(values[1]); if (unlikely((__pyx_v_fs == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 124, __pyx_L3_error)
-    __pyx_v_low_cut = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_low_cut == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 124, __pyx_L3_error)
-    __pyx_v_hi_cut = __pyx_PyFloat_AsDouble(values[3]); if (unlikely((__pyx_v_hi_cut == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 124, __pyx_L3_error)
+    __pyx_v_x = __Pyx_PyObject_to_MemoryviewSlice_dsdsds_double__const__(values[0], 0); if (unlikely(!__pyx_v_x.memview)) __PYX_ERR(0, 112, __pyx_L3_error)
+    __pyx_v_fs = __pyx_PyFloat_AsDouble(values[1]); if (unlikely((__pyx_v_fs == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 112, __pyx_L3_error)
+    __pyx_v_low_cut = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_low_cut == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 112, __pyx_L3_error)
+    __pyx_v_hi_cut = __pyx_PyFloat_AsDouble(values[3]); if (unlikely((__pyx_v_hi_cut == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 112, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("get_power", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 124, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("get_power", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 112, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("PfyMU.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_power", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_10get_power(((struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self), __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut);
+  __pyx_r = __pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_8get_power(((struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self), __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_10get_power(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut) {
+static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_8get_power(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -5209,8 +4702,8 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("get_power", 0);
   __Pyx_XDECREF(__pyx_r);
-  if (unlikely(!__pyx_v_x.memview)) { __Pyx_RaiseUnboundLocalError("x"); __PYX_ERR(0, 124, __pyx_L1_error) }
-  __pyx_t_1 = __pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_power(__pyx_v_self, __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 124, __pyx_L1_error)
+  if (unlikely(!__pyx_v_x.memview)) { __Pyx_RaiseUnboundLocalError("x"); __PYX_ERR(0, 112, __pyx_L1_error) }
+  __pyx_t_1 = __pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_power(__pyx_v_self, __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 112, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5228,8 +4721,446 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
   return __pyx_r;
 }
 
-/* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":141
+/* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":129
  *         return self.df_ratio
+ * 
+ *     cpdef get_spectral_flatness(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):             # <<<<<<<<<<<<<<
+ *         if not self.base_run:
+ *             self._base_fn(x, fs, low_cut, hi_cut)
+ */
+
+static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_11get_spectral_flatness(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_spectral_flatness(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut, int __pyx_skip_dispatch) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  PyObject *__pyx_t_5 = NULL;
+  PyObject *__pyx_t_6 = NULL;
+  PyObject *__pyx_t_7 = NULL;
+  PyObject *__pyx_t_8 = NULL;
+  int __pyx_t_9;
+  PyObject *__pyx_t_10 = NULL;
+  int __pyx_t_11;
+  Py_ssize_t __pyx_t_12;
+  Py_ssize_t __pyx_t_13;
+  Py_ssize_t __pyx_t_14;
+  Py_ssize_t __pyx_t_15;
+  Py_ssize_t __pyx_t_16;
+  Py_ssize_t __pyx_t_17;
+  __Pyx_memviewslice __pyx_t_18 = { 0, 0, { 0 }, { 0 }, { 0 } };
+  double __pyx_t_19;
+  double __pyx_t_20;
+  Py_ssize_t __pyx_t_21;
+  Py_ssize_t __pyx_t_22;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("get_spectral_flatness", 0);
+  /* Check if called by wrapper */
+  if (unlikely(__pyx_skip_dispatch)) ;
+  /* Check if overridden in Python */
+  else if (unlikely((Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0) || (Py_TYPE(((PyObject *)__pyx_v_self))->tp_flags & (Py_TPFLAGS_IS_ABSTRACT | Py_TPFLAGS_HEAPTYPE)))) {
+    #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+    static PY_UINT64_T __pyx_tp_dict_version = __PYX_DICT_VERSION_INIT, __pyx_obj_dict_version = __PYX_DICT_VERSION_INIT;
+    if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
+      PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
+      #endif
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_spectral_flatness); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 129, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_11get_spectral_flatness)) {
+        __Pyx_XDECREF(__pyx_r);
+        if (unlikely(!__pyx_v_x.memview)) { __Pyx_RaiseUnboundLocalError("x"); __PYX_ERR(0, 129, __pyx_L1_error) }
+        __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_x, 3, (PyObject *(*)(char *)) __pyx_memview_get_double__const__, (int (*)(char *, PyObject *)) NULL, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 129, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_3);
+        __pyx_t_4 = PyFloat_FromDouble(__pyx_v_fs); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 129, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_4);
+        __pyx_t_5 = PyFloat_FromDouble(__pyx_v_low_cut); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 129, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_5);
+        __pyx_t_6 = PyFloat_FromDouble(__pyx_v_hi_cut); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 129, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_6);
+        __Pyx_INCREF(__pyx_t_1);
+        __pyx_t_7 = __pyx_t_1; __pyx_t_8 = NULL;
+        __pyx_t_9 = 0;
+        if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_7))) {
+          __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_7);
+          if (likely(__pyx_t_8)) {
+            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+            __Pyx_INCREF(__pyx_t_8);
+            __Pyx_INCREF(function);
+            __Pyx_DECREF_SET(__pyx_t_7, function);
+            __pyx_t_9 = 1;
+          }
+        }
+        #if CYTHON_FAST_PYCALL
+        if (PyFunction_Check(__pyx_t_7)) {
+          PyObject *__pyx_temp[5] = {__pyx_t_8, __pyx_t_3, __pyx_t_4, __pyx_t_5, __pyx_t_6};
+          __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_9, 4+__pyx_t_9); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 129, __pyx_L1_error)
+          __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+          __Pyx_GOTREF(__pyx_t_2);
+          __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+          __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+        } else
+        #endif
+        #if CYTHON_FAST_PYCCALL
+        if (__Pyx_PyFastCFunction_Check(__pyx_t_7)) {
+          PyObject *__pyx_temp[5] = {__pyx_t_8, __pyx_t_3, __pyx_t_4, __pyx_t_5, __pyx_t_6};
+          __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_7, __pyx_temp+1-__pyx_t_9, 4+__pyx_t_9); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 129, __pyx_L1_error)
+          __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+          __Pyx_GOTREF(__pyx_t_2);
+          __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+          __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+        } else
+        #endif
+        {
+          __pyx_t_10 = PyTuple_New(4+__pyx_t_9); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 129, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_10);
+          if (__pyx_t_8) {
+            __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_8); __pyx_t_8 = NULL;
+          }
+          __Pyx_GIVEREF(__pyx_t_3);
+          PyTuple_SET_ITEM(__pyx_t_10, 0+__pyx_t_9, __pyx_t_3);
+          __Pyx_GIVEREF(__pyx_t_4);
+          PyTuple_SET_ITEM(__pyx_t_10, 1+__pyx_t_9, __pyx_t_4);
+          __Pyx_GIVEREF(__pyx_t_5);
+          PyTuple_SET_ITEM(__pyx_t_10, 2+__pyx_t_9, __pyx_t_5);
+          __Pyx_GIVEREF(__pyx_t_6);
+          PyTuple_SET_ITEM(__pyx_t_10, 3+__pyx_t_9, __pyx_t_6);
+          __pyx_t_3 = 0;
+          __pyx_t_4 = 0;
+          __pyx_t_5 = 0;
+          __pyx_t_6 = 0;
+          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_10, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 129, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_2);
+          __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+        }
+        __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+        __pyx_r = __pyx_t_2;
+        __pyx_t_2 = 0;
+        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+        goto __pyx_L0;
+      }
+      #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+      __pyx_tp_dict_version = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
+      __pyx_obj_dict_version = __Pyx_get_object_dict_version(((PyObject *)__pyx_v_self));
+      if (unlikely(__pyx_type_dict_guard != __pyx_tp_dict_version)) {
+        __pyx_tp_dict_version = __pyx_obj_dict_version = __PYX_DICT_VERSION_INIT;
+      }
+      #endif
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_PYTYPE_LOOKUP && CYTHON_USE_TYPE_SLOTS
+    }
+    #endif
+  }
+
+  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":130
+ * 
+ *     cpdef get_spectral_flatness(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
+ *         if not self.base_run:             # <<<<<<<<<<<<<<
+ *             self._base_fn(x, fs, low_cut, hi_cut)
+ * 
+ */
+  __pyx_t_11 = ((!(__pyx_v_self->base_run != 0)) != 0);
+  if (__pyx_t_11) {
+
+    /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":131
+ *     cpdef get_spectral_flatness(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
+ *         if not self.base_run:
+ *             self._base_fn(x, fs, low_cut, hi_cut)             # <<<<<<<<<<<<<<
+ * 
+ *         for self.i in range(self.M):
+ */
+    __pyx_t_1 = ((struct __pyx_vtabstruct_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self->__pyx_vtab)->_base_fn(__pyx_v_self, __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 131, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+    /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":130
+ * 
+ *     cpdef get_spectral_flatness(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
+ *         if not self.base_run:             # <<<<<<<<<<<<<<
+ *             self._base_fn(x, fs, low_cut, hi_cut)
+ * 
+ */
+  }
+
+  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":133
+ *             self._base_fn(x, fs, low_cut, hi_cut)
+ * 
+ *         for self.i in range(self.M):             # <<<<<<<<<<<<<<
+ *             for self.k in range(self.P):
+ *                 self.mean = 0.
+ */
+  __pyx_t_12 = __pyx_v_self->M;
+  __pyx_t_13 = __pyx_t_12;
+  for (__pyx_t_14 = 0; __pyx_t_14 < __pyx_t_13; __pyx_t_14+=1) {
+    __pyx_v_self->i = __pyx_t_14;
+
+    /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":134
+ * 
+ *         for self.i in range(self.M):
+ *             for self.k in range(self.P):             # <<<<<<<<<<<<<<
+ *                 self.mean = 0.
+ *                 mean_1d(self.sp_norm[self.i, :, self.k], &self.mean)
+ */
+    __pyx_t_15 = __pyx_v_self->P;
+    __pyx_t_16 = __pyx_t_15;
+    for (__pyx_t_17 = 0; __pyx_t_17 < __pyx_t_16; __pyx_t_17+=1) {
+      __pyx_v_self->k = __pyx_t_17;
+
+      /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":135
+ *         for self.i in range(self.M):
+ *             for self.k in range(self.P):
+ *                 self.mean = 0.             # <<<<<<<<<<<<<<
+ *                 mean_1d(self.sp_norm[self.i, :, self.k], &self.mean)
+ *                 self.spec_flat[self.i, self.k] = 10. * log(gmean(self.sp_norm[self.i, :, self.k]) / self.mean) / log(10.0)
+ */
+      __pyx_v_self->mean = 0.;
+
+      /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":136
+ *             for self.k in range(self.P):
+ *                 self.mean = 0.
+ *                 mean_1d(self.sp_norm[self.i, :, self.k], &self.mean)             # <<<<<<<<<<<<<<
+ *                 self.spec_flat[self.i, self.k] = 10. * log(gmean(self.sp_norm[self.i, :, self.k]) / self.mean) / log(10.0)
+ * 
+ */
+      if (unlikely(!__pyx_v_self->sp_norm.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 136, __pyx_L1_error)}
+      __pyx_t_18.data = __pyx_v_self->sp_norm.data;
+      __pyx_t_18.memview = __pyx_v_self->sp_norm.memview;
+      __PYX_INC_MEMVIEW(&__pyx_t_18, 0);
+      {
+    Py_ssize_t __pyx_tmp_idx = __pyx_v_self->i;
+    Py_ssize_t __pyx_tmp_stride = __pyx_v_self->sp_norm.strides[0];
+        __pyx_t_18.data += __pyx_tmp_idx * __pyx_tmp_stride;
+}
+
+__pyx_t_18.shape[0] = __pyx_v_self->sp_norm.shape[1];
+__pyx_t_18.strides[0] = __pyx_v_self->sp_norm.strides[1];
+    __pyx_t_18.suboffsets[0] = -1;
+
+{
+    Py_ssize_t __pyx_tmp_idx = __pyx_v_self->k;
+    Py_ssize_t __pyx_tmp_stride = __pyx_v_self->sp_norm.strides[2];
+        __pyx_t_18.data += __pyx_tmp_idx * __pyx_tmp_stride;
+}
+
+__pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_1d(__pyx_t_18, (&__pyx_v_self->mean));
+      __PYX_XDEC_MEMVIEW(&__pyx_t_18, 1);
+      __pyx_t_18.memview = NULL;
+      __pyx_t_18.data = NULL;
+
+      /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":137
+ *                 self.mean = 0.
+ *                 mean_1d(self.sp_norm[self.i, :, self.k], &self.mean)
+ *                 self.spec_flat[self.i, self.k] = 10. * log(gmean(self.sp_norm[self.i, :, self.k]) / self.mean) / log(10.0)             # <<<<<<<<<<<<<<
+ * 
+ *         return self.spec_flat
+ */
+      if (unlikely(!__pyx_v_self->sp_norm.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 137, __pyx_L1_error)}
+      __pyx_t_18.data = __pyx_v_self->sp_norm.data;
+      __pyx_t_18.memview = __pyx_v_self->sp_norm.memview;
+      __PYX_INC_MEMVIEW(&__pyx_t_18, 0);
+      {
+    Py_ssize_t __pyx_tmp_idx = __pyx_v_self->i;
+    Py_ssize_t __pyx_tmp_stride = __pyx_v_self->sp_norm.strides[0];
+        __pyx_t_18.data += __pyx_tmp_idx * __pyx_tmp_stride;
+}
+
+__pyx_t_18.shape[0] = __pyx_v_self->sp_norm.shape[1];
+__pyx_t_18.strides[0] = __pyx_v_self->sp_norm.strides[1];
+    __pyx_t_18.suboffsets[0] = -1;
+
+{
+    Py_ssize_t __pyx_tmp_idx = __pyx_v_self->k;
+    Py_ssize_t __pyx_tmp_stride = __pyx_v_self->sp_norm.strides[2];
+        __pyx_t_18.data += __pyx_tmp_idx * __pyx_tmp_stride;
+}
+
+__pyx_t_19 = __pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_gmean(__pyx_t_18);
+      __PYX_XDEC_MEMVIEW(&__pyx_t_18, 1);
+      __pyx_t_18.memview = NULL;
+      __pyx_t_18.data = NULL;
+      if (unlikely(__pyx_v_self->mean == 0)) {
+        PyErr_SetString(PyExc_ZeroDivisionError, "float division");
+        __PYX_ERR(0, 137, __pyx_L1_error)
+      }
+      __pyx_t_20 = (10. * log((__pyx_t_19 / __pyx_v_self->mean)));
+      __pyx_t_19 = log(10.0);
+      if (unlikely(__pyx_t_19 == 0)) {
+        PyErr_SetString(PyExc_ZeroDivisionError, "float division");
+        __PYX_ERR(0, 137, __pyx_L1_error)
+      }
+      if (unlikely(!__pyx_v_self->spec_flat.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 137, __pyx_L1_error)}
+      __pyx_t_21 = __pyx_v_self->i;
+      __pyx_t_22 = __pyx_v_self->k;
+      *((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->spec_flat.data + __pyx_t_21 * __pyx_v_self->spec_flat.strides[0]) ) + __pyx_t_22 * __pyx_v_self->spec_flat.strides[1]) )) = (__pyx_t_20 / __pyx_t_19);
+    }
+  }
+
+  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":139
+ *                 self.spec_flat[self.i, self.k] = 10. * log(gmean(self.sp_norm[self.i, :, self.k]) / self.mean) / log(10.0)
+ * 
+ *         return self.spec_flat             # <<<<<<<<<<<<<<
+ * 
+ *     cpdef get_spectral_entropy(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
+ */
+  __Pyx_XDECREF(__pyx_r);
+  if (unlikely(!__pyx_v_self->spec_flat.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 139, __pyx_L1_error)}
+  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_self->spec_flat, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 139, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":129
+ *         return self.df_ratio
+ * 
+ *     cpdef get_spectral_flatness(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):             # <<<<<<<<<<<<<<
+ *         if not self.base_run:
+ *             self._base_fn(x, fs, low_cut, hi_cut)
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_5);
+  __Pyx_XDECREF(__pyx_t_6);
+  __Pyx_XDECREF(__pyx_t_7);
+  __Pyx_XDECREF(__pyx_t_8);
+  __Pyx_XDECREF(__pyx_t_10);
+  __PYX_XDEC_MEMVIEW(&__pyx_t_18, 1);
+  __Pyx_AddTraceback("PfyMU.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_spectral_flatness", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = 0;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_11get_spectral_flatness(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_11get_spectral_flatness(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  __Pyx_memviewslice __pyx_v_x = { 0, 0, { 0 }, { 0 }, { 0 } };
+  double __pyx_v_fs;
+  double __pyx_v_low_cut;
+  double __pyx_v_hi_cut;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("get_spectral_flatness (wrapper)", 0);
+  {
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_x,&__pyx_n_s_fs,&__pyx_n_s_low_cut,&__pyx_n_s_hi_cut,0};
+    PyObject* values[4] = {0,0,0,0};
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
+      switch (pos_args) {
+        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+        CYTHON_FALLTHROUGH;
+        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+        CYTHON_FALLTHROUGH;
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        CYTHON_FALLTHROUGH;
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = PyDict_Size(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_x)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        CYTHON_FALLTHROUGH;
+        case  1:
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_fs)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("get_spectral_flatness", 1, 4, 4, 1); __PYX_ERR(0, 129, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  2:
+        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_low_cut)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("get_spectral_flatness", 1, 4, 4, 2); __PYX_ERR(0, 129, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  3:
+        if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_hi_cut)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("get_spectral_flatness", 1, 4, 4, 3); __PYX_ERR(0, 129, __pyx_L3_error)
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "get_spectral_flatness") < 0)) __PYX_ERR(0, 129, __pyx_L3_error)
+      }
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+      values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+      values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+    }
+    __pyx_v_x = __Pyx_PyObject_to_MemoryviewSlice_dsdsds_double__const__(values[0], 0); if (unlikely(!__pyx_v_x.memview)) __PYX_ERR(0, 129, __pyx_L3_error)
+    __pyx_v_fs = __pyx_PyFloat_AsDouble(values[1]); if (unlikely((__pyx_v_fs == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 129, __pyx_L3_error)
+    __pyx_v_low_cut = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_low_cut == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 129, __pyx_L3_error)
+    __pyx_v_hi_cut = __pyx_PyFloat_AsDouble(values[3]); if (unlikely((__pyx_v_hi_cut == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 129, __pyx_L3_error)
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("get_spectral_flatness", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 129, __pyx_L3_error)
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("PfyMU.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_spectral_flatness", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_10get_spectral_flatness(((struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self), __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut);
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_10get_spectral_flatness(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("get_spectral_flatness", 0);
+  __Pyx_XDECREF(__pyx_r);
+  if (unlikely(!__pyx_v_x.memview)) { __Pyx_RaiseUnboundLocalError("x"); __PYX_ERR(0, 129, __pyx_L1_error) }
+  __pyx_t_1 = __pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_spectral_flatness(__pyx_v_self, __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 129, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("PfyMU.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_spectral_flatness", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __PYX_XDEC_MEMVIEW(&__pyx_v_x, 1);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":141
+ *         return self.spec_flat
  * 
  *     cpdef get_spectral_entropy(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):             # <<<<<<<<<<<<<<
  *         if not self.base_run:
@@ -5506,7 +5437,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
   goto __pyx_L0;
 
   /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":141
- *         return self.df_ratio
+ *         return self.spec_flat
  * 
  *     cpdef get_spectral_entropy(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):             # <<<<<<<<<<<<<<
  *         if not self.base_run:
@@ -19733,8 +19664,8 @@ static PyMethodDef __pyx_methods_5PfyMU_8features_3lib_7_cython_17frequencyFeatu
   {"_base_fn", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_3_base_fn, METH_VARARGS|METH_KEYWORDS, 0},
   {"get_dominant_freq", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_5get_dominant_freq, METH_VARARGS|METH_KEYWORDS, 0},
   {"get_dominant_freq_value", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_7get_dominant_freq_value, METH_VARARGS|METH_KEYWORDS, 0},
-  {"get_spectral_flatness", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_9get_spectral_flatness, METH_VARARGS|METH_KEYWORDS, 0},
-  {"get_power", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_11get_power, METH_VARARGS|METH_KEYWORDS, 0},
+  {"get_power", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_9get_power, METH_VARARGS|METH_KEYWORDS, 0},
+  {"get_spectral_flatness", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_11get_spectral_flatness, METH_VARARGS|METH_KEYWORDS, 0},
   {"get_spectral_entropy", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_13get_spectral_entropy, METH_VARARGS|METH_KEYWORDS, 0},
   {"__reduce_cython__", (PyCFunction)__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_15__reduce_cython__, METH_NOARGS, 0},
   {"__setstate_cython__", (PyCFunction)__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_17__setstate_cython__, METH_O, 0},
@@ -20622,7 +20553,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_fs, __pyx_k_fs, sizeof(__pyx_k_fs), 0, 0, 1, 1},
   {&__pyx_n_s_get_dominant_freq, __pyx_k_get_dominant_freq, sizeof(__pyx_k_get_dominant_freq), 0, 0, 1, 1},
   {&__pyx_n_s_get_dominant_freq_value, __pyx_k_get_dominant_freq_value, sizeof(__pyx_k_get_dominant_freq_value), 0, 0, 1, 1},
-  {&__pyx_n_s_get_max_freq, __pyx_k_get_max_freq, sizeof(__pyx_k_get_max_freq), 0, 0, 1, 1},
   {&__pyx_n_s_get_power, __pyx_k_get_power, sizeof(__pyx_k_get_power), 0, 0, 1, 1},
   {&__pyx_n_s_get_spectral_entropy, __pyx_k_get_spectral_entropy, sizeof(__pyx_k_get_spectral_entropy), 0, 0, 1, 1},
   {&__pyx_n_s_get_spectral_flatness, __pyx_k_get_spectral_flatness, sizeof(__pyx_k_get_spectral_flatness), 0, 0, 1, 1},
@@ -21037,8 +20967,8 @@ static int __Pyx_modinit_type_init_code(void) {
   __pyx_vtable_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures._base_fn = (PyObject *(*)(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch))__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures__base_fn;
   __pyx_vtable_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures.get_dominant_freq = (PyObject *(*)(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch))__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_dominant_freq;
   __pyx_vtable_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures.get_dominant_freq_value = (PyObject *(*)(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch))__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_dominant_freq_value;
-  __pyx_vtable_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures.get_spectral_flatness = (PyObject *(*)(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch))__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_spectral_flatness;
   __pyx_vtable_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures.get_power = (PyObject *(*)(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch))__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_power;
+  __pyx_vtable_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures.get_spectral_flatness = (PyObject *(*)(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch))__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_spectral_flatness;
   __pyx_vtable_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures.get_spectral_entropy = (PyObject *(*)(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch))__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_spectral_entropy;
   if (PyType_Ready(&__pyx_type_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures) < 0) __PYX_ERR(0, 35, __pyx_L1_error)
   #if PY_VERSION_HEX < 0x030800B1
