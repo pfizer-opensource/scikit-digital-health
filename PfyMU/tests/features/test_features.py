@@ -69,3 +69,16 @@ class TestRangeCountPercentage(TestFeature):
 
 class TestRatioBeyondRSigma(TestFeature):
     feature = RatioBeyondRSigma(r=2.0)
+
+
+# SMOOTHNESS FEATURES
+class TestJerkMetric(TestFeature):
+    feature = JerkMetric(normalize=True)
+
+
+class TestDimensionlessJerk(TestFeature):
+    feature = DimensionlessJerk(log=True, signal_type='acceleration')
+
+
+class TestSPARC(TestFeature):
+    feature = SPARC(padlevel=4, fc=10.0, amplitude_threshold=0.05)
