@@ -33,3 +33,23 @@ class TestSampleEntropy(TestFeature):
 
 class TestPermutationEntropy(TestFeature):
     feature = PermutationEntropy(order=4, delay=1, normalize=False)
+
+
+class TestDominantFrequency(TestFeature):
+    feature = DominantFrequency(low_cutoff=0.0, high_cutoff=12.0)
+
+
+class TestDominantFrequencyValue(TestFeature):
+    feature = DominantFrequencyValue(low_cutoff=0.0, high_cutoff=12.0)
+
+
+class TestPowerSpectralSum(TestFeature):
+    feature = PowerSpectralSum(low_cutoff=0.0, high_cutoff=12.0)
+
+
+class TestSpectralFlatness(TestFeature):
+    feature = SpectralFlatness(low_cutoff=0.0, high_cutoff=12.0)
+
+
+class TestSpectralEntropy(TestFeature):
+    feature = SpectralEntropy(low_cutoff=0.0, high_cutoff=12.0)
