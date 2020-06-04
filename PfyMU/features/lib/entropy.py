@@ -119,7 +119,7 @@ class PermutationEntropy(Feature):
         if self.normalize:
             pe = pe / log2(factorial(self.order))
 
-        return pe
+        self._result = pe
 
     @staticmethod
     def _embed(x_1d, order, delay):
