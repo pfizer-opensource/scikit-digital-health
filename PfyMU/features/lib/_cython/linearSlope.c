@@ -2453,7 +2453,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_linregress
  *     cdef double slope, intercept
  * 
  *     mean_1d(x, &xmean)             # <<<<<<<<<<<<<<
- *     mean_1d(x, &ymean)
+ *     mean_1d(y, &ymean)
  * 
  */
   __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_1d(__pyx_v_x, (&__pyx_v_xmean));
@@ -2461,11 +2461,11 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_linregress
   /* "PfyMU/features/lib/_cython/linearSlope.pyx":36
  * 
  *     mean_1d(x, &xmean)
- *     mean_1d(x, &ymean)             # <<<<<<<<<<<<<<
+ *     mean_1d(y, &ymean)             # <<<<<<<<<<<<<<
  * 
  *     # average sum of squares
  */
-  __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_1d(__pyx_v_x, (&__pyx_v_ymean));
+  __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_1d(__pyx_v_y, (&__pyx_v_ymean));
 
   /* "PfyMU/features/lib/_cython/linearSlope.pyx":39
  * 
