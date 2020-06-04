@@ -3,6 +3,7 @@ from PfyMU.features import *
 from PfyMU.tests.features.conftest import TestFeature
 
 
+# STATISTICAL MOMENT FEATURES
 class TestMean(TestFeature):
     feature = Mean()
 
@@ -23,6 +24,7 @@ class TestKurtosis(TestFeature):
     feature = Kurtosis()
 
 
+# ENTROPY FEATURES
 class TestSignalEntropy(TestFeature):
     feature = SignalEntropy()
 
@@ -35,6 +37,7 @@ class TestPermutationEntropy(TestFeature):
     feature = PermutationEntropy(order=4, delay=1, normalize=False)
 
 
+# FREQUENCY FEATURES
 class TestDominantFrequency(TestFeature):
     feature = DominantFrequency(low_cutoff=0.0, high_cutoff=12.0)
 
@@ -53,3 +56,16 @@ class TestSpectralFlatness(TestFeature):
 
 class TestSpectralEntropy(TestFeature):
     feature = SpectralEntropy(low_cutoff=0.0, high_cutoff=12.0)
+
+
+# MISC FEATURES
+class TestComplexityInvariantDistance(TestFeature):
+    feature = ComplexityInvariantDistance(normalize=True)
+
+
+class TestRangeCountPercentage(TestFeature):
+    feature = RangeCountPercentage(range_min=-1.0, range_max=1.0)
+
+
+class TestRatioBeyondRSigma(TestFeature):
+    feature = RatioBeyondRSigma(r=2.0)
