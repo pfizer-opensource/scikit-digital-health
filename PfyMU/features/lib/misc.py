@@ -34,7 +34,7 @@ class ComplexityInvariantDistance(Feature):
 
 
 class RangeCountPercentage(Feature):
-    def __init__(self, range_min=-1, range_max=1):
+    def __init__(self, range_min=-1.0, range_max=1.0):
         """
         Compute the percent of the signal that falls between the minimum and maximum values
 
@@ -60,7 +60,7 @@ class RangeCountPercentage(Feature):
     def _compute(self, x, fs):
         super(RangeCountPercentage, self)._compute(x, fs)
 
-        self._result = -_cython.RangeCount(x, self.rmin, self.rmax)
+        self._result = _cython.RangeCount(x, self.rmin, self.rmax)
 
 
 class RatioBeyondRSigma(Feature):
@@ -87,4 +87,4 @@ class RatioBeyondRSigma(Feature):
     def _compute(self, x, fs):
         super(RatioBeyondRSigma, self)._compute(x, fs)
 
-        self._result = -_cython.RatioBeyondRSigma(x, self.r)
+        self._result = _cython.RatioBeyondRSigma(x, self.r)
