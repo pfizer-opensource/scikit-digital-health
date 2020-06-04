@@ -38,7 +38,7 @@ cpdef histogram(const double[:] signal, double[:] descriptor):
     cdef double delta = (max_val - min_val) / <double>(N - 1)
 
     descriptor[0] = min_val - delta / 2
-    descriptor[1] = max_val - delta / 2
+    descriptor[1] = max_val + delta / 2
     descriptor[2] = ceil(sqrt(N))
 
     return hist(signal, <int>(descriptor[2]), min_val, max_val, N)
