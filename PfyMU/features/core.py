@@ -124,7 +124,7 @@ class Bank:
 
         # iterate over all the features and compute them, saving the result as desired in the feature table
         for i, dft in enumerate(self._feat_list):
-            dft.compute(x, fs)  # compute the feature without returning it
+            dft._compute(x, fs)  # compute the feature without returning it
 
             feats[:, idx:idx + self._n_feats[i]] = dft.get_result()  # get the result
             if isinstance(signal, DataFrame):
@@ -281,7 +281,7 @@ class Feature:
 
 
 class DeferredFeature:
-    __slots__ = ('parent', 'index', 'compute', 'n')  # limit attributes
+    __slots__ = ('parent', 'index', '_compute', 'n')  # limit attributes
 
     def __init__(self, parent, index):
         """
@@ -302,7 +302,7 @@ class DeferredFeature:
 
         self.index = index
         # we want the "private" method that doesn't return a value, and checks if the computation was done already
-        self.compute = self.parent._compute
+        self._compute = self.parent._compute
 
         # determine how many features will be returned
         if hasattr(index, "__len__"):
