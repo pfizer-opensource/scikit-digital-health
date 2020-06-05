@@ -252,9 +252,9 @@ class Feature:
     # FUNCTIONALITY METHODS
     def __eq__(self, other):
         if isinstance(other, type(self)):
-            return other._eq_params == self._eq_params
+            return (other._eq_params == self._eq_params) and (other._name == self._name)
         elif isinstance(other, DeferredFeature):
-            return other.parent._eq_params == self._eq_params
+            return (other.parent._eq_params == self._eq_params) and (other.parent._name == self._name)
         else:
             return False
 
@@ -327,9 +327,9 @@ class DeferredFeature:
     # FUNCTIONALITY METHODS
     def __eq__(self, other):
         if isinstance(other, DeferredFeature):
-            return other.parent._eq_params == self.parent._eq_params
+            return (other.parent._eq_params == self.parent._eq_params) and (other.parent._name == self.parent._name)
         elif isinstance(other, Feature):
-            return other._eq_params == self.parent._eq_params
+            return (other._eq_params == self.parent._eq_params) and (other._name == self.parent._name)
         else:
             return False
 
