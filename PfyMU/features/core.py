@@ -258,9 +258,9 @@ class Feature:
     def __getitem__(self, key):
         index = None
         if isinstance(key, str):
-            index = self._xyz_map.get(key, default=None)
+            index = self._xyz_map.get(key, None)  # default return is None if doesn't exist
             if index is None:
-                index = self._xyz_comp_map.get(key, default=None)
+                index = self._xyz_comp_map.get(key, None)
         elif isinstance(key, (int, type(Ellipsis))):
             index = key
         elif isinstance(key, (list, tuple, ndarray)):
