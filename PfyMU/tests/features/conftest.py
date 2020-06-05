@@ -1,5 +1,5 @@
 from pytest import fixture
-from numpy import allclose, broadcast_to
+from numpy import allclose, broadcast_to, zeros
 from pandas.testing import assert_frame_equal
 from pandas import DataFrame
 from importlib import resources
@@ -146,3 +146,21 @@ def get_dataframe_truth():
 
         return DataFrame(data=truth, columns=[f'{name}_x', f'{name}_y', f'{name}_z'])
     return get_df
+
+
+@fixture(scope='package')
+def bank_2d_truth():
+    """
+    bank + Mean()
+    bank + Range()[['x', 'z']]
+    bank + JerkMetric(normalize=True)
+    bank + Range()['y']
+    """
+    truth = zeros((1, 9))
+    with resources.path('PfyMU.tests.data', 'features_truth.h5') as path:
+        with h5py.File(path, 'r') as f:
+            truth[0, :3] = f['Mean']
+            truth[0, [3, 8, 4]] = f['Range']
+            truth[0, 5:8] = f['JerkMetric']
+
+    return truth
