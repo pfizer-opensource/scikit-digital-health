@@ -283,6 +283,12 @@ class Feature:
 class DeferredFeature:
     __slots__ = ('parent', 'index', '_compute', 'n')  # limit attributes
 
+    def __str__(self):
+        return f'Deferred{self.parent._name}'
+
+    def __repr__(self):
+        return f'Deferred{self.parent.__repr__()}'
+
     def __init__(self, parent, index):
         """
         An object for storing a feature for deferred computation. Stores the parent feature, as well as the desired
