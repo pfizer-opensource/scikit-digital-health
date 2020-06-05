@@ -99,7 +99,10 @@ class Bank:
             raise NoFeaturesError('No features to compute.')
 
         # compute windowing # of samples if necessary
-        window_length, window_step = compute_window_samples(fs, self.wlen_s, self.wstep)
+        if self.wlen_s is not None and self.wstep is not None:
+            window_length, window_step = compute_window_samples(fs, self.wlen_s, self.wstep)
+        else:
+            window_length, window_step = None, None
 
         # standardize the input signal, and perform windowing if desired
         x, columns = standardize_signal(signal, windowed=windowed, window_length=window_length,
