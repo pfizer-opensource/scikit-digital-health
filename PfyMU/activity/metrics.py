@@ -33,9 +33,9 @@ def roll_mean(x, fs, win_s):
     return diff(x2[::n]) / n
 
 
-def roll_median(x, fs, win_s):
+def roll_median_1(x, fs, win_s=5.0):
     """
-    Compute the rolling median across non-overlapping windows
+    Compute the rolling median across maximally overlapping windows
 
     Parameters
     ----------
@@ -47,7 +47,7 @@ def roll_median(x, fs, win_s):
         window size in seconds
     """
     n = int(round(fs * win_s))
-    xw = get_windowed_view(x, n, n)
+    xw = get_windowed_view(x, n, 1)
     return median(xw, axis=1)
 
 
