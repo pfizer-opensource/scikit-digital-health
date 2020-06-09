@@ -11,7 +11,7 @@ from scipy.signal import butter, sosfiltfilt
 from PfyMU.features.utility import get_windowed_view
 
 
-__all__ = ['roll_mean', 'roll_median_1', 'angle', 'hfen_plus', 'enmo', 'enmoz']
+__all__ = ['roll_mean', 'roll_median_1', 'angle', 'hfen_plus', 'enmo', 'enmoa']
 
 
 def roll_mean(x, fs, win_s):
@@ -135,7 +135,7 @@ def enmo(acc):
     return norm(acc, axis=1) - 1
 
 
-def enmoz(acc):
+def enmoa(acc):
     """
     Compute the Euclidean Norm minus gravity, with negative values clipped to 0
 
@@ -146,8 +146,8 @@ def enmoz(acc):
 
     Returns
     -------
-    enmoz : numpy.ndarray
-        (N, ) array of the ENMOZ metric
+    enmoa : numpy.ndarray
+        (N, ) array of the ENMOa metric
     """
     tmp = norm(acc, axis=1) - 1
     tmp[tmp < 0] = 0.0
