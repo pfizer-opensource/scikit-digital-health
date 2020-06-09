@@ -4,9 +4,48 @@ Metric definitions
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
-from numpy import atan, sqrt
+from numpy import atan, sqrt, diff, cumsum, zeros, median
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt
+
+from PfyMU.features.utility import get_windowed_view
+
+
+def roll_mean(x, fs, win_s):
+    """
+    Compute the mean across non-overlapping windows
+
+    Parameters
+    ----------
+    x : numpy.ndarray
+        signal
+    fs : float
+        sampling frequency
+    win_s : float
+        window size in seconds
+    """
+    n = int(round(fs * win_s))
+    x2 = zeros(x.size + 1)
+    x2[1:] = cumsum(x)
+    return diff(x2[::n]) / n
+
+
+def roll_median(x, fs, win_s):
+    """
+    Compute the rolling median across non-overlapping windows
+
+    Parameters
+    ----------
+    x : numpy.ndarray
+        signal
+    fs : float,
+        sampling frequency
+    win_s : float
+        window size in seconds
+    """
+    n = int(round(fs * win_s))
+    xw = get_windowed_view(x, n, n)
+    return median(xw, axis=1)
 
 
 def angle(acc, axis):
@@ -62,3 +101,39 @@ def hfen_plus(acc, fs, cut=0.2, N=4):
     tmp_lo = sosfiltfilt(sos_lop, acc, axis=0)
 
     return norm(tmp_hi, axis=1) + norm(tmp_lo, axis=1) - 1  # minus gravity
+
+
+def enmo(acc):
+    """
+    Compute the Euclidean Norm minus gravity
+
+    Parameters
+    ----------
+    acc : numpy.ndarray
+        (N, 3) array of accelerations in units of g
+
+    Returns
+    -------
+    enmo : numpy.ndarray
+        (N, ) array of the ENMO metric
+    """
+    return norm(acc, axis=1) - 1
+
+
+def enmoz(acc):
+    """
+    Compute the Euclidean Norm minus gravity, with negative values clipped to 0
+
+    Parameters
+    ----------
+    acc : numpy.ndarray
+        (N, 3) array of accelerations in units of g
+
+    Returns
+    -------
+    enmoz : numpy.ndarray
+        (N, ) array of the ENMOZ metric
+    """
+    tmp = norm(acc, axis=1) - 1
+    tmp[tmp < 0] = 0.0
+    return tmp
