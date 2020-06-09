@@ -4,14 +4,14 @@ Metric definitions
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
-from numpy import atan, sqrt, diff, cumsum, zeros, median
+from numpy import atan, sqrt, diff, cumsum, zeros, nanmedian, full, nan, where, isnan
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt
 
 from PfyMU.features.utility import get_windowed_view
 
 
-__all__ = ['roll_mean', 'roll_median', 'angle', 'hfen_plus', 'enmo', 'enmoz']
+__all__ = ['roll_mean', 'roll_median_1', 'angle', 'hfen_plus', 'enmo', 'enmoz']
 
 
 def roll_mean(x, fs, win_s):
@@ -47,8 +47,20 @@ def roll_median_1(x, fs, win_s=5.0):
         window size in seconds
     """
     n = int(round(fs * win_s))
+    n2 = int(n // 2)
     xw = get_windowed_view(x, n, 1)
-    return median(xw, axis=1)
+
+    xm = full(x.shape, nan)
+    xm[n2:-n2] = nanmedian(xw, axis=-1)
+    # GGIR uses median, replaces NaN values with the first non nan value in the whole array
+
+    # replace NaN values with closest value on the beginning and end (to make returned array same shape as input)
+    ind = where(~isnan(xm))[0]
+    first, last = ind[0], ind[-1]
+    xm[:first] = xm[first]
+    xm[last + 1:] = xm[last]
+
+    return xm
 
 
 def angle(acc, axis):
