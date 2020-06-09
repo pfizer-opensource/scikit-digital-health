@@ -11,6 +11,9 @@ from scipy.signal import butter, sosfiltfilt
 from PfyMU.features.utility import get_windowed_view
 
 
+__all__ = ['roll_mean', 'roll_median', 'angle', 'hfen_plus', 'enmo', 'enmoz']
+
+
 def roll_mean(x, fs, win_s):
     """
     Compute the mean across non-overlapping windows
