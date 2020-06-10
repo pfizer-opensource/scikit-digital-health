@@ -105,14 +105,15 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
                             f_intrp = interp1d(np.arange(0, n/fs, 1/fs), f[activity][trial]['Accelerometer'], axis=0)
                             tmp = f_intrp(np.arange(0, n/fs, 1/goal_fs))
                         else:
-                            tmp = f[activity][trial]
+                            tmp = f[activity][trial]['Accelerometer']
 
                         if acc_mag:
                             tmp = np.linalg.norm(tmp, axis=1)
 
                         m = int(((tmp.shape[0] - n_wlen) / n_wstep + 1))
                         dataset[cnt:cnt+m] = get_windowed_view(tmp, n_wlen, n_wstep)
-                        subjects[cnt:cnt+m] = f'{subj.name}_{di}'  # append study/dataset number to seperate studies
+                        # append study/dataset number to seperate studies
+                        subjects[cnt:cnt+m] = f'{subj.name.split(".")[0]}_{di}'
                         labels[cnt:cnt+m] = gait_label
 
                         cnt += m  # increment count
