@@ -66,7 +66,6 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
     n_wlen, n_wstep = compute_window_samples(goal_fs, window_length, window_step)
 
     M, N = 0, n_wlen
-    P = 1 if acc_mag else 3
 
     # first pass to get size for array allocation
     for dset in paths:
@@ -84,7 +83,7 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
                         M += int((n - n_wlen) / n_wstep + 1)
 
     # allocate space for the data
-    dataset = np.zeros((M, N, P))
+    dataset = np.zeros((M, N)) if acc_mag else np.zeros((M, N, 3))
     subjects = np.empty(M, dtype='U30')  # maximum 30 character strings
     labels = np.empty(M, dtype='int')
 
