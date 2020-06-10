@@ -77,7 +77,7 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
             with h5py.File(subj, 'r') as f:
                 for activity in f.keys():
                     for trial in f[activity].keys():
-                        n, _ = f[activity][trial].shape
+                        n, _ = f[activity][trial]['Accelerometer'].shape
                         fs = f[activity][trial].attrs.get('Sampling rate')
 
                         n = int(n * goal_fs / fs)  # compute samples when down/upsampled
