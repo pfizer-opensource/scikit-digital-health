@@ -100,7 +100,7 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
                 for activity in f.keys():
                     gait_label = f[activity].attrs.get('Gait Label')
                     for trial in f[activity].keys():
-                        n, _ = f[activity][trial].shape
+                        n, _ = f[activity][trial]['Accelerometer'].shape
                         fs = f[activity][trial].attrs.get('Sampling rate')
                         if fs != goal_fs:
                             f = interp1d(np.linspace(0, n/fs, 1/fs), f[activity][trial]['Accelerometer'], axis=0)
