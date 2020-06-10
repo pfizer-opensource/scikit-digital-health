@@ -9,6 +9,9 @@ import numpy as np
 from PfyMU.features.utility import get_windowed_view, compute_window_samples
 
 
+__all__ = ['load_datasets']
+
+
 def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_step=0.5):
     """
     Load standardized datasets into memory
