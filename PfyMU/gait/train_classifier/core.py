@@ -103,8 +103,8 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
                         n, _ = f[activity][trial]['Accelerometer'].shape
                         fs = f[activity][trial].attrs.get('Sampling rate')
                         if fs != goal_fs:
-                            f = interp1d(np.linspace(0, n/fs, 1/fs), f[activity][trial]['Accelerometer'], axis=0)
-                            tmp = f(np.linspace(0, n/fs, 1/goal_fs))
+                            f = interp1d(np.arange(0, n/fs, 1/fs), f[activity][trial]['Accelerometer'], axis=0)
+                            tmp = f(np.arange(0, n/fs, 1/goal_fs))
                         else:
                             tmp = f[activity][trial]
 
