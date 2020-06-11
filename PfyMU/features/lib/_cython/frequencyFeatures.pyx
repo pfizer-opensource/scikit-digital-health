@@ -95,7 +95,7 @@ cdef class FrequencyFeatures:
         
         for self.i in range(self.M):
             for self.k in range(self.P):
-                self.maxf[self.i, self.k] = self.freq[self.imax[self.i, self.k]]
+                self.maxf[self.i, self.k] = self.freq[self.imax[self.i, self.k] + self.ilcut]
         
         return self.maxf
     
@@ -105,7 +105,7 @@ cdef class FrequencyFeatures:
         
         for self.i in range(self.M):
             for self.k in range(self.P):
-                self.maxfv[self.i, self.k] = self.sp_norm[self.i, self.imax[self.i, self.k], self.k]
+                self.maxfv[self.i, self.k] = self.sp_norm[self.i, self.imax[self.i, self.k] + self.ilcut, self.k]
         
         return self.maxfv
 
