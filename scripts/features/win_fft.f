@@ -36,13 +36,14 @@
         complex(8) :: ws(4 * k + 15)
         integer(8) :: i, j
 
+        F = complex(0.0_8, 0.0_8)
+        call dcffti(int(k, 4), ws)
+
         do i=1, n-L, step
           j = int(i / step + 1)
 
-          F(j, :) = cmplx(0.0, kind=8)
           F(j, :L) = cmplx(x(i:i+L-1), kind=8)
 
-          call dcffti(int(k, 4), ws)
           call dcfftf(int(k, 4), F(j, :), ws)
         end do
       end
