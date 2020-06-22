@@ -97,10 +97,15 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
             with h5py.File(subj, 'r') as f:
                 # first pass to get size for array allocation
                 for activity in f.keys():
-                    gait_label = f[activity].attrs.get('Gait Label')
+                    gait_label = f[activity].attrs.get('Gait label')
                     for trial in f[activity].keys():
-                        n, _ = f[activity][trial]['Accelerometer'].shape
+                        n, *_ = f[activity][trial]['Accelerometer'].shape
                         fs = f[activity][trial].attrs.get('Sampling rate')
+
+                        # ensure there is enough data
+                        if n < (n_wlen * fs / goal_fs):
+                            continue
+
                         if fs != goal_fs:
                             f_intrp = interp1d(
                                 np.arange(0, n/fs, 1/fs),
