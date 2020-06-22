@@ -79,7 +79,7 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
                         n, _ = f[activity][trial]['Accelerometer'].shape
                         fs = f[activity][trial].attrs.get('Sampling rate')
 
-                        n = int(n * goal_fs / fs)  # compute samples when down/upsampled
+                        n = int(np.ceil(n * goal_fs / fs))  # compute samples when down/upsampled
                         M += int((n - n_wlen) // n_wstep + 1)
 
     # allocate space for the data
