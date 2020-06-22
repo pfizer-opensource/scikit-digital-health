@@ -30,6 +30,13 @@ class NoFeaturesError(Exception):
 class Bank:
     __slots__ = ('_feat_list', '_n_feats', '_eq_idx', 'wlen_s', 'wstep')
 
+    def __str__(self):
+        ret = '[\n'
+        for i in self._feat_list:
+            ret += f'\t{i.parent.__str__()},\n'
+        ret += ']'
+        return ret
+
     def __init__(self, window_length=None, window_step=1.0):
         """
         A feature bank for ease in creating a table of features for a given signal, applying the windowing as specified.
@@ -55,11 +62,11 @@ class Bank:
         --------
         >>> fb = Bank()
         >>> # add features to the Bank
-        >>> fb + SignalMean()
-        >>> fb + SignalRange()
+        >>> fb + Mean()
+        >>> fb + Range()
         >>> # add specific axes of features to the Bank
         >>> fb + SignalEntropy()[0]
-        >>> fb + SignalIQR()[[1, 2]]
+        >>> fb + IQR()[[1, 2]]
         >>> fb + SignalEntropy()[2]  # this will reuse the same instance created above, to avoid feature re-computation
         >>> features = fb.compute(signal)
         """
