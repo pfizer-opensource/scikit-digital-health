@@ -76,11 +76,13 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
             with h5py.File(subj, 'r') as f:
                 for activity in f.keys():
                     for trial in f[activity].keys():
-                        n, _ = f[activity][trial]['Accelerometer'].shape
+                        n = f[activity][trial]['Accelerometer'].shape[0]
                         fs = f[activity][trial].attrs.get('Sampling rate')
 
                         n = int(np.ceil(n * goal_fs / fs))  # compute samples when down/upsampled
-                        M += int((n - n_wlen) // n_wstep + 1)
+                        if n < n_wlen:
+                            continue
+                        M += int(((n - n_wlen) // n_wstep + 1))
 
     # allocate space for the data
     dataset = np.zeros((M, N)) if acc_mag else np.zeros((M, N, 3))
@@ -95,11 +97,10 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
         subjs = [i for i in dset.glob('*.h5') if i.is_file()]
         for subj in subjs:
             with h5py.File(subj, 'r') as f:
-                # first pass to get size for array allocation
                 for activity in f.keys():
                     gait_label = f[activity].attrs.get('Gait label')
                     for trial in f[activity].keys():
-                        n, *_ = f[activity][trial]['Accelerometer'].shape
+                        n = f[activity][trial]['Accelerometer'].shape[0]
                         fs = f[activity][trial].attrs.get('Sampling rate')
 
                         # ensure there is enough data
@@ -108,7 +109,7 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
 
                         if fs != goal_fs:
                             f_intrp = interp1d(
-                                np.arange(0, n/fs, 1/fs),
+                                np.arange(0, n/fs, 1/fs)[:n],
                                 f[activity][trial]['Accelerometer'],
                                 axis=0,
                                 bounds_error=False,
@@ -116,11 +117,10 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
                             )
                             tmp = f_intrp(np.arange(0, n/fs, 1/goal_fs))
                         else:
-                            tmp = f[activity][trial]['Accelerometer']
+                            tmp = f[activity][trial]['Accelerometer'][()]
 
                         if acc_mag:
                             tmp = np.linalg.norm(tmp, axis=1)
-
                         m = int(((tmp.shape[0] - n_wlen) // n_wstep + 1))
                         dataset[cnt:cnt+m] = get_windowed_view(tmp, n_wlen, n_wstep)
                         # append study/dataset number to seperate studies
