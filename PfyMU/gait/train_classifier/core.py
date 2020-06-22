@@ -80,7 +80,7 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
                         fs = f[activity][trial].attrs.get('Sampling rate')
 
                         n = int(n * goal_fs / fs)  # compute samples when down/upsampled
-                        M += int((n - n_wlen) / n_wstep + 1)
+                        M += int((n - n_wlen) // n_wstep + 1)
 
     # allocate space for the data
     dataset = np.zeros((M, N)) if acc_mag else np.zeros((M, N, 3))
@@ -121,7 +121,7 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
                         if acc_mag:
                             tmp = np.linalg.norm(tmp, axis=1)
 
-                        m = int(((tmp.shape[0] - n_wlen) / n_wstep + 1))
+                        m = int(((tmp.shape[0] - n_wlen) // n_wstep + 1))
                         dataset[cnt:cnt+m] = get_windowed_view(tmp, n_wlen, n_wstep)
                         # append study/dataset number to seperate studies
                         subjects[cnt:cnt+m] = f'{subj.name.split(".")[0]}_{di}'
