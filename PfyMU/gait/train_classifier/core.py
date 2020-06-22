@@ -70,7 +70,7 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
     # first pass to get size for array allocation
     for dset in paths:
         # find all the subjects in the dataset
-        subjs = [i for i in dset.glob('subject*.h5') if i.is_file()]
+        subjs = [i for i in dset.glob('*.h5') if i.is_file()]
 
         for subj in subjs:
             with h5py.File(subj, 'r') as f:
@@ -92,7 +92,7 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
     # second pass to get the data from the datasets
     for di, dset in enumerate(paths):
         # find all the subjects in the dataset
-        subjs = [i for i in dset.glob('subject*.h5') if i.is_file()]
+        subjs = [i for i in dset.glob('*.h5') if i.is_file()]
         for subj in subjs:
             with h5py.File(subj, 'r') as f:
                 # first pass to get size for array allocation
