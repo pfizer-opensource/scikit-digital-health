@@ -64,7 +64,7 @@ class DetailPower(Feature):
 
         N = sum(diff(sign(xr), axis=1) > 0, axis=1)
         # ensure no 0 values to prevent divide by 0
-        N[~nonzero(N)] = 1e-4
+        N[N == 0] = 1e-4
 
         power = zeros((x.shape[0], x.shape[2]))
         for i in range(lvls[0] - lvls[1] + 1):
