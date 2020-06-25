@@ -4,3 +4,4 @@ from .statistics import *
 from .frequency import *
 from .misc import *
 from .moments import *
+from .wavelet import *
