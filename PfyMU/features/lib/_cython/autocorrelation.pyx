@@ -3,6 +3,7 @@
 # cython: wraparound = False
 cimport cython
 from numpy import zeros, double as npy_double
+from .common cimport mean_sd_1d
 
 
 def Autocorrelation(const double[:, :, :] x, int lag, bint normalize):
