@@ -99,3 +99,12 @@ class TestRMS(TestFeature):
 
 class TestLinearSlope(TestFeature):
     feature = LinearSlope()
+
+
+# WAVELET FEATURES
+class TestDetailPower(TestFeature):
+    feature = DetailPower(wavelet='coif4', freq_band=[1.0, 3.0])
+
+
+class TestDetailPowerRatio(TestFeature):
+    feature = DetailPowerRatio(wavelet='coif4', freq_band=[1.0, 3.0])
