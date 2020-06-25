@@ -1,3 +1,4 @@
+from .autocorrelation import Autocorrelation
 from .complexityInvariantDistance import CID
 from .correlationCoefficient import CC3
 from .entropy import SignalEntropy, SampleEntropy
