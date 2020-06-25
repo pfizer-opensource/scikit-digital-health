@@ -62,7 +62,7 @@ class RMS(Feature):
 
 
 class Autocorrelation(Feature):
-    def __init__(self, lag=1, normalize=True)
+    def __init__(self, lag=1, normalize=True):
         """
         Compute the autocorrelation of a signal at the given lag
 
