@@ -66,12 +66,10 @@ class DetailPower(Feature):
         # ensure no 0 values to prevent divide by 0
         N[N == 0] = 1e-4
 
-        power = zeros((x.shape[0], x.shape[2]))
+        self._result = zeros((x.shape[0], x.shape[2]))
         for i in range(lvls[0] - lvls[1] + 1):
-            power += sum(cD[i]**2, axis=1)
-        power /= N
-
-        return power
+            self._result += sum(cD[i]**2, axis=1)
+        self._result /= N
 
 
 class DetailPowerRatio(Feature):
@@ -123,10 +121,8 @@ class DetailPowerRatio(Feature):
         # TODO test effect of mode on result
         cA, *cD = pywt.wavedec(x, self.wave, mode='symmetric', level=lvls[0], axis=1)
 
-        power = zeros((x.shape[0], x.shape[2]))
+        self._result = zeros((x.shape[0], x.shape[2]))
         for i in range(lvls[0] - lvls[1] + 1):
-            power += sum(cD[i]**2, axis=1)
+            self._result += sum(cD[i]**2, axis=1)
 
-        power /= sum(x**2, axis=1)
-
-        return power
+        self._result /= sum(x**2, axis=1)
