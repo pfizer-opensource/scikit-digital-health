@@ -7,7 +7,7 @@ from PfyMU.features.core import Feature
 from PfyMU.features.lib import _cython
 
 
-__all__ = ['Range', 'IQR', 'RMS', 'LinearSlope']
+__all__ = ['Range', 'IQR', 'RMS', 'Autocorrelation', 'LinearSlope']
 
 
 class Range(Feature):
@@ -60,6 +60,33 @@ class RMS(Feature):
 
         self._result = std(x - mean(x, axis=1, keepdims=True), axis=1, ddof=1)
 
+
+class Autocorrelation(Feature):
+    def __init__(self, lag=1, normalize=True)
+        """
+        Compute the autocorrelation of a signal at the given lag
+
+        Parameters
+        ----------
+        lag : int, optional
+            Amount of lag (in samples) to use for the autocorrelation. Default is 1 sample.
+        normalize : bool, optional
+            Normalize the result using the mean/std. deviation. Default is True
+
+        Methods
+        -------
+        compute(signal[, columns=None, windowed=False])
+        """
+        super(Autocorrelation, self).__init__('Autocorrelation', {'lag': lag, 'normalize': normalize})
+
+        self.lag = lag
+        self.normalize = normalize
+
+    def _compute(self, x, fs):
+        super(Autocorrelation, self)._compute(x, fs)
+
+        self._result = _cython.Autocorrelation(x, self.lag, self.normalize)
+        
 
 class LinearSlope(Feature):
     def __init__(self):
