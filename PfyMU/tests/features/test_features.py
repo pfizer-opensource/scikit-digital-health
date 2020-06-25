@@ -97,6 +97,10 @@ class TestRMS(TestFeature):
     feature = RMS()
 
 
+class TestAutocorrelation(TestFeature):
+    feature = Autocorrelation(lag=1, normalize=True)
+
+
 class TestLinearSlope(TestFeature):
     feature = LinearSlope()
 
