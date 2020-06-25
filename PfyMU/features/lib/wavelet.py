@@ -100,7 +100,7 @@ class DetailPowerRatio(Feature):
         .. [1] Sekine, M. et al. "Classification of waist-acceleration signals in a continuous walking record." Medical
         Engineering & Physics. Vol. 22. Pp 285-291. 2000.
         """
-        super().__init__('DetailPower', {'wavelet': wavelet, 'freq_band': freq_band})
+        super().__init__('DetailPowerRatio', {'wavelet': wavelet, 'freq_band': freq_band})
 
         self.wave = wavelet
 
