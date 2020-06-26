@@ -62,7 +62,7 @@ class DetailPower(Feature):
         # reconstruct and get negative->positive zero crossings
         xr = pywt.waverec((cA,) + tuple(cD), self.wave, mode='symmetric', axis=1)
 
-        N = sum(diff(sign(xr), axis=1) > 0, axis=1)
+        N = sum(diff(sign(xr), axis=1) > 0, axis=1).astype(float)
         # ensure no 0 values to prevent divide by 0
         N[N == 0] = 1e-4
 
