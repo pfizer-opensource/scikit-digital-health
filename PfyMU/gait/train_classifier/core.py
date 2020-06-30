@@ -12,7 +12,7 @@ from PfyMU.features.utility import get_windowed_view, compute_window_samples
 __all__ = ['load_datasets']
 
 
-def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_step=0.5):
+def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_step=0.5, signal_function=None):
     """
     Load standardized datasets into memory
 
@@ -31,6 +31,9 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
         Window step - the spacing between the start of windows. This can be specified several different ways
         (see Notes). Default is 0.5. If providing an array, the first value is the overlap for NON-GAIT events, and the
         second value is the overlap for GAIT events.
+    signal_function : None, function
+        Function to apply to the data (or data magnitude). Signature is `function(signal, fs)`, and it should return
+        `transformed_signal` that is the same shape as the input `signal`.
 
     Returns
     -------
@@ -135,6 +138,9 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
 
                         if acc_mag:
                             tmp = np.linalg.norm(tmp, axis=1)
+
+                        if signal_function is not None:
+                            tmp = signal_function(tmp, goal_fs)
 
                         if step2:
                             m = int(((tmp.shape[0] - n_wlen) // n_wstep[gait_label] + 1))
