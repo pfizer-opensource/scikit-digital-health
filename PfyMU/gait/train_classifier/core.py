@@ -140,7 +140,7 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
                             tmp = np.linalg.norm(tmp, axis=1)
 
                         if signal_function is not None:
-                            tmp = np.ascontinuousarray(signal_function(tmp, goal_fs))
+                            tmp = np.ascontiguousarray(signal_function(tmp, goal_fs))
 
                         if step2:
                             m = int(((tmp.shape[0] - n_wlen) // n_wstep[gait_label] + 1))
