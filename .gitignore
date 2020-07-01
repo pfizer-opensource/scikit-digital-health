@@ -3,6 +3,9 @@
 .idea/*
 .idea*
 
+# features
+scripts/feature_exploration/features.h5
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
