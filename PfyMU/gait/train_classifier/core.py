@@ -27,10 +27,10 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
         Compute and use the acceleration magnitude instead of the 3-axis acceleration. Default is True.
     window_length : float
         Window length in seconds. If not provided (None), will do no windowing. Default is 3.0 seconds
-    window_step : {float, int, array-like}
+    window_step : {float, int, dict}
         Window step - the spacing between the start of windows. This can be specified several different ways
-        (see Notes). Default is 0.5. If providing an array, the first value is the overlap for NON-GAIT events, and the
-        second value is the overlap for GAIT events.
+        (see Notes). Default is 0.5. If providing a dictionary, each key is an activity, and its value
+        is the value of the overlap. You can specify a default overlap by using the key 'default'.
     signal_function : None, function
         Function to apply to the data (or data magnitude). Signature is `function(signal, fs)`, and it should return
         `transformed_signal` that is the same shape as the input `signal`.
@@ -69,14 +69,26 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
     paths = [Path(i) for i in paths]  # make sure entries are Path objects
 
     # compute the goal window length and the goal window step
-    if hasattr(window_step, '__len__'):
-        n_wstep = [0, 0]
-        n_wlen, n_wstep[0] = compute_window_samples(goal_fs, window_length, window_step[0])
-        n_wlen, n_wstep[1] = compute_window_samples(goal_fs, window_length, window_step[1])
-        step2 = True
+    # if hasattr(window_step, '__len__') and not isinstance(window_step, dict):
+    #     n_wstep = [0, 0]
+    #     n_wlen, n_wstep[0] = compute_window_samples(goal_fs, window_length, window_step[0])
+    #     n_wlen, n_wstep[1] = compute_window_samples(goal_fs, window_length, window_step[1])
+    #     step2 = 1
+    # elif isinstance(window_step, dict):
+    #     step2 = -1
+    # else:
+    #     n_wlen, n_wstep = compute_window_samples(goal_fs, window_length, window_step)
+    #     step2 = 0
+    if isinstance(window_step, dict):
+        n_wstep = {}
+        if 'default' not in window_step:
+            window_step['default'] = 0.5
+        for act in window_step:
+            n_wlen, n_wstep[act] = compute_window_samples(goal_fs, window_length, window_step[act])
+        step_d = True
     else:
         n_wlen, n_wstep = compute_window_samples(goal_fs, window_length, window_step)
-        step2 = False
+        step_d = False
 
     M, N = 0, n_wlen
 
@@ -88,7 +100,6 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
         for subj in subjs:
             with h5py.File(subj, 'r') as f:
                 for activity in f.keys():
-                    gait_label = f[activity].attrs.get('Gait label')
                     for trial in f[activity].keys():
                         n = f[activity][trial]['Accelerometer'].shape[0]
                         fs = f[activity][trial].attrs.get('Sampling rate')
@@ -96,8 +107,8 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
                         n = int(np.ceil(n * goal_fs / fs))  # compute samples when down/upsampled
                         if n < n_wlen:
                             continue
-                        if step2:
-                            M += int(((n - n_wlen) // n_wstep[gait_label] + 1))
+                        if step_d:
+                            M += int(((n - n_wlen) // n_wstep.get(activity, n_wstep['default']) + 1))
                         else:
                             M += int(((n - n_wlen) // n_wstep + 1))
     # allocate space for the data
@@ -142,9 +153,9 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
                         if signal_function is not None:
                             tmp = np.ascontiguousarray(signal_function(tmp, goal_fs))
 
-                        if step2:
-                            m = int(((tmp.shape[0] - n_wlen) // n_wstep[gait_label] + 1))
-                            dataset[cnt:cnt + m] = get_windowed_view(tmp, n_wlen, n_wstep[gait_label])
+                        if step_d:
+                            m = int(((tmp.shape[0] - n_wlen) // n_wstep.get(activity, n_wstep['default']) + 1))
+                            dataset[cnt:cnt + m] = get_windowed_view(tmp, n_wlen, n_wstep.get(activity, n_wstep['default']))
                         else:
                             m = int(((tmp.shape[0] - n_wlen) // n_wstep + 1))
                             dataset[cnt:cnt + m] = get_windowed_view(tmp, n_wlen, n_wstep)
