@@ -9,6 +9,23 @@ from sklearn.model_selection import RandomizedSearchCV
 
 data = pd.read_hdf('../feature_exploration/features.h5', key='no_preprocessing')
 
+# take top half of features based on PP score
+dtophalf = data.drop([
+    'Skewness',
+    'Kurtosis',
+    'LinearSlope',
+    'SpectralFlatness',
+    'Autocorrelation',
+    'RangeCountPercentage',
+    'ComplexityInvariantDistance',
+    'PowerSpectralSum',
+    'RatioBeyondRSigma',
+    'SignalEntropy',
+    'DominantFrequencyValue',
+    'JerkMetric',  # add mean cross rate, remove Jerkmetric (correlation with DimensionlessJerk)
+    'StdDev'  # add mean, remove StdDev (high correlation with RMS)
+], axis=1)
+
 # get the subjects for which LOSO actually makes sense: those with multiple activities (ie more than just walking)
 gbc = data.groupby(['Subject', 'Activity'], as_index=False).count()
 loso_subjects = [i for i in gbc.Subject.unique() if gbc.loc[gbc.Subject == i].shape[0] > 3]
@@ -63,7 +80,7 @@ clf = RandomizedSearchCV(
     verbose=verbose
 )
 
-search = clf.fit(data.iloc[:, 3:], data.Label)
+search = clf.fit(dtophalf.iloc[:, 3:], dtophalf.Label)
 
 cv_results = pd.DataFrame(data=search.cv_results_)
-cv_results.to_csv('rfc_cv_results.csv')
+cv_results.to_csv('rfc_cv_results_topfeats.csv')
