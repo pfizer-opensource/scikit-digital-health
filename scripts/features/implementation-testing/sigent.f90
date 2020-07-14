@@ -8,8 +8,9 @@ subroutine fmean_sd_1d(n, x, mn, sd)
 !f2py intent(hide) :: n, mn, sd
     real(8) :: k, Ex, Ex2
     integer(8) :: i
-    Ex = 0._8
-    Ex2 = 0._8
+    
+    Ex = 0.0_8
+    Ex2 = 0.0_8
     mn = 0.0_8
     k = x(1)
     
@@ -97,13 +98,10 @@ subroutine fsignalEntropy(p, n, m, signal, sigEnt)
             if (std == 0._8) then
                 std = 1._8  ! ensure no division by 0
             end if
-
-            print *, mean, std
             
             data_norm = signal(i, :, k) / std
             
             call fhistogram(n, sqn, data_norm, d, h)
-            print *, h(1:8)
             
             if (d(1) == d(2)) then
                 sigEnt(i, k) = 0._8
@@ -117,17 +115,74 @@ subroutine fsignalEntropy(p, n, m, signal, sigEnt)
                     else
                         logf = 0._8
                     end if
+                    print *, logf, h(j)
 
                     count = count + h(j)
                     estimate = estimate - h(j) * logf
                 end do
-                
-                print *, count, estimate
+                print *, ''
 
                 nbias = -(d(3) - 1) / (2 * count)
-                print *, nbias
                 estimate = estimate / count + log(count) + log((d(2) - d(1)) / d(3)) - nbias
                 sigEnt(i, k) = exp(estimate**2) - 2
+            end if
+        end do
+    end do
+end subroutine
+
+
+subroutine fsignalEntropy2(m, n, p, signal, sigEnt)
+    ! # m is the signal dimension
+    ! # n is the axis dimension
+    ! # p is the window dimension
+    implicit none
+    integer(8), intent(in) :: m, n, p
+    real(8), intent(in) :: signal(m, n, p)
+    real(8), intent(out) :: sigEnt(n, p)
+!fp2y intent(hide) :: m, n, p
+    real(8) :: d(3), data_norm(m), nbias, count
+    real(8) :: estimate, std, mean
+    real(8) :: logf(ceiling(sqrt(real(m))))
+    integer(8) :: j, k, sqn
+    integer(8) :: h(ceiling(sqrt(real(m))))
+            
+    sqn = ceiling(sqrt(real(m)))
+    
+    do k=1, p
+        do j=1, n
+            call fmean_sd_1d(m, signal(:, j, k), mean, std)
+
+            print *, mean, std
+            
+            if (std == 0._8) then
+                std = 1._8  ! ensure no division by 0
+            end if
+            
+            data_norm = signal(:, j, k) / std
+            
+            call fhistogram(m, sqn, data_norm, d, h)
+            
+            if (d(1) == d(2)) then
+                sigEnt(j, k) = 0._8
+            else
+                count = 0._8
+                estimate = 0._8
+                
+                logf = 0._8
+                where (h > 0)
+                    logf = log(real(h, 8))
+                end where
+
+                print *, logf
+                print *, h
+                print *, ''
+                
+                count = sum(h)
+                estimate = -sum(h * logf)
+
+                nbias = -(d(3) - 1) / (2 * count)
+                estimate = estimate / count + log(count) + log((d(2) - d(1)) / d(3)) - nbias
+                sigEnt(j, k) = exp(estimate**2) - 2
             end if
         end do
     end do
