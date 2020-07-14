@@ -151,9 +151,9 @@ class Bank:
 
         if isinstance(signal, ndarray):
             if columns is not None:
-                return feats
-            else:
                 return feats, feat_columns
+            else:
+                return feats
         elif isinstance(signal, DataFrame):
             return DataFrame(data=feats, columns=feat_columns)
 
