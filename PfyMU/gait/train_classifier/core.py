@@ -261,6 +261,8 @@ def load_datasets_v2(paths, device_location, goal_fs=100.0, acc_mag=True, window
             with h5py.File(subj, 'r') as f:
                 for activity in f.keys():
                     for trial in f[activity].keys():
+                        if device_location not in f[activity][trial].keys():
+                            continue
                         n = f[activity][trial][device_location]['Accelerometer'].shape[0]
                         fs = f[activity][trial][device_location].attrs.get('Sampling rate')
 
@@ -288,7 +290,9 @@ def load_datasets_v2(paths, device_location, goal_fs=100.0, acc_mag=True, window
                 for activity in f.keys():
                     gait_label = f[activity].attrs.get('Gait label')
                     for trial in f[activity].keys():
-                        n = f[activity][trial]['Accelerometer'][device_location].shape[0]
+                        if device_location not in f[activity][trial].keys():
+                            continue
+                        n = f[activity][trial][device_location]['Accelerometer'].shape[0]
                         fs = f[activity][trial][device_location].attrs.get('Sampling rate')
 
                         # ensure there is enough data
