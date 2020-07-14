@@ -93,7 +93,8 @@ class Bank:
             Sampling frequency of the signal in Hz. Only required if the features in the Bank require
             sampling frequency in the computation (see feature documentation), or if windowing `signal`.
         columns : array-like, optional
-            Columns to use from the pandas.DataFrame.
+            Columns to use from the pandas.DataFrame. If signal is an ndarray, providing columns will provide
+            a return of the column/feature name combinations that matches the columns in the returned ndarray
         windowed : bool, optional
             If the signal has already been windowed. Default is False.
 
@@ -116,6 +117,13 @@ class Bank:
                                         step=window_step, columns=columns)
         feat_columns = []  # allocate if necessary
 
+        # ensure if passing an ndarray, that the columns matches the appropriate shape
+        if not isinstance(signal, DataFrame):
+            if columns is not None:
+                if len(columns) != x.shape[-1]:
+                    raise ValueError(f'Provided column names ({len(columns)}) does not match the number of columns'
+                                     f'in the data ({x.shape[-1]}).')
+
         # first get the number of features expected so the space can be allocated
         for dft in self._feat_list:
             # need this if statement to deal with ellipsis indices
@@ -124,7 +132,7 @@ class Bank:
 
             self._n_feats.append(dft.n)
 
-        # allocate the feature table
+        # allocate the feature table. This accounts for multiple columns per feature
         feats = zeros((x.shape[0], sum(self._n_feats)))
 
         idx = 0  # set a counter to keep track of where to put each computed feature
@@ -136,11 +144,16 @@ class Bank:
             feats[:, idx:idx + self._n_feats[i]] = dft.get_result()  # get the result
             if isinstance(signal, DataFrame):
                 feat_columns.append(dft.get_columns(columns))
+            elif columns is not None:
+                feat_columns.append(dft.get_columns(columns))
 
             idx += self._n_feats[i]  # increment the index tracker
 
         if isinstance(signal, ndarray):
-            return feats
+            if columns is not None:
+                return feats
+            else:
+                return feats, feat_columns
         elif isinstance(signal, DataFrame):
             return DataFrame(data=feats, columns=feat_columns)
 
