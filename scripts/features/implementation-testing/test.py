@@ -1,11 +1,10 @@
-from scipy.misc import electrocardiogram
+import numpy as np
 
-x1d = electrocardiogram()
-x3d = x1d.reshape((1, -1, 1))
+xb = np.random.rand(2, 16, 1)
+xc = np.ascontiguousarray(xb.transpose([0, 2, 1]))
 
 
-from sigent import fsignalentropy
+from sigent import fsignalentropy, fsignalentropy2
 
-for i in range(3):
-    res = fsignalentropy(x3d)
-    print(res)
+fsignalentropy(xb.T)
+fsignalentropy2(xc.T)
