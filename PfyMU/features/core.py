@@ -144,10 +144,8 @@ class Bank:
             dft._compute(x, fs)  # compute the feature without returning it
 
             feats[:, idx:idx + self._n_feats[i]] = dft.get_result()  # get the result
-            if isinstance(signal, DataFrame):
-                feat_columns.append(dft.get_columns(columns))
-            elif columns is not None:
-                feat_columns.append(dft.get_columns(columns))
+            if isinstance(signal, DataFrame) or columns is not None:
+                feat_columns.extend(dft.get_columns(columns))
 
             idx += self._n_feats[i]  # increment the index tracker
 
