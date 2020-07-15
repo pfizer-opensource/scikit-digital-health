@@ -73,7 +73,7 @@ class Bank:
         # storage for the features to calculate
         self._feat_list = []
         # storage for the number of features that will be calculated
-        self._n_feats = []
+        self._n_feats = None  # need to allocate in compute to reset for each compute call
         # storage of the last instance of a particular class/instance, if it exists
         self._eq_idx = None
 
@@ -105,6 +105,8 @@ class Bank:
         """
         if not self._feat_list:
             raise NoFeaturesError('No features to compute.')
+
+        self._n_feats = []
 
         # compute windowing # of samples if necessary
         if self.wlen_s is not None and self.wstep is not None:
