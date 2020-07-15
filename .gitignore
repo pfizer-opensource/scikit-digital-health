@@ -6,6 +6,9 @@
 # features
 scripts/feature_exploration/features.h5
 
+# actigraph sample data
+scripts/binary_readers/actigraph/data/sample*
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
