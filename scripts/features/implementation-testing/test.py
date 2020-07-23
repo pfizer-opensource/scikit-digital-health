@@ -1,10 +1,10 @@
 import numpy as np
 
-xb = np.random.rand(2, 16, 1)
-xc = np.ascontiguousarray(xb.transpose([0, 2, 1]))
+np.random.seed(5)
+x = np.around(np.random.rand(100, 1, 1), 2)
 
 
-from sigent import fsignalentropy, fsignalentropy2
+from sampent import sampleentropy, sampen2
 
-fsignalentropy(xb.T)
-fsignalentropy2(xc.T)
+sampleentropy(x, 3, 0.3)
+sampen2(x[:, 0, 0], 3, 0.3)
