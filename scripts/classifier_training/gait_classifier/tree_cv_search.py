@@ -7,24 +7,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import f1_score, make_scorer
 from sklearn.model_selection import RandomizedSearchCV
 
-data = pd.read_hdf('../feature_exploration/features.h5', key='no_preprocessing')
-
-# take top half of features based on PP score
-dtophalf = data.drop([
-    'Skewness',
-    'Kurtosis',
-    'LinearSlope',
-    'SpectralFlatness',
-    'Autocorrelation',
-    'RangeCountPercentage',
-    'ComplexityInvariantDistance',
-    'PowerSpectralSum',
-    'RatioBeyondRSigma',
-    'SignalEntropy',
-    'DominantFrequencyValue',
-    'JerkMetric',  # add mean cross rate, remove Jerkmetric (correlation with DimensionlessJerk)
-    'StdDev'  # add mean, remove StdDev (high correlation with RMS)
-], axis=1)
+data = pd.read_hdf('../feature_exploration/features.h5', key='incl_stairs')
 
 # get the subjects for which LOSO actually makes sense: those with multiple activities (ie more than just walking)
 gbc = data.groupby(['Subject', 'Activity'], as_index=False).count()
@@ -37,15 +20,17 @@ training_masks = []
 validation_masks = []
 testing_masks = []
 
-for i in range(0, len(loso_subjects), 3):
+for i in range(0, len(loso_subjects), 4):
     tr_m = np.ones(data.shape[0], dtype='bool')
     v_m = np.zeros(data.shape[0], dtype='bool')
+    te_m = np.zeros(data.shape[0], dtype='bool')
     
     for j in range(3):
         tr_m &= data.Subject != loso_subjects[i+j]
     for j in range(2):
         v_m |= data.Subject == loso_subjects[i+j]
-    te_m = data.Subject == loso_subjects[i+2]
+    for j in range(2):
+        te_m |= data.Subject == loso_subjects[i+j+2]
     
     training_masks.append(tr_m)
     validation_masks.append(v_m)
@@ -62,7 +47,7 @@ param_distributions = {
     'min_samples_split': [2, 10, 20, 50, 100, 500, 1000],
     'min_samples_leaf': [1, 2, 4, 8, 16, 32]
 }
-n_iter = 25
+n_iter = 100
 scoring = make_scorer(f1_score)
 n_jobs = -1  # use all possible cores
 refit = False  # don't want to refit on the whole dataset afterwards
@@ -80,7 +65,7 @@ clf = RandomizedSearchCV(
     verbose=verbose
 )
 
-search = clf.fit(dtophalf.iloc[:, 3:], dtophalf.Label)
+search = clf.fit(data.iloc[:, 3:], data.Label)
 
 cv_results = pd.DataFrame(data=search.cv_results_)
-cv_results.to_csv('rfc_cv_results_topfeats.csv')
+cv_results.to_csv('rfc_cv_results_incl_stairs.csv')

@@ -8,24 +8,8 @@ import xgboost as xgb
 from sklearn.metrics import f1_score, make_scorer, accuracy_score
 from sklearn.model_selection import RandomizedSearchCV
 
-data = pd.read_hdf('../feature_exploration/features.h5', key='no_preprocessing')
+data = pd.read_hdf('../feature_exploration/features.h5', key='incl_stairs')
 
-# take top half of features based on PP score
-data = data.drop([
-    'Skewness',
-    'Kurtosis',
-    'LinearSlope',
-    'SpectralFlatness',
-    'Autocorrelation',
-    'RangeCountPercentage',
-    'ComplexityInvariantDistance',
-    'PowerSpectralSum',
-    'RatioBeyondRSigma',
-    'SignalEntropy',
-    'DominantFrequencyValue',
-    'JerkMetric',  # add mean cross rate, remove Jerkmetric (correlation with DimensionlessJerk)
-    'StdDev'  # add mean, remove StdDev (high correlation with RMS)
-], axis=1)
 
 # get the subjects for which LOSO actually makes sense: those with multiple activities (ie more than just walking)
 gbc = data.groupby(['Subject', 'Activity'], as_index=False).count()
@@ -38,15 +22,17 @@ training_masks = []
 validation_masks = []
 testing_masks = []
 
-for i in range(0, len(loso_subjects), 3):
+for i in range(0, len(loso_subjects), 4):
     tr_m = np.ones(data.shape[0], dtype='bool')
     v_m = np.zeros(data.shape[0], dtype='bool')
+    te_m = np.zeros(data.shape[0], dtype='bool')
     
     for j in range(3):
         tr_m &= data.Subject != loso_subjects[i+j]
     for j in range(2):
         v_m |= data.Subject == loso_subjects[i+j]
-    te_m = data.Subject == loso_subjects[i+2]
+    for j in range(2):
+        te_m |= data.Subject == loso_subjects[i+j+2]
     
     training_masks.append(tr_m)
     validation_masks.append(v_m)
@@ -87,4 +73,4 @@ clf = RandomizedSearchCV(
 search = clf.fit(data.iloc[:, 3:], data.Label)
 
 cv_results = pd.DataFrame(data=search.cv_results_)
-cv_results.to_csv('xgbrf_cv_results_topfeats.cvs', index=False)
+cv_results.to_csv('xgbrf_cv_results_incl_stairs.csv', index=False)
