@@ -8,7 +8,7 @@ scripts/feature_exploration/features.h5
 
 # actigraph sample data
 scripts/binary_readers/actigraph/data/sample*
-
+scripts/wrist_testing/data.h5
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
