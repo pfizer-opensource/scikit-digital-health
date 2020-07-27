@@ -1,115 +1,92 @@
 ! -*- f95 -*-
+include "sort.f90"
+include "common.f90"
 
-subroutine embed(n, x, order, delay, res)
+
+! --------------------------------------------------------------------
+! SUBROUTINE  embed_sort
+!     Create embedding vectors from the array x, and get the indices of the sorted embedding vectors
+! 
+!     In
+!     n, m   : integer(8)
+!     x(n)   : real(8), array of values of length n
+!     order  : integer(8), order (number of values) of each embedding vector
+!     delay  : integer(8), number of samples to skip when extracting each embedding vector
+! 
+!     Out
+!     res(m, order)  : integer(8), sorted embedding vectors
+! --------------------------------------------------------------------
+subroutine embed_sort(n, m, x, order, delay, res)
     implicit none
-    integer(8), intent(in) :: n, order, delay
+    integer(8), intent(in) :: n, m, order, delay
     real(8), intent(in) :: x(n)
-    real(8), intent(out) :: res(n - ( order - 1) * delay, order)
+    integer(8), intent(out) :: res(m, order)
 !f2py intent(hide) :: n
-    integer(8) :: i, m
+    integer(8) :: j
+    real(8) :: temp(m, order)
     
-    m = n - ( order - 1) * delay
-    
-    do i=0, order-1
-        res(:, i+1) = x(i * delay + 1:i * delay + 1 + m)
+    do j=0, order-1
+        res(:, j+1) = j
     end do
+    
+    do j=0, order-1
+        temp(:, j+1) = x(j * delay + 1:j * delay + 1 + m)
+    end do
+    
+    call dpqsort_2d(m, order, temp, res)
+    
 end subroutine
 
 
-!subroutine permutationEntropy(m, n, p, x, order, delay, normalize, pe)
-!    implicit none
-!    integer(8), intent(in) :: m, n, p, order, delay
-!    real(8), intent(in) :: x(m, n, p)
-!    logical, intent(in) :: normalize
-!    real(8), intent(out) :: pe(n, p)
+! --------------------------------------------------------------------
+! SUBROUTINE  permutationEntropy
+!     Compute the permutation entropy of a 3d array
+! 
+!     In
+!     m, n, p     : integer(8)
+!     x(m, n, p)  : real(8), array of values of length n
+!     order       : integer(8), order (number of values) of each embedding vector
+!     delay       : integer(8), number of samples to skip when extracting each embedding vector
+!     normalize   : logical, normalize the permutation entropy
+! 
+!     Out
+!     pe(n, p)  : real(8), computed permutation entropy
+! --------------------------------------------------------------------
+subroutine permutationEntropy(m, n, p, x, order, delay, normalize, pe)
+    implicit none
+    integer(8), intent(in) :: m, n, p, order, delay
+    real(8), intent(in) :: x(m, n, p)
+    logical, intent(in) :: normalize
+    real(8), intent(out) :: pe(n, p)
 !f2py intent(hide) :: m, n, p
-
-
-recursive subroutine quicksort(a, first, last)
-    implicit none
-    real*8  a(*), x, t
-    integer first, last
-    integer i, j
-
-    x = a( (first+last) / 2 )
-    i = first
-    j = last
-    do
-     do while (a(i) < x)
-        i=i+1
-     end do
-     do while (x < a(j))
-        j=j-1
-     end do
-     if (i >= j) exit
-     t = a(i);  a(i) = a(j);  a(j) = t
-     i=i+1
-     j=j-1
-    end do
-    if (first < i-1) call quicksort(a, first, i-1)
-    if (j+1 < last)  call quicksort(a, j+1, last)
-end subroutine quicksort
-
-recursive subroutine qsort(n, x, idx)
-    implicit none
-    integer(8), intent(in) :: n
-    real(8), intent(inout) :: x(n)
-    integer(8), intent(inout) :: idx(n)
-!f2py intent(hide) :: n
-    integer(8) :: i, j, itmp, mrk
-    real(8) :: pivot, rnd, rtmp
+    integer(8) :: i, j, k, msi, n_unq
+    integer(8) :: sorted_idx(m - ( order - 1) * delay, order)
+    real(8) :: hashval(m - ( order - 1) * delay)
+    real(8) :: unq_vals(m - ( order - 1) * delay)
+    real(8) :: unq_counts(m - ( order - 1) * delay)
+    real(8), parameter :: log2 = dlog(2._8)
     
-    if (n > 1) then
-        call random_number(rnd)
-        ! random pivot, not best but avoids worst case
-        pivot = x(int(rnd * real(n - 1)) + 1)
-        i = 0
-        j = n + 1
-        
-        do while (i < j)
-            j = j - 1
-            do while (x(j) > pivot)
-                j = j - 1
+    msi = m - ( order - 1) * delay
+    
+    do k=1, p
+        do j=1, n
+            call embed_sort(m, msi, x(:, j, k), order, delay, sorted_idx)
+            
+            hashval = 0._8
+            do i=1, order
+                hashval = hashval + order**(i-1) * sorted_idx(:, i)
             end do
-            i = i + 1
-            do while (x(j) < pivot)
-                i = i + 1
-            end do
-            if (i < j) then
-                rtmp = x(i); itmp = idx(i)
-                x(i) = x(j); x(j) = rtmp
-                idx(i) = idx(j); idx(j) = itmp
-            end if
+            
+            unq_counts = 0._8
+            call unique(msi, hashval, unq_vals, unq_counts, n_unq)
+            
+            unq_counts = unq_counts / sum(unq_counts)
+            
+            pe(j, k) = -sum(unq_counts(:n_unq) * dlog(unq_counts(:n_unq)) / log2)
         end do
-        
-        if (i == j) then
-            mrk = i + 1
-        else
-            mrk = i
-        end if
-        
-        call qsort(x(:(mrk - 1)))
-                
-
-            IF (I < J) THEN
-              RTEMP = A(I)
-              A(I) = A(J)
-              A(J) = RTEMP
-              ITEMP = IDX(I)
-              IDX(I) = IDX(J)
-              IDX(J) = ITEMP
-            END IF
-          END DO
-
-          IF (I == J) THEN
-            MARK = I + 1
-          ELSE
-            MARK = I
-          END IF
-
-          CALL QSORT(A(:(MARK - 1)), IDX(:(MARK - 1)), MARK - 1)
-          CALL QSORT(A(MARK:), IDX(MARK:), N - MARK + 1)
-
-        END IF
-      END
+    end do
     
+    if (normalize) then
+        pe = pe / (dlog(product((/(real(j, 8), j=1, order)/))) / log2)
+    end if
+end subroutine

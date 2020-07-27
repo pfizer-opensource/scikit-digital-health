@@ -1,10 +1,10 @@
 import numpy as np
 
-np.random.seed(5)
-x = np.around(np.random.rand(100, 1, 1), 2)
+from perment import permutationentropy
 
 
-from sampent import sampleentropy, sampen2
+np.random.seed(17)
+n = 20
+x = np.around(np.random.rand(n, 1, 1), 2)
 
-sampleentropy(x, 3, 0.3)
-sampen2(x[:, 0, 0], 3, 0.3)
+permutationentropy(x, 3, 1, False)
