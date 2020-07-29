@@ -132,7 +132,10 @@ def SampleEntropy(const double[:, :, :] signal, int M, double r):
             ent[wind, 0, axis] = -log(A[wind, 0, axis] / N)
 
             for mm in range(1, M):
-                ent[wind, mm, axis] = -log(A[wind, mm, axis] / B[wind, mm - 1, axis])
+                if (B[wind, mm-1, axis] == 0) or (A[wind, mm, axis] == 0):
+                    ent[wind, mm, axis] = 100.0  # set to a large value. TODO evaluate this value
+                else:
+                    ent[wind, mm, axis] = -log(A[wind, mm, axis] / B[wind, mm - 1, axis])
 
     return entropy
 
