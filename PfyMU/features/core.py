@@ -189,13 +189,20 @@ class Feature:
         s = ''
         for key in self._eq_params:
             if isinstance(self._eq_params[key], float):
-                s += f'{key}={self._eq_params[key]:.2f}'
+                s += f'{key}={self._eq_params[key]:.2f}, '
             else:
                 s += f'{key}={self._eq_params[key]}, '
         s = s[:-2]
         return f'{self._name}({s})'
 
     def __repr__(self):
+        s = ''
+        for key in self._eq_params:
+            if isinstance(self._eq_params[key], float):
+                s += f'{self._eq_params[key]:.2f}, '
+            else:
+                s += f'{self._eq_params[key]}, '
+        s = s[:-2]
         return self.__str__()
 
     def __init__(self, name, eq_params):
@@ -304,7 +311,7 @@ class DeferredFeature:
     __slots__ = ('parent', 'index', '_compute', 'n')  # limit attributes
 
     def __str__(self):
-        return f'Deferred{self.parent._name}'
+        return f'Deferred{self.parent.__str__()}'
 
     def __repr__(self):
         return f'Deferred{self.parent.__repr__()}'
@@ -342,7 +349,7 @@ class DeferredFeature:
         return self.parent._result[:, self.index]
 
     def get_columns(self, columns):
-        return [f'{i}_{self.parent._name.lower()}' for i in array(columns)[self.index]]
+        return [f'{i}_{self.parent.__repr__()}' if i != '' else f'{self.parent.__repr__()}' for i in array(columns)[self.index]]
 
     # FUNCTIONALITY METHODS
     def __eq__(self, other):
