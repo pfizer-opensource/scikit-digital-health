@@ -196,14 +196,17 @@ class Feature:
         return f'{self._name}({s})'
 
     def __repr__(self):
-        s = ''
-        for key in self._eq_params:
-            if isinstance(self._eq_params[key], float):
-                s += f'{self._eq_params[key]:.2f}, '
-            else:
-                s += f'{self._eq_params[key]}, '
-        s = s[:-2]
-        return self.__str__()
+        if self._eq_params != {}:
+            s = ''
+            for key in self._eq_params:
+                if isinstance(self._eq_params[key], float):
+                    s += f'{self._eq_params[key]:.2f}_'
+                else:
+                    s += f'{self._eq_params[key]}_'
+            s = s[:-1]
+            return f'{self._name.lower()}_{s}'
+        else:
+            return self._name.lower()
 
     def __init__(self, name, eq_params):
         """
