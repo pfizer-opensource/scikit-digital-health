@@ -12,7 +12,7 @@ from PfyMU.features.utility import get_windowed_view, compute_window_samples
 __all__ = ['load_datasets']
 
 
-def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_step=0.5, signal_function=None):
+def load_datasets(paths, device_location=None, goal_fs=100.0, acc_mag=True, window_length=3.0, window_step=0.5, signal_function=None):
     """
     Load standardized datasets into memory
 
@@ -20,6 +20,8 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
     ----------
     paths : str, Path, array_like
         Path to a dataset or an array-like of strings for multiple datasets
+    device_location : {str, None}, optional
+        Body location of the device. None indicates that no body location should be looked for in the data files.
     goal_fs : float, optional
         Desired sampling frequency. Will interpolate up/down depending on the sampling frequency of the
         provided datasets. Default is 100.0
@@ -33,7 +35,8 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
         is the value of the overlap. You can specify a default overlap by using the key 'default'.
     signal_function : None, function
         Function to apply to the data (or data magnitude). Signature is `function(signal, fs)`, and it should return
-        `transformed_signal` that is the same shape as the input `signal`.
+        `transformed_signal`. If a function is provided, but `acc_mag=True`, then
+        the function is applied after taking the magnitude.
 
     Returns
     -------
@@ -68,17 +71,6 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
 
     paths = [Path(i) for i in paths]  # make sure entries are Path objects
 
-    # compute the goal window length and the goal window step
-    # if hasattr(window_step, '__len__') and not isinstance(window_step, dict):
-    #     n_wstep = [0, 0]
-    #     n_wlen, n_wstep[0] = compute_window_samples(goal_fs, window_length, window_step[0])
-    #     n_wlen, n_wstep[1] = compute_window_samples(goal_fs, window_length, window_step[1])
-    #     step2 = 1
-    # elif isinstance(window_step, dict):
-    #     step2 = -1
-    # else:
-    #     n_wlen, n_wstep = compute_window_samples(goal_fs, window_length, window_step)
-    #     step2 = 0
     if isinstance(window_step, dict):
         n_wstep = {}
         if 'default' not in window_step:
@@ -91,6 +83,21 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
         step_d = False
 
     M, N = 0, n_wlen
+    
+    # determine the last dimension of the output array after functions are applied
+    if acc_mag:
+        if signal_function is not None:
+            try:
+                P = signal_function(np.random.rand(50), goal_fs).shape[1]
+            except IndexError:
+                P = 1
+        else:
+            P = 1
+    else:
+        try:
+            P = signal_function(np.random.rand(50, 3), goal_fs).shape[1]
+        except IndexError:
+            P = 1
 
     # first pass to get size for array allocation
     for dset in paths:
@@ -101,8 +108,14 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
             with h5py.File(subj, 'r') as f:
                 for activity in f.keys():
                     for trial in f[activity].keys():
-                        n = f[activity][trial]['Accelerometer'].shape[0]
-                        fs = f[activity][trial].attrs.get('Sampling rate')
+                        if device_location is None:
+                            n = f[activity][trial]['Accelerometer'].shape[0]
+                            fs = f[activity][trial].attrs.get('Sampling rate')
+                        else:
+                            if device_location not in f[activity][trial]:
+                                continue
+                            n = f[activity][trial][device_location]['Accelerometer'].shape[0]
+                            fs = f[activity][trial][device_location].attrs.get('Sampling rate')
 
                         n = int(np.ceil(n * goal_fs / fs))  # compute samples when down/upsampled
                         if n < n_wlen:
@@ -111,8 +124,9 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
                             M += int(((n - n_wlen) // n_wstep.get(activity, n_wstep['default']) + 1))
                         else:
                             M += int(((n - n_wlen) // n_wstep + 1))
+    
     # allocate space for the data
-    dataset = np.zeros((M, N)) if acc_mag else np.zeros((M, N, 3))
+    dataset = np.zeros((M, N) if (P == 1) else (M, N, P))
     subjects = np.empty(M, dtype='U30')  # maximum 30 character strings
     activities = np.empty(M, dtype='U30')  # maximum 30 character strings
     labels = np.empty(M, dtype='int')
@@ -128,8 +142,17 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
                 for activity in f.keys():
                     gait_label = f[activity].attrs.get('Gait label')
                     for trial in f[activity].keys():
-                        n = f[activity][trial]['Accelerometer'].shape[0]
-                        fs = f[activity][trial].attrs.get('Sampling rate')
+                        if device_location is None:
+                            fsloc = f'{activity}/{trial}'
+                            loc = fsloc + '/Accelerometer'
+                        else:
+                            if device_location not in f[activity][trial]:
+                                continue
+                            fsloc = f'{activity}/{trial}/{device_location}'
+                            loc = fsloc + '/Accelerometer'
+                        
+                        n = f[loc].shape[0]
+                        fs = f[fsloc].attrs.get('Sampling rate')
 
                         # ensure there is enough data
                         if n < (n_wlen * fs / goal_fs):
@@ -138,14 +161,14 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
                         if fs != goal_fs:
                             f_intrp = interp1d(
                                 np.arange(0, n/fs, 1/fs)[:n],
-                                f[activity][trial]['Accelerometer'],
+                                f[loc],
                                 axis=0,
                                 bounds_error=False,
                                 fill_value='extrapolate'
                             )
                             tmp = f_intrp(np.arange(0, n/fs, 1/goal_fs))
                         else:
-                            tmp = f[activity][trial]['Accelerometer'][()]
+                            tmp = f[loc][()]
 
                         if acc_mag:
                             tmp = np.linalg.norm(tmp, axis=1)
@@ -168,6 +191,3 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
                         cnt += m  # increment count
 
     return dataset, labels, subjects, activities
-
-
-
