@@ -94,10 +94,13 @@ def load_datasets(paths, device_location=None, goal_fs=100.0, acc_mag=True, wind
         else:
             P = 1
     else:
-        try:
-            P = signal_function(np.random.rand(50, 3), goal_fs).shape[1]
-        except IndexError:
-            P = 1
+        if signal_function is not None:
+            try:
+                P = signal_function(np.random.rand(50, 3), goal_fs).shape[1]
+            except IndexError:
+                P = 1
+        else:
+            P = 3
 
     # first pass to get size for array allocation
     for dset in paths:
