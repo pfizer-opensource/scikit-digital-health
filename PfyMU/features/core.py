@@ -1,20 +1,14 @@
 """
 Core functionality for feature computation
-
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
 from numpy import ndarray, array, zeros, sum
 from pandas import DataFrame
-<<<<<<< HEAD
 import json
 
 from PfyMU.features.utility import standardize_signal, compute_window_samples
 from PfyMU.features import lib
-=======
-
-from PfyMU.features.utility import standardize_signal, compute_window_samples
->>>>>>> c58b4fb23624c66aa098d7bd6127a9e5dd012ffe
 
 
 __all__ = ['Bank']
@@ -47,7 +41,6 @@ class Bank:
     def __init__(self, window_length=None, window_step=1.0):
         """
         A feature bank for ease in creating a table of features for a given signal, applying the windowing as specified.
-
         Parameters
         ----------
         window_length : float
@@ -55,7 +48,6 @@ class Bank:
         window_step : {float, int}
             Window step - the spacing between the start of windows. This can be specified several different ways
             (see Notes). Default is 1.0
-
         Notes
         -----
         Computation of the window step depends on the type of input provided, and the range.
@@ -63,8 +55,6 @@ class Bank:
         next window
         - `window_step` is an integer > 1: specifies the number of samples to skip to get to the start of the next
         window
-
-
         Examples
         --------
         >>> fb = Bank()
@@ -80,11 +70,7 @@ class Bank:
         # storage for the features to calculate
         self._feat_list = []
         # storage for the number of features that will be calculated
-<<<<<<< HEAD
         self._n_feats = None  # need to allocate in compute to reset for each compute call
-=======
-        self._n_feats = []
->>>>>>> c58b4fb23624c66aa098d7bd6127a9e5dd012ffe
         # storage of the last instance of a particular class/instance, if it exists
         self._eq_idx = None
 
@@ -95,7 +81,6 @@ class Bank:
     def compute(self, signal, fs=None, columns=None, windowed=False):
         """
         Compute the features in the Bank.
-
         Parameters
         ----------
         signal : {numpy.ndarray, pandas.DataFrame}
@@ -104,15 +89,10 @@ class Bank:
             Sampling frequency of the signal in Hz. Only required if the features in the Bank require
             sampling frequency in the computation (see feature documentation), or if windowing `signal`.
         columns : array-like, optional
-<<<<<<< HEAD
             Columns to use from the pandas.DataFrame. If signal is an ndarray, providing columns will provide
             a return of the column/feature name combinations that matches the columns in the returned ndarray
-=======
-            Columns to use from the pandas.DataFrame.
->>>>>>> c58b4fb23624c66aa098d7bd6127a9e5dd012ffe
         windowed : bool, optional
             If the signal has already been windowed. Default is False.
-
         Returns
         -------
         features : {numpy.ndarray, pandas.DataFrame}
@@ -121,11 +101,8 @@ class Bank:
         if not self._feat_list:
             raise NoFeaturesError('No features to compute.')
 
-<<<<<<< HEAD
         self._n_feats = []
 
-=======
->>>>>>> c58b4fb23624c66aa098d7bd6127a9e5dd012ffe
         # compute windowing # of samples if necessary
         if self.wlen_s is not None and self.wstep is not None:
             window_length, window_step = compute_window_samples(fs, self.wlen_s, self.wstep)
@@ -137,7 +114,6 @@ class Bank:
                                         step=window_step, columns=columns)
         feat_columns = []  # allocate if necessary
 
-<<<<<<< HEAD
         # ensure if passing an ndarray, that the columns matches the appropriate shape
         if not isinstance(signal, DataFrame):
             if columns is not None:
@@ -145,25 +121,15 @@ class Bank:
                     raise ValueError(f'Provided column names ({len(columns)}) does not match the number of columns'
                                      f'in the data ({x.shape[-1]}).')
 
-=======
->>>>>>> c58b4fb23624c66aa098d7bd6127a9e5dd012ffe
         # first get the number of features expected so the space can be allocated
         for dft in self._feat_list:
             # need this if statement to deal with ellipsis indices
             if dft.n == -1:
-<<<<<<< HEAD
                 self._n_feats.append(x.shape[-1])  # number of axes is last
             else:
                 self._n_feats.append(dft.n)
 
         # allocate the feature table. This accounts for multiple columns per feature
-=======
-                dft.n = x.shape[-1]  # number of axes is last
-
-            self._n_feats.append(dft.n)
-
-        # allocate the feature table
->>>>>>> c58b4fb23624c66aa098d7bd6127a9e5dd012ffe
         feats = zeros((x.shape[0], sum(self._n_feats)))
 
         idx = 0  # set a counter to keep track of where to put each computed feature
@@ -173,18 +139,12 @@ class Bank:
             dft._compute(x, fs)  # compute the feature without returning it
 
             feats[:, idx:idx + self._n_feats[i]] = dft.get_result()  # get the result
-<<<<<<< HEAD
             if isinstance(signal, DataFrame) or columns is not None:
                 feat_columns.extend(dft.get_columns(columns))
-=======
-            if isinstance(signal, DataFrame):
-                feat_columns.append(dft.get_columns(columns))
->>>>>>> c58b4fb23624c66aa098d7bd6127a9e5dd012ffe
 
             idx += self._n_feats[i]  # increment the index tracker
 
         if isinstance(signal, ndarray):
-<<<<<<< HEAD
             if columns is not None:
                 return feats, feat_columns
             else:
@@ -234,12 +194,6 @@ class Bank:
             self + getattr(lib, name)(**params)[index]
         
         
-=======
-            return feats
-        elif isinstance(signal, DataFrame):
-            return DataFrame(data=feats, columns=feat_columns)
-
->>>>>>> c58b4fb23624c66aa098d7bd6127a9e5dd012ffe
     # FUNCTIONALITY METHODS
     def __contains__(self, item):
         isin = False
@@ -272,18 +226,13 @@ class Feature:
         s = ''
         for key in self._eq_params:
             if isinstance(self._eq_params[key], float):
-<<<<<<< HEAD
                 s += f'{key}={self._eq_params[key]:.2f}, '
-=======
-                s += f'{key}={self._eq_params[key]:.2f}'
->>>>>>> c58b4fb23624c66aa098d7bd6127a9e5dd012ffe
             else:
                 s += f'{key}={self._eq_params[key]}, '
         s = s[:-2]
         return f'{self._name}({s})'
 
     def __repr__(self):
-<<<<<<< HEAD
         if self._eq_params != {}:
             s = ''
             for key in self._eq_params:
@@ -295,14 +244,10 @@ class Feature:
             return f'{self._name.lower()}_{s}'
         else:
             return self._name.lower()
-=======
-        return self.__str__()
->>>>>>> c58b4fb23624c66aa098d7bd6127a9e5dd012ffe
 
     def __init__(self, name, eq_params):
         """
         Base feature class. intended to be overwritten
-
         Parameters
         ----------
         name : str
@@ -326,7 +271,6 @@ class Feature:
     def compute(self, signal, fs=None, *, columns=None, windowed=False):
         """
         Compute the feature.
-
         Parameters
         ----------
         signal : {numpy.ndarray, pandas.DataFrame}
@@ -337,7 +281,6 @@ class Feature:
             Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
         windowed : bool, optional
             If the signal has already been windowed. Default is False.
-
         Returns
         -------
         feature : {numpy.ndarray, pandas.DataFrame}
@@ -405,23 +348,15 @@ class DeferredFeature:
     __slots__ = ('parent', 'index', '_compute', 'n')  # limit attributes
 
     def __str__(self):
-<<<<<<< HEAD
         return f'Deferred{self.parent.__str__()}'
 
     def __repr__(self):
         return f'deferred{self.parent.__repr__()}'
-=======
-        return f'Deferred{self.parent._name}'
-
-    def __repr__(self):
-        return f'Deferred{self.parent.__repr__()}'
->>>>>>> c58b4fb23624c66aa098d7bd6127a9e5dd012ffe
 
     def __init__(self, parent, index):
         """
         An object for storing a feature for deferred computation. Stores the parent feature, as well as the desired
         index to return of the results
-
         Parameters
         ----------
         parent : Feature
@@ -450,11 +385,7 @@ class DeferredFeature:
         return self.parent._result[:, self.index]
 
     def get_columns(self, columns):
-<<<<<<< HEAD
         return [f'{i}_{self.parent.__repr__()}' if i != '' else f'{self.parent.__repr__()}' for i in array(columns)[self.index]]
-=======
-        return [f'{i}_{self.parent._name.lower()}' for i in array(columns)[self.index]]
->>>>>>> c58b4fb23624c66aa098d7bd6127a9e5dd012ffe
 
     # FUNCTIONALITY METHODS
     def __eq__(self, other):
@@ -464,9 +395,3 @@ class DeferredFeature:
             return (other._eq_params == self.parent._eq_params) and (other._name == self.parent._name)
         else:
             return False
-
-
-
-
-
-
