@@ -130,9 +130,9 @@ class Bank:
         for dft in self._feat_list:
             # need this if statement to deal with ellipsis indices
             if dft.n == -1:
-                dft.n = x.shape[-1]  # number of axes is last
-
-            self._n_feats.append(dft.n)
+                self._n_feats.append(x.shape[-1])  # number of axes is last
+            else:
+                self._n_feats.append(dft.n)
 
         # allocate the feature table. This accounts for multiple columns per feature
         feats = zeros((x.shape[0], sum(self._n_feats)))
