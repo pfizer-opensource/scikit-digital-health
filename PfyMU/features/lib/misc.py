@@ -25,7 +25,7 @@ class ComplexityInvariantDistance(Feature):
         -------
         compute(signal[, columns=None, windowed=False])
         """
-        super(ComplexityInvariantDistance, self).__init__('ComplexityInvariantDistance', {'Normalize': normalize})
+        super(ComplexityInvariantDistance, self).__init__('ComplexityInvariantDistance', {'normalize': normalize})
         self.normalize = normalize
 
     def _compute(self, x, fs):
@@ -51,7 +51,7 @@ class RangeCountPercentage(Feature):
         """
         super(RangeCountPercentage, self).__init__(
             'RangeCountPercentage',
-            {'Range min': range_min, 'Range max': range_max}
+            {'range_min': range_min, 'range_max': range_max}
         )
 
         self.rmin = range_min

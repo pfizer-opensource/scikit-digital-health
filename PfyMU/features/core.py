@@ -1,13 +1,14 @@
 """
 Core functionality for feature computation
-
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
 from numpy import ndarray, array, zeros, sum
 from pandas import DataFrame
+import json
 
 from PfyMU.features.utility import standardize_signal, compute_window_samples
+from PfyMU.features import lib
 
 
 __all__ = ['Bank']
@@ -40,7 +41,6 @@ class Bank:
     def __init__(self, window_length=None, window_step=1.0):
         """
         A feature bank for ease in creating a table of features for a given signal, applying the windowing as specified.
-
         Parameters
         ----------
         window_length : float
@@ -48,7 +48,6 @@ class Bank:
         window_step : {float, int}
             Window step - the spacing between the start of windows. This can be specified several different ways
             (see Notes). Default is 1.0
-
         Notes
         -----
         Computation of the window step depends on the type of input provided, and the range.
@@ -56,8 +55,6 @@ class Bank:
         next window
         - `window_step` is an integer > 1: specifies the number of samples to skip to get to the start of the next
         window
-
-
         Examples
         --------
         >>> fb = Bank()
@@ -84,7 +81,6 @@ class Bank:
     def compute(self, signal, fs=None, columns=None, windowed=False):
         """
         Compute the features in the Bank.
-
         Parameters
         ----------
         signal : {numpy.ndarray, pandas.DataFrame}
@@ -97,7 +93,6 @@ class Bank:
             a return of the column/feature name combinations that matches the columns in the returned ndarray
         windowed : bool, optional
             If the signal has already been windowed. Default is False.
-
         Returns
         -------
         features : {numpy.ndarray, pandas.DataFrame}
@@ -156,7 +151,49 @@ class Bank:
                 return feats
         elif isinstance(signal, DataFrame):
             return DataFrame(data=feats, columns=feat_columns)
-
+    
+    # SAVING and LOADING METHODS
+    def save(self, file):
+        """
+        Save the features in the feature bank to a JSON file for easy (re-)creation of the FeatureBank
+        
+        Parameters
+        ----------
+        file : {str, Path}
+            File path to save to.
+        """
+        out = []
+        
+        for ft in self._feat_list:
+            idx = 'Ellipsis' if ft.index is Ellipsis else ft.index
+            out.append({ft.parent._name: {'Parameters': ft.parent._eq_params, 'Index': idx}})
+        
+        with open(file, 'w') as f:
+            json.dump(out, f)
+    
+    def load(self, file):
+        """
+        Load a set of features from a JSON file.
+        
+        Parameters
+        ----------
+        file : {str, Path}
+            File path to load from. File is the uutput of FeatureBank.save
+        """
+        with open(file, 'r') as f:
+            feats = json.load(f)
+        
+        for ft in feats:
+            name = list(ft.keys())[0]
+            params = ft[name]['Parameters']
+            index = ft[name]['Index']
+            if index == 'Ellipsis':
+                index = Ellipsis
+            
+            # add it to the FeatureBank
+            self + getattr(lib, name)(**params)[index]
+        
+        
     # FUNCTIONALITY METHODS
     def __contains__(self, item):
         isin = False
@@ -211,7 +248,6 @@ class Feature:
     def __init__(self, name, eq_params):
         """
         Base feature class. intended to be overwritten
-
         Parameters
         ----------
         name : str
@@ -235,7 +271,6 @@ class Feature:
     def compute(self, signal, fs=None, *, columns=None, windowed=False):
         """
         Compute the feature.
-
         Parameters
         ----------
         signal : {numpy.ndarray, pandas.DataFrame}
@@ -246,7 +281,6 @@ class Feature:
             Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
         windowed : bool, optional
             If the signal has already been windowed. Default is False.
-
         Returns
         -------
         feature : {numpy.ndarray, pandas.DataFrame}
@@ -317,13 +351,12 @@ class DeferredFeature:
         return f'Deferred{self.parent.__str__()}'
 
     def __repr__(self):
-        return f'Deferred{self.parent.__repr__()}'
+        return f'deferred{self.parent.__repr__()}'
 
     def __init__(self, parent, index):
         """
         An object for storing a feature for deferred computation. Stores the parent feature, as well as the desired
         index to return of the results
-
         Parameters
         ----------
         parent : Feature
@@ -362,9 +395,3 @@ class DeferredFeature:
             return (other._eq_params == self.parent._eq_params) and (other._name == self.parent._name)
         else:
             return False
-
-
-
-
-
-
