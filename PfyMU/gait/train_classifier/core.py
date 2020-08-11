@@ -157,7 +157,7 @@ def load_datasets(paths, device_location=None, goal_fs=100.0, acc_mag=True, wind
                 for activity in f:
                     # get the number of samples per step for windowing
                     activity_step = n_wstep.get(activity, n_wstep['default'])
-                    gait_label = f[activity].attrs.get('Gait Label')
+                    gait_label = f[activity].attrs.get('Gait label')
                     
                     for trial in f[activity]:
                         if device_location is None:
