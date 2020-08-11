@@ -12,24 +12,16 @@ from PfyMU.features.utility import get_windowed_view, compute_window_samples
 __all__ = ['load_datasets']
 
 
-<<<<<<< HEAD
 
 def load_datasets(paths, device_location=None, goal_fs=100.0, acc_mag=True, window_length=3.0, window_step=0.5, signal_function=None):
-=======
-def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_step=0.5, signal_function=None):
->>>>>>> c58b4fb23624c66aa098d7bd6127a9e5dd012ffe
     """
     Load standardized datasets into memory
-
     Parameters
     ----------
     paths : str, Path, array_like
         Path to a dataset or an array-like of strings for multiple datasets
-<<<<<<< HEAD
     device_location : {str, None}, optional
         Body location of the device. None indicates that no body location should be looked for in the data files.
-=======
->>>>>>> c58b4fb23624c66aa098d7bd6127a9e5dd012ffe
     goal_fs : float, optional
         Desired sampling frequency. Will interpolate up/down depending on the sampling frequency of the
         provided datasets. Default is 100.0
@@ -43,13 +35,8 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
         is the value of the overlap. You can specify a default overlap by using the key 'default'.
     signal_function : None, function
         Function to apply to the data (or data magnitude). Signature is `function(signal, fs)`, and it should return
-<<<<<<< HEAD
         `transformed_signal`. If a function is provided, but `acc_mag=True`, then
         the function is applied after taking the magnitude.
-=======
-        `transformed_signal` that is the same shape as the input `signal`.
->>>>>>> c58b4fb23624c66aa098d7bd6127a9e5dd012ffe
-
     Returns
     -------
     dataset : numpy.ndarray
@@ -64,7 +51,6 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
         `subject1` for the 3rd study in `paths`.
     activities : numpy.ndarray
         (M, ) array of the specific activity identifiers.
-
     Notes
     -----
     Computation of the window step depends on the type of input provided, and the range.
@@ -76,7 +62,6 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
     # TODO add support for continuous data with time-varying labels
     # TODO add support for non-windowed data
     # TODO add support for gyroscope data
-<<<<<<< HEAD
     
     # make sure paths is able to be iterated over
     if isinstance(paths, (str, Path)):
@@ -159,71 +144,10 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
     
     cnt = 0  # keeping track of index
     
-=======
-    # TODO add support for various other processing to the acceleration signals (ie filtering) before windowing
-
-    if isinstance(paths, (str, Path)):
-        paths = [paths]
-
-    paths = [Path(i) for i in paths]  # make sure entries are Path objects
-
-    # compute the goal window length and the goal window step
-    # if hasattr(window_step, '__len__') and not isinstance(window_step, dict):
-    #     n_wstep = [0, 0]
-    #     n_wlen, n_wstep[0] = compute_window_samples(goal_fs, window_length, window_step[0])
-    #     n_wlen, n_wstep[1] = compute_window_samples(goal_fs, window_length, window_step[1])
-    #     step2 = 1
-    # elif isinstance(window_step, dict):
-    #     step2 = -1
-    # else:
-    #     n_wlen, n_wstep = compute_window_samples(goal_fs, window_length, window_step)
-    #     step2 = 0
-    if isinstance(window_step, dict):
-        n_wstep = {}
-        if 'default' not in window_step:
-            window_step['default'] = 0.5
-        for act in window_step:
-            n_wlen, n_wstep[act] = compute_window_samples(goal_fs, window_length, window_step[act])
-        step_d = True
-    else:
-        n_wlen, n_wstep = compute_window_samples(goal_fs, window_length, window_step)
-        step_d = False
-
-    M, N = 0, n_wlen
-
-    # first pass to get size for array allocation
-    for dset in paths:
-        # find all the subjects in the dataset
-        subjs = [i for i in dset.glob('*.h5') if i.is_file()]
-
-        for subj in subjs:
-            with h5py.File(subj, 'r') as f:
-                for activity in f.keys():
-                    for trial in f[activity].keys():
-                        n = f[activity][trial]['Accelerometer'].shape[0]
-                        fs = f[activity][trial].attrs.get('Sampling rate')
-
-                        n = int(np.ceil(n * goal_fs / fs))  # compute samples when down/upsampled
-                        if n < n_wlen:
-                            continue
-                        if step_d:
-                            M += int(((n - n_wlen) // n_wstep.get(activity, n_wstep['default']) + 1))
-                        else:
-                            M += int(((n - n_wlen) // n_wstep + 1))
-    # allocate space for the data
-    dataset = np.zeros((M, N)) if acc_mag else np.zeros((M, N, 3))
-    subjects = np.empty(M, dtype='U30')  # maximum 30 character strings
-    activities = np.empty(M, dtype='U30')  # maximum 30 character strings
-    labels = np.empty(M, dtype='int')
-
-    cnt = 0  # keeping track of index
-
->>>>>>> c58b4fb23624c66aa098d7bd6127a9e5dd012ffe
     # second pass to get the data from the datasets
     for di, dset in enumerate(paths):
         # find all the subjects in the dataset
         subjs = [i for i in dset.glob('*.h5') if i.is_file()]
-<<<<<<< HEAD
         
         for subj in subjs:  # get from previous iteration
             with h5py.File(subj, 'r') as f:
@@ -257,29 +181,10 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
                                 np.arange(0, n / fs, 1 / fs)[:n],
                                 f[loc],
                                 kind='cubic',
-=======
-        for subj in subjs:
-            with h5py.File(subj, 'r') as f:
-                for activity in f.keys():
-                    gait_label = f[activity].attrs.get('Gait label')
-                    for trial in f[activity].keys():
-                        n = f[activity][trial]['Accelerometer'].shape[0]
-                        fs = f[activity][trial].attrs.get('Sampling rate')
-
-                        # ensure there is enough data
-                        if n < (n_wlen * fs / goal_fs):
-                            continue
-
-                        if fs != goal_fs:
-                            f_intrp = interp1d(
-                                np.arange(0, n/fs, 1/fs)[:n],
-                                f[activity][trial]['Accelerometer'],
->>>>>>> c58b4fb23624c66aa098d7bd6127a9e5dd012ffe
                                 axis=0,
                                 bounds_error=False,
                                 fill_value='extrapolate'
                             )
-<<<<<<< HEAD
                             
                             tmp = f_interp(np.arange(0, n / fs, 1 / goal_fs))
                         else:
@@ -303,35 +208,3 @@ def load_datasets(paths, goal_fs=100.0, acc_mag=True, window_length=3.0, window_
                         cnt += m
     
     return dataset, labels, subjects, activities
-                        
-    
-=======
-                            tmp = f_intrp(np.arange(0, n/fs, 1/goal_fs))
-                        else:
-                            tmp = f[activity][trial]['Accelerometer'][()]
-
-                        if acc_mag:
-                            tmp = np.linalg.norm(tmp, axis=1)
-
-                        if signal_function is not None:
-                            tmp = np.ascontiguousarray(signal_function(tmp, goal_fs))
-
-                        if step_d:
-                            m = int(((tmp.shape[0] - n_wlen) // n_wstep.get(activity, n_wstep['default']) + 1))
-                            dataset[cnt:cnt + m] = get_windowed_view(tmp, n_wlen, n_wstep.get(activity, n_wstep['default']))
-                        else:
-                            m = int(((tmp.shape[0] - n_wlen) // n_wstep + 1))
-                            dataset[cnt:cnt + m] = get_windowed_view(tmp, n_wlen, n_wstep)
-
-                        # append study/dataset number to seperate studies
-                        subjects[cnt:cnt+m] = f'{subj.name.split(".")[0]}_{di}'
-                        activities[cnt:cnt+m] = activity
-                        labels[cnt:cnt+m] = gait_label
-
-                        cnt += m  # increment count
-
-    return dataset, labels, subjects, activities
-
-
-
->>>>>>> c58b4fb23624c66aa098d7bd6127a9e5dd012ffe
