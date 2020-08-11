@@ -6,8 +6,10 @@ Pfizer DMTI 2020
 """
 from numpy import ndarray, array, zeros, sum
 from pandas import DataFrame
+import json
 
 from PfyMU.features.utility import standardize_signal, compute_window_samples
+from PfyMU.features import lib
 
 
 __all__ = ['Bank']
@@ -156,7 +158,49 @@ class Bank:
                 return feats
         elif isinstance(signal, DataFrame):
             return DataFrame(data=feats, columns=feat_columns)
-
+    
+    # SAVING and LOADING METHODS
+    def save(self, file):
+        """
+        Save the features in the feature bank to a JSON file for easy (re-)creation of the FeatureBank
+        
+        Parameters
+        ----------
+        file : {str, Path}
+            File path to save to.
+        """
+        out = []
+        
+        for ft in self._feat_list:
+            idx = 'Ellipsis' if ft.index is Ellipsis else ft.index
+            out.append({ft.parent._name: {'Parameters': ft.parent._eq_params, 'Index': idx}})
+        
+        with open(file, 'w') as f:
+            json.dump(out, f)
+    
+    def load(self, file):
+        """
+        Load a set of features from a JSON file.
+        
+        Parameters
+        ----------
+        file : {str, Path}
+            File path to load from. File is the uutput of FeatureBank.save
+        """
+        with open(file, 'r') as f:
+            feats = json.load(f)
+        
+        for ft in feats:
+            name = list(ft.keys())[0]
+            params = ft[name]['Parameters']
+            index = ft[name]['Index']
+            if index == 'Ellipsis':
+                index = Ellipsis
+            
+            # add it to the FeatureBank
+            self + getattr(lib, name)(**params)[index]
+        
+        
     # FUNCTIONALITY METHODS
     def __contains__(self, item):
         isin = False
@@ -317,7 +361,7 @@ class DeferredFeature:
         return f'Deferred{self.parent.__str__()}'
 
     def __repr__(self):
-        return f'Deferred{self.parent.__repr__()}'
+        return f'deferred{self.parent.__repr__()}'
 
     def __init__(self, parent, index):
         """
