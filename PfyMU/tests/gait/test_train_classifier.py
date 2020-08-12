@@ -15,7 +15,7 @@ class TestLoadDatasets:
     def test_2_datasets(self, sample_datasets, gfs, wlen_s, wstep):
         wlen_n, wstep_n = compute_window_samples(gfs, wlen_s, wstep)
 
-        dataset, subjects, labels = load_datasets(
+        dataset, labels, subjects, activities = load_datasets(
             sample_datasets,
             goal_fs=gfs,
             acc_mag=True,
@@ -42,10 +42,11 @@ class TestLoadDatasets:
         nw2 = ((N2 - wlen_n) // wstep_n + 1) * s_n2 * act_n2 * tr_n2
 
         n_win = nw1 + nw2
-
+        
         assert dataset.shape == (n_win, wlen_n)
-        assert subjects[0] == 'subject_0_0'
-        assert subjects[-1] == 'subject_1_1'
-
+        assert 'subject_0_0' in subjects
+        assert 'subject_1_0' in subjects
+        assert 'subject_0_1' in subjects
+        assert 'subject_1_1' in subjects
 
 

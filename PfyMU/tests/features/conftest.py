@@ -1,4 +1,4 @@
-from pytest import fixture
+from pytest import fixture, mark
 from numpy import allclose, broadcast_to, zeros
 from pandas.testing import assert_frame_equal
 from pandas import DataFrame
@@ -6,7 +6,7 @@ from importlib import resources
 import h5py
 
 
-class TestFeature:
+class BaseTestFeature:
     def test_1d_ndarray(self, fs, x, y, z, get_1d_truth):
         x_truth, y_truth, z_truth = get_1d_truth(self.feature._name)
 

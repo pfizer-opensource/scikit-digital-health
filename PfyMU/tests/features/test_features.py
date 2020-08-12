@@ -1,114 +1,114 @@
 from PfyMU.features import *
 
-from PfyMU.tests.features.conftest import TestFeature
+from PfyMU.tests.features.conftest import BaseTestFeature
 
 
 # STATISTICAL MOMENT FEATURES
-class TestMean(TestFeature):
+class TestMean(BaseTestFeature):
     feature = Mean()
 
 
-class TestMeanCrossRate(TestFeature):
+class TestMeanCrossRate(BaseTestFeature):
     feature = MeanCrossRate()
 
 
-class TestStdDev(TestFeature):
+class TestStdDev(BaseTestFeature):
     feature = StdDev()
 
 
-class TestSkewness(TestFeature):
+class TestSkewness(BaseTestFeature):
     feature = Skewness()
 
 
-class TestKurtosis(TestFeature):
+class TestKurtosis(BaseTestFeature):
     feature = Kurtosis()
 
 
 # ENTROPY FEATURES
-class TestSignalEntropy(TestFeature):
+class TestSignalEntropy(BaseTestFeature):
     feature = SignalEntropy()
 
 
-class TestSampleEntropy(TestFeature):
+class TestSampleEntropy(BaseTestFeature):
     feature = SampleEntropy(m=4, r=1.0)
 
 
-class TestPermutationEntropy(TestFeature):
+class TestPermutationEntropy(BaseTestFeature):
     feature = PermutationEntropy(order=4, delay=1, normalize=False)
 
 
 # FREQUENCY FEATURES
-class TestDominantFrequency(TestFeature):
+class TestDominantFrequency(BaseTestFeature):
     feature = DominantFrequency(low_cutoff=0.0, high_cutoff=12.0)
 
 
-class TestDominantFrequencyValue(TestFeature):
+class TestDominantFrequencyValue(BaseTestFeature):
     feature = DominantFrequencyValue(low_cutoff=0.0, high_cutoff=12.0)
 
 
-class TestPowerSpectralSum(TestFeature):
+class TestPowerSpectralSum(BaseTestFeature):
     feature = PowerSpectralSum(low_cutoff=0.0, high_cutoff=12.0)
 
 
-class TestSpectralFlatness(TestFeature):
+class TestSpectralFlatness(BaseTestFeature):
     feature = SpectralFlatness(low_cutoff=0.0, high_cutoff=12.0)
 
 
-class TestSpectralEntropy(TestFeature):
+class TestSpectralEntropy(BaseTestFeature):
     feature = SpectralEntropy(low_cutoff=0.0, high_cutoff=12.0)
 
 
 # MISC FEATURES
-class TestComplexityInvariantDistance(TestFeature):
+class TestComplexityInvariantDistance(BaseTestFeature):
     feature = ComplexityInvariantDistance(normalize=True)
 
 
-class TestRangeCountPercentage(TestFeature):
+class TestRangeCountPercentage(BaseTestFeature):
     feature = RangeCountPercentage(range_min=-1.0, range_max=1.0)
 
 
-class TestRatioBeyondRSigma(TestFeature):
+class TestRatioBeyondRSigma(BaseTestFeature):
     feature = RatioBeyondRSigma(r=2.0)
 
 
 # SMOOTHNESS FEATURES
-class TestJerkMetric(TestFeature):
+class TestJerkMetric(BaseTestFeature):
     feature = JerkMetric(normalize=True)
 
 
-class TestDimensionlessJerk(TestFeature):
+class TestDimensionlessJerk(BaseTestFeature):
     feature = DimensionlessJerk(log=True, signal_type='acceleration')
 
 
-class TestSPARC(TestFeature):
+class TestSPARC(BaseTestFeature):
     feature = SPARC(padlevel=4, fc=10.0, amplitude_threshold=0.05)
 
 
 # STATISTICS FEATURES
-class TestRange(TestFeature):
+class TestRange(BaseTestFeature):
     feature = Range()
 
 
-class TestIQR(TestFeature):
+class TestIQR(BaseTestFeature):
     feature = IQR()
 
 
-class TestRMS(TestFeature):
+class TestRMS(BaseTestFeature):
     feature = RMS()
 
 
-class TestAutocorrelation(TestFeature):
+class TestAutocorrelation(BaseTestFeature):
     feature = Autocorrelation(lag=1, normalize=True)
 
 
-class TestLinearSlope(TestFeature):
+class TestLinearSlope(BaseTestFeature):
     feature = LinearSlope()
 
 
 # WAVELET FEATURES
-class TestDetailPower(TestFeature):
+class TestDetailPower(BaseTestFeature):
     feature = DetailPower(wavelet='coif4', freq_band=[1.0, 3.0])
 
 
-class TestDetailPowerRatio(TestFeature):
+class TestDetailPowerRatio(BaseTestFeature):
     feature = DetailPowerRatio(wavelet='coif4', freq_band=[1.0, 3.0])
