@@ -105,7 +105,7 @@ cdef class FrequencyFeatures:
         
         for self.i in range(self.M):
             for self.k in range(self.P):
-                self.maxfv[self.i, self.k] = self.sp_norm[self.i, self.imax[self.i, self.k] + self.ilcut, self.k]
+                self.maxfv[self.i, self.k] = self.sp_norm[self.i, self.imax[self.i, self.k], self.k]
         
         return self.maxfv
 
@@ -121,7 +121,7 @@ cdef class FrequencyFeatures:
         for self.i in range(self.M):
             for self.j in range(self.ihcut - self.ilcut):
                 for self.k in range(self.P):
-                    if ((self.maxf[self.i, self.k] - 0.5) < self.freq[self.j] < (self.maxf[self.i, self.k] + 0.5)):
+                    if ((self.maxf[self.i, self.k] - 0.5) < self.freq[self.j + self.ilcut] < (self.maxf[self.i, self.k] + 0.5)):
                         self.df_ratio[self.i, self.k] += self.sp_norm[self.i, self.j, self.k]
     
         return self.df_ratio
