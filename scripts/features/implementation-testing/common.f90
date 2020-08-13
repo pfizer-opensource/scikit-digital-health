@@ -1,4 +1,5 @@
 ! -*- f90 -*-
+include "sort.f90"
 
 ! --------------------------------------------------------------------
 ! SUBROUTINE  mean_sd_1d
@@ -80,4 +81,37 @@ subroutine unique(n, x, uniq, counts, j)
     j = j - 1  ! make length of unique samples valid
 end subroutine
 
+
+! --------------------------------------------------------------------
+! SUBROUTINE  gmean
+!     Compute the geometric mean of a series
+! 
+!     In
+!     n     : integer(8), number of samples in x
+!     x(n)  : real(8), array of values of length n
+! 
+!     Out
+!     gm : real(8), geometric mean of the series x
+! --------------------------------------------------------------------
+subroutine gmean(n, x, gm)
+    implicit none
+    integer(8), intent(in) :: n
+    real(8), intent(in) :: x(n)
+    real(8), intent(out) :: gm
+!f2py intent(hide) :: n
+    real(8) :: logsum, prod
+    real(8), parameter :: large=1.d64, small=1.d-64
+    integer(8) :: i
     
+    logsum = 0._8
+    prod = 1._8
+    
+    do i=1, n
+        prod = prod * x(i)
+        if ((prod > large) .OR. (prod < small)) then
+            logsum = logsum + log(prod)
+            prod = 1._8
+        end if
+    end do
+    gm = exp((logsum + log(prod)) / n)
+end subroutine
