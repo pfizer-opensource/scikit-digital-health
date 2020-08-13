@@ -27,6 +27,24 @@ subroutine fft(n, x, nfft, res)
 end subroutine
 
 
+! --------------------------------------------------------------------
+! SUBROUTINE  dominantFrequency
+!     Compute the dominant frequency value in a signal in the specified
+!     range of frequencies
+! 
+!     Input
+!     m            : integer(8), signal dimension
+!     n            : integer(8), axis dimension
+!     p            : integer(8), window dimension
+!     x(m, n, p)   : real(8), array to compute signal entropy for
+!     nfft         : integer(8), half the number of samples to use in the FFT. Must be the nearest lower power of 2 to "m"
+!     fs           : real(8), sampling frequency of the signal, in Hz
+!     low_cut      : real(8), lower cutoff frequency (Hz)
+!     hi_cut       : real(8), upper cutoff frequency (Hz)
+! 
+!     Output
+!     dFreq(n, p) : real(8), dominant frequencies
+! --------------------------------------------------------------------
 subroutine dominantFrequency(m, n, p, x, nfft, fs, low_cut, hi_cut, dFreq)
     implicit none
     integer(8), intent(in) :: m, n, p, nfft
@@ -76,6 +94,23 @@ subroutine dominantFrequency(m, n, p, x, nfft, fs, low_cut, hi_cut, dFreq)
 end subroutine
 
 
+! --------------------------------------------------------------------
+! SUBROUTINE  dominantFrequencyValue
+!     Compute the value of the spectral power at the dominant frequency
+! 
+!     Input
+!     m            : integer(8), signal dimension
+!     n            : integer(8), axis dimension
+!     p            : integer(8), window dimension
+!     x(m, n, p)   : real(8), array to compute signal entropy for
+!     nfft         : integer(8), half the number of samples to use in the FFT. Must be the nearest lower power of 2 to "m"
+!     fs           : real(8), sampling frequency of the signal, in Hz
+!     low_cut      : real(8), lower cutoff frequency (Hz)
+!     hi_cut       : real(8), upper cutoff frequency (Hz)
+! 
+!     Output
+!     dFreqVal(n, p) : real(8)
+! --------------------------------------------------------------------
 subroutine dominantFrequencyValue(m, n, p, x, nfft, fs, low_cut, hi_cut, dFreqVal)
     implicit none
     integer(8), intent(in) :: m, n, p, nfft
@@ -122,6 +157,23 @@ subroutine dominantFrequencyValue(m, n, p, x, nfft, fs, low_cut, hi_cut, dFreqVa
 end subroutine
 
 
+! --------------------------------------------------------------------
+! SUBROUTINE  powerSpectralSum
+!     Compute the sum of the spectral power in a +- 0.5Hz window around the dominant frequency
+! 
+!     Input
+!     m            : integer(8), signal dimension
+!     n            : integer(8), axis dimension
+!     p            : integer(8), window dimension
+!     x(m, n, p)   : real(8), array to compute signal entropy for
+!     nfft         : integer(8), half the number of samples to use in the FFT. Must be the nearest lower power of 2 to "m"
+!     fs           : real(8), sampling frequency of the signal, in Hz
+!     low_cut      : real(8), lower cutoff frequency (Hz)
+!     hi_cut       : real(8), upper cutoff frequency (Hz)
+! 
+!     Output
+!     pss(n, p) : real(8)
+! --------------------------------------------------------------------
 subroutine powerSpectralSum(m, n, p, x, nfft, fs, low_cut, hi_cut, pss)
     implicit none
     integer(8), intent(in) :: m, n, p, nfft
@@ -177,6 +229,23 @@ subroutine powerSpectralSum(m, n, p, x, nfft, fs, low_cut, hi_cut, pss)
 end subroutine
 
 
+! --------------------------------------------------------------------
+! SUBROUTINE  spectralEntropy
+!     Compute the spectral entropy in the given frequency band
+! 
+!     Input
+!     m            : integer(8), signal dimension
+!     n            : integer(8), axis dimension
+!     p            : integer(8), window dimension
+!     x(m, n, p)   : real(8), array to compute signal entropy for
+!     nfft         : integer(8), half the number of samples to use in the FFT. Must be the nearest lower power of 2 to "m"
+!     fs           : real(8), sampling frequency of the signal, in Hz
+!     low_cut      : real(8), lower cutoff frequency (Hz)
+!     hi_cut       : real(8), upper cutoff frequency (Hz)
+! 
+!     Output
+!     sEnt(n, p) : real(8)
+! --------------------------------------------------------------------
 subroutine spectralEntropy(m, n, p, x, nfft, fs, low_cut, hi_cut, sEnt)
     implicit none
     integer(8), intent(in) :: m, n, p, nfft
@@ -229,6 +298,23 @@ subroutine spectralEntropy(m, n, p, x, nfft, fs, low_cut, hi_cut, sEnt)
 end subroutine
 
 
+! --------------------------------------------------------------------
+! SUBROUTINE  spectralFlatness
+!     Compute the spectral flatness in the given frequency band
+! 
+!     Input
+!     m            : integer(8), signal dimension
+!     n            : integer(8), axis dimension
+!     p            : integer(8), window dimension
+!     x(m, n, p)   : real(8), array to compute signal entropy for
+!     nfft         : integer(8), half the number of samples to use in the FFT. Must be the nearest lower power of 2 to "m"
+!     fs           : real(8), sampling frequency of the signal, in Hz
+!     low_cut      : real(8), lower cutoff frequency (Hz)
+!     hi_cut       : real(8), upper cutoff frequency (Hz)
+! 
+!     Output
+!     sFlat(n, p) : real(8)
+! --------------------------------------------------------------------
 subroutine spectralFlatness(m, n, p, x, nfft, fs, low_cut, hi_cut, sFlat)
     implicit none
     integer(8), intent(in) :: m, n, p, nfft
