@@ -10,7 +10,7 @@ include "common.f90"
 !     m            : integer(8), signal dimension
 !     n            : integer(8), axis dimension
 !     p            : integer(8), window dimension
-!     x(m, n, p)   : real(8), array to compute signal entropy for
+!     x(m, n, p)   : real(8), array to compute autocorrelation for
 !     lag          : integer(8), lag for the autocorrelation, in samples
 !     normalize    : logical, normalize the autocorrelation
 ! 

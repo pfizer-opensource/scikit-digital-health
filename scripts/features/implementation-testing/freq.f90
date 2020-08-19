@@ -1,5 +1,5 @@
 ! -*- f90 -*-
-include "fftpack3.f90"
+include "cfft5.f90"
 include "common.f90"
 
 
@@ -36,7 +36,7 @@ end subroutine
 !     m            : integer(8), signal dimension
 !     n            : integer(8), axis dimension
 !     p            : integer(8), window dimension
-!     x(m, n, p)   : real(8), array to compute signal entropy for
+!     x(m, n, p)   : real(8), array to compute for
 !     nfft         : integer(8), half the number of samples to use in the FFT. Must be the nearest lower power of 2 to "m"
 !     fs           : real(8), sampling frequency of the signal, in Hz
 !     low_cut      : real(8), lower cutoff frequency (Hz)
@@ -102,7 +102,7 @@ end subroutine
 !     m            : integer(8), signal dimension
 !     n            : integer(8), axis dimension
 !     p            : integer(8), window dimension
-!     x(m, n, p)   : real(8), array to compute signal entropy for
+!     x(m, n, p)   : real(8), array to compute for
 !     nfft         : integer(8), half the number of samples to use in the FFT. Must be the nearest lower power of 2 to "m"
 !     fs           : real(8), sampling frequency of the signal, in Hz
 !     low_cut      : real(8), lower cutoff frequency (Hz)
@@ -165,7 +165,7 @@ end subroutine
 !     m            : integer(8), signal dimension
 !     n            : integer(8), axis dimension
 !     p            : integer(8), window dimension
-!     x(m, n, p)   : real(8), array to compute signal entropy for
+!     x(m, n, p)   : real(8), array to compute for
 !     nfft         : integer(8), half the number of samples to use in the FFT. Must be the nearest lower power of 2 to "m"
 !     fs           : real(8), sampling frequency of the signal, in Hz
 !     low_cut      : real(8), lower cutoff frequency (Hz)
@@ -237,7 +237,7 @@ end subroutine
 !     m            : integer(8), signal dimension
 !     n            : integer(8), axis dimension
 !     p            : integer(8), window dimension
-!     x(m, n, p)   : real(8), array to compute signal entropy for
+!     x(m, n, p)   : real(8), array to compute for
 !     nfft         : integer(8), half the number of samples to use in the FFT. Must be the nearest lower power of 2 to "m"
 !     fs           : real(8), sampling frequency of the signal, in Hz
 !     low_cut      : real(8), lower cutoff frequency (Hz)
@@ -306,7 +306,7 @@ end subroutine
 !     m            : integer(8), signal dimension
 !     n            : integer(8), axis dimension
 !     p            : integer(8), window dimension
-!     x(m, n, p)   : real(8), array to compute signal entropy for
+!     x(m, n, p)   : real(8), array to compute for
 !     nfft         : integer(8), half the number of samples to use in the FFT. Must be the nearest lower power of 2 to "m"
 !     fs           : real(8), sampling frequency of the signal, in Hz
 !     low_cut      : real(8), lower cutoff frequency (Hz)
