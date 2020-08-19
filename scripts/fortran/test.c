@@ -22,14 +22,21 @@ static int comp_twiddle(pln plan)
     
     double *ptr = plan->mem;
     
+    printf("%x  %x  %x\n", ptr, plan->mem, &plan->mem);
+    
     for (size_t k=0; k<2; ++k){
         plan->fct[k].tw = ptr;
-        ptr += 5;  //arbitrary
+        
+        for (size_t i=0; i<8; ++i) printf("%5.1f", ptr[i]);
+        printf("\n");
+        for (size_t i=0; i<8; ++i) printf("%5.1f", twid[i]);
+        printf("\n\n");
             
-        for (size_t i=1; i<length; i+=3){
+        for (size_t i=1; i<length; i+=4){
             plan->fct[k].tw[i] = twid[i];
             plan->fct[k].tw[i+1] = twid[i+1];
         }
+        ptr += 5;  //arbitrary
     }
     return 0;
 }
@@ -45,7 +52,7 @@ int main() {
     comp_twiddle(plan);
     
     for (size_t i=0; i<8; ++i){
-        printf("%f  %f\n", plan->fct[0].tw[i], plan->fct[1].tw[i]);
+        printf("%0.1f  %0.1f\n", plan->fct[0].tw[i], plan->fct[1].tw[i]);
     }
     
     return 0;
