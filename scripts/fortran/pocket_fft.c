@@ -1,7 +1,15 @@
+#define NPY_NO_DEPRECATED_API NPY_API_VERSION
+
+#include "Python.h"
+#include "numpy/arrayobject.h"
+
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+
+//#include "npy_config.h"
+//#define restrict NPY_RESTRICT
 
 #define RALLOC(type,num) \
   ((type *)malloc((num)*sizeof(type)))
@@ -42,23 +50,23 @@ static void my_sincosm1pi (double a, double *restrict res)
   double s = a * a;
   /* Approximate cos(pi*x)-1 for x in [-0.25,0.25] */
   double r =     -1.0369917389758117e-4;
-  r = fma (r, s,  1.9294935641298806e-3);
-  r = fma (r, s, -2.5806887942825395e-2);
-  r = fma (r, s,  2.3533063028328211e-1);
-  r = fma (r, s, -1.3352627688538006e+0);
-  r = fma (r, s,  4.0587121264167623e+0);
-  r = fma (r, s, -4.9348022005446790e+0);
+  r = r * s +  1.9294935641298806e-3;
+  r = r * s -  2.5806887942825395e-2;
+  r = r * s +  2.3533063028328211e-1;
+  r = r * s -  1.3352627688538006e+0;
+  r = r * s +  4.0587121264167623e+0;
+  r = r * s -  4.9348022005446790e+0;
   double c = r*s;
   /* Approximate sin(pi*x) for x in [-0.25,0.25] */
   r =             4.6151442520157035e-4;
-  r = fma (r, s, -7.3700183130883555e-3);
-  r = fma (r, s,  8.2145868949323936e-2);
-  r = fma (r, s, -5.9926452893214921e-1);
-  r = fma (r, s,  2.5501640398732688e+0);
-  r = fma (r, s, -5.1677127800499516e+0);
+  r = r * s - 7.3700183130883555e-3;
+  r = r * s + 8.2145868949323936e-2;
+  r = r * s - 5.9926452893214921e-1;
+  r = r * s + 2.5501640398732688e+0;
+  r = r * s - 5.1677127800499516e+0;
   s = s * a;
   r = r * s;
-  s = fma (a, 3.1415926535897931e+0, r);
+  s = a * 3.1415926535897931e+0 + r;
   res[0] = c;
   res[1] = s;
   }
@@ -535,13 +543,129 @@ static int rfftp_forward(rfftp_plan plan, double c[], double fct){
         DEALLOC(ch);
         return 0;
   }
+  
+
+static PyObject *
+execute_real_forward(PyObject *a1, double fct)
+{
+    rfft_plan plan=NULL;
+    int fail = 0;
+    PyArrayObject *data = (PyArrayObject *)PyArray_FromAny(a1,
+            PyArray_DescrFromType(NPY_DOUBLE), 1, 0,
+            NPY_ARRAY_DEFAULT | NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_FORCECAST,
+            NULL);
+    if (!data) return NULL;
+
+    int ndim = PyArray_NDIM(data);
+    const npy_intp *odim = PyArray_DIMS(data);
+    int npts = odim[ndim - 1];
+    npy_intp *tdim=(npy_intp *)malloc(ndim*sizeof(npy_intp));
+    if (!tdim)
+      { Py_XDECREF(data); return NULL; }
+    for (int d=0; d<ndim-1; ++d){
+      tdim[d] = odim[d];
+    }
+    tdim[ndim-1] = npts/2 + 1;
+    PyArrayObject *ret = (PyArrayObject *)PyArray_Empty(ndim,
+            tdim, PyArray_DescrFromType(NPY_CDOUBLE), 0);
+    free(tdim);
+    if (!ret) fail=1;
+    if (!fail) {
+      int rstep = PyArray_DIM(ret, PyArray_NDIM(ret) - 1)*2;
+
+      int nrepeats = PyArray_SIZE(data)/npts;
+      double *rptr = (double *)PyArray_DATA(ret),
+             *dptr = (double *)PyArray_DATA(data);
+      Py_BEGIN_ALLOW_THREADS;
+      plan = make_rfftp_plan(npts);
+      if (!plan) fail=1;
+      if (!fail)
+        for (int i = 0; i < nrepeats; i++) {
+            rptr[rstep-1] = 0.0;
+            memcpy((char *)(rptr+1), dptr, npts*sizeof(double));
+            if (rfftp_forward(plan, rptr+1, fct)!=0) {fail=1; break;}
+            rptr[0] = rptr[1];
+            rptr[1] = 0.0;
+            rptr += rstep;
+            dptr += npts;
+      }
+      if (plan) destroy_rfftp_plan(plan);
+      Py_END_ALLOW_THREADS;
+    }
+    if (fail) {
+      Py_XDECREF(data);
+      Py_XDECREF(ret);
+      return PyErr_NoMemory();
+    }
+    Py_DECREF(data);
+    return (PyObject *)ret;
+}
+
+static PyObject *
+execute_real(PyObject *a1, int is_forward, double fct)
+{
+    return execute_real_forward(a1, fct);
+}
+
+static const char execute__doc__[] = "";
+
+static PyObject *
+execute(PyObject *NPY_UNUSED(self), PyObject *args)
+{
+    PyObject *a1;
+    int is_real, is_forward;
+    double fct;
+
+    if(!PyArg_ParseTuple(args, "Oiid:execute", &a1, &is_real, &is_forward, &fct)) {
+        return NULL;
+    }
+
+    return execute_real(a1, is_forward, fct);
+}
+
+/* gcc -I/home/lukasadamowicz/miniconda3/envs/pfymu/include/python3.8 pocket_fft.c  -o cpfi.so -L/home/lukasadamowicz/miniconda3/envs/pfymu/lib -lpython3.8 -Wl,-rpath=/home/lukasadamowicz/miniconda3/envs/pfymu/lib */
+/* List of methods defined in the module */
+
+static struct PyMethodDef methods[] = {
+    {"execute",   execute,   1, execute__doc__},
+    {NULL, NULL, 0, NULL}          /* sentinel */
+};
+
+static struct PyModuleDef moduledef = {
+        PyModuleDef_HEAD_INIT,
+        "_pocketfft_internal",
+        NULL,
+        -1,
+        methods,
+        NULL,
+        NULL,
+        NULL,
+        NULL
+};
+
+/* Initialization function for the module */
+PyMODINIT_FUNC PyInit__pocketfft_internal(void)
+{
+    PyObject *m;
+    m = PyModule_Create(&moduledef);
+    if (m == NULL) {
+        return NULL;
+    }
+
+    /* Import the array object */
+    import_array();
+
+    /* XXXX Add constants here */
+
+    return m;
+}
 
 /* -----------------------------------------------
 --------------
 -------------
 -----------
 --------
----- */
+---- 
 int main (int argc, char *argv[]) {
     rfftp_plan plan = NULL;
     if (argc == 2){
@@ -558,7 +682,7 @@ int main (int argc, char *argv[]) {
     for (int i=0; i<plan->nfct; ++i){
         printf("fct %d: %lu  \n", i, plan->fct[i].fct);
 
-/*
+
         if (plan->fct[i].tw){
             for (size_t j=0; j<plan->fct[i].twsize; ++j){
                 printf("%6.2f", plan->fct[i].tw[j]);
@@ -566,10 +690,11 @@ int main (int argc, char *argv[]) {
             }
             printf("\n");
         }
-*/
+
     }
     
     size_t tws=rfftp_twsize(plan);
     
     return 0;
 }
+*/

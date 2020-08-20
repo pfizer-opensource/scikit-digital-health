@@ -3,14 +3,14 @@
 module real_fft
     type :: rfftp_fctdata
         integer(8) :: fct
-        real(8), pointer :: tw(:)
+        real(8), pointer :: tw(:)=>null()
     end type rfftp_fctdata
 
     type :: rfftp_plan
-        integer(8) :: length
+        integer(8) :: length = -1
         integer(8) :: nfct
         integer(8) :: twsize
-        real(8), pointer :: mem(:)
+        real(8), pointer :: mem(:)=>null()
         type(rfftp_fctdata) :: fct(25)
     end type rfftp_plan
     
@@ -22,25 +22,47 @@ module real_fft
 
 contains
 
-    subroutine execute_real_forward(n, x, fct)
+    subroutine destroy_plan()
+        implicit none
+        integer :: i
+        
+        if (associated(plan%mem)) nullify(plan%mem)
+        do i=1, NFCT_
+            if (associated(plan%fct(i)%tw)) nullify(plan%fct(i)%tw)
+        end do
+    end subroutine
+    
+    subroutine execute_real_forward(n, x, fct, ret, ier)
         implicit none
         integer(8), intent(in) :: n
         real(8), intent(in) :: x(n), fct
-    !f2py intent(hide) :: n
-        integer(8) :: ier, i
-        ier = 0
+        real(8), intent(out) :: ret(n+2)
+        integer(8), intent(out) :: ier
+!f2py   intent(hide) :: n
         
+        ! ensure proper power of 2 size
         if (iand(n, n-1) .NE. 0) then
+            ier = -1_8
             return
         end if
         
-        call make_rfftp_plan(n, ier)
-        ! error catching
+        if ((plan%length .NE. n) .OR. (plan%length == -1_8)) then
+            call make_rfftp_plan(n, ier)
+        end if
+        if (ier .NE. 0) return
         
-        do i=1, plan%nfct
-            print "(A,I2, A, I2)", "FCT", i, ':', plan%fct(i)%fct
-            !print "(10F5.2)", plan%fct(i)%tw
-        end do
+        ret = 0_8
+        
+        ret = 0._8
+        ret(2:n+1) = x
+        call rfftp_forward(n, ret(2:), fct, ier)
+        if (ier .NE. 0) return
+        
+        ret(1) = ret(2)
+        ret(2) = 0._8
+        
+        ier = 0_8
+    
     end subroutine
     
     
@@ -60,34 +82,33 @@ contains
     
     
     
-    
-    
-    subroutine rfftp_forward(n, x, fct, ier)
+    subroutine rfftp_forward(m, x, fct, ier)
         implicit none
-        integer(8), intent(in) :: m, fct
+        integer(8), intent(in) :: m
         real(8), intent(in), target :: x(m)
+        real(8), intent(in) :: fct
         integer(8), intent(out) :: ier
         ! local
-        integer(8) :: l1, nf, k1, k, ip, ido
-        real(8), target :: ch(:)
-        real(8), pointer :: p1(:)=null(), p2(:)=null()
+        integer(8) :: n, l1, nf, k1, k, ip, ido, iswap
+        real(8), target :: ch(m)
+        real(8), pointer :: p1(:)=>null(), p2(:)=>null()
         
-        if (plan%length == 1) then
-            ier = -1
+        if (plan%length == 1_8) then
+            ier = -1_8
             return
         end if
         
         n = plan%length
         l1 = n
         nf = plan%nfct
-        allocate(ch(n))
         
+        iswap = 1_8  ! keep track of swapping
         p1 => x
         p2 => ch
         
         do k1=1, nf
             k = nf - k1 + 1
-            ip = plan%fct(k).fct
+            ip = plan%fct(k)%fct
             ido = n / l1
             l1 = l1 / ip
             
@@ -100,18 +121,24 @@ contains
                 return
             end if
             
-            !SWAP(p1, p2, double *);
-!#define SWAP(a,b,type) do { type tmp_=(a); (a)=(b); (b)=tmp_; } while(0)
+            ! swap which arrays the pointers point to
             nullify(p1)
             nullify(p2)
-            p1 => ch
-            p2 => x
+            if (iand(iswap, 1) .NE. 0) then
+                p1 => ch
+                p2 => x
+            else
+                p1 => x
+                p2 => ch
+            end if
+            iswap = iswap + 1_8
+            
         end do
         
-        call copy_and_norm(c, p1, n, fct)
+        ! normalize
+        call copy_and_norm(x, p1, n, fct)
         nullify(p1)
         nullify(p2)
-        deallocate(ch)
         ier = 0_8
     end subroutine
     
@@ -126,13 +153,13 @@ contains
         real(8) :: tr2, ti2
         
         do k=0, l1-1
-            ch(0+ido*(0+cdim*k)+1) = cc(0+ido*(k+l1*0)+1) + cc(0+ido*(k+l1*1)+1)
-            ch((ido-1)+ido*(1+cdim*k)+1) = cc(0+ido*(k+l1*0)+1) - cc(0+ido*(k+l1*1)+1)
+            ch(ido*cdim*k+1) = cc(ido*k+1) + cc(ido*(k+l1)+1)
+            ch(ido+ido*(1+cdim*k)) = cc(ido*k+1) - cc(ido*(k+l1)+1)
         end do
         if (iand(ido, 1) == 0) then
             do k=0, l1-1
-                ch(0+ido*(1+cdim*k)+1) = -cc((ido-1)+ido*(k+l1*1)+1)
-                ch((ido-1)+ido*(0+cdim*k)+1) = cc((ido-1)+ido*(k+l1*0)+1)
+                ch(ido*(1+cdim*k)+1) = -cc(ido+ido*(k+l1))
+                ch(ido+ido*(cdim*k)) = cc(ido+ido*k)
             end do
         end if
         if (ido <= 2) return
@@ -140,13 +167,13 @@ contains
             do i=2, ido-1, 2
                 ic = ido - i
                 
-                tr2 = wa((i-2)+0*(ido-1)+1) * cc((i-1)+ido*(k+l1*1)+1) + wa((i-1)+0*(ido-1)+1) * cc(i+ido*(k+l1*1)+1)
-                ti2 = wa((i-2)+0*(ido-1)+1) * cc(i+ido*(k+l1*1)+1) - wa((i-1)+0*(ido-1)+1) * cc((i-1)+ido*(k+l1*1)+1)
+                tr2 = wa(i-1) * cc(i+ido*(k+l1)) + wa(i) * cc(i+ido*(k+l1)+1)
+                ti2 = wa(i-1) * cc(i+ido*(k+l1)+1) - wa(i) * cc(i+ido*(k+l1))
                 
-                ch((i-1)+ido*(0+cdim*k)+1) = cc((i-1)+ido*(k+l1*0)+1) + tr2
-                ch((ic-1)+ido*(1+cdim*k)+1) = cc((i-1)+ido*(k+l1*0)+1) - tr2
-                ch(i+ido*(0+cdim*k)+1) = ti2 + cc(i+ido*(k+l1*0)+1)
-                ch(ic+ido*(1+cdim*k)+1) = ti2 - cc(i+ido*(k+l1*0)+1)
+                ch(i+ido*cdim*k) = cc(i+ido*k) + tr2
+                ch(ic+ido*(1+cdim*k)) = cc(i+ido*k) - tr2
+                ch(i+ido*cdim*k+1) = ti2 + cc(i+ido*k+1)
+                ch(ic+ido*(1+cdim*k)+1) = ti2 - cc(i+ido*k+1)
             end do
         end do
     end subroutine
@@ -163,24 +190,24 @@ contains
         real(8) :: ti1, ti2, ti3, ti4, tr1, tr2, tr3, tr4
         
         do k=0, l1-1
-            tr1 = cc(0+ido*(k+l1*3)+1) + cc(0+ido*(k+l1*1)+1)
-            ch(0+ido*(2+cdim*k)+1) = cc(0+ido*(k+l1*3)+1) - cc(0+ido*(k+l1*1)+1)
+            tr1 = cc(ido*(k+l1*3)+1) + cc(ido*(k+l1)+1)
+            ch(ido*(2+cdim*k)+1) = cc(ido*(k+l1*3)+1) - cc(ido*(k+l1)+1)
             
-            tr2 = cc(0+ido*(k+l1*(c))+1) + cc(0+ido*(k+l1*(c))+1)
-            ch((ido-1)+ido*(1+cdim*(c))+1) = cc(0+ido*(k+l1*(c))+1) - cc(0+ido*(k+l1*(c))+1)
+            tr2 = cc(ido*k+1) + cc(ido*(k+l1*2)+1)
+            ch(ido+ido*(1+cdim*k)) = cc(ido*k+1) - cc(ido*(k+l1*2)+1)
             
-            ch(0+ido*(0+cdim*k)+1) = tr2 + tr1
-            ch((ido-1)+ido*(3+cdim*k)+1) = tr2 - tr1
+            ch(ido*(cdim*k)+1) = tr2 + tr1
+            ch(ido+ido*(3+cdim*k)) = tr2 - tr1
         end do
         if (iand(ido, 1) == 0) then
             do k=0, l1-1
-                ti1 = -hsqt2 * (cc((ido-1)+ido*(k+l1*1)+1) + cc((ido-1)+ido*(k+l1*3)+1))
-                tr1 = hsqt2 * (cc((ido-1)+ido*(k+l1*1)+1) - cc((ido-1)+ido*(k+l1*3)+1))
+                ti1 = -hsqt2 * (cc(ido+ido*(k+l1)) + cc(ido+ido*(k+l1*3)))
+                tr1 = hsqt2 * (cc(ido+ido*(k+l1)) - cc(ido+ido*(k+l1*3)))
 
-                ch((ido-1)+ido*(0+cdim*k)+1) = cc((ido-1)+ido*(k+l1*0)+1) + tr1
-                ch((ido-1)+ido*(2+cdim*k)+1) = cc((ido-1)+ido*(k+l1*0)+1) - tr1
-                ch(0+ido*(3+cdim*k)+1) = ti1 + cc((ido-1)+ido*(k+l1*2)+1)
-                ch(0+ido*(1+cdim*k)+1) = ti1 - cc((ido-1)+ido*(k+l1*2)+1)
+                ch(ido+ido*(cdim*k)) = cc(ido+ido*k) + tr1
+                ch(ido+ido*(2+cdim*k)) = cc(ido+ido*k) - tr1
+                ch(ido*(3+cdim*k)+1) = ti1 + cc(ido+ido*(k+l1*2))
+                ch(ido*(1+cdim*k)+1) = ti1 - cc(ido+ido*(k+l1*2))
             end do
         end if
         if (ido <= 2) return
@@ -188,79 +215,62 @@ contains
             do i=2, ido-1, 2
                 ic = ido-i
                 
-                MULPM(
-                    cr2,
-                    ci2,
-                    WA(0,i-2),    wa[(i)+(x)*(ido-1)]
-                    WA(0,i-1),    wa[(i)+(x)*(ido-1)]
-                    CC(i-1,k,1),  cc[(a)+ido*((b)+l1*(c))]
-                    CC(i,k,1)     cc[(a)+ido*((b)+l1*(c))]
-                )
-                MULPM(
-                    cr3,
-                    ci3,
-                    WA(1,i-2),    wa[(i)+(x)*(ido-1)]
-                    WA(1,i-1),    wa[(i)+(x)*(ido-1)]
-                    CC(i-1,k,2),  cc[(a)+ido*((b)+l1*(c))]
-                    CC(i,k,2)     cc[(a)+ido*((b)+l1*(c))]
-                )
-                MULPM(
-                    cr4,
-                    ci4,
-                    WA(2,i-2),    wa[(i)+(x)*(ido-1)]
-                    WA(2,i-1),    wa[(i)+(x)*(ido-1)]
-                    CC(i-1,k,3),  cc[(a)+ido*((b)+l1*(c))]
-                    CC(i,k,3)     cc[(a)+ido*((b)+l1*(c))]
-                )
-                PM(
-                    tr1,
-                    tr4,
-                    cr4,
-                    cr2
-                )
-                PM(
-                    ti1,
-                    ti4,
-                    ci2,
-                    ci4
-                )
-                PM(
-                    tr2,
-                    tr3,
-                    CC(i-1,k,0),  cc[(a)+ido*((b)+l1*(c))]
-                    cr3
-                )
-                PM(
-                    ti2,
-                    ti3,
-                    CC(i  ,k,0),  cc[(a)+ido*((b)+l1*(c))]
-                    ci3
-                )
-                PM(
-                    CH(i-1,0,k),  ch[(a)+ido*((b)+cdim*(c))]
-                    CH(ic-1,3,k), ch[(a)+ido*((b)+cdim*(c))]
-                    tr2,
-                    tr1
-                )
-                PM(
-                    CH(i  ,0,k),  ch[(a)+ido*((b)+cdim*(c))]
-                    CH(ic  ,3,k), ch[(a)+ido*((b)+cdim*(c))]
-                    ti1,
-                    ti2
-                )
-                PM(
-                    CH(i-1,2,k),  ch[(a)+ido*((b)+cdim*(c))]
-                    CH(ic-1,1,k), ch[(a)+ido*((b)+cdim*(c))]
-                    tr3,
-                    ti4
-                )
-                PM(
-                    CH(i  ,2,k),  ch[(a)+ido*((b)+cdim*(c))]
-                    CH(ic  ,1,k), ch[(a)+ido*((b)+cdim*(c))]
-                    tr4,
-                    ti3
-                )
+                cr2 = wa(i-1) * cc(i+ido*(k+l1)) + wa(i) * cc(i+ido*(k+l1)+1)
+                ci2 = wa(i-1) * cc(i+ido*(k+l1)+1) - wa(i) * cc(i+ido*(k+l1))
                 
+                cr3 = wa((i-2)+ido) * cc(i+ido*(k+l1*2)) + wa(i-1+ido) * cc(i+ido*(k+l1*2)+1)
+                ci3 = wa((i-2)+ido) * cc(i+ido*(k+l1*2)+1) - wa(i-1+ido) * cc(i+ido*(k+l1*2))
+                
+                cr4 = wa(i-1+2*(ido-1)) * cc(i+ido*(k+l1*3)) + wa(i+2*(ido-1)) * cc(i+ido*(k+l1*3)+1)
+                ci4 = wa((i-1)+2*(ido-1)) * cc(i+ido*(k+l1*3)+1) - wa(i+2*(ido-1)) * cc(i+ido*(k+l1*3))
+                
+                
+                tr1 = cr4 + cr2
+                tr4 = cr4 - cr2
+                
+                ti1 = ci2 + ci4
+                ti4 = ci2 - ci4
+                
+                tr2 = cc(i+ido*k) + cr3
+                tr3 = cc(i+ido*k) - cr3
+                
+                ti2 = cc(i+ido*k+1) + ci3
+                ti3 = cc(i+ido*k+1) - ci3
+                
+                ch(i+ido*cdim*k) = tr2 + tr1
+                ch(ic+ido*(3+cdim*k)) = tr2 - tr1
+                
+                ch(i+ido*cdim*k+1) = ti1 + ti2
+                ch(ic+ido*(3+cdim*k)+1) = ti1 - ti2
+                
+                ch(i+ido*(2+cdim*k)) = tr3 + ti4
+                ch(ic+ido*(1+cdim*k)) = tr3 - ti4
+                
+                ch(i+ido*(2+cdim*k)+1) = tr4 + ti3
+                ch(ic+ido*(1+cdim*k)+1) = tr4 - ti3
+            end do
+        end do
+    end subroutine
+    
+    subroutine copy_and_norm(c, p1, n, fct)
+        implicit none
+        real(8), target :: c(n)
+        real(8), pointer :: p1(:)
+        integer(8) :: n
+        real(8) :: fct
+        
+        if (.NOT. associated(p1, c)) then
+            if (fct .NE. 1._8) then
+                c = fct * p1
+            else
+                c = p1
+            end if
+        else
+            if (fct .NE. 1._8) then
+                c = c * fct
+            end if
+        end if
+    end subroutine
                 
     
     
@@ -327,7 +337,7 @@ contains
         integer(8), intent(out) :: ier
         ! local
         real(8), target :: twid(2 * length)
-        integer(8) :: l1, i, j, ji, k, ip, ido, iptr, twsize
+        integer(8) :: l1, i, j, k, ip, ido, iptr, twsize
         
         twsize = plan%twsize
         
