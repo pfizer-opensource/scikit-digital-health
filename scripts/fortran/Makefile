@@ -13,7 +13,7 @@ testf : pocket_fft.f90
 	clear
 	python t2.py 512
 
-pfi : pocket_fft.f90
+pfi : real_fft.f90
 	f2py -c -m pfi real_fft.f90 only: execute_real_forward destroy_plan :
     
 cpfi : pocket_fft.c

@@ -3,50 +3,305 @@
 module real_fft
     type :: rfftp_fctdata
         integer(8) :: fct
-        real(8), allocatable :: tw(:), tws(:)
+        real(8), pointer :: tw(:)=>null()
     end type rfftp_fctdata
 
     type :: rfftp_plan
-        integer(8) :: length
+        integer(8) :: length = -1
         integer(8) :: nfct
         integer(8) :: twsize
-        real(8), allocatable :: mem(:)
+        real(8), pointer :: mem(:)=>null()
         type(rfftp_fctdata) :: fct(25)
     end type rfftp_plan
     
     ! parameters
-    integer(8), parameter :: NFCT_ = 25
+    integer(8), parameter, private :: NFCT_ = 25
     
     ! variables
     type(rfftp_plan), private :: plan
 
 contains
 
-    subroutine execute_real_forward(n, x, fct)
+    subroutine destroy_plan()
+        implicit none
+        integer :: i
+        
+        ! reset to know to generate plan again
+        plan%length = -1_8
+        
+        if (associated(plan%mem)) deallocate(plan%mem)
+        if (associated(plan%mem)) nullify(plan%mem)
+        do i=1, NFCT_
+            if (associated(plan%fct(i)%tw)) nullify(plan%fct(i)%tw)
+            plan%fct(i)%fct = 0_8
+        end do
+    end subroutine
+    
+    subroutine execute_real_forward(n, x, fct, ret, ier)
         implicit none
         integer(8), intent(in) :: n
         real(8), intent(in) :: x(n), fct
-    !f2py intent(hide) :: n
-        integer(8) :: ier, i
-        ier = 0
+        real(8), intent(out) :: ret(n+2)
+        integer(8), intent(out) :: ier
+!f2py   intent(hide) :: n
+        ier = 0_8
         
-        call make_rfftp_plan(n, ier)
-        ! error catching
-
-        print "(A6, I3)", "length", plan%length
-        print "(A4, I3)", "nfct", plan%nfct
-        print "(A6, I3)", 'twsize', plan%twsize
+        ! ensure proper power of 2 size
+        if (iand(n, n-1) .NE. 0) then
+            print *, "N is not a power of 2"
+            ier = -1_8
+            return
+        end if
         
-        open(13, file='tw_f.txt', status='new')
+        if ((plan%length .NE. n) .OR. (plan%length == -1_8)) then
+            call make_rfftp_plan(n, ier)
+        end if
+        if (ier .NE. 0) then
+            print *, "Error making plan"
+            return
+        end if
         
-        do i=1, plan%nfct
-            print "(A3, I2,A1, I3)", 'fct', i, ':', plan%fct(i)%fct
-            
-            write (13, "(54f10.6)"), plan%fct(i)%tw(:plan%twsize)
-        end do
-        close(13)
-
+        ret = 0_8
+        
+        ret = 0._8
+        ret(2:n+1) = x
+        call rfftp_forward(n, ret(2:), fct, ier)
+        if (ier .NE. 0) then
+            print *, "Error calling rfftp_forward"
+            return
+        end if
+        
+        ret(1) = ret(2)
+        ret(2) = 0._8
+        
+        ier = 0_8
+    
     end subroutine
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    subroutine rfftp_forward(m, x, fct, ier)
+        implicit none
+        integer(8), intent(in) :: m
+        real(8), intent(inout), target :: x(m)
+        real(8), intent(in) :: fct
+        integer(8), intent(out) :: ier
+        ! local
+        integer(8) :: n, l1, nf, k1, k, ip, ido, iswap
+        real(8), target :: ch(m)
+        real(8), pointer :: p1(:)=>null(), p2(:)=>null()
+        
+        if (plan%length == 1_8) then
+            ier = -1_8
+            return
+        end if
+        
+        n = plan%length
+        l1 = n
+        nf = plan%nfct
+        
+        iswap = 1_8  ! keep track of swapping
+        p1 => x
+        p2 => ch
+        
+        do k1=1, nf
+            k = nf - k1 + 1
+            ip = plan%fct(k)%fct
+            ido = n / l1
+            l1 = l1 / ip
+            
+            if (ip .EQ. 4) then
+                call radf4(ido, l1, p1, p2, plan%fct(k)%tw)
+            else if (ip .EQ. 2) then
+                call radf2(ido, l1, p1, p2, plan%fct(k)%tw)
+            else
+                ier = -1
+                return
+            end if
+            
+            ! swap which arrays the pointers point to
+            nullify(p1)
+            nullify(p2)
+            if (iand(iswap, 1) .NE. 0) then
+                p1 => ch
+                p2 => x
+            else
+                p1 => x
+                p2 => ch
+            end if
+            iswap = iswap + 1_8
+            
+        end do
+        
+        ! normalize
+        !call copy_and_norm(x, p1, n, fct)
+        if (.NOT. associated(p1, x)) then
+            if (fct .NE. 1._8) then
+                x = fct * p1
+            else
+                x = p1
+            end if
+        else
+            if (fct .NE. 1._8) then
+                x = x * fct
+            end if
+        end if
+        
+        
+        nullify(p1)
+        nullify(p2)
+        ier = 0_8
+    end subroutine
+    
+    
+    subroutine radf2(ido, l1, cc, ch, wa)
+        implicit none
+        integer(8), intent(in) :: ido, l1
+        real(8), dimension(:) :: cc, ch, wa
+        ! local
+        integer(8), parameter :: cdim=2_8
+        integer(8) :: k, i, ic
+        real(8) :: tr2, ti2
+        
+        do k=0, l1-1
+            ch(ido*cdim*k+1) = cc(ido*k+1) + cc(ido*(k+l1)+1)
+            ch(ido+ido*(1+cdim*k)) = cc(ido*k+1) - cc(ido*(k+l1)+1)
+        end do
+        if (iand(ido, 1) == 0) then
+            do k=0, l1-1
+                ch(ido*(1+cdim*k)+1) = -cc(ido+ido*(k+l1))
+                ch(ido+ido*(cdim*k)) = cc(ido+ido*k)
+            end do
+        end if
+        if (ido <= 2) return
+        do k=0, l1-1
+            do i=2, ido-1, 2
+                ic = ido - i
+                
+                tr2 = wa(i-1) * cc(i+ido*(k+l1)) + wa(i) * cc(i+ido*(k+l1)+1)
+                ti2 = wa(i-1) * cc(i+ido*(k+l1)+1) - wa(i) * cc(i+ido*(k+l1))
+                
+                ch(i+ido*cdim*k) = cc(i+ido*k) + tr2
+                ch(ic+ido*(1+cdim*k)) = cc(i+ido*k) - tr2
+                ch(i+ido*cdim*k+1) = ti2 + cc(i+ido*k+1)
+                ch(ic+ido*(1+cdim*k)+1) = ti2 - cc(i+ido*k+1)
+            end do
+        end do
+    end subroutine
+    
+    subroutine radf4(ido, l1, cc, ch, wa)
+        implicit none
+        integer(8), intent(in) :: ido, l1
+        real(8), dimension(:) :: cc, ch, wa
+        ! local
+        integer(8), parameter :: cdim=4_8
+        real(8), parameter :: hsqt2=0.70710678118654752440
+        integer(8) :: k, i, ic
+        real(8) :: ci2, ci3, ci4, cr2, cr3, cr4
+        real(8) :: ti1, ti2, ti3, ti4, tr1, tr2, tr3, tr4
+        
+        do k=0, l1-1
+            tr1 = cc(ido*(k+l1*3)+1) + cc(ido*(k+l1)+1)
+            ch(ido*(2+cdim*k)+1) = cc(ido*(k+l1*3)+1) - cc(ido*(k+l1)+1)
+            
+            tr2 = cc(ido*k+1) + cc(ido*(k+l1*2)+1)
+            ch(ido+ido*(1+cdim*k)) = cc(ido*k+1) - cc(ido*(k+l1*2)+1)
+            
+            ch(ido*(cdim*k)+1) = tr2 + tr1
+            ch(ido+ido*(3+cdim*k)) = tr2 - tr1
+        end do
+        if (iand(ido, 1) == 0) then
+            do k=0, l1-1
+                ti1 = -hsqt2 * (cc(ido+ido*(k+l1)) + cc(ido+ido*(k+l1*3)))
+                tr1 = hsqt2 * (cc(ido+ido*(k+l1)) - cc(ido+ido*(k+l1*3)))
+
+                ch(ido+ido*(cdim*k)) = cc(ido+ido*k) + tr1
+                ch(ido+ido*(2+cdim*k)) = cc(ido+ido*k) - tr1
+                ch(ido*(3+cdim*k)+1) = ti1 + cc(ido+ido*(k+l1*2))
+                ch(ido*(1+cdim*k)+1) = ti1 - cc(ido+ido*(k+l1*2))
+            end do
+        end if
+        if (ido <= 2) return
+        do k=0, l1-1
+            do i=2, ido-1, 2
+                ic = ido-i
+                
+                cr2 = wa(i-1) * cc(i+ido*(k+l1)) + wa(i) * cc(i+ido*(k+l1)+1)
+                ci2 = wa(i-1) * cc(i+ido*(k+l1)+1) - wa(i) * cc(i+ido*(k+l1))
+                
+                cr3 = wa((i-2)+ido) * cc(i+ido*(k+l1*2)) + wa(i-1+ido) * cc(i+ido*(k+l1*2)+1)
+                ci3 = wa((i-2)+ido) * cc(i+ido*(k+l1*2)+1) - wa(i-1+ido) * cc(i+ido*(k+l1*2))
+                
+                cr4 = wa(i-1+2*(ido-1)) * cc(i+ido*(k+l1*3)) + wa(i+2*(ido-1)) * cc(i+ido*(k+l1*3)+1)
+                ci4 = wa((i-1)+2*(ido-1)) * cc(i+ido*(k+l1*3)+1) - wa(i+2*(ido-1)) * cc(i+ido*(k+l1*3))
+                
+                
+                tr1 = cr4 + cr2
+                tr4 = cr4 - cr2
+                
+                ti1 = ci2 + ci4
+                ti4 = ci2 - ci4
+                
+                tr2 = cc(i+ido*k) + cr3
+                tr3 = cc(i+ido*k) - cr3
+                
+                ti2 = cc(i+ido*k+1) + ci3
+                ti3 = cc(i+ido*k+1) - ci3
+                
+                ch(i+ido*cdim*k) = tr2 + tr1
+                ch(ic+ido*(3+cdim*k)) = tr2 - tr1
+                
+                ch(i+ido*cdim*k+1) = ti1 + ti2
+                ch(ic+ido*(3+cdim*k)+1) = ti1 - ti2
+                
+                ch(i+ido*(2+cdim*k)) = tr3 + ti4
+                ch(ic+ido*(1+cdim*k)) = tr3 - ti4
+                
+                ch(i+ido*(2+cdim*k)+1) = tr4 + ti3
+                ch(ic+ido*(1+cdim*k)+1) = tr4 - ti3
+            end do
+        end do
+    end subroutine
+                
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     subroutine make_rfftp_plan( length, ier)
         implicit none
@@ -55,7 +310,8 @@ contains
         ! local
         integer(8) :: i, tws
         
-        if ( length == 0 ) then
+        if (( length == 0) .OR. ( length == 1) ) then
+            print *, "0 length"
             ier = -1_8
             return
         end if
@@ -65,24 +321,28 @@ contains
         
         do i=1, NFCT_
             plan%fct(i)%fct = 0_8
-            allocate(plan%fct(i)%tw( length))
-            allocate(plan%fct(i)%tws( length))
-            
-            plan%fct(i)%tw = 0._8
-            plan%fct(i)%tws= 0._8
         end do
         
-        if ( length == 1) return
-        
         call rfftp_factorize(ier)
-        ! error catching
+        if (ier .NE. 0) then
+            print *, "Error calling rfftp_factorize"
+            return
+        end if
         
         call rfftp_twsize(tws)
         plan%twsize = tws
         
+        if (associated(plan%mem)) then
+            deallocate(plan%mem)
+        end if
         allocate(plan%mem(tws))
+        plan%mem = 0._8
         
         call rfftp_comp_twiddle( length, ier)
+        if (ier .NE. 0) then
+            print *, "Error calling rfftp_comp_twiddle"
+            return
+        end if
     end subroutine
     
     
@@ -91,7 +351,7 @@ contains
         integer(8), intent(in) :: length
         integer(8), intent(out) :: ier
         ! local
-        real(8) :: twid(2 * length)
+        real(8), target :: twid(2 * length)
         integer(8) :: l1, i, j, k, ip, ido, iptr, twsize
         
         twsize = plan%twsize
@@ -107,34 +367,17 @@ contains
             ido = length / (l1 * ip)
             
             if (k < plan%nfct)  then ! last factor doesn't need twiddles
-                do j=1, ip-1
-                    do i=1, (ido-1)/2
-                        plan%mem((j-1)*(ido-1)+2*i-1) = twid(2*j*l1*i+1)
-                        plan%mem((j-1)*(ido-1)+2*i) = twid(2*j*l1*i+2)
-                    end do
-                end do
-                
-                plan%fct(k)%tw(:twsize-iptr+1) = plan%mem(iptr:)
-                plan%fct(k)%tw(iptr:) = plan%mem(:twsize-iptr+1)
+                plan%fct(k)%tw => plan%mem(iptr:)
                 iptr = iptr + (ip - 1) * (ido - 1)
                 
-                print "(10f6.2)", plan%fct(k)%tw(:twsize)
-                print *, ""
-            end if
-            
-            if (ip > 5) then ! special factors required by *g functions
-                plan%fct(k)%tws = plan%mem(iptr)
-                iptr = iptr + 2 * ip
-                plan%fct(k)%tws(1) = 1._8
-                plan%fct(k)%tws(2) = 1._8
-                
-                do i=1, ishft(ip, -1)
-                    plan%fct(k)%tws(2*i+1) = twid(2*i*( length/ip)+1)
-                    plan%fct(k)%tws(2*i+2) = twid(2*i*( length/ip)+2)
-                    plan%fct(k)%tws(2*(ip-i)+1) = twid(2*i*( length/ip)+1)
-                    plan%fct(k)%tws(2*(ip-1)+2) = twid(2*i*( length/ip)+2)
+                do j=1, ip-1
+                    do i=1, (ido-1)/2
+                        plan%fct(k)%tw((j-1)*(ido-1)+2*i-1) = twid(2*j*l1*i+1)
+                        plan%fct(k)%tw((j-1)*(ido-1)+2*i) = twid(2*j*l1*i+2)
+                    end do
                 end do
             end if
+            ! remove if ip > 5 due to factors always being 2 or 4
             l1 = l1 * ip
         end do
         ier = 0_8

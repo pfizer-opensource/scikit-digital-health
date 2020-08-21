@@ -26,6 +26,7 @@ contains
         implicit none
         integer :: i
         
+        if (associated(plan%mem)) deallocate(plan%mem)
         if (associated(plan%mem)) nullify(plan%mem)
         do i=1, NFCT_
             if (associated(plan%fct(i)%tw)) nullify(plan%fct(i)%tw)
@@ -85,7 +86,7 @@ contains
     subroutine rfftp_forward(m, x, fct, ier)
         implicit none
         integer(8), intent(in) :: m
-        real(8), intent(in), target :: x(m)
+        real(8), intent(inout), target :: x(m)
         real(8), intent(in) :: fct
         integer(8), intent(out) :: ier
         ! local
@@ -136,7 +137,20 @@ contains
         end do
         
         ! normalize
-        call copy_and_norm(x, p1, n, fct)
+        !call copy_and_norm(x, p1, n, fct)
+        if (.NOT. associated(p1, x)) then
+            if (fct .NE. 1._8) then
+                x = fct * p1
+            else
+                x = p1
+            end if
+        else
+            if (fct .NE. 1._8) then
+                x = x * fct
+            end if
+        end if
+        
+        
         nullify(p1)
         nullify(p2)
         ier = 0_8
@@ -250,26 +264,6 @@ contains
                 ch(ic+ido*(1+cdim*k)+1) = tr4 - ti3
             end do
         end do
-    end subroutine
-    
-    subroutine copy_and_norm(c, p1, n, fct)
-        implicit none
-        real(8), target :: c(n)
-        real(8), pointer :: p1(:)
-        integer(8) :: n
-        real(8) :: fct
-        
-        if (.NOT. associated(p1, c)) then
-            if (fct .NE. 1._8) then
-                c = fct * p1
-            else
-                c = p1
-            end if
-        else
-            if (fct .NE. 1._8) then
-                c = c * fct
-            end if
-        end if
     end subroutine
                 
     
