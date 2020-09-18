@@ -1,13 +1,8 @@
-from sparc2 import sparc_1d as fsparc2_1d
+from acorr import autocorr as fcac
 import numpy as np
 
-x = np.random.rand(150)
-fs = 50.0
-cut = 10.0
-pad = 4
-thresh = 0.05
-nfft = int(pow(2, np.ceil(np.log2(150)) + pad))
+x = np.random.rand(50000, 150, 3)
+xc = np.ascontiguousarray(x.transpose([0, 2, 1]))
+xf = np.asfortranarray(x.transpose([1, 2, 0]))
 
-a = fsparc2_1d(x, fs, nfft, cut, thresh)
-b = fsparc2_1d(x, fs, nfft, cut, thresh)
-print(a, b)
+fcac(xc, 1, 1)
