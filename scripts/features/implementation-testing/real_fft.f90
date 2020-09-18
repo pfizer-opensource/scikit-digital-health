@@ -1,5 +1,36 @@
 ! -*- f90 -*-
 
+! Copyright (c) 2005-2020, NumPy Developers.
+! All rights reserved.
+
+! Redistribution and use in source and binary forms, with or without
+! modification, are permitted provided that the following conditions are
+! met:
+
+!     * Redistributions of source code must retain the above copyright
+!        notice, this list of conditions and the following disclaimer.
+
+!     * Redistributions in binary form must reproduce the above
+!        copyright notice, this list of conditions and the following
+!        disclaimer in the documentation and/or other materials provided
+!        with the distribution.
+
+!     * Neither the name of the NumPy Developers nor the names of any
+!        contributors may be used to endorse or promote products derived
+!        from this software without specific prior written permission.
+
+! THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+! "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+! LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+! A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+! OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+! LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+! DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+! THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+! (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+! OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 module real_fft
     type :: rfftp_fctdata
         integer(8) :: fct
@@ -137,7 +168,7 @@ contains
             ! swap which arrays the pointers point to
             nullify(p1)
             nullify(p2)
-            if (iand(iswap, 1) .NE. 0) then
+            if (iand(iswap, 1_8) .NE. 0) then
                 p1 => ch
                 p2 => x
             else
@@ -182,7 +213,7 @@ contains
             ch(ido*cdim*k+1) = cc(ido*k+1) + cc(ido*(k+l1)+1)
             ch(ido+ido*(1+cdim*k)) = cc(ido*k+1) - cc(ido*(k+l1)+1)
         end do
-        if (iand(ido, 1) == 0) then
+        if (iand(ido, 1_8) == 0) then
             do k=0, l1-1
                 ch(ido*(1+cdim*k)+1) = -cc(ido+ido*(k+l1))
                 ch(ido+ido*(cdim*k)) = cc(ido+ido*k)
@@ -225,7 +256,7 @@ contains
             ch(ido*(cdim*k)+1) = tr2 + tr1
             ch(ido+ido*(3+cdim*k)) = tr2 - tr1
         end do
-        if (iand(ido, 1) == 0) then
+        if (iand(ido, 1_8) == 0) then
             do k=0, l1-1
                 ti1 = -hsqt2 * (cc(ido+ido*(k+l1)) + cc(ido+ido*(k+l1*3)))
                 tr1 = hsqt2 * (cc(ido+ido*(k+l1)) - cc(ido+ido*(k+l1*3)))
@@ -488,7 +519,7 @@ contains
         
         quart = ishft(n, -2)
         
-        if (iand(n, 7) == 0) then
+        if (iand(n, 7_8) == 0) then
             res(quart) = hsqt2
             res(quart + 1) = hsqt2
         end if
@@ -511,7 +542,7 @@ contains
         
         half = ishft(n, -1)
         
-        if (iand(n, 3) == 0) then
+        if (iand(n, 3_8) == 0) then
             do i=0, half-1, 2
                 res(i+half) = -res(i+1)
                 res(i+half+1) = res(i)
