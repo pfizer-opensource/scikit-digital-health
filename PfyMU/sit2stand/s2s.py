@@ -4,7 +4,7 @@ Sit-to-stand transfer detection and processing
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
-from numpy import sum, mean, std, around, zeros, ceil, cumsum, arange, nonzero
+from numpy import array, sum, mean, std, around, zeros, ceil, cumsum, arange, nonzero
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt, find_peaks
 from pywt import cwt, scale2frequency
@@ -89,7 +89,7 @@ class Sit2Stand(_BaseProcess):
             - jerk moving std: 3         :: maximum moving std jerk to be considered still (m/s^3)
 
         """
-        super().__init__()
+        super().__init__('STS Detection Process')
 
         # FILTER PARAMETERS
         self.cwave = continuous_wavelet
@@ -216,3 +216,18 @@ class Sit2Stand(_BaseProcess):
                 f_acc,
                 power_peaks
             )
+
+        # get rid of the partial transitions
+        partial = array(sts['Partial'])
+
+        sts['STS Start'] = array(sts['STS Start'])[~partial]
+        sts['STS End'] = array(sts['STS End'])[~partial]
+        sts['Duration'] = array(sts['Duration'])[~partial]
+        sts['Max. Accel.'] = array(sts['Max. Accel.'])[~partial]
+        sts['Min. Accel.'] = array(sts['Min. Accel.'])[~partial]
+        sts['SPARC'] = array(sts['SPARC'])[~partial]
+        sts['Vertical Displacement'] = array(sts['Vertical Displacement'])[~partial]
+
+        sts.pop('Partial')
+
+        return dict(time=time, accel=accel, **kwargs), sts
