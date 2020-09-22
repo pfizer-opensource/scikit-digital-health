@@ -7,11 +7,16 @@ Pfizer DMTI 2020
 
 
 class _BaseProcess:
-    def __init__(self):
+    def __init__(self, name):
         """
         Intended to be subclassed
+
+        Parameters
+        ----------
+        name : str
+            Name of the process
         """
-        pass
+        self.name = name
 
     def predict(self, file=None, time=None, accel=None, angvel=None, temperature=None, **kwargs):
         pass
