@@ -14,15 +14,47 @@ from PfyMU.sit2stand.transfer_detector import Detector
 
 
 class Sit2Stand(_BaseProcess):
-    def __init__(self, *, continuous_wavelet='gaus1', power_band=None, power_peak_kw=None, power_std_height=True,
-                 power_std_trim=0, lowpass_order=4, lowpass_cutoff=5, reconstruction_window=0.25,
-                 stillness_constraint=True, gravity=9.81, thresholds=None, gravity_pass_order=4,
-                 gravity_pass_cutoff=0.8, long_still=0.5, still_window=0.3):
+    def __init__(
+            self, *,
+            stillness_constraint=True,
+            gravity=9.81,
+            thresholds=None,
+            long_still=0.5,
+            still_window=0.3,
+            gravity_pass_order=4,
+            gravity_pass_cutoff=0.8,
+            continuous_wavelet='gaus1',
+            power_band=None,
+            power_peak_kw=None,
+            power_std_height=True,
+            power_std_trim=0,
+            lowpass_order=4,
+            lowpass_cutoff=5,
+            reconstruction_window=0.25
+    ):
         """
         Sit-to-stand transfer detection and processing.
 
         Parameters
         ----------
+        stillness_constraint : bool, optional
+            Whether or not to impose the stillness constraint on the detected transitions. Default is True.
+        gravity : float, optional
+            Value of gravitational acceleration measured by the accelerometer when still. Default is 9.81 m/s^2.
+        thresholds : dict, optional
+            A dictionary of thresholds to change for stillness detection and transition verification. See *Notes* for
+            default values. Only values present will be used over the defaults.
+        long_still : float, optional
+            Length of time of stillness for it to be considered a long period of stillness. Used to determine the
+            integration window limits when available. Default is 0.5s
+        still_window : float, optional
+            Length of the moving window for calculating the moving statistics for determining stillness.
+            Default is 0.3s.
+        gravity_pass_order : int, optional
+            Low-pass filter order for estimating the direction of gravity by low-pass filtering the raw acceleration.
+            Default is 4.
+        gravity_pass_cutoff : float, optional
+            Low-pass filter frequency cutoff for estimating the direction of gravity. Default is 0.8Hz.
         continuous_wavelet : str, optional
             Continuous wavelet to use for signal deconstruction. Default is 'gaus1'. CWT coefficients will be summed
             in the frequency range defined by `power_band`
@@ -46,24 +78,6 @@ class Sit2Stand(_BaseProcess):
             Initial low-pass filtering cuttoff, in Hz. Default is 5Hz.
         reconstruction_window : float, optional
             Window to use for moving average, in seconds. Default is 0.25s. Ignored if reconstruction_method is 'dwt'.
-        stillness_constraint : bool, optional
-            Whether or not to impose the stillness constraint on the detected transitions. Default is True.
-        gravity : float, optional
-            Value of gravitational acceleration measured by the accelerometer when still. Default is 9.81 m/s^2.
-        thresholds : dict, optional
-            A dictionary of thresholds to change for stillness detection and transition verification. See *Notes* for
-            default values. Only values present will be used over the defaults.
-        gravity_pass_order : int, optional
-            Low-pass filter order for estimating the direction of gravity by low-pass filtering the raw acceleration.
-            Default is 4.
-        gravity_pass_cutoff : float, optional
-            Low-pass filter frequency cutoff for estimating the direction of gravity. Default is 0.8Hz.
-        long_still : float, optional
-            Length of time of stillness for it to be considered a long period of stillness. Used to determine the
-            integration window limits when available. Default is 0.5s
-        still_window : float, optional
-            Length of the moving window for calculating the moving statistics for determining stillness.
-            Default is 0.3s.
 
         Notes
         -----
