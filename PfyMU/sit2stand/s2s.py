@@ -1,0 +1,218 @@
+"""
+Sit-to-stand transfer detection and processing
+
+Lukas Adamowicz
+Pfizer DMTI 2020
+"""
+from numpy import sum, mean, std, around, zeros, ceil, cumsum, arange, nonzero
+from numpy.linalg import norm
+from scipy.signal import butter, sosfiltfilt, find_peaks
+from pywt import cwt, scale2frequency
+from warnings import warn
+
+
+from PfyMU.base import _BaseProcess
+from PfyMU.sit2stand.transfer_detector import Detector
+
+
+class Sit2Stand(_BaseProcess):
+    def __init__(self, *, continuous_wavelet='gaus1', power_band=None, power_peak_kw=None, power_std_height=True,
+                 power_std_trim=0, lowpass_order=4, lowpass_cutoff=5, reconstruction_window=0.25,
+                 stillness_constraint=True, gravity=9.81, thresholds=None, gravity_pass_order=4,
+                 gravity_pass_cutoff=0.8, long_still=0.5, still_window=0.3):
+        """
+        Sit-to-stand transfer detection and processing.
+
+        Parameters
+        ----------
+        continuous_wavelet : str, optional
+            Continuous wavelet to use for signal deconstruction. Default is 'gaus1'. CWT coefficients will be summed
+            in the frequency range defined by `power_band`
+        power_band : {array_like, int, float}, optional
+            Frequency band in which to sum the CWT coefficients. Either an array_like of length 2, with the lower and
+            upper limits, or a number, which will be taken as the upper limit, and the lower limit will be set to 0.
+            Default is [0, 0.5].
+        power_peak_kw : {None, dict}, optional
+            Extra key-word arguments to pass to `scipy.signal.find_peaks` when finding peaks in the
+            summed CWT coefficient power band data. Default is None, which will use the default parameters except
+            setting minimum height to 90, unless `power_std_height` is True.
+        power_std_height : bool, optional
+            Use the standard deviation of the power for peak finding. Default is True. If True, the standard deviation
+            height will overwrite the `height` setting in `power_peak_kw`.
+        power_std_trim : float, int, optional
+            Number of seconds to trim off the start and end of the power signal before computing the standard deviation
+            for `power_std_height`. Default is 0s, which will not trim anything. Suggested value of trimming is 0.5s.
+        lowpass_order : int, optional
+            Initial low-pass filtering order. Default is 4.
+        lowpass_cutoff : float, optional
+            Initial low-pass filtering cuttoff, in Hz. Default is 5Hz.
+        reconstruction_window : float, optional
+            Window to use for moving average, in seconds. Default is 0.25s. Ignored if reconstruction_method is 'dwt'.
+        stillness_constraint : bool, optional
+            Whether or not to impose the stillness constraint on the detected transitions. Default is True.
+        gravity : float, optional
+            Value of gravitational acceleration measured by the accelerometer when still. Default is 9.81 m/s^2.
+        thresholds : dict, optional
+            A dictionary of thresholds to change for stillness detection and transition verification. See *Notes* for
+            default values. Only values present will be used over the defaults.
+        gravity_pass_order : int, optional
+            Low-pass filter order for estimating the direction of gravity by low-pass filtering the raw acceleration.
+            Default is 4.
+        gravity_pass_cutoff : float, optional
+            Low-pass filter frequency cutoff for estimating the direction of gravity. Default is 0.8Hz.
+        long_still : float, optional
+            Length of time of stillness for it to be considered a long period of stillness. Used to determine the
+            integration window limits when available. Default is 0.5s
+        still_window : float, optional
+            Length of the moving window for calculating the moving statistics for determining stillness.
+            Default is 0.3s.
+
+        Notes
+        -----
+        The default height threshold of 90 in `power_peak_kw` was determined on data sampled at 128Hz, and would likely
+        need to be adjusted for different sampling frequencies. Especially if using a different sampling frequency,
+        use of `power_std_height=True` is recommended.
+
+        `stillness_constraint` determines whether or not a sit-to-stand transition is required to start and the
+        end of a still period in the data. This constraint is suggested for at-home data. For processing clinic data,
+        it is suggested to set this to `False`, especially if processing a task where sit-to-stands are repeated in
+        rapid succession.
+
+        Default thresholds:
+            - stand displacement: 0.125  :: minimum displacement for COM for a transfer (m)
+            - displacement factor: 0.75  :: minimum factor * median displacement for a transfer to be valid
+            - transition velocity: 0.2   :: minimum vertical velocity necessary for a valid transfer (m/s)
+            - duration factor: 10        :: maximum duration factor between first and second part of a transition
+            - accel moving avg: 0.2      :: maximum moving average acceleration to be considered still (m/s^2)
+            - accel moving std: 0.1      :: maximum moving std acceleration to be considered still (m/s^2)
+            - jerk moving avg: 2.5       :: maximum moving average jerk to be considered still (m/s^3)
+            - jerk moving std: 3         :: maximum moving std jerk to be considered still (m/s^3)
+
+        """
+        super().__init__()
+
+        # FILTER PARAMETERS
+        self.cwave = continuous_wavelet
+
+        if power_band is None:
+            self.power_start_f = 0
+            self.power_end_f = 0.5
+        elif isinstance(power_band, (int, float)):
+            self.power_start_f = 0
+            self.power_end_f = power_band
+        else:
+            self.power_start_f, self.power_end_f = power_band
+
+        self.std_height = power_std_height
+        self.std_trim = power_std_trim
+
+        if power_peak_kw is None:
+            self.power_peak_kw = {'height': 90 / 9.81}  # convert for g
+        else:
+            self.power_peak_kw = power_peak_kw
+
+        self.lp_ord = lowpass_order
+        self.lp_cut = lowpass_cutoff
+        self.rwindow = reconstruction_window
+
+        # for transfer detection
+        self.detector = Detector(
+            stillness_constraint=stillness_constraint,
+            gravity=gravity,
+            thresholds=thresholds,
+            gravity_pass_order=gravity_pass_order,
+            gravity_pass_cutoff=gravity_pass_cutoff,
+            long_still=long_still,
+            still_window=still_window
+        )
+
+    def predict(self, time=None, accel=None, **kwargs):
+        """
+        Predict the sit-to-stand transfers, and compute per-transition quantities
+
+        Parameters
+        ----------
+        time : ndarray
+            (N, ) array of timestamps (in seconds since 1970-1-1 00:00:00)
+        accel : ndarray
+            (N, 3) array of acceleration, with units of 'g'.
+        """
+        super().predict(time=time, accel=accel)
+
+    def _predict(self, *, time=None, accel=None, **kwargs):
+        super()._predict(time=time, accel=accel, **kwargs)
+        # FILTERING
+        # ======================================================
+        # compute the sampling period
+        dt = mean(time)
+
+        # setup filter
+        sos = butter(self.lp_ord, 2 * self.lp_cut * dt, btype='low', output='sos')
+
+        # check if windows exist for days
+        if 'Days' in kwargs:
+            days = kwargs['Days']
+        else:
+            days = [(0, accel.shape[0])]
+
+        # results storage
+        sts = {
+            'STS Start': [],
+            'STS End': [],
+            'Duration': [],
+            'Max. Accel.': [],
+            'Min. Accel.': [],
+            'SPARC': [],
+            'Vertical Displacement': [],
+            'Partial': []
+        }
+
+        for iday, day_idx in enumerate(days):
+            start, stop = day_idx
+
+            # compute the magnitude of the acceleration
+            m_acc = norm(accel[start:stop, :], axis=1)
+            # filtered acceleration
+            f_acc = sosfiltfilt(sos, m_acc, padtype='odd', padlen=None)
+
+            # reconstructed acceleration
+            n_window = int(around(self.rwindow / dt))
+            if n_window < 2:
+                n_window = 2
+            pad = int(ceil(n_window / 2))
+            n = f_acc.size
+
+            f_acc_cs = cumsum(f_acc)
+
+            r_acc = zeros(n)
+            r_acc[pad:pad+n] = (f_acc_cs[n_window:] - f_acc_cs[:-n_window]) / n_window
+            r_acc[:pad], r_acc[pad+n:] = r_acc[pad], r_acc[-pad-1]
+
+            # get the frequencies first to limit computation necessary
+            freqs = scale2frequency(self.cwave, arange(1, 65))
+            f_mask = nonzero((freqs <= self.power_end_f) & (freqs >= self.power_start_f))[0] + 1
+
+            # CWT power peak detection
+            coefs, freq = cwt(r_acc, f_mask, self.cwave, sampling_period=dt)
+
+            # sum coefficients over the frequencies in the power band
+            power = sum(coefs, axis=0)
+
+            # find the peaks in the power data
+            if self.std_height:
+                if self.std_trim != 0:
+                    trim = int(self.std_trim / dt)
+                    self.power_peak_kw['height'] = std(power[trim:-trim], ddof=1)
+                else:
+                    self.power_peak_kw['height'] = std(power, ddof=1)
+
+            power_peaks, _ = find_peaks(power, **self.power_peak_kw)
+
+            self.detector.predict(
+                sts,
+                dt,
+                time[start:stop],
+                accel[start:stop, :],
+                f_acc,
+                power_peaks
+            )
