@@ -8,8 +8,6 @@ from numpy import array, sum, mean, std, around, zeros, ceil, cumsum, arange, no
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt, find_peaks
 from pywt import cwt, scale2frequency
-from warnings import warn
-
 
 from PfyMU.base import _BaseProcess
 from PfyMU.sit2stand.transfer_detector import Detector
