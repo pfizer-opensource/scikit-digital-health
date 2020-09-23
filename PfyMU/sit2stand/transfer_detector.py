@@ -246,7 +246,7 @@ class Detector:
                     sts_start = pos_zc[pos_zc < ppk][-1]
                     p_still = stops[stops < ppk][-1]
                     # possibly use the end of stillness if it is close enough
-                    if -0.5 < (dt * p_still - sts_start) < 0.7:
+                    if -0.5 < (dt * (p_still - sts_start)) < 0.7:
                         sts_start = p_still
                 except IndexError:
                     continue
