@@ -6,7 +6,7 @@
         "depends": [],
         "name": "PfyMU.features.lib._cython.ratioBeyondRSigma",
         "sources": [
-            "/Users/adamol/Documents/Python Packages/PfyMU/PfyMU/features/lib/_cython/ratioBeyondRSigma.pyx"
+            "/Users/adamol/Documents/PyPackages/PfyMU/PfyMU/features/lib/_cython/ratioBeyondRSigma.pyx"
         ]
     },
     "module_name": "PfyMU.features.lib._cython.ratioBeyondRSigma"

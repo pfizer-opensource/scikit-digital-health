@@ -5,7 +5,7 @@
     "distutils": {
         "name": "PfyMU.features.lib._cython.autocorrelation",
         "sources": [
-            "/Users/adamol/Documents/Python Packages/PfyMU/PfyMU/features/lib/_cython/autocorrelation.pyx"
+            "/Users/adamol/Documents/PyPackages/PfyMU/PfyMU/features/lib/_cython/autocorrelation.pyx"
         ]
     },
     "module_name": "PfyMU.features.lib._cython.autocorrelation"

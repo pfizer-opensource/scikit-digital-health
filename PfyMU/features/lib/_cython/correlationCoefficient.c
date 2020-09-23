@@ -6,7 +6,7 @@
         "depends": [],
         "name": "PfyMU.features.lib._cython.correlationCoefficient",
         "sources": [
-            "/Users/adamol/Documents/Python Packages/PfyMU/PfyMU/features/lib/_cython/correlationCoefficient.pyx"
+            "/Users/adamol/Documents/PyPackages/PfyMU/PfyMU/features/lib/_cython/correlationCoefficient.pyx"
         ]
     },
     "module_name": "PfyMU.features.lib._cython.correlationCoefficient"
