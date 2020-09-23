@@ -42,6 +42,10 @@ def parse_setuppy_commands():
         # user forgot to give an argument. Let setuptools handle that
         return True
 
+    # setup for the cythonize command
+    if 'cythonize' in args:
+        os.environ['CYTHONIZE'] = 'True'
+
     info_commands = ['--help-commands', '--name', '--version', '-V', '--fullname', '--author', '--author-email',
                      '--maintainer', '--maintainer-email', '--contact', '--contact-email', '--url', '--license',
                      '--description', '--long-description', '--platforms', '--classifiers', '--keywords', '--provides',
