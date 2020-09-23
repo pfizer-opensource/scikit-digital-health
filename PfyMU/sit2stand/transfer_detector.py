@@ -63,7 +63,7 @@ def moving_stats(seq, window):
     return m_mn, m_st, pad
 
 
-def get_stillness(filt_accel, dt, window, thresholds):
+def get_stillness(filt_accel, dt, gravity, window, thresholds):
     """
     Stillness determination based on filtered acceleration magnitude and jerk magnitude
 
@@ -73,6 +73,8 @@ def get_stillness(filt_accel, dt, window, thresholds):
         1D array of filtered magnitude of acceleration data, units of m/s^2
     dt : float
         Sampling time, in seconds
+    gravity : float
+        Gravitational acceleration in m/s^2, as measured by the sensor during motionless periods
     window : float
         Moving statistics window length, in seconds
     thresholds : dict
@@ -99,19 +101,19 @@ def get_stillness(filt_accel, dt, window, thresholds):
     jerk_rm, jerk_rsd, _ = moving_stats(jerk, n_window)
 
     # create the stillness masks
-    arm_mask = abs(acc_rm - 1.0) < thresholds['accel moving avg']
+    arm_mask = abs(acc_rm - gravity) < thresholds['accel moving avg']
     arsd_mask = acc_rsd < thresholds['accel moving std']
     jrm_mask = abs(jerk_rm) < thresholds['jerk moving avg']
     jrsd_mask = jerk_rsd < thresholds['jerk moving std']
 
     still = arm_mask & arsd_mask & jrm_mask & jrsd_mask
     starts = where(diff(still.astype(int)) == 1)[0]
-    stops = where(diff(still.astyp(int)) == -1)[0]
+    stops = where(diff(still.astype(int)) == -1)[0]
 
     if still[0]:
         starts = insert(starts, 0, 0)
     if still[-1]:
-        stops.append(stops, len(still) - 1)
+        stops = append(stops, len(still) - 1)
 
     return still, starts, stops
 
@@ -190,7 +192,7 @@ class Detector:
         raw_acc = raw_accel * self.grav
         filt_acc = filt_accel * self.grav
 
-        still, starts, stops = get_stillness(filt_acc, dt, self.still_window)
+        still, starts, stops = get_stillness(filt_acc, dt, self.grav, self.still_window, self.thresh)
         still_dt = (stops - starts) * dt
 
         lstill_starts = starts[still_dt > self.long_still]
@@ -275,7 +277,7 @@ class Detector:
                 mx_ = filt_acc[sts_start:sts_end].max()
                 mn_ = filt_acc[sts_start:sts_end].min()
                 vdisp_ = v_pos[t_end_i] - v_pos[t_start_i]
-                sal_, *_ = self.sparc(norm(raw_acc[sts_start:sts_end], axis=1), 1 / dt)
+                sal_ = self.sparc(norm(raw_acc[sts_start:sts_end], axis=1), 1 / dt)
 
                 sts['STS Start'].append(time[sts_start])
                 sts['STS End'].append(time[sts_end])
@@ -291,7 +293,7 @@ class Detector:
                     mx_ = filt_acc[sts_start:sts_end].max()
                     mn_ = filt_acc[sts_start:sts_end].min()
                     vdisp_ = v_pos[t_end_i] - v_pos[t_start_i]
-                    sal_, *_ = self.sparc(norm(raw_acc[sts_start:sts_end], axis=1), 1 / dt)
+                    sal_ = self.sparc(norm(raw_acc[sts_start:sts_end], axis=1), 1 / dt)
 
                     sts['STS Start'].append(time[sts_start])
                     sts['STS End'].append(time[sts_end])
@@ -334,7 +336,7 @@ class Detector:
                 vel -= vel[0]  # reset the beginning back to 0
         else:
             vel_dr = cumtrapz(vert_accel, dx=dt, initial=0)
-            vel = vel_dr = (((vel_dr[-1] - vel_dr[0]) / (x[-1] - x[0])) * x)  # no intercept
+            vel = vel_dr - (((vel_dr[-1] - vel_dr[0]) / (x[-1] - x[0])) * x)  # no intercept
 
         # integrate velocity to get position
         pos = cumtrapz(vel, dx=dt, initial=0)

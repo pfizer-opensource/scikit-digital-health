@@ -4,13 +4,13 @@ Sit-to-stand transfer detection and processing
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
-from numpy import array, sum, mean, std, around, zeros, ceil, cumsum, arange, nonzero
+from numpy import array, sum, mean, std, around, arange, nonzero, diff, ascontiguousarray
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt, find_peaks
 from pywt import cwt, scale2frequency
 
 from PfyMU.base import _BaseProcess
-from PfyMU.sit2stand.transfer_detector import Detector
+from PfyMU.sit2stand.transfer_detector import Detector, moving_stats
 
 
 class Sit2Stand(_BaseProcess):
@@ -138,7 +138,7 @@ class Sit2Stand(_BaseProcess):
             still_window=still_window
         )
 
-    def predict(self, time=None, accel=None, **kwargs):
+    def _predict(self, *, time=None, accel=None, **kwargs):
         """
         Predict the sit-to-stand transfers, and compute per-transition quantities
 
@@ -149,14 +149,11 @@ class Sit2Stand(_BaseProcess):
         accel : ndarray
             (N, 3) array of acceleration, with units of 'g'.
         """
-        super().predict(time=time, accel=accel)
-
-    def _predict(self, *, time=None, accel=None, **kwargs):
         super()._predict(time=time, accel=accel, **kwargs)
         # FILTERING
         # ======================================================
         # compute the sampling period
-        dt = mean(time)
+        dt = mean(diff(time[:500]))
 
         # setup filter
         sos = butter(self.lp_ord, 2 * self.lp_cut * dt, btype='low', output='sos')
@@ -185,23 +182,14 @@ class Sit2Stand(_BaseProcess):
             # compute the magnitude of the acceleration
             m_acc = norm(accel[start:stop, :], axis=1)
             # filtered acceleration
-            f_acc = sosfiltfilt(sos, m_acc, padtype='odd', padlen=None)
+            f_acc = ascontiguousarray(sosfiltfilt(sos, m_acc, padtype='odd', padlen=None))
 
             # reconstructed acceleration
             n_window = int(around(self.rwindow / dt))
-            if n_window < 2:
-                n_window = 2
-            pad = int(ceil(n_window / 2))
-            n = f_acc.size
-
-            f_acc_cs = cumsum(f_acc)
-
-            r_acc = zeros(n)
-            r_acc[pad:pad+n] = (f_acc_cs[n_window:] - f_acc_cs[:-n_window]) / n_window
-            r_acc[:pad], r_acc[pad+n:] = r_acc[pad], r_acc[-pad-1]
+            r_acc, *_ = moving_stats(f_acc, n_window)
 
             # get the frequencies first to limit computation necessary
-            freqs = scale2frequency(self.cwave, arange(1, 65))
+            freqs = scale2frequency(self.cwave, arange(1, 65)) / dt
             f_mask = nonzero((freqs <= self.power_end_f) & (freqs >= self.power_start_f))[0] + 1
 
             # CWT power peak detection
