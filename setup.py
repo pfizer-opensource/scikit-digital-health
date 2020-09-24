@@ -95,9 +95,7 @@ def parse_setuppy_commands():
     # the user explicitly adds a --force command-line argument.
     bad_commands = dict(
         test=f"""
-            `setup.py test` is not supported.  Use one of the following
-            instead:
-              - `pytest --pyargs {PACKAGE_NAME}.tests`   (to test installed package)
+            `setup.py test` is not supported.
             """,
         upload="""
             `setup.py upload` is not supported, because it's insecure.
@@ -153,7 +151,7 @@ def configuration(parent_package='', top_path=None):
                        delegate_options_to_subpackages=True,
                        quiet=True)
     # add the PfyMU subpackage, which will list all the additional subpackages
-    config.add_subpackage(PACKAGE_NAME)
+    config.add_subpackage(PACKAGE_NAME, subpackage_path='src')
 
     config.get_version(f'{PACKAGE_NAME}/version.py')
 
