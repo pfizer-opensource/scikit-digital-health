@@ -1,6 +1,7 @@
 from pytest import mark
 
-from src.PfyMU.features import compute_window_samples
+from PfyMU.features import compute_window_samples
+from PfyMU.gait.train_classifier import load_datasets
 
 
 class TestLoadDatasets:

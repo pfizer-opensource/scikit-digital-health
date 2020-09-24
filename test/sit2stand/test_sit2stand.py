@@ -1,6 +1,6 @@
-from src.PfyMU import BaseProcessTester
+from ..base_conftest import BaseProcessTester
 
-from src.PfyMU.sit2stand import Sit2Stand
+from PfyMU.sit2stand import Sit2Stand
 
 
 class TestSit2StandStillness(BaseProcessTester):

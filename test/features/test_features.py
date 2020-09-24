@@ -1,4 +1,5 @@
-from src.PfyMU import BaseTestFeature
+from PfyMU import BaseTestFeature
+from PfyMU.features import *
 
 
 # STATISTICAL MOMENT FEATURES
