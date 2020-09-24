@@ -6,7 +6,7 @@
         "depends": [],
         "name": "PfyMU.features.lib._cython.ratioBeyondRSigma",
         "sources": [
-            "/Users/adamol/Documents/PyPackages/PfyMU/PfyMU/features/lib/_cython/ratioBeyondRSigma.pyx"
+            "PfyMU/features/lib/_cython/ratioBeyondRSigma.pyx"
         ]
     },
     "module_name": "PfyMU.features.lib._cython.ratioBeyondRSigma"
@@ -821,7 +821,7 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "ratioBeyondRSigma.pyx",
+  "PfyMU/features/lib/_cython/ratioBeyondRSigma.pyx",
   "stringsource",
 };
 /* MemviewSliceStruct.proto */
@@ -1838,7 +1838,6 @@ static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_strided_and_direct[] = "<strided and direct>";
 static const char __pyx_k_strided_and_indirect[] = "<strided and indirect>";
 static const char __pyx_k_contiguous_and_direct[] = "<contiguous and direct>";
-static const char __pyx_k_ratioBeyondRSigma_pyx[] = "ratioBeyondRSigma.pyx";
 static const char __pyx_k_MemoryView_of_r_object[] = "<MemoryView of %r object>";
 static const char __pyx_k_MemoryView_of_r_at_0x_x[] = "<MemoryView of %r at 0x%x>";
 static const char __pyx_k_contiguous_and_indirect[] = "<contiguous and indirect>";
@@ -1856,11 +1855,12 @@ static const char __pyx_k_Incompatible_checksums_s_vs_0xb0[] = "Incompatible che
 static const char __pyx_k_Indirect_dimensions_not_supporte[] = "Indirect dimensions not supported";
 static const char __pyx_k_Invalid_mode_expected_c_or_fortr[] = "Invalid mode, expected 'c' or 'fortran', got %s";
 static const char __pyx_k_Out_of_bounds_on_buffer_access_a[] = "Out of bounds on buffer access (axis %d)";
-static const char __pyx_k_PfyMU_features_lib__cython_ratio[] = "PfyMU.features.lib._cython.ratioBeyondRSigma";
+static const char __pyx_k_PfyMU_features_lib__cython_ratio[] = "PfyMU/features/lib/_cython/ratioBeyondRSigma.pyx";
 static const char __pyx_k_Unable_to_convert_item_to_object[] = "Unable to convert item to object";
 static const char __pyx_k_got_differing_extents_in_dimensi[] = "got differing extents in dimension %d (got %d and %d)";
 static const char __pyx_k_no_default___reduce___due_to_non[] = "no default __reduce__ due to non-trivial __cinit__";
 static const char __pyx_k_unable_to_allocate_shape_and_str[] = "unable to allocate shape and strides.";
+static const char __pyx_k_PfyMU_features_lib__cython_ratio_2[] = "PfyMU.features.lib._cython.ratioBeyondRSigma";
 static PyObject *__pyx_n_s_ASCII;
 static PyObject *__pyx_kp_s_Buffer_view_does_not_expose_stri;
 static PyObject *__pyx_n_u_C;
@@ -1880,7 +1880,8 @@ static PyObject *__pyx_kp_s_MemoryView_of_r_at_0x_x;
 static PyObject *__pyx_kp_s_MemoryView_of_r_object;
 static PyObject *__pyx_n_b_O;
 static PyObject *__pyx_kp_s_Out_of_bounds_on_buffer_access_a;
-static PyObject *__pyx_n_s_PfyMU_features_lib__cython_ratio;
+static PyObject *__pyx_kp_s_PfyMU_features_lib__cython_ratio;
+static PyObject *__pyx_n_s_PfyMU_features_lib__cython_ratio_2;
 static PyObject *__pyx_n_s_PickleError;
 static PyObject *__pyx_n_s_RatioBeyondRSigma;
 static PyObject *__pyx_n_s_TypeError;
@@ -1944,7 +1945,6 @@ static PyObject *__pyx_n_s_pyx_unpickle_Enum;
 static PyObject *__pyx_n_s_pyx_vtable;
 static PyObject *__pyx_n_s_r;
 static PyObject *__pyx_n_s_range;
-static PyObject *__pyx_kp_s_ratioBeyondRSigma_pyx;
 static PyObject *__pyx_n_s_reduce;
 static PyObject *__pyx_n_s_reduce_cython;
 static PyObject *__pyx_n_s_reduce_ex;
@@ -16235,7 +16235,8 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_MemoryView_of_r_object, __pyx_k_MemoryView_of_r_object, sizeof(__pyx_k_MemoryView_of_r_object), 0, 0, 1, 0},
   {&__pyx_n_b_O, __pyx_k_O, sizeof(__pyx_k_O), 0, 0, 0, 1},
   {&__pyx_kp_s_Out_of_bounds_on_buffer_access_a, __pyx_k_Out_of_bounds_on_buffer_access_a, sizeof(__pyx_k_Out_of_bounds_on_buffer_access_a), 0, 0, 1, 0},
-  {&__pyx_n_s_PfyMU_features_lib__cython_ratio, __pyx_k_PfyMU_features_lib__cython_ratio, sizeof(__pyx_k_PfyMU_features_lib__cython_ratio), 0, 0, 1, 1},
+  {&__pyx_kp_s_PfyMU_features_lib__cython_ratio, __pyx_k_PfyMU_features_lib__cython_ratio, sizeof(__pyx_k_PfyMU_features_lib__cython_ratio), 0, 0, 1, 0},
+  {&__pyx_n_s_PfyMU_features_lib__cython_ratio_2, __pyx_k_PfyMU_features_lib__cython_ratio_2, sizeof(__pyx_k_PfyMU_features_lib__cython_ratio_2), 0, 0, 1, 1},
   {&__pyx_n_s_PickleError, __pyx_k_PickleError, sizeof(__pyx_k_PickleError), 0, 0, 1, 1},
   {&__pyx_n_s_RatioBeyondRSigma, __pyx_k_RatioBeyondRSigma, sizeof(__pyx_k_RatioBeyondRSigma), 0, 0, 1, 1},
   {&__pyx_n_s_TypeError, __pyx_k_TypeError, sizeof(__pyx_k_TypeError), 0, 0, 1, 1},
@@ -16299,7 +16300,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_pyx_vtable, __pyx_k_pyx_vtable, sizeof(__pyx_k_pyx_vtable), 0, 0, 1, 1},
   {&__pyx_n_s_r, __pyx_k_r, sizeof(__pyx_k_r), 0, 0, 1, 1},
   {&__pyx_n_s_range, __pyx_k_range, sizeof(__pyx_k_range), 0, 0, 1, 1},
-  {&__pyx_kp_s_ratioBeyondRSigma_pyx, __pyx_k_ratioBeyondRSigma_pyx, sizeof(__pyx_k_ratioBeyondRSigma_pyx), 0, 0, 1, 0},
   {&__pyx_n_s_reduce, __pyx_k_reduce, sizeof(__pyx_k_reduce), 0, 0, 1, 1},
   {&__pyx_n_s_reduce_cython, __pyx_k_reduce_cython, sizeof(__pyx_k_reduce_cython), 0, 0, 1, 1},
   {&__pyx_n_s_reduce_ex, __pyx_k_reduce_ex, sizeof(__pyx_k_reduce_ex), 0, 0, 1, 1},
@@ -16546,7 +16546,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__19 = PyTuple_Pack(12, __pyx_n_s_x, __pyx_n_s_r, __pyx_n_s_m, __pyx_n_s_n, __pyx_n_s_p, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_k, __pyx_n_s_xcount, __pyx_n_s_count, __pyx_n_s_mu, __pyx_n_s_sigma); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(0, 10, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__19);
   __Pyx_GIVEREF(__pyx_tuple__19);
-  __pyx_codeobj__20 = (PyObject*)__Pyx_PyCode_New(2, 0, 12, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__19, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_ratioBeyondRSigma_pyx, __pyx_n_s_RatioBeyondRSigma, 10, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__20)) __PYX_ERR(0, 10, __pyx_L1_error)
+  __pyx_codeobj__20 = (PyObject*)__Pyx_PyCode_New(2, 0, 12, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__19, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_PfyMU_features_lib__cython_ratio, __pyx_n_s_RatioBeyondRSigma, 10, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__20)) __PYX_ERR(0, 10, __pyx_L1_error)
 
   /* "View.MemoryView":286
  *         return self.name
@@ -17006,7 +17006,7 @@ if (!__Pyx_RefNanny) {
  *     cdef Py_ssize_t m = x.shape[0], n = x.shape[1], p = x.shape[2], i, j, k
  *     xcount = zeros((m, p), dtype=npy_double, order='C')
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5PfyMU_8features_3lib_7_cython_17ratioBeyondRSigma_1RatioBeyondRSigma, NULL, __pyx_n_s_PfyMU_features_lib__cython_ratio); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 10, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5PfyMU_8features_3lib_7_cython_17ratioBeyondRSigma_1RatioBeyondRSigma, NULL, __pyx_n_s_PfyMU_features_lib__cython_ratio_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 10, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_RatioBeyondRSigma, __pyx_t_2) < 0) __PYX_ERR(0, 10, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;

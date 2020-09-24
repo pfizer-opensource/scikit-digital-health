@@ -5,7 +5,7 @@
     "distutils": {
         "name": "PfyMU.features.lib._cython.autocorrelation",
         "sources": [
-            "/Users/adamol/Documents/PyPackages/PfyMU/PfyMU/features/lib/_cython/autocorrelation.pyx"
+            "PfyMU/features/lib/_cython/autocorrelation.pyx"
         ]
     },
     "module_name": "PfyMU.features.lib._cython.autocorrelation"
@@ -819,7 +819,7 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "autocorrelation.pyx",
+  "PfyMU/features/lib/_cython/autocorrelation.pyx",
   "stringsource",
 };
 /* MemviewSliceStruct.proto */
@@ -1833,7 +1833,6 @@ static const char __pyx_k_setstate_cython[] = "__setstate_cython__";
 static const char __pyx_k_pyx_unpickle_Enum[] = "__pyx_unpickle_Enum";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_strided_and_direct[] = "<strided and direct>";
-static const char __pyx_k_autocorrelation_pyx[] = "autocorrelation.pyx";
 static const char __pyx_k_strided_and_indirect[] = "<strided and indirect>";
 static const char __pyx_k_contiguous_and_direct[] = "<contiguous and direct>";
 static const char __pyx_k_MemoryView_of_r_object[] = "<MemoryView of %r object>";
@@ -1853,11 +1852,12 @@ static const char __pyx_k_Incompatible_checksums_s_vs_0xb0[] = "Incompatible che
 static const char __pyx_k_Indirect_dimensions_not_supporte[] = "Indirect dimensions not supported";
 static const char __pyx_k_Invalid_mode_expected_c_or_fortr[] = "Invalid mode, expected 'c' or 'fortran', got %s";
 static const char __pyx_k_Out_of_bounds_on_buffer_access_a[] = "Out of bounds on buffer access (axis %d)";
-static const char __pyx_k_PfyMU_features_lib__cython_autoc[] = "PfyMU.features.lib._cython.autocorrelation";
+static const char __pyx_k_PfyMU_features_lib__cython_autoc[] = "PfyMU/features/lib/_cython/autocorrelation.pyx";
 static const char __pyx_k_Unable_to_convert_item_to_object[] = "Unable to convert item to object";
 static const char __pyx_k_got_differing_extents_in_dimensi[] = "got differing extents in dimension %d (got %d and %d)";
 static const char __pyx_k_no_default___reduce___due_to_non[] = "no default __reduce__ due to non-trivial __cinit__";
 static const char __pyx_k_unable_to_allocate_shape_and_str[] = "unable to allocate shape and strides.";
+static const char __pyx_k_PfyMU_features_lib__cython_autoc_2[] = "PfyMU.features.lib._cython.autocorrelation";
 static PyObject *__pyx_n_s_ASCII;
 static PyObject *__pyx_n_s_Autocorrelation;
 static PyObject *__pyx_kp_s_Buffer_view_does_not_expose_stri;
@@ -1877,7 +1877,8 @@ static PyObject *__pyx_kp_s_MemoryView_of_r_at_0x_x;
 static PyObject *__pyx_kp_s_MemoryView_of_r_object;
 static PyObject *__pyx_n_b_O;
 static PyObject *__pyx_kp_s_Out_of_bounds_on_buffer_access_a;
-static PyObject *__pyx_n_s_PfyMU_features_lib__cython_autoc;
+static PyObject *__pyx_kp_s_PfyMU_features_lib__cython_autoc;
+static PyObject *__pyx_n_s_PfyMU_features_lib__cython_autoc_2;
 static PyObject *__pyx_n_s_PickleError;
 static PyObject *__pyx_n_s_TypeError;
 static PyObject *__pyx_kp_s_Unable_to_convert_item_to_object;
@@ -1886,7 +1887,6 @@ static PyObject *__pyx_n_s_View_MemoryView;
 static PyObject *__pyx_n_s_ac;
 static PyObject *__pyx_n_s_allocate_buffer;
 static PyObject *__pyx_n_s_autocorr;
-static PyObject *__pyx_kp_s_autocorrelation_pyx;
 static PyObject *__pyx_n_s_base;
 static PyObject *__pyx_n_s_c;
 static PyObject *__pyx_n_u_c;
@@ -16415,7 +16415,8 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_MemoryView_of_r_object, __pyx_k_MemoryView_of_r_object, sizeof(__pyx_k_MemoryView_of_r_object), 0, 0, 1, 0},
   {&__pyx_n_b_O, __pyx_k_O, sizeof(__pyx_k_O), 0, 0, 0, 1},
   {&__pyx_kp_s_Out_of_bounds_on_buffer_access_a, __pyx_k_Out_of_bounds_on_buffer_access_a, sizeof(__pyx_k_Out_of_bounds_on_buffer_access_a), 0, 0, 1, 0},
-  {&__pyx_n_s_PfyMU_features_lib__cython_autoc, __pyx_k_PfyMU_features_lib__cython_autoc, sizeof(__pyx_k_PfyMU_features_lib__cython_autoc), 0, 0, 1, 1},
+  {&__pyx_kp_s_PfyMU_features_lib__cython_autoc, __pyx_k_PfyMU_features_lib__cython_autoc, sizeof(__pyx_k_PfyMU_features_lib__cython_autoc), 0, 0, 1, 0},
+  {&__pyx_n_s_PfyMU_features_lib__cython_autoc_2, __pyx_k_PfyMU_features_lib__cython_autoc_2, sizeof(__pyx_k_PfyMU_features_lib__cython_autoc_2), 0, 0, 1, 1},
   {&__pyx_n_s_PickleError, __pyx_k_PickleError, sizeof(__pyx_k_PickleError), 0, 0, 1, 1},
   {&__pyx_n_s_TypeError, __pyx_k_TypeError, sizeof(__pyx_k_TypeError), 0, 0, 1, 1},
   {&__pyx_kp_s_Unable_to_convert_item_to_object, __pyx_k_Unable_to_convert_item_to_object, sizeof(__pyx_k_Unable_to_convert_item_to_object), 0, 0, 1, 0},
@@ -16424,7 +16425,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_ac, __pyx_k_ac, sizeof(__pyx_k_ac), 0, 0, 1, 1},
   {&__pyx_n_s_allocate_buffer, __pyx_k_allocate_buffer, sizeof(__pyx_k_allocate_buffer), 0, 0, 1, 1},
   {&__pyx_n_s_autocorr, __pyx_k_autocorr, sizeof(__pyx_k_autocorr), 0, 0, 1, 1},
-  {&__pyx_kp_s_autocorrelation_pyx, __pyx_k_autocorrelation_pyx, sizeof(__pyx_k_autocorrelation_pyx), 0, 0, 1, 0},
   {&__pyx_n_s_base, __pyx_k_base, sizeof(__pyx_k_base), 0, 0, 1, 1},
   {&__pyx_n_s_c, __pyx_k_c, sizeof(__pyx_k_c), 0, 0, 1, 1},
   {&__pyx_n_u_c, __pyx_k_c, sizeof(__pyx_k_c), 0, 1, 0, 1},
@@ -16727,7 +16727,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__19 = PyTuple_Pack(15, __pyx_n_s_x, __pyx_n_s_lag, __pyx_n_s_normalize, __pyx_n_s_m, __pyx_n_s_n, __pyx_n_s_p, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_k, __pyx_n_s_mean1, __pyx_n_s_mean2, __pyx_n_s_std1, __pyx_n_s_std2, __pyx_n_s_autocorr, __pyx_n_s_ac); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(0, 9, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__19);
   __Pyx_GIVEREF(__pyx_tuple__19);
-  __pyx_codeobj__20 = (PyObject*)__Pyx_PyCode_New(3, 0, 15, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__19, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_autocorrelation_pyx, __pyx_n_s_Autocorrelation, 9, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__20)) __PYX_ERR(0, 9, __pyx_L1_error)
+  __pyx_codeobj__20 = (PyObject*)__Pyx_PyCode_New(3, 0, 15, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__19, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_PfyMU_features_lib__cython_autoc, __pyx_n_s_Autocorrelation, 9, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__20)) __PYX_ERR(0, 9, __pyx_L1_error)
 
   /* "View.MemoryView":286
  *         return self.name
@@ -17187,7 +17187,7 @@ if (!__Pyx_RefNanny) {
  *     cdef Py_ssize_t m = x.shape[0], n = x.shape[1], p = x.shape[2], i, j, k
  *     cdef double mean1, mean2, std1, std2
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5PfyMU_8features_3lib_7_cython_15autocorrelation_1Autocorrelation, NULL, __pyx_n_s_PfyMU_features_lib__cython_autoc); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 9, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5PfyMU_8features_3lib_7_cython_15autocorrelation_1Autocorrelation, NULL, __pyx_n_s_PfyMU_features_lib__cython_autoc_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 9, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_Autocorrelation, __pyx_t_2) < 0) __PYX_ERR(0, 9, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;

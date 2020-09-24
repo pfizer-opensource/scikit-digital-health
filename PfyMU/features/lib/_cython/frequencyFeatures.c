@@ -6,7 +6,7 @@
         "depends": [],
         "name": "PfyMU.features.lib._cython.frequencyFeatures",
         "sources": [
-            "/Users/adamol/Documents/PyPackages/PfyMU/PfyMU/features/lib/_cython/frequencyFeatures.pyx"
+            "PfyMU/features/lib/_cython/frequencyFeatures.pyx"
         ]
     },
     "module_name": "PfyMU.features.lib._cython.frequencyFeatures"
@@ -843,7 +843,7 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "frequencyFeatures.pyx",
+  "PfyMU/features/lib/_cython/frequencyFeatures.pyx",
   "stringsource",
 };
 /* MemviewSliceStruct.proto */

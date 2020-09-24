@@ -5,11 +5,12 @@ def configuration(parent_package='', top_path=None):
 
     config = Configuration('_cython', parent_package, top_path)
 
-    if os.getenv('CYTHONIZE', 'False') == 'True':
+    # if os.getenv('CYTHONIZE', 'False') == 'True':
+    if True:
         from Cython.Build import cythonize
 
         for pyxf in [i for i in Path('.').rglob('*/features/lib/_cython/*.pyx')]:
-            cythonize(str(pyxf))  # create a c file from the cython file
+            cythonize(str(pyxf), compiler_directives={'language_level': 3})  # create a c file from the cython file
     # get a list of the c files to compile
     for cf in [i for i in Path('.').rglob('*/features/lib/_cython/*.c')]:
         config.add_extension(cf.stem, sources=[str(cf)])  # Path().stem is the file name without extension

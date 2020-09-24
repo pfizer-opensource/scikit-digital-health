@@ -6,7 +6,7 @@
         "depends": [],
         "name": "PfyMU.features.lib._cython.jerk",
         "sources": [
-            "/Users/adamol/Documents/PyPackages/PfyMU/PfyMU/features/lib/_cython/jerk.pyx"
+            "PfyMU/features/lib/_cython/jerk.pyx"
         ]
     },
     "module_name": "PfyMU.features.lib._cython.jerk"
@@ -821,7 +821,7 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "jerk.pyx",
+  "PfyMU/features/lib/_cython/jerk.pyx",
   "stringsource",
 };
 /* MemviewSliceStruct.proto */
@@ -1810,7 +1810,6 @@ static const char __pyx_k_memview[] = "memview";
 static const char __pyx_k_Ellipsis[] = "Ellipsis";
 static const char __pyx_k_getstate[] = "__getstate__";
 static const char __pyx_k_itemsize[] = "itemsize";
-static const char __pyx_k_jerk_pyx[] = "jerk.pyx";
 static const char __pyx_k_pyx_type[] = "__pyx_type";
 static const char __pyx_k_setstate[] = "__setstate__";
 static const char __pyx_k_TypeError[] = "TypeError";
@@ -1851,7 +1850,7 @@ static const char __pyx_k_Invalid_shape_in_axis_d_d[] = "Invalid shape in axis %
 static const char __pyx_k_itemsize_0_for_cython_array[] = "itemsize <= 0 for cython.array";
 static const char __pyx_k_unable_to_allocate_array_data[] = "unable to allocate array data.";
 static const char __pyx_k_strided_and_direct_or_indirect[] = "<strided and direct or indirect>";
-static const char __pyx_k_PfyMU_features_lib__cython_jerk[] = "PfyMU.features.lib._cython.jerk";
+static const char __pyx_k_PfyMU_features_lib__cython_jerk[] = "PfyMU/features/lib/_cython/jerk.pyx";
 static const char __pyx_k_Buffer_view_does_not_expose_stri[] = "Buffer view does not expose strides";
 static const char __pyx_k_Can_only_create_a_buffer_that_is[] = "Can only create a buffer that is contiguous in memory.";
 static const char __pyx_k_Cannot_assign_to_read_only_memor[] = "Cannot assign to read-only memoryview";
@@ -1865,6 +1864,7 @@ static const char __pyx_k_Unable_to_convert_item_to_object[] = "Unable to conver
 static const char __pyx_k_got_differing_extents_in_dimensi[] = "got differing extents in dimension %d (got %d and %d)";
 static const char __pyx_k_no_default___reduce___due_to_non[] = "no default __reduce__ due to non-trivial __cinit__";
 static const char __pyx_k_unable_to_allocate_shape_and_str[] = "unable to allocate shape and strides.";
+static const char __pyx_k_PfyMU_features_lib__cython_jerk_2[] = "PfyMU.features.lib._cython.jerk";
 static PyObject *__pyx_n_s_ASCII;
 static PyObject *__pyx_kp_s_Buffer_view_does_not_expose_stri;
 static PyObject *__pyx_n_u_C;
@@ -1886,7 +1886,8 @@ static PyObject *__pyx_kp_s_MemoryView_of_r_at_0x_x;
 static PyObject *__pyx_kp_s_MemoryView_of_r_object;
 static PyObject *__pyx_n_b_O;
 static PyObject *__pyx_kp_s_Out_of_bounds_on_buffer_access_a;
-static PyObject *__pyx_n_s_PfyMU_features_lib__cython_jerk;
+static PyObject *__pyx_kp_s_PfyMU_features_lib__cython_jerk;
+static PyObject *__pyx_n_s_PfyMU_features_lib__cython_jerk_2;
 static PyObject *__pyx_n_s_PickleError;
 static PyObject *__pyx_n_s_TypeError;
 static PyObject *__pyx_kp_s_Unable_to_convert_item_to_object;
@@ -1924,7 +1925,6 @@ static PyObject *__pyx_kp_s_itemsize_0_for_cython_array;
 static PyObject *__pyx_n_s_j;
 static PyObject *__pyx_n_s_jerk;
 static PyObject *__pyx_n_s_jerk_metric;
-static PyObject *__pyx_kp_s_jerk_pyx;
 static PyObject *__pyx_n_s_jsum;
 static PyObject *__pyx_n_s_k;
 static PyObject *__pyx_n_s_m;
@@ -16844,7 +16844,8 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_MemoryView_of_r_object, __pyx_k_MemoryView_of_r_object, sizeof(__pyx_k_MemoryView_of_r_object), 0, 0, 1, 0},
   {&__pyx_n_b_O, __pyx_k_O, sizeof(__pyx_k_O), 0, 0, 0, 1},
   {&__pyx_kp_s_Out_of_bounds_on_buffer_access_a, __pyx_k_Out_of_bounds_on_buffer_access_a, sizeof(__pyx_k_Out_of_bounds_on_buffer_access_a), 0, 0, 1, 0},
-  {&__pyx_n_s_PfyMU_features_lib__cython_jerk, __pyx_k_PfyMU_features_lib__cython_jerk, sizeof(__pyx_k_PfyMU_features_lib__cython_jerk), 0, 0, 1, 1},
+  {&__pyx_kp_s_PfyMU_features_lib__cython_jerk, __pyx_k_PfyMU_features_lib__cython_jerk, sizeof(__pyx_k_PfyMU_features_lib__cython_jerk), 0, 0, 1, 0},
+  {&__pyx_n_s_PfyMU_features_lib__cython_jerk_2, __pyx_k_PfyMU_features_lib__cython_jerk_2, sizeof(__pyx_k_PfyMU_features_lib__cython_jerk_2), 0, 0, 1, 1},
   {&__pyx_n_s_PickleError, __pyx_k_PickleError, sizeof(__pyx_k_PickleError), 0, 0, 1, 1},
   {&__pyx_n_s_TypeError, __pyx_k_TypeError, sizeof(__pyx_k_TypeError), 0, 0, 1, 1},
   {&__pyx_kp_s_Unable_to_convert_item_to_object, __pyx_k_Unable_to_convert_item_to_object, sizeof(__pyx_k_Unable_to_convert_item_to_object), 0, 0, 1, 0},
@@ -16882,7 +16883,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_j, __pyx_k_j, sizeof(__pyx_k_j), 0, 0, 1, 1},
   {&__pyx_n_s_jerk, __pyx_k_jerk, sizeof(__pyx_k_jerk), 0, 0, 1, 1},
   {&__pyx_n_s_jerk_metric, __pyx_k_jerk_metric, sizeof(__pyx_k_jerk_metric), 0, 0, 1, 1},
-  {&__pyx_kp_s_jerk_pyx, __pyx_k_jerk_pyx, sizeof(__pyx_k_jerk_pyx), 0, 0, 1, 0},
   {&__pyx_n_s_jsum, __pyx_k_jsum, sizeof(__pyx_k_jsum), 0, 0, 1, 1},
   {&__pyx_n_s_k, __pyx_k_k, sizeof(__pyx_k_k), 0, 0, 1, 1},
   {&__pyx_n_s_m, __pyx_k_m, sizeof(__pyx_k_m), 0, 0, 1, 1},
@@ -17157,7 +17157,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__19 = PyTuple_Pack(13, __pyx_n_s_x, __pyx_n_s_fsample, __pyx_n_s_m, __pyx_n_s_n, __pyx_n_s_p, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_k, __pyx_n_s_amplitude, __pyx_n_s_scale, __pyx_n_s_jsum, __pyx_n_s_jerk_metric, __pyx_n_s_jerk); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(0, 8, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__19);
   __Pyx_GIVEREF(__pyx_tuple__19);
-  __pyx_codeobj__20 = (PyObject*)__Pyx_PyCode_New(2, 0, 13, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__19, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_jerk_pyx, __pyx_n_s_JerkMetric, 8, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__20)) __PYX_ERR(0, 8, __pyx_L1_error)
+  __pyx_codeobj__20 = (PyObject*)__Pyx_PyCode_New(2, 0, 13, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__19, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_PfyMU_features_lib__cython_jerk, __pyx_n_s_JerkMetric, 8, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__20)) __PYX_ERR(0, 8, __pyx_L1_error)
 
   /* "PfyMU/features/lib/_cython/jerk.pyx":30
  * 
@@ -17169,7 +17169,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__21 = PyTuple_Pack(12, __pyx_n_s_x, __pyx_n_s_stype, __pyx_n_s_m, __pyx_n_s_n, __pyx_n_s_p, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_k, __pyx_n_s_dimless_jerk, __pyx_n_s_jerk, __pyx_n_s_amplitude, __pyx_n_s_jsum); if (unlikely(!__pyx_tuple__21)) __PYX_ERR(0, 30, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__21);
   __Pyx_GIVEREF(__pyx_tuple__21);
-  __pyx_codeobj__22 = (PyObject*)__Pyx_PyCode_New(2, 0, 12, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__21, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_jerk_pyx, __pyx_n_s_DimensionlessJerk, 30, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__22)) __PYX_ERR(0, 30, __pyx_L1_error)
+  __pyx_codeobj__22 = (PyObject*)__Pyx_PyCode_New(2, 0, 12, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__21, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_PfyMU_features_lib__cython_jerk, __pyx_n_s_DimensionlessJerk, 30, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__22)) __PYX_ERR(0, 30, __pyx_L1_error)
 
   /* "View.MemoryView":286
  *         return self.name
@@ -17618,7 +17618,7 @@ if (!__Pyx_RefNanny) {
  *     cdef Py_ssize_t m = x.shape[0], n = x.shape[1], p = x.shape[2], i, j, k
  *     cdef double amplitude, scale, jsum
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5PfyMU_8features_3lib_7_cython_4jerk_1JerkMetric, NULL, __pyx_n_s_PfyMU_features_lib__cython_jerk); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 8, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5PfyMU_8features_3lib_7_cython_4jerk_1JerkMetric, NULL, __pyx_n_s_PfyMU_features_lib__cython_jerk_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 8, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_JerkMetric, __pyx_t_2) < 0) __PYX_ERR(0, 8, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -17630,7 +17630,7 @@ if (!__Pyx_RefNanny) {
  *     # stype: 1 == 'velocity', 2 == 'acceleration', 3 == 'jerk'
  *     cdef Py_ssize_t m = x.shape[0], n = x.shape[1], p = x.shape[2], i, j, k
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5PfyMU_8features_3lib_7_cython_4jerk_3DimensionlessJerk, NULL, __pyx_n_s_PfyMU_features_lib__cython_jerk); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 30, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5PfyMU_8features_3lib_7_cython_4jerk_3DimensionlessJerk, NULL, __pyx_n_s_PfyMU_features_lib__cython_jerk_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 30, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_DimensionlessJerk, __pyx_t_2) < 0) __PYX_ERR(0, 30, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;

@@ -6,7 +6,7 @@
         "depends": [],
         "name": "PfyMU.features.lib._cython.rootMeanVariance",
         "sources": [
-            "/Users/adamol/Documents/PyPackages/PfyMU/PfyMU/features/lib/_cython/rootMeanVariance.pyx"
+            "PfyMU/features/lib/_cython/rootMeanVariance.pyx"
         ]
     },
     "module_name": "PfyMU.features.lib._cython.rootMeanVariance"
@@ -821,7 +821,7 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "rootMeanVariance.pyx",
+  "PfyMU/features/lib/_cython/rootMeanVariance.pyx",
   "stringsource",
 };
 /* MemviewSliceStruct.proto */

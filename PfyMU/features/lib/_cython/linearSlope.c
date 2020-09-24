@@ -6,7 +6,7 @@
         "depends": [],
         "name": "PfyMU.features.lib._cython.linearSlope",
         "sources": [
-            "/Users/adamol/Documents/PyPackages/PfyMU/PfyMU/features/lib/_cython/linearSlope.pyx"
+            "PfyMU/features/lib/_cython/linearSlope.pyx"
         ]
     },
     "module_name": "PfyMU.features.lib._cython.linearSlope"
@@ -821,7 +821,7 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "linearSlope.pyx",
+  "PfyMU/features/lib/_cython/linearSlope.pyx",
   "stringsource",
 };
 /* MemviewSliceStruct.proto */

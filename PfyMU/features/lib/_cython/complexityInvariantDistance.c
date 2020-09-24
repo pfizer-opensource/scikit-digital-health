@@ -6,7 +6,7 @@
         "depends": [],
         "name": "PfyMU.features.lib._cython.complexityInvariantDistance",
         "sources": [
-            "/Users/adamol/Documents/PyPackages/PfyMU/PfyMU/features/lib/_cython/complexityInvariantDistance.pyx"
+            "PfyMU/features/lib/_cython/complexityInvariantDistance.pyx"
         ]
     },
     "module_name": "PfyMU.features.lib._cython.complexityInvariantDistance"
@@ -821,7 +821,7 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "complexityInvariantDistance.pyx",
+  "PfyMU/features/lib/_cython/complexityInvariantDistance.pyx",
   "stringsource",
 };
 /* MemviewSliceStruct.proto */
