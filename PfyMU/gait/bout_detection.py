@@ -76,7 +76,7 @@ def get_lgb_gait_classification(accel, fs):
             bst = lgb.Booster(model_file=file_path)
     
     # predict
-    gait_predictions = bst.predict(accel_feats)
+    gait_predictions = bst.predict(accel_feats, raw_score=True) > thresh
     
     # expand the predictions to be per sample.
     tmp = zeros(accel.shape[0])
