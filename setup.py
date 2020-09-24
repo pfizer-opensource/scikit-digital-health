@@ -26,7 +26,8 @@ REQUIREMENTS = [
     'cython>=0.29.14',
     'numpy>=1.17.2',
     'scipy>=1.3.1',
-    'pandas>=0.23.4'
+    'pandas>=0.23.4',
+    'lightgbm>=2.3.0'
 ]
 
 
