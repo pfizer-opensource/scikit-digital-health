@@ -17,9 +17,8 @@ if version_info >= (3, 7):
 else:
     import importlib_resources
 
-from PfyMU.base import _BaseProcess
-from PfyMU.utility import get_windowed_view
-from PfyMU.features import Bank
+from src.PfyMU.utility import get_windowed_view
+from src.PfyMU.features import Bank
 
 
 def get_lgb_gait_classification(accel, fs):

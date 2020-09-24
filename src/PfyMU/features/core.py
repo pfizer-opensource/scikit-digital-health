@@ -7,8 +7,8 @@ from numpy import ndarray, array, zeros, sum
 from pandas import DataFrame
 import json
 
-from PfyMU.features.utility import standardize_signal, compute_window_samples
-from PfyMU.features import lib
+from src.PfyMU.features import standardize_signal, compute_window_samples
+from src.PfyMU.features import lib
 
 
 __all__ = ['Bank']

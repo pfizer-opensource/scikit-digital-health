@@ -7,7 +7,7 @@ Pfizer DMTI 2020
 from numpy import mean, std, sum, diff, sign
 from scipy.stats import skew, kurtosis
 
-from PfyMU.features.core import Feature
+from src.PfyMU.features import Feature
 
 
 __all__ = ['Mean', 'MeanCrossRate', 'StdDev', 'Skewness', 'Kurtosis']

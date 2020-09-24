@@ -4,10 +4,10 @@ Features using wavelet transforms
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
-from numpy import zeros, ceil, log2, sort, sum, diff, sign, nonzero
+from numpy import zeros, ceil, log2, sort, sum, diff, sign
 import pywt
 
-from PfyMU.features.core import Feature
+from src.PfyMU.features import Feature
 
 
 __all__ = ['DetailPower', 'DetailPowerRatio']

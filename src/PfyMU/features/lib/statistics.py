@@ -3,9 +3,8 @@ Signal features based on statistics measures
 """
 from numpy import max, min, quantile, mean, std, arange
 
-from PfyMU.features.core import Feature
-from PfyMU.features.lib import _cython
-
+from src.PfyMU.features import Feature
+from src.PfyMU.features.lib import _cython
 
 __all__ = ['Range', 'IQR', 'RMS', 'Autocorrelation', 'LinearSlope']
 

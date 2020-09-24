@@ -8,7 +8,7 @@ from numpy import atan, sqrt, diff, cumsum, zeros, nanmedian, full, nan, where, 
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt
 
-from PfyMU.features.utility import get_windowed_view
+from src.PfyMU.features import get_windowed_view
 
 
 __all__ = ['roll_mean', 'roll_median_1', 'angle', 'hfen_plus', 'enmo', 'enmoa']

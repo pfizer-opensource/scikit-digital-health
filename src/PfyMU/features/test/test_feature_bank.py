@@ -1,7 +1,5 @@
 from numpy import allclose
 
-from PfyMU.features import *
-
 
 class TestBank:
     def set_up(self):

@@ -1,10 +1,6 @@
 from pytest import fixture
 import h5py
-from numpy import allclose
-import tempfile
 from importlib import resources
-
-from PfyMU.tests.base_conftest import get_sample_data, get_truth_data
 
 
 # TRUTH DATA

@@ -1,9 +1,6 @@
-import pytest
+from src.PfyMU import BaseProcessTester
 
-from PfyMU.tests.base_conftest import BaseProcessTester
-
-from PfyMU.sit2stand.s2s import Sit2Stand
-from PfyMU.sit2stand.transfer_detector import moving_stats, get_stillness, Detector
+from src.PfyMU.sit2stand import Sit2Stand
 
 
 class TestSit2StandStillness(BaseProcessTester):

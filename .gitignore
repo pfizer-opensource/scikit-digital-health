@@ -144,4 +144,4 @@ dmypy.json
 .pyre/
 
 # Project specific
-!PfyMU/features/lib/
+!src/PfyMU/features/lib/

@@ -6,7 +6,7 @@ import h5py
 from scipy.interpolate import interp1d
 import numpy as np
 
-from PfyMU.features.utility import get_windowed_view, compute_window_samples
+from src.PfyMU.features import get_windowed_view, compute_window_samples
 
 
 __all__ = ['load_datasets']
