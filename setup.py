@@ -161,6 +161,9 @@ def configuration(parent_package='', top_path=None):
 
 
 def setup_package():
+    if sys.version_info < (3, 7):  # check if using version 3.6
+        REQUIREMENTS.append('importlib_resources')
+
     with open("README.md", "r") as fh:
         long_description = fh.read()
 
