@@ -22,7 +22,7 @@ def configuration(parent_package='', top_path=None):
     config.add_subpackage('read')
     config.add_subpackage('sit2stand')
     # ==============================
-    config.add_subpackage('tests')
+    config.add_subpackage('test')
 
     return config
 

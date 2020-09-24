@@ -3,7 +3,7 @@ def configuration(parent_package='', top_path=None):
 
     config = Configuration('sit2stand', parent_package, top_path)
 
-    config.add_subpackage('tests')
+    config.add_subpackage('test')
 
     return config
 
