@@ -1,9 +1,14 @@
-from pytest import fixture, mark
+from pytest import fixture
 from numpy import allclose, broadcast_to, zeros
 from pandas.testing import assert_frame_equal
 from pandas import DataFrame
-from importlib import resources
 import h5py
+from sys import version_info
+
+if version_info >= (3, 7):
+    from importlib import resources
+else:
+    import importlib_resources
 
 
 class BaseTestFeature:
@@ -42,49 +47,79 @@ class BaseTestFeature:
 
 @fixture(scope='package')
 def fs():
-    with resources.path('PfyMU.tests.data', 'sample_accelerometer.h5') as path:
-        with h5py.File(path, 'r') as f:
-            ret = f.attrs.get('Sampling rate')
+    if version_info >= (3, 7):
+        with resources.path('PfyMU.tests.data', 'sample_accelerometer.h5') as path:
+            with h5py.File(path, 'r') as f:
+                ret = f.attrs.get('Sampling rate')
+    else:
+        with importlib_resources.path('PfyMU.tests.data', 'sample_accelerometer.h5') as path:
+            with h5py.File(path, 'r') as f:
+                ret = f.attrs.get('Sampling rate')
     return ret
 
 
 @fixture(scope='package')
 def x():
-    with resources.path('PfyMU.tests.data', 'sample_accelerometer.h5') as path:
-        with h5py.File(path, 'r') as f:
-            ret = f['Accelerometer'][:, 0]
+    if version_info >= (3, 7):
+        with resources.path('PfyMU.tests.data', 'sample_accelerometer.h5') as path:
+            with h5py.File(path, 'r') as f:
+                ret = f['Accelerometer'][:, 0]
+    else:
+        with importlib_resources.path('PfyMU.tests.data', 'sample_accelerometer.h5') as path:
+            with h5py.File(path, 'r') as f:
+                ret = f['Accelerometer'][:, 0]
     return ret
 
 
 @fixture(scope='package')
 def y():
-    with resources.path('PfyMU.tests.data', 'sample_accelerometer.h5') as path:
-        with h5py.File(path, 'r') as f:
-            ret = f['Accelerometer'][:, 1]
+    if version_info >= (3, 7):
+        with resources.path('PfyMU.tests.data', 'sample_accelerometer.h5') as path:
+            with h5py.File(path, 'r') as f:
+                ret = f['Accelerometer'][:, 1]
+    else:
+        with importlib_resources.path('PfyMU.tests.data', 'sample_accelerometer.h5') as path:
+            with h5py.File(path, 'r') as f:
+                ret = f['Accelerometer'][:, 1]
     return ret
 
 
 @fixture(scope='package')
 def z():
-    with resources.path('PfyMU.tests.data', 'sample_accelerometer.h5') as path:
-        with h5py.File(path, 'r') as f:
-            ret = f['Accelerometer'][:, 2]
+    if version_info >= (3, 7):
+        with resources.path('PfyMU.tests.data', 'sample_accelerometer.h5') as path:
+            with h5py.File(path, 'r') as f:
+                ret = f['Accelerometer'][:, 2]
+    else:
+        with importlib_resources.path('PfyMU.tests.data', 'sample_accelerometer.h5') as path:
+            with h5py.File(path, 'r') as f:
+                ret = f['Accelerometer'][:, 2]
     return ret
 
 
 @fixture(scope='package')
 def acc():
-    with resources.path('PfyMU.tests.data', 'sample_accelerometer.h5') as path:
-        with h5py.File(path, 'r') as f:
-            ret = f['Accelerometer'][()]
+    if version_info >= (3, 7):
+        with resources.path('PfyMU.tests.data', 'sample_accelerometer.h5') as path:
+            with h5py.File(path, 'r') as f:
+                ret = f['Accelerometer'][()]
+    else:
+        with importlib_resources.path('PfyMU.tests.data', 'sample_accelerometer.h5') as path:
+            with h5py.File(path, 'r') as f:
+                ret = f['Accelerometer'][()]
     return ret
 
 
 @fixture(scope='package')
 def win_acc():
-    with resources.path('PfyMU.tests.data', 'sample_accelerometer.h5') as path:
-        with h5py.File(path, 'r') as f:
-            acc = f['Accelerometer'][()]
+    if version_info >= (3, 7):
+        with resources.path('PfyMU.tests.data', 'sample_accelerometer.h5') as path:
+            with h5py.File(path, 'r') as f:
+                acc = f['Accelerometer'][()]
+    else:
+        with importlib_resources.path('PfyMU.tests.data', 'sample_accelerometer.h5') as path:
+            with h5py.File(path, 'r') as f:
+                acc = f['Accelerometer'][()]
 
     # broadcast the acceleration into windows (with the same samples)
     ret = broadcast_to(acc, (4, ) + acc.shape)
@@ -93,19 +128,30 @@ def win_acc():
 
 @fixture(scope='package')
 def df_acc():
-    with resources.path('PfyMU.tests.data', 'sample_accelerometer.h5') as path:
-        with h5py.File(path, 'r') as f:
-            acc = f['Accelerometer'][()]
-    ret = DataFrame(data=acc, columns=['x', 'y', 'z'])
+    if version_info >= (3, 7):
+        with resources.path('PfyMU.tests.data', 'sample_accelerometer.h5') as path:
+            with h5py.File(path, 'r') as f:
+                acc = f['Accelerometer'][()]
+        ret = DataFrame(data=acc, columns=['x', 'y', 'z'])
+    else:
+        with importlib_resources.path('PfyMU.tests.data', 'sample_accelerometer.h5') as path:
+            with h5py.File(path, 'r') as f:
+                acc = f['Accelerometer'][()]
+        ret = DataFrame(data=acc, columns=['x', 'y', 'z'])
     return ret
 
 
 @fixture(scope='package')
 def get_1d_truth():
     def get_1d(name):
-        with resources.path('PfyMU.tests.data', 'features_truth.h5') as path:
-            with h5py.File(path, 'r') as f:
-                x_, y_, z_ = f[name][()].flatten()
+        if version_info >= (3, 7):
+            with resources.path('PfyMU.tests.data', 'features_truth.h5') as path:
+                with h5py.File(path, 'r') as f:
+                    x_, y_, z_ = f[name][()].flatten()
+        else:
+            with importlib_resources.path('PfyMU.tests.data', 'features_truth.h5') as path:
+                with h5py.File(path, 'r') as f:
+                    x_, y_, z_ = f[name][()].flatten()
 
         xtr = x_.reshape((1, 1, 1))
         ytr = y_.reshape((1, 1, 1))
@@ -118,9 +164,14 @@ def get_1d_truth():
 @fixture(scope='package')
 def get_2d_truth():
     def get_2d(name):
-        with resources.path('PfyMU.tests.data', 'features_truth.h5') as path:
-            with h5py.File(path, 'r') as f:
-                truth = f[name][()].reshape((1, 3))
+        if version_info >= (3, 7):
+            with resources.path('PfyMU.tests.data', 'features_truth.h5') as path:
+                with h5py.File(path, 'r') as f:
+                    truth = f[name][()].reshape((1, 3))
+        else:
+            with importlib_resources.path('PfyMU.tests.data', 'features_truth.h5') as path:
+                with h5py.File(path, 'r') as f:
+                    truth = f[name][()].reshape((1, 3))
 
         return truth
     return get_2d
@@ -129,9 +180,14 @@ def get_2d_truth():
 @fixture(scope='package')
 def get_3d_truth():
     def get_3d(name):
-        with resources.path('PfyMU.tests.data', 'features_truth.h5') as path:
-            with h5py.File(path, 'r') as f:
-                truth = f[name][()].reshape((1, 3))
+        if version_info >= (3, 7):
+            with resources.path('PfyMU.tests.data', 'features_truth.h5') as path:
+                with h5py.File(path, 'r') as f:
+                    truth = f[name][()].reshape((1, 3))
+        else:
+            with importlib_resources.path('PfyMU.tests.data', 'features_truth.h5') as path:
+                with h5py.File(path, 'r') as f:
+                    truth = f[name][()].reshape((1, 3))
 
         return broadcast_to(truth, (4, 3))
     return get_3d
@@ -140,9 +196,14 @@ def get_3d_truth():
 @fixture(scope='package')
 def get_dataframe_truth():
     def get_df(name):
-        with resources.path('PfyMU.tests.data', 'features_truth.h5') as path:
-            with h5py.File(path, 'r') as f:
-                truth = f[name][()]
+        if version_info >= (3, 7):
+            with resources.path('PfyMU.tests.data', 'features_truth.h5') as path:
+                with h5py.File(path, 'r') as f:
+                    truth = f[name][()]
+        else:
+            with importlib_resources.path('PfyMU.tests.data', 'features_truth.h5') as path:
+                with h5py.File(path, 'r') as f:
+                    truth = f[name][()]
 
         return DataFrame(data=truth, columns=[f'{name}_x', f'{name}_y', f'{name}_z'])
     return get_df
@@ -157,10 +218,18 @@ def bank_2d_truth():
     bank + Range()['y']
     """
     truth = zeros((1, 9))
-    with resources.path('PfyMU.tests.data', 'features_truth.h5') as path:
-        with h5py.File(path, 'r') as f:
-            truth[0, :3] = f['Mean']
-            truth[0, [3, 8, 4]] = f['Range']
-            truth[0, 5:8] = f['JerkMetric']
+
+    if version_info >= (3, 7):
+        with resources.path('PfyMU.tests.data', 'features_truth.h5') as path:
+            with h5py.File(path, 'r') as f:
+                truth[0, :3] = f['Mean']
+                truth[0, [3, 8, 4]] = f['Range']
+                truth[0, 5:8] = f['JerkMetric']
+    else:
+        with resources.path('PfyMU.tests.data', 'features_truth.h5') as path:
+            with h5py.File(path, 'r') as f:
+                truth[0, :3] = f['Mean']
+                truth[0, [3, 8, 4]] = f['Range']
+                truth[0, 5:8] = f['JerkMetric']
 
     return truth
