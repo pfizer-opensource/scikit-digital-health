@@ -1,5 +1,6 @@
 from sys import version_info
 from setuptools import setup, find_packages
+from numpy.distutils.core import setup
 
 
 CLASSIFIERS = """\
@@ -29,17 +30,27 @@ REQUIREMENTS = [
 if version_info < (3, 7):
     REQUIREMENTS.append('importlib_resources')
 
+
+def configuration(parent_package='', top_path=None):
+    from numpy.distutils.misc_util import Configuration
+
+    config = Configuration(None, parent_package, top_path)
+    config.set_options(ignore_setup_xxx_py=True,
+                       assume_default_configuration=True,
+                       delegate_options_to_subpackages=True,
+                       quiet=True)
+
+    # config.add_subpackage('PfyMU', subpackage_path='src')
+    config.get_version('src/PfyMU/version.py')
+
+    return config
+
+
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-# these lines allow 1 file to control the version, so only 1 file needs to be updated per version change
-fid = open("src/PfyMU/version.py")
-vers = fid.readlines()[-1].split()[-1].strip("\"'")
-fid.close()
-
 setup(
     name="PfyMU",
-    version=vers,
     author="Pfizer DMTI Analytics",
     author_email="",
     description="Python general purpose IMU analysis and processing package.",
@@ -56,7 +67,9 @@ setup(
     package_dir={'': 'src'},
     license="MIT",
     python_requires=">=3.6",  # Version of python required
+    setup_requires=REQUIREMENTS,
     install_requires=REQUIREMENTS,
     classifiers=CLASSIFIERS,
+    configuration=configuration
 )
 
