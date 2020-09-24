@@ -10,7 +10,6 @@ def configuration(parent_package='', top_path=None):
     config = Configuration('gait', parent_package, top_path)
 
     config.add_subpackage('train_classifier')
-    config.add_subpackage('test')
 
     config.add_data_dir('model')
 
