@@ -1,7 +1,4 @@
-import os
-import sys
-import textwrap
-import warnings
+from sys import version_info
 from setuptools import setup, find_packages
 
 
@@ -28,6 +25,9 @@ REQUIREMENTS = [
     'pandas>=0.23.4',
     'lightgbm>=2.3.0'
 ]
+
+if version_info < (3, 7):
+    REQUIREMENTS.append('importlib_resources')
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
