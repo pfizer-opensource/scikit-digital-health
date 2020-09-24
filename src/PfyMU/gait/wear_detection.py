@@ -6,7 +6,7 @@ Pfizer DMTI 2020
 """
 
 
-from src.PfyMU.base import _BaseProcess
+from PfyMU.base import _BaseProcess
 
 
 class DetectWear(_BaseProcess):

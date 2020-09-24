@@ -17,16 +17,16 @@ if version_info >= (3, 7):
 else:
     import importlib_resources
 
-from src.PfyMU.utility import get_windowed_view
-from src.PfyMU.features import Bank
+from PfyMU.utility import get_windowed_view
+from PfyMU.features import Bank
 
 
 def get_lgb_gait_classification(accel, fs):
     """
     Get classification of windows of accelerometer data
 
-    Paramters
-    ---------
+    Parameters
+    ----------
     accel : numpy.ndarray
         (N, 3) array of acceleration values, in units of "g"
     fs : float

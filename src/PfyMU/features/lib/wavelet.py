@@ -7,7 +7,7 @@ Pfizer DMTI 2020
 from numpy import zeros, ceil, log2, sort, sum, diff, sign
 import pywt
 
-from src.PfyMU.features import Feature
+from PfyMU.features.core import Feature
 
 
 __all__ = ['DetailPower', 'DetailPowerRatio']

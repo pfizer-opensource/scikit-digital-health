@@ -6,14 +6,14 @@ import h5py
 from scipy.interpolate import interp1d
 import numpy as np
 
-from src.PfyMU.features import get_windowed_view, compute_window_samples
+from PfyMU.features import get_windowed_view, compute_window_samples
 
 
 __all__ = ['load_datasets']
 
 
-
-def load_datasets(paths, device_location=None, goal_fs=100.0, acc_mag=True, window_length=3.0, window_step=0.5, signal_function=None):
+def load_datasets(paths, device_location=None, goal_fs=100.0, acc_mag=True, window_length=3.0, window_step=0.5,
+                  signal_function=None):
     """
     Load standardized datasets into memory
     Parameters

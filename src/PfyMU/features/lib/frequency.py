@@ -6,8 +6,8 @@ Pfizer DMTI 2020
 """
 from numpy import array
 
-from src.PfyMU.features import Feature
-from src.PfyMU.features.lib import _cython
+from PfyMU.features.core import Feature
+from PfyMU.features.lib import _cython
 
 __all__ = ['DominantFrequency', 'DominantFrequencyValue', 'PowerSpectralSum', 'SpectralFlatness', 'SpectralEntropy']
 

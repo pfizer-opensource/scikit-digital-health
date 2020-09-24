@@ -1,3 +1,8 @@
+"""
+Lukas Adamowicz
+Pfizer DMTI 2020
+"""
+
 from numpy.f2py import capi_maps
 
 # MODIFY the f2c maps for types
@@ -22,7 +27,6 @@ def configuration(parent_package='', top_path=None):
     config.add_subpackage('read')
     config.add_subpackage('sit2stand')
     # ==============================
-    config.add_subpackage('test')
 
     return config
 

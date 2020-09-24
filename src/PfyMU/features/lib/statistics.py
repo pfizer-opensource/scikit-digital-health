@@ -1,10 +1,13 @@
 """
 Signal features based on statistics measures
+
+Lukas Adamowicz
+Pfizer DMTI 2020
 """
 from numpy import max, min, quantile, mean, std, arange
 
-from src.PfyMU.features import Feature
-from src.PfyMU.features.lib import _cython
+from PfyMU.features.core import Feature
+from PfyMU.features.lib import _cython
 
 __all__ = ['Range', 'IQR', 'RMS', 'Autocorrelation', 'LinearSlope']
 

@@ -1,9 +1,13 @@
+"""
+Lukas Adamowicz
+Pfizer DMTI 2020
+"""
+
+
 def configuration(parent_package='', top_path=None):
     from numpy.distutils.misc_util import Configuration
 
     config = Configuration('sit2stand', parent_package, top_path)
-
-    config.add_subpackage('test')
 
     return config
 

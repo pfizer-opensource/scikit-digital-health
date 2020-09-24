@@ -1,3 +1,9 @@
+"""
+Lukas Adamowicz
+Pfizer DMTI 2020
+"""
+
+
 def configuration(parent_package='', top_path=None):
     from numpy.distutils.misc_util import Configuration
 
