@@ -192,8 +192,7 @@ class Bank:
             
             # add it to the FeatureBank
             self + getattr(lib, name)(**params)[index]
-        
-        
+
     # FUNCTIONALITY METHODS
     def __contains__(self, item):
         isin = False
