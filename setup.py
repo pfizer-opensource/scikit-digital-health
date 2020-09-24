@@ -153,7 +153,7 @@ def configuration(parent_package='', top_path=None):
     # add the PfyMU subpackage, which will list all the additional subpackages
     config.add_subpackage(PACKAGE_NAME, subpackage_path='src')
 
-    config.get_version(f'{PACKAGE_NAME}/version.py')
+    config.get_version(f'src/{PACKAGE_NAME}/version.py')
 
     return config
 
@@ -165,7 +165,7 @@ def setup_package():
     with open("README.md", "r") as fh:
         long_description = fh.read()
 
-    with open(f'{PACKAGE_NAME}/version.py') as fid:
+    with open(f'src/{PACKAGE_NAME}/version.py') as fid:
         vers = fid.readlines()[-1].split()[-1].strip("\"'")
 
     metadata = dict(
