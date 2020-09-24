@@ -1,7 +1,12 @@
 from pytest import fixture
 import h5py
 from numpy import allclose
-from importlib import resources
+from sys import version_info
+
+if version_info >= (3, 7):
+    from importlib import resources
+else:
+    import importlib_resources
 
 
 # BASE TESTING CLASS
@@ -48,11 +53,18 @@ class BaseProcessTester:
 def get_sample_data():
     def sample_data(file_parts, data_names):
         res = {}
-        with resources.path(*file_parts) as file:
-            with h5py.File(file, 'r') as h5:
-                for key in data_names:
-                    if key in h5:
-                        res[key] = h5[key][()]
+        if version_info >= (3, 7):
+            with resources.path(*file_parts) as file:
+                with h5py.File(file, 'r') as h5:
+                    for key in data_names:
+                        if key in h5:
+                            res[key] = h5[key][()]
+        else:
+            with importlib_resources.path(*file_parts) as file:
+                with h5py.File(file, 'r') as h5:
+                    for key in data_names:
+                        if key in h5:
+                            res[key] = h5[key][()]
         return res
     return sample_data
 
@@ -62,10 +74,19 @@ def get_truth_data():
     def truth_data(file_parts, data_names, path_suffix=None):
         truth = {}
         truth_key = 'Truth' if path_suffix is None else f'Truth/{path_suffix}'
-        with resources.path(*file_parts) as file:
-            with h5py.File(file, 'r') as h5:
-                for key in data_names:
-                    if key in h5[truth_key]:
-                        truth[key] = h5[truth_key][key][()]
+
+        if version_info >= (3, 7):
+            with resources.path(*file_parts) as file:
+                with h5py.File(file, 'r') as h5:
+                    for key in data_names:
+                        if key in h5[truth_key]:
+                            truth[key] = h5[truth_key][key][()]
+        else:
+            with importlib_resources.path(*file_parts) as file:
+                with h5py.File(file, 'r') as h5:
+                    for key in data_names:
+                        if key in h5[truth_key]:
+                            truth[key] = h5[truth_key][key][()]
+
         return truth
     return truth_data
