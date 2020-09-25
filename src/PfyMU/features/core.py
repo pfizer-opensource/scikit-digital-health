@@ -8,7 +8,6 @@ from pandas import DataFrame
 import json
 
 from PfyMU.features.utility import standardize_signal, compute_window_samples
-from PfyMU.features import lib
 
 
 __all__ = ['Bank']
@@ -180,6 +179,9 @@ class Bank:
         file : {str, Path}
             File path to load from. File is the uutput of FeatureBank.save
         """
+        # the import must be here, otherwise a circular import error occurs
+        from PfyMU.features import lib
+
         with open(file, 'r') as f:
             feats = json.load(f)
         
