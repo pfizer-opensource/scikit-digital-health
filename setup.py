@@ -180,11 +180,7 @@ def configuration(parent_package='', top_path=None):
     if CYTHONIZE:
         from Cython.Build import cythonize
 
-        # for pxdf in list(Path('.').rglob('*/features/lib/_cython/*.pxd')):
-        #     cythonize(str(pxdf), compiler_directives={'language_level': 3})  # create a c file from the cython file
         for pyxf in list(Path('.').rglob('*/features/lib/_cython/*.pyx')):
-            if pyxf.stem == 'common':  # skip the common pyx file
-                continue
             cythonize(str(pyxf), compiler_directives={'language_level': 3})  # create a c file from the cython file
 
     # get a list of the c files to compile
