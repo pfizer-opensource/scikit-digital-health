@@ -142,7 +142,6 @@ Operating System :: MacOS
 
 
 REQUIREMENTS = [
-    'cython>=0.29.14',
     'numpy>=1.17.2',
     'scipy>=1.3.1',
     'pandas>=0.23.4',
@@ -152,6 +151,8 @@ REQUIREMENTS = [
 
 if sys.version_info < (3, 7):
     REQUIREMENTS.append('importlib_resources')
+if os.environ.get('CYTHONIZE', 'False') == 'True':
+    REQUIREMENTS.append('cython>=0.29')
 
 
 def configuration(parent_package='', top_path=None):
