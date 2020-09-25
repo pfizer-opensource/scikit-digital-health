@@ -1,6 +1,129 @@
-from sys import version_info
-from setuptools import setup, find_packages
-from numpy.distutils.core import setup
+import sys
+import textwrap
+import warnings
+
+
+def parse_setuppy_commands():
+    """
+    Check the commands and respond appropriately.  Disable broken commands.
+
+    Return a boolean value for whether or not to run the build or not.
+    """
+    args = sys.argv[1:]
+
+    if not args:
+        # user forgot to give an argument. Let setuptools handle that
+        return True
+
+    info_commands = ['--help-commands', '--name', '--version', '-V', '--fullname', '--author', '--author-email',
+                     '--maintainer', '--maintainer-email', '--contact', '--contact-email', '--url', '--license',
+                     '--description', '--long-description', '--platforms', '--classifiers', '--keywords', '--provides',
+                     '--requires', '--obsoletes']
+
+    for command in info_commands:
+        if command in args:
+            return False
+
+    # Note that 'alias', 'saveopts' and 'setopt' commands also seem to work
+    # fine as they are, but are usually used together with one of the commands
+    # below and not standalone.  Hence they're not added to good_commands.
+    good_commands = ('develop', 'sdist', 'build', 'build_ext', 'build_py', 'build_clib', 'build_scripts', 'bdist_wheel',
+                     'bdist_rpm', 'bdist_wininst', 'bdist_msi', 'bdist_mpkg')
+
+    for command in good_commands:
+        if command in args:
+            return True
+
+    # The following commands are supported, but we need to show more
+    # useful messages to the user
+    if 'install' in args:
+        print(textwrap.dedent("""
+            Note: if you need reliable uninstall behavior, then install
+            with pip instead of using `setup.py install`:
+              - `pip install .`       (from a git repo or downloaded source
+                                       release)
+            """))
+        return True
+
+    if '--help' in args or '-h' in sys.argv[1]:
+        print(textwrap.dedent("""
+            Help
+            -------------------
+            To install inertial-sensor-routines from here with reliable uninstall, we recommend
+            that you use `pip install .`.
+            For help with build/installation issues, please ask on the
+            github repository.
+
+            Setuptools commands help
+            ------------------------
+            """))
+        return False
+
+    # The following commands aren't supported.  They can only be executed when
+    # the user explicitly adds a --force command-line argument.
+    bad_commands = dict(
+        test="""
+            `setup.py test` is not supported.  Use one of the following
+            instead:
+              - `pytest --pyargs inertial_sensor_routines.tests`   (to test installed package)
+            """,
+        upload="""
+            `setup.py upload` is not supported, because it's insecure.
+            Instead, build what you want to upload and upload those files
+            with `twine upload -s <filenames>` instead.
+            """,
+        upload_docs="`setup.py upload_docs` is not supported",
+        easy_install="`setup.py easy_install` is not supported",
+        clean="""
+            `setup.py clean` is not supported, use one of the following instead:
+              - `git clean -xdf` (cleans all files)
+              - `git clean -Xdf` (cleans all versioned files, doesn't touch
+                                  files that aren't checked into the git repo)
+            """,
+        check="`setup.py check` is not supported",
+        register="`setup.py register` is not supported",
+        bdist_dumb="`setup.py bdist_dumb` is not supported",
+        bdist="`setup.py bdist` is not supported",
+    )
+
+    bad_commands['nosetests'] = bad_commands['test']
+    for command in ('upload_docs', 'easy_install', 'bdist', 'bdist_dumb',
+                    'register', 'check', 'install_data', 'install_headers',
+                    'install_lib', 'install_scripts',):
+        bad_commands[command] = "`setup.py %s` is not supported" % command
+
+    for command in bad_commands.keys():
+        if command in args:
+            print(textwrap.dedent(bad_commands[command]) +
+                  "\nAdd `--force` to your command to use it anyway if you "
+                  "must (unsupported).\n")
+            sys.exit(1)
+
+    # Commands that do more than print info, but also don't need Cython and
+    # template parsing.
+    other_commands = ['egg_info', 'install_egg_info', 'rotate']
+    for command in other_commands:
+        if command in args:
+            return False
+
+    # If we got here, we didn't detect what setup.py command was given
+    warnings.warn("Unrecognized setuptools command ('{}'), proceeding with "
+                  "generating sources and expanding templates".format(' '.join(sys.argv[1:])))
+    return True
+
+
+CYTHONIZE = True
+
+MAINTAINERS = [
+    'Pfizer DMTI Analytics',
+    'Lukas Adamowicz',
+    'Yiorgos Christakis'
+]
+
+MAINTAINER_EMAILS = [
+    'lukas.adamowicz@pfizer.com',
+    'Yiorgos.Christakis@pfizer.com'
+]
 
 
 CLASSIFIERS = """\
@@ -27,49 +150,103 @@ REQUIREMENTS = [
     'lightgbm>=2.3.0'
 ]
 
-if version_info < (3, 7):
+if sys.version_info < (3, 7):
     REQUIREMENTS.append('importlib_resources')
 
 
 def configuration(parent_package='', top_path=None):
     from numpy.distutils.misc_util import Configuration
+    from pathlib import Path
 
     config = Configuration(None, parent_package, top_path)
     config.set_options(ignore_setup_xxx_py=True,
                        assume_default_configuration=True,
                        delegate_options_to_subpackages=True,
-                       quiet=True)
+                       quiet=False)
 
-    # config.add_subpackage('PfyMU', subpackage_path='src')
+    # EXTENSIONS
+    # ========================
+    config.add_library('fcwa_convert', sources='src/PfyMU/read/_extensions/cwa_convert.f95')
+    config.add_extension(
+        'PfyMU/read/_extensions/cwa_convert',
+        sources='src/PfyMU/read/_extensions/cwa_convert.c',
+        libraries=['fcwa_convert']
+    )
+    config.add_extension(
+        'PfyMU/read/_extensions/bin_convert',
+        sources='src/PfyMU/read/_extensions/bin_convert.c'
+    )
+
+    if CYTHONIZE:
+        from Cython.Build import cythonize
+
+        # for pxdf in list(Path('.').rglob('*/features/lib/_cython/*.pxd')):
+        #     cythonize(str(pxdf), compiler_directives={'language_level': 3})  # create a c file from the cython file
+        for pyxf in list(Path('.').rglob('*/features/lib/_cython/*.pyx')):
+            if pyxf.stem == 'common':  # skip the common pyx file
+                continue
+            cythonize(str(pyxf), compiler_directives={'language_level': 3})  # create a c file from the cython file
+
+    # get a list of the c files to compile
+    for cf in list(Path('.').rglob('*/features/lib/_cython/*.c')):
+        config.add_extension(
+            str(Path(*cf.parts[1:]).with_suffix('')),
+            sources=[str(cf)]
+        )
+
+    # ========================
+
     config.get_version('src/PfyMU/version.py')
 
     return config
 
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
+def setup_package():
+    from setuptools import find_packages
 
-setup(
-    name="PfyMU",
-    author="Pfizer DMTI Analytics",
-    author_email="",
-    description="Python general purpose IMU analysis and processing package.",
-    long_description=long_description,
-    long_description_content_type="text/markdown",
-    url="https://github.com/PfizerRD/PfyMU",  # project url, most likely a github link
-    # download_url="https://pypi.org/signal_features",  # link to where the package can be downloaded, most likely PyPI
-    # project_urls={"Documentation": "https://signal_features.readthedocs.io/en/latest/"},
-    include_package_data=True,  # set to True if you have data to package, ie models or similar
-    # package_data={'package': ['*.csv']},  # currently adds any csv files alongside the top level __init__.py
-    # package_data={'PfyMU.tests.data': ['*.h5'],
-    #               'PfyMU.features.lib._cython': ['*.c', '*.pxd']},
-    packages=find_packages('src'),  # automatically find sub-packages
-    package_dir={'': 'src'},
-    license="MIT",
-    python_requires=">=3.6",  # Version of python required
-    setup_requires=REQUIREMENTS,
-    install_requires=REQUIREMENTS,
-    classifiers=CLASSIFIERS,
-    configuration=configuration
-)
+    with open("README.md", "r") as fh:
+        long_description = fh.read()
+    with open('src/PfyMU/version.py') as fid:
+        vers = fid.readlines()[-1].split()[-1].strip("\"'")
+
+    setup_kwargs = dict(
+        name='PfyMU',
+        maintainer=MAINTAINERS,
+        maintainer_email=MAINTAINER_EMAILS,
+        description="Python general purpose IMU analysis and processing package.",
+        long_description=long_description,
+        long_description_content_type="text/markdown",
+        # download_url="https:/pypi.org/PfyMU",  # download link, most likely PyPi
+        # project_urls={
+        #     "Documentation": "https://PfyMU.readthedocs.io./en/latest/"
+        # },
+        packages=find_packages('src'),
+        package_dir={'': 'src'},
+        license="GNU GPL v3",
+        python_requires=">=3.6",
+        setup_requires=REQUIREMENTS,
+        install_requires=REQUIREMENTS,
+        classifiers=CLASSIFIERS
+    )
+
+    if "--force" in sys.argv:
+        run_build = True
+        sys.argv.remove('--force')
+    else:
+        # raise errors for unsupported commands, improve help output, etc
+        run_build = parse_setuppy_commands()
+
+    from setuptools import setup
+    if run_build:
+        from numpy.distutils.core import setup
+
+        setup_kwargs['configuration'] = configuration
+    else:
+        setup_kwargs['version'] = vers
+
+    setup(**setup_kwargs)
+
+
+if __name__ == '__main__':
+    setup_package()
 
