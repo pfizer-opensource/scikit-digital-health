@@ -145,7 +145,7 @@ def configuration(parent_package='', top_path=None):
 ## Adding Tests for a new module
 In order to make sure that any tests are run on installed versions of `PfyMU`, the test directory is outside the `src` directory. Again, convenience base process testing classes are available to make setting up testing easy and quick.  All testing is done using Pytest
 
-The first step is to create a new directory for your new module under the `test` directory, and add an `__init__.py` file to allow for relative importing, like below:
+The first step is to create a new directory for your new module under the `test` directory, and add an `__init__.py` file to allow for relative importing, the test file, and a `conftest.py` file if desired:
 
 ```
 PfyMU
@@ -154,7 +154,91 @@ PfyMU
 |   +-- sit2stand
 |   +-- preprocessing
 |       +-- __init__.py
+|       +-- conftest.py
+|       +-- test_preprocessing.py
 ```
 
-        
+Inside `test_preprocessing.py`, import the base process testing class, set a few options, and the basic tests will be completed (when provided sample and truth data!):
+
+```python
+# test/preprocessing/test_preprocessing.py
+from ..base_conftest import *  # import BaseProcessTester, and resolve_data_path - a useful utility for making sure tests run in all 3 possible locations
+
+from PfyMU.preprocessing import PreProcess
+
+
+class TestPreProcess(BaseProcessTester):
+    @classmethod
+    def setup_class(cls):
+        super().setup_class()  # make sure to call the super method
+
+        # override specific necessary attributes
+        """ resolve_data_path() takes 2 arguments
+        1. the file name
+        2. the module name (ie the folder name this script is in)
+        """
+        cls.sample_data_file = resolve_data_path('test_data.h5', 'preprocess')  
+        cls.truth_data_file = resolve_data_path('test_data.h5', 'preprocess')  # can be the same file as sample data
+        cls.truth_suffix = None  # if not none, means that the truth data is in the path "Truth/{truth_suffix}" in the truth h5 file
+        cls.truth_data_keys = [  # list of keys to check against 
+            'accel'
+        ]
+        cls.test_results = False  # we want to test the first return argument, not the "results"
+
+        cls.process = PreProcess(attr1=5, attr2=10)
+```
+
+This file would be all that is needed to test that the output `accel` values match those contained in the truth file.
+
+### Sample/Truth data file format
+The sample and truth data files are h5 files, with the below formats/keys:
+
+```bash
+sample  # can have one or more of any of the below keys
++- time
++- accel
++- gyro
++- temperature
+```
+
+The `BaseProcessTester` class will automatically look for these keys. If you need to specify more/other keys, add the below line:
+```python
+@clsmethod
+def setup_class(cls):
+    ...
+    cls.sample_data_keys.extend([
+        'extra_key1',
+        'extra_key2
+    ])
+    ...
+```
+
+The truth data is very similar. For our example (testing `accel` against its truth value):
+
+```bash
+truth
++- Truth
+|   +- accel
+```
+
+Alternatively, if `cls.truth_suffix` had been set to somethign else, ie `preproc`, then the structure would be as follows:
+
+```bash
+truth
++- Truth
+|   +- preproc
+|       +- accel
+```
+
+the sample and truth files can be combined into 1 file:
+
+```bash
+truth/sample
++- Truth
+|   +- accel
++- time
++- accel
++- gyro
++- temperature
+```
 
