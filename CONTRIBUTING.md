@@ -147,13 +147,14 @@ In order to make sure that any tests are run on installed versions of `PfyMU`, t
 
 The first step is to create a new directory for your new module under the `test` directory, and add an `__init__.py` file to allow for relative importing, like below:
 
+```
 PfyMU
 +-- src
 +-- test
 |   +-- sit2stand
 |   +-- preprocessing
 |       +-- __init__.py
-
+```
 
         
 
