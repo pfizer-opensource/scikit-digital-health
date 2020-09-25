@@ -20,11 +20,12 @@ class BaseProcessTester:
 
     @classmethod
     def setup_class(cls):
-        cls.process = None
-        cls.sample_data_file = None
-        cls.truth_data_file = None
-        cls.truth_data_keys = []
-        cls.truth_suffix = None
+        cls.process = None  # the process to be tested
+        cls.sample_data_file = None  # the sample data file path
+        cls.truth_data_file = None  # the truth data file path
+        cls.truth_data_keys = []  # the keys in the truth data to test against
+        cls.truth_suffix = None   # additional path to the keys in the truth data
+        cls.test_results = True   # test the results, or the data passed back out
 
     def test(self, get_sample_data, get_truth_data):
         data = get_sample_data(
@@ -38,9 +39,12 @@ class BaseProcessTester:
             self.truth_suffix
         )
 
-        res = self.process.predict(**data)
+        inp, res = self.process._predict(**data)
 
-        self.dict_allclose(res, truth_data, self.truth_data_keys)
+        if self.test_results:
+            self.dict_allclose(res, truth_data, self.truth_data_keys)
+        else:
+            self.dict_allclose(inp, truth_data, self.truth_data_keys)
 
     def dict_allclose(self, pred, truth, keys):
         for key in keys:
