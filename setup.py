@@ -147,7 +147,8 @@ REQUIREMENTS = [
     'numpy>=1.17.2',
     'scipy>=1.3.1',
     'pandas>=0.23.4',
-    'lightgbm>=2.3.0'
+    'lightgbm>=2.3.0',
+    'pywavelets'
 ]
 
 if sys.version_info < (3, 7):
