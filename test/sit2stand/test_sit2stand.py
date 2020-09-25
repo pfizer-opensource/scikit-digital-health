@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from ..base_conftest import *
 
 from PfyMU.sit2stand import Sit2Stand
