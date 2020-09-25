@@ -6,7 +6,7 @@
         "depends": [],
         "name": "PfyMU.features.lib._cython.entropy",
         "sources": [
-            "PfyMU/features/lib/_cython/entropy.pyx"
+            "src/PfyMU/features/lib/_cython/entropy.pyx"
         ]
     },
     "module_name": "PfyMU.features.lib._cython.entropy"
@@ -821,7 +821,7 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "PfyMU/features/lib/_cython/entropy.pyx",
+  "src/PfyMU/features/lib/_cython/entropy.pyx",
   "stringsource",
 };
 /* MemviewSliceStruct.proto */
@@ -1913,12 +1913,12 @@ static const char __pyx_k_Incompatible_checksums_s_vs_0xb0[] = "Incompatible che
 static const char __pyx_k_Indirect_dimensions_not_supporte[] = "Indirect dimensions not supported";
 static const char __pyx_k_Invalid_mode_expected_c_or_fortr[] = "Invalid mode, expected 'c' or 'fortran', got %s";
 static const char __pyx_k_Out_of_bounds_on_buffer_access_a[] = "Out of bounds on buffer access (axis %d)";
-static const char __pyx_k_PfyMU_features_lib__cython_entro[] = "PfyMU/features/lib/_cython/entropy.pyx";
+static const char __pyx_k_PfyMU_features_lib__cython_entro[] = "PfyMU.features.lib._cython.entropy";
 static const char __pyx_k_Unable_to_convert_item_to_object[] = "Unable to convert item to object";
 static const char __pyx_k_got_differing_extents_in_dimensi[] = "got differing extents in dimension %d (got %d and %d)";
 static const char __pyx_k_no_default___reduce___due_to_non[] = "no default __reduce__ due to non-trivial __cinit__";
+static const char __pyx_k_src_PfyMU_features_lib__cython_e[] = "src/PfyMU/features/lib/_cython/entropy.pyx";
 static const char __pyx_k_unable_to_allocate_shape_and_str[] = "unable to allocate shape and strides.";
-static const char __pyx_k_PfyMU_features_lib__cython_entro_2[] = "PfyMU.features.lib._cython.entropy";
 static PyObject *__pyx_n_s_A;
 static PyObject *__pyx_n_s_ASCII;
 static PyObject *__pyx_n_s_B;
@@ -1943,8 +1943,7 @@ static PyObject *__pyx_n_s_N;
 static PyObject *__pyx_n_b_O;
 static PyObject *__pyx_kp_s_Out_of_bounds_on_buffer_access_a;
 static PyObject *__pyx_n_s_P;
-static PyObject *__pyx_kp_s_PfyMU_features_lib__cython_entro;
-static PyObject *__pyx_n_s_PfyMU_features_lib__cython_entro_2;
+static PyObject *__pyx_n_s_PfyMU_features_lib__cython_entro;
 static PyObject *__pyx_n_s_PickleError;
 static PyObject *__pyx_n_s_SampleEntropy;
 static PyObject *__pyx_n_s_SignalEntropy;
@@ -2041,6 +2040,7 @@ static PyObject *__pyx_n_s_setstate_cython;
 static PyObject *__pyx_n_s_shape;
 static PyObject *__pyx_n_s_signal;
 static PyObject *__pyx_n_s_size;
+static PyObject *__pyx_kp_s_src_PfyMU_features_lib__cython_e;
 static PyObject *__pyx_n_s_start;
 static PyObject *__pyx_n_s_std;
 static PyObject *__pyx_n_s_step;
@@ -18059,8 +18059,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_b_O, __pyx_k_O, sizeof(__pyx_k_O), 0, 0, 0, 1},
   {&__pyx_kp_s_Out_of_bounds_on_buffer_access_a, __pyx_k_Out_of_bounds_on_buffer_access_a, sizeof(__pyx_k_Out_of_bounds_on_buffer_access_a), 0, 0, 1, 0},
   {&__pyx_n_s_P, __pyx_k_P, sizeof(__pyx_k_P), 0, 0, 1, 1},
-  {&__pyx_kp_s_PfyMU_features_lib__cython_entro, __pyx_k_PfyMU_features_lib__cython_entro, sizeof(__pyx_k_PfyMU_features_lib__cython_entro), 0, 0, 1, 0},
-  {&__pyx_n_s_PfyMU_features_lib__cython_entro_2, __pyx_k_PfyMU_features_lib__cython_entro_2, sizeof(__pyx_k_PfyMU_features_lib__cython_entro_2), 0, 0, 1, 1},
+  {&__pyx_n_s_PfyMU_features_lib__cython_entro, __pyx_k_PfyMU_features_lib__cython_entro, sizeof(__pyx_k_PfyMU_features_lib__cython_entro), 0, 0, 1, 1},
   {&__pyx_n_s_PickleError, __pyx_k_PickleError, sizeof(__pyx_k_PickleError), 0, 0, 1, 1},
   {&__pyx_n_s_SampleEntropy, __pyx_k_SampleEntropy, sizeof(__pyx_k_SampleEntropy), 0, 0, 1, 1},
   {&__pyx_n_s_SignalEntropy, __pyx_k_SignalEntropy, sizeof(__pyx_k_SignalEntropy), 0, 0, 1, 1},
@@ -18157,6 +18156,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_shape, __pyx_k_shape, sizeof(__pyx_k_shape), 0, 0, 1, 1},
   {&__pyx_n_s_signal, __pyx_k_signal, sizeof(__pyx_k_signal), 0, 0, 1, 1},
   {&__pyx_n_s_size, __pyx_k_size, sizeof(__pyx_k_size), 0, 0, 1, 1},
+  {&__pyx_kp_s_src_PfyMU_features_lib__cython_e, __pyx_k_src_PfyMU_features_lib__cython_e, sizeof(__pyx_k_src_PfyMU_features_lib__cython_e), 0, 0, 1, 0},
   {&__pyx_n_s_start, __pyx_k_start, sizeof(__pyx_k_start), 0, 0, 1, 1},
   {&__pyx_n_s_std, __pyx_k_std, sizeof(__pyx_k_std), 0, 0, 1, 1},
   {&__pyx_n_s_step, __pyx_k_step, sizeof(__pyx_k_step), 0, 0, 1, 1},
@@ -18406,7 +18406,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__20 = PyTuple_Pack(21, __pyx_n_s_signal, __pyx_n_s_signal, __pyx_n_s_M, __pyx_n_s_N, __pyx_n_s_P, __pyx_n_s_res, __pyx_n_s_result, __pyx_n_s_d, __pyx_n_s_data_norm, __pyx_n_s_logf, __pyx_n_s_nbias, __pyx_n_s_count, __pyx_n_s_estimate, __pyx_n_s_h_n, __pyx_n_s_std, __pyx_n_s_mean, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_k, __pyx_n_s_n, __pyx_n_s_h); if (unlikely(!__pyx_tuple__20)) __PYX_ERR(0, 47, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__20);
   __Pyx_GIVEREF(__pyx_tuple__20);
-  __pyx_codeobj__21 = (PyObject*)__Pyx_PyCode_New(1, 0, 21, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__20, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_PfyMU_features_lib__cython_entro, __pyx_n_s_SignalEntropy, 47, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__21)) __PYX_ERR(0, 47, __pyx_L1_error)
+  __pyx_codeobj__21 = (PyObject*)__Pyx_PyCode_New(1, 0, 21, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__20, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_src_PfyMU_features_lib__cython_e, __pyx_n_s_SignalEntropy, 47, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__21)) __PYX_ERR(0, 47, __pyx_L1_error)
 
   /* "PfyMU/features/lib/_cython/entropy.pyx":96
  * 
@@ -18418,7 +18418,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__22 = PyTuple_Pack(23, __pyx_n_s_signal, __pyx_n_s_M, __pyx_n_s_r, __pyx_n_s_n, __pyx_n_s_k, __pyx_n_s_p, __pyx_n_s_entropy, __pyx_n_s_ent, __pyx_n_s_nj, __pyx_n_s_j, __pyx_n_s_run, __pyx_n_s_lastrun, __pyx_n_s_N, __pyx_n_s_M1, __pyx_n_s_A, __pyx_n_s_B, __pyx_n_s_Y1, __pyx_n_s_i, __pyx_n_s_jj, __pyx_n_s_mm, __pyx_n_s_kk, __pyx_n_s_axis, __pyx_n_s_wind); if (unlikely(!__pyx_tuple__22)) __PYX_ERR(0, 96, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__22);
   __Pyx_GIVEREF(__pyx_tuple__22);
-  __pyx_codeobj__23 = (PyObject*)__Pyx_PyCode_New(3, 0, 23, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__22, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_PfyMU_features_lib__cython_entro, __pyx_n_s_SampleEntropy, 96, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__23)) __PYX_ERR(0, 96, __pyx_L1_error)
+  __pyx_codeobj__23 = (PyObject*)__Pyx_PyCode_New(3, 0, 23, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__22, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_src_PfyMU_features_lib__cython_e, __pyx_n_s_SampleEntropy, 96, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__23)) __PYX_ERR(0, 96, __pyx_L1_error)
 
   /* "View.MemoryView":286
  *         return self.name
@@ -18900,7 +18900,7 @@ if (!__Pyx_RefNanny) {
  *     cdef Py_ssize_t M = signal.shape[0], N = signal.shape[1], P = signal.shape[2]
  * 
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5PfyMU_8features_3lib_7_cython_7entropy_5SignalEntropy, NULL, __pyx_n_s_PfyMU_features_lib__cython_entro_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 47, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5PfyMU_8features_3lib_7_cython_7entropy_5SignalEntropy, NULL, __pyx_n_s_PfyMU_features_lib__cython_entro); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 47, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_SignalEntropy, __pyx_t_2) < 0) __PYX_ERR(0, 47, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -18912,7 +18912,7 @@ if (!__Pyx_RefNanny) {
  *     cdef Py_ssize_t n = signal.shape[1], k = signal.shape[2], p = signal.shape[0]
  *     entropy = zeros((p, M, k), dtype=npy_double)
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5PfyMU_8features_3lib_7_cython_7entropy_7SampleEntropy, NULL, __pyx_n_s_PfyMU_features_lib__cython_entro_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 96, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5PfyMU_8features_3lib_7_cython_7entropy_7SampleEntropy, NULL, __pyx_n_s_PfyMU_features_lib__cython_entro); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 96, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_SampleEntropy, __pyx_t_2) < 0) __PYX_ERR(0, 96, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;

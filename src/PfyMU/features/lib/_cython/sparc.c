@@ -6,7 +6,7 @@
         "depends": [],
         "name": "PfyMU.features.lib._cython.sparc",
         "sources": [
-            "PfyMU/features/lib/_cython/sparc.pyx"
+            "src/PfyMU/features/lib/_cython/sparc.pyx"
         ]
     },
     "module_name": "PfyMU.features.lib._cython.sparc"
@@ -821,7 +821,7 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "PfyMU/features/lib/_cython/sparc.pyx",
+  "src/PfyMU/features/lib/_cython/sparc.pyx",
   "stringsource",
 };
 /* MemviewSliceStruct.proto */
