@@ -151,7 +151,7 @@ The first step is to create a new directory for your new module under the `test`
 PfyMU
 ├── src
 ├── test
-│   ├── preprocessing
+│   └──preprocessing
 │       ├──  __init__.py
 │       ├──  conftest.py
 │       └── test_preprocessing.py
@@ -192,7 +192,7 @@ This file would be all that is needed to test that the output `accel` values mat
 ### Sample/Truth data file format
 The sample and truth data files are h5 files, with the below formats/keys:
 
-```bash
+```
 sample.h5  # can have one or more of any of the below keys
 ├── time
 ├── accel
@@ -214,7 +214,7 @@ def setup_class(cls):
 
 The truth data is very similar. For our example (testing `accel` against its truth value):
 
-```bash
+```
 truth.h5
 ├── Truth
 │   └──accel
@@ -222,7 +222,7 @@ truth.h5
 
 Alternatively, if `cls.truth_suffix` had been set to somethign else, ie `preproc`, then the structure would be as follows:
 
-```bash
+```
 truth.h5
 ├── Truth
 │   └──preproc
@@ -231,8 +231,8 @@ truth.h5
 
 the sample and truth files can be combined into 1 file:
 
-```bash
-truth/sample
+```
+sample_truth.h5
 ├── Truth
 │   └──accel
 ├── time
