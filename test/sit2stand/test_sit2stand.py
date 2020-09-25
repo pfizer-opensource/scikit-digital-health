@@ -1,4 +1,4 @@
-from ..base_conftest import BaseProcessTester
+from ..base_conftest import BaseProcessTester, get_sample_data, get_truth_data
 
 from PfyMU.sit2stand import Sit2Stand
 
@@ -9,8 +9,8 @@ class TestSit2StandStillness(BaseProcessTester):
         super().setup_class()
 
         # override specific necessary attributes
-        cls.sample_data_file = ('PfyMU.sit2stand.tests.data', 'test_data.h5')
-        cls.truth_data_file = ('PfyMU.sit2stand.tests.data', 'test_data.h5')
+        cls.sample_data_file = '../data/test_data.h5'
+        cls.truth_data_file = '../data/test_data.h5'
         cls.truth_suffix = 'Stillness'
         cls.truth_data_keys = [
             'STS Start',
@@ -47,8 +47,8 @@ class TestSit2StandDisplacement(BaseProcessTester):
         super().setup_class()
 
         # override specific necessary attributes
-        cls.sample_data_file = ('PfyMU.sit2stand.tests.data', 'test_data.h5')
-        cls.truth_data_file = ('PfyMU.sit2stand.tests.data', 'test_data.h5')
+        cls.sample_data_file = '../data/test_data.h5'
+        cls.truth_data_file = '../data/test_data.h5'
         cls.truth_suffix = 'Displacement'
         cls.truth_data_keys = [
             'STS Start',
