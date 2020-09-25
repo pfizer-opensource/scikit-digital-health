@@ -3,6 +3,14 @@ from numpy import allclose, broadcast_to, zeros
 from pandas.testing import assert_frame_equal
 from pandas import DataFrame
 import h5py
+from pathlib import Path
+
+if Path.cwd().name != 'test':
+    SAMPLE_DATA_PATH = Path('../data/sample_accelerometer.h5')
+    FEATURES_TRUTH_PATH = Path('../data/features_truth.h5')
+else:
+    SAMPLE_DATA_PATH = Path('data/sample_accelerometer.h5')
+    FEATURES_TRUTH_PATH = Path('data/features_truth.h5')
 
 
 class BaseTestFeature:
@@ -41,7 +49,7 @@ class BaseTestFeature:
 
 @fixture(scope='package')
 def fs():
-    path = '../data/sample_accelerometer.h5'
+    path = SAMPLE_DATA_PATH
     with h5py.File(path, 'r') as f:
         ret = f.attrs.get('Sampling rate')
 
@@ -50,7 +58,7 @@ def fs():
 
 @fixture(scope='package')
 def x():
-    path = '../data/sample_accelerometer.h5'
+    path = SAMPLE_DATA_PATH
     with h5py.File(path, 'r') as f:
         ret = f['Accelerometer'][:, 0]
 
@@ -59,7 +67,7 @@ def x():
 
 @fixture(scope='package')
 def y():
-    path = '../data/sample_accelerometer.h5'
+    path = SAMPLE_DATA_PATH
     with h5py.File(path, 'r') as f:
         ret = f['Accelerometer'][:, 1]
 
@@ -68,7 +76,7 @@ def y():
 
 @fixture(scope='package')
 def z():
-    path = '../data/sample_accelerometer.h5'
+    path = SAMPLE_DATA_PATH
     with h5py.File(path, 'r') as f:
         ret = f['Accelerometer'][:, 2]
 
@@ -77,7 +85,7 @@ def z():
 
 @fixture(scope='package')
 def acc():
-    path = '../data/sample_accelerometer.h5'
+    path = SAMPLE_DATA_PATH
     with h5py.File(path, 'r') as f:
         ret = f['Accelerometer'][()]
 
@@ -86,7 +94,7 @@ def acc():
 
 @fixture(scope='package')
 def win_acc():
-    path = '../data/sample_accelerometer.h5'
+    path = SAMPLE_DATA_PATH
     with h5py.File(path, 'r') as f:
         acc = f['Accelerometer'][()]
 
@@ -97,7 +105,7 @@ def win_acc():
 
 @fixture(scope='package')
 def df_acc():
-    path = '../data/sample_accelerometer.h5'
+    path = SAMPLE_DATA_PATH
     with h5py.File(path, 'r') as f:
         acc = f['Accelerometer'][()]
     ret = DataFrame(data=acc, columns=['x', 'y', 'z'])
@@ -108,7 +116,7 @@ def df_acc():
 @fixture(scope='package')
 def get_1d_truth():
     def get_1d(name):
-        path = '../data/features_truth.h5'
+        path = FEATURES_TRUTH_PATH
         with h5py.File(path, 'r') as f:
             x_, y_, z_ = f[name][()].flatten()
 
@@ -123,7 +131,7 @@ def get_1d_truth():
 @fixture(scope='package')
 def get_2d_truth():
     def get_2d(name):
-        path = '../data/features_truth.h5'
+        path = FEATURES_TRUTH_PATH
         with h5py.File(path, 'r') as f:
             truth = f[name][()].reshape((1, 3))
         return truth
@@ -134,7 +142,7 @@ def get_2d_truth():
 @fixture(scope='package')
 def get_3d_truth():
     def get_3d(name):
-        path = '../data/features_truth.h5'
+        path = FEATURES_TRUTH_PATH
         with h5py.File(path, 'r') as f:
             truth = f[name][()].reshape((1, 3))
         return broadcast_to(truth, (4, 3))
@@ -145,7 +153,7 @@ def get_3d_truth():
 @fixture(scope='package')
 def get_dataframe_truth():
     def get_df(name):
-        path = '../data/features_truth.h5'
+        path = FEATURES_TRUTH_PATH
         with h5py.File(path, 'r') as f:
             truth = f[name][()]
 
@@ -163,7 +171,7 @@ def bank_2d_truth():
     """
     truth = zeros((1, 9))
 
-    path = '../data/features_truth.h5'
+    path = FEATURES_TRUTH_PATH
     with h5py.File(path, 'r') as f:
         truth[0, :3] = f['Mean']
         truth[0, [3, 8, 4]] = f['Range']
