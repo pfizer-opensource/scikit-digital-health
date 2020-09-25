@@ -149,13 +149,12 @@ The first step is to create a new directory for your new module under the `test`
 
 ```
 PfyMU
-+-- src
-+-- test
-|   +-- sit2stand
-|   +-- preprocessing
-|       +-- __init__.py
-|       +-- conftest.py
-|       +-- test_preprocessing.py
+├── src
+├── test
+│   ├── preprocessing
+│       ├──  __init__.py
+│       ├──  conftest.py
+│       └── test_preprocessing.py
 ```
 
 Inside `test_preprocessing.py`, import the base process testing class, set a few options, and the basic tests will be completed (when provided sample and truth data!):
@@ -194,11 +193,11 @@ This file would be all that is needed to test that the output `accel` values mat
 The sample and truth data files are h5 files, with the below formats/keys:
 
 ```bash
-sample  # can have one or more of any of the below keys
-+- time
-+- accel
-+- gyro
-+- temperature
+sample.h5  # can have one or more of any of the below keys
+├── time
+├── accel
+├── gyro
+└──temperature
 ```
 
 The `BaseProcessTester` class will automatically look for these keys. If you need to specify more/other keys, add the below line:
@@ -216,29 +215,29 @@ def setup_class(cls):
 The truth data is very similar. For our example (testing `accel` against its truth value):
 
 ```bash
-truth
-+- Truth
-|   +- accel
+truth.h5
+├── Truth
+│   └──accel
 ```
 
 Alternatively, if `cls.truth_suffix` had been set to somethign else, ie `preproc`, then the structure would be as follows:
 
 ```bash
-truth
-+- Truth
-|   +- preproc
-|       +- accel
+truth.h5
+├── Truth
+│   └──preproc
+│       └──accel
 ```
 
 the sample and truth files can be combined into 1 file:
 
 ```bash
 truth/sample
-+- Truth
-|   +- accel
-+- time
-+- accel
-+- gyro
-+- temperature
+├── Truth
+│   └──accel
+├── time
+├── accel
+├── gyro
+└──temperature
 ```
 
