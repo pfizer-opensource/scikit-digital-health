@@ -1,6 +1,10 @@
 from pytest import fixture
 import h5py
 from numpy import allclose
+from pathlib import Path
+
+
+__all__ = ['BaseProcessTester', 'get_sample_data', 'get_truth_data', 'resolve_data_path']
 
 
 # BASE TESTING CLASS
@@ -68,3 +72,22 @@ def get_truth_data():
 
         return truth
     return truth_data
+
+
+# MISC other utility functions
+class TestRunLocationError(Exception):
+    pass
+
+
+def resolve_data_path(file, module=None):
+    if Path.cwd().name == 'PfyMU':
+        path = Path(f'test/data/{file}')
+    elif Path.cwd().name == 'test':
+        path = Path(f'data/{file}')
+    elif module is not None:
+        if Path.cwd().name == module:
+            path = Path(f'../data/{file}')
+    else:
+        raise TestRunLocationError('tests cannot be run from this directory')
+
+    return path

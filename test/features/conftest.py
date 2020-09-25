@@ -5,12 +5,11 @@ from pandas import DataFrame
 import h5py
 from pathlib import Path
 
-if Path.cwd().name != 'test':
-    SAMPLE_DATA_PATH = Path('../data/sample_accelerometer.h5')
-    FEATURES_TRUTH_PATH = Path('../data/features_truth.h5')
-else:
-    SAMPLE_DATA_PATH = Path('data/sample_accelerometer.h5')
-    FEATURES_TRUTH_PATH = Path('data/features_truth.h5')
+from ..base_conftest import resolve_data_path
+
+
+SAMPLE_DATA_PATH = resolve_data_path('sample_accelerometer.h5', 'features')
+FEATURES_TRUTH_PATH = resolve_data_path('features_truth.h5', 'features')
 
 
 class BaseTestFeature:
