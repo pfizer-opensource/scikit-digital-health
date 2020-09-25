@@ -1,4 +1,5 @@
 import sys
+import os
 import textwrap
 import warnings
 
@@ -112,8 +113,6 @@ def parse_setuppy_commands():
     return True
 
 
-CYTHONIZE = True
-
 MAINTAINERS = [
     'Pfizer DMTI Analytics',
     'Lukas Adamowicz',
@@ -178,7 +177,7 @@ def configuration(parent_package='', top_path=None):
         sources='src/PfyMU/read/_extensions/bin_convert.c'
     )
 
-    if CYTHONIZE:
+    if os.environ.get('CYTHONIZE', 'False') == 'True':
         from Cython.Build import cythonize
 
         for pyxf in list(Path('.').rglob('*/features/lib/_cython/*.pyx')):
@@ -223,7 +222,7 @@ def setup_package():
         python_requires=">=3.6",
         setup_requires=REQUIREMENTS,
         install_requires=REQUIREMENTS,
-        classifiers=CLASSIFIERS
+        classifiers=CLASSIFIERS,
     )
 
     if "--force" in sys.argv:
