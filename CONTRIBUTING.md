@@ -65,7 +65,7 @@ class PreProcessing(_BaseProcess):
 Make sure all imports are handled in `src/PfyMU/preprocessing/__init__.py`, as well as adding `preprocessing` imports to the `src/PfyMU/__init__.py`.
 
 ### 4. Make any additions to setup.py
-If you don't have any data files (any non python files that need to be distributed with the package), or low level (c, cython, or fortran) extensions, everything should be good for the actual module, and you can skip the next steps
+If you don't have any data files (any non python files that need to be distributed with the package), or low level (c, cython, or fortran) extensions, everything should be good for the actual module, and you can skip to the Testing section
 
 If you do have data files or extensions, do the following in `setup.py` (the main one in the root directory)
 
@@ -141,5 +141,19 @@ def configuration(parent_package='', top_path=None):
 
     return config
 ```
+
+## Adding Tests for a new module
+In order to make sure that any tests are run on installed versions of `PfyMU`, the test directory is outside the `src` directory. Again, convenience base process testing classes are available to make setting up testing easy and quick.  All testing is done using Pytest
+
+The first step is to create a new directory for your new module under the `test` directory, and add an `__init__.py` file to allow for relative importing, like below:
+
+PfyMU
++-- src
++-- test
+|   +-- sit2stand
+|   +-- preprocessing
+|       +-- __init__.py
+
+
         
 
