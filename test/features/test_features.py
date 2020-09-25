@@ -1,4 +1,4 @@
-from PfyMU import BaseTestFeature
+from .conftest import BaseTestFeature
 from PfyMU.features import *
 
 
