@@ -220,7 +220,7 @@ truth.h5
 │   └──accel
 ```
 
-Alternatively, if `cls.truth_suffix` had been set to somethign else, ie `preproc`, then the structure would be as follows:
+Alternatively, if `cls.truth_suffix` had been set to something else, ie `preproc`, then the structure would be as follows:
 
 ```
 truth.h5
