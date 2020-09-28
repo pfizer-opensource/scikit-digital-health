@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8]
+        python-version: 3.8
 
     steps:
     - uses: actions/checkout@v2
@@ -27,7 +27,7 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Install PfyMU
       run: |
-        pip install .
+        pip install . -v
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
