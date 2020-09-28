@@ -36,11 +36,11 @@ def standardize_signal(signal, windowed=False, window_length=None, step=None, co
     windowed : bool, optional
         The signal has already been windowed. Default is False.
     window_length : int, optional
-        Window length in samples. If not provided (None), or input data is 3D, input data is assumed to be the signal on
-        which to compute features.
+        Window length in samples. If not provided (None), or input data is 3D, input data is
+        assumed to be the signal on which to compute features.
     step : int, optional
-        Window step in samples. If not provided (None), or input data is 3D, input data is assumed to be the signal on
-        which to compute features.
+        Window step in samples. If not provided (None), or input data is 3D, input data is assumed
+        to be the signal on which to compute features.
     columns : array-like, optional
         If providing a DataFrame, the columns to use for the signal.
 
@@ -54,7 +54,7 @@ def standardize_signal(signal, windowed=False, window_length=None, step=None, co
     # get a numpy array of the signal
     if isinstance(signal, ndarray):
         if signal.ndim > 3:
-            raise DimensionError(f'signal dimensions ({signal.ndim}) exceeds dimension maximum of 3')
+            raise DimensionError(f'signal dimensions ({signal.ndim}) exceed dimension max of 3')
         x = ascontiguousarray(signal)
     elif isinstance(signal, DataFrame):
         if columns is not None:
@@ -63,7 +63,9 @@ def standardize_signal(signal, windowed=False, window_length=None, step=None, co
             x = ascontiguousarray(signal.values)
             columns = signal.columns
     else:
-        raise InputTypeError(f"signal must be a numpy.ndarray or pandas.DataFrame, not {type(signal)}")
+        raise InputTypeError(
+            f"signal must be a numpy.ndarray or pandas.DataFrame, not {type(signal)}"
+        )
 
     # determine if going to window the signal
     if (not windowed) and (x.ndim < 3) and (window_length is not None) and (step is not None):
@@ -97,8 +99,8 @@ def compute_window_samples(fs, window_length, window_step):
     window_length : float
         Window length in seconds. If not provided (None), will do no windowing. Default is None
     window_step : {float, int}
-        Window step - the spacing between the start of windows. This can be specified several different ways
-        (see Notes). Default is 1.0
+        Window step - the spacing between the start of windows. This can be specified several
+        different ways (see Notes). Default is 1.0
 
     Returns
     -------
@@ -110,19 +112,21 @@ def compute_window_samples(fs, window_length, window_step):
     Notes
     -----
     Computation of the window step depends on the type of input provided, and the range.
-    - `window_step` is a float in (0.0, 1.0]: specifies the fraction of a window to skip to get to the start of the
-    next window
-    - `window_step` is an integer > 1: specifies the number of samples to skip to get to the start of the next
-    window
+    - `window_step` is a float in (0.0, 1.0]: specifies the fraction of a window to skip to get to
+    the start of the next window
+    - `window_step` is an integer > 1: specifies the number of samples to skip to get to the start
+    of the next window
 
     Examples
     --------
-    Compute the window length and step in samples for a 3s window with 50% overlap, with a sampling rate of 50Hz
+    Compute the window length and step in samples for a 3s window with 50% overlap, with a
+    sampling rate of 50Hz
 
     >>> compute_window_samples(50.0, 3.0, 0.5)
     (150, 75)
 
-    Compute the window length for a 4.5s window with a step of 1 sample, and a sampling rate of 100Hz
+    Compute the window length for a 4.5s window with a step of 1 sample, and a sampling
+    rate of 100Hz
     >>> compute_window_samples(100.0, 4.5, 1)
     (450, 1)
     """
@@ -161,7 +165,8 @@ def get_windowed_view(x, win_len, stepsize):
     win_len : int
         Window length.
     stepsize : int
-        Stride length/step size. How many places to step for the center of the windows being created.
+        Stride length/step size. Number of places to step for the center of the windows being
+        created.
 
     Returns
     -------

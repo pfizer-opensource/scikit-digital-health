@@ -15,7 +15,8 @@ __all__ = ['Bank']
 
 class NotAFeatureError(Exception):
     """
-    Custom error for indicating an attempt to add something that is not a feature to a features.Bank
+    Custom error for indicating an attempt to add something that is not a feature to a
+    features.Bank
     """
     pass
 
@@ -39,21 +40,24 @@ class Bank:
 
     def __init__(self, window_length=None, window_step=1.0):
         """
-        A feature bank for ease in creating a table of features for a given signal, applying the windowing as specified.
+        A feature bank for ease in creating a table of features for a given signal, applying the
+        windowing as specified.
+
         Parameters
         ----------
         window_length : float
             Window length in seconds. If not provided (None), will do no windowing. Default is None
         window_step : {float, int}
-            Window step - the spacing between the start of windows. This can be specified several different ways
-            (see Notes). Default is 1.0
+            Window step - the spacing between the start of windows. This can be specified several
+            different ways (see Notes). Default is 1.0
         Notes
         -----
         Computation of the window step depends on the type of input provided, and the range.
-        - `window_step` is a float in (0.0, 1.0]: specifies the fraction of a window to skip to get to the start of the
-        next window
-        - `window_step` is an integer > 1: specifies the number of samples to skip to get to the start of the next
-        window
+        - `window_step` is a float in (0.0, 1.0]: specifies the fraction of a window to skip to
+        get to the start of the next window
+        - `window_step` is an integer > 1: specifies the number of samples to skip to get to the
+        start of the next window
+
         Examples
         --------
         >>> fb = Bank()
@@ -63,7 +67,7 @@ class Bank:
         >>> # add specific axes of features to the Bank
         >>> fb + SignalEntropy()[0]
         >>> fb + IQR()[[1, 2]]
-        >>> fb + SignalEntropy()[2]  # this will reuse the same instance created above, to avoid feature re-computation
+        >>> fb + SignalEntropy()[2]  # this will reuse the same instance created above
         >>> features = fb.compute(signal)
         """
         # storage for the features to calculate
@@ -83,13 +87,16 @@ class Bank:
         Parameters
         ----------
         signal : {numpy.ndarray, pandas.DataFrame}
-            Either a numpy array (up to 3D), or a pandas.DataFrame containing the signal to be analyzed
+            Either a numpy array (up to 3D), or a pandas.DataFrame containing the signal to be
+            analyzed
         fs : float, optional
-            Sampling frequency of the signal in Hz. Only required if the features in the Bank require
-            sampling frequency in the computation (see feature documentation), or if windowing `signal`.
+            Sampling frequency of the signal in Hz. Only required if the features in the Bank
+            require sampling frequency in the computation (see feature documentation), or if
+            windowing `signal`.
         columns : array-like, optional
-            Columns to use from the pandas.DataFrame. If signal is an ndarray, providing columns will provide
-            a return of the column/feature name combinations that matches the columns in the returned ndarray
+            Columns to use from the pandas.DataFrame. If signal is an ndarray, providing columns
+            will provide a return of the column/feature name combinations that matches the columns
+            in the returned ndarray
         windowed : bool, optional
             If the signal has already been windowed. Default is False.
         Returns
@@ -117,8 +124,8 @@ class Bank:
         if not isinstance(signal, DataFrame):
             if columns is not None:
                 if len(columns) != x.shape[-1]:
-                    raise ValueError(f'Provided column names ({len(columns)}) does not match the number of columns'
-                                     f'in the data ({x.shape[-1]}).')
+                    raise ValueError(f'Provided column names ({len(columns)}) does not match the '
+                                     f'number of columns in the data ({x.shape[-1]}).')
 
         # first get the number of features expected so the space can be allocated
         for dft in self._feat_list:
@@ -133,7 +140,8 @@ class Bank:
 
         idx = 0  # set a counter to keep track of where to put each computed feature
 
-        # iterate over all the features and compute them, saving the result as desired in the feature table
+        # iterate over all the features and compute them, saving the result as desired in the
+        # feature table
         for i, dft in enumerate(self._feat_list):
             dft._compute(x, fs)  # compute the feature without returning it
 
@@ -150,30 +158,31 @@ class Bank:
                 return feats
         elif isinstance(signal, DataFrame):
             return DataFrame(data=feats, columns=feat_columns)
-    
+
     # SAVING and LOADING METHODS
     def save(self, file):
         """
-        Save the features in the feature bank to a JSON file for easy (re-)creation of the FeatureBank
-        
+        Save the features in the feature bank to a JSON file for easy (re-)creation of the
+        FeatureBank
+
         Parameters
         ----------
         file : {str, Path}
             File path to save to.
         """
         out = []
-        
+
         for ft in self._feat_list:
             idx = 'Ellipsis' if ft.index is Ellipsis else ft.index
             out.append({ft.parent._name: {'Parameters': ft.parent._eq_params, 'Index': idx}})
-        
+
         with open(file, 'w') as f:
             json.dump(out, f)
-    
+
     def load(self, file):
         """
         Load a set of features from a JSON file.
-        
+
         Parameters
         ----------
         file : {str, Path}
@@ -184,14 +193,14 @@ class Bank:
 
         with open(file, 'r') as f:
             feats = json.load(f)
-        
+
         for ft in feats:
             name = list(ft.keys())[0]
             params = ft[name]['Parameters']
             index = ft[name]['Index']
             if index == 'Ellipsis':
                 index = Ellipsis
-            
+
             # add it to the FeatureBank
             self + getattr(lib, name)(**params)[index]
 
@@ -215,11 +224,15 @@ class Bank:
             self._feat_list.append(DeferredFeature(other, ...))
         elif isinstance(other, DeferredFeature):
             if other in self:
-                self._feat_list.append(DeferredFeature(self._feat_list[self._eq_idx].parent, other.index))
+                self._feat_list.append(
+                    DeferredFeature(self._feat_list[self._eq_idx].parent, other.index)
+                )
             else:
                 self._feat_list.append(other)
         else:
-            raise NotAFeatureError(f'Cannot add an object of type ({type(other)}) to a feature Bank.')
+            raise NotAFeatureError(
+                f'Cannot add an object of type ({type(other)}) to a feature Bank.'
+            )
 
 
 class Feature:
@@ -254,8 +267,8 @@ class Feature:
         name : str
             Feature name. Used for creating the str/repr of the feature
         eq_params : dict
-            Dictionary of parameter names and their values. Used for creating the str/repr of the feature, and
-            checking equivalence between features
+            Dictionary of parameter names and their values. Used for creating the str/repr of the
+            feature, and checking equivalence between features
         """
         self._x = None
         self._result = None
@@ -290,15 +303,19 @@ class Feature:
         # check fs
         if fs is not None:
             if not isinstance(fs, (float, int)):
-                raise ValueError("fs must be a float or int. If trying to specify columns, it is keyword-required")
+                raise ValueError(
+                    "fs must be a float or int. If trying to use columns, it is keyword-required"
+                )
 
-        # set the result to None, to force re-computation. publicly should always be re-computing. The benefit
-        # for avoiding re-computation comes for the feature Bank pipeline of computation, where the same result
-        # might be used multiple times but for different indices
+        # set the result to None, to force re-computation. publicly should always be re-computing.
+        # The benefit for avoiding re-computation comes for the feature Bank pipeline of
+        # computation, where the same result might be used multiple times but for different indices
         self._result = None
 
         # extract and standardize the data. No windowing in the public method here
-        x, columns = standardize_signal(signal, windowed=windowed, window_length=None, step=None, columns=columns)
+        x, columns = standardize_signal(
+            signal, windowed=windowed, window_length=None, step=None, columns=columns
+        )
 
         self._compute(x, fs)
 
@@ -309,8 +326,9 @@ class Feature:
 
     # PRIVATE METHODS
     def _compute(self, x, fs):
-        # if the result is already defined, don't need to compute again. Note that if calling from the public
-        # Feature.compute() method, _result is automatically set to None for re-computation each time it is called
+        # if the result is already defined, don't need to compute again. Note that if calling from
+        # the public Feature.compute() method, _result is automatically set to None for
+        # re-computation each time it is called
         if self._result is not None:
             return
 
@@ -319,7 +337,8 @@ class Feature:
         if isinstance(other, type(self)):
             return (other._eq_params == self._eq_params) and (other._name == self._name)
         elif isinstance(other, DeferredFeature):
-            return (other.parent._eq_params == self._eq_params) and (other.parent._name == self._name)
+            return (other.parent._eq_params == self._eq_params) and \
+                   (other.parent._name == self._name)
         else:
             return False
 
@@ -340,7 +359,8 @@ class Feature:
                 index = key
 
         if index is None:
-            raise IndexError("Index must be a int, in ['x', 'y', 'z', 'xy', 'xz', 'yz'] or an array-like of those")
+            raise IndexError("Index must be a int, in ['x', 'y', 'z', 'xy', 'xz', 'yz'] or an "
+                             "array-like of those")
 
         return DeferredFeature(self, index)
 
@@ -356,8 +376,9 @@ class DeferredFeature:
 
     def __init__(self, parent, index):
         """
-        An object for storing a feature for deferred computation. Stores the parent feature, as well as the desired
-        index to return of the results
+        An object for storing a feature for deferred computation. Stores the parent feature, as
+        well as the desired index to return of the results
+
         Parameters
         ----------
         parent : Feature
@@ -371,13 +392,15 @@ class DeferredFeature:
             raise NotAFeatureError('DeferredFeature parent must be a Feature or subclass')
 
         self.index = index
-        # we want the "private" method that doesn't return a value, and checks if the computation was done already
+        # we want the "private" method that doesn't return a value, and checks if the computation
+        # was done already
         self._compute = self.parent._compute
 
         # determine how many features will be returned
         if hasattr(index, "__len__"):
             self.n = len(index)
-        elif isinstance(index, type(Ellipsis)):  # can't figure this out until later, when we know signal size
+        elif isinstance(index, type(Ellipsis)):
+            # can't figure this out until later, when we know signal size
             self.n = -1
         else:
             self.n = 1  # if not an array-like, only returning 1 value
@@ -386,13 +409,16 @@ class DeferredFeature:
         return self.parent._result[:, self.index]
 
     def get_columns(self, columns):
-        return [f'{i}_{self.parent.__repr__()}' if i != '' else f'{self.parent.__repr__()}' for i in array(columns)[self.index]]
+        return [f'{i}_{self.parent.__repr__()}' if i != '' else f'{self.parent.__repr__()}'
+                for i in array(columns)[self.index]]
 
     # FUNCTIONALITY METHODS
     def __eq__(self, other):
         if isinstance(other, DeferredFeature):
-            return (other.parent._eq_params == self.parent._eq_params) and (other.parent._name == self.parent._name)
+            return (other.parent._eq_params == self.parent._eq_params) \
+                   and (other.parent._name == self.parent._name)
         elif isinstance(other, Feature):
-            return (other._eq_params == self.parent._eq_params) and (other._name == self.parent._name)
+            return (other._eq_params == self.parent._eq_params) \
+                   and (other._name == self.parent._name)
         else:
             return False

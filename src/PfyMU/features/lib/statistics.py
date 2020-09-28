@@ -32,7 +32,8 @@ class Range(Feature):
 class IQR(Feature):
     def __init__(self):
         """
-        Compute the difference between the 75th percentile and 25th percentile of the values in a signal.
+        Compute the difference between the 75th percentile and 25th percentile of the values in
+        a signal.
 
         Methods
         -------
@@ -79,7 +80,9 @@ class Autocorrelation(Feature):
         -------
         compute(signal[, columns=None, windowed=False])
         """
-        super(Autocorrelation, self).__init__('Autocorrelation', {'lag': lag, 'normalize': normalize})
+        super(Autocorrelation, self).__init__(
+            'Autocorrelation', {'lag': lag, 'normalize': normalize}
+        )
 
         self.lag = lag
         self.normalize = normalize
@@ -88,7 +91,7 @@ class Autocorrelation(Feature):
         super(Autocorrelation, self)._compute(x, fs)
 
         self._result = _cython.Autocorrelation(x, self.lag, self.normalize)
-        
+
 
 class LinearSlope(Feature):
     def __init__(self):
@@ -137,4 +140,3 @@ class AutocovarianceIQR(Feature):
         super(AutocovarianceIQR, self).__init__('AutocovarianceIQR', {})
 
         raise NotImplementedError('Feature not yet implemented')
-

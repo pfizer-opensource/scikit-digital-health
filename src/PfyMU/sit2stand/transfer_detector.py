@@ -4,8 +4,8 @@ Sit-to-stand transfer detection and processing
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
-from numpy import array, zeros, ceil, around, mean, std, sum, abs, gradient, where, diff, insert, append, sign, \
-    median, ascontiguousarray, arange, sqrt, log2
+from numpy import array, zeros, ceil, around, mean, std, sum, abs, gradient, where, diff, insert, \
+    append, sign, median, ascontiguousarray, arange, sqrt, log2
 from numpy.fft import fft
 from numpy.linalg import norm
 from numpy.lib import stride_tricks
@@ -36,7 +36,7 @@ def moving_stats(seq, window):
     """
     def rolling_window(x, wind):
         if not x.flags['C_CONTIGUOUS']:
-            raise ValueError("Data must be C-contiguous to be able to window for moving statistics")
+            raise ValueError("Data must be C-contiguous in order to window for moving statistics")
         shape = x.shape[:-1] + (x.shape[-1] - wind + 1, wind)
         strides = x.strides + (x.strides[-1],)
         return stride_tricks.as_strided(x, shape=shape, strides=strides)
@@ -87,9 +87,11 @@ def get_stillness(filt_accel, dt, gravity, window, thresholds):
     still : numpy.ndarray
         (N, ) boolean array of stillness (True)
     starts : numpy.ndarray
-        (Q, ) array of indices where stillness starts. Includes index 0 if still[0] is True. Q < (N/2)
+        (Q, ) array of indices where still periods start. Includes index 0 if still[0] is True.
+        Q < (N/2)
     stops : numpy.ndarray
-        (Q, ) array of indices where stillness ends. Includes index N-1 if still[-1] is True. Q < (N/2)
+        (Q, ) array of indices where still periods end. Includes index N-1 if still[-1] is True.
+        Q < (N/2)
     """
     # compute the sample window length from the time value
     n_window = int(around(window / dt))
@@ -119,48 +121,53 @@ def get_stillness(filt_accel, dt, gravity, window, thresholds):
 
 
 class Detector:
-    def __init__(self, stillness_constraint=True, gravity=9.81, thresholds=None, gravity_pass_order=4,
-                 gravity_pass_cutoff=0.8, long_still=0.5, still_window=0.3, **kwargs):
+    def __init__(self, stillness_constraint=True, gravity=9.81, thresholds=None,
+                 gravity_pass_order=4, gravity_pass_cutoff=0.8, long_still=0.5, still_window=0.3):
         """
-        Method for detecting sit-to-stand transitions based on a series of heuristic signal processing rules.
+        Method for detecting sit-to-stand transitions based on a series of heuristic signal
+        processing rules.
 
         Parameters
         ----------
         stillness_constraint : bool, optional
-            Whether or not to impose the stillness constraint on the detected transitions. Default is True.
+            Whether or not to impose the stillness constraint on the detected transitions.
+            Default is True.
         gravity : float, optional
-            Value of gravitational acceleration measured by the accelerometer when still. Default is 9.81 m/s^2.
+            Value of gravitational acceleration measured by the accelerometer when still.
+            Default is 9.81 m/s^2.
         thresholds : dict, optional
-            A dictionary of thresholds to change for stillness detection and transition verification. See *Notes* for
-            default values. Only values present will be used over the defaults.
+            A dictionary of thresholds to change for stillness detection and transition
+            verification. See *Notes* for default values. Only values present will be used
+            over the defaults.
         gravity_pass_order : int, optional
-            Low-pass filter order for estimating the direction of gravity by low-pass filtering the raw acceleration.
-            Default is 4.
+            Low-pass filter order for estimating the direction of gravity by low-pass filtering
+            the raw acceleration. Default is 4.
         gravity_pass_cutoff : float, optional
-            Low-pass filter frequency cutoff for estimating the direction of gravity. Default is 0.8Hz.
+            Low-pass filter frequency cutoff for estimating the direction of gravity.
+            Default is 0.8Hz.
         long_still : float, optional
-            Length of time of stillness for it to be considered a long period of stillness. Used to determine the
-            integration window limits when available. Default is 0.5s
+            Length of time of stillness for it to be considered a long period of stillness.
+            Used to determine the integration window limits when available. Default is 0.5s
         still_window : float, optional
-            Length of the moving window for calculating the moving statistics for determining stillness.
-            Default is 0.3s.
+            Length of the moving window for calculating the moving statistics for determining
+            stillness. Default is 0.3s.
 
         Notes
         -----
-        `stillness_constraint` determines whether or not a sit-to-stand transition is required to start and the
-        end of a still period in the data. This constraint is suggested for at-home data. For processing clinic data,
-        it is suggested to set this to `False`, especially if processing a task where sit-to-stands are repeated in
-        rapid succession.
+        `stillness_constraint` determines whether or not a sit-to-stand transition is required to
+        start and the end of a still period in the data. This constraint is suggested for at-home
+        data. For processing clinic data, it is suggested to set this to `False`, especially if
+        processing a task where sit-to-stands are repeated in rapid succession.
 
         Default thresholds:
-            - stand displacement: 0.125  :: minimum displacement for COM for a transfer (m)
-            - displacement factor: 0.75  :: minimum factor * median displacement for a transfer to be valid
-            - transition velocity: 0.2   :: minimum vertical velocity necessary for a valid transfer (m/s)
-            - duration factor: 10        :: maximum duration factor between first and second part of a transition
-            - accel moving avg: 0.2      :: maximum moving average acceleration to be considered still (m/s^2)
-            - accel moving std: 0.1      :: maximum moving std acceleration to be considered still (m/s^2)
-            - jerk moving avg: 2.5       :: maximum moving average jerk to be considered still (m/s^3)
-            - jerk moving std: 3         :: maximum moving std jerk to be considered still (m/s^3)
+            - stand displacement: 0.125  :: min displacement for COM for a transfer (m)
+            - displacement factor: 0.75  :: min factor * median displacement for a valid transfer
+            - transition velocity: 0.2   :: min vertical velocity for a valid transfer (m/s)
+            - duration factor: 10        :: max factor between 1st/2nd part duration of transfer
+            - accel moving avg: 0.2      :: max moving avg accel to be considered still (m/s^2)
+            - accel moving std: 0.1      :: max moving std accel to be considered still (m/s^2)
+            - jerk moving avg: 2.5       :: max moving average jerk to be considered still (m/s^3)
+            - jerk moving std: 3         :: max moving std jerk to be considered still (m/s^3)
 
         """
         # set the default thresholds
@@ -192,7 +199,9 @@ class Detector:
         raw_acc = raw_accel * self.grav
         filt_acc = filt_accel * self.grav
 
-        still, starts, stops = get_stillness(filt_acc, dt, self.grav, self.still_window, self.thresh)
+        still, starts, stops = get_stillness(
+            filt_acc, dt, self.grav, self.still_window, self.thresh
+        )
         still_dt = (stops - starts) * dt
 
         lstill_starts = starts[still_dt > self.long_still]
@@ -260,7 +269,8 @@ class Detector:
             # ==============
             if (time[sts_end] - time[sts_start]) > 4.5:  # threshold from various lit
                 continue
-            if (time[ppk] - time[sts_start]) > (self.thresh['duration factor'] * (time[sts_end] - time[ppk])):
+            if (time[ppk] - time[sts_start]) > \
+                    (self.thresh['duration factor'] * (time[sts_end] - time[ppk])):
                 continue
 
             t_start_i = sts_start - prev_int_start  # integrated value start index
@@ -305,7 +315,9 @@ class Detector:
 
         # check to ensure no partial transitions
         vdisp_ndarr = array(sts['Vertical Displacement'][n_prev:])
-        sts['Partial'].extend((vdisp_ndarr < (self.thresh['displacement factor'] * median(vdisp_ndarr))).tolist())
+        sts['Partial'].extend(
+            (vdisp_ndarr < (self.thresh['displacement factor'] * median(vdisp_ndarr))).tolist()
+        )
 
     def _integrate(self, vert_accel, dt, still_at_end):
         """
@@ -318,7 +330,8 @@ class Detector:
         dt : float
             Sampling time in seconds
         still_at_end : bool
-            Whether or not the acceleration provided ends with a still period. Determines drift mitigation strategy.
+            Whether or not the acceleration provided ends with a still period. Determines drift
+            mitigation strategy.
 
         Returns
         -------
@@ -380,14 +393,15 @@ class Detector:
         sal : float
             The spectral arc length estimate of the given data's smoothness
         (f, Mf) : (numpy.ndarray, numpy.ndarray)
-            The frequency and the magnitude spectrum of the input data. This spectral is from 0 to the Nyquist frequency
+            The frequency and the magnitude spectrum of the input data. This spectral is from 0
+            to the Nyquist frequency
         (f_sel, Mf_sel) : (numpy.ndarray, numpy.ndarray)
             The portion of the spectrum that is selected for calculating the spectral arc length
 
         References
         ----------
-        S. Balasubramanian, A. Melendez-Calderon, A. Roby-Brami, E. Burdet. "On the analysis of movement smoothness."
-        Journal of NeuroEngineering and Rehabilitation. 2015.
+        S. Balasubramanian, A. Melendez-Calderon, A. Roby-Brami, E. Burdet. "On the analysis of
+        movement smoothness." Journal of NeuroEngineering and Rehabilitation. 2015.
         """
         padlevel, fc, amp_th = 4, 10.0, 0.05
 
@@ -401,14 +415,14 @@ class Detector:
         Mf = Mf / Mf.max()
 
         # indices to choose only the spectrum withing the given cutoff frequency Fc
-        # NOTE: this is a low pass filtering operation to get rid of high frequency noise from affecting the next step
-        # (amplitude threshold based cutoff for arc length calculation
+        # NOTE: this is a low pass filtering operation to get rid of high frequency noise from
+        # affecting the next step (amplitude threshold based cutoff for arc length calculation
         fc_inx = ((f <= fc) * 1).nonzero()
         f_sel = f[fc_inx]
         Mf_sel = Mf[fc_inx]
 
-        # choose the amplitude threshold based cutoff frequency. Index of the last point on the magnitude spectrum is
-        # greater than or equal to the amplitude threshold
+        # choose the amplitude threshold based cutoff frequency. Index of the last point on the
+        # magnitude spectrum is greater than or equal to the amplitude threshold
         inx = ((Mf_sel >= amp_th) * 1).nonzero()[0]
         fc_inx = arange(inx[0], inx[-1] + 1)
         f_sel = f_sel[fc_inx]

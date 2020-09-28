@@ -8,16 +8,19 @@ def configuration(parent_package='', top_path=None):
     if os.getenv('CYTHONIZE', 'False') == 'True':
         from Cython.Build import cythonize
 
+        # create a c file from the cython file
         for pxdf in list(Path('.').rglob('*/features/lib/_cython/*.pxd')):
-            cythonize(pxdf.name, compiler_directives={'language_level': 3})  # create a c file from the cython file
+            cythonize(pxdf.name, compiler_directives={'language_level': 3})
         for pyxf in list(Path('.').rglob('*/features/lib/_cython/*.pyx')):
             if pyxf.stem == 'common':  # skip the common pyx file
                 continue
-            cythonize(pyxf.name, compiler_directives={'language_level': 3})  # create a c file from the cython file
+            # create a c file from the cython file
+            cythonize(pyxf.name, compiler_directives={'language_level': 3})
 
     # get a list of the c files to compile
     for cf in list(Path('.').rglob('*/features/lib/_cython/*.c')):
-        config.add_extension(cf.stem, sources=[cf.name])  # Path().stem is the file name without extension
+        # Path().stem is the file name without extension
+        config.add_extension(cf.stem, sources=[cf.name])
 
     return config
 

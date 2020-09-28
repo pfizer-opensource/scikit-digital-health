@@ -24,7 +24,9 @@ class ComplexityInvariantDistance(Feature):
         -------
         compute(signal[, columns=None, windowed=False])
         """
-        super(ComplexityInvariantDistance, self).__init__('ComplexityInvariantDistance', {'normalize': normalize})
+        super(ComplexityInvariantDistance, self).__init__(
+            'ComplexityInvariantDistance', {'normalize': normalize}
+        )
         self.normalize = normalize
 
     def _compute(self, x, fs):
@@ -65,12 +67,14 @@ class RangeCountPercentage(Feature):
 class RatioBeyondRSigma(Feature):
     def __init__(self, r=2.0):
         """
-        Compute the percent of the signal that is farther than :math:`r\sigma(x)` away from the mean of the signal.
+        Compute the percent of the signal that is farther than :math:`r\\sigma(x)` away from the
+        mean of the signal.
 
         Parameters
         ----------
         r : float, optional
-            Number of standard deviations above or below the mean the range includes. Default is 2.0
+            Number of standard deviations above or below the mean the range includes. Default is
+            2.0
 
         Methods
         -------

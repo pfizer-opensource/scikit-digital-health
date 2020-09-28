@@ -9,7 +9,8 @@ from numpy import array
 from PfyMU.features.core import Feature
 from PfyMU.features.lib import _cython
 
-__all__ = ['DominantFrequency', 'DominantFrequencyValue', 'PowerSpectralSum', 'SpectralFlatness', 'SpectralEntropy']
+__all__ = ['DominantFrequency', 'DominantFrequencyValue', 'PowerSpectralSum', 'SpectralFlatness',
+           'SpectralEntropy']
 
 
 class DominantFrequency(Feature):
@@ -58,8 +59,8 @@ class DominantFrequencyValue(Feature):
         -------
         compute(signal, fs[, columns=None, windowed=False])
         """
-        super(DominantFrequencyValue, self).__init__('DominantFrequencyValue', {'low_cutoff': low_cutoff,
-                                                                                'high_cutoff': high_cutoff})
+        super(DominantFrequencyValue, self).__init__(
+            'DominantFrequencyValue', {'low_cutoff': low_cutoff, 'high_cutoff': high_cutoff})
 
         self.low_cut = low_cutoff
         self.high_cut = high_cutoff
@@ -75,7 +76,8 @@ class DominantFrequencyValue(Feature):
 class PowerSpectralSum(Feature):
     def __init__(self, low_cutoff=0.0, high_cutoff=5.0):
         """
-        Compute sum of the power spectral density estimate in a 1.0Hz band around the dominant frequency
+        Compute sum of the power spectral density estimate in a 1.0Hz band around the dominant
+        frequency
 
         Parameters
         ----------
@@ -105,8 +107,8 @@ class PowerSpectralSum(Feature):
 class SpectralFlatness(Feature):
     def __init__(self, low_cutoff=0.0, high_cutoff=5.0):
         """
-        Compute the spectral flatness in a range of frequencies. The spectral flatness is a measure of the
-        "tonality" or resonant structure of a signal (as opposed to just noise).
+        Compute the spectral flatness in a range of frequencies. The spectral flatness is a
+        measure of the "tonality" or resonant structure of a signal (as opposed to just noise).
 
         Parameters
         ----------
@@ -136,8 +138,8 @@ class SpectralFlatness(Feature):
 class SpectralEntropy(Feature):
     def __init__(self, low_cutoff=0.0, high_cutoff=5.0):
         """
-        Compute the spectral entropy in a specified frequency range. Spectral entropy is a measure of the information
-        contained in the power spectral density estimate.
+        Compute the spectral entropy in a specified frequency range. Spectral entropy is a
+        measure of the information contained in the power spectral density estimate.
 
         Parameters
         ----------

@@ -40,8 +40,8 @@ class Mean(Feature):
 class MeanCrossRate(Feature):
     def __init__(self):
         """
-        Calculate the number of times the signal crosses the mean value, expressed as a percentage of the signal
-        length in samples.
+        Calculate the number of times the signal crosses the mean value, expressed as a percentage
+        of the signal length in samples.
 
         Methods
         -------

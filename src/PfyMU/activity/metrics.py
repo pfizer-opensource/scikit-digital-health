@@ -8,7 +8,7 @@ from numpy import atan, sqrt, diff, cumsum, zeros, nanmedian, full, nan, where, 
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt
 
-from src.PfyMU.features import get_windowed_view
+from PfyMU.features import get_windowed_view
 
 
 __all__ = ['roll_mean', 'roll_median_1', 'angle', 'hfen_plus', 'enmo', 'enmoa']
@@ -54,7 +54,8 @@ def roll_median_1(x, fs, win_s=5.0):
     xm[n2:-n2] = nanmedian(xw, axis=-1)
     # GGIR uses median, replaces NaN values with the first non nan value in the whole array
 
-    # replace NaN values with closest value on the beginning and end (to make returned array same shape as input)
+    # replace NaN values with closest value on the beginning and end (to make returned array
+    # same shape as input)
     ind = where(~isnan(xm))[0]
     first, last = ind[0], ind[-1]
     xm[:first] = xm[first]
@@ -91,7 +92,8 @@ def angle(acc, axis):
 
 def hfen_plus(acc, fs, cut=0.2, N=4):
     """
-    Compute the High-pass Filter with Euclidean norm, plus the low-pass euclidean norm less gravitiy
+    Compute the High-pass Filter with Euclidean norm, plus the low-pass euclidean norm less
+    gravitiy
 
     Parameters
     ----------

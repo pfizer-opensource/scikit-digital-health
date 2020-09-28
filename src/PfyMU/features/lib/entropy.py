@@ -33,8 +33,9 @@ class SignalEntropy(Feature):
 class SampleEntropy(Feature):
     def __init__(self, m=4, r=1.0):
         """
-        Compute the sample entropy of a given signal, which is the negative log that if the distance between two sets
-        of `m` points is less than `r`, then the distance between two sets of `m+1` points is also less than `r`
+        Compute the sample entropy of a given signal, which is the negative log that if the
+        distance between two sets of `m` points is less than `r`, then the distance between two
+        sets of `m+1` points is also less than `r`
 
         Parameters
         ----------
@@ -49,8 +50,8 @@ class SampleEntropy(Feature):
 
         Notes
         -----
-        The distance metric used is the Chebyshev distance, which is defined as the maximum absolute value of the
-        sample-by-sample difference between two sets of the same length
+        The distance metric used is the Chebyshev distance, which is defined as the maximum
+        absolute value of the sample-by-sample difference between two sets of the same length
 
         References
         ----------
@@ -73,8 +74,9 @@ class SampleEntropy(Feature):
 class PermutationEntropy(Feature):
     def __init__(self, order=3, delay=1, normalize=False):
         """
-        Calculate permutation entropy of signals. Permutation entropy is a meausure of the signal complexity based on
-        how the temporal signal behaves according to a series of ordinal patterns.
+        Calculate permutation entropy of signals. Permutation entropy is a meausure of the signal
+        complexity based on how the temporal signal behaves according to a series of ordinal
+        patterns.
 
         Parameters
         ----------
@@ -89,8 +91,9 @@ class PermutationEntropy(Feature):
         -------
         compute(signal, fs[, columns=None, windowed=False])
         """
-        super(PermutationEntropy, self).__init__("PermutationEntropy", {'order': order, 'delay': delay,
-                                                                        'normalize': normalize})
+        super(PermutationEntropy, self).__init__(
+            "PermutationEntropy", {'order': order, 'delay': delay, 'normalize': normalize}
+        )
         self.order = order
         self.delay = delay
         self.normalize = normalize
@@ -104,7 +107,9 @@ class PermutationEntropy(Feature):
         for wind in range(x.shape[0]):
             for ax in range(x.shape[2]):
                 # Embed x and sort the order of permutations
-                sorted_idx = PermutationEntropy._embed(x[wind, :, ax], self.order, self.delay).argsort(kind='quicksort')
+                sorted_idx = PermutationEntropy._embed(
+                    x[wind, :, ax], self.order, self.delay
+                ).argsort(kind='quicksort')
 
                 # Associate unique integer to each permutations
                 hashval = (multiply(sorted_idx, hashmult)).sum(1)
@@ -143,4 +148,3 @@ class PermutationEntropy(Feature):
         for i in range(order):
             Y[i] = x_1d[i * delay:i * delay + Y.shape[1]]
         return Y.T
-

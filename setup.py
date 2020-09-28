@@ -16,9 +16,12 @@ def parse_setuppy_commands():
         # user forgot to give an argument. Let setuptools handle that
         return True
 
-    info_commands = ['--help-commands', '--name', '--version', '-V', '--fullname', '--author', '--author-email',
-                     '--maintainer', '--maintainer-email', '--contact', '--contact-email', '--url', '--license',
-                     '--description', '--long-description', '--platforms', '--classifiers', '--keywords', '--provides',
+    info_commands = ['--help-commands', '--name', '--version', '-V', 
+                     '--fullname', '--author', '--author-email',
+                     '--maintainer', '--maintainer-email', '--contact', 
+                     '--contact-email', '--url', '--license',
+                     '--description', '--long-description', '--platforms', 
+                     '--classifiers', '--keywords', '--provides',
                      '--requires', '--obsoletes']
 
     for command in info_commands:
@@ -28,7 +31,8 @@ def parse_setuppy_commands():
     # Note that 'alias', 'saveopts' and 'setopt' commands also seem to work
     # fine as they are, but are usually used together with one of the commands
     # below and not standalone.  Hence they're not added to good_commands.
-    good_commands = ('develop', 'sdist', 'build', 'build_ext', 'build_py', 'build_clib', 'build_scripts', 'bdist_wheel',
+    good_commands = ('develop', 'sdist', 'build', 'build_ext', 'build_py', 
+                     'build_clib', 'build_scripts', 'bdist_wheel',
                      'bdist_rpm', 'bdist_wininst', 'bdist_msi', 'bdist_mpkg')
 
     for command in good_commands:
@@ -50,8 +54,8 @@ def parse_setuppy_commands():
         print(textwrap.dedent("""
             Help
             -------------------
-            To install inertial-sensor-routines from here with reliable uninstall, we recommend
-            that you use `pip install .`.
+            To install inertial-sensor-routines from here with reliable 
+            uninstall, we recommend that you use `pip install .`.
             For help with build/installation issues, please ask on the
             github repository.
 
@@ -64,9 +68,7 @@ def parse_setuppy_commands():
     # the user explicitly adds a --force command-line argument.
     bad_commands = dict(
         test="""
-            `setup.py test` is not supported.  Use one of the following
-            instead:
-              - `pytest --pyargs inertial_sensor_routines.tests`   (to test installed package)
+            `setup.py test` is not supported.
             """,
         upload="""
             `setup.py upload` is not supported, because it's insecure.
@@ -109,7 +111,8 @@ def parse_setuppy_commands():
 
     # If we got here, we didn't detect what setup.py command was given
     warnings.warn("Unrecognized setuptools command ('{}'), proceeding with "
-                  "generating sources and expanding templates".format(' '.join(sys.argv[1:])))
+                  "generating sources and expanding "
+                  "templates".format(' '.join(sys.argv[1:])))
     return True
 
 
@@ -167,7 +170,10 @@ def configuration(parent_package='', top_path=None):
 
     # EXTENSIONS
     # ========================
-    config.add_library('fcwa_convert', sources='src/PfyMU/read/_extensions/cwa_convert.f95')
+    config.add_library(
+        'fcwa_convert',
+        sources='src/PfyMU/read/_extensions/cwa_convert.f95'
+    )
     config.add_extension(
         'PfyMU/read/_extensions/cwa_convert',
         sources='src/PfyMU/read/_extensions/cwa_convert.c',
@@ -181,8 +187,9 @@ def configuration(parent_package='', top_path=None):
     if os.environ.get('CYTHONIZE', 'False') == 'True':
         from Cython.Build import cythonize
 
+        # create a c file from the cython file
         for pyxf in list(Path('.').rglob('*/features/lib/_cython/*.pyx')):
-            cythonize(str(pyxf), compiler_directives={'language_level': 3})  # create a c file from the cython file
+            cythonize(str(pyxf), compiler_directives={'language_level': 3})
 
     # get a list of the c files to compile
     for cf in list(Path('.').rglob('*/features/lib/_cython/*.c')):
@@ -218,10 +225,10 @@ def setup_package():
         name='PfyMU',
         maintainer=MAINTAINERS,
         maintainer_email=MAINTAINER_EMAILS,
-        description="Python general purpose IMU analysis and processing package.",
+        description="Python general purpose IMU data processing package.",
         long_description=long_description,
         long_description_content_type="text/markdown",
-        # download_url="https:/pypi.org/PfyMU",  # download link, most likely PyPi
+        # download_url="https:/pypi.org/PfyMU",  # download link, likely PyPi
         # project_urls={
         #     "Documentation": "https://PfyMU.readthedocs.io./en/latest/"
         # },

@@ -31,8 +31,8 @@ class DetailPower(Feature):
 
         References
         ----------
-        .. [1] Sekine, M. et al. "Classification of waist-acceleration signals in a continuous walking record." Medical
-        Engineering & Physics. Vol. 22. Pp 285-291. 2000.
+        .. [1] Sekine, M. et al. "Classification of waist-acceleration signals in a continuous
+        walking record." Medical Engineering & Physics. Vol. 22. Pp 285-291. 2000.
         """
         super().__init__('DetailPower', {'wavelet': wavelet, 'freq_band': freq_band})
 
@@ -91,14 +91,14 @@ class DetailPowerRatio(Feature):
 
         Notes
         -----
-        In the original paper [1]_, the result is multiplied by 100 to obtain a percentage. This final multiplication
-        is not included in order to obtain results that have a scale that closer matches the typical 0-1 (or -1 to 1)
-        scale for machine learning features.
+        In the original paper [1]_, the result is multiplied by 100 to obtain a percentage. This
+        final multiplication is not included in order to obtain results that have a scale that
+        closer matches the typical 0-1 (or -1 to 1) scale for machine learning features.
 
         References
         ----------
-        .. [1] Sekine, M. et al. "Classification of waist-acceleration signals in a continuous walking record." Medical
-        Engineering & Physics. Vol. 22. Pp 285-291. 2000.
+        .. [1] Sekine, M. et al. "Classification of waist-acceleration signals in a continuous
+        walking record." Medical Engineering & Physics. Vol. 22. Pp 285-291. 2000.
         """
         super().__init__('DetailPowerRatio', {'wavelet': wavelet, 'freq_band': freq_band})
 

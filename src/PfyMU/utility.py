@@ -14,15 +14,17 @@ def get_windowed_view(x, window_length, step_size, ensure_c_contiguity=False):
     Parameters
     ----------
     x : numpy.ndarray
-        1- or 2-D array of signals to window. Windows occur along the 0 axis. Must be C-contiguous.
+        1- or 2-D array of signals to window. Windows occur along the 0 axis.
+        Must be C-contiguous.
     window_length : int
         Window length/size.
     step_size : int
-        Step/stride size for windows - how many samples to step from window center to window center.
+        Step/stride size for windows - how many samples to step from window
+        center to window center.
     ensure_c_contiguity : bool, optional
-        Create a new array with C-contiguity if the passed array is not C-contiguous. This *may* result in the
-        memory requirements significantly increasing. Default is False, which will raise a ValueError if `x` is
-        not C-contiguous
+        Create a new array with C-contiguity if the passed array is not C-contiguous.
+        This *may* result in the memory requirements significantly increasing. Default is False,
+        which will raise a ValueError if `x` is not C-contiguous
     Returns
     -------
     x_win : numpy.ndarray
@@ -40,7 +42,12 @@ def get_windowed_view(x, window_length, step_size, ensure_c_contiguity=False):
     if x.ndim == 1:
         nrows = ((x.size - window_length) // step_size) + 1
         n = x.strides[0]
-        return as_strided(x, shape=(nrows, window_length), strides=(step_size * n, n), writeable=False)
+        return as_strided(
+            x,
+            shape=(nrows, window_length),
+            strides=(step_size * n, n),
+            writeable=False
+        )
 
     else:
         k = x.shape[1]
