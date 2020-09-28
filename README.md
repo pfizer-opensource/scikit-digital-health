@@ -66,4 +66,4 @@ pytest -v
 TODO
 
 ## Contributing
-Please read the CONTRIBUTING.md document for guidelines for making contributions.
+Please read the [CONTRIBUTING](Contributing.md) document for guidelines for making contributions.
