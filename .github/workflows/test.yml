@@ -18,7 +18,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Print gfortran version
       run: |
-        if [ "$RUNNER_OS" == "macOS"]; then
+        if [ "$RUNNER_OS" == "macOS" ]; then
           gfortran-9 --version
         else
           gfortran --version
