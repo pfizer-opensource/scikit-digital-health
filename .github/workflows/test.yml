@@ -25,5 +25,6 @@ jobs:
         pip install numpy
     - name: Print gfortran version
       run: |
+        alias gfortran="gfortran-9"
         f2py -c --help-fcompiler
       shell: bash
