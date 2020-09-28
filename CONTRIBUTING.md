@@ -1,3 +1,17 @@
+# Coding Standards
+Everything inside the `/src` directory should follow PEP8 standards, and pass tests run by `flake8`, which is checked as part of the CI process on any pull requests into the `master` branch. There are 2 exceptions which are not checked (specified in `.flake8`): 
+1. in `__init__.py` files, * imports may be used, and imports may be unused
+2. Line length is set to a maximum of 99 (Python standard is 79, which is a bit short)
+
+In order to make sure these standards are met, __before__ issuing a pull request, please check that your code conforms to these standards through the following:
+
+1. Make sure flake8 is installed - `conda install flake8` or `pip install flake8` (note that the python version here is important - flake8 will test against syntax for the version it is installed alongside)
+2. Navigate to the root directory and run `flake8 src/`
+3. Make sure there are no warnings. If there are no warnings, the code is set to be in a pull request
+
+# Automatic Testing
+Through GitHub Actions, the test suite (using `pytest`) will be run through on different OSs and python versions. To make sure that your tests are working properly (at least on your OS/python version), at the very least you should run `pytest` from the root directory before any pull requests
+
 # Adding modules
 The goal of `PfyMU` is to have one package with a defined architechture that allows for easy pipeline generation with multiple stages that may or may not depend on previous stages. To that end, there are several pre-defined base classes that will help setting up modules that are intended to directly interface with the pipeline infrastructure.
 

@@ -49,7 +49,7 @@ Testing has additional requirements:
 - pytest
 - h5py
 
-To run the tests, first clone the repository (tests are no longer distributed with the package itself, saving on install/download size). Once the repository has been downloaded, make sure `PfyMU` is installed, navigate to the local directory of `PfyMU`, and simply run `pytest`:
+All tests are automatically run each time a pull request is issued into the master branch. If for some reason you want to run the tests locally, first clone the repository (tests are no longer distributed with the package itself, saving on install/download size). Once the repository has been downloaded, make sure `PfyMU` is installed, navigate to the local directory of `PfyMU`, and simply run `pytest`:
 
 ```shell script
 # clone the repository

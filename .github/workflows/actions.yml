@@ -1,10 +1,8 @@
 name: PfyMU
 
 on:
-  push:
-    branches: [ development ]
   pull_request:
-    branches: [ $default-branch ]
+    branches: [ master ]
 jobs:
   build:
 
