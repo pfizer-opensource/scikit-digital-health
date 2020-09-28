@@ -1,3 +1,5 @@
+![Build Status](https://github.com/PfizerRD/PfyMU/workflows/PfyMU/badge.svg)
+
 # PfyMU
 Python package with methods for reading, pre-processing, manipulating, and analyzing Inertial Meausurement Unit data. `PfyMU` contains the following sub-modules:
 
