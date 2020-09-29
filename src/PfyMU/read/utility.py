@@ -1,3 +1,9 @@
+"""
+reader utility functions
+
+Lukas Adamowicz
+Pfizer DMTI 2020
+"""
 from numpy import insert, append
 
 
