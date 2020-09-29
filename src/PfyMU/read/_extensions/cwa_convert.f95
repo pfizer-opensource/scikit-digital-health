@@ -133,7 +133,6 @@ contains
 
     ! sampling frequency
     info%frequency = 3200._c_double / shiftl(1, 15_c_int8_t - iand(hdr%samplingRate, z'0f'))
-    print "(F6.2 I10 b15)", info%frequency, hdr%samplingRate, hdr%samplingRate
   end subroutine
 
   subroutine read_block(info, pos, imudata, timestamps, indx, light)
