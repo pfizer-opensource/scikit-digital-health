@@ -27,6 +27,10 @@ class BaseProcessTester:
         cls.truth_suffix = None   # additional path to the keys in the truth data
         cls.test_results = True   # test the results, or the data passed back out
 
+        # tolerances for testing
+        cls.atol = 1e-8
+        cls.atol_time = 1e-8
+
     def test(self, get_sample_data, get_truth_data):
         data = get_sample_data(
             self.sample_data_file,
@@ -48,7 +52,14 @@ class BaseProcessTester:
 
     def dict_allclose(self, pred, truth, keys):
         for key in keys:
-            assert allclose(pred[key], truth[key]), f"{self.process.name} test for value ({key}) not close to truth"
+            if key == 'time':
+                ptime = pred[key] - truth[key][0]
+                ttime = truth[key] - truth[key][0]
+                assert allclose(ptime, ttime, atol=self.atol_time), \
+                    f"{self.process.name} test for value ({key}) not close to truth"
+            else:
+                assert allclose(pred[key], truth[key], atol=self.atol), \
+                    f"{self.process.name} test for value ({key}) not close to truth"
 
 
 @fixture(scope='module')
@@ -58,7 +69,11 @@ def get_sample_data():
         with h5py.File(file, 'r') as h5:
             for key in data_names:
                 if key in h5:
-                    res[key] = h5[key][()]
+                    if key == 'file':
+                        path = resolve_data_path(h5[key][0], 'data')
+                        res[key] = path
+                    else:
+                        res[key] = h5[key][()]
         return res
     return sample_data
 
