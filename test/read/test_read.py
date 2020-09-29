@@ -54,6 +54,11 @@ class TestReadAx3CWA(BaseProcessTester):
         with pytest.raises(ValueError):
             ReadCWA(base=base, period=period)
 
+    def test_extension_warning(self):
+        with pytest.warns(UserWarning):
+            with pytest.raises(OSError):
+                ReadCWA().predict('test.bin')
+
 
 class TestReadAx6CWA(BaseProcessTester):
     @classmethod
@@ -92,3 +97,19 @@ class TestReadBin(BaseProcessTester):
         cls.process = ReadBin(base=None, period=None)
 
         cls.atol = 5e-5
+
+    def test_window_warning(self):
+        with pytest.warns(UserWarning):
+            ReadBin(base=None, period=12)
+        with pytest.warns(UserWarning):
+            ReadBin(base=8, period=None)
+
+    @pytest.mark.parametrize(('base', 'period'), ((-1, 12), (0, 25), (8, 30), (24, 12), (8, -12)))
+    def test_window_bounds_error(self, base, period):
+        with pytest.raises(ValueError):
+            ReadBin(base=base, period=period)
+
+    def test_extension_warning(self):
+        with pytest.warns(UserWarning):
+            with pytest.raises(OSError):
+                ReadBin().predict('test.random')
