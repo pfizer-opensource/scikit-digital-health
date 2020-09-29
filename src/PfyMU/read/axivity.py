@@ -6,7 +6,7 @@ Pfizer DMTI 2020
 """
 from warnings import warn
 
-from numpy import vstack, insert, append
+from numpy import vstack
 
 from PfyMU.base import _BaseProcess
 from PfyMU.read.utility import _get_window_start_stop
