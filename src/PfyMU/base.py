@@ -7,6 +7,15 @@ Pfizer DMTI 2020
 
 
 class _BaseProcess:
+    # names of the variables that are passed to predict
+    # CHANGE IF predict/_predict call changes!
+    _file = 'file'
+    _time = 'time'
+    _acc = 'accel'
+    _gyro = 'gyro'
+    _mag = 'magnet'
+    _temp = 'temperature'
+
     def __init__(self, name):
         """
         Intended to be subclassed
