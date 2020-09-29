@@ -235,4 +235,5 @@ class Sit2Stand(_BaseProcess):
 
         sts.pop('Partial')
 
-        return dict(time=time, accel=accel, **kwargs), sts
+        kwargs.update({self._time: time, self._acc: accel})
+        return kwargs, sts
