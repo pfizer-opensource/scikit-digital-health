@@ -104,3 +104,5 @@ class ReadCWA(_BaseProcess):
         if self.window:
             day_starts, day_stops = _get_window_start_stop(idx, ts.size)
             results['day_ends'] = vstack((day_starts, day_stops)).T
+
+        return results, None
