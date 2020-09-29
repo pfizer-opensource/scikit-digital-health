@@ -65,6 +65,12 @@ class PreProcessing(_BaseProcess):
         accel1 = step1(accel)
         accel2 = step2(accel)
 
+        # If you need something passed in thats not a default/standard argument (ie it might come through kwargs), use the following:
+        if necessary_item in kwargs:
+            nec_item = kwargs[necessary_item]
+        else:
+            raise KeyError(f'{necessary_item} not in the additional arguments passed into predict')
+
         """
         FINALLY: the return of the _predict function needs to be 2 items
         1. a dictionary of the input to _predict, and anything that might be needed in other stages
@@ -72,7 +78,13 @@ class PreProcessing(_BaseProcess):
         """
         # for this specific case, the goal is to modify the acceleration (hence preprocessing, the modified version needs to be returned in the input dictionary)
         # additionally, there are no specific results from this step, so None is returned as the second argument
-        return dict(time=time, accel=accel2, **kwargs), None
+        # the neatest way to return the inputs, plus anything declared in the function declaration is to update the kwargs variable, and return it
+        kwargs.update({self._time: time, self._acc: accel2})
+        """
+        Note that the _BaseProcess class has several attributes which help keep track of the names of time, accel, etc, which should help minimize
+        work if these names ever change. However, they can't be readily used in function declarations.
+        """
+        return kwargs, None
 ```
 
 ### 3. Make sure everything is setup/imported
@@ -100,7 +112,8 @@ def configuration(parent_package='', top_path=None):
         'src/PfyMU/preprocessing/data/preprocessing_info.dat'        # Added this file
     ])
 
-    config.add_data_dir('src/PfyMU/preprocessing/data')  # alternatively add this directory, any files/folders under this directory will be added recursively
+    # alternatively add this directory, any files/folders under this directory will be added recursively
+    config.add_data_dir('src/PfyMU/preprocessing/data')
     # ========================
 
     config.get_version('src/PfyMU/version.py')
@@ -175,6 +188,8 @@ Inside `test_preprocessing.py`, import the base process testing class, set a few
 
 ```python
 # test/preprocessing/test_preprocessing.py
+import pytest
+
 from ..base_conftest import *  # import BaseProcessTester, and resolve_data_path - a useful utility for making sure tests run in all 3 possible locations
 
 from PfyMU.preprocessing import PreProcess
@@ -199,6 +214,15 @@ class TestPreProcess(BaseProcessTester):
         cls.test_results = False  # we want to test the first return argument, not the "results"
 
         cls.process = PreProcess(attr1=5, attr2=10)
+    
+    """
+    Adding additional tests, for errors, edge cases, anything that can't be accomplished with the 
+    provided default structure can easily be accomplished by simply defining new functions under this class.
+    Note that if the default .test method is not working for your use case, just overwrite it.
+    """
+    def test_error_missing_necessary_item(self):
+        with pytest.raises(KeyError):
+            PreProcess().predict({'not_necessary_item': 5})
 ```
 
 This file would be all that is needed to test that the output `accel` values match those contained in the truth file.
