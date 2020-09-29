@@ -164,8 +164,8 @@ class Sit2Stand(_BaseProcess):
         sos = butter(self.lp_ord, 2 * self.lp_cut * dt, btype='low', output='sos')
 
         # check if windows exist for days
-        if 'Days' in kwargs:
-            days = kwargs['Days']
+        if 'day_ends' in kwargs:
+            days = kwargs['day_ends']
         else:
             days = [(0, accel.shape[0])]
 
