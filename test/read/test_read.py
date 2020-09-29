@@ -43,6 +43,17 @@ class TestReadAx3CWA(BaseProcessTester):
 
         cls.atol_time = 5e-5
 
+    def test_window_warning(self):
+        with pytest.warns(UserWarning):
+            ReadCWA(base=None, period=12)
+        with pytest.warns(UserWarning):
+            ReadCWA(base=8, period=None)
+
+    @pytest.mark.parametrize(('base', 'period'), ((-1, 12), (0, 25), (8, 30), (24, 12), (8, -12)))
+    def test_window_bounds_error(self, base, period):
+        with pytest.raises(ValueError):
+            ReadCWA(base=base, period=period)
+
 
 class TestReadAx6CWA(BaseProcessTester):
     @classmethod
