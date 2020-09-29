@@ -1,0 +1,83 @@
+import pytest
+from numpy import allclose
+
+from ..base_conftest import *
+
+from PfyMU.read import ReadCWA, ReadBin
+from PfyMU.read.utility import _get_window_start_stop
+
+
+@pytest.mark.parametrize(
+    'days_type',
+    (
+        '24hr',
+        'full first, full last',
+        'full first, partial last',
+        'partial first, full last',
+        'partial first, partial last'
+    )
+)
+def test_get_window_start_stop(days_type, windowing_data):
+    w_input, w_output = windowing_data(days_type)
+
+    starts, stops = _get_window_start_stop(*w_input)
+
+    assert allclose(starts, w_output[0])
+    assert allclose(stops, w_output[1])
+
+
+class TestReadAx3CWA(BaseProcessTester):
+    @classmethod
+    def setup_class(cls):
+        super().setup_class()
+
+        # override specific necessary attributes
+        cls.sample_data_file = resolve_data_path('ax3_data.h5', 'read')
+        cls.truth_data_file = resolve_data_path('ax3_data.h5', 'read')
+        cls.truth_data_keys = [
+            'time',
+            'accel'
+        ]
+        cls.test_results = False
+        cls.process = ReadCWA(base=None, period=None)
+
+        cls.atol_time = 5e-5
+
+
+class TestReadAx6CWA(BaseProcessTester):
+    @classmethod
+    def setup_class(cls):
+        super().setup_class()
+
+        # override specific necessary attributes
+        cls.sample_data_file = resolve_data_path('ax6_data.h5', 'read')
+        cls.truth_data_file = resolve_data_path('ax6_data.h5', 'read')
+        cls.truth_data_keys = [
+            'time',
+            'accel',
+            'gyro'
+        ]
+        cls.test_results = False
+        cls.process = ReadCWA(base=None, period=None)
+
+        cls.atol_time = 5e-5
+        cls.atol = 5e-6
+
+
+class TestReadBin(BaseProcessTester):
+    @classmethod
+    def setup_class(cls):
+        super().setup_class()
+
+        # override specific necessary attributes
+        cls.sample_data_file = resolve_data_path('gnactv_data.h5', 'read')
+        cls.truth_data_file = resolve_data_path('gnactv_data.h5', 'read')
+        cls.truth_data_keys = [
+            'time',
+            'accel'
+        ]
+
+        cls.test_results = False
+        cls.process = ReadBin(base=None, period=None)
+
+        cls.atol = 5e-5
