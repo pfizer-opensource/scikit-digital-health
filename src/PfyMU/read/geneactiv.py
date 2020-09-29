@@ -17,8 +17,8 @@ class ReadBin(_BaseProcess):
     def __init__(self, base=None, period=None):
         """
         Read a binary .bin file from a GeneActiv sensor into memory. The units for acceleration
-        data will be `g`. If providing a base and period value, included in the output will be the indices to create windows
-        starting at the `base` time, with a length of `period`.
+        data will be `g`. If providing a base and period value, included in the output will be the
+        indices to create windows starting at the `base` time, with a length of `period`.
 
         Parameters
         ----------
@@ -85,6 +85,6 @@ class ReadBin(_BaseProcess):
 
         if self.window:
             day_starts, day_stops = _get_window_start_stop(idx, time.size)
-            results['day_ends'] = vstack((day_starts, day_stops)).T
+            results[self._days] = vstack((day_starts, day_stops)).T
 
         return results, None
