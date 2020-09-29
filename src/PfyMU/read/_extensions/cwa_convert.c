@@ -34,6 +34,11 @@ PyObject * read_cwa(PyObject *NPY_UNUSED(self), PyObject *args){
   PyBytes_AsStringAndSize(bytes, &filename, &flen);
 
   FILE *fp = fopen(filename, "rb");
+  if (!fp){
+    PyErr_SetString(PyExc_IOError, "Error openining file");
+    Py_XDECREF(bytes);
+    return NULL;
+  }
   fseek(fp, 0, SEEK_END);
   unsigned long length_bytes = ftell(fp);
   info.nblocks = length_bytes / 512;
