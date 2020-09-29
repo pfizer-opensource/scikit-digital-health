@@ -15,6 +15,7 @@ class _BaseProcess:
     _gyro = 'gyro'
     _mag = 'magnet'
     _temp = 'temperature'
+    _days = 'day_ends'
 
     def __init__(self, name):
         """
