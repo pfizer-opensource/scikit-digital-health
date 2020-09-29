@@ -1,4 +1,0 @@
-{
-    'real': {'real64': 'double'},
-    'integer': {'int64': 'long_long'}
-}
