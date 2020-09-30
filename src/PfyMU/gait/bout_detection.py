@@ -97,5 +97,5 @@ def get_lgb_gait_classification(accel, fs):
     c[i2:] = 1
 
     tmp /= c
-    gait_pred_ps = tmp >= 0.5  # final gait predictions
+    gait_pred_ps = tmp >= 0.5  # final gait predictions, ps = per sample
     return gait_pred_ps
