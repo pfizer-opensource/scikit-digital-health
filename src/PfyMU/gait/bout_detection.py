@@ -4,21 +4,22 @@ Gait bout detection from accelerometer data
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
+from warnings import warn
+from sys import version_info
+
 from numpy import arange, zeros
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt
 from scipy.interpolate import interp1d
-from warnings import warn
 import lightgbm as lgb
-from sys import version_info
+
+from PfyMU.utility import get_windowed_view
+from PfyMU.features import Bank
 
 if version_info >= (3, 7):
     from importlib import resources
 else:
     import importlib_resources
-
-from PfyMU.utility import get_windowed_view
-from PfyMU.features import Bank
 
 
 def get_lgb_gait_classification(accel, fs):
