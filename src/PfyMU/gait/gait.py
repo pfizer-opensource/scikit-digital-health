@@ -6,8 +6,8 @@ Pfizer DMTI 2020
 """
 from warnings import warn
 
-from numpy import mean, std, diff, abs, argmax, nan, fft, where, insert, append, sign, round, \
-    array, sum, unique, full, float_, sqrt, cov
+from numpy import mean, std, sum, diff, sqrt, cov, abs, where, argmax, insert, append, sign, \
+    round, unique, array, full, fft, nan, float_
 from scipy.signal import detrend, butter, sosfiltfilt, find_peaks
 from scipy.integrate import cumtrapz
 from pywt import cwt
