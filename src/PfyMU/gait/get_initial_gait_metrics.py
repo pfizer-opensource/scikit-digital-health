@@ -73,5 +73,5 @@ def get_initial_gait_metrics(
 
     gait['Bout N'].extend([bout_n + 1] * bout_n_steps)
     gait['Bout Start'].extend(time[bout_start] * bout_n_steps)
-    gait['Bout Duration'].extend([(bout[1] - bout[0]) * dt] * bout_n_steps)
+    gait['Bout Duration'].extend([(bout_ends[1] - bout_ends[0]) * dt] * bout_n_steps)
     gait['Bout Steps'].extend([sum(gait['b valid cycle'][gait_index:])] * bout_n_steps)
