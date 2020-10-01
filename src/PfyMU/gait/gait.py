@@ -6,17 +6,18 @@ Pfizer DMTI 2020
 """
 from warnings import warn
 
-from numpy import mean, std, diff, abs, argmax, argmin, arange, fft
+from numpy import mean, std, diff, abs, argmax, argmin, arange, fft, where, insert, append, vstack
 from scipy.signal import detrend, butter, sosfiltfilt, find_peaks
 from scipy.integrate import cumtrapz
-from pywt import cwt, scale2frequency
+from pywt import cwt
 
 from PfyMU.base import _BaseProcess
 from PfyMU.gait.bout_detection import get_lgb_gait_classification
 
 
 class Gait(_BaseProcess):
-    def __init__(self, use_cwt_scale_relation=True, max_stride_time=2.25, loading_factor=0.2,
+    def __init__(self, use_cwt_scale_relation=True, min_bout_time=5.0,
+                 max_bout_seperation_time=0.5, max_stride_time=2.25, loading_factor=0.2,
                  height_factor=0.53, leg_length=False, filter_order=4, filter_cutoff=20.0):
         """
         Detect gait, extract gait events (heel-strikes, toe-offs), and compute gait metrics from
@@ -29,6 +30,11 @@ class Gait(_BaseProcess):
             scale is used for the smoothing/differentiation operation performed with the
             continuous wavelet transform. Default is True. See Notes for a caveat of the
             relationship
+        min_bout_time : float, optional
+            Minimum time in seconds for a gait bout. Default is 5s
+        max_bout_seperation_time : float, optional
+            Maximum time in seoncds between two bouts of gait for them to be merged into 1 gait
+            bout. Default is 0.5s
         max_stride_time : float, optional
             The maximum time in seconds for a stride, for optimization of gait events detection.
             Default is 2.25s
@@ -88,6 +94,8 @@ class Gait(_BaseProcess):
         super().__init__('Gait Process')
 
         self.use_opt_scale = use_cwt_scale_relation
+        self.min_bout = min_bout_time
+        self.max_bout_sep = max_bout_seperation_time
 
         self.max_stride_time = max_stride_time
         self.loading_factor = loading_factor
@@ -151,52 +159,102 @@ class Gait(_BaseProcess):
         for iday, day_idx in enumerate(days):
             start, stop = day_idx
 
-            # GET GAIT EVENTS
+            # GET GAIT BOUTS
             # ======================================
-            vert_acc = detrend(accel[start:stop, v_axis])
+            gait_bouts = self._get_gait_bouts(gait_class[start:stop])
 
-            # low-pass filter
-            sos = butter(self.filt_ord, 2 * self.filt_cut * dt, btype='low', output='sos')
-            fvert_acc = sosfiltfilt(sos, vert_acc)
+            for bout in gait_bouts:
+                # GET GAIT EVENTS
+                # ======================================
+                vert_acc = detrend(accel[start+bout[0]:start+bout[1], v_axis])
 
-            # first integrate the vertical acceleration to get vertical velocity
-            vert_vel = cumtrapz(fvert_acc, dx=dt, initial=0)
+                # low-pass filter
+                sos = butter(self.filt_ord, 2 * self.filt_cut * dt, btype='low', output='sos')
+                fvert_acc = sosfiltfilt(sos, vert_acc)
 
-            # differentiate using the continuous wavelet transform with a gaus1 wavelet
-            coef1, freq = cwt(vert_vel, arange(1, 50), 'gaus1', sampling_period=dt)
+                # first integrate the vertical acceleration to get vertical velocity
+                vert_vel = cumtrapz(fvert_acc, dx=dt, initial=0)
 
-            # 1.25 corresponds to the scale used in the original paper
-            scale1 = argmin(abs(freq - 1.25))
+                # differentiate using the continuous wavelet transform with a gaus1 wavelet
+                coef1, freq = cwt(vert_vel, arange(1, 50), 'gaus1', sampling_period=dt)
 
-            # if using the optimal scale relationship, get the optimal scale
-            if self.use_opt_scale:
-                F = abs(fft.rfft(coef1[scale1]))
-                # compute an estimate of the step frequency
-                step_freq = argmax(F) / coef1.shape[1] / dt
+                # 1.25 corresponds to the scale used in the original paper
+                scale1 = argmin(abs(freq - 1.25))
 
-                ic_opt_freq = 0.69 * step_freq + 0.34
-                fc_opt_freq = 3.6 * step_freq - 4.5
+                # if using the optimal scale relationship, get the optimal scale
+                if self.use_opt_scale:
+                    F = abs(fft.rfft(coef1[scale1]))
+                    # compute an estimate of the step frequency
+                    step_freq = argmax(F) / coef1.shape[1] / dt
 
-                scale1 = argmin(abs(freq - ic_opt_freq))
-                scale2 = argmin(abs(freq - fc_opt_freq))
-            else:
-                scale2 = scale1
+                    ic_opt_freq = 0.69 * step_freq + 0.34
+                    fc_opt_freq = 3.6 * step_freq - 4.5
 
-            """
-            Find the peaks in the coefficients at the computed scale. 
-            Normally, this should be the troughs in the signal, but the way PyWavelets computes
-            the CWT results in an inverted signal, so finding peaks in the normal signal
-            works as intended and matches the original papers
-            """
-            ic, *_ = find_peaks(coef1[scale1], height=0.5*std(coef1[scale1]))
+                    scale1 = argmin(abs(freq - ic_opt_freq))
+                    scale2 = argmin(abs(freq - fc_opt_freq))
+                else:
+                    scale2 = scale1
 
-            coef2, _ = cwt(coef1[scale2], scale2, 'gaus1')
+                """
+                Find the peaks in the coefficients at the computed scale. 
+                Normally, this should be the troughs in the signal, but the way PyWavelets computes
+                the CWT results in an inverted signal, so finding peaks in the normal signal
+                works as intended and matches the original papers
+                """
+                ic, *_ = find_peaks(coef1[scale1], height=0.5*std(coef1[scale1]))
 
-            """
-            Peaks are the final contact points
-            This matches the expected result from the original papers
-            """
-            fc, *_ = find_peaks(coef2[0], height=0.5 * std(coef2[0]))
+                coef2, _ = cwt(coef1[scale2], scale2, 'gaus1')
 
-            # GET STEPS/STRIDES/ETC
-            # ======================================
+                """
+                Peaks are the final contact points
+                This matches the expected result from the original papers
+                """
+                fc, *_ = find_peaks(coef2[0], height=0.5 * std(coef2[0]))
+
+                # GET STEPS/STRIDES/ETC
+                # ======================================
+                loading_forward_time = self.loading_factor * self.max_stride_time
+                stance_forward_time = (self.max_stride_time / 2) + loading_forward_time
+
+                # create sample times for events
+                ic_times = ic * dt
+                fc_times = fc * dt
+
+    def _get_gait_bouts(self, classification, dt):
+        """
+        Get the gait bouts from an array of per sample predictions of gait
+
+        Parameters
+        ----------
+        classification : numpy.ndarray
+            Array of predictions of gait
+
+        Returns
+        -------
+        bouts : numpy.ndarray
+            (M, 2) array of starts and stops of gait bouts
+        """
+        starts = where(diff(classification.astype(int)) == 1)[0]
+        stops = where(diff(classification.astype(int)) == -1)[0]
+
+        if classification[0]:
+            starts = insert(starts, 0, 0)
+        if classification[-1]:
+            stops = append(stops, len(classification) - 1)
+
+        if starts.size != stops.size:
+            raise ValueError('Starts and stops of bouts do not match')
+
+        bouts = []
+        nb = 0
+        while nb < starts.size:
+            ncb = 0
+            while ((starts[nb+ncb+1] - stops[nb+ncb]) * dt) < self.max_bout_sep:
+                ncb += 1
+
+            if ((stops[nb+ncb] - starts[nb]) * dt) > self.min_bout:
+                bouts.append((starts[nb], stops[nb+ncb]))
+
+            nb += ncb + 1
+
+        return bouts
