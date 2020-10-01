@@ -17,7 +17,7 @@ from PfyMU.gait.bout_detection import get_lgb_gait_classification
 
 class Gait(_BaseProcess):
     def __init__(self, use_cwt_scale_relation=True, min_bout_time=5.0,
-                 max_bout_seperation_time=0.5, max_stride_time=2.25, loading_factor=0.2,
+                 max_bout_separation_time=0.5, max_stride_time=2.25, loading_factor=0.2,
                  height_factor=0.53, leg_length=False, filter_order=4, filter_cutoff=20.0):
         """
         Detect gait, extract gait events (heel-strikes, toe-offs), and compute gait metrics from
@@ -32,8 +32,8 @@ class Gait(_BaseProcess):
             relationship
         min_bout_time : float, optional
             Minimum time in seconds for a gait bout. Default is 5s
-        max_bout_seperation_time : float, optional
-            Maximum time in seoncds between two bouts of gait for them to be merged into 1 gait
+        max_bout_separation_time : float, optional
+            Maximum time in seconds between two bouts of gait for them to be merged into 1 gait
             bout. Default is 0.5s
         max_stride_time : float, optional
             The maximum time in seconds for a stride, for optimization of gait events detection.
@@ -95,7 +95,7 @@ class Gait(_BaseProcess):
 
         self.use_opt_scale = use_cwt_scale_relation
         self.min_bout = min_bout_time
-        self.max_bout_sep = max_bout_seperation_time
+        self.max_bout_sep = max_bout_separation_time
 
         self.max_stride_time = max_stride_time
         self.loading_factor = loading_factor
