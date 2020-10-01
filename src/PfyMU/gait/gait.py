@@ -11,13 +11,9 @@ from numpy import mean, diff, sqrt, abs, argmax, sign, round, unique, array, ful
 from PfyMU.base import _BaseProcess
 from PfyMU.gait.get_gait_classification import get_gait_classification_lgbm
 from PfyMU.gait.get_gait_bouts import get_gait_bouts
-from .get_gait_bouts import get_gait_bouts
 from PfyMU.gait.get_gait_events import get_gait_events
-from .get_gait_events import get_gait_events
 from PfyMU.gait.get_strides import get_strides
-from .get_strides import get_strides
 from PfyMU.gait.get_initial_gait_metrics import get_initial_gait_metrics
-from .get_initial_gait_metrics import get_initial_gait_metrics
 
 
 class Gait(_BaseProcess):
