@@ -6,7 +6,8 @@ Pfizer DMTI 2020
 """
 from warnings import warn
 
-from numpy import mean, std, diff, abs, argmax, argmin, arange, fft, where, insert, append, vstack
+from numpy import mean, std, diff, abs, argmax, nan, fft, where, insert, append, sign, round, \
+    array, sum, unique, full, float_, sqrt, cov
 from scipy.signal import detrend, butter, sosfiltfilt, find_peaks
 from scipy.integrate import cumtrapz
 from pywt import cwt
@@ -16,6 +17,31 @@ from PfyMU.gait.bout_detection import get_lgb_gait_classification
 
 
 class Gait(_BaseProcess):
+    # gait parameters
+    params = [
+        'stride time',
+        'stance time',
+        'swing time',
+        'step time',
+        'initial double support',
+        'terminal double support',
+        'double support',
+        'single support',
+        'step length',
+        'stride length',
+        'gait speed',
+        'cadence',
+        'step regularity - V',  # complex asymmetry param
+        'stride regularity - V'  # complex asymmetry param
+    ]
+
+    # basic asymmetry parameters
+    asym_params = [
+        'stride time', 'stance time', 'swing time', 'step time', 'initial double support',
+        'terminal double support', 'double support', 'single support', 'step length',
+        'stride length'
+    ]
+
     def __init__(self, use_cwt_scale_relation=True, min_bout_time=5.0,
                  max_bout_separation_time=0.5, max_stride_time=2.25, loading_factor=0.2,
                  height_factor=0.53, leg_length=False, filter_order=4, filter_cutoff=20.0):
@@ -137,7 +163,9 @@ class Gait(_BaseProcess):
         else:
             # if not providing leg length (default), multiply height by the height factor
             if not self.leg_length:
-                height = self.height_factor * height
+                leg_length = self.height_factor * height
+            else:
+                leg_length = height
 
         # compute fs/delta t
         dt = mean(diff(time[:500]))
@@ -148,13 +176,34 @@ class Gait(_BaseProcess):
         else:
             days = [(0, accel.shape[0])]
 
-        results = {}
-
         # get the gait classifications
         gait_class = get_lgb_gait_classification(accel, 1 / dt)
 
         # figure out vertical axis
-        v_axis = argmax(abs(mean(accel[:500])))
+        acc_mean = mean(accel, axis=0)
+        v_axis = argmax(abs(acc_mean))
+
+        # original scale. compute outside loop.
+        # 1.25 comes from original paper, corresponds to desired frequency
+        # 0.4 comes from using the 'gaus1' wavelet
+        scale_original = round(0.4 / (2 * 1.25 * 1/dt)) - 1
+
+        gait = {
+            'Day N': [],
+            'Bout N': [], 'Bout Start': [], 'Bout Duration': [], 'Bout Steps': [],
+            'IC': [], 'FC': [], 'FC opp foot': [],
+            'b valid cycle': [], 'delta h': []
+        }
+        # allocate params just for order of creation
+        for p in self.params:
+            gait[f'PARAM:{p}'] = None
+        for p in self.asym_params:
+            gait[f'PARAM:{p} asymmetry'] = None
+        # allocate regularity params
+        gait['PARAM:step regularity - V'] = []
+        gait['PARAM:stride regularity - V'] = []
+
+        ig = 0  # keep track of where everything is in the cycle
 
         for iday, day_idx in enumerate(days):
             start, stop = day_idx
@@ -163,10 +212,11 @@ class Gait(_BaseProcess):
             # ======================================
             gait_bouts = self._get_gait_bouts(gait_class[start:stop])
 
-            for bout in gait_bouts:
+            for ibout, bout in enumerate(gait_bouts):
+                bstart = start + bout[0]
                 # GET GAIT EVENTS
                 # ======================================
-                vert_acc = detrend(accel[start+bout[0]:start+bout[1], v_axis])
+                vert_acc = detrend(accel[bstart:start+bout[1], v_axis])
 
                 # low-pass filter
                 sos = butter(self.filt_ord, 2 * self.filt_cut * dt, btype='low', output='sos')
@@ -175,41 +225,43 @@ class Gait(_BaseProcess):
                 # first integrate the vertical acceleration to get vertical velocity
                 vert_vel = cumtrapz(fvert_acc, dx=dt, initial=0)
 
-                # differentiate using the continuous wavelet transform with a gaus1 wavelet
-                coef1, freq = cwt(vert_vel, arange(1, 50), 'gaus1', sampling_period=dt)
-
-                # 1.25 corresponds to the scale used in the original paper
-                scale1 = argmin(abs(freq - 1.25))
-
                 # if using the optimal scale relationship, get the optimal scale
                 if self.use_opt_scale:
-                    F = abs(fft.rfft(coef1[scale1]))
+                    coef_scale_original, _ = cwt(vert_vel, scale_original, 'gaus1')
+                    F = abs(fft.rfft(coef_scale_original[0]))
                     # compute an estimate of the step frequency
-                    step_freq = argmax(F) / coef1.shape[1] / dt
+                    step_freq = argmax(F) / vert_vel.size / dt
 
                     ic_opt_freq = 0.69 * step_freq + 0.34
                     fc_opt_freq = 3.6 * step_freq - 4.5
 
-                    scale1 = argmin(abs(freq - ic_opt_freq))
-                    scale2 = argmin(abs(freq - fc_opt_freq))
+                    scale1 = round(0.4 / (2 * ic_opt_freq * dt)) - 1
+                    scale2 = round(0.4 / (2 * fc_opt_freq * dt)) - 1
                 else:
-                    scale2 = scale1
+                    scale1 = scale2 = scale_original
 
+                coef1, _ = cwt(vert_vel, scale1, 'gaus1')
                 """
-                Find the peaks in the coefficients at the computed scale. 
-                Normally, this should be the troughs in the signal, but the way PyWavelets computes
-                the CWT results in an inverted signal, so finding peaks in the normal signal
-                works as intended and matches the original papers
+                Find the local minima in the signal. This should technically always require using 
+                the negative signal in "find_peaks", however the way PyWavelets computes the
+                CWT results in the opposite signal that we want.
+                Therefore, if the sign of the acceleration was negative, we need to use the
+                positve coefficient signal, and opposite for positive acceleration reading.
                 """
-                ic, *_ = find_peaks(coef1[scale1], height=0.5*std(coef1[scale1]))
+                ic, *_ = find_peaks(-sign(acc_mean[v_axis]) * coef1[0],
+                                    height=0.5*std(coef1[scale1]))
 
                 coef2, _ = cwt(coef1[scale2], scale2, 'gaus1')
 
                 """
                 Peaks are the final contact points
-                This matches the expected result from the original papers
+                Same issue as above
                 """
-                fc, *_ = find_peaks(coef2[0], height=0.5 * std(coef2[0]))
+                fc, *_ = find_peaks(-sign(acc_mean[v_axis]) * coef2[0], height=0.5 * std(coef2[0]))
+
+                # add the starting index so events are absolute index
+                ic += bstart
+                fc += bstart
 
                 # GET STEPS/STRIDES/ETC
                 # ======================================
@@ -219,6 +271,145 @@ class Gait(_BaseProcess):
                 # create sample times for events
                 ic_times = ic * dt
                 fc_times = fc * dt
+
+                sib = 0  # steps in bout
+                for i, curr_ic in enumerate(ic_times):
+                    fc_forward = fc[fc_times > curr_ic]
+                    fc_forward_times = fc_times[fc_times > curr_ic]
+
+                    # OPTIMIZATION 1: initial double support (loading) time should be less than
+                    # max_stride_time * loading_factor
+                    if (fc_forward_times < (curr_ic + loading_forward_time)).sum() != 1:
+                        continue  # skip this IC
+                    # OPTIMIZATION 2: stance time should be less than half a gait cycle
+                    # + initial double support time
+                    if (fc_forward_times < (curr_ic + stance_forward_time)).sum() < 2:
+                        continue  # skip this ic
+
+                    # if this point is reached, both optimizations passed
+                    gait['IC'].append(ic[i])
+                    gait['FC'].append(fc_forward[1])
+                    gait['FC opp foot'].append(fc_forward[0])
+                    sib += 1
+
+                if sib > 2:
+                    gait['b valid cycle'].extend(
+                        [((gait['IC'][ig + i+2] - gait['IC'][ig + i]) * dt) < self.max_stride_time
+                         for i in range(sib-2)]
+                    )
+                if sib > 0:
+                    gait['b valid cycle'].extend([False] * sib)
+
+                # GET GAIT METRICS
+                # ======================================
+                # compute the vertical position
+                vert_pos = cumtrapz(vert_vel, dx=dt, initial=0)
+
+                # get the change in height
+                for i in range(sib - 1):
+                    if gait['b valid cycle'][ig + i]:
+                        i1 = gait['IC'][ig+i] - bstart
+                        i2 = gait['IC'][ig+i+1] - bstart
+                        gait['delta h'].append(
+                            (vert_pos[i1:i2].max() - vert_pos[i1:i2].min()) * 9.81  # convert to m
+                        )
+                    else:
+                        gait['delta h'].append(nan)
+
+                # regularity metrics
+                for i in range(sib - 1):
+                    i1 = gait['IC'][i] - bstart
+                    i2 = gait['IC'][i + 1] - bstart
+                    i3 = 2 * gait['IC'][i + 1] - gait['IC'][i] - bstart
+                    if i3 < vert_acc.size:
+                        gait['PARAM:step regularity - V'].append(
+                            self._autocov(vert_acc, i1, i2, i3))
+
+                for i in range(sib - 2):
+                    i1 = gait['IC'][i] - bstart
+                    i2 = gait['IC'][i + 2] - bstart
+                    i3 = 2 * gait['IC'][i + 2] - gait['IC'][i] - bstart
+
+                    if i3 < vert_acc.size:
+                        gait['PARAM:stride regularity - V'].append(
+                            self._autocov(vert_acc, i1, i2, i3))
+
+                # per bout metrics
+                gait['Bout N'].extend([ibout+1] * sib)
+                gait['Bout Start'].extend(time[start+bout[0]] * sib)
+                gait['Bout Duration'].extend([(bout[1] - bout[0]) * dt] * sib)
+                gait['Bout Steps'].extend([sum(gait['b valid cycle'][ig:])] * sib)
+
+                ig += sib
+
+            # add the day number
+            gait['Day N'].extend([iday+1] * (len(gait['Bout N']) - len(gait['Day N'])))
+
+        # convert to arrays
+        for key in gait:
+            gait[key] = array(gait[key])
+
+        # create the parameters
+        for p in self.params:
+            gait[f'PARAM:{p}'] = full(gait['IC'].size, nan, dtype=float_)
+        for p in self.asym_params:
+            gait[f'PARAM:{p} asymmetry'] = full(gait['IC'].size, nan, dtype=float_)
+
+        # compute step length first because needed by stride length
+        if height is not None:
+            gait['PARAM:step length'] = 2 * sqrt(
+                2 * leg_length * gait['delta h'] - gait['delta h']**2)
+
+        # compute additional gait metrics - only some need to be computed per bout
+        for day in unique(gait['Day N']):
+            for bout in unique(gait['Bout N'][gait['Day N'] == day]):
+                mask = (gait['Day N'] == day) & (gait['Bout N'] == bout)
+
+                gait['PARAM:stride time'][mask][:-2] = (gait['IC'][mask][2:]
+                                                        - gait['IC'][mask][:-2]) * dt
+                gait['Param:swing time'][mask][:-2] = (gait['IC'][mask][2:]
+                                                       - gait['FC'][:-2]) * dt
+                gait['PARAM:step time'][mask][:-1] = (gait['IC'][mask][1:]
+                                                      - gait['IC'][mask][:-1]) * dt
+                gait['PARAM:terminal double support'][mask][:-1] = (gait['FC opp foot'][mask][1:]
+                                                                    - gait['IC'][mask][1:]) * dt
+                gait['PARAM:single support'][mask][:-1] = (gait['IC'][mask][1:]
+                                                           - gait['FC opp foot'][mask][:-1]) * dt
+                if height is not None:
+                    gait['PARAM:stride length'][mask][:-1] = gait['PARAM:step length'][mask][:-1] \
+                                                             + gait['PARAM:step length'][mask][1:]
+
+        # compute rest of metrics that can be computed all at once
+        gait['PARAM:stance time'][:] = (gait['FC'] - gait['IC']) * dt
+        gait['PARAM:initial double support'][:] = (gait['FC opp foot'] - gait['IC']) * dt
+        gait['PARAM:double support'][:] = gait['PARAM:initial double support'] \
+                                          + gait['PARAM:terminal double support']
+
+        if height is not None:
+            gait['PARAM:gait speed'][:] = gait['PARAM:stride length'] / gait['PARAM:stride time']
+
+        gait['PARAM:cadence'][:] = 60 / gait['PARAM:step time']
+
+        # compute basic asymmetry parameters
+        for day in unique(gait['Day N']):
+            for bout in unique(gait['Bout N'][gait['Day N'] == day]):
+                mask = (gait['Day N'] == day) & (gait['Bout N'] == bout)
+                for p in ['stride time', 'stance time', 'swing time', 'step time',
+                          'initial double support', 'terminal double support', 'double support',
+                          'single support', 'step length', 'stride length']:
+                    gait[f'PARAM:{p} asymmetry'][mask][:-1] = abs(gait[f'PARAM:{p}'][mask][1:]
+                                                                  - gait[f'PARAM:{p}'][mask][:-1])
+
+        gait['PARAM:autocorrelation symmetry - V'] = abs(
+            gait['PARAM:step regularity - V'] - gait['PARAM:stride regularity - V'])
+
+        kwargs.update({self._acc: accel, self._time: time, self._gyro: gyro, 'height': height})
+        return kwargs, gait
+
+    @staticmethod
+    def _autocov(x, i1, i2, i3):
+        ac = cov(x[i1:i2], x[i2:i3], bias=False)[0, 1]
+        return ac / (std(x[i1:i2], ddof=1) * std(x[i2:i3], ddof=1))
 
     def _get_gait_bouts(self, classification, dt):
         """
