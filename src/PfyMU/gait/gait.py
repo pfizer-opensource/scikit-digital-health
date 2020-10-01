@@ -158,7 +158,7 @@ class Gait(_BaseProcess):
         """
         super()._predict(time=time, accel=accel, gyro=gyro, **kwargs)
 
-        if 'height' is None:
+        if height is None:
             warn('height not provided, not computing spatial metrics', UserWarning)
         else:
             # if not providing leg length (default), multiply height by the height factor
@@ -186,7 +186,7 @@ class Gait(_BaseProcess):
         # original scale. compute outside loop.
         # 1.25 comes from original paper, corresponds to desired frequency
         # 0.4 comes from using the 'gaus1' wavelet
-        scale_original = round(0.4 / (2 * 1.25 * 1/dt)) - 1
+        scale_original = round(0.4 / (2 * 1.25 * 1 / dt)) - 1
 
         gait = {
             'Day N': [],
@@ -216,7 +216,7 @@ class Gait(_BaseProcess):
                 bstart = start + bout[0]
                 # GET GAIT EVENTS
                 # ======================================
-                vert_acc = detrend(accel[bstart:start+bout[1], v_axis])
+                vert_acc = detrend(accel[bstart:start + bout[1], v_axis])
 
                 # low-pass filter
                 sos = butter(self.filt_ord, 2 * self.filt_cut * dt, btype='low', output='sos')
@@ -242,14 +242,14 @@ class Gait(_BaseProcess):
 
                 coef1, _ = cwt(vert_vel, scale1, 'gaus1')
                 """
-                Find the local minima in the signal. This should technically always require using 
+                Find the local minima in the signal. This should technically always require using
                 the negative signal in "find_peaks", however the way PyWavelets computes the
                 CWT results in the opposite signal that we want.
                 Therefore, if the sign of the acceleration was negative, we need to use the
                 positve coefficient signal, and opposite for positive acceleration reading.
                 """
                 ic, *_ = find_peaks(-sign(acc_mean[v_axis]) * coef1[0],
-                                    height=0.5*std(coef1[scale1]))
+                                    height=0.5 * std(coef1[scale1]))
 
                 coef2, _ = cwt(coef1[scale2], scale2, 'gaus1')
 
@@ -294,8 +294,9 @@ class Gait(_BaseProcess):
 
                 if sib > 2:
                     gait['b valid cycle'].extend(
-                        [((gait['IC'][ig + i+2] - gait['IC'][ig + i]) * dt) < self.max_stride_time
-                         for i in range(sib-2)]
+                        [((gait['IC'][ig + i + 2]
+                           - gait['IC'][ig + i]) * dt) < self.max_stride_time
+                         for i in range(sib - 2)]
                     )
                 if sib > 0:
                     gait['b valid cycle'].extend([False] * sib)
@@ -308,8 +309,8 @@ class Gait(_BaseProcess):
                 # get the change in height
                 for i in range(sib - 1):
                     if gait['b valid cycle'][ig + i]:
-                        i1 = gait['IC'][ig+i] - bstart
-                        i2 = gait['IC'][ig+i+1] - bstart
+                        i1 = gait['IC'][ig + i] - bstart
+                        i2 = gait['IC'][ig + i + 1] - bstart
                         gait['delta h'].append(
                             (vert_pos[i1:i2].max() - vert_pos[i1:i2].min()) * 9.81  # convert to m
                         )
@@ -335,15 +336,15 @@ class Gait(_BaseProcess):
                             self._autocov(vert_acc, i1, i2, i3))
 
                 # per bout metrics
-                gait['Bout N'].extend([ibout+1] * sib)
-                gait['Bout Start'].extend(time[start+bout[0]] * sib)
+                gait['Bout N'].extend([ibout + 1] * sib)
+                gait['Bout Start'].extend(time[start + bout[0]] * sib)
                 gait['Bout Duration'].extend([(bout[1] - bout[0]) * dt] * sib)
                 gait['Bout Steps'].extend([sum(gait['b valid cycle'][ig:])] * sib)
 
                 ig += sib
 
             # add the day number
-            gait['Day N'].extend([iday+1] * (len(gait['Bout N']) - len(gait['Day N'])))
+            gait['Day N'].extend([iday + 1] * (len(gait['Bout N']) - len(gait['Day N'])))
 
         # convert to arrays
         for key in gait:
@@ -382,8 +383,8 @@ class Gait(_BaseProcess):
         # compute rest of metrics that can be computed all at once
         gait['PARAM:stance time'][:] = (gait['FC'] - gait['IC']) * dt
         gait['PARAM:initial double support'][:] = (gait['FC opp foot'] - gait['IC']) * dt
-        gait['PARAM:double support'][:] = gait['PARAM:initial double support'] \
-                                          + gait['PARAM:terminal double support']
+        gait['PARAM:double support'][:] = (gait['PARAM:initial double support']
+                                           + gait['PARAM:terminal double support'])
 
         if height is not None:
             gait['PARAM:gait speed'][:] = gait['PARAM:stride length'] / gait['PARAM:stride time']
@@ -440,11 +441,11 @@ class Gait(_BaseProcess):
         nb = 0
         while nb < starts.size:
             ncb = 0
-            while ((starts[nb+ncb+1] - stops[nb+ncb]) * dt) < self.max_bout_sep:
+            while ((starts[nb + ncb + 1] - stops[nb + ncb]) * dt) < self.max_bout_sep:
                 ncb += 1
 
-            if ((stops[nb+ncb] - starts[nb]) * dt) > self.min_bout:
-                bouts.append((starts[nb], stops[nb+ncb]))
+            if ((stops[nb + ncb] - starts[nb]) * dt) > self.min_bout:
+                bouts.append((starts[nb], stops[nb + ncb]))
 
             nb += ncb + 1
 
