@@ -22,9 +22,9 @@ else:
     import importlib_resources
 
 
-def get_lgb_gait_classification(accel, fs):
+def get_gait_classification_lgbm(accel, fs):
     """
-    Get classification of windows of accelerometer data
+    Get classification of windows of accelerometer data using the LightGBM classifier
 
     Parameters
     ----------
