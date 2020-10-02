@@ -14,6 +14,19 @@ from PfyMU.sit2stand.detector import Detector, moving_stats
 
 
 class Sit2Stand(_BaseProcess):
+    def __repr__(self):
+        ret = "Sit2Stand("
+        ret += f"{self.detector!r}, "
+        ret += f"continuous_wavelet={self.cwave!r}, "
+        ret += f"power_band=[{self.power_start_f!r}, {self.power_end_f!r}], "
+        ret += f"power_peak_kw={self.power_peak_kw!r}, "
+        ret += f"power_std_height={self.std_height!r}, "
+        ret += f"power_std_trim={self.std_trim!r}, "
+        ret += f"lowpass_order={self.lp_ord!r}, "
+        ret += f"lowpass_cutoff={self.lp_cut!r}, "
+        ret += f"reconstruction_window={self.rwindow!r})"
+        return ret
+
     def __init__(
             self, *,
             stillness_constraint=True,
