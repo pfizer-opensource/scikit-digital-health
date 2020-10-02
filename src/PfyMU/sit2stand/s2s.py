@@ -106,7 +106,7 @@ class Sit2Stand(_BaseProcess):
             - jerk moving std: 3         :: max moving std jerk to be considered still (m/s^3)
 
         """
-        super().__init__('STS Detection Process')
+        super().__init__('STS Detection Process', True)
 
         # FILTER PARAMETERS
         self.cwave = continuous_wavelet
@@ -143,7 +143,7 @@ class Sit2Stand(_BaseProcess):
             still_window=still_window
         )
 
-    def _predict(self, *, time=None, accel=None, **kwargs):
+    def predict(self, *args, **kwargs):
         """
         Predict the sit-to-stand transfers, and compute per-transition quantities
 
@@ -154,7 +154,9 @@ class Sit2Stand(_BaseProcess):
         accel : ndarray
             (N, 3) array of acceleration, with units of 'g'.
         """
-        super()._predict(time=time, accel=accel, **kwargs)
+        super().predict(*args, **kwargs)
+
+    def _predict(self, time=None, accel=None, **kwargs):
         # FILTERING
         # ======================================================
         # compute the sampling period

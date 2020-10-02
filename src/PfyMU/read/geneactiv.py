@@ -35,7 +35,7 @@ class ReadBin(_BaseProcess):
         >>> reader = ReadBin(base=8, period=12)
         >>> reader.predict('example.bin')
         """
-        super().__init__('Read bin')
+        super().__init__('Read bin', False)
 
         if (base is None) and (period is None):
             self.window = False
@@ -54,7 +54,7 @@ class ReadBin(_BaseProcess):
             else:
                 raise ValueError("Base must be in [0, 23] and period must be in [1, 23]")
 
-    def _predict(self, *, file=None, **kwargs):
+    def predict(self, *args, **kwargs):
         """
         Read the data from the axivity file
 
@@ -64,8 +64,9 @@ class ReadBin(_BaseProcess):
             Path to the file to read. Must either be a string, or be able to be converted by
             `str(file)`
         """
-        super()._predict(file=file, **kwargs)
+        super().predict(*args, **kwargs)
 
+    def _predict(self, file=None, **kwargs):
         if file is None:
             raise ValueError("file must not be None")
         if not isinstance(file, str):

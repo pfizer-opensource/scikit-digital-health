@@ -115,7 +115,7 @@ class Gait(_BaseProcess):
             Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
             Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
         """
-        super().__init__('Gait Process')
+        super().__init__('Gait Process', True)
 
         self.use_opt_scale = use_cwt_scale_relation
         self.min_bout = min_bout_time
@@ -130,8 +130,7 @@ class Gait(_BaseProcess):
         self.filt_ord = filter_order
         self.filt_cut = filter_cutoff
 
-    def _predict(self, *, time=None, accel=None, gyro=None, height=None, gait_pred=None,
-                 **kwargs):
+    def predict(self, *args, **kwargs):
         """
         Get the gait events and metrics from a time series signal
 
@@ -158,8 +157,10 @@ class Gait(_BaseProcess):
         -------
         gait_results : dict
         """
-        super()._predict(time=time, accel=accel, gyro=gyro, **kwargs)
+        super().predict(*args, **kwargs)
 
+    def _predict(self, time=None, accel=None, *, gyro=None, height=None, gait_pred=None,
+                 **kwargs):
         if height is None:
             warn('height not provided, not computing spatial metrics', UserWarning)
             leg_length = None

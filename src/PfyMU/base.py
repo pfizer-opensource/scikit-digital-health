@@ -17,7 +17,7 @@ class _BaseProcess:
     _temp = 'temperature'
     _days = 'day_ends'
 
-    def __init__(self, name):
+    def __init__(self, name, return_result=True):
         """
         Intended to be subclassed
 
@@ -25,15 +25,19 @@ class _BaseProcess:
         ----------
         name : str
             Name of the process
+        return_result : bool, optional
+            Return the result part of predict, or the input/output dictionary
         """
-        self.name = name
+        self._proc_name = name
+        self._return_result = return_result
 
-    def predict(self, file=None, time=None, accel=None, gyro=None, temperature=None, **kwargs):
-        self.predict.__doc__ = self._predict.__doc__
-        result = self._predict(
-            file=file, time=time, accel=accel, gyro=gyro, temperature=temperature, **kwargs
-            )
-        return result[1]
+    def predict(self, *args, **kwargs):
+        result = self._predict(*args, **kwargs)
 
-    def _predict(self, *, file=None, time=None, accel=None, gyro=None, temperature=None, **kwargs):
-        pass
+        if self._return_result:
+            return result[1]
+        else:
+            return result[0]
+
+    def _predict(self, *args, **kwargs):
+        return None, None

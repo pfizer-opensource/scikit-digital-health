@@ -36,7 +36,7 @@ class ReadCWA(_BaseProcess):
         >>> reader = ReadCWA(base=8, period=12)
         >>> reader.predict('example.cwa')
         """
-        super().__init__('Read CWA')
+        super().__init__('Read CWA', False)
 
         if (base is None) and (period is None):
             self.window = False
@@ -55,7 +55,7 @@ class ReadCWA(_BaseProcess):
             else:
                 raise ValueError("Base must be in [0, 23] and period must be in [1, 23]")
 
-    def _predict(self, *, file=None, **kwargs):
+    def predict(self, *args, **kwargs):
         """
         Read the data from the axivity file
 
@@ -65,7 +65,18 @@ class ReadCWA(_BaseProcess):
             Path to the file to read. Must either be a string, or be able to be converted by
             `str(file)`
         """
-        super()._predict(file=file, **kwargs)
+        super().predict(*args, **kwargs)
+
+    def _predict(self, file=None, **kwargs):
+        """
+        Read the data from the axivity file
+
+        Parameters
+        ----------
+        file : {str, Path}
+            Path to the file to read. Must either be a string, or be able to be converted by
+            `str(file)`
+        """
 
         if file is None:
             raise ValueError("file must not be None")
