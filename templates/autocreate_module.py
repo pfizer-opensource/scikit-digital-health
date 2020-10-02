@@ -47,8 +47,5 @@ if __name__ == "__main__":
     init_file = folder / '__init__.py'
     with open(init_file, 'w') as f:
         f.write(
-            f"""
-            from PfyMU.{module_name.lower()}.{module_name.lower()} import {module_name}
-            
-            """
+            f"from PfyMU.{module_name.lower()}.{module_name.lower()} import {module_name}\n"
         )
