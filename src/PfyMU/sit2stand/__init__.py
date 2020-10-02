@@ -1,3 +1,3 @@
-from PfyMU.sit2stand.s2s import Sit2Stand
+from PfyMU.sit2stand.sit2stand import Sit2Stand
 
 __all__ = ['Sit2Stand']
