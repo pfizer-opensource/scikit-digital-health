@@ -6,14 +6,14 @@ Pfizer DMTI 2020
 """
 from warnings import warn
 
-from numpy import mean, diff, sqrt, abs, argmax, sign, round, unique, array, full, nan, float_
+from numpy import mean, diff, abs, argmax, sign, round, array, full, nan, float_
 
 from PfyMU.base import _BaseProcess
 from PfyMU.gait.get_gait_classification import get_gait_classification_lgbm
 from PfyMU.gait.get_gait_bouts import get_gait_bouts
 from PfyMU.gait.get_gait_events import get_gait_events
 from PfyMU.gait.get_strides import get_strides
-from PfyMU.gait.get_initial_gait_metrics import get_initial_gait_metrics
+from PfyMU.gait.get_gait_metrics import get_gait_metrics_initial, get_gait_metrics_final
 
 
 class Gait(_BaseProcess):
@@ -158,6 +158,7 @@ class Gait(_BaseProcess):
 
         if height is None:
             warn('height not provided, not computing spatial metrics', UserWarning)
+            leg_length = None
         else:
             # if not providing leg length (default), multiply height by the height factor
             if not self.leg_length:
@@ -226,7 +227,7 @@ class Gait(_BaseProcess):
                 sib = get_strides(gait, ig, ic, fc, dt, self.max_stride_time, self.loading_factor)
 
                 # get the initial gait metrics
-                get_initial_gait_metrics(
+                get_gait_metrics_initial(
                     gait, ig, ibout, dt, time, vert_acc, vert_pos, sib, bout, bstart
                 )
 
@@ -239,59 +240,14 @@ class Gait(_BaseProcess):
         for key in gait:
             gait[key] = array(gait[key])
 
-        # create the parameters
+        # initialize the metrics/parameters
         for p in self.params:
             gait[f'PARAM:{p}'] = full(gait['IC'].size, nan, dtype=float_)
         for p in self.asym_params:
             gait[f'PARAM:{p} asymmetry'] = full(gait['IC'].size, nan, dtype=float_)
 
-        # compute step length first because needed by stride length
-        if height is not None:
-            gait['PARAM:step length'] = 2 * sqrt(
-                2 * leg_length * gait['delta h'] - gait['delta h']**2)
-
-        # compute additional gait metrics - only some need to be computed per bout
-        for day in unique(gait['Day N']):
-            for bout in unique(gait['Bout N'][gait['Day N'] == day]):
-                mask = (gait['Day N'] == day) & (gait['Bout N'] == bout)
-
-                gait['PARAM:stride time'][mask][:-2] = (gait['IC'][mask][2:]
-                                                        - gait['IC'][mask][:-2]) * dt
-                gait['Param:swing time'][mask][:-2] = (gait['IC'][mask][2:]
-                                                       - gait['FC'][:-2]) * dt
-                gait['PARAM:step time'][mask][:-1] = (gait['IC'][mask][1:]
-                                                      - gait['IC'][mask][:-1]) * dt
-                gait['PARAM:terminal double support'][mask][:-1] = (gait['FC opp foot'][mask][1:]
-                                                                    - gait['IC'][mask][1:]) * dt
-                gait['PARAM:single support'][mask][:-1] = (gait['IC'][mask][1:]
-                                                           - gait['FC opp foot'][mask][:-1]) * dt
-                if height is not None:
-                    gait['PARAM:stride length'][mask][:-1] = gait['PARAM:step length'][mask][:-1] \
-                                                             + gait['PARAM:step length'][mask][1:]
-
-        # compute rest of metrics that can be computed all at once
-        gait['PARAM:stance time'][:] = (gait['FC'] - gait['IC']) * dt
-        gait['PARAM:initial double support'][:] = (gait['FC opp foot'] - gait['IC']) * dt
-        gait['PARAM:double support'][:] = (gait['PARAM:initial double support']
-                                           + gait['PARAM:terminal double support'])
-
-        if height is not None:
-            gait['PARAM:gait speed'][:] = gait['PARAM:stride length'] / gait['PARAM:stride time']
-
-        gait['PARAM:cadence'][:] = 60 / gait['PARAM:step time']
-
-        # compute basic asymmetry parameters
-        for day in unique(gait['Day N']):
-            for bout in unique(gait['Bout N'][gait['Day N'] == day]):
-                mask = (gait['Day N'] == day) & (gait['Bout N'] == bout)
-                for p in ['stride time', 'stance time', 'swing time', 'step time',
-                          'initial double support', 'terminal double support', 'double support',
-                          'single support', 'step length', 'stride length']:
-                    gait[f'PARAM:{p} asymmetry'][mask][:-1] = abs(gait[f'PARAM:{p}'][mask][1:]
-                                                                  - gait[f'PARAM:{p}'][mask][:-1])
-
-        gait['PARAM:autocorrelation symmetry - V'] = abs(
-            gait['PARAM:step regularity - V'] - gait['PARAM:stride regularity - V'])
+        # get the final gait metrics
+        get_gait_metrics_final(gait, leg_length, dt)
 
         kwargs.update({self._acc: accel, self._time: time, self._gyro: gyro, 'height': height})
         return kwargs, gait
