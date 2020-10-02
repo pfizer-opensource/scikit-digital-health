@@ -37,7 +37,7 @@ class Bank:
     def __repr__(self):
         ret = '[\n'
         for i in self._feat_list:
-            ret += f'\t{i.parent.__str__()},\n'
+            ret += f'\t{i.parent!r},\n'
         ret += ']'
         return ret
 
