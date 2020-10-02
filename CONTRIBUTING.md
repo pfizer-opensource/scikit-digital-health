@@ -143,14 +143,14 @@ If there is too much code to be contained inside the `PreProcessing._predict` ca
 3. Functions with a common theme can live in 1 file, with the common name matching that of the file
 4. A "utility.py" file might make sense for any functions that have general utility *outside* of this specific module (ie something from `preprocessing/utility.py` getting called from `gait/gait.py`)
 
-For examples of these, check out the `sit2stand` module within `PfyMU` - there are examples of 1 function per file, as well as multiple functions per file (`get_gait_metrics.py`)
+For examples of these, check out the `gait` module within `PfyMU` - there are examples of 1 function per file, as well as multiple functions per file (`get_gait_metrics.py`)
 
 However, these are just guidelines in order to maintain some clarity with multiple different functions split over multiple files. If you have a good reason to do something different, just try to maintain clarity for future users.
 
 #### 2b. Structure for helper functions
 There is no defined/suggested structure for the above helper functions, if a class makes sense for this instead of a function, then use a class, but you __definitely should__ add a `__repr__` method for that class, in case it has to be accessed from somewhere else.
 
-An example of this can be seen again in the `sit2stand` module, where `detector.py` contains a `Detector` class that is used in `sit2stand.py`, both in the code as a helper function, but *also* inside the `Sit2Stand.__repr__` 
+An example of this can be seen again in the `sit2stand` module, where `detector.py` contains a `Detector` class that is used in `sit2stand.py`, both in the code as a helper function, but *also* inside the `Sit2Stand.__repr__`
 
 ### 3. Make sure everything is setup/imported
 Make sure all imports are handled in `src/PfyMU/preprocessing/__init__.py`, as well as adding `preprocessing` imports to the `src/PfyMU/__init__.py`.
