@@ -15,6 +15,14 @@ Through GitHub Actions, the test suite (using `pytest`) will be run through on d
 # Adding modules
 The goal of `PfyMU` is to have one package with a defined architechture that allows for easy pipeline generation with multiple stages that may or may not depend on previous stages. To that end, there are several pre-defined base classes that will help setting up modules that are intended to directly interface with the pipeline infrastructure.
 
+While you should fully read this document, there is the option to create a template module that will take care of some of the boilerplate that has to be present (and is described below). If you want to use this, from the root directory, run
+
+```shell script
+python templates/autocreate_module.py
+```
+
+You will be prompted for the module name, author name, and a short description, after which the module will be created in `src/PfyMU`
+
 ### 1. Create a new module directory
 Under `src/PfyMU/` create a new directory with the desired name (for this example, we will use `preprocessing`), and create the normal files for a new python package (`__init__.py`, etc)
 
