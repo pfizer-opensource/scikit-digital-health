@@ -17,6 +17,9 @@ class _BaseProcess:
     _temp = 'temperature'
     _days = 'day_ends'
 
+    def __str__(self):
+        return self._proc_name.replace(' ', '')
+
     def __init__(self, name, return_result=True):
         """
         Intended to be subclassed
