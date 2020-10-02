@@ -73,4 +73,3 @@ class Pipeline:
                 results[process._name] = step_result
 
         return results
-
