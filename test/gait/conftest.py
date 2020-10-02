@@ -1,8 +1,29 @@
-from pytest import fixture
 from tempfile import TemporaryDirectory as TempDir
 from pathlib import Path
+
+from pytest import fixture
 import h5py
 import numpy as np
+
+from ..base_conftest import *
+
+
+@fixture(scope='module')
+def sample_accel():
+    path = resolve_data_path('ax3_data.h5', 'gait')
+    with h5py.File(path, 'r') as f:
+        accel = f['Truth']['accel'][()]
+
+    return accel
+
+
+@fixture(scope='module')
+def sample_fs():
+    path = resolve_data_path('ax3_data.h5', 'gait')
+    with h5py.File(path, 'r') as f:
+        fs = 1 / np.mean(np.diff(f['Truth']['time']))
+
+    return fs
 
 
 @fixture(scope='module')
