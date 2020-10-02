@@ -36,7 +36,8 @@ class PreProcessing(_BaseProcess):
     """
     def __repr__(self): 
         ret = "PreProcessing("  # class call/name + (
-        ret += f"attr1={self.attr1!r}, "  # first __init__ parameter and its value. Note the ...!r} part, this calls the arguments own __repr__
+        # first __init__ parameter and its value. Note the ...!r} part, this calls the arguments own __repr__
+        ret += f"attr1={self.attr1!r}, "
         ret += f"attr2={self.attr2!r})"  # second __init__ parameter and its value. note the ending ")"
         return ret
     """
@@ -51,17 +52,22 @@ class PreProcessing(_BaseProcess):
         ...
         """
         # make sure to call the super method
-        super().__init__('Preprocessing', False)  # double check the docstring of _BaseProcess.__init__ for the required parameters 
+        # double check the docstring of _BaseProcess.__init__ for the required parameters 
+        super().__init__('Preprocessing', False)
         # param 1 is a human-readable name for the process
-        # param 2 is whether or not the result return value is important. If False, the input/output dictionary is returned from predict
-        # if True, the result dictionary is returned
+        # param 2 is whether or not the result return value is important. 
+        # If False, the input/output dictionary is returned from predict
+        # If True, the result dictionary is returned
 
         self.attr1 = attr1
         ...
     
     """
-    Due to the way that python sets docstrings, this call is necessary to have a publically viewable docstring for the public method, predict
-    The definition and body of the function should not change (ie always should be "def predict(self, *args, **kwargs)" and "super().predict(*args, **kwargs)"). The only thing that gets modified here is the docstring, which should match that of the _predict declaration
+    Due to the way that python sets docstrings, this call is necessary to have a publically viewable docstring
+    for the public method, predict
+    The definition and body of the function should not change 
+    (ie always should be "def predict(self, *args, **kwargs)" and "super().predict(*args, **kwargs)"). 
+    The only thing that gets modified here is the docstring, which should match that of the _predict declaration
     """
     def predict(self, *args, **kwargs):
         """
@@ -77,7 +83,18 @@ class PreProcessing(_BaseProcess):
         super().predict(*args, **kwargs)
     
     """
-    This is the function that will actually run in the pipeline. It needs to have the above call - _predict(self, arg1=None, arg2=None, *, arg3=None, **kwargs). This call would indicate that arg1 and arg2 are required (even though they have default options), and arg3 is optional (ie might add some additional functionality). Finally, the lone '*' argument indicates that everything after it must be passed as a key-word argument. If you have no optionl arguments (no arg3 in this case), the call becomes _predict(self, arg1=None, arg2=None, **kwargs). 
+    This is the function that will actually run in the pipeline. It needs to have the call - 
+    
+    _predict(self, arg1=None, arg2=None, *, arg3=None, **kwargs). 
+    
+    This call would indicate that arg1 and arg2 are required (even though they have default options), 
+    and arg3 is optional (ie might add some additional functionality). 
+    
+    Finally, the lone '*' argument indicates that everything after it must be passed as a key-word argument. 
+    If you have no optional arguments (no arg3 in this case), the 
+    call becomes: 
+    
+    _predict(self, arg1=None, arg2=None, **kwargs). 
 
     NOTE the units for time are [seconds since 1970/0/0 00:00:00], acceleration [g], angular velocity [deg/s]
     """
@@ -87,7 +104,8 @@ class PreProcessing(_BaseProcess):
         accel1 = step1(accel)
         accel2 = step2(accel)
 
-        # If you need something passed in thats not a default/standard argument (ie it might come through kwargs), use the following:
+        # If you need something passed in thats not a default/standard argument 
+        # (ie it might come through kwargs), use the following:
         if necessary_item in kwargs:
             nec_item = kwargs[necessary_item]
         else:
@@ -98,14 +116,20 @@ class PreProcessing(_BaseProcess):
         1. a dictionary of the input to _predict, and anything that might be needed in other stages
         2. anything else that needs to be returned, results, etc
 
-        The dictionary from 1. MUST be updated with any arguments that are passed in as required or optional with keywords!
+        The dictionary from 1. MUST be updated with any arguments 
+        that are passed in as required or optional with keywords!
+        
+        For this specific case, the goal is to modify the acceleration 
+        (hence preprocessing, the modified version needs to be returned in the input dictionary)
+        additionally, there are no specific results from this step, so None is returned as the second argument
+        
+        The neatest way to return the inputs, plus anything declared in the function declaration 
+        is to update the kwargs variable, and return it
         """
-        # for this specific case, the goal is to modify the acceleration (hence preprocessing, the modified version needs to be returned in the input dictionary)
-        # additionally, there are no specific results from this step, so None is returned as the second argument
-        # the neatest way to return the inputs, plus anything declared in the function declaration is to update the kwargs variable, and return it
         kwargs.update({self._time: time, self._acc: accel2})
         """
-        Note that the _BaseProcess class has several attributes which help keep track of the names of time, accel, etc, which should help minimize
+        Note that the _BaseProcess class has several attributes which help keep 
+        track of the names of time, accel, etc, which should help minimize
         work if these names ever change. However, they can't be readily used in function declarations.
         """
         return kwargs, None
