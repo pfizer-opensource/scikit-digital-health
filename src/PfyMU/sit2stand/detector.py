@@ -121,6 +121,20 @@ def get_stillness(filt_accel, dt, gravity, window, thresholds):
 
 
 class Detector:
+    def __str__(self):
+        return "Sit2StandTransferDetector"
+
+    def __repr__(self):
+        ret = "Detector("
+        ret += f"stillness_constraint={self.stillness_constraint!r}, "
+        ret += f"gravity={self.grav!r}, "
+        ret += f"thresholds={self.thresh!r}, "
+        ret += f"gravity_pass_order={self.grav_ord!r}, "
+        ret += f"gravity_pass_cutoff={self.grav_cut!r}, "
+        ret += f"long_still={self.long_still!r}, "
+        ret += f"still_window={self.still_window!r})"
+        return ret
+
     def __init__(self, stillness_constraint=True, gravity=9.81, thresholds=None,
                  gravity_pass_order=4, gravity_pass_cutoff=0.8, long_still=0.5, still_window=0.3):
         """
