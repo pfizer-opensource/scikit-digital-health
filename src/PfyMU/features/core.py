@@ -247,7 +247,7 @@ class Feature:
         for key in self._eq_params:
             s += f"{key}={self._eq_params[key]!r}, "
         s = s[:-2]
-        return f"{self.name}({s})"
+        return f"{self._name}({s})"
 
     def __init__(self, name, eq_params):
         """
