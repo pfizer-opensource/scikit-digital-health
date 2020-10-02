@@ -32,6 +32,9 @@ class Bank:
     __slots__ = ('_feat_list', '_n_feats', '_eq_idx', 'wlen_s', 'wstep')
 
     def __str__(self):
+        return "FeatureBank"
+
+    def __repr__(self):
         ret = '[\n'
         for i in self._feat_list:
             ret += f'\t{i.parent.__str__()},\n'
