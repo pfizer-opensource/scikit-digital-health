@@ -64,12 +64,12 @@ class Pipeline:
         # treat the first step specially due to args, kwargs input
         inout, step_result = self._steps[0]._predict(*args, **kwargs)
         if self._steps[0]._return_result:
-            results[self._steps[0]._name] = step_result
+            results[self._steps[0]._proc_name] = step_result
 
         # iterate over the rest of the processes
         for process in self._steps[1:]:
             inout, step_result = process._predict(**inout)
             if process._return_result:
-                results[process._name] = step_result
+                results[process._proc_name] = step_result
 
         return results
