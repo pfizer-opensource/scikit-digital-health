@@ -27,13 +27,14 @@ def get_gait_bouts(bool_gait, dt, max_bout_separation, min_bout_time):
     bouts : numpy.ndarray
         (M, 2) array of starts and stops of gait bouts
     """
-    starts = where(diff(bool_gait.astype(int)) == 1)[0]
-    stops = where(diff(bool_gait.astype(int)) == -1)[0]
+    # add plus 1 to deal with index from diff
+    starts = where(diff(bool_gait.astype(int)) == 1)[0] + 1
+    stops = where(diff(bool_gait.astype(int)) == -1)[0] + 1
 
     if bool_gait[0]:
         starts = insert(starts, 0, 0)
     if bool_gait[-1]:
-        stops = append(stops, bool_gait.size - 1)
+        stops = append(stops, bool_gait.size)
 
     if starts.size != stops.size:
         raise ValueError('Starts and stops of bouts do not match')
@@ -42,8 +43,12 @@ def get_gait_bouts(bool_gait, dt, max_bout_separation, min_bout_time):
     nb = 0
     while nb < starts.size:
         ncb = 0
-        while ((starts[nb + ncb + 1] - stops[nb + ncb]) * dt) < max_bout_separation:
-            ncb += 1
+
+        if (nb + ncb + 1) < starts.size:
+            tdiff = ((starts[nb + ncb + 1] - stops[nb + ncb]) * dt)
+            while (tdiff < max_bout_separation) and ((nb + ncb + 2) < starts.size):
+                ncb += 1
+                tdiff = ((starts[nb + ncb + 1] - stops[nb + ncb]) * dt)
 
         if ((stops[nb + ncb] - starts[nb]) * dt) > min_bout_time:
             bouts.append((starts[nb], stops[nb + ncb]))
