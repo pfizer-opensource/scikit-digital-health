@@ -28,6 +28,22 @@ import ...  # import installed modules (eg numpy, etc)
 from PfyMU.base import _BaseProcess  # import the base process class
 
 class PreProcessing(_BaseProcess):
+    """
+    Defining __repr__ is SUPER important!
+    it is used for logging, and making sure that each process has a clear representation for pipelines, etc
+
+    Don't split the lines here (ie with \\n), just make it one (potentially very) long line
+    """
+    def __repr__(self): 
+        ret = "PreProcessing("  # class call/name + (
+        ret += f"attr1={self.attr1!r}, "  # first __init__ parameter and its value. Note the ...!r} part, this calls the arguments own __repr__
+        ret += f"attr2={self.attr2!r})"  # second __init__ parameter and its value. note the ending ")"
+        return ret
+    """
+    End result of PreProcessing.__repr__:
+    PreProcessing(attr1=None, attr2=None)
+    """
+
     def __init__(self, attr1=None, attr2=None):
         """
         Class to implement any preprocessing steps
@@ -35,19 +51,19 @@ class PreProcessing(_BaseProcess):
         ...
         """
         # make sure to call the super method
-        super().__init__('Preprocessing')  # check for the required parameters, in this case it is the human-readable name of this process
+        super().__init__('Preprocessing', False)  # double check the docstring of _BaseProcess.__init__ for the required parameters 
+        # param 1 is a human-readable name for the process
+        # param 2 is whether or not the result return value is important. If False, the input/output dictionary is returned from predict
+        # if True, the result dictionary is returned
 
         self.attr1 = attr1
         ...
     
     """
-    This is the function that will actually run in the pipeline. It needs to have the above call - _predict(self, *, **kwargs). The "*" after self means that arguments must be passed in as key-word arguments. If you need specific names for arguments (e.g. time and accel in this case), put in the function declaration. **kwargs must come last, as additional arguments may be passed in within the pipeline architecture.
-
-    Complete the documentation for this function using the numpydoc format, documenting the arguments that are needed by the function. DO NOT document **kwargs
-
-    NOTE the units for time are [seconds since 1970/0/0 00:00:00], acceleration [g], angular velocity [deg/s]
+    Due to the way that python sets docstrings, this call is necessary to have a publically viewable docstring for the public method, predict
+    The definition and body of the function should not change (ie always should be "def predict(self, *args, **kwargs)" and "super().predict(*args, **kwargs)"). The only thing that gets modified here is the docstring, which should match that of the _predict declaration
     """
-    def _predict(self, *, time=None, accel=None, **kwargs):
+    def predict(self, *args, **kwargs):
         """
         Do the preprocessing step
 
@@ -58,8 +74,14 @@ class PreProcessing(_BaseProcess):
         accel : numpy.ndarray
             (N, 3) array of acceleration values, with units of 'g'
         """
-        # call the super method
-        super()._predict(time=time, accel=accel, **kwargs)  # pass in the key-word arguments, as well as the key-word argument dictionary
+        super().predict(*args, **kwargs)
+    
+    """
+    This is the function that will actually run in the pipeline. It needs to have the above call - _predict(self, arg1=None, arg2=None, *, arg3=None, **kwargs). This call would indicate that arg1 and arg2 are required (even though they have default options), and arg3 is optional (ie might add some additional functionality). Finally, the lone '*' argument indicates that everything after it must be passed as a key-word argument. If you have no optionl arguments (no arg3 in this case), the call becomes _predict(self, arg1=None, arg2=None, **kwargs). 
+
+    NOTE the units for time are [seconds since 1970/0/0 00:00:00], acceleration [g], angular velocity [deg/s]
+    """
+    def _predict(self, time=None, accel=None, **kwargs):
 
         # do any preprocessing - this can either be functions that are referenced here, or just all inside _predict
         accel1 = step1(accel)
@@ -75,6 +97,8 @@ class PreProcessing(_BaseProcess):
         FINALLY: the return of the _predict function needs to be 2 items
         1. a dictionary of the input to _predict, and anything that might be needed in other stages
         2. anything else that needs to be returned, results, etc
+
+        The dictionary from 1. MUST be updated with any arguments that are passed in as required or optional with keywords!
         """
         # for this specific case, the goal is to modify the acceleration (hence preprocessing, the modified version needs to be returned in the input dictionary)
         # additionally, there are no specific results from this step, so None is returned as the second argument
@@ -86,6 +110,23 @@ class PreProcessing(_BaseProcess):
         """
         return kwargs, None
 ```
+
+#### 2a. External file functions
+If there is too much code to be contained inside the `PreProcessing._predict` call, there are a few suggested guidelines:
+
+1. Generally, avoid adding too many other functions to the main file
+2. Individual functions (especially if they are fairly long) should get their own file, with the name matching that of the function inside
+3. Functions with a common theme can live in 1 file, with the common name matching that of the file
+4. A "utility.py" file might make sense for any functions that have general utility *outside* of this specific module (ie something from `preprocessing/utility.py` getting called from `gait/gait.py`)
+
+For examples of these, check out the `sit2stand` module within `PfyMU` - there are examples of 1 function per file, as well as multiple functions per file (`get_gait_metrics.py`)
+
+However, these are just guidelines in order to maintain some clarity with multiple different functions split over multiple files. If you have a good reason to do something different, just try to maintain clarity for future users.
+
+#### 2b. Structure for helper functions
+There is no defined/suggested structure for the above helper functions, if a class makes sense for this instead of a function, then use a class, but you __definitely should__ add a `__repr__` method for that class, in case it has to be accessed from somewhere else.
+
+An example of this can be seen again in the `sit2stand` module, where `detector.py` contains a `Detector` class that is used in `sit2stand.py`, both in the code as a helper function, but *also* inside the `Sit2Stand.__repr__` 
 
 ### 3. Make sure everything is setup/imported
 Make sure all imports are handled in `src/PfyMU/preprocessing/__init__.py`, as well as adding `preprocessing` imports to the `src/PfyMU/__init__.py`.
