@@ -10,7 +10,7 @@ from scipy.signal import butter, sosfiltfilt, find_peaks
 from pywt import cwt, scale2frequency
 
 from PfyMU.base import _BaseProcess
-from PfyMU.sit2stand.transfer_detector import Detector, moving_stats
+from PfyMU.sit2stand.detector import Detector, moving_stats
 
 
 class Sit2Stand(_BaseProcess):
