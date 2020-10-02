@@ -130,7 +130,8 @@ class Gait(_BaseProcess):
         self.filt_ord = filter_order
         self.filt_cut = filter_cutoff
 
-    def _predict(self, *, time=None, accel=None, gyro=None, height=None, **kwargs):
+    def _predict(self, *, time=None, accel=None, gyro=None, height=None, gait_pred=None,
+                 **kwargs):
         """
         Get the gait events and metrics from a time series signal
 
@@ -149,6 +150,9 @@ class Gait(_BaseProcess):
             Either height (False) or leg length (True) of the subject who wore the inertial
             measurement device, in meters, depending on `leg_length`. If not provided,
             spatial metrics will not be computed
+        gait_pred : numpy.ndarray, optional
+            (N, ) array of boolean predictions of gait. If not provided, gait classification
+            will be performed on the acceleration data
 
         Returns
         -------
@@ -175,8 +179,12 @@ class Gait(_BaseProcess):
         else:
             days = [(0, accel.shape[0])]
 
-        # get the gait classifications
-        gait_class = get_gait_classification_lgbm(accel, 1 / dt)
+        # get the gait classifications if necessary
+        if gait_pred is None:
+            gait_pred = get_gait_classification_lgbm(accel, 1 / dt)
+        else:
+            if gait_pred.size != accel.shape[0]:
+                raise ValueError('Number of gait predictions must much number of accel samples')
 
         # figure out vertical axis
         acc_mean = mean(accel, axis=0)
@@ -203,7 +211,7 @@ class Gait(_BaseProcess):
             # GET GAIT BOUTS
             # ======================================
             gait_bouts = get_gait_bouts(
-                gait_class[start:stop], dt, self.max_bout_sep, self.min_bout
+                gait_pred[start:stop], dt, self.max_bout_sep, self.min_bout
             )
 
             for ibout, bout in enumerate(gait_bouts):
