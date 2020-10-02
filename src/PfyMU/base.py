@@ -29,6 +29,7 @@ class _BaseProcess:
         self.name = name
 
     def predict(self, file=None, time=None, accel=None, gyro=None, temperature=None, **kwargs):
+        self.predict.__doc__ = self._predict.__doc__
         result = self._predict(
             file=file, time=time, accel=accel, gyro=gyro, temperature=temperature, **kwargs
             )
