@@ -28,7 +28,7 @@ if __name__ == "__main__":
     if module_name == '' or author == '' or short_descr == '':
         raise ValueError('please provide module name, author, and a short description')
 
-    with open('templates/core_template.py', 'r') as f:
+    with open('templates/core_template.txt', 'r') as f:
         lines = f.readlines()
 
     file_replace(lines, 'module_name', module_name)
