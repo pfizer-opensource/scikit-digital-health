@@ -83,10 +83,10 @@ def get_gait_classification_lgbm(accel, fs):
     # predict
     gait_predictions = bst.predict(accel_feats, raw_score=False) > thresh
 
-    # expand the predictions to be per sample.
-    tmp = zeros(accel.shape[0])
+    # expand the predictions to be per sample, for the downsampled data
+    tmp = zeros(accel_rs.shape[0])
 
-    c = zeros(accel.shape[0], dtype='int')  # keep track of overlap
+    c = zeros(accel_rs.shape[0], dtype='int')  # keep track of overlap
     for i, p in enumerate(gait_predictions):
         i1 = i * wstep
         i2 = i1 + wlen
@@ -98,5 +98,11 @@ def get_gait_classification_lgbm(accel, fs):
     c[i2:] = 1
 
     tmp /= c
-    gait_pred_ps = tmp >= 0.5  # final gait predictions, ps = per sample
-    return gait_pred_ps
+    gait_pred_sample_rs = tmp >= 0.5  # final gait predictions, ps = per sample
+
+    # upsample the gait predictions
+    f = interp1d(arange(0, accel.shape[0] / fs, 1 / goal_fs), gait_pred_sample_rs,
+                 kind='previous', bounds_error=False, fill_value=0)
+    gait_pred_sample = f(arange(0, accel.shape[0] / fs, 1 / fs))
+
+    return gait_pred_sample
