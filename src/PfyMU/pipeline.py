@@ -18,7 +18,7 @@ class Pipeline:
     def __repr__(self):
         ret = "["
         for proc in self._steps:
-            ret += f'{proc:r}, '
+            ret += f'\t{proc!r},\n'
         ret = ret[:-2] + ']'
         return ret
 
