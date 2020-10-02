@@ -14,6 +14,9 @@ from PfyMU.read._extensions import bin_convert
 
 
 class ReadBin(_BaseProcess):
+    def __repr__(self):
+        return f"ReadBin(base={self.base!r}, period={self.period!r})"
+
     def __init__(self, base=None, period=None):
         """
         Read a binary .bin file from a GeneActiv sensor into memory. The units for acceleration

@@ -14,6 +14,9 @@ from PfyMU.read._extensions import read_cwa
 
 
 class ReadCWA(_BaseProcess):
+    def __repr__(self):
+        return f"ReadCWA(base={self.base!r}, period={self.period!r})"
+
     def __init__(self, base=None, period=None):
         """
         Read a binary CWA file from an axivity sensor into memory. The units for acceleration data
