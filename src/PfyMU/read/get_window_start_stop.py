@@ -7,7 +7,7 @@ Pfizer DMTI 2020
 from numpy import insert, append
 
 
-def _get_window_start_stop(indices, n_samples):
+def get_window_start_stop(indices, n_samples):
     """
     Get the correct starts and stops of windows from indices from the GeneActiv reader
 

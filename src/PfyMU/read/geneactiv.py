@@ -9,7 +9,7 @@ from warnings import warn
 from numpy import vstack
 
 from PfyMU.base import _BaseProcess
-from PfyMU.read.utility import _get_window_start_stop
+from PfyMU.read.get_window_start_stop import get_window_start_stop
 from PfyMU.read._extensions import bin_convert
 
 
@@ -85,7 +85,7 @@ class ReadBin(_BaseProcess):
         }
 
         if self.window:
-            day_starts, day_stops = _get_window_start_stop(idx, time.size)
+            day_starts, day_stops = get_window_start_stop(idx, time.size)
             results[self._days] = vstack((day_starts, day_stops)).T
 
         kwargs.update(results)

@@ -9,7 +9,7 @@ from warnings import warn
 from numpy import vstack
 
 from PfyMU.base import _BaseProcess
-from PfyMU.read.utility import _get_window_start_stop
+from PfyMU.read.get_window_start_stop import get_window_start_stop
 from PfyMU.read._extensions import read_cwa
 
 
@@ -113,7 +113,7 @@ class ReadCWA(_BaseProcess):
             results[self._mag] = imudata[:, mag_axes]
 
         if self.window:
-            day_starts, day_stops = _get_window_start_stop(idx, ts.size)
+            day_starts, day_stops = get_window_start_stop(idx, ts.size)
             results[self._days] = vstack((day_starts, day_stops)).T
 
         kwargs.update(results)
