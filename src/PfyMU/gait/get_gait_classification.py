@@ -44,7 +44,7 @@ def get_gait_classification_lgbm(accel, fs):
             warn(f"fs ({fs:.2f}) is less than 50.0Hz. Upsampling to 50.0Hz")
 
         f_rs = interp1d(
-            arange(0, accel.shape[0]) / fs, 1 / fs, accel, axis=0, bounds_error=False,
+            arange(0, accel.shape[0]) / fs, accel, kind='cubic', axis=0, bounds_error=False,
             fill_value='extrapolate'
         )
         accel_rs = f_rs(arange(0, accel.shape[0] / fs, 1 / goal_fs))
@@ -61,10 +61,10 @@ def get_gait_classification_lgbm(accel, fs):
     # get the feature bank
     feat_bank = Bank(window_length=None, window_step=None)  # make sure no windowing
     if version_info >= (3, 7):
-        with resources.path('PfyMU.gait.models', 'final_features.json') as file_path:
+        with resources.path('PfyMU.gait.model', 'final_features.json') as file_path:
             feat_bank.load(file_path)
     else:
-        with importlib_resources.path('PfyMU.gait.models', 'final_features.json') as file_path:
+        with importlib_resources.path('PfyMU.gait.model', 'final_features.json') as file_path:
             feat_bank.load(file_path)
 
     # compute the features
@@ -73,12 +73,12 @@ def get_gait_classification_lgbm(accel, fs):
     # load the model
     if version_info >= (3, 7):
         with resources.path(
-                'PfyMU.gait.models', 'lgbm_gait_classifier_no-stairs.lgbm') as file_path:
-            bst = lgb.Booster(model_file=file_path)
+                'PfyMU.gait.model', 'lgbm_gait_classifier_no-stairs.lgbm') as file_path:
+            bst = lgb.Booster(model_file=str(file_path))
     else:
         with importlib_resources.path(
-                'PfyMU.gait.models', 'lgbm_gait_classifier_no-stairs.lgbm') as file_path:
-            bst = lgb.Booster(model_file=file_path)
+                'PfyMU.gait.model', 'lgbm_gait_classifier_no-stairs.lgbm') as file_path:
+            bst = lgb.Booster(model_file=str(file_path))
 
     # predict
     gait_predictions = bst.predict(accel_feats, raw_score=True) > thresh
