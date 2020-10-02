@@ -40,6 +40,19 @@ class Gait(_BaseProcess):
         'stride length'
     ]
 
+    def __repr__(self):
+        ret = "Gait("
+        ret += f"use_cwt_scale_relation={self.use_opt_scale!r}, "
+        ret += f"min_bout_time={self.min_bout!r}, "
+        ret += f"max_bout_separation_time={self.max_bout_sep!r}, "
+        ret += f"max_stride_time={self.max_stride_time!r}, "
+        ret += f"loading_factor={self.loading_factor!r}, "
+        ret += f"height_factor={self.height_factor!r}, "
+        ret += f"leg_length={self.leg_length!r}, "
+        ret += f"filter_order={self.filt_ord!r}, "
+        ret += f"filter_cutoff={self.filt_cut!r})"
+        return ret
+
     def __init__(self, use_cwt_scale_relation=True, min_bout_time=5.0,
                  max_bout_separation_time=0.5, max_stride_time=2.25, loading_factor=0.2,
                  height_factor=0.53, leg_length=False, filter_order=4, filter_cutoff=20.0):
