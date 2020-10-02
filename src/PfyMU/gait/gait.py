@@ -247,7 +247,7 @@ class Gait(_BaseProcess):
             gait[f'PARAM:{p} asymmetry'] = full(gait['IC'].size, nan, dtype=float_)
 
         # get the final gait metrics
-        get_gait_metrics_final(gait, leg_length, dt)
+        get_gait_metrics_final(gait, leg_length, dt, self.asym_params)
 
         kwargs.update({self._acc: accel, self._time: time, self._gyro: gyro, 'height': height})
         return kwargs, gait

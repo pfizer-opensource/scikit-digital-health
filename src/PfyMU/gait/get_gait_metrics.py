@@ -77,7 +77,7 @@ def get_gait_metrics_initial(
     gait['Bout Steps'].extend([sum(gait['b valid cycle'][gait_index:])] * bout_n_steps)
 
 
-def get_gait_metrics_final(gait, leg_length, dt):
+def get_gait_metrics_final(gait, leg_length, dt, asym_params):
     """
     Compute the final gait metrics, most of which can be vectorized to some extent
 
@@ -89,6 +89,9 @@ def get_gait_metrics_final(gait, leg_length, dt):
         Leg length or None if not available
     dt : float
         Sampling period in seconds
+    asym_params : list
+        List of asymmetry parameters that are computed by the absolute difference in sides
+        of steps/strides
     """
     # compute step length first because needed by stride length
     if leg_length is not None:
@@ -99,18 +102,25 @@ def get_gait_metrics_final(gait, leg_length, dt):
         for bout in unique(gait['Bout N'][gait['Day N'] == day]):
             mask = (gait['Day N'] == day) & (gait['Bout N'] == bout)
 
-            gait['PARAM:stride time'][mask][:-2] = (gait['IC'][mask][2:] - gait['IC'][mask][:-2]) * dt
-            gait['Param:swing time'][mask][:-2] = (gait['IC'][mask][2:] - gait['FC'][:-2]) * dt
-            gait['PARAM:step time'][mask][:-1] = (gait['IC'][mask][1:] - gait['IC'][mask][:-1]) * dt
-            gait['PARAM:terminal double support'][mask][:-1] = (gait['FC opp foot'][mask][1:] - gait['IC'][mask][1:]) * dt
-            gait['PARAM:single support'][mask][:-1] = (gait['IC'][mask][1:] - gait['FC opp foot'][mask][:-1]) * dt
+            gait['PARAM:stride time'][mask][:-2] = \
+                (gait['IC'][mask][2:] - gait['IC'][mask][:-2]) * dt
+            gait['Param:swing time'][mask][:-2] = \
+                (gait['IC'][mask][2:] - gait['FC'][:-2]) * dt
+            gait['PARAM:step time'][mask][:-1] = \
+                (gait['IC'][mask][1:] - gait['IC'][mask][:-1]) * dt
+            gait['PARAM:terminal double support'][mask][:-1] = \
+                (gait['FC opp foot'][mask][1:] - gait['IC'][mask][1:]) * dt
+            gait['PARAM:single support'][mask][:-1] = \
+                (gait['IC'][mask][1:] - gait['FC opp foot'][mask][:-1]) * dt
             if leg_length is not None:
-                gait['PARAM:stride length'][mask][:-1] = gait['PARAM:step length'][mask][:-1] + gait['PARAM:step length'][mask][1:]
+                gait['PARAM:stride length'][mask][:-1] = \
+                    gait['PARAM:step length'][mask][:-1] + gait['PARAM:step length'][mask][1:]
 
     # compute rest of metrics that can be computed all at once
     gait['PARAM:stance time'][:] = (gait['FC'] - gait['IC']) * dt
     gait['PARAM:initial double support'][:] = (gait['FC opp foot'] - gait['IC']) * dt
-    gait['PARAM:double support'][:] = (gait['PARAM:initial double support'] + gait['PARAM:terminal double support'])
+    gait['PARAM:double support'][:] = \
+        (gait['PARAM:initial double support'] + gait['PARAM:terminal double support'])
 
     if leg_length is not None:
         gait['PARAM:gait speed'][:] = gait['PARAM:stride length'] / gait['PARAM:stride time']
@@ -121,9 +131,9 @@ def get_gait_metrics_final(gait, leg_length, dt):
     for day in unique(gait['Day N']):
         for bout in unique(gait['Bout N'][gait['Day N'] == day]):
             mask = (gait['Day N'] == day) & (gait['Bout N'] == bout)
-            for p in ['stride time', 'stance time', 'swing time', 'step time',
-                      'initial double support', 'terminal double support', 'double support',
-                      'single support', 'step length', 'stride length']:
-                gait[f'PARAM:{p} asymmetry'][mask][:-1] = abs(gait[f'PARAM:{p}'][mask][1:] - gait[f'PARAM:{p}'][mask][:-1])
+            for p in asym_params:
+                gait[f'PARAM:{p} asymmetry'][mask][:-1] = \
+                    abs(gait[f'PARAM:{p}'][mask][1:] - gait[f'PARAM:{p}'][mask][:-1])
 
-    gait['PARAM:autocorrelation symmetry - V'] = abs(gait['PARAM:step regularity - V'] - gait['PARAM:stride regularity - V'])
+    gait['PARAM:autocorrelation symmetry - V'] = \
+        abs(gait['PARAM:step regularity - V'] - gait['PARAM:stride regularity - V'])
