@@ -5,6 +5,71 @@ import h5py
 import numpy as np
 
 
+@fixture(scope='module')
+def get_bgait_samples_truth():  # boolean gait classification
+    def get_stuff(case):
+        bgait = np.zeros(1000, dtype=np.bool_)
+
+        bouts_ = [
+            (0, 90),
+            (150, 160),
+            (165, 180),
+            (200, 210),
+            (225, 240),
+            (400, 760),
+            (770, 780),
+            (990, 1000)
+        ]
+        for bout in bouts_:
+            bgait[bout[0]:bout[1]] = True
+
+        if case == 1:
+            dt = 1 / 50
+            n_max_sep = 25  # 0.5 seconds
+            n_min_time = 75  # 1.5 seconds
+
+            bouts = [
+                (0, 90),
+                (150, 240),
+                (400, 780)
+            ]
+        elif case == 2:
+            dt = 1 / 100
+            n_max_sep = 50  # 0.5 seconds
+            n_min_time = 200  # 2 seconds
+
+            bouts = [
+                (400, 780)
+            ]
+
+        elif case == 3:
+            dt = 1 / 50
+            n_max_sep = 75  # 1.5 seconds
+            n_min_time = 5  # 0.1 seconds
+
+            bouts = [
+                (0, 240),
+                (400, 780),
+                (990, 1000)
+            ]
+        else:
+            dt = 1 / 50
+            n_max_sep = 6  # 0.12 seconds
+            n_min_time = 5  # 0.1 seconds
+
+            bouts = [
+                (0, 90),
+                (150, 180),
+                (200, 210),
+                (225, 240),
+                (400, 760),
+                (770, 780),
+                (990, 1000)
+            ]
+        return bgait, dt, n_max_sep * dt, n_min_time * dt, bouts
+    return get_stuff
+
+
 @fixture(scope='class')
 def sample_datasets():
     study1_td = TempDir()
