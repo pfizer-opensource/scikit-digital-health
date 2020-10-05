@@ -33,3 +33,8 @@ class TestGetGaitBouts:
         assert allclose(pred_bouts, bouts)
 
 
+class TestGetGaitEvents:
+    def test(self):
+        pass
+
+
