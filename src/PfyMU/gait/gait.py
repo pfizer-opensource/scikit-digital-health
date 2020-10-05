@@ -207,7 +207,7 @@ class Gait(_BaseProcess):
         # original scale. compute outside loop.
         # 1.25 comes from original paper, corresponds to desired frequency
         # 0.4 comes from using the 'gaus1' wavelet
-        scale_original = round(0.4 / (2 * 1.25 * 1 / dt)) - 1
+        scale_original = round(0.4 / (2 * 1.25 * dt)) - 1
 
         gait = {
             'Day N': [],
