@@ -79,7 +79,7 @@ def get_gait_events(vert_accel, dt, va_sign, o_scale, filter_order, filter_cutof
     Therefore, if the sign of the acceleration was negative, we need to use the
     positve coefficient signal, and opposite for positive acceleration reading.
     """
-    init_contact, *_ = find_peaks(-va_sign * coef1[0], height=0.5 * std(coef1[scale1]))
+    init_contact, *_ = find_peaks(-va_sign * coef1[0], height=0.5 * std(coef1[0]))
 
     coef2, _ = cwt(coef1[1], scale2, 'gaus1')
 
