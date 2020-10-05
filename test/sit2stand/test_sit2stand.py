@@ -9,8 +9,8 @@ class TestSit2StandStillness(BaseProcessTester):
         super().setup_class()
 
         # override specific necessary attributes
-        cls.sample_data_file = resolve_data_path('test_data.h5', 'sit2stand')
-        cls.truth_data_file = resolve_data_path('test_data.h5', 'sit2stand')
+        cls.sample_data_file = resolve_data_path('sit2stand_data.h5', 'sit2stand')
+        cls.truth_data_file = resolve_data_path('sit2stand_data.h5', 'sit2stand')
         cls.truth_suffix = 'Stillness'
         cls.truth_data_keys = [
             'STS Start',
@@ -47,8 +47,8 @@ class TestSit2StandDisplacement(BaseProcessTester):
         super().setup_class()
 
         # override specific necessary attributes
-        cls.sample_data_file = resolve_data_path('test_data.h5', 'sit2stand')
-        cls.truth_data_file = resolve_data_path('test_data.h5', 'sit2stand')
+        cls.sample_data_file = resolve_data_path('sit2stand_data.h5', 'sit2stand')
+        cls.truth_data_file = resolve_data_path('sit2stand_data.h5', 'sit2stand')
         cls.truth_suffix = 'Displacement'
         cls.truth_data_keys = [
             'STS Start',
