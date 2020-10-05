@@ -203,8 +203,8 @@ def configuration(parent_package='', top_path=None):
     # DATA FILES
     # ========================
     config.add_data_files([
-        'PfyMU/gait/model/final_features.json',
-        'PfyMU/gait/model/lgbm_gait_classifier_no-stairs.lgbm'
+        ('gait/model', 'src/PfyMU/gait/model/final_features.json'),
+        ('gait/model', 'PfyMU/gait/model/lgbm_gait_classifier_no-stairs.lgbm')
     ])
     # ========================
 
