@@ -7,6 +7,8 @@ Lukas Adamowicz
 import pytest
 from numpy import allclose
 
+from ..base_conftest import *
+
 from PfyMU.gait import Gait
 from PfyMU.gait.get_gait_classification import get_gait_classification_lgbm
 from PfyMU.gait.get_gait_bouts import get_gait_bouts
@@ -38,3 +40,33 @@ class TestGetGaitEvents:
         pass
 
 
+class TestGait(BaseProcessTester):
+    @classmethod
+    def setup_class(cls):
+        super().setup_class()
+
+        # override necessary attributes
+        cls.sample_data_file = resolve_data_path('gait_data.h5', 'gait')
+        cls.truth_data_file = resolve_data_path('gait_data.h5', 'gait')
+        cls.truth_suffix = None
+        cls.truth_data_keys = [
+            'PARAM:stride time'
+        ]
+        cls.sample_data_keys.extend([
+            'height'
+        ])
+
+        cls.process = Gait(
+            use_cwt_scale_relation=True,
+            min_bout_time=5.0,
+            max_bout_separation_time=0.5,
+            max_stride_time=2.25,
+            loading_factor=0.2,
+            height_factor=0.53,
+            leg_length=False,
+            filter_order=4,
+            filter_cutoff=20.0
+        )
+
+    def test(self, get_sample_data, get_truth_data):
+        super(TestGait, self).test(get_sample_data, get_truth_data)
