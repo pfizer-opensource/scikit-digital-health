@@ -16,10 +16,11 @@ from PfyMU.gait.get_gait_metrics import get_gait_metrics_initial, get_gait_metri
 
 
 class TestGetGaitClassificationLGBM:
-    def test(self, sample_accel, sample_fs):
+    def test(self, sample_accel, sample_fs, sample_gait_classification_truth):
         b_gait = get_gait_classification_lgbm(sample_accel, sample_fs)
 
-        assert True
+        assert b_gait.sum() == 15637
+        assert allclose(b_gait, sample_gait_classification_truth)
 
 
 class TestGetGaitBouts:

@@ -27,6 +27,14 @@ def sample_fs():
 
 
 @fixture(scope='module')
+def sample_gait_classification_truth():
+    with h5py.File(resolve_data_path('gait_data.h5', 'gait'), 'r') as f:
+        truth = f['Truth']['Gait Classification']['gait_classification'][()]
+
+    return truth
+
+
+@fixture(scope='module')
 def get_bgait_samples_truth():  # boolean gait classification
     def get_stuff(case):
         bgait = np.zeros(1000, dtype=np.bool_)
