@@ -58,7 +58,7 @@ def get_gait_events(vert_accel, dt, va_sign, o_scale, filter_order, filter_cutof
 
     # if using the optimal scale relationship, get the optimal scale
     if use_optimal_scale:
-        coef_scale_original, _ = cwt(vert_velocity, o_scale, 'gaus1')
+        coef_scale_original, _ = cwt(vert_velocity, [o_scale], 'gaus1')
         F = abs(fft.rfft(coef_scale_original[0]))
         # compute an estimate of the step frequency
         step_freq = argmax(F) / vert_velocity.size / dt
@@ -71,7 +71,7 @@ def get_gait_events(vert_accel, dt, va_sign, o_scale, filter_order, filter_cutof
     else:
         scale1 = scale2 = o_scale
 
-    coef1, _ = cwt(vert_velocity, scale1, 'gaus1')
+    coef1, _ = cwt(vert_velocity, [scale1, scale2], 'gaus1')
     """
     Find the local minima in the signal. This should technically always require using
     the negative signal in "find_peaks", however the way PyWavelets computes the
@@ -81,7 +81,7 @@ def get_gait_events(vert_accel, dt, va_sign, o_scale, filter_order, filter_cutof
     """
     init_contact, *_ = find_peaks(-va_sign * coef1[0], height=0.5 * std(coef1[scale1]))
 
-    coef2, _ = cwt(coef1[scale2], scale2, 'gaus1')
+    coef2, _ = cwt(coef1[1], [scale2], 'gaus1')
 
     """
     Peaks are the final contact points
