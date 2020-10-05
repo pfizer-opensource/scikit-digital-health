@@ -169,7 +169,9 @@ If you don't have any data files (any non python files that need to be distribut
 If you do have data files or extensions, do the following in `setup.py` (the main one in the root directory)
 
 #### 4a. Data Files
-For data files, find the `def configuration` function in `setup.py`, and locate the DATA FILES section, and add any data files that you have. If you have a lot of files in one directory, you can add a whole directory (but be careful, random files such as caches will be included as well):
+For data files, find the `def configuration` function in `setup.py`, and locate the DATA FILES section, and add any data files that you have. If you have a lot of files in one directory, you can add a whole directory (but be careful, random files such as caches will be included as well).data
+
+This requires a specific format, namely a tuple of (*desired_path*, *source_path*):
 
 ```python
 # setup.py
@@ -179,11 +181,11 @@ def configuration(parent_package='', top_path=None):
     ...
     # DATA FILES
     # ========================
-    config.add_data_files([
-        'src/PfyMU/gait/model/final_features.json',
-        'src/PfyMU/gait/model/lgbm_gait_classifier_no-stairs.lgbm',
-        'src/PfyMU/preprocessing/data/preprocessing_info.dat'        # Added this file
-    ])
+    config.add_data_files(
+        ('PfyMU/gait/model', 'src/PfyMU/gait/model/final_features.json'),
+        ('PfyMU/gait/model', 'src/PfyMU/gait/model/lgbm_gait_classifier_no-stairs.lgbm'),
+        ('PfyMU/preprocessing/data', 'src/PfyMU/preprocessing/data/preprocessing_info.dat')        # Added this file
+    )
 
     # alternatively add this directory, any files/folders under this directory will be added recursively
     config.add_data_dir('src/PfyMU/preprocessing/data')
