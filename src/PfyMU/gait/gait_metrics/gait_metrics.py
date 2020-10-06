@@ -29,10 +29,15 @@ stride length: step_length_i + step_length_i+1
 
 gait speed: stride_length / stride time
 """
-from numpy import std, cov, sqrt, nan, nonzero
+from numpy import std, cov, sqrt, nan, nonzero, abs
 
 
-from PfyMU.gait.gait_metrics.base import GaitMetric
+from PfyMU.gait.gait_metrics.base import GaitMetric, basic_asymmetry
+
+
+__all__ = ['StrideTime', 'StanceTime', 'SwingTime', 'StepTime', 'InitialDoubleSupport',
+           'TerminalDoubleSupport', 'DoubleSupport', 'SingleSupport', 'StepLength',
+           'StrideLength', 'GaitSpeed', 'Cadence', 'StepRegularity', 'StrideRegularity']
 
 
 def _autocov(x, i1, i2, i3):
@@ -47,6 +52,7 @@ class StrideTime(GaitMetric):
     def __init__(self):
         super().__init__('stride time')
 
+    @basic_asymmetry
     def predict(self, dt, leg_length, gait, gait_aux):
         mask, mask_ofst = self.__predict_init(gait, True, 2)
         gait[self.k_][mask] = (gait['IC'][mask_ofst] - gait['IC'][mask]) * dt
@@ -97,7 +103,7 @@ class TerminalDoubleSupport(GaitMetric):
 
 class DoubleSupport(GaitMetric):
     def __init__(self):
-        super().__init__('double support')
+        super().__init__('double support', depends=[InitialDoubleSupport, TerminalDoubleSupport])
 
     def predict(self, dt, leg_length, gait, gait_aux):
         gait[self.k_] = gait['PARAM:initial double support'] + gait['PARAM:terminal double support']
@@ -123,7 +129,7 @@ class StepLength(GaitMetric):
 
 class StrideLength(GaitMetric):
     def __init__(self):
-        super().__init__('stride length')
+        super().__init__('stride length', depends=[StepLength])
 
     def predict(self, dt, leg_length, gait, gait_aux):
         mask, mask_ofst = self.__predict_init(gait, True, 1)
@@ -134,7 +140,7 @@ class StrideLength(GaitMetric):
 
 class GaitSpeed(GaitMetric):
     def __init__(self):
-        super().__init__('gait speed')
+        super().__init__('gait speed', depends=[StrideLength, StrideTime])
 
     def predict(self, dt, leg_length, gait, gait_aux):
         if leg_length is not None:
@@ -143,7 +149,7 @@ class GaitSpeed(GaitMetric):
 
 class Cadence(GaitMetric):
     def __init__(self):
-        super().__init__('cadence')
+        super().__init__('cadence', depends=[StepTime])
 
     def predict(self, dt, leg_length, gait, gait_aux):
         gait[self.k_] = 60.0 / gait['PARAM:step time']
@@ -183,3 +189,42 @@ class StepRegularity(GaitMetric):
                 gait_aux['vert accel'][gait_aux['inertial data i'][idx]],
                 i1[i], i2[i], i3[i]
             )
+
+
+class AutocorrelationSymmetry(GaitMetric):
+    def __init__(self):
+        super().__init__(
+            'autocorrelation symmetry - V', depends=[StepRegularity, StrideRegularity]
+        )
+
+    def predict(self, dt, leg_length, gait, gait_aux):
+        super().predict(dt, leg_length, gait, gait_aux)
+
+        gait[self.k_] = abs(
+            gait['PARAM:step regularity - V'] - gait['PARAM:stride regularity - V']
+        )
+
+
+class StrideTimeAsymmetry(BasicAsymmetryMetric):
+    def __init__(self):
+        super().__init__('stride time', StrideTime)
+
+
+class StanceTimeAsymmetry(BasicAsymmetryMetric):
+    def __init__(self):
+        super().__init__('stance time', StanceTime)
+
+
+class SwingTimeAsymmetry(BasicAsymmetryMetric):
+    def __init__(self):
+        super().__init__('swing time', SwingTime)
+
+
+class StepTimeAsymmetry(BasicAsymmetryMetric):
+    def __init__(self):
+        super().__init__('step time', StepTime)
+
+
+class InitialDoubleSupportAsymmetry(BasicAsymmetryMetric):
+    def __init__(self):
+        super().__init__('initial double support', InitialDoubleSupport)
