@@ -136,7 +136,7 @@ class StrideLength(GaitMetric):
     def _predict(self, dt, leg_length, gait, gait_aux):
         mask, mask_ofst = self._predict_init(gait, True, 1)
         if leg_length is not None:
-            gait[self.k_] = gait['PARAM:step length'][mask_ofst] \
+            gait[self.k_][mask] = gait['PARAM:step length'][mask_ofst] \
                             + gait['PARAM:step length'][mask]
 
 
