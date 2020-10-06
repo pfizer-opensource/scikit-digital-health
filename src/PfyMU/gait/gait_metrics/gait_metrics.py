@@ -203,28 +203,3 @@ class AutocorrelationSymmetry(GaitMetric):
         gait[self.k_] = abs(
             gait['PARAM:step regularity - V'] - gait['PARAM:stride regularity - V']
         )
-
-
-class StrideTimeAsymmetry(BasicAsymmetryMetric):
-    def __init__(self):
-        super().__init__('stride time', StrideTime)
-
-
-class StanceTimeAsymmetry(BasicAsymmetryMetric):
-    def __init__(self):
-        super().__init__('stance time', StanceTime)
-
-
-class SwingTimeAsymmetry(BasicAsymmetryMetric):
-    def __init__(self):
-        super().__init__('swing time', SwingTime)
-
-
-class StepTimeAsymmetry(BasicAsymmetryMetric):
-    def __init__(self):
-        super().__init__('step time', StepTime)
-
-
-class InitialDoubleSupportAsymmetry(BasicAsymmetryMetric):
-    def __init__(self):
-        super().__init__('initial double support', InitialDoubleSupport)
