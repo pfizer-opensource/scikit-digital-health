@@ -54,27 +54,8 @@ def get_gait_metrics_initial(
         else:
             gait['delta h'].append(nan)
 
-        # step regularity can be computed in the same loop
-        i3 = 2 * gait['IC'][gait_index + i + 1] - gait['IC'][gait_index + i] - bout_start
-        if i3 < vert_accel.size:
-            gait['PARAM:step regularity - V'].append(_autocov(vert_accel, i1, i2, i3))
-        else:
-            gait['PARAM:step regularity - V'].append(nan)
-
-    for i in range(bout_n_steps - 2):
-        i1 = gait['IC'][gait_index + i] - bout_start
-        i2 = gait['IC'][gait_index + i + 2] - bout_start
-        i3 = 2 * gait['IC'][gait_index + i + 2] - gait['IC'][gait_index + i] - bout_start
-
-        if i3 < vert_accel.size:
-            gait['PARAM:stride regularity - V'].append(_autocov(vert_accel, i1, i2, i3))
-        else:
-            gait['PARAM:stride regularity - V'].append(nan)
-
     # make sure parameters here match the number of steps in gait
     gait['delta h'].append(nan)
-    gait['PARAM:step regularity - V'].append(nan)
-    gait['PARAM:stride regularity - V'].extend([nan] * 2)
 
     # add bout level metrics
     gait['Bout N'].extend([bout_n + 1] * bout_n_steps)

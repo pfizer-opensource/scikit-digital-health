@@ -13,31 +13,27 @@ from PfyMU.gait.get_gait_classification import get_gait_classification_lgbm
 from PfyMU.gait.get_gait_bouts import get_gait_bouts
 from PfyMU.gait.get_gait_events import get_gait_events
 from PfyMU.gait.get_strides import get_strides
+from PfyMU.gait.gait_metrics import *
 from PfyMU.gait.get_gait_metrics import get_gait_metrics_initial, get_gait_metrics_final
 
 
 class Gait(_BaseProcess):
     # gait parameters
     params = [
-        'stride time',
-        'stance time',
-        'swing time',
-        'step time',
-        'initial double support',
-        'terminal double support',
-        'double support',
-        'single support',
-        'step length',
-        'stride length',
-        'gait speed',
-        'cadence'
-    ]
-
-    # basic asymmetry parameters
-    asym_params = [
-        'stride time', 'stance time', 'swing time', 'step time', 'initial double support',
-        'terminal double support', 'double support', 'single support', 'step length',
-        'stride length'
+        StrideTime,
+        StanceTime,
+        SwingTime,
+        StepTime,
+        InitialDoubleSupport,
+        TerminalDoubleSupport,
+        DoubleSupport,
+        SingleSupport,
+        StepLength,
+        StrideLength,
+        GaitSpeed,
+        Cadence,
+        StepRegularity,
+        StrideRegularity
     ]
 
     def __repr__(self):
@@ -142,6 +138,24 @@ class Gait(_BaseProcess):
 
         self.filt_ord = filter_order
         self.filt_cut = filter_cutoff
+
+    def add_metrics(self, metrics):
+        """
+        Add metrics to be computed
+
+        Parameters
+        ----------
+        metrics : {collections.Iterable, GaitMetric}
+            Either an iterable of GaitMetric's or an individual GaitMetric to be
+            added to the list of metrics to be computed
+        """
+        if isinstance(metrics, GaitMetric):
+            self.params.append(metrics)
+        else:
+            if all(isinstance(i, GaitMetric) for i in metrics):
+                self.params.extend(metrics)
+            else:
+                raise ValueError('Must provide either a GaitMetric or iterable of GaitMetrics')
 
     def predict(self, *args, **kwargs):
         """
@@ -276,14 +290,9 @@ class Gait(_BaseProcess):
         for key in gait:
             gait[key] = array(gait[key])
 
-        # initialize the metrics/parameters
-        for p in self.params:
-            gait[f'PARAM:{p}'] = full(gait['IC'].size, nan, dtype=float_)
-        for p in self.asym_params:
-            gait[f'PARAM:{p} asymmetry'] = full(gait['IC'].size, nan, dtype=float_)
-
-        # get the final gait metrics
-        get_gait_metrics_final(gait, leg_length, dt, self.asym_params)
+        # loop over metrics and compute
+        for param in self.params:
+            param().predict(dt, leg_length, gait, gait_aux)
 
         kwargs.update({self._acc: accel, self._time: time, self._gyro: gyro, 'height': height})
         return kwargs, gait
