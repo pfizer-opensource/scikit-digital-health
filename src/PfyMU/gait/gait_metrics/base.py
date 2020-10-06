@@ -25,6 +25,8 @@ class GaitMetric:
         """
         self.name = name
 
+        self.k_ = f'PARAM:{self.name}'
+
     @staticmethod
     def _get_mask1(gait_dict):
         mask = zeros(gait_dict['IC'].size, dtype=bool_)
