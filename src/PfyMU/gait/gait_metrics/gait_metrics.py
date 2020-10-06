@@ -35,23 +35,41 @@ from numpy import std, cov, full, nan, roll, nonzero, float_
 from PfyMU.gait.gait_metrics.base import GaitMetric
 
 
+def _autocov(x, i1, i2, i3):
+    if i3 > x.size:
+        return nan
+    else:
+        ac = cov(x[i1:i2], x[i2:i3], bias=False)[0, 1]
+        return ac / (std(x[i1:i2], ddof=1) * std(x[i2:i3], ddof=1))
+
+
+class StrideRegularity(GaitMetric):
+    def __init__(self):
+        super().__init__('stride regularity - V')
+
+    def __call__(self, gait_dict, gait_aux):
+        # get the mask for +2
+        m2 = self._get_mask2(gait_dict)
+        m2_2 = roll(m2, 2)
+
+        gait_dict[f'PARAM:{self.name}'] = full(gait_dict['IC'].size, nan, dtype=float_)
+
+        i1 = gait_dict['IC'][m2]
+        i2 = gait_dict['IC'][m2_2]
+        i3 = i2 + (i2 - i1)
+
+        for i, idx in enumerate(nonzero(m2)[0]):
+            gait_dict[f'PARAM:{self.name}'][idx] = _autocov(
+                gait_aux['vert accel'][gait_aux['inertial data i'][idx]],
+                i1[i], i2[i], i3[i]
+            )
+
+
 class StepRegularity(GaitMetric):
     def __init__(self):
         super().__init__('step regularity - V')
 
     def __call__(self, gait_dict, gait_aux):
-        """
-        Compute the parameter
-
-        Parameters
-        ----------
-        gait_dict : dictionary
-        gait_aux : dictionary
-
-        Returns
-        -------
-        step_regularity
-        """
         # get the masks for +1, +2
         m1 = self._get_mask1(gait_dict)
         m1_1 = roll(m1, 1)
@@ -63,15 +81,7 @@ class StepRegularity(GaitMetric):
         i3 = i2 + (i2 - i1)
 
         for i, idx in enumerate(nonzero(m1)[0]):
-            gait_dict[f'PARAM:{self.name}'][idx] = self._autocov(
-                gait_aux['vert accel'][gait_aux['inertial data i']],
+            gait_dict[f'PARAM:{self.name}'][idx] = _autocov(
+                gait_aux['vert accel'][gait_aux['inertial data i'][idx]],
                 i1[i], i2[i], i3[i]
             )
-
-    @staticmethod
-    def _autocov(x, i1, i2, i3):
-        if i3 > x.size:
-            return nan
-        else:
-            ac = cov(x[i1:i2], x[i2:i3], bias=False)[0, 1]
-            return ac / (std(x[i1:i2], ddof=1) * std(x[i2:i3], ddof=1))
