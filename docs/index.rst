@@ -27,12 +27,24 @@ features
 --------
 The `features` sub-module contains a library of features that can be generated for accelerometer/gyroscope/time-series signals. These features can be used for classification problems, etc. Feature computations are also implemented in Fortran to ensure quicker computation time when dealing with very long (multiple days) recordings.
 
+Requirements
+------------
+- Python >= 3.6
+- numpy >= 1.17.2
+- scipy >= 1.3.1
+- pandas >= 0.23.4
+- lightgbm >= 2.3.0
+- pywavelets
+- [cython >= 0.29.14] : optional, only if cythonizing .pyx files before building
 
 Contents
 --------
 .. toctree::
    :maxdepth: 3
 
+   src/installation
+   src/testing
+   src/usage
    ref/index
 
 
