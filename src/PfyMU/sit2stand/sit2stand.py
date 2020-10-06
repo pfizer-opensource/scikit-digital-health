@@ -167,7 +167,7 @@ class Sit2Stand(_BaseProcess):
         accel : ndarray
             (N, 3) array of acceleration, with units of 'g'.
         """
-        super().predict(*args, **kwargs)
+        return super().predict(*args, **kwargs)
 
     def _predict(self, time=None, accel=None, **kwargs):
         # FILTERING

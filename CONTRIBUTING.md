@@ -88,7 +88,7 @@ class PreProcessing(_BaseProcess):
         accel : numpy.ndarray
             (N, 3) array of acceleration values, with units of 'g'
         """
-        super().predict(*args, **kwargs)
+        return super().predict(*args, **kwargs)
     
     """
     This is the function that will actually run in the pipeline. It needs to have the call - 

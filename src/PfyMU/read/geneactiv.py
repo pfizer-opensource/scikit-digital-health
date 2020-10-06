@@ -67,7 +67,7 @@ class ReadBin(_BaseProcess):
             Path to the file to read. Must either be a string, or be able to be converted by
             `str(file)`
         """
-        super().predict(*args, **kwargs)
+        return super().predict(*args, **kwargs)
 
     def _predict(self, file=None, **kwargs):
         if file is None:
