@@ -41,6 +41,3 @@ class _BaseProcess:
             return result[1]
         else:
             return result[0]
-
-    def _predict(self, *args, **kwargs):
-        return None, None
