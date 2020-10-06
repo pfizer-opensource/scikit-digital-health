@@ -216,6 +216,13 @@ class Gait(_BaseProcess):
             'b valid cycle': [], 'delta h': [],
             'PARAM:step regularity - V': [], 'PARAM:stride regularity - V': []
         }
+        # auxiliary dictionary for storing values for computing gait metrics
+        gait_aux = {
+            'vert accel': [],
+            'vert velocity': [],
+            'vert position': [],
+            'inertial data i': []
+        }
 
         ig = 0  # keep track of where everything is in the cycle
 
@@ -241,12 +248,19 @@ class Gait(_BaseProcess):
                     self.use_opt_scale
                 )
 
+                gait_aux['vert accel'].append(vert_acc)
+                gait_aux['vert velocity'].append(vert_vel)
+                gait_aux['vert position'].append(vert_pos)
+
                 # add start index to gait event indices to get absolute indices
                 ic += bstart
                 fc += bstart
 
                 # get strides
                 sib = get_strides(gait, ig, ic, fc, dt, self.max_stride_time, self.loading_factor)
+
+                # add the index for the corresponding accel/velocity/position
+                gait_aux['inertial data i'].extend([len(gait_aux['vert accel']) - 1] * sib)
 
                 # get the initial gait metrics
                 get_gait_metrics_initial(

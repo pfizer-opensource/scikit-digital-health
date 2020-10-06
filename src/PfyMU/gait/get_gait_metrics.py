@@ -69,8 +69,14 @@ def get_gait_metrics_initial(
         if i3 < vert_accel.size:
             gait['PARAM:stride regularity - V'].append(_autocov(vert_accel, i1, i2, i3))
         else:
-            gait['PARAM:step regularity - V'].append(nan)
+            gait['PARAM:stride regularity - V'].append(nan)
 
+    # make sure parameters here match the number of steps in gait
+    gait['delta h'].append(nan)
+    gait['PARAM:step regularity - V'].append(nan)
+    gait['PARAM:stride regularity - V'].extend([nan] * 2)
+
+    # add bout level metrics
     gait['Bout N'].extend([bout_n + 1] * bout_n_steps)
     gait['Bout Start'].extend([time[bout_start]] * bout_n_steps)
     gait['Bout Duration'].extend([(bout_ends[1] - bout_ends[0]) * dt] * bout_n_steps)
@@ -104,8 +110,8 @@ def get_gait_metrics_final(gait, leg_length, dt, asym_params):
 
             gait['PARAM:stride time'][mask][:-2] = \
                 (gait['IC'][mask][2:] - gait['IC'][mask][:-2]) * dt
-            gait['Param:swing time'][mask][:-2] = \
-                (gait['IC'][mask][2:] - gait['FC'][:-2]) * dt
+            gait['PARAM:swing time'][mask][:-2] = \
+                (gait['IC'][mask][2:] - gait['FC'][mask][:-2]) * dt
             gait['PARAM:step time'][mask][:-1] = \
                 (gait['IC'][mask][1:] - gait['IC'][mask][:-1]) * dt
             gait['PARAM:terminal double support'][mask][:-1] = \
