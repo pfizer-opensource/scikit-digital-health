@@ -5,6 +5,7 @@ Lukas Adamowicz
 Pfizer DMTI 2020
 """
 from warnings import warn
+from collections import Iterable
 
 from numpy import mean, diff, abs, argmax, sign, round, array, full, nan, float_
 
@@ -146,17 +147,34 @@ class Gait(_BaseProcess):
 
         Parameters
         ----------
-        metrics : {collections.Iterable, GaitMetric}
-            Either an iterable of GaitMetric's or an individual GaitMetric to be
+        metrics : {collections.Iterable, callable}
+            Either an iterable of GaitMetric references or an individual GaitMetric reference to be
             added to the list of metrics to be computed
+
+        Examples
+        --------
+        >>> class NewGaitMetric(GaitMetric):
+        >>>     pass
+        >>>
+        >>> gait = Gait()
+        >>> gait.add_metrics(NewGaitMetric)
+
+        >>> class NewGaitMetric(GaitMetric):
+        >>>     pass
+        >>> class NewGaitMetric2(GaitMetric):
+        >>>     pass
+        >>>
+        >>> gait = Gait()
+        >>> gait.add_metrics([NewGaitMetric, NewGaitMetric2])
         """
-        if isinstance(metrics, GaitMetric):
-            self.params.append(metrics)
-        else:
-            if all(isinstance(i, GaitMetric) for i in metrics):
+        if isinstance(metrics, Iterable):
+            if all(isinstance(i(), GaitMetric) for i in metrics):
                 self.params.extend(metrics)
             else:
                 raise ValueError('Must provide either a GaitMetric or iterable of GaitMetrics')
+        else:
+            if isinstance(metrics(), GaitMetric):
+                self.params.append(metrics)
 
     def predict(self, *args, **kwargs):
         """
