@@ -61,7 +61,7 @@ class Gait(_BaseProcess):
         Parameters
         ----------
         use_cwt_scale_relation : bool, optional
-            Use the optimal scale/frequency relationship defined in [5]_. This changes which
+            Use the optimal scale/frequency relationship (see Notes). This changes which
             scale is used for the smoothing/differentiation operation performed with the
             continuous wavelet transform. Default is True. See Notes for a caveat of the
             relationship
@@ -96,12 +96,12 @@ class Gait(_BaseProcess):
         3 optimizations are performed on the detected events to minimize false positives.
 
         1. Loading time (initial double support) must be less than
-        :math:`loading_factor * max_stride_time`
+        :math:`loading\\_factor * max\\_stride\\_time`
 
         2. Stance time must be less than
-        :math:`(max_stride_time/2) + loading_factor * max_stride_time`
+        :math:`(max\\_stride\\_time/2) + loading\\_factor * max\\_stride\\_time`
 
-        3. Stride time must be less than `max_stride_time`
+        3. Stride time must be less than `max\\_stride\\_time`
 
         References
         ----------
