@@ -97,8 +97,10 @@ class Gait(_BaseProcess):
 
         1. Loading time (initial double support) must be less than
         :math:`loading_factor * max_stride_time`
+
         2. Stance time must be less than
         :math:`(max_stride_time/2) + loading_factor * max_stride_time`
+
         3. Stride time must be less than `max_stride_time`
 
         References
@@ -203,10 +205,37 @@ class Gait(_BaseProcess):
         -------
         gait_results : dict
         """
-        super().predict(*args, **kwargs)
+        return super().predict(*args, **kwargs)
 
     def _predict(self, time=None, accel=None, *, gyro=None, height=None, gait_pred=None,
                  **kwargs):
+        """
+        predict(time=None, accel=None, *, gyro=None, height=None, gait_pred=None)
+        Get the gait events and metrics from a time series signal
+
+        Parameters
+        ----------
+        time : numpy.ndarray
+            (N, ) array of unix timestamps, in seconds
+        accel : numpy.ndarray
+            (N, 3) array of accelerations measured by centrally mounted lumbar device, in
+            units of 'g'
+        gyro : numpy.ndarray, optional
+            (N, 3) array of angular velocities measured by the same centrally mounted lumbar
+            device, in units of 'deg/s'. Only optionally used if provided. Main functionality
+            is to allow distinguishing step sides.
+        height : float, optional
+            Either height (False) or leg length (True) of the subject who wore the inertial
+            measurement device, in meters, depending on `leg_length`. If not provided,
+            spatial metrics will not be computed
+        gait_pred : numpy.ndarray, optional
+            (N, ) array of boolean predictions of gait. If not provided, gait classification
+            will be performed on the acceleration data
+
+        Returns
+        -------
+        gait_results : dict
+        """
         if height is None:
             warn('height not provided, not computing spatial metrics', UserWarning)
             leg_length = None
