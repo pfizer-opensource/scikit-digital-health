@@ -52,7 +52,7 @@ class GaitMetric:
             return
         if self._depends is not None:
             for param in self._depends:
-                param()._predict(dt, leg_length, gait, gait_aux)
+                param().predict(dt, leg_length, gait, gait_aux)
 
         self._predict(dt, leg_length, gait, gait_aux)
 
