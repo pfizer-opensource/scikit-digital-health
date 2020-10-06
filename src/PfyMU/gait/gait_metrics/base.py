@@ -4,7 +4,7 @@ Base gait metrics class
 Lukas Adamowicz
 2020, Pfizer DMTI
 """
-from numpy import zeros, diff, bool_
+from numpy import zeros, roll, full, nan, bool_, float_
 
 
 class GaitMetric:
@@ -28,15 +28,21 @@ class GaitMetric:
         self.k_ = f'PARAM:{self.name}'
 
     @staticmethod
-    def _get_mask1(gait_dict):
-        mask = zeros(gait_dict['IC'].size, dtype=bool_)
-        mask[:-1] = diff(gait_dict['Bout N']) == 0
+    def _get_mask(gait, offset):
+        if offset not in [1, 2]:
+            raise ValueError('invalid offset')
+        mask = zeros(gait['IC'].size, dtype=bool_)
+        mask[:-offset] = (gait['Bout N'][offset:] - gait['Bout N'][:-offset]) == 0
 
         return mask
 
-    @staticmethod
-    def _get_mask2(gait_dict):
-        mask = zeros(gait_dict['IC'].size, dtype=bool_)
-        mask[:-2] = (gait_dict['Bout N'][2:] - gait_dict['Bout N'][:-2]) == 0
+    def predict(self, dt, leg_length, gait, gait_aux):
+        pass
 
-        return mask
+    def __predict_init(self, gait, init=True, offset=None):
+        if init:
+            gait[self.k_] = full(gait['IC'].size, nan, dtype=float_)
+        if offset is not None:
+            mask = self._get_mask(gait, offset)
+            mask_ofst = roll(mask, offset)
+            return mask, mask_ofst
