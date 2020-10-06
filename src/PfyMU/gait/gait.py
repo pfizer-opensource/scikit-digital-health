@@ -14,6 +14,7 @@ from PfyMU.gait.get_gait_bouts import get_gait_bouts
 from PfyMU.gait.get_gait_events import get_gait_events
 from PfyMU.gait.get_strides import get_strides
 from PfyMU.gait.gait_metrics import *
+from PfyMU.gait.gait_metrics import GaitMetric
 from PfyMU.gait.get_gait_metrics import get_gait_metrics_initial, get_gait_metrics_final
 
 
@@ -227,8 +228,7 @@ class Gait(_BaseProcess):
             'Day N': [],
             'Bout N': [], 'Bout Start': [], 'Bout Duration': [], 'Bout Steps': [],
             'IC': [], 'FC': [], 'FC opp foot': [],
-            'b valid cycle': [], 'delta h': [],
-            'PARAM:step regularity - V': [], 'PARAM:stride regularity - V': []
+            'b valid cycle': [], 'delta h': []
         }
         # auxiliary dictionary for storing values for computing gait metrics
         gait_aux = {
