@@ -44,8 +44,8 @@ def get_gait_metrics_initial(
     """
     # get the change in height
     for i in range(bout_n_steps - 1):
-        i1 = gait['IC'][gait_index + i] - bout_start
-        i2 = gait['IC'][gait_index + i + 1] - bout_start
+        i1 = gait['IC'][gait_index + i]  # - bout_start
+        i2 = gait['IC'][gait_index + i + 1]  # - bout_start
 
         if gait['b valid cycle'][gait_index + i]:
             gait['delta h'].append(

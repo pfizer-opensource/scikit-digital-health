@@ -267,8 +267,8 @@ class Gait(_BaseProcess):
                 gait_aux['vert position'].append(vert_pos)
 
                 # add start index to gait event indices to get absolute indices
-                ic += bstart
-                fc += bstart
+                # ic += bstart
+                # fc += bstart
 
                 # get strides
                 sib = get_strides(gait, ig, ic, fc, dt, self.max_stride_time, self.loading_factor)
