@@ -13,7 +13,7 @@ def basic_asymmetry(f):
     @functools.wraps(f)
     def run_basic_asymmetry(self, *args, **kwargs):
         f(self, *args, **kwargs)
-        self.predict_asymmetry(self, *args, **kwargs)
+        self._predict_asymmetry(*args, **kwargs)
     return run_basic_asymmetry
 
 
@@ -52,9 +52,11 @@ class GaitMetric:
             return
         if self._depends is not None:
             for param in self._depends:
-                pass
+                param()._predict(dt, leg_length, gait, gait_aux)
 
-    def predict_asymmetry(self, dt, leg_length, gait, gait_aux):
+        self._predict(dt, leg_length, gait, gait_aux)
+
+    def _predict_asymmetry(self, dt, leg_length, gait, gait_aux):
         asy_name = f'{self.name} asymmetry'
         gait[asy_name] = full(gait['IC'].size, nan, dtype=float_)
 
@@ -63,7 +65,7 @@ class GaitMetric:
 
         gait[asy_name][mask] = gait[self.k_][mask_ofst] - gait[self.k_][mask]
 
-    def __predict_init(self, gait, init=True, offset=None):
+    def _predict_init(self, gait, init=True, offset=None):
         if init:
             gait[self.k_] = full(gait['IC'].size, nan, dtype=float_)
         if offset is not None:
