@@ -67,7 +67,8 @@ def get_strides(gait, gait_index, ic, fc, dt, max_stride_time, loading_factor):
                 ) < max_stride_time for i in range(bout_n_steps - 2)
             ]
         )
-    if bout_n_steps > 0:
+        gait['b valid cycle'].extend([False] * 2)
+    elif bout_n_steps > 0:
         gait['b valid cycle'].extend([False] * bout_n_steps)
 
     return bout_n_steps
