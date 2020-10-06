@@ -147,7 +147,7 @@ class Gait(_BaseProcess):
 
         Parameters
         ----------
-        metrics : {collections.Iterable, callable}
+        metrics : {Iterable, callable}
             Either an iterable of GaitMetric references or an individual GaitMetric reference to be
             added to the list of metrics to be computed
 
