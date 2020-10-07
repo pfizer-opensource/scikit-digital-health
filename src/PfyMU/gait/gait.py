@@ -96,7 +96,7 @@ class Gait(_BaseProcess):
     """
 
     # gait parameters
-    params = [
+    _params = [
         StrideTime,
         StanceTime,
         SwingTime,
@@ -172,12 +172,12 @@ class Gait(_BaseProcess):
         """
         if isinstance(metrics, Iterable):
             if all(isinstance(i(), GaitMetric) for i in metrics):
-                self.params.extend(metrics)
+                self._params.extend(metrics)
             else:
                 raise ValueError('Must provide either a GaitMetric or iterable of GaitMetrics')
         else:
             if isinstance(metrics(), GaitMetric):
-                self.params.append(metrics)
+                self._params.append(metrics)
 
     def predict(self, *args, **kwargs):
         """
