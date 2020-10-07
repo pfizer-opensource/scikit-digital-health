@@ -34,7 +34,7 @@ needs_sphinx = '2.2.0'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.intersphinx', 'numpydoc']
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.intersphinx', 'sphinx.ext.autosummary', 'numpydoc']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -61,14 +61,10 @@ language = None
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = None
+pygments_style = 'sphinx'
 
 # A lits of ignored prefixes for module index sorting
 modindex_common_prefix = [f'{project}.']
-
-
-autoclass_content = 'both'
-autosummary_generate = True
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -181,5 +177,21 @@ epub_title = project
 # A list of files that should not be packed into the epub file.
 epub_exclude_files = ['search.html']
 
+
+# -----------------------------------------------------------------------------
+# Intersphinx configuration
+# -----------------------------------------------------------------------------
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/dev', None),
+    'numpy': ('https://numpy.org/doc/stable/reference/index.html', None),
+    'scipy': ('https://docs.scipy.org/doc/scipy/reference', None),
+    'pandas': ('https://pandas.pydata.org/pandas-docs/stable', None),
+}
+
+# -----------------------------------------------------------------------------
+# Autosummary
+# -----------------------------------------------------------------------------
+
+autosummary_generate = True
 
 # -- Extension configuration -------------------------------------------------

@@ -1,7 +1,24 @@
-PfyMU.gait.Gait
-------------------------------------
+IMU-based Gait Analysis (PfyMU.gait)
+====================================
 
-.. currentmodule:: PfyMU.gait
 
-.. autoclass:: Gait
-    :members:
+Pipeline gait processing
+------------------------
+
+.. toctree::
+  :maxdepth: 2
+
+  gait
+
+Gait Metrics
+------------
+
+.. currentmodule:: PfyMU.gait.gait_metrics
+
+.. autosummary::
+    :toctree:
+
+    StrideTime
+    StanceTime
+    SwingTime
+    StepTime
