@@ -12,7 +12,7 @@ def _autocov(x, i1, i2, i3):
     return ac / (std(x[i1:i2], ddof=1) * std(x[i2:i3], ddof=1))
 
 
-def get_gait_metrics_initial(
+def get_gait_metrics(
         gait, gait_index, bout_n, dt, time, vert_accel, vert_position, bout_n_steps, bout_ends,
         bout_start
 ):
