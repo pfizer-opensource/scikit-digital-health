@@ -291,6 +291,10 @@ class StrideRegularity(GaitMetric):
     .. [1] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
         Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
         Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
+    .. [2] R. Moe-Nilssen and J. L. Helbostad, “Estimation of gait cycle characteristics by trunk
+        accelerometry,” Journal of Biomechanics, vol. 37, no. 1, pp. 121–126, Jan. 2004,
+        doi: 10.1016/S0021-9290(03)00233-1.
+
     """
     def __init__(self):
         super().__init__('stride regularity - V')
@@ -320,6 +324,9 @@ class StepRegularity(GaitMetric):
     .. [1] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
         Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
         Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
+    .. [2] R. Moe-Nilssen and J. L. Helbostad, “Estimation of gait cycle characteristics by trunk
+        accelerometry,” Journal of Biomechanics, vol. 37, no. 1, pp. 121–126, Jan. 2004,
+        doi: 10.1016/S0021-9290(03)00233-1.
     """
     def __init__(self):
         super().__init__('step regularity - V')
