@@ -164,7 +164,8 @@ class DoubleSupport(GaitMetric):
 
     @basic_asymmetry
     def _predict(self, dt, leg_length, gait, gait_aux):
-        gait[self.k_] = gait['PARAM:initial double support'] + gait['PARAM:terminal double support']
+        gait[self.k_] = gait['PARAM:initial double support'] \
+                        + gait['PARAM:terminal double support']
 
 
 class SingleSupport(GaitMetric):
