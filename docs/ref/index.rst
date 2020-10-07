@@ -1,4 +1,4 @@
-.. PfyMU api reference
+.. _PfyMU api reference
 
 API Reference
 ================
