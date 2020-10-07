@@ -48,6 +48,22 @@ class GaitMetric:
         return mask
 
     def predict(self, dt, leg_length, gait, gait_aux):
+        """
+        Predict the gait metric
+
+        Parameters
+        ----------
+        dt : float
+            Sampling period in seconds
+        leg_length : {None, float}
+            Leg length in meters
+        gait : dict
+            Dictionary of gait items and results. Modified in place to add the metric being
+            calculated
+        gait_aux : dict
+            Dictionary of acceleration, velocity, and position data for bouts, and the mapping
+            from step to bout and inertial data
+        """
         if self.k_ in gait:
             return
         if self._depends is not None:
