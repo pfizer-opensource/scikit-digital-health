@@ -37,7 +37,8 @@ from PfyMU.gait.gait_metrics.base import GaitMetric, basic_asymmetry
 
 __all__ = ['StrideTime', 'StanceTime', 'SwingTime', 'StepTime', 'InitialDoubleSupport',
            'TerminalDoubleSupport', 'DoubleSupport', 'SingleSupport', 'StepLength',
-           'StrideLength', 'GaitSpeed', 'Cadence', 'StepRegularity', 'StrideRegularity']
+           'StrideLength', 'GaitSpeed', 'Cadence', 'StepRegularity', 'StrideRegularity',
+           'AutocorrelationSymmetry']
 
 
 def _autocov(x, i1, i2, i3):
