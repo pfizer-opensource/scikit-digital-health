@@ -20,6 +20,81 @@ from PfyMU.gait.get_gait_metrics import get_gait_metrics_initial, get_gait_metri
 
 
 class Gait(_BaseProcess):
+    """
+    Detect gait, extract gait events (heel-strikes, toe-offs), and compute gait metrics from
+    inertial data collected from a lumbar mounted wearable inertial measurement unit
+
+    Parameters
+    ----------
+    use_cwt_scale_relation : bool, optional
+        Use the optimal scale/frequency relationship (see Notes). This changes which
+        scale is used for the smoothing/differentiation operation performed with the
+        continuous wavelet transform. Default is True. See Notes for a caveat of the
+        relationship
+    min_bout_time : float, optional
+        Minimum time in seconds for a gait bout. Default is 5s
+    max_bout_separation_time : float, optional
+        Maximum time in seconds between two bouts of gait for them to be merged into 1 gait
+        bout. Default is 0.5s
+    max_stride_time : float, optional
+        The maximum time in seconds for a stride, for optimization of gait events detection.
+        Default is 2.25s
+    loading_factor : float, optional
+        The factor to determine maximum loading time (initial double support time), for
+        optimization of gait events detection. Default is 0.2
+    height_factor : float, optional
+        The factor multiplied by height to obtain an estimate of leg length.
+        Default is 0.53 [4]_. Ignored if `leg_length` is `True`
+    leg_length : bool, optional
+        If the actual leg length will be provided. Setting to true would have the same effect
+        as setting height_factor to 1.0 while providing leg length. Default is False
+    filter_order : int, optional
+        Acceleration low-pass filter order. Default is 4
+    filter_cutoff : float, optional
+        Acceleration low-pass filter cutoff in Hz. Default is 20.0Hz
+
+    Notes
+    -----
+    The optimal scale/frequency relationship found in [5]_ was based on a cohort of only young
+    women students. While it is recommended to use this relationship, the user should be aware
+    of this shortfall in the generation of the relationship.
+
+    3 optimizations are performed on the detected events to minimize false positives.
+
+    1. Loading time (initial double support) must be less than
+    :math:`loading\\_factor * max\\_stride\\_time`
+
+    2. Stance time must be less than
+    :math:`(max\\_stride\\_time/2) + loading\\_factor * max\\_stride\\_time`
+
+    3. Stride time must be less than `max\\_stride\\_time`
+
+    References
+    ----------
+    .. [1] B. Najafi, K. Aminian, A. Paraschiv-Ionescu, F. Loew, C. J. Bula, and P. Robert,
+        “Ambulatory system for human motion analysis using a kinematic sensor: monitoring of
+        daily physical activity in the elderly,” IEEE Transactions on Biomedical Engineering,
+        vol. 50, no. 6, pp. 711–723, Jun. 2003, doi: 10.1109/TBME.2003.812189.
+    .. [2] W. Zijlstra and A. L. Hof, “Assessment of spatio-temporal gait parameters from
+        trunk accelerations during human walking,” Gait & Posture, vol. 18, no. 2, pp. 1–10,
+        Oct. 2003, doi: 10.1016/S0966-6362(02)00190-X.
+    .. [3] J. McCamley, M. Donati, E. Grimpampi, and C. Mazzà, “An enhanced estimate of initial
+        contact and final contact instants of time using lower trunk inertial sensor data,”
+        Gait & Posture, vol. 36, no. 2, pp. 316–318, Jun. 2012,
+        doi: 10.1016/j.gaitpost.2012.02.019.
+    .. [4] S. Del Din, A. Godfrey, and L. Rochester, “Validation of an Accelerometer to
+        Quantify a Comprehensive Battery of Gait Characteristics in Healthy Older Adults and
+        Parkinson’s Disease: Toward Clinical and at Home Use,” IEEE J. Biomed. Health Inform.,
+        vol. 20, no. 3, pp. 838–847, May 2016, doi: 10.1109/JBHI.2015.2419317.
+    .. [5] C. Caramia, C. De Marchis, and M. Schmid, “Optimizing the Scale of a Wavelet-Based
+        Method for the Detection of Gait Events from a Waist-Mounted Accelerometer under
+        Different Walking Speeds,” Sensors, vol. 19, no. 8, p. 1869, Jan. 2019,
+        doi: 10.3390/s19081869.
+    .. [6] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
+        Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
+        Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
+    """
+
     # gait parameters
     params = [
         StrideTime,
@@ -54,80 +129,6 @@ class Gait(_BaseProcess):
     def __init__(self, use_cwt_scale_relation=True, min_bout_time=5.0,
                  max_bout_separation_time=0.5, max_stride_time=2.25, loading_factor=0.2,
                  height_factor=0.53, leg_length=False, filter_order=4, filter_cutoff=20.0):
-        """
-        Detect gait, extract gait events (heel-strikes, toe-offs), and compute gait metrics from
-        inertial data collected from a lumbar mounted wearable inertial measurement unit
-
-        Parameters
-        ----------
-        use_cwt_scale_relation : bool, optional
-            Use the optimal scale/frequency relationship (see Notes). This changes which
-            scale is used for the smoothing/differentiation operation performed with the
-            continuous wavelet transform. Default is True. See Notes for a caveat of the
-            relationship
-        min_bout_time : float, optional
-            Minimum time in seconds for a gait bout. Default is 5s
-        max_bout_separation_time : float, optional
-            Maximum time in seconds between two bouts of gait for them to be merged into 1 gait
-            bout. Default is 0.5s
-        max_stride_time : float, optional
-            The maximum time in seconds for a stride, for optimization of gait events detection.
-            Default is 2.25s
-        loading_factor : float, optional
-            The factor to determine maximum loading time (initial double support time), for
-            optimization of gait events detection. Default is 0.2
-        height_factor : float, optional
-            The factor multiplied by height to obtain an estimate of leg length.
-            Default is 0.53 [4]_. Ignored if `leg_length` is `True`
-        leg_length : bool, optional
-            If the actual leg length will be provided. Setting to true would have the same effect
-            as setting height_factor to 1.0 while providing leg length. Default is False
-        filter_order : int, optional
-            Acceleration low-pass filter order. Default is 4
-        filter_cutoff : float, optional
-            Acceleration low-pass filter cutoff in Hz. Default is 20.0Hz
-
-        Notes
-        -----
-        The optimal scale/frequency relationship found in [5]_ was based on a cohort of only young
-        women students. While it is recommended to use this relationship, the user should be aware
-        of this shortfall in the generation of the relationship.
-
-        3 optimizations are performed on the detected events to minimize false positives.
-
-        1. Loading time (initial double support) must be less than
-        :math:`loading\\_factor * max\\_stride\\_time`
-
-        2. Stance time must be less than
-        :math:`(max\\_stride\\_time/2) + loading\\_factor * max\\_stride\\_time`
-
-        3. Stride time must be less than `max\\_stride\\_time`
-
-        References
-        ----------
-        .. [1] B. Najafi, K. Aminian, A. Paraschiv-Ionescu, F. Loew, C. J. Bula, and P. Robert,
-            “Ambulatory system for human motion analysis using a kinematic sensor: monitoring of
-            daily physical activity in the elderly,” IEEE Transactions on Biomedical Engineering,
-            vol. 50, no. 6, pp. 711–723, Jun. 2003, doi: 10.1109/TBME.2003.812189.
-        .. [2] W. Zijlstra and A. L. Hof, “Assessment of spatio-temporal gait parameters from
-            trunk accelerations during human walking,” Gait & Posture, vol. 18, no. 2, pp. 1–10,
-            Oct. 2003, doi: 10.1016/S0966-6362(02)00190-X.
-        .. [3] J. McCamley, M. Donati, E. Grimpampi, and C. Mazzà, “An enhanced estimate of initial
-            contact and final contact instants of time using lower trunk inertial sensor data,”
-            Gait & Posture, vol. 36, no. 2, pp. 316–318, Jun. 2012,
-            doi: 10.1016/j.gaitpost.2012.02.019.
-        .. [4] S. Del Din, A. Godfrey, and L. Rochester, “Validation of an Accelerometer to
-            Quantify a Comprehensive Battery of Gait Characteristics in Healthy Older Adults and
-            Parkinson’s Disease: Toward Clinical and at Home Use,” IEEE J. Biomed. Health Inform.,
-            vol. 20, no. 3, pp. 838–847, May 2016, doi: 10.1109/JBHI.2015.2419317.
-        .. [5] C. Caramia, C. De Marchis, and M. Schmid, “Optimizing the Scale of a Wavelet-Based
-            Method for the Detection of Gait Events from a Waist-Mounted Accelerometer under
-            Different Walking Speeds,” Sensors, vol. 19, no. 8, p. 1869, Jan. 2019,
-            doi: 10.3390/s19081869.
-        .. [6] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
-            Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
-            Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
-        """
         super().__init__('Gait Process', True)
 
         self.use_opt_scale = use_cwt_scale_relation
