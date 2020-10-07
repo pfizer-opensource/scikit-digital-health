@@ -1,7 +1,7 @@
-PfyMU.gait.gait\_metrics.StanceTime
-===================================
+PfyMU.gait.StanceTime
+=====================
 
-.. currentmodule:: PfyMU.gait.gait_metrics
+.. currentmodule:: PfyMU.gait
 
 .. autoclass:: StanceTime
 

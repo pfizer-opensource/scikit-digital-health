@@ -1,7 +1,7 @@
-PfyMU.gait.gait\_metrics.SwingTime
-==================================
+PfyMU.gait.SwingTime
+====================
 
-.. currentmodule:: PfyMU.gait.gait_metrics
+.. currentmodule:: PfyMU.gait
 
 .. autoclass:: SwingTime
 

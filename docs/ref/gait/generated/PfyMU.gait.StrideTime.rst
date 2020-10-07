@@ -1,7 +1,7 @@
-PfyMU.gait.gait\_metrics.StrideTime
-===================================
+PfyMU.gait.StrideTime
+=====================
 
-.. currentmodule:: PfyMU.gait.gait_metrics
+.. currentmodule:: PfyMU.gait
 
 .. autoclass:: StrideTime
 
