@@ -20,6 +20,14 @@ bottom - this library/module imports. ideally, all imports should be ABSOLUTE, n
 
 
 class !{{ module_name }}(_BaseProcess):
+    """
+    Process description here
+
+    Parameters
+    ----------
+    attr1
+    attr2
+    """
     def __repr__(self):
         ret = "!{{ module_name }}("
         ret += f"attr1={self.attr1!r}, "  # TODO update these to be parameters passed to __init__
@@ -27,14 +35,6 @@ class !{{ module_name }}(_BaseProcess):
         return ret
 
     def __init__(self, attr1=None, attr2=None):
-        """
-        Process description here
-
-        Parameters
-        ----------
-        attr1
-        attr2
-        """
         super().__init__("!{{ module_name }}", True)  # TODO update this if desired!
 
         self.attr1 = attr1
@@ -52,7 +52,7 @@ class !{{ module_name }}(_BaseProcess):
         -------
 
         """
-        super().predict(*args, **kwargs)
+        return super().predict(*args, **kwargs)
 
     def _predict(self, time=None, accel=None, *, gyro=None, **kwargs):
         # TODO add functionality
