@@ -49,14 +49,14 @@ def _autocov(x, i1, i2, i3):
 
 
 class StrideTime(GaitMetric):
+    """
+    Stride time is the time to complete 1 full gait cycle for 1 foot, defined as heel-strike
+    (initial contact) to heel-strike for the same foot.
+
+    A basic asymmetry measure is also computed as the difference between sequential
+    stride times of opposite feet
+    """
     def __init__(self):
-        """
-        Stride time is the time to complete 1 full gait cycle for 1 foot, defined as heel-strike
-        (initial contact) to heel-strike for the same foot.
-        
-        A basic asymmetry measure is also computed as the difference between sequential
-        stride times of opposite feet
-        """
         super().__init__('stride time')
 
     @basic_asymmetry
@@ -66,14 +66,14 @@ class StrideTime(GaitMetric):
 
 
 class StanceTime(GaitMetric):
+    """
+    Stance time is the time during which the foot is on the ground, defined as heel-strike
+    (initial contact) to toe-off (final contact) for a foot.
+
+    A basic asymmetry measure is also computed as the difference between sequential
+    stance times of opposite feet
+    """
     def __init__(self):
-        """
-        Stance time is the time during which the foot is on the ground, defined as heel-strike 
-        (initial contact) to toe-off (final contact) for a foot.
-        
-        A basic asymmetry measure is also computed as the difference between sequential
-        stance times of opposite feet
-        """
         super().__init__('stance time')
 
     @basic_asymmetry
@@ -82,14 +82,14 @@ class StanceTime(GaitMetric):
 
 
 class SwingTime(GaitMetric):
+    """
+    Swing time is the time during which the foot is off the ground, defined as toe-off
+    (final contact) to heel-strike (initial contact) of the same foot.
+
+    A basic asymmetry measure is also computed as the difference between sequential
+    swing times of opposite feet
+    """
     def __init__(self):
-        """
-        Swing time is the time during which the foot is off the ground, defined as toe-off
-        (final contact) to heel-strike (initial contact) of the same foot.
-        
-        A basic asymmetry measure is also computed as the difference between sequential
-        swing times of opposite feet
-        """
         super().__init__('swing time')
 
     @basic_asymmetry
@@ -99,14 +99,14 @@ class SwingTime(GaitMetric):
 
 
 class StepTime(GaitMetric):
+    """
+    Step time is the duration from heel-strike (initial contact) to heel-strike of the opposite
+    foot.
+
+    A basic asymmetry measure is also computed as the difference between sequential
+    step times of opposite feet
+    """
     def __init__(self):
-        """
-        Step time is the duration from heel-strike (initial contact) to heel-strike of the opposite
-        foot.
-        
-        A basic asymmetry measure is also computed as the difference between sequential
-        step times of opposite feet
-        """
         super().__init__('step time')
 
     @basic_asymmetry
@@ -116,15 +116,15 @@ class StepTime(GaitMetric):
 
 
 class InitialDoubleSupport(GaitMetric):
+    """
+    Initial double support is the time immediately following heel strike during which the
+    opposite foot is still on the ground. Defined as heel-strike (initial contact) to toe-off
+    (final contact) of the opposite foot.
+
+    A basic asymmetry measure is also computed as the difference between sequential
+    initial double support times of opposite feet
+    """
     def __init__(self):
-        """
-        Initial double support is the time immediately following heel strike during which the
-        opposite foot is still on the ground. Defined as heel-strike (initial contact) to toe-off
-        (final contact) of the opposite foot.
-        
-        A basic asymmetry measure is also computed as the difference between sequential
-        initial double support times of opposite feet
-        """
         super().__init__('initial double support')
 
     @basic_asymmetry
@@ -133,15 +133,15 @@ class InitialDoubleSupport(GaitMetric):
 
 
 class TerminalDoubleSupport(GaitMetric):
-    def __init__(self):
-        """
-        Terminal double support is the time immediately before toe-off (final contact) in which
-        the opposite foot has contacted the ground. Defined as heel-strike (initial contact) of the
-        opposite foot to toe-off of the current foot
+    """
+    Terminal double support is the time immediately before toe-off (final contact) in which
+    the opposite foot has contacted the ground. Defined as heel-strike (initial contact) of the
+    opposite foot to toe-off of the current foot
 
-        A basic asymmetry measure is also computed as the difference between sequential
-        terminal double support times of opposite feet
-        """
+    A basic asymmetry measure is also computed as the difference between sequential
+    terminal double support times of opposite feet
+    """
+    def __init__(self):
         super().__init__('terminal double support')
 
     @basic_asymmetry
@@ -151,14 +151,14 @@ class TerminalDoubleSupport(GaitMetric):
 
 
 class DoubleSupport(GaitMetric):
-    def __init__(self):
-        """
-        Double support is the combined initial and terminal double support times. It is the total
-        time during a stride that the current and opposite foot are in contact with the ground.
+    """
+    Double support is the combined initial and terminal double support times. It is the total
+    time during a stride that the current and opposite foot are in contact with the ground.
 
-        A basic asymmetry measure is also computed as the difference between sequential
-        double support times of opposite feet
-        """
+    A basic asymmetry measure is also computed as the difference between sequential
+    double support times of opposite feet
+    """
+    def __init__(self):
         super().__init__('double support', depends=[InitialDoubleSupport, TerminalDoubleSupport])
 
     @basic_asymmetry
@@ -167,15 +167,15 @@ class DoubleSupport(GaitMetric):
 
 
 class SingleSupport(GaitMetric):
-    def __init__(self):
-        """
-        Single support is the time during a stride that only the current foot is in contact with 
-        the ground. Defined as opposite foot toe-off (final contact) to opposite foot heel-strike
-        (initial contact).
+    """
+    Single support is the time during a stride that only the current foot is in contact with
+    the ground. Defined as opposite foot toe-off (final contact) to opposite foot heel-strike
+    (initial contact).
 
-        A basic asymmetry measure is also computed as the difference between sequential
-        single support times of opposite feet
-        """
+    A basic asymmetry measure is also computed as the difference between sequential
+    single support times of opposite feet
+    """
+    def __init__(self):
         super().__init__('single support')
 
     @basic_asymmetry
@@ -185,26 +185,26 @@ class SingleSupport(GaitMetric):
 
 
 class StepLength(GaitMetric):
-    def __init__(self):
-        """
-        Step length is the distance traveled during a step (heel-strike to opposite foot 
-        heel-strike). Here it is computed using the inverted pendulum model from [1]_:
-        
-        :math:`L_{step} = 2\\sqrt{2l_{leg}h-h^2}`
-        
-        where :math:`L_{step}` is the step length, :math:`l_{leg}` is the leg length, and
-        :math:`h` is the Center of Mass change in height during a step. Leg length can either be
-        measured, or taken to be :math:`0.53height`
+    """
+    Step length is the distance traveled during a step (heel-strike to opposite foot
+    heel-strike). Here it is computed using the inverted pendulum model from [1]_:
 
-        A basic asymmetry measure is also computed as the difference between sequential
-        step lengths of opposite feet
-        
-        References
-        ----------
-        .. [1] W. Zijlstra and A. L. Hof, “Assessment of spatio-temporal gait parameters from
-            trunk accelerations during human walking,” Gait & Posture, vol. 18, no. 2, pp. 1–10,
-            Oct. 2003, doi: 10.1016/S0966-6362(02)00190-X.
-        """
+    :math:`L_{step} = 2\\sqrt{2l_{leg}h-h^2}`
+
+    where :math:`L_{step}` is the step length, :math:`l_{leg}` is the leg length, and
+    :math:`h` is the Center of Mass change in height during a step. Leg length can either be
+    measured, or taken to be :math:`0.53height`
+
+    A basic asymmetry measure is also computed as the difference between sequential
+    step lengths of opposite feet
+
+    References
+    ----------
+    .. [1] W. Zijlstra and A. L. Hof, “Assessment of spatio-temporal gait parameters from
+        trunk accelerations during human walking,” Gait & Posture, vol. 18, no. 2, pp. 1–10,
+        Oct. 2003, doi: 10.1016/S0966-6362(02)00190-X.
+    """
+    def __init__(self):
         super().__init__('step length')
 
     @basic_asymmetry
@@ -216,27 +216,27 @@ class StepLength(GaitMetric):
 
 
 class StrideLength(GaitMetric):
-    def __init__(self):
-        """
-        Stride length is the distance traveled during a stride (heel-strike to current foot 
-        heel-strike). Here it is computed using the inverted pendulum model from [1]_:
-        
-        :math:`L_{step} = 2\\sqrt{2l_{leg}h-h^2}`
-        :math:`L_{stride} = L_{step, i} + L_{step, i+1}`
-        
-        where :math:`L_{s}` is the step or stride length, :math:`l_{leg}` is the leg length, and
-        :math:`h` is the Center of Mass change in height during a step. Leg length can either be
-        measured, or taken to be :math:`0.53height`
+    """
+    Stride length is the distance traveled during a stride (heel-strike to current foot
+    heel-strike). Here it is computed using the inverted pendulum model from [1]_:
 
-        A basic asymmetry measure is also computed as the difference between sequential
-        stride lengths of opposite feet
-        
-        References
-        ----------
-        .. [1] W. Zijlstra and A. L. Hof, “Assessment of spatio-temporal gait parameters from
-            trunk accelerations during human walking,” Gait & Posture, vol. 18, no. 2, pp. 1–10,
-            Oct. 2003, doi: 10.1016/S0966-6362(02)00190-X.
-        """
+    :math:`L_{step} = 2\\sqrt{2l_{leg}h-h^2}`
+    :math:`L_{stride} = L_{step, i} + L_{step, i+1}`
+
+    where :math:`L_{s}` is the step or stride length, :math:`l_{leg}` is the leg length, and
+    :math:`h` is the Center of Mass change in height during a step. Leg length can either be
+    measured, or taken to be :math:`0.53height`
+
+    A basic asymmetry measure is also computed as the difference between sequential
+    stride lengths of opposite feet
+
+    References
+    ----------
+    .. [1] W. Zijlstra and A. L. Hof, “Assessment of spatio-temporal gait parameters from
+        trunk accelerations during human walking,” Gait & Posture, vol. 18, no. 2, pp. 1–10,
+        Oct. 2003, doi: 10.1016/S0966-6362(02)00190-X.
+    """
+    def __init__(self):
         super().__init__('stride length', depends=[StepLength])
 
     @basic_asymmetry
@@ -248,14 +248,14 @@ class StrideLength(GaitMetric):
 
 
 class GaitSpeed(GaitMetric):
-    def __init__(self):
-        """
-        Gait speed is defined as the distance covered during 1 stride divided by the duration of 
-        that stride.
+    """
+    Gait speed is defined as the distance covered during 1 stride divided by the duration of
+    that stride.
 
-        A basic asymmetry measure is also computed as the difference between sequential
-        gait speeds of opposite feet
-        """
+    A basic asymmetry measure is also computed as the difference between sequential
+    gait speeds of opposite feet
+    """
+    def __init__(self):
         super().__init__('gait speed', depends=[StrideLength, StrideTime])
 
     @basic_asymmetry
@@ -267,11 +267,11 @@ class GaitSpeed(GaitMetric):
 
 
 class Cadence(GaitMetric):
+    """
+    Cadence is the number of steps taken in 1 minute. Here it is computed per step, as 60.0s
+    divided by the step time
+    """
     def __init__(self):
-        """
-        Cadence is the number of steps taken in 1 minute. Here it is computed per step, as 60.0s
-        divided by the step time
-        """
         super().__init__('cadence', depends=[StepTime])
 
     def _predict(self, dt, leg_length, gait, gait_aux):
@@ -279,18 +279,18 @@ class Cadence(GaitMetric):
 
 
 class StrideRegularity(GaitMetric):
+    """
+    Stride regularity is a measure of asymmetry, which is computed using the autocovariance
+    with a lag of 1 stride time. In other words, it is how similar the acceleration signal
+    is from one stride to the next. Values near 1 indicate very symmetrical strides
+
+    References
+    ----------
+    .. [1] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
+        Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
+        Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
+    """
     def __init__(self):
-        """
-        Stride regularity is a measure of asymmetry, which is computed using the autocovariance
-        with a lag of 1 stride time. In other words, it is how similar the acceleration signal 
-        is from one stride to the next. Values near 1 indicate very symmetrical strides
-        
-        References
-        ----------
-        .. [1] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
-            Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
-            Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
-        """
         super().__init__('stride regularity - V')
 
     def _predict(self, dt, leg_length, gait, gait_aux):
@@ -308,18 +308,18 @@ class StrideRegularity(GaitMetric):
 
 
 class StepRegularity(GaitMetric):
+    """
+    Step regularity is a measure of asymmetry, which is computed using the autocovariance
+    with a lag of 1 step time. In other words, it is how similar the acceleration signal
+    is from one step to the next. Values near 1 indicated very symmetrical steps
+
+    References
+    ----------
+    .. [1] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
+        Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
+        Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
+    """
     def __init__(self):
-        """
-        Step regularity is a measure of asymmetry, which is computed using the autocovariance
-        with a lag of 1 step time. In other words, it is how similar the acceleration signal 
-        is from one step to the next. Values near 1 indicated very symmetrical steps
-        
-        References
-        ----------
-        .. [1] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
-            Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
-            Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
-        """
         super().__init__('step regularity - V')
 
     def _predict(self, dt, leg_length, gait, gait_aux):
@@ -337,17 +337,17 @@ class StepRegularity(GaitMetric):
 
 
 class AutocorrelationSymmetry(GaitMetric):
+    """
+    Autocorrelation symmetry is a measure of symmetry, defined as the absolute difference
+    between the step and stride regularity measures.
+
+    References
+    ----------
+    .. [1] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
+        Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
+        Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
+    """
     def __init__(self):
-        """
-        Autocorrelation symmetry is a measure of symmetry, defined as the absolute difference
-        between the step and stride regularity measures.
-        
-        References
-        ----------
-        .. [1] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
-            Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
-            Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
-        """
         super().__init__(
             'autocorrelation symmetry - V', depends=[StepRegularity, StrideRegularity]
         )
