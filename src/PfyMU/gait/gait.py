@@ -14,8 +14,7 @@ from PfyMU.gait.get_gait_classification import get_gait_classification_lgbm
 from PfyMU.gait.get_gait_bouts import get_gait_bouts
 from PfyMU.gait.get_gait_events import get_gait_events
 from PfyMU.gait.get_strides import get_strides
-from PfyMU.gait.gait_metrics import *
-from PfyMU.gait.gait_metrics import GaitMetric
+from PfyMU.gait import gait_metrics
 from PfyMU.gait.get_bout_metrics_delta_h import get_bout_metrics_delta_h
 
 
@@ -98,20 +97,20 @@ class Gait(_BaseProcess):
 
     # gait parameters
     _params = [
-        StrideTime,
-        StanceTime,
-        SwingTime,
-        StepTime,
-        InitialDoubleSupport,
-        TerminalDoubleSupport,
-        DoubleSupport,
-        SingleSupport,
-        StepLength,
-        StrideLength,
-        GaitSpeed,
-        Cadence,
-        StepRegularity,
-        StrideRegularity
+        gait_metrics.StrideTime,
+        gait_metrics.StanceTime,
+        gait_metrics.SwingTime,
+        gait_metrics.StepTime,
+        gait_metrics.InitialDoubleSupport,
+        gait_metrics.TerminalDoubleSupport,
+        gait_metrics.DoubleSupport,
+        gait_metrics.SingleSupport,
+        gait_metrics.StepLength,
+        gait_metrics.StrideLength,
+        gait_metrics.GaitSpeed,
+        gait_metrics.Cadence,
+        gait_metrics.StepRegularity,
+        gait_metrics.StrideRegularity
     ]
 
     def __repr__(self):
@@ -157,27 +156,27 @@ class Gait(_BaseProcess):
 
         Examples
         --------
-        >>> class NewGaitMetric(GaitMetric):
+        >>> class NewGaitMetric(gait_metrics.GaitMetric):
         >>>     pass
         >>>
         >>> gait = Gait()
         >>> gait.add_metrics(NewGaitMetric)
 
-        >>> class NewGaitMetric(GaitMetric):
+        >>> class NewGaitMetric(gait_metrics.GaitMetric):
         >>>     pass
-        >>> class NewGaitMetric2(GaitMetric):
+        >>> class NewGaitMetric2(gait_metrics.GaitMetric):
         >>>     pass
         >>>
         >>> gait = Gait()
         >>> gait.add_metrics([NewGaitMetric, NewGaitMetric2])
         """
         if isinstance(metrics, Iterable):
-            if all(isinstance(i(), GaitMetric) for i in metrics):
+            if all(isinstance(i(), gait_metrics.GaitMetric) for i in metrics):
                 self._params.extend(metrics)
             else:
                 raise ValueError('Must provide either a GaitMetric or iterable of GaitMetrics')
         else:
-            if isinstance(metrics(), GaitMetric):
+            if isinstance(metrics(), gait_metrics.GaitMetric):
                 self._params.append(metrics)
 
     def predict(self, *args, **kwargs):
