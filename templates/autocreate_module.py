@@ -43,7 +43,7 @@ if __name__ == "__main__":
     module_name = input("Module name: ")
     author = input("Author: ")
     short_descr = input("Short description: ")
-    year = datetime.now().year
+    year = str(datetime.now().year)
 
     if not module_name[0].isupper():
         module_name = module_name.capitalize()
