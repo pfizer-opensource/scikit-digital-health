@@ -9,7 +9,6 @@ Pipeline gait processing
 
 .. autosummary::
     :toctree: generated/
-    :recursive:
 
     Gait
 
@@ -18,7 +17,6 @@ Gait Metrics
 
 .. autosummary::
     :toctree: generated/
-    :recursive:
 
     StrideTime
     StanceTime
