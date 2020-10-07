@@ -22,6 +22,17 @@ Gait Metrics
     StanceTime
     SwingTime
     StepTime
+    InitialDoubleSupport
+    TerminalDoubleSupport
+    DoubleSupport
+    SingleSupport
+    StepLength
+    StrideLength
+    GaitSpeed
+    Cadence
+    StepRegularity
+    StrideRegularity
+    AutocorrelationSymmetry
 """
 from PfyMU.gait.gait import Gait
 from PfyMU.gait import gait
