@@ -35,12 +35,16 @@ needs_sphinx = '2.2.0'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'autoclasstoc',
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
     'sphinx.ext.autosummary',
     'numpydoc'
 ]
+
+# this is needed for some reason...
+# see https://github.com/numpy/numpydoc/issues/69
+numpydoc_class_members_toctree = False
+
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -206,10 +210,7 @@ autosummary_generate = True
 # -----------------------------------------------------------------------------
 autodoc_default_options = {
     'members': True,
-    'special-members': True,
-    'private-members': False,
-    'inherited-members': False,
-    'undoc-members': False,
+    'inherited-members': True,
 }
 
 # -- Extension configuration -------------------------------------------------

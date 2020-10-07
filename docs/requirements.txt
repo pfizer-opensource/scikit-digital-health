@@ -1,4 +1,3 @@
 pydata-sphinx-theme
-autoclasstoc
 sphinx >= 2.2.0
 numpydoc
