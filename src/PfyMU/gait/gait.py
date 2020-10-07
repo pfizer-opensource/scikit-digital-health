@@ -16,7 +16,7 @@ from PfyMU.gait.get_gait_events import get_gait_events
 from PfyMU.gait.get_strides import get_strides
 from PfyMU.gait.gait_metrics import *
 from PfyMU.gait.gait_metrics import GaitMetric
-from PfyMU.gait.get_gait_metrics import get_gait_metrics_initial
+from PfyMU.gait.get_gait_metrics import get_gait_metrics
 
 
 class Gait(_BaseProcess):
@@ -325,7 +325,7 @@ class Gait(_BaseProcess):
                 gait_aux['inertial data i'].extend([len(gait_aux['vert accel']) - 1] * sib)
 
                 # get the initial gait metrics
-                get_gait_metrics_initial(
+                get_gait_metrics(
                     gait, ig, ibout, dt, time, vert_acc, vert_pos, sib, bout, bstart
                 )
 
