@@ -34,7 +34,13 @@ needs_sphinx = '2.2.0'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.intersphinx', 'sphinx.ext.autosummary', 'numpydoc']
+extensions = [
+    'autoclasstoc',
+    'sphinx.ext.autodoc',
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.autosummary',
+    'numpydoc'
+]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -193,5 +199,17 @@ intersphinx_mapping = {
 # -----------------------------------------------------------------------------
 
 autosummary_generate = True
+
+
+# -----------------------------------------------------------------------------
+# Autodoc
+# -----------------------------------------------------------------------------
+autodoc_default_options = {
+    'members': True,
+    'special-members': True,
+    'private-members': False,
+    'inherited-members': False,
+    'undoc-members': False,
+}
 
 # -- Extension configuration -------------------------------------------------
