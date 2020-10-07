@@ -16,6 +16,29 @@ def file_replace(lines, name, replace_with):
     return lines
 
 
+init_contents = '''"""
+MODULE DESCRIPTION (:mod:`PfyMU.{mod_lower}`)
+=======================================
+
+.. currentmodule:: PfyMU.{mod_lower}
+
+Heading 1
+---------
+
+.. autosummary::
+    :toctree: generated/
+
+    {mod}
+    
+Heading 2
+---------
+contents
+"""
+from PfyMU.{mod_lower}.{mod_lower} import {mod}
+
+'''
+
+
 if __name__ == "__main__":
     module_name = input("Module name: ")
     author = input("Author: ")
@@ -47,5 +70,5 @@ if __name__ == "__main__":
     init_file = folder / '__init__.py'
     with open(init_file, 'w') as f:
         f.write(
-            f"from PfyMU.{module_name.lower()}.{module_name.lower()} import {module_name}\n"
+            init_contents.format(mod_lower=module_name.lower(), mod=module_name)
         )
