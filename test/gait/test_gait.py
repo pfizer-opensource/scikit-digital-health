@@ -14,7 +14,7 @@ from PfyMU.gait.get_gait_classification import get_gait_classification_lgbm
 from PfyMU.gait.get_gait_bouts import get_gait_bouts
 from PfyMU.gait.get_gait_events import get_gait_events
 from PfyMU.gait.get_strides import get_strides
-from PfyMU.gait.get_gait_metrics import get_gait_metrics_initial, get_gait_metrics_final
+from PfyMU.gait.get_bout_metrics_delta_h import get_bout_metrics_delta_h
 
 
 class TestGetGaitClassificationLGBM:

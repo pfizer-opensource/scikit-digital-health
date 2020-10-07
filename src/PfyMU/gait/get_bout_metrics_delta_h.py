@@ -4,7 +4,7 @@ Function for getting the initial gait metrics
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
-from numpy import nan, cov, std, sqrt, unique, abs
+from numpy import nan, cov, std
 
 
 def _autocov(x, i1, i2, i3):
@@ -12,8 +12,8 @@ def _autocov(x, i1, i2, i3):
     return ac / (std(x[i1:i2], ddof=1) * std(x[i2:i3], ddof=1))
 
 
-def get_gait_metrics(
-        gait, gait_index, bout_n, dt, time, vert_accel, vert_position, bout_n_steps, bout_ends,
+def get_bout_metrics_delta_h(
+        gait, gait_index, bout_n, dt, time, vert_position, bout_n_steps, bout_ends,
         bout_start
 ):
     """
@@ -31,8 +31,6 @@ def get_gait_metrics(
         Sampling period
     time : numpy.ndarray
         (M, ) Unix timestamps
-    vert_accel : numpy.ndarray
-        (N, ) array of vertical acceleration
     vert_position : numpy.ndarray
         (N, ) array of vertial position
     bout_n_steps : int

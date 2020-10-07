@@ -16,7 +16,7 @@ from PfyMU.gait.get_gait_events import get_gait_events
 from PfyMU.gait.get_strides import get_strides
 from PfyMU.gait.gait_metrics import *
 from PfyMU.gait.gait_metrics import GaitMetric
-from PfyMU.gait.get_gait_metrics import get_gait_metrics
+from PfyMU.gait.get_bout_metrics_delta_h import get_bout_metrics_delta_h
 
 
 class Gait(_BaseProcess):
@@ -326,8 +326,8 @@ class Gait(_BaseProcess):
                 gait_aux['inertial data i'].extend([len(gait_aux['vert accel']) - 1] * sib)
 
                 # get the initial gait metrics
-                get_gait_metrics(
-                    gait, ig, ibout, dt, time, vert_acc, vert_pos, sib, bout, bstart
+                get_bout_metrics_delta_h(
+                    gait, ig, ibout, dt, time, vert_pos, sib, bout, bstart
                 )
 
                 ig += sib
@@ -340,7 +340,7 @@ class Gait(_BaseProcess):
             gait[key] = array(gait[key])
 
         # loop over metrics and compute
-        for param in self.params:
+        for param in self._params:
             param().predict(dt, leg_length, gait, gait_aux)
 
         kwargs.update({self._acc: accel, self._time: time, self._gyro: gyro, 'height': height})
