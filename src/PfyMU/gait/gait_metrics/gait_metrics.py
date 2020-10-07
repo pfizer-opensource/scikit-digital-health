@@ -30,6 +30,7 @@ stride length: step_length_i + step_length_i+1
 gait speed: stride_length / stride time
 """
 from numpy import mean, std, sum, sqrt, nan, nonzero, abs
+from numpy import zeros
 from scipy.signal import butter, sosfiltfilt
 
 
@@ -38,8 +39,24 @@ from PfyMU.gait.gait_metrics.base import GaitMetric, basic_asymmetry
 
 __all__ = ['StrideTime', 'StanceTime', 'SwingTime', 'StepTime', 'InitialDoubleSupport',
            'TerminalDoubleSupport', 'DoubleSupport', 'SingleSupport', 'StepLength',
-           'StrideLength', 'GaitSpeed', 'Cadence', 'GaitSymmetryIndex', 'StepRegularity',
-           'StrideRegularity', 'AutocorrelationSymmetry']
+           'StrideLength', 'GaitSpeed', 'Cadence', 'GaitSymmetryIndex', 'IntraStepCovariance',
+           'IntraStrideCovariance']
+
+
+def _ac(x, m_lim):
+    ac = zeros(m_lim)
+    for lag in range(m_lim):
+        x1 = x[:x.size-lag]
+        x2 = x[lag:]
+        m1 = mean(x1)
+        m2 = mean(x2)
+        s1 = std(x1, ddof=1)
+        s2 = std(x2, ddof=1)
+
+        ac[lag] = sum((x1 - m1) * (x2 - m2))
+        ac[lag] /= ((x.size - lag) * s1 * s2)
+
+    return ac
 
 
 def _autocovariance(x, i1, i2, i3, biased=False):
@@ -66,8 +83,8 @@ def _autocovariance3(x, i1, i2, i3, biased=False):
 
     N = i3 - i1
     m = i2 - i1
-    m1, s1 = mean(x[i1:i2], axis=0, keepdims=True), std(x[i1:i2], ddof=1, axis=0, keepdims=True)
-    m2, s2 = mean(x[i2:i3], axis=0, keepdims=True), std(x[i2:i3], ddof=1, axis=0, keepdims=True)
+    m1, s1 = mean(x[i1:i2], axis=0), std(x[i1:i2], ddof=1, axis=0)
+    m2, s2 = mean(x[i2:i3], axis=0), std(x[i2:i3], ddof=1, axis=0)
 
     ac = sum((x[i1:i2] - m1) * (x[i2:i3] - m2), axis=0)
     if biased:
@@ -343,24 +360,22 @@ class GaitSymmetryIndex(GaitMetric):
             gait[self.k_][idx] = sqrt(sum(ac)) / sqrt(3)
 
 
-class StrideRegularity(GaitMetric):
+class IntraStrideCovariance(GaitMetric):
     """
-    Stride regularity is the autocovariance with lag equal to 1 stride duration. In other words,
-    it is how similar the acceleration signal is from one stride to the next. Values near 1
-    indicate very symmetrical strides
+    Intra-stride covariance is the autocovariance of 1 stride with lag equal to the stride
+    duration. In other words, it is how similar the acceleration signal is from one stride to the
+    next for only 1 stride. Values near 1 indicate very symmetrical strides. It differs from the
+    `StrideRegularity` in that stride regularity uses the acceleration from the entire gait bout
+    while intra-stride covariance uses the acceleration only from individual strides.
 
     References
     ----------
     .. [1] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
         Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
         Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
-    .. [2] R. Moe-Nilssen and J. L. Helbostad, “Estimation of gait cycle characteristics by trunk
-        accelerometry,” Journal of Biomechanics, vol. 37, no. 1, pp. 121–126, Jan. 2004,
-        doi: 10.1016/S0021-9290(03)00233-1.
-
     """
     def __init__(self):
-        super().__init__('stride regularity - V')
+        super().__init__('intra-stride covariance - V')
 
     def _predict(self, dt, leg_length, gait, gait_aux):
         mask, mask_ofst = self._predict_init(gait, True, 2)
@@ -377,20 +392,19 @@ class StrideRegularity(GaitMetric):
             )
 
 
-class StepRegularity(GaitMetric):
+class IntraStepCovariance(GaitMetric):
     """
-    Step regularity is the autocovariance with lag equal to 1 step duration.  In other words, it
-    is how similar the acceleration signal is from one step to the next. Values near 1 indicate
-    very symmetrical steps
+    Intra-step covariance is the autocovariance of 1 step with lag equal to the step
+    duration. In other words, it is how similar the acceleration signal is from one step to the
+    next for only 1 step. Values near 1 indicate very symmetrical steps. It differs from the
+    `StepRegularity` in that step regularity uses the acceleration from the entire gait bout
+    while intra-step covariance uses the acceleration only from individual steps.
 
     References
     ----------
     .. [1] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
         Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
         Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
-    .. [2] R. Moe-Nilssen and J. L. Helbostad, “Estimation of gait cycle characteristics by trunk
-        accelerometry,” Journal of Biomechanics, vol. 37, no. 1, pp. 121–126, Jan. 2004,
-        doi: 10.1016/S0021-9290(03)00233-1.
     """
     def __init__(self):
         super().__init__('step regularity - V')
@@ -409,22 +423,22 @@ class StepRegularity(GaitMetric):
             )
 
 
-class AutocorrelationSymmetry(GaitMetric):
-    """
-    Autocorrelation symmetry is the absolute difference between stride and step regularity.
-
-    References
-    ----------
-    .. [1] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
-        Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
-        Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
-    """
-    def __init__(self):
-        super().__init__(
-            'autocorrelation symmetry - V', depends=[StepRegularity, StrideRegularity]
-        )
-
-    def _predict(self, dt, leg_length, gait, gait_aux):
-        gait[self.k_] = abs(
-            gait['PARAM:step regularity - V'] - gait['PARAM:stride regularity - V']
-        )
+# class AutocorrelationSymmetry(GaitMetric):
+#     """
+#     Autocorrelation symmetry is the absolute difference between stride and step regularity.
+#
+#     References
+#     ----------
+#     .. [1] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
+#         Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
+#         Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
+#     """
+#     def __init__(self):
+#         super().__init__(
+#             'autocorrelation symmetry - V', depends=[StepRegularity, StrideRegularity]
+#         )
+#
+#     def _predict(self, dt, leg_length, gait, gait_aux):
+#         gait[self.k_] = abs(
+#             gait['PARAM:step regularity - V'] - gait['PARAM:stride regularity - V']
+#         )

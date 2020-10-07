@@ -110,9 +110,8 @@ class Gait(_BaseProcess):
         gait_metrics.GaitSpeed,
         gait_metrics.Cadence,
         gait_metrics.GaitSymmetryIndex,
-        gait_metrics.StepRegularity,
-        gait_metrics.StrideRegularity,
-        gait_metrics.AutocorrelationSymmetry
+        gait_metrics.IntraStepCovariance,
+        gait_metrics.IntraStrideCovariance,
     ]
 
     def __repr__(self):
