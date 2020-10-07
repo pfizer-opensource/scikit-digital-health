@@ -3,15 +3,6 @@
 .idea/*
 .idea*
 
-# features
-scripts/feature_exploration/features.h5
-
-<<<<<<< HEAD
-# actigraph sample data
-scripts/binary_readers/actigraph/data/sample*
-scripts/wrist_testing/data.h5
-=======
->>>>>>> c58b4fb23624c66aa098d7bd6127a9e5dd012ffe
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -145,3 +136,5 @@ dmypy.json
 
 # Project specific
 !src/PfyMU/features/lib/
+/docs/ref/gait/generated/
+/docs/**/generated/
