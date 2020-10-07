@@ -51,7 +51,7 @@ def _autocov(x, i1, i2, i3):
 
 class StrideTime(GaitMetric):
     """
-    Stride time is the time to complete 1 full gait cycle for 1 foot, defined as heel-strike
+    Stride time is the time to complete 1 full gait cycle for 1 foot. Defined as heel-strike
     (initial contact) to heel-strike for the same foot.
 
     A basic asymmetry measure is also computed as the difference between sequential
@@ -68,7 +68,7 @@ class StrideTime(GaitMetric):
 
 class StanceTime(GaitMetric):
     """
-    Stance time is the time during which the foot is on the ground, defined as heel-strike
+    Stance time is the time during which the foot is on the ground. Defined as heel-strike
     (initial contact) to toe-off (final contact) for a foot.
 
     A basic asymmetry measure is also computed as the difference between sequential
@@ -84,7 +84,7 @@ class StanceTime(GaitMetric):
 
 class SwingTime(GaitMetric):
     """
-    Swing time is the time during which the foot is off the ground, defined as toe-off
+    Swing time is the time during which the foot is off the ground. Defined as toe-off
     (final contact) to heel-strike (initial contact) of the same foot.
 
     A basic asymmetry measure is also computed as the difference between sequential
@@ -250,8 +250,8 @@ class StrideLength(GaitMetric):
 
 class GaitSpeed(GaitMetric):
     """
-    Gait speed is defined as the distance covered during 1 stride divided by the duration of
-    that stride.
+    Gait speed is how fast distance is being convered. Defined as the stride length divided by the
+    stride duration, in m/s
 
     A basic asymmetry measure is also computed as the difference between sequential
     gait speeds of opposite feet
@@ -281,9 +281,9 @@ class Cadence(GaitMetric):
 
 class StrideRegularity(GaitMetric):
     """
-    Stride regularity is a measure of asymmetry, which is computed using the autocovariance
-    with a lag of 1 stride time. In other words, it is how similar the acceleration signal
-    is from one stride to the next. Values near 1 indicate very symmetrical strides
+    Stride regularity is the autocovariance with lag equal to 1 stride duration. In other words,
+    it is how similar the acceleration signal is from one stride to the next. Values near 1
+    indicate very symmetrical strides
 
     References
     ----------
@@ -310,9 +310,9 @@ class StrideRegularity(GaitMetric):
 
 class StepRegularity(GaitMetric):
     """
-    Step regularity is a measure of asymmetry, which is computed using the autocovariance
-    with a lag of 1 step time. In other words, it is how similar the acceleration signal
-    is from one step to the next. Values near 1 indicated very symmetrical steps
+    Step regularity is the autocovariance with lag equal to 1 step duration.  In other words, it
+    is how similar the acceleration signal is from one step to the next. Values near 1 indicate
+    very symmetrical steps
 
     References
     ----------
@@ -339,8 +339,7 @@ class StepRegularity(GaitMetric):
 
 class AutocorrelationSymmetry(GaitMetric):
     """
-    Autocorrelation symmetry is a measure of symmetry, defined as the absolute difference
-    between the step and stride regularity measures.
+    Autocorrelation symmetry is the absolute difference between stride and step regularity.
 
     References
     ----------

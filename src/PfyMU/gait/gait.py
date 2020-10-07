@@ -21,8 +21,9 @@ from PfyMU.gait.get_gait_metrics import get_gait_metrics
 
 class Gait(_BaseProcess):
     """
-    Detect gait, extract gait events (heel-strikes, toe-offs), and compute gait metrics from
-    inertial data collected from a lumbar mounted wearable inertial measurement unit
+    Process IMU data to extract metrics of gait. Detect gait, extract gait events (heel-strikes,
+    toe-offs), and compute gait metrics from inertial data collected from a lumbar mounted
+    wearable inertial measurement unit
 
     Parameters
     ----------
