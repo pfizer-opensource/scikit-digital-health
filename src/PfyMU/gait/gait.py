@@ -7,7 +7,7 @@ Pfizer DMTI 2020
 from warnings import warn
 from collections import Iterable
 
-from numpy import mean, diff, abs, argmax, sign, round, array, full, nan, float_
+from numpy import mean, diff, abs, argmax, sign, round, array
 
 from PfyMU.base import _BaseProcess
 from PfyMU.gait.get_gait_classification import get_gait_classification_lgbm
@@ -16,7 +16,7 @@ from PfyMU.gait.get_gait_events import get_gait_events
 from PfyMU.gait.get_strides import get_strides
 from PfyMU.gait.gait_metrics import *
 from PfyMU.gait.gait_metrics import GaitMetric
-from PfyMU.gait.get_gait_metrics import get_gait_metrics_initial, get_gait_metrics_final
+from PfyMU.gait.get_gait_metrics import get_gait_metrics_initial
 
 
 class Gait(_BaseProcess):
