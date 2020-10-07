@@ -109,8 +109,10 @@ class Gait(_BaseProcess):
         gait_metrics.StrideLength,
         gait_metrics.GaitSpeed,
         gait_metrics.Cadence,
+        gait_metrics.GaitSymmetryIndex,
         gait_metrics.StepRegularity,
-        gait_metrics.StrideRegularity
+        gait_metrics.StrideRegularity,
+        gait_metrics.AutocorrelationSymmetry
     ]
 
     def __repr__(self):
@@ -280,7 +282,8 @@ class Gait(_BaseProcess):
         }
         # auxiliary dictionary for storing values for computing gait metrics
         gait_aux = {
-            'vert accel': [],
+            'vert axis': v_axis,
+            'accel': [],
             'vert velocity': [],
             'vert position': [],
             'inertial data i': []
@@ -310,7 +313,8 @@ class Gait(_BaseProcess):
                     self.use_opt_scale
                 )
 
-                gait_aux['vert accel'].append(vert_acc)
+                # add inertial data to the aux dict for use in gait metric calculation
+                gait_aux['accel'].append(accel[bstart:start+bout[1], :])
                 gait_aux['vert velocity'].append(vert_vel)
                 gait_aux['vert position'].append(vert_pos)
 
@@ -322,7 +326,7 @@ class Gait(_BaseProcess):
                 sib = get_strides(gait, ig, ic, fc, dt, self.max_stride_time, self.loading_factor)
 
                 # add the index for the corresponding accel/velocity/position
-                gait_aux['inertial data i'].extend([len(gait_aux['vert accel']) - 1] * sib)
+                gait_aux['inertial data i'].extend([len(gait_aux['accel']) - 1] * sib)
 
                 # get the initial gait metrics
                 get_bout_metrics_delta_h(

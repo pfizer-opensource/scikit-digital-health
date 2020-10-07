@@ -29,7 +29,8 @@ stride length: step_length_i + step_length_i+1
 
 gait speed: stride_length / stride time
 """
-from numpy import std, cov, sqrt, nan, nonzero, abs
+from numpy import mean, std, sum, sqrt, nan, nonzero, abs
+from scipy.signal import butter, sosfiltfilt
 
 
 from PfyMU.gait.gait_metrics.base import GaitMetric, basic_asymmetry
@@ -37,16 +38,44 @@ from PfyMU.gait.gait_metrics.base import GaitMetric, basic_asymmetry
 
 __all__ = ['StrideTime', 'StanceTime', 'SwingTime', 'StepTime', 'InitialDoubleSupport',
            'TerminalDoubleSupport', 'DoubleSupport', 'SingleSupport', 'StepLength',
-           'StrideLength', 'GaitSpeed', 'Cadence', 'StepRegularity', 'StrideRegularity',
-           'AutocorrelationSymmetry']
+           'StrideLength', 'GaitSpeed', 'Cadence', 'GaitSymmetryIndex', 'StepRegularity',
+           'StrideRegularity', 'AutocorrelationSymmetry']
 
 
-def _autocov(x, i1, i2, i3):
+def _autocovariance(x, i1, i2, i3, biased=False):
     if i3 > x.size:
         return nan
+
+    N = i3 - i1
+    m = i2 - i1
+    m1, s1 = mean(x[i1:i2]), std(x[i1:i2], ddof=1)
+    m2, s2 = mean(x[i2:i3]), std(x[i2:i3], ddof=1)
+
+    ac = sum((x[i1:i2] - m1) * (x[i2:i3] - m2))
+    if biased:
+        ac /= (N * s1 * s2)
     else:
-        ac = cov(x[i1:i2], x[i2:i3], bias=False)[0, 1]
-        return ac / (std(x[i1:i2], ddof=1) * std(x[i2:i3], ddof=1))
+        ac /= ((N - m) * s1 * s2)
+
+    return ac
+
+
+def _autocovariance3(x, i1, i2, i3, biased=False):
+    if i3 > x.shape[0]:
+        return nan
+
+    N = i3 - i1
+    m = i2 - i1
+    m1, s1 = mean(x[i1:i2], axis=0, keepdims=True), std(x[i1:i2], ddof=1, axis=0, keepdims=True)
+    m2, s2 = mean(x[i2:i3], axis=0, keepdims=True), std(x[i2:i3], ddof=1, axis=0, keepdims=True)
+
+    ac = sum((x[i1:i2] - m1) * (x[i2:i3] - m2), axis=0)
+    if biased:
+        ac /= (N * s1 * s2)
+    else:
+        ac /= ((N - m) * s1 * s2)
+
+    return ac
 
 
 class StrideTime(GaitMetric):
@@ -280,6 +309,40 @@ class Cadence(GaitMetric):
         gait[self.k_] = 60.0 / gait['PARAM:step time']
 
 
+class GaitSymmetryIndex(GaitMetric):
+    """
+    Gait Symmetry Index (GSI) assesses symmetry between steps during straight overground gait.
+
+    References
+    ----------
+    .. [1] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
+        Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
+        Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
+    """
+    def __init__(self):
+        super().__init__('gait symmetry index')
+
+    def _predict(self, dt, leg_length, gait, gait_aux):
+        mask, mask_ofst = self._predict_init(gait, True, 1)
+
+        i1 = gait['IC'][mask]
+        i2 = gait['IC'][mask_ofst]
+        i3 = i2 + (i2 - i1)
+
+        # filter the acceleration data first
+        faccel = {'accel': gait_aux['accel']}
+        sos = butter(4, 2 * 10 * dt, btype='low', output='sos')
+        for i, acc in enumerate(faccel['accel']):
+            faccel['accel'][i] = sosfiltfilt(sos, acc, axis=0)
+
+        for i, idx in enumerate(nonzero(mask)[0]):
+            ac = _autocovariance3(
+                faccel['accel'][gait_aux['inertial data i'][idx]],
+                i1[i], i2[i], i3[i]
+            )
+            gait[self.k_][idx] = sqrt(sum(ac)) / sqrt(3)
+
+
 class StrideRegularity(GaitMetric):
     """
     Stride regularity is the autocovariance with lag equal to 1 stride duration. In other words,
@@ -307,9 +370,10 @@ class StrideRegularity(GaitMetric):
         i3 = i2 + (i2 - i1)
 
         for i, idx in enumerate(nonzero(mask)[0]):
-            gait[self.k_][idx] = _autocov(
-                gait_aux['vert accel'][gait_aux['inertial data i'][idx]],
-                i1[i], i2[i], i3[i]
+            gait[self.k_][idx] = _autocovariance(
+                # index the accel, then the list of views, then the vertical axis
+                gait_aux['accel'][gait_aux['inertial data i'][idx]][:, gait_aux['vert axis']],
+                i1[i], i2[i], i3[i], biased=False
             )
 
 
@@ -339,9 +403,9 @@ class StepRegularity(GaitMetric):
         i3 = i2 + (i2 - i1)
 
         for i, idx in enumerate(nonzero(mask)[0]):
-            gait[self.k_][idx] = _autocov(
-                gait_aux['vert accel'][gait_aux['inertial data i'][idx]],
-                i1[i], i2[i], i3[i]
+            gait[self.k_][idx] = _autocovariance(
+                gait_aux['accel'][gait_aux['inertial data i'][idx]][:, gait_aux['vert axis']],
+                i1[i], i2[i], i3[i], biased=False
             )
 
 
