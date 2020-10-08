@@ -416,7 +416,7 @@ class IntraStepCovariance(EventMetric):
 
 
 class HarmonicRatioV(EventMetric):
-    """
+    r"""
     Harmonic Ratio (HR) assesses the symmetry of the 2 steps that occur during each stride. Defined
     as the sum of the amplitude of the even harmonics (of average stride frequency) divided by the
     sum of the amplitude of the odd harmonics. Higher values indicate better symmetry between the
@@ -430,6 +430,17 @@ class HarmonicRatioV(EventMetric):
     .. [2] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
         Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
         Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
+
+    Notes
+    -----
+    The Harmonic ratio is computed from the first 20 harmonics extracted from a fourier series.
+    For the vertical direction, the HR is defined as
+
+    .. math:: HR = \frac{\sum_{n=1}^{10}F(2nf_{stride})}{\sum_{n=1}^{10}F((2n-1)f_{stride})}
+
+    where :math:`F` is the power spectral density and :math:`f_{stride}` is the stride frequency.
+    Since this is computed on a per-stride basis, the stride frequency is estimated as the inverse
+    of stride time for the individual stride.
     """
 
     def __init__(self):
@@ -599,10 +610,8 @@ class StepRegularityV(BoutMetric):
     """
     Step regularity is the autocorrelation at a lag time of 1 step. Computed for an entire bout
     of gait, this is a measure of the average symmetry of sequential steps during overground
-    strait gait for the vertical acceleration component.
-
-    Values close to 1 indicate high degree of regularity/symmetry, while values close to 0 indicate
-    a low degree of regularity/symmetry
+    strait gait for the vertical acceleration component. Values close to 1 indicate high degree of
+    regularity/symmetry, while values close to 0 indicate a low degree of regularity/symmetry
 
     References
     ----------
@@ -612,6 +621,17 @@ class StepRegularityV(BoutMetric):
     .. [2] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
         Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
         Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
+
+    Notes
+    -----
+    Step regularity is the value of the autocovariance function at a lag equal to the time
+    for one step. While [2]_ uses the autocorrelation instead of the autocovariance like [1]_, the
+    autocovariance is used here as it provides a mathematically better comparison of the
+    acceleration profile during gait.
+
+    The peak corresponding to one step time is found by searching the area near the lag
+    corresponding to the average step time for the gait bout. The nearest peak to this point is
+    used as the peak at a lag of one step.
     """
     def __init__(self):
         super().__init__('step regularity - V', depends=[StepTime])
@@ -649,6 +669,17 @@ class StrideRegularityV(BoutMetric):
     .. [2] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
         Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
         Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
+
+    Notes
+    -----
+    Stride regularity is the value of the autocovariance function at a lag equal to the time
+    for one stride. While [2]_ uses the autocorrelation instead of the autocovariance like [1]_,
+    the autocovariance is used here as it provides a mathematically better comparison of the
+    acceleration profile during gait.
+
+    The peak corresponding to one stride time is found by searching the area near the lag
+    corresponding to the average stride time for the gait bout. The nearest peak to this point is
+    used as the peak at a lag of one stride.
     """
     def __init__(self):
         super().__init__('stride regularity - V', depends=[StrideTime])
@@ -671,7 +702,9 @@ class StrideRegularityV(BoutMetric):
 
 class AutocorrelationSymmetryV(BoutMetric):
     """
-    Autocorrelation symmetry is the absolute difference between stride and step regularity.
+    Autocorrelation symmetry is the absolute difference between stride and step regularity. It
+    quantifies the level of symmetry between the stride and step regularity and provide an overall
+    metric of symmetry for the gait bout
 
     References
     ----------
