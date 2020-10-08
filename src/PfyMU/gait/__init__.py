@@ -30,8 +30,8 @@ Event Level Gait Metrics
     StrideLength
     GaitSpeed
     Cadence
-    IntraStepCovariance
-    IntraStrideCovariance
+    IntraStepCovarianceV
+    IntraStrideCovarianceV
     HarmonicRatioV
 
 Bout Level Gait Metrics
@@ -44,7 +44,7 @@ Bout Level Gait Metrics
     GaitSymmetryIndex
     StepRegularityV
     StrideRegularityV
-    AutocorrelationSymmetryV
+    AutocovarianceSymmetryV
 """
 from PfyMU.gait.gait import Gait
 from PfyMU.gait import gait
