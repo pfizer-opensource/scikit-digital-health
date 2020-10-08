@@ -111,11 +111,13 @@ class Gait(_BaseProcess):
         gait_metrics.StrideLength,
         gait_metrics.GaitSpeed,
         gait_metrics.Cadence,
-        gait_metrics.GaitSymmetryIndex,
         gait_metrics.IntraStepCovariance,
         gait_metrics.IntraStrideCovariance,
         # bout level metrics
-        gait_metrics.StepRegularityV
+        gait_metrics.GaitSymmetryIndex,
+        gait_metrics.StepRegularityV,
+        gait_metrics.StrideRegularityV,
+        gait_metrics.AutocorrelationSymmetryV
     ]
 
     def __repr__(self):
@@ -344,6 +346,8 @@ class Gait(_BaseProcess):
         # convert to arrays
         for key in gait:
             gait[key] = array(gait[key])
+        # convert inertial data index to an array
+        gait_aux['inertial data i'] = array(gait_aux['inertial data i'])
 
         # loop over metrics and compute
         for param in self._params:
