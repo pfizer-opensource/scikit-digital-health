@@ -40,8 +40,8 @@ from PfyMU.gait.gait_metrics.base import EventMetric, BoutMetric, basic_asymmetr
 __all__ = ['StrideTime', 'StanceTime', 'SwingTime', 'StepTime', 'InitialDoubleSupport',
            'TerminalDoubleSupport', 'DoubleSupport', 'SingleSupport', 'StepLength',
            'StrideLength', 'GaitSpeed', 'Cadence', 'GaitSymmetryIndex', 'IntraStepCovariance',
-           'IntraStrideCovariance', 'HarmonicRatioV', 'StepRegularityV', 'StrideRegularityV',
-           'AutocorrelationSymmetryV']
+           'IntraStrideCovariance', 'HarmonicRatioV', 'PhaseCoordinationIndex', 'StepRegularityV',
+           'StrideRegularityV', 'AutocorrelationSymmetryV']
 
 
 def _autocovariance_lag(x, lag, biased=False):

@@ -115,6 +115,7 @@ class Gait(_BaseProcess):
         gait_metrics.IntraStrideCovariance,
         gait_metrics.HarmonicRatioV,
         # bout level metrics
+        gait_metrics.PhaseCoordinationIndex,
         gait_metrics.GaitSymmetryIndex,
         gait_metrics.StepRegularityV,
         gait_metrics.StrideRegularityV,
