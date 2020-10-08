@@ -17,6 +17,55 @@ def basic_asymmetry(f):
     return run_basic_asymmetry
 
 
+class BoutMetric:
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return self.name
+
+    def __init__(self, name, depends=None):
+        """
+        Bout level metric base class
+
+        Parameters
+        ----------
+        name : str
+            Name of the metric
+        depends : Iterable
+            Any other metrics that are required to be computed beforehand
+        """
+        self.name = name
+        self.k_ = f'BOUTPARAM:{self.name}'
+
+        self._depends = depends
+
+    def predict(self, dt, leg_length, gait, gait_aux):
+        """
+        Predict the bout level gait metric
+
+        Parameters
+        ----------
+        dt : float
+            Sampling period in seconds
+        leg_length : {None, float}
+            Leg length in meters
+        gait : dict
+            Dictionary of gait items and results. Modified in place to add the metric being
+            calculated
+        gait_aux : dict
+            Dictionary of acceleration, velocity, and position data for bouts, and the mapping
+            from step to bout and inertial data
+        """
+        if self.k_ in gait:
+            return
+        if self._depends is not None:
+            for param in self._depends:
+                param().predict(dt, leg_length, gait, gait_aux)
+
+        self._predict(dt, leg_length, gait, gait_aux)
+
+
 class EventMetric:
     def __str__(self):
         return self.name
@@ -49,7 +98,7 @@ class EventMetric:
 
     def predict(self, dt, leg_length, gait, gait_aux):
         """
-        Predict the gait metric
+        Predict the gait event-level metric
 
         Parameters
         ----------
