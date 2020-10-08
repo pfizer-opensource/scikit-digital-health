@@ -18,21 +18,21 @@ Event Level Gait Metrics
 .. autosummary::
     :toctree: generated/
 
-    StrideTime,
-    StanceTime,
-    SwingTime,
-    StepTime,
-    InitialDoubleSupport,
-    TerminalDoubleSupport,
-    DoubleSupport,
-    SingleSupport,
-    StepLength,
-    StrideLength,
-    GaitSpeed,
-    Cadence,
-    IntraStepCovariance,
-    IntraStrideCovariance,
-    HarmonicRatioV,
+    StrideTime
+    StanceTime
+    SwingTime
+    StepTime
+    InitialDoubleSupport
+    TerminalDoubleSupport
+    DoubleSupport
+    SingleSupport
+    StepLength
+    StrideLength
+    GaitSpeed
+    Cadence
+    IntraStepCovariance
+    IntraStrideCovariance
+    HarmonicRatioV
 
 Bout Level Gait Metrics
 -----------------------
@@ -40,10 +40,10 @@ Bout Level Gait Metrics
 .. autosummary::
     :toctree: generated/
 
-    PhaseCoordinationIndex,
-    GaitSymmetryIndex,
-    StepRegularityV,
-    StrideRegularityV,
+    PhaseCoordinationIndex
+    GaitSymmetryIndex
+    StepRegularityV
+    StrideRegularityV
     AutocorrelationSymmetryV
 """
 from PfyMU.gait.gait import Gait
