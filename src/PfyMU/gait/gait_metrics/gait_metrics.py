@@ -442,13 +442,18 @@ class PhaseCoordinationIndex(BoutMetric):
     """
     Phase Coordination Index (PCI) assesses symmetry between steps during straight overground gait.
     Computed for an entire bout, it is a measure of the deviation from symmetrical steps (ie half a
-    stride is equal to exactly 1 step duration)
+    stride is equal to exactly 1 step duration). Lower values indicate better symmetry and
+    a "more consistent and accurate phase generation" [2]_
 
     References
     ----------
     .. [1] M. Plotnik, N. Giladi, and J. M. Hausdorff, “A new measure for quantifying the
         bilateral coordination of human gait: effects of aging and Parkinson’s disease,”
         Exp Brain Res, vol. 181, no. 4, pp. 561–570, Aug. 2007, doi: 10.1007/s00221-007-0955-7.
+    .. [2] A. Weiss, T. Herman, N. Giladi, and J. M. Hausdorff, “Association between Community
+        Ambulation Walking Patterns and Cognitive Function in Patients with Parkinson’s Disease:
+        Further Insights into Motor-Cognitive Links,” Parkinsons Dis, vol. 2015, 2015,
+        doi: 10.1155/2015/547065.
 
     Notes
     -----
