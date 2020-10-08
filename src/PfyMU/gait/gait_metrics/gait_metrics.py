@@ -1,5 +1,5 @@
 """
-Gait metric definitions
+Gait event-level and bout-level metric definitions
 
 Lukas Adamowicz
 2020, Pfizer DMTI
@@ -29,21 +29,21 @@ stride length: step_length_i + step_length_i+1
 
 gait speed: stride_length / stride time
 """
-from numpy import mean, std, sum, sqrt, nan, nonzero, abs
-from numpy import zeros
+from numpy import zeros, nanmean, mean, std, sum, sqrt, nan, nonzero, abs, round, float_
 from scipy.signal import butter, sosfiltfilt
 
 
-from PfyMU.gait.gait_metrics.base import EventMetric, basic_asymmetry
+from PfyMU.gait.gait_metrics.base import EventMetric, BoutMetric, basic_asymmetry
 
 
 __all__ = ['StrideTime', 'StanceTime', 'SwingTime', 'StepTime', 'InitialDoubleSupport',
            'TerminalDoubleSupport', 'DoubleSupport', 'SingleSupport', 'StepLength',
            'StrideLength', 'GaitSpeed', 'Cadence', 'GaitSymmetryIndex', 'IntraStepCovariance',
-           'IntraStrideCovariance']
+           'IntraStrideCovariance', 'StepRegularityV', 'StrideRegularityV',
+           'AutocorrelationSymmetryV']
 
 
-def _ac(x, m_lim):
+def _autocovariancefunction(x, m_lim):
     ac = zeros(m_lim)
     for lag in range(m_lim):
         x1 = x[:x.size-lag]
@@ -56,6 +56,21 @@ def _ac(x, m_lim):
         ac[lag] = sum((x1 - m1) * (x2 - m2))
         ac[lag] /= ((x.size - lag) * s1 * s2)
 
+    return ac
+
+
+def _autocovariance_lag(x, lag, biased=False):
+    N = x.size
+    m1 = mean(x[:N-lag])
+    m2 = mean(x[lag:])
+    s1 = std(x[:N-lag], ddof=1)
+    s2 = std(x[lag:], ddof=1)
+
+    ac = sum((x[:N-lag] - m1) * (x[lag:] - m2))
+    if biased:
+        ac /= (N * s1 * s2)
+    else:
+        ac /= ((N - lag) * s1 * s2)
     return ac
 
 
@@ -95,6 +110,9 @@ def _autocovariance3(x, i1, i2, i3, biased=False):
     return ac
 
 
+# ===========================================================
+#     GAIT EVENT-LEVEL METRICS
+# ===========================================================
 class StrideTime(EventMetric):
     """
     Stride time is the time to complete 1 full gait cycle for 1 foot. Defined as heel-strike
@@ -423,22 +441,93 @@ class IntraStepCovariance(EventMetric):
             )
 
 
-# class AutocorrelationSymmetry(EventMetric):
-#     """
-#     Autocorrelation symmetry is the absolute difference between stride and step regularity.
-#
-#     References
-#     ----------
-#     .. [1] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
-#         Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
-#         Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
-#     """
-#     def __init__(self):
-#         super().__init__(
-#             'autocorrelation symmetry - V', depends=[StepRegularity, StrideRegularity]
-#         )
-#
-#     def _predict(self, dt, leg_length, gait, gait_aux):
-#         gait[self.k_] = abs(
-#             gait['PARAM:step regularity - V'] - gait['PARAM:stride regularity - V']
-#         )
+# ===========================================================
+#     GAIT BOUT-LEVEL METRICS
+# ===========================================================
+class StepRegularityV(BoutMetric):
+    """
+    Step regularity is the autocorrelation at a lag time of 1 step. Computed for an entire bout
+    of gait, this is a measure of the average symmetry of sequential steps during overground
+    strait gait for the vertical acceleration component.
+
+    References
+    ----------
+    .. [1] R. Moe-Nilssen and J. L. Helbostad, “Estimation of gait cycle characteristics by trunk
+        accelerometry,” Journal of Biomechanics, vol. 37, no. 1, pp. 121–126, Jan. 2004,
+        doi: 10.1016/S0021-9290(03)00233-1.
+    .. [2] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
+        Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
+        Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
+    """
+    def __init__(self):
+        super().__init__('step regularity - V', depends=[StepTime])
+
+    def _predict(self, dt, leg_length, gait, gait_aux):
+        stepreg = zeros(len(gait_aux['accel']), dtype=float_)
+
+        for i, acc in enumerate(gait_aux['accel']):
+            # acf = _autocovariancefunction(acc[:, gait_aux['vert axis']], int(4.5 / dt))
+            # compute the average number of samples per step, this *should* be the
+            # lag over the bout for sequential steps
+            lag = int(
+                round(nanmean(gait['PARAM:step time'][gait_aux['inertial data i'] == i]) / dt)
+            )
+            stepreg[i] = _autocovariance_lag(acc[:, gait_aux['vert axis']], lag)
+
+        # broadcast step regularity into gait for each step
+        gait[self.k_] = stepreg[gait_aux['inertial data i']]
+
+
+class StrideRegularityV(BoutMetric):
+    """
+    Stride regularity is the autocorrelation at a lag time of 1 stride. Computed for an entire bout
+    of gait, this is a measure of the average symmetry of sequential stride during overground
+    strait gait for the vertical acceleration component.
+
+    References
+    ----------
+    .. [1] R. Moe-Nilssen and J. L. Helbostad, “Estimation of gait cycle characteristics by trunk
+        accelerometry,” Journal of Biomechanics, vol. 37, no. 1, pp. 121–126, Jan. 2004,
+        doi: 10.1016/S0021-9290(03)00233-1.
+    .. [2] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
+        Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
+        Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
+    """
+    def __init__(self):
+        super().__init__('stride regularity - V', depends=[StrideTime])
+
+    def _predict(self, dt, leg_length, gait, gait_aux):
+        stridereg = zeros(len(gait_aux['accel']), dtype=float_)
+
+        for i, acc in enumerate(gait_aux['accel']):
+            # acf = _autocovariancefunction(acc[:, gait_aux['vert axis']], int(4.5 / dt))
+            # compute the average number of samples per stride, this *should* be the
+            # lag over the bout for sequential strides
+            lag = int(
+                round(nanmean(gait['PARAM:stride time'][gait_aux['inertial data i'] == i]) / dt)
+            )
+            stridereg[i] = _autocovariance_lag(acc[:, gait_aux['vert axis']], lag)
+
+        # broadcast step regularity into gait for each step
+        gait[self.k_] = stridereg[gait_aux['inertial data i']]
+
+
+class AutocorrelationSymmetryV(BoutMetric):
+    """
+    Autocorrelation symmetry is the absolute difference between stride and step regularity.
+
+    References
+    ----------
+    .. [1] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
+        Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
+        Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
+    """
+    def __init__(self):
+        super().__init__(
+            'autocorrelation symmetry - V', depends=[StepRegularityV, StrideRegularityV]
+        )
+
+    def _predict(self, dt, leg_length, gait, gait_aux):
+        gait[self.k_] = abs(
+            gait['BOUTPARAM:step regularity - V'] - gait['BOUTPARAM:stride regularity - V']
+        )
