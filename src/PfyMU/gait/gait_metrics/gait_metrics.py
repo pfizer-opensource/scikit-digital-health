@@ -117,9 +117,9 @@ def _autocovariance(x, i1, i2, i3, biased=False):
 # ===========================================================
 class StrideTime(EventMetric):
     """
-    Stride time is the time to complete 1 full gait cycle for 1 foot. Defined as heel-strike
-    (initial contact) to heel-strike for the same foot. A basic asymmetry measure is also computed
-    as the difference between sequential stride times of opposite feet
+    The time to complete 1 full gait cycle for 1 foot. Defined as heel-strike (initial contact) to
+    heel-strike for the same foot. A basic asymmetry measure is also computed as the difference
+    between sequential stride times of opposite feet.
     """
     def __init__(self):
         super().__init__('stride time')
@@ -132,9 +132,9 @@ class StrideTime(EventMetric):
 
 class StanceTime(EventMetric):
     """
-    Stance time is the time during which the foot is on the ground. Defined as heel-strike
+    The time during a stride in which the foot is on the ground. Defined as heel-strike
     (initial contact) to toe-off (final contact) for a foot. A basic asymmetry measure is also
-    computed as the difference between sequential stance times of opposite feet
+    computed as the difference between sequential stance times of opposite feet.
     """
     def __init__(self):
         super().__init__('stance time')
@@ -146,9 +146,9 @@ class StanceTime(EventMetric):
 
 class SwingTime(EventMetric):
     """
-    Swing time is the time during which the foot is off the ground. Defined as toe-off
-    (final contact) to heel-strike (initial contact) of the same foot. A basic asymmetry measure
-    is also computed as the difference between sequential swing times of opposite feet
+    The time during which the foot is off the ground. Defined as toe-off (final contact) to
+    heel-strike (initial contact) of the same foot. A basic asymmetry measure is also computed as
+    the difference between sequential swing times of opposite feet.
     """
     def __init__(self):
         super().__init__('swing time')
@@ -161,9 +161,9 @@ class SwingTime(EventMetric):
 
 class StepTime(EventMetric):
     """
-    Step time is the duration from heel-strike (initial contact) to heel-strike of the opposite
-    foot. A basic asymmetry measure is also computed as the difference between sequential
-    step times of opposite feet
+    The duration from heel-strike (initial contact) to heel-strike of the opposite foot. A basic
+    asymmetry measure is also computed as the difference between sequential step times of opposite
+    feet.
     """
     def __init__(self):
         super().__init__('step time')
@@ -176,10 +176,10 @@ class StepTime(EventMetric):
 
 class InitialDoubleSupport(EventMetric):
     """
-    Initial double support is the time immediately following heel strike during which the
-    opposite foot is still on the ground. Defined as heel-strike (initial contact) to toe-off
-    (final contact) of the opposite foot. A basic asymmetry measure is also computed as the
-    difference between sequential initial double support times of opposite feet
+    The time immediately following heel strike during which the opposite foot is still on the
+    ground. Defined as heel-strike (initial contact) to toe-off (final contact) of the opposite
+    foot. A basic asymmetry measure is also computed as the difference between sequential initial
+    double support times of opposite feet.
     """
     def __init__(self):
         super().__init__('initial double support')
@@ -191,10 +191,10 @@ class InitialDoubleSupport(EventMetric):
 
 class TerminalDoubleSupport(EventMetric):
     """
-    Terminal double support is the time immediately before toe-off (final contact) in which
-    the opposite foot has contacted the ground. Defined as heel-strike (initial contact) of the
-    opposite foot to toe-off of the current foot. A basic asymmetry measure is also computed as
-    the difference between sequential terminal double support times of opposite feet
+    The time immediately before toe-off (final contact) in which the opposite foot has contacted
+    the ground. Defined as heel-strike (initial contact) of the opposite foot to toe-off of the
+    current foot. A basic asymmetry measure is also computed as the difference between sequential
+    terminal double support times of opposite feet.
     """
     def __init__(self):
         super().__init__('terminal double support')
@@ -207,10 +207,9 @@ class TerminalDoubleSupport(EventMetric):
 
 class DoubleSupport(EventMetric):
     """
-    Double support is the combined initial and terminal double support times. It is the total
-    time during a stride that the current and opposite foot are in contact with the ground. A
-    basic asymmetry measure is also computed as the difference between sequential double support
-    times of opposite feet
+    The combined initial and terminal double support times. It is the total time during a stride
+    that the current and opposite foot are in contact with the ground. A basic asymmetry measure
+    is also computed as the difference between sequential double support times of opposite feet.
     """
     def __init__(self):
         super().__init__('double support', depends=[InitialDoubleSupport, TerminalDoubleSupport])
@@ -223,10 +222,10 @@ class DoubleSupport(EventMetric):
 
 class SingleSupport(EventMetric):
     """
-    Single support is the time during a stride that only the current foot is in contact with
-    the ground. Defined as opposite foot toe-off (final contact) to opposite foot heel-strike
-    (initial contact). A basic asymmetry measure is also computed as the difference between
-    sequential single support times of opposite feet
+    The time during a stride that only the current foot is in contact with the ground. Defined as
+    opposite foot toe-off (final contact) to opposite foot heel-strike (initial contact). A basic
+    asymmetry measure is also computed as the difference between sequential single support times
+    of opposite feet.
     """
     def __init__(self):
         super().__init__('single support')
@@ -239,19 +238,19 @@ class SingleSupport(EventMetric):
 
 class StepLength(EventMetric):
     """
-    Step length is the distance traveled during a step (heel-strike to opposite foot
-    heel-strike). A basic asymmetry measure is also computed as the difference between sequential
-    step lengths of opposite feet
+    The distance traveled during a step (heel-strike to opposite foot heel-strike). A basic
+    asymmetry measure is also computed as the difference between sequential step lengths of
+    opposite feet.
 
     Notes
     -----
-    The step length is computed using the inverted pendulum model from [1]_:
+    The step length is computed using the inverted pendulum model from [1]_ per
 
     .. math:: L_{step} = 2\\sqrt{2l_{leg}h-h^2}
 
     where :math:`L_{step}` is the step length, :math:`l_{leg}` is the leg length, and
     :math:`h` is the Center of Mass change in height during a step. Leg length can either be
-    measured, or taken to be :math:`0.53height`
+    measured, or taken to be :math:`0.53height`.
 
     References
     ----------
@@ -272,20 +271,20 @@ class StepLength(EventMetric):
 
 class StrideLength(EventMetric):
     r"""
-    Stride length is the distance traveled during a stride (heel-strike to current foot
-    heel-strike). A basic asymmetry measure is also computed as the difference between sequential
-    stride lengths of opposite feet
+    The distance traveled during a stride (heel-strike to current foot heel-strike). A basic
+    asymmetry measure is also computed as the difference between sequential stride lengths of
+    opposite feet.
 
     Notes
     -----
-    The stride length is computed using the inverted pendulum model from [1]_:
+    The stride length is computed using the inverted pendulum model from [1]_ per
 
     .. math:: L_{step} = 2\sqrt{2l_{leg}h-h^2}
     .. math:: L_{stride} = L_{step, i} + L_{step, i+1}
 
     where :math:`L_{s}` is the step or stride length, :math:`l_{leg}` is the leg length, and
     :math:`h` is the Center of Mass change in height during a step. Leg length can either be
-    measured, or taken to be :math:`0.53height`
+    measured, or taken to be :math:`0.53height`.
 
     References
     ----------
@@ -306,9 +305,9 @@ class StrideLength(EventMetric):
 
 class GaitSpeed(EventMetric):
     """
-    Gait speed is how fast distance is being convered. Defined as the stride length divided by the
+    How fast distance is being traveled. Defined as the stride length divided by the
     stride duration, in m/s. A basic asymmetry measure is also computed as the difference between
-    sequential gait speeds of opposite feet
+    sequential gait speeds of opposite feet.
     """
     def __init__(self):
         super().__init__('gait speed', depends=[StrideLength, StrideTime])
@@ -323,8 +322,7 @@ class GaitSpeed(EventMetric):
 
 class Cadence(EventMetric):
     """
-    Cadence is the number of steps taken in 1 minute. It is computed per step, as 60.0s
-    divided by the step time
+    The number of steps taken in 1 minute. Computed per step as 60.0s divided by the step time.
     """
     def __init__(self):
         super().__init__('cadence', depends=[StepTime])
@@ -335,13 +333,13 @@ class Cadence(EventMetric):
 
 class IntraStrideCovariance(EventMetric):
     """
-    Intra-stride covariance is the autocovariance of 1 stride with lag equal to the stride
-    duration. In other words, it is how similar the acceleration signal is from one stride to the
-    next for only 1 stride. Values near 1 indicate very symmetrical strides. It differs from the
-    `StrideRegularity` in that stride regularity uses the acceleration from the entire gait bout
-    while intra-stride covariance uses the acceleration only from individual strides. Values close
-    to 1 indicate that the following stride was very similar/symmetrical to the current stride,
-    while values close to 0 indicate that the following stride was not similar
+    The autocovariance of vertical acceleration of 1 stride with lag equal to the stride duration.
+    In other words, it is how similar the vertical acceleration signal is from one stride to the
+    next, for only 1 stride. It differs from the `StrideRegularity` in that stride regularity uses
+    the acceleration from the entire gait bout while intra-stride covariance uses the acceleration
+    only from individual steps. Values close to 1 indicate that the following stride was very
+    similar to the current stride, while values close to 0 indicate that the following stride was
+    not very similar.
 
     References
     ----------
@@ -367,15 +365,15 @@ class IntraStrideCovariance(EventMetric):
             )
 
 
-class IntraStepCovariance(EventMetric):
+class IntraStepCovarianceV(EventMetric):
     """
-    Intra-step covariance is the autocovariance of 1 step with lag equal to the step
-    duration. In other words, it is how similar the acceleration signal is from one step to the
-    next for only 1 step. Values near 1 indicate very symmetrical steps. It differs from the
-    `StepRegularity` in that step regularity uses the acceleration from the entire gait bout
-    while intra-step covariance uses the acceleration only from individual steps. Values close to
-    1 indicate that the following step was very similar/symmetrical to the current step, while
-    values close to 0 indicate that the following step was not similar
+    The autocovariance of vertical acceleration of 1 step with lag equal to the step duration. In
+    other words, it is how similar the acceleration signal is from one step to the next for only
+    1 step. It differs from the `StepRegularity` in that step regularity uses the acceleration
+    from the entire gait bout while intra-step covariance uses the acceleration only from
+    individual steps. Values close to 1 indicate that the following step was very
+    similar to the current step, while values close to 0 indicate that the following step was
+    not very similar.
 
     References
     ----------
@@ -402,10 +400,10 @@ class IntraStepCovariance(EventMetric):
 
 class HarmonicRatioV(EventMetric):
     r"""
-    Harmonic Ratio (HR) assesses the symmetry of the 2 steps that occur during each stride. Defined
-    as the sum of the amplitude of the even harmonics (of average stride frequency) divided by the
-    sum of the amplitude of the odd harmonics. Higher values indicate better symmetry between the
-    steps occuring during an individual stride
+    Symmetry measure of the 2 steps that occur during each stride. It attempts to capture this
+    relationship by looking at the frequency components for steps and strides and creating a ratio
+    using these values. Higher values indicate better symmetry between the steps occuring during
+    an individual stride.
 
     Notes
     -----
@@ -460,10 +458,10 @@ class HarmonicRatioV(EventMetric):
 # ===========================================================
 class PhaseCoordinationIndex(BoutMetric):
     r"""
-    Phase Coordination Index (PCI) assesses symmetry between steps during straight overground gait.
+    Assessment of the symmetry between steps during straight overground gait.
     Computed for an entire bout, it is a measure of the deviation from symmetrical steps (ie half a
     stride is equal to exactly 1 step duration). Lower values indicate better symmetry and
-    a "more consistent and accurate phase generation" [2]_
+    a "more consistent and accurate phase generation" [2]_.
 
     Notes
     -----
@@ -484,7 +482,7 @@ class PhaseCoordinationIndex(BoutMetric):
     .. math: \varphi_{CV} = 100\frac{s_{\varphi}}{\bar{\varphi}}
 
     where :math:`\bar{\varphi}` and :math:`s_{\varphi}` are the sample mean and standard deviation
-    of :math:`\varphi` respectively. Finally, the PCI is computed,
+    of :math:`\varphi` respectively. Finally, the PCI is computed per
 
     .. math:: PCI = \varphi_{CV} + 100\frac{\varphi_{ABS}}{180}
 
@@ -518,9 +516,9 @@ class PhaseCoordinationIndex(BoutMetric):
 
 class GaitSymmetryIndex(BoutMetric):
     r"""
-    Gait Symmetry Index (GSI) assesses symmetry between steps during straight overground gait. It
-    is computed for a whole bout. Values closer to 1 indicate higher symmetry, while values close
-    to 0 indicate lower symmetry
+    Assessment of the symmetry between steps during straight overground gait. It is computed for
+    an entire bout. Values closer to 1 indicate higher symmetry, while values close to 0 indicate
+    lower symmetry.
 
     Notes
     -----
@@ -593,10 +591,10 @@ class GaitSymmetryIndex(BoutMetric):
 
 class StepRegularityV(BoutMetric):
     """
-    Step regularity is the autocorrelation at a lag time of 1 step. Computed for an entire bout
-    of gait, this is a measure of the average symmetry of sequential steps during overground
-    strait gait for the vertical acceleration component. Values close to 1 indicate high degree of
-    regularity/symmetry, while values close to 0 indicate a low degree of regularity/symmetry
+    The autocovariance at a lag time of 1 step for the vertical acceleration. Computed for an
+    entire bout of gait, it is a measure of the average symmetry of sequential steps during
+    overground strait gait. Values close to 1 indicate high degree of regularity/symmetry, while
+    values close to 0 indicate a low degree of regularity/symmetry.
 
     Notes
     -----
@@ -640,10 +638,10 @@ class StepRegularityV(BoutMetric):
 
 class StrideRegularityV(BoutMetric):
     """
-    Stride regularity is the autocorrelation at a lag time of 1 stride. Computed for an entire bout
-    of gait, this is a measure of the average symmetry of sequential stride during overground
-    strait gait for the vertical acceleration component. Values close to 1 indicate high degree of
-    regularity/symmetry, while values close to 0 indicate a low degree of regularity/symmetry
+    Autocovariance at a lag time of 1 stride for the vertical acceleration. Computed for an
+    entire bout of gait, it is a measure of the average symmetry of sequential stride during
+    overground strait gait. Values close to 1 indicate high degree of regularity/symmetry, while
+    values close to 0 indicate a low degree of regularity/symmetry.
 
     Notes
     -----
@@ -688,11 +686,11 @@ class StrideRegularityV(BoutMetric):
         gait[self.k_] = stridereg[gait_aux['inertial data i']]
 
 
-class AutocorrelationSymmetryV(BoutMetric):
+class AutocovarianceSymmetryV(BoutMetric):
     """
-    Autocorrelation symmetry is the absolute difference between stride and step regularity. It
-    quantifies the level of symmetry between the stride and step regularity and provide an overall
-    metric of symmetry for the gait bout
+    The absolute difference between stride and step regularity for the vertical axis.
+    It quantifies the level of symmetry between the stride and step regularity and provide an
+    overall metric of symmetry for the gait bout
 
     References
     ----------
@@ -702,7 +700,7 @@ class AutocorrelationSymmetryV(BoutMetric):
     """
     def __init__(self):
         super().__init__(
-            'autocorrelation symmetry - V', depends=[StepRegularityV, StrideRegularityV]
+            'autocovariance symmetry - V', depends=[StepRegularityV, StrideRegularityV]
         )
 
     def _predict(self, dt, leg_length, gait, gait_aux):
