@@ -284,18 +284,9 @@ class StepLength(EventMetric):
 
 
 class StrideLength(EventMetric):
-    """
+    r"""
     Stride length is the distance traveled during a stride (heel-strike to current foot
-    heel-strike). Here it is computed using the inverted pendulum model from [1]_:
-
-    :math:`L_{step} = 2\\sqrt{2l_{leg}h-h^2}`
-    :math:`L_{stride} = L_{step, i} + L_{step, i+1}`
-
-    where :math:`L_{s}` is the step or stride length, :math:`l_{leg}` is the leg length, and
-    :math:`h` is the Center of Mass change in height during a step. Leg length can either be
-    measured, or taken to be :math:`0.53height`
-
-    A basic asymmetry measure is also computed as the difference between sequential
+    heel-strike). A basic asymmetry measure is also computed as the difference between sequential
     stride lengths of opposite feet
 
     References
@@ -303,6 +294,17 @@ class StrideLength(EventMetric):
     .. [1] W. Zijlstra and A. L. Hof, “Assessment of spatio-temporal gait parameters from
         trunk accelerations during human walking,” Gait & Posture, vol. 18, no. 2, pp. 1–10,
         Oct. 2003, doi: 10.1016/S0966-6362(02)00190-X.
+
+    Notes
+    -----
+    The stride length is computed using the inverted pendulum model from [1]_:
+
+    .. math:: L_{step} = 2\sqrt{2l_{leg}h-h^2}
+    .. math:: L_{stride} = L_{step, i} + L_{step, i+1}
+
+    where :math:`L_{s}` is the step or stride length, :math:`l_{leg}` is the leg length, and
+    :math:`h` is the Center of Mass change in height during a step. Leg length can either be
+    measured, or taken to be :math:`0.53height`
     """
     def __init__(self):
         super().__init__('stride length', depends=[StepLength])
@@ -318,10 +320,8 @@ class StrideLength(EventMetric):
 class GaitSpeed(EventMetric):
     """
     Gait speed is how fast distance is being convered. Defined as the stride length divided by the
-    stride duration, in m/s
-
-    A basic asymmetry measure is also computed as the difference between sequential
-    gait speeds of opposite feet
+    stride duration, in m/s. A basic asymmetry measure is also computed as the difference between
+    sequential gait speeds of opposite feet
     """
     def __init__(self):
         super().__init__('gait speed', depends=[StrideLength, StrideTime])
@@ -336,7 +336,7 @@ class GaitSpeed(EventMetric):
 
 class Cadence(EventMetric):
     """
-    Cadence is the number of steps taken in 1 minute. Here it is computed per step, as 60.0s
+    Cadence is the number of steps taken in 1 minute. It is computed per step, as 60.0s
     divided by the step time
     """
     def __init__(self):
@@ -352,10 +352,9 @@ class IntraStrideCovariance(EventMetric):
     duration. In other words, it is how similar the acceleration signal is from one stride to the
     next for only 1 stride. Values near 1 indicate very symmetrical strides. It differs from the
     `StrideRegularity` in that stride regularity uses the acceleration from the entire gait bout
-    while intra-stride covariance uses the acceleration only from individual strides.
-
-    Values close to 1 indicate that the following stride was very similar/symmetrical to the
-    current stride, while values close to 0 indicate that the following stride was not similar
+    while intra-stride covariance uses the acceleration only from individual strides. Values close
+    to 1 indicate that the following stride was very similar/symmetrical to the current stride,
+    while values close to 0 indicate that the following stride was not similar
 
     References
     ----------
@@ -387,10 +386,9 @@ class IntraStepCovariance(EventMetric):
     duration. In other words, it is how similar the acceleration signal is from one step to the
     next for only 1 step. Values near 1 indicate very symmetrical steps. It differs from the
     `StepRegularity` in that step regularity uses the acceleration from the entire gait bout
-    while intra-step covariance uses the acceleration only from individual steps.
-
-    Values close to 1 indicate that the following step was very similar/symmetrical to the current
-    step, while values close to 0 indicate that the following step was not similar
+    while intra-step covariance uses the acceleration only from individual steps. Values close to
+    1 indicate that the following step was very similar/symmetrical to the current step, while
+    values close to 0 indicate that the following step was not similar
 
     References
     ----------
@@ -656,10 +654,8 @@ class StrideRegularityV(BoutMetric):
     """
     Stride regularity is the autocorrelation at a lag time of 1 stride. Computed for an entire bout
     of gait, this is a measure of the average symmetry of sequential stride during overground
-    strait gait for the vertical acceleration component.
-
-    Values close to 1 indicate high degree of regularity/symmetry, while values close to 0 indicate
-    a low degree of regularity/symmetry
+    strait gait for the vertical acceleration component. Values close to 1 indicate high degree of
+    regularity/symmetry, while values close to 0 indicate a low degree of regularity/symmetry
 
     References
     ----------
