@@ -17,7 +17,7 @@ def basic_asymmetry(f):
     return run_basic_asymmetry
 
 
-class GaitMetric:
+class EventMetric:
     def __str__(self):
         return self.name
 

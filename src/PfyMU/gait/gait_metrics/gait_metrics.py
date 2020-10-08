@@ -34,7 +34,7 @@ from numpy import zeros
 from scipy.signal import butter, sosfiltfilt
 
 
-from PfyMU.gait.gait_metrics.base import GaitMetric, basic_asymmetry
+from PfyMU.gait.gait_metrics.base import EventMetric, basic_asymmetry
 
 
 __all__ = ['StrideTime', 'StanceTime', 'SwingTime', 'StepTime', 'InitialDoubleSupport',
@@ -95,7 +95,7 @@ def _autocovariance3(x, i1, i2, i3, biased=False):
     return ac
 
 
-class StrideTime(GaitMetric):
+class StrideTime(EventMetric):
     """
     Stride time is the time to complete 1 full gait cycle for 1 foot. Defined as heel-strike
     (initial contact) to heel-strike for the same foot.
@@ -112,7 +112,7 @@ class StrideTime(GaitMetric):
         gait[self.k_][mask] = (gait['IC'][mask_ofst] - gait['IC'][mask]) * dt
 
 
-class StanceTime(GaitMetric):
+class StanceTime(EventMetric):
     """
     Stance time is the time during which the foot is on the ground. Defined as heel-strike
     (initial contact) to toe-off (final contact) for a foot.
@@ -128,7 +128,7 @@ class StanceTime(GaitMetric):
         gait[self.k_] = (gait['FC'] - gait['IC']) * dt
 
 
-class SwingTime(GaitMetric):
+class SwingTime(EventMetric):
     """
     Swing time is the time during which the foot is off the ground. Defined as toe-off
     (final contact) to heel-strike (initial contact) of the same foot.
@@ -145,7 +145,7 @@ class SwingTime(GaitMetric):
         gait[self.k_][mask] = (gait['IC'][mask_ofst] - gait['FC'][mask]) * dt
 
 
-class StepTime(GaitMetric):
+class StepTime(EventMetric):
     """
     Step time is the duration from heel-strike (initial contact) to heel-strike of the opposite
     foot.
@@ -162,7 +162,7 @@ class StepTime(GaitMetric):
         gait[self.k_][mask] = (gait['IC'][mask_ofst] - gait['IC'][mask]) * dt
 
 
-class InitialDoubleSupport(GaitMetric):
+class InitialDoubleSupport(EventMetric):
     """
     Initial double support is the time immediately following heel strike during which the
     opposite foot is still on the ground. Defined as heel-strike (initial contact) to toe-off
@@ -179,7 +179,7 @@ class InitialDoubleSupport(GaitMetric):
         gait[self.k_] = (gait['FC opp foot'] - gait['IC']) * dt
 
 
-class TerminalDoubleSupport(GaitMetric):
+class TerminalDoubleSupport(EventMetric):
     """
     Terminal double support is the time immediately before toe-off (final contact) in which
     the opposite foot has contacted the ground. Defined as heel-strike (initial contact) of the
@@ -197,7 +197,7 @@ class TerminalDoubleSupport(GaitMetric):
         gait[self.k_][mask] = (gait['FC opp foot'][mask_ofst] - gait['IC'][mask_ofst]) * dt
 
 
-class DoubleSupport(GaitMetric):
+class DoubleSupport(EventMetric):
     """
     Double support is the combined initial and terminal double support times. It is the total
     time during a stride that the current and opposite foot are in contact with the ground.
@@ -214,7 +214,7 @@ class DoubleSupport(GaitMetric):
                         + gait['PARAM:terminal double support']
 
 
-class SingleSupport(GaitMetric):
+class SingleSupport(EventMetric):
     """
     Single support is the time during a stride that only the current foot is in contact with
     the ground. Defined as opposite foot toe-off (final contact) to opposite foot heel-strike
@@ -232,7 +232,7 @@ class SingleSupport(GaitMetric):
         gait[self.k_][mask] = (gait['IC'][mask_ofst] - gait['FC opp foot'][mask]) * dt
 
 
-class StepLength(GaitMetric):
+class StepLength(EventMetric):
     """
     Step length is the distance traveled during a step (heel-strike to opposite foot
     heel-strike). Here it is computed using the inverted pendulum model from [1]_:
@@ -263,7 +263,7 @@ class StepLength(GaitMetric):
             self._predict_init(gait, True, None)  # don't generate masks
 
 
-class StrideLength(GaitMetric):
+class StrideLength(EventMetric):
     """
     Stride length is the distance traveled during a stride (heel-strike to current foot
     heel-strike). Here it is computed using the inverted pendulum model from [1]_:
@@ -295,7 +295,7 @@ class StrideLength(GaitMetric):
                             + gait['PARAM:step length'][mask]
 
 
-class GaitSpeed(GaitMetric):
+class GaitSpeed(EventMetric):
     """
     Gait speed is how fast distance is being convered. Defined as the stride length divided by the
     stride duration, in m/s
@@ -314,7 +314,7 @@ class GaitSpeed(GaitMetric):
             self._predict_init(gait, True, None)  # don't generate masks
 
 
-class Cadence(GaitMetric):
+class Cadence(EventMetric):
     """
     Cadence is the number of steps taken in 1 minute. Here it is computed per step, as 60.0s
     divided by the step time
@@ -326,7 +326,7 @@ class Cadence(GaitMetric):
         gait[self.k_] = 60.0 / gait['PARAM:step time']
 
 
-class GaitSymmetryIndex(GaitMetric):
+class GaitSymmetryIndex(EventMetric):
     """
     Gait Symmetry Index (GSI) assesses symmetry between steps during straight overground gait.
 
@@ -360,7 +360,7 @@ class GaitSymmetryIndex(GaitMetric):
             gait[self.k_][idx] = sqrt(sum(ac)) / sqrt(3)
 
 
-class IntraStrideCovariance(GaitMetric):
+class IntraStrideCovariance(EventMetric):
     """
     Intra-stride covariance is the autocovariance of 1 stride with lag equal to the stride
     duration. In other words, it is how similar the acceleration signal is from one stride to the
@@ -392,7 +392,7 @@ class IntraStrideCovariance(GaitMetric):
             )
 
 
-class IntraStepCovariance(GaitMetric):
+class IntraStepCovariance(EventMetric):
     """
     Intra-step covariance is the autocovariance of 1 step with lag equal to the step
     duration. In other words, it is how similar the acceleration signal is from one step to the
@@ -423,7 +423,7 @@ class IntraStepCovariance(GaitMetric):
             )
 
 
-# class AutocorrelationSymmetry(GaitMetric):
+# class AutocorrelationSymmetry(EventMetric):
 #     """
 #     Autocorrelation symmetry is the absolute difference between stride and step regularity.
 #
