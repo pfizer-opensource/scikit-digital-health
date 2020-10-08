@@ -118,10 +118,8 @@ def _autocovariance(x, i1, i2, i3, biased=False):
 class StrideTime(EventMetric):
     """
     Stride time is the time to complete 1 full gait cycle for 1 foot. Defined as heel-strike
-    (initial contact) to heel-strike for the same foot.
-
-    A basic asymmetry measure is also computed as the difference between sequential
-    stride times of opposite feet
+    (initial contact) to heel-strike for the same foot. A basic asymmetry measure is also computed
+    as the difference between sequential stride times of opposite feet
     """
     def __init__(self):
         super().__init__('stride time')
@@ -135,10 +133,8 @@ class StrideTime(EventMetric):
 class StanceTime(EventMetric):
     """
     Stance time is the time during which the foot is on the ground. Defined as heel-strike
-    (initial contact) to toe-off (final contact) for a foot.
-
-    A basic asymmetry measure is also computed as the difference between sequential
-    stance times of opposite feet
+    (initial contact) to toe-off (final contact) for a foot. A basic asymmetry measure is also
+    computed as the difference between sequential stance times of opposite feet
     """
     def __init__(self):
         super().__init__('stance time')
@@ -151,10 +147,8 @@ class StanceTime(EventMetric):
 class SwingTime(EventMetric):
     """
     Swing time is the time during which the foot is off the ground. Defined as toe-off
-    (final contact) to heel-strike (initial contact) of the same foot.
-
-    A basic asymmetry measure is also computed as the difference between sequential
-    swing times of opposite feet
+    (final contact) to heel-strike (initial contact) of the same foot. A basic asymmetry measure
+    is also computed as the difference between sequential swing times of opposite feet
     """
     def __init__(self):
         super().__init__('swing time')
@@ -168,9 +162,7 @@ class SwingTime(EventMetric):
 class StepTime(EventMetric):
     """
     Step time is the duration from heel-strike (initial contact) to heel-strike of the opposite
-    foot.
-
-    A basic asymmetry measure is also computed as the difference between sequential
+    foot. A basic asymmetry measure is also computed as the difference between sequential
     step times of opposite feet
     """
     def __init__(self):
@@ -186,10 +178,8 @@ class InitialDoubleSupport(EventMetric):
     """
     Initial double support is the time immediately following heel strike during which the
     opposite foot is still on the ground. Defined as heel-strike (initial contact) to toe-off
-    (final contact) of the opposite foot.
-
-    A basic asymmetry measure is also computed as the difference between sequential
-    initial double support times of opposite feet
+    (final contact) of the opposite foot. A basic asymmetry measure is also computed as the
+    difference between sequential initial double support times of opposite feet
     """
     def __init__(self):
         super().__init__('initial double support')
@@ -203,10 +193,8 @@ class TerminalDoubleSupport(EventMetric):
     """
     Terminal double support is the time immediately before toe-off (final contact) in which
     the opposite foot has contacted the ground. Defined as heel-strike (initial contact) of the
-    opposite foot to toe-off of the current foot
-
-    A basic asymmetry measure is also computed as the difference between sequential
-    terminal double support times of opposite feet
+    opposite foot to toe-off of the current foot. A basic asymmetry measure is also computed as
+    the difference between sequential terminal double support times of opposite feet
     """
     def __init__(self):
         super().__init__('terminal double support')
@@ -220,10 +208,9 @@ class TerminalDoubleSupport(EventMetric):
 class DoubleSupport(EventMetric):
     """
     Double support is the combined initial and terminal double support times. It is the total
-    time during a stride that the current and opposite foot are in contact with the ground.
-
-    A basic asymmetry measure is also computed as the difference between sequential
-    double support times of opposite feet
+    time during a stride that the current and opposite foot are in contact with the ground. A
+    basic asymmetry measure is also computed as the difference between sequential double support
+    times of opposite feet
     """
     def __init__(self):
         super().__init__('double support', depends=[InitialDoubleSupport, TerminalDoubleSupport])
@@ -238,10 +225,8 @@ class SingleSupport(EventMetric):
     """
     Single support is the time during a stride that only the current foot is in contact with
     the ground. Defined as opposite foot toe-off (final contact) to opposite foot heel-strike
-    (initial contact).
-
-    A basic asymmetry measure is also computed as the difference between sequential
-    single support times of opposite feet
+    (initial contact). A basic asymmetry measure is also computed as the difference between
+    sequential single support times of opposite feet
     """
     def __init__(self):
         super().__init__('single support')
@@ -255,16 +240,18 @@ class SingleSupport(EventMetric):
 class StepLength(EventMetric):
     """
     Step length is the distance traveled during a step (heel-strike to opposite foot
-    heel-strike). Here it is computed using the inverted pendulum model from [1]_:
+    heel-strike). A basic asymmetry measure is also computed as the difference between sequential
+    step lengths of opposite feet
 
-    :math:`L_{step} = 2\\sqrt{2l_{leg}h-h^2}`
+    Notes
+    -----
+    The step length is computed using the inverted pendulum model from [1]_:
+
+    .. math:: L_{step} = 2\\sqrt{2l_{leg}h-h^2}
 
     where :math:`L_{step}` is the step length, :math:`l_{leg}` is the leg length, and
     :math:`h` is the Center of Mass change in height during a step. Leg length can either be
     measured, or taken to be :math:`0.53height`
-
-    A basic asymmetry measure is also computed as the difference between sequential
-    step lengths of opposite feet
 
     References
     ----------
@@ -289,12 +276,6 @@ class StrideLength(EventMetric):
     heel-strike). A basic asymmetry measure is also computed as the difference between sequential
     stride lengths of opposite feet
 
-    References
-    ----------
-    .. [1] W. Zijlstra and A. L. Hof, “Assessment of spatio-temporal gait parameters from
-        trunk accelerations during human walking,” Gait & Posture, vol. 18, no. 2, pp. 1–10,
-        Oct. 2003, doi: 10.1016/S0966-6362(02)00190-X.
-
     Notes
     -----
     The stride length is computed using the inverted pendulum model from [1]_:
@@ -305,6 +286,12 @@ class StrideLength(EventMetric):
     where :math:`L_{s}` is the step or stride length, :math:`l_{leg}` is the leg length, and
     :math:`h` is the Center of Mass change in height during a step. Leg length can either be
     measured, or taken to be :math:`0.53height`
+
+    References
+    ----------
+    .. [1] W. Zijlstra and A. L. Hof, “Assessment of spatio-temporal gait parameters from
+        trunk accelerations during human walking,” Gait & Posture, vol. 18, no. 2, pp. 1–10,
+        Oct. 2003, doi: 10.1016/S0966-6362(02)00190-X.
     """
     def __init__(self):
         super().__init__('stride length', depends=[StepLength])
@@ -420,15 +407,6 @@ class HarmonicRatioV(EventMetric):
     sum of the amplitude of the odd harmonics. Higher values indicate better symmetry between the
     steps occuring during an individual stride
 
-    References
-    ----------
-    .. [1] J. L. Roche, K. A. Lowry, J. M. Vanswearingen, J. S. Brach, and M. S. Redfern,
-        “Harmonic Ratios: A quantification of step to step symmetry,” J Biomech, vol. 46, no. 4,
-        pp. 828–831, Feb. 2013, doi: 10.1016/j.jbiomech.2012.12.008.
-    .. [2] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
-        Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
-        Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
-
     Notes
     -----
     The Harmonic ratio is computed from the first 20 harmonics extracted from a fourier series.
@@ -439,6 +417,15 @@ class HarmonicRatioV(EventMetric):
     where :math:`F` is the power spectral density and :math:`f_{stride}` is the stride frequency.
     Since this is computed on a per-stride basis, the stride frequency is estimated as the inverse
     of stride time for the individual stride.
+
+    References
+    ----------
+    .. [1] J. L. Roche, K. A. Lowry, J. M. Vanswearingen, J. S. Brach, and M. S. Redfern,
+        “Harmonic Ratios: A quantification of step to step symmetry,” J Biomech, vol. 46, no. 4,
+        pp. 828–831, Feb. 2013, doi: 10.1016/j.jbiomech.2012.12.008.
+    .. [2] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
+        Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
+        Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
     """
 
     def __init__(self):
@@ -478,6 +465,29 @@ class PhaseCoordinationIndex(BoutMetric):
     stride is equal to exactly 1 step duration). Lower values indicate better symmetry and
     a "more consistent and accurate phase generation" [2]_
 
+    Notes
+    -----
+    The computation of PCI relies on the assumption that healthy gait is perfectly even, with
+    step times being exactly half of stride times. This assumption informs the definition
+    of the PCI, where the perfect step phase is set to :math:`180^\circ`. To compute PCI, the
+    phase is first computed for each stride as the relative step to stride time in degrees,
+
+    .. math:: \varphi_i = 360^\circ\left(\frac{hs_{i+1}-hs_{i}}{hs_{i+2}-hs{i}}\right)
+
+    where :math:`hs_i` is the *ith* heel-strike. Then over the whole bout, the mean absolute
+    difference from :math:`180^\circ` is computed as :math:`\varphi_{ABS}`,
+
+    .. math:: \varphi_{ABS} = \frac{1}{N}\sum_{i=1}^{N}|\varphi_i - 180^\circ|
+
+    The coefficient of variation (:math:`\varphi_{CV}`) is also computed for phase,
+
+    .. math: \varphi_{CV} = 100\frac{s_{\varphi}}{\bar{\varphi}}
+
+    where :math:`\bar{\varphi}` and :math:`s_{\varphi}` are the sample mean and standard deviation
+    of :math:`\varphi` respectively. Finally, the PCI is computed,
+
+    .. math:: PCI = \varphi_{CV} + 100\frac{\varphi_{ABS}}{180}
+
     References
     ----------
     .. [1] M. Plotnik, N. Giladi, and J. M. Hausdorff, “A new measure for quantifying the
@@ -487,29 +497,6 @@ class PhaseCoordinationIndex(BoutMetric):
         Ambulation Walking Patterns and Cognitive Function in Patients with Parkinson’s Disease:
         Further Insights into Motor-Cognitive Links,” Parkinsons Dis, vol. 2015, 2015,
         doi: 10.1155/2015/547065.
-
-    Notes
-    -----
-    The computation of PCI relies on the assumption that healthy gait is perfectly even, with
-    step times being exactly half of stride times. This assumption informs the definition
-    of the PCI, where the perfect step phase is set to :math:`180^\circ`. To compute PCI, the
-    phase is first computed for each stride as the relative step to stride time in degrees,
-
-    :math:`\varphi_i = 360^\circ\left(\frac{hs_{i+1}-hs_{i}}{hs_{i+2}-hs{i}}\right)`
-
-    where :math:`hs_i` is the *ith* heel-strike. Then over the whole bout, the mean absolute
-    difference from :math:`180^\circ` is computed as :math:`\varphi_{ABS}`,
-
-    :math:`\varphi_{ABS} = \frac{1}{N}\sum_{i=1}^{N}|\varphi_i - 180^\circ|`
-
-    The coefficient of variation (:math:`\varphi_{CV}`) is also computed for phase,
-
-    :math:`\varphi_{CV} = 100\frac{s_{\varphi}}{\bar{\varphi}}`
-
-    where :math:`\bar{\varphi}` and :math:`s_{\varphi}` are the sample mean and standard deviation
-    of :math:`\varphi` respectively. Finally, the PCI is computed,
-
-    :math:`PCI = \varphi_{CV} + 100\frac{\varphi_{ABS}}{180}`
     """
     def __init__(self):
         super().__init__('phase coordination index')
@@ -534,18 +521,6 @@ class GaitSymmetryIndex(BoutMetric):
     Gait Symmetry Index (GSI) assesses symmetry between steps during straight overground gait. It
     is computed for a whole bout. Values closer to 1 indicate higher symmetry, while values close
     to 0 indicate lower symmetry
-
-    References
-    ----------
-    .. [1] W. Zhang, M. Smuck, C. Legault, M. A. Ith, A. Muaremi, and K. Aminian, “Gait Symmetry
-        Assessment with a Low Back 3D Accelerometer in Post-Stroke Patients,” Sensors, vol. 18,
-        no. 10, p. 3322, Oct. 2018, doi: 10.3390/s18103322.
-    .. [2] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
-        Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
-        Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
-    .. [3] H. P. von Schroeder, R. D. Coutts, P. D. Lyden, E. Billings, and V. L. Nickel, “Gait
-        parameters following stroke: a practical assessment,” Journal of Rehabilitation Research
-        and Development, vol. 32, no. 1, pp. 25–31, Feb. 1995.
 
     Notes
     -----
@@ -578,6 +553,18 @@ class GaitSymmetryIndex(BoutMetric):
     a local maximum in the autocovariance function. To find the peak corresponding to
     :math:`m_{stride}` the peak nearest to the average stride time for the bout is used. GSI is
     normalized by :math:`\sqrt{3}` in order to have a maximum value of 1.
+
+    References
+    ----------
+    .. [1] W. Zhang, M. Smuck, C. Legault, M. A. Ith, A. Muaremi, and K. Aminian, “Gait Symmetry
+        Assessment with a Low Back 3D Accelerometer in Post-Stroke Patients,” Sensors, vol. 18,
+        no. 10, p. 3322, Oct. 2018, doi: 10.3390/s18103322.
+    .. [2] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
+        Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
+        Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
+    .. [3] H. P. von Schroeder, R. D. Coutts, P. D. Lyden, E. Billings, and V. L. Nickel, “Gait
+        parameters following stroke: a practical assessment,” Journal of Rehabilitation Research
+        and Development, vol. 32, no. 1, pp. 25–31, Feb. 1995.
     """
     def __init__(self):
         super().__init__('gait symmetry index')
@@ -611,15 +598,6 @@ class StepRegularityV(BoutMetric):
     strait gait for the vertical acceleration component. Values close to 1 indicate high degree of
     regularity/symmetry, while values close to 0 indicate a low degree of regularity/symmetry
 
-    References
-    ----------
-    .. [1] R. Moe-Nilssen and J. L. Helbostad, “Estimation of gait cycle characteristics by trunk
-        accelerometry,” Journal of Biomechanics, vol. 37, no. 1, pp. 121–126, Jan. 2004,
-        doi: 10.1016/S0021-9290(03)00233-1.
-    .. [2] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
-        Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
-        Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
-
     Notes
     -----
     Step regularity is the value of the autocovariance function at a lag equal to the time
@@ -630,6 +608,15 @@ class StepRegularityV(BoutMetric):
     The peak corresponding to one step time is found by searching the area near the lag
     corresponding to the average step time for the gait bout. The nearest peak to this point is
     used as the peak at a lag of one step.
+
+    References
+    ----------
+    .. [1] R. Moe-Nilssen and J. L. Helbostad, “Estimation of gait cycle characteristics by trunk
+        accelerometry,” Journal of Biomechanics, vol. 37, no. 1, pp. 121–126, Jan. 2004,
+        doi: 10.1016/S0021-9290(03)00233-1.
+    .. [2] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
+        Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
+        Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
     """
     def __init__(self):
         super().__init__('step regularity - V', depends=[StepTime])
@@ -657,15 +644,6 @@ class StrideRegularityV(BoutMetric):
     strait gait for the vertical acceleration component. Values close to 1 indicate high degree of
     regularity/symmetry, while values close to 0 indicate a low degree of regularity/symmetry
 
-    References
-    ----------
-    .. [1] R. Moe-Nilssen and J. L. Helbostad, “Estimation of gait cycle characteristics by trunk
-        accelerometry,” Journal of Biomechanics, vol. 37, no. 1, pp. 121–126, Jan. 2004,
-        doi: 10.1016/S0021-9290(03)00233-1.
-    .. [2] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
-        Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
-        Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
-
     Notes
     -----
     Stride regularity is the value of the autocovariance function at a lag equal to the time
@@ -676,6 +654,15 @@ class StrideRegularityV(BoutMetric):
     The peak corresponding to one stride time is found by searching the area near the lag
     corresponding to the average stride time for the gait bout. The nearest peak to this point is
     used as the peak at a lag of one stride.
+
+    References
+    ----------
+    .. [1] R. Moe-Nilssen and J. L. Helbostad, “Estimation of gait cycle characteristics by trunk
+        accelerometry,” Journal of Biomechanics, vol. 37, no. 1, pp. 121–126, Jan. 2004,
+        doi: 10.1016/S0021-9290(03)00233-1.
+    .. [2] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
+        Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
+        Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
     """
     def __init__(self):
         super().__init__('stride regularity - V', depends=[StrideTime])
