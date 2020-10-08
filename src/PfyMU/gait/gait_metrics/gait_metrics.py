@@ -39,9 +39,9 @@ from PfyMU.gait.gait_metrics.base import EventMetric, BoutMetric, basic_asymmetr
 
 __all__ = ['StrideTime', 'StanceTime', 'SwingTime', 'StepTime', 'InitialDoubleSupport',
            'TerminalDoubleSupport', 'DoubleSupport', 'SingleSupport', 'StepLength',
-           'StrideLength', 'GaitSpeed', 'Cadence', 'GaitSymmetryIndex', 'IntraStepCovariance',
-           'IntraStrideCovariance', 'HarmonicRatioV', 'PhaseCoordinationIndex', 'StepRegularityV',
-           'StrideRegularityV', 'AutocorrelationSymmetryV']
+           'StrideLength', 'GaitSpeed', 'Cadence', 'GaitSymmetryIndex', 'IntraStepCovarianceV',
+           'IntraStrideCovarianceV', 'HarmonicRatioV', 'PhaseCoordinationIndex', 'StepRegularityV',
+           'StrideRegularityV', 'AutocovarianceSymmetryV']
 
 
 def _autocovariancefunction(x, max_lag, biased=False):
@@ -331,7 +331,7 @@ class Cadence(EventMetric):
         gait[self.k_] = 60.0 / gait['PARAM:step time']
 
 
-class IntraStrideCovariance(EventMetric):
+class IntraStrideCovarianceV(EventMetric):
     """
     The autocovariance of vertical acceleration of 1 stride with lag equal to the stride duration.
     In other words, it is how similar the vertical acceleration signal is from one stride to the
