@@ -555,7 +555,7 @@ class GaitSymmetryIndex(BoutMetric):
     .. math:: C_{stride}(m) = K_{AP}(m) + K_{V}(m) + K_{ML}(m)
 
     where :math:`K_{x}` is the autocovariance in the :math:`x` direction - Anterior-Posterior (AP),
-    Medial-Lateral (ML), and vertical (V). The coefficient of step repetition (:math:`C_{step}`)
+    Medial-Lateral (ML), or vertical (V). The coefficient of step repetition (:math:`C_{step}`)
     is the norm of :math:`C_{stride}`
 
     .. math:: C_{step}(m) = \sqrt{C_{stride}(m)} = \sqrt{K_{AP}(m) + K_{V}(m) + K_{ML}(m)}
