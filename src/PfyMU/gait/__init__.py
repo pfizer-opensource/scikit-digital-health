@@ -12,27 +12,39 @@ Pipeline gait processing
 
     Gait
 
-Gait Metrics
-------------
+Event Level Gait Metrics
+------------------------
 
 .. autosummary::
     :toctree: generated/
 
-    StrideTime
-    StanceTime
-    SwingTime
-    StepTime
-    InitialDoubleSupport
-    TerminalDoubleSupport
-    DoubleSupport
-    SingleSupport
-    StepLength
-    StrideLength
-    GaitSpeed
-    Cadence
-    StepRegularity
-    StrideRegularity
-    AutocorrelationSymmetry
+    StrideTime,
+    StanceTime,
+    SwingTime,
+    StepTime,
+    InitialDoubleSupport,
+    TerminalDoubleSupport,
+    DoubleSupport,
+    SingleSupport,
+    StepLength,
+    StrideLength,
+    GaitSpeed,
+    Cadence,
+    IntraStepCovariance,
+    IntraStrideCovariance,
+    HarmonicRatioV,
+
+Bout Level Gait Metrics
+-----------------------
+
+.. autosummary::
+    :toctree: generated/
+
+    PhaseCoordinationIndex,
+    GaitSymmetryIndex,
+    StepRegularityV,
+    StrideRegularityV,
+    AutocorrelationSymmetryV
 """
 from PfyMU.gait.gait import Gait
 from PfyMU.gait import gait
