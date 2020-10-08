@@ -382,7 +382,7 @@ class IntraStepCovarianceV(EventMetric):
         Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
     """
     def __init__(self):
-        super().__init__('step regularity - V')
+        super().__init__('intra-step covariance - V')
 
     def _predict(self, dt, leg_length, gait, gait_aux):
         mask, mask_ofst = self._predict_init(gait, True, 1)
