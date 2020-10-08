@@ -43,30 +43,25 @@ __all__ = ['StrideTime', 'StanceTime', 'SwingTime', 'StepTime', 'InitialDoubleSu
            'AutocorrelationSymmetryV']
 
 
-def _autocovariancefunction(x, m_lim):
-    ac = zeros(m_lim)
-    for lag in range(m_lim):
-        x1 = x[:x.size-lag]
-        x2 = x[lag:]
-        m1 = mean(x1)
-        m2 = mean(x2)
-        s1 = std(x1, ddof=1)
-        s2 = std(x2, ddof=1)
-
-        ac[lag] = sum((x1 - m1) * (x2 - m2))
-        ac[lag] /= ((x.size - lag) * s1 * s2)
-
-    return ac
-
-
 def _autocovariance_lag(x, lag, biased=False):
-    N = x.size
-    m1 = mean(x[:N-lag])
-    m2 = mean(x[lag:])
-    s1 = std(x[:N-lag], ddof=1)
-    s2 = std(x[lag:], ddof=1)
+    if x.ndim == 1:
+        N = x.size
+        m1 = mean(x[:N-lag])
+        m2 = mean(x[lag:])
+        s1 = std(x[:N-lag], ddof=1)
+        s2 = std(x[lag:], ddof=1)
 
-    ac = sum((x[:N-lag] - m1) * (x[lag:] - m2))
+        ac = sum((x[:N-lag] - m1) * (x[lag:] - m2))
+    elif x.ndim == 2:
+        N = x.shape[0]
+        m1 = mean(x[:N-lag], axis=0)
+        m2 = mean(x[lag:], axis=0)
+        s1 = std(x[:N-lag], ddof=1, axis=0)
+        s2 = std(x[lag:], ddof=1, axis=0)
+
+        ac = sum((x[:N-lag] - m1) * (x[lag:] - m2), axis=0)
+    else:
+        raise ValueError('Too many dimensions (>2) for x')
     if biased:
         ac /= (N * s1 * s2)
     else:
@@ -84,24 +79,6 @@ def _autocovariance(x, i1, i2, i3, biased=False):
     m2, s2 = mean(x[i2:i3]), std(x[i2:i3], ddof=1)
 
     ac = sum((x[i1:i2] - m1) * (x[i2:i3] - m2))
-    if biased:
-        ac /= (N * s1 * s2)
-    else:
-        ac /= ((N - m) * s1 * s2)
-
-    return ac
-
-
-def _autocovariance3(x, i1, i2, i3, biased=False):
-    if i3 > x.shape[0]:
-        return nan
-
-    N = i3 - i1
-    m = i2 - i1
-    m1, s1 = mean(x[i1:i2], axis=0), std(x[i1:i2], ddof=1, axis=0)
-    m2, s2 = mean(x[i2:i3], axis=0), std(x[i2:i3], ddof=1, axis=0)
-
-    ac = sum((x[i1:i2] - m1) * (x[i2:i3] - m2), axis=0)
     if biased:
         ac /= (N * s1 * s2)
     else:
@@ -344,40 +321,6 @@ class Cadence(EventMetric):
         gait[self.k_] = 60.0 / gait['PARAM:step time']
 
 
-class GaitSymmetryIndex(EventMetric):
-    """
-    Gait Symmetry Index (GSI) assesses symmetry between steps during straight overground gait.
-
-    References
-    ----------
-    .. [1] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
-        Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
-        Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
-    """
-    def __init__(self):
-        super().__init__('gait symmetry index')
-
-    def _predict(self, dt, leg_length, gait, gait_aux):
-        mask, mask_ofst = self._predict_init(gait, True, 1)
-
-        i1 = gait['IC'][mask]
-        i2 = gait['IC'][mask_ofst]
-        i3 = i2 + (i2 - i1)
-
-        # filter the acceleration data first
-        faccel = {'accel': gait_aux['accel']}
-        sos = butter(4, 2 * 10 * dt, btype='low', output='sos')
-        for i, acc in enumerate(faccel['accel']):
-            faccel['accel'][i] = sosfiltfilt(sos, acc, axis=0)
-
-        for i, idx in enumerate(nonzero(mask)[0]):
-            ac = _autocovariance3(
-                faccel['accel'][gait_aux['inertial data i'][idx]],
-                i1[i], i2[i], i3[i]
-            )
-            gait[self.k_][idx] = sqrt(sum(ac)) / sqrt(3)
-
-
 class IntraStrideCovariance(EventMetric):
     """
     Intra-stride covariance is the autocovariance of 1 stride with lag equal to the stride
@@ -385,6 +328,9 @@ class IntraStrideCovariance(EventMetric):
     next for only 1 stride. Values near 1 indicate very symmetrical strides. It differs from the
     `StrideRegularity` in that stride regularity uses the acceleration from the entire gait bout
     while intra-stride covariance uses the acceleration only from individual strides.
+
+    Values close to 1 indicate that the following stride was very similar/symmetrical to the
+    current stride, while values close to 0 indicate that the following stride was not similar
 
     References
     ----------
@@ -418,6 +364,9 @@ class IntraStepCovariance(EventMetric):
     `StepRegularity` in that step regularity uses the acceleration from the entire gait bout
     while intra-step covariance uses the acceleration only from individual steps.
 
+    Values close to 1 indicate that the following step was very similar/symmetrical to the current
+    step, while values close to 0 indicate that the following step was not similar
+
     References
     ----------
     .. [1] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
@@ -444,11 +393,47 @@ class IntraStepCovariance(EventMetric):
 # ===========================================================
 #     GAIT BOUT-LEVEL METRICS
 # ===========================================================
+class GaitSymmetryIndex(BoutMetric):
+    """
+    Gait Symmetry Index (GSI) assesses symmetry between steps during straight overground gait. It
+    is computed for a whole bout.
+
+    Values closer to 1 indicate higher symmetry, while values close to 0 indicate lower symmetry
+
+    References
+    ----------
+    .. [1] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
+        Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
+        Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
+    """
+    def __init__(self):
+        super().__init__('gait symmetry index')
+
+    def _predict(self, dt, leg_length, gait, gait_aux):
+        gsi = zeros(len(gait_aux['accel']), dtype=float_)
+
+        # setup acceleration filter
+        sos = butter(4, 2 * 10 * dt, btype='low', output='sos')
+        for i, acc in enumerate(gait_aux['accel']):
+            lag = int(
+                round(nanmean(gait['PARAM:step time'][gait_aux['inertial data i'] == i]) / dt)
+            )
+            # GSI uses biased autocovariance
+            ac = _autocovariance_lag(sosfiltfilt(sos, acc, axis=0), lag, biased=True)
+
+            gsi[i] = sqrt(sum(ac)) / sqrt(3)
+
+        gait[self.k_] = gsi[gait_aux['inertial data i']]
+
+
 class StepRegularityV(BoutMetric):
     """
     Step regularity is the autocorrelation at a lag time of 1 step. Computed for an entire bout
     of gait, this is a measure of the average symmetry of sequential steps during overground
     strait gait for the vertical acceleration component.
+
+    Values close to 1 indicate high degree of regularity/symmetry, while values close to 0 indicate
+    a low degree of regularity/symmetry
 
     References
     ----------
@@ -483,6 +468,9 @@ class StrideRegularityV(BoutMetric):
     Stride regularity is the autocorrelation at a lag time of 1 stride. Computed for an entire bout
     of gait, this is a measure of the average symmetry of sequential stride during overground
     strait gait for the vertical acceleration component.
+
+    Values close to 1 indicate high degree of regularity/symmetry, while values close to 0 indicate
+    a low degree of regularity/symmetry
 
     References
     ----------
