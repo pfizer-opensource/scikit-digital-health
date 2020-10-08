@@ -29,8 +29,8 @@ stride length: step_length_i + step_length_i+1
 
 gait speed: stride_length / stride time
 """
-from numpy import zeros, nanmean, mean, std, sum, sqrt, nan, nonzero, argmin, abs, round, float_, \
-    int_, fft, arange
+from numpy import zeros, nanmean, mean, nanstd, std, sum, sqrt, nan, nonzero, argmin, abs, round, \
+    float_, int_, fft, arange
 from scipy.signal import butter, sosfiltfilt
 
 
@@ -438,6 +438,55 @@ class HarmonicRatioV(EventMetric):
 # ===========================================================
 #     GAIT BOUT-LEVEL METRICS
 # ===========================================================
+class PhaseCoordinationIndex(BoutMetric):
+    """
+    Phase Coordination Index (PCI) assesses symmetry between steps during straight overground gait.
+    Computed for an entire bout, it is a measure of the deviation from symmetrical steps (ie half a
+    stride is equal to exactly 1 step duration)
+
+    References
+    ----------
+    .. [1] M. Plotnik, N. Giladi, and J. M. Hausdorff, “A new measure for quantifying the
+        bilateral coordination of human gait: effects of aging and Parkinson’s disease,”
+        Exp Brain Res, vol. 181, no. 4, pp. 561–570, Aug. 2007, doi: 10.1007/s00221-007-0955-7.
+
+    Notes
+    -----
+    The computation of PCI relies on the assumption that healthy gait is perfectly even, with
+    step times being exactly half of stride times. This assumption informs the definition
+    of the PCI, where the perfect step phase is set to :math:`180^\\circ`. To compute PCI, the
+    phase is first computed for each stride as the relative step to stride time in degrees,
+
+    :math:`\\psi_i = 360^\\circle\\left(\\frac{hs_{i+1}-hs_{i}}{hs_{i+2}-hs{i}}\\right)`
+
+    where :math:`hs_i` is the *ith* heel-strike. Then over the whole bout, the mean absolute
+    difference from :math:`180^\\circ` is computed as :math:`\\psi_{ABS}`,
+
+    :math:`\\psi_{ABS} = \\frac{1}{N}\\sum_{i=1}^{N}|\\psi_i - 180^\\circle|`
+
+    The coefficient of variation is also computed as the standard deviation divided by the mean,
+    labeled as :math:`\\psi_{CV}`. Finally, the PCI is computed,
+
+    :math:`PCI = \\psi_{CV} + 100\\frac{\\psi_{ABS}{180}`
+    """
+    def __init__(self):
+        super().__init__('phase coordination index')
+
+    def _predict(self, dt, leg_length, gait, gait_aux):
+        pci = zeros(len(gait_aux['accel']), dtype=float_)
+
+        phase = gait['PARAM:step time'] / gait['PARAM:stride time']  # %, not degrees
+        for i in range(len(gait_aux['accel'])):
+            mask = gait_aux['inertial data i'] == i
+
+            psi_abs = nanmean(abs(phase[mask] - 0.5))  # using % not degrees right now
+            psi_cv = nanstd(phase[mask], ddof=1, ) / nanmean(phase[mask])
+
+            pci[i] = 100 * (psi_cv + psi_abs / 0.5)
+
+        gait[self.k_] = pci[gait_aux['inertial data i']]
+
+
 class GaitSymmetryIndex(BoutMetric):
     """
     Gait Symmetry Index (GSI) assesses symmetry between steps during straight overground gait. It
