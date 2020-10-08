@@ -15,6 +15,7 @@ from PfyMU.gait.get_gait_bouts import get_gait_bouts
 from PfyMU.gait.get_gait_events import get_gait_events
 from PfyMU.gait.get_strides import get_strides
 from PfyMU.gait import gait_metrics
+from PfyMU.gait.gait_metrics import EventMetric, BoutMetric
 from PfyMU.gait.get_bout_metrics_delta_h import get_bout_metrics_delta_h
 
 
@@ -97,6 +98,7 @@ class Gait(_BaseProcess):
 
     # gait parameters
     _params = [
+        # event level metrics
         gait_metrics.StrideTime,
         gait_metrics.StanceTime,
         gait_metrics.SwingTime,
@@ -112,6 +114,8 @@ class Gait(_BaseProcess):
         gait_metrics.GaitSymmetryIndex,
         gait_metrics.IntraStepCovariance,
         gait_metrics.IntraStrideCovariance,
+        # bout level metrics
+        gait_metrics.StepRegularityV
     ]
 
     def __repr__(self):
@@ -152,8 +156,8 @@ class Gait(_BaseProcess):
         Parameters
         ----------
         metrics : {Iterable, callable}
-            Either an iterable of GaitMetric references or an individual GaitMetric reference to be
-            added to the list of metrics to be computed
+            Either an iterable of EventMetric or BoutMetric references or an individual
+            EventMetric/BoutMetric reference to be added to the list of metrics to be computed
 
         Examples
         --------
@@ -165,14 +169,14 @@ class Gait(_BaseProcess):
 
         >>> class NewGaitMetric(gait_metrics.EventMetric):
         >>>     pass
-        >>> class NewGaitMetric2(gait_metrics.EventMetric):
+        >>> class NewGaitMetric2(gait_metrics.BoutMetric):
         >>>     pass
         >>>
         >>> gait = Gait()
         >>> gait.add_metrics([NewGaitMetric, NewGaitMetric2])
         """
         if isinstance(metrics, Iterable):
-            if all(isinstance(i(), gait_metrics.EventMetric) for i in metrics):
+            if all(isinstance(i(), (EventMetric, BoutMetric)) for i in metrics):
                 self._params.extend(metrics)
             else:
                 raise ValueError('Must provide either a GaitMetric or iterable of GaitMetrics')
