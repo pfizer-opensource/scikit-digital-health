@@ -625,13 +625,14 @@ class StepRegularityV(BoutMetric):
         stepreg = zeros(len(gait_aux['accel']), dtype=float_)
 
         for i, acc in enumerate(gait_aux['accel']):
-            # acf = _autocovariancefunction(acc[:, gait_aux['vert axis']], int(4.5 / dt))
-            # compute the average number of samples per step, this *should* be the
-            # lag over the bout for sequential steps
             lag = int(
                 round(nanmean(gait['PARAM:step time'][gait_aux['inertial data i'] == i]) / dt)
             )
-            stepreg[i] = _autocovariance_lag(acc[:, gait_aux['vert axis']], lag)
+            acf = _autocovariancefunction(acc[:, gait_aux['vert axis']], int(4.5 * dt))
+            pks, _ = find_peaks(acf)
+            idx = argmin(abs(pks - lag))
+
+            stepreg[i] = acf[idx]
 
         # broadcast step regularity into gait for each step
         gait[self.k_] = stepreg[gait_aux['inertial data i']]
@@ -677,7 +678,11 @@ class StrideRegularityV(BoutMetric):
             lag = int(
                 round(nanmean(gait['PARAM:stride time'][gait_aux['inertial data i'] == i]) / dt)
             )
-            stridereg[i] = _autocovariance_lag(acc[:, gait_aux['vert axis']], lag)
+            acf = _autocovariancefunction(acc[:, gait_aux['vert axis']], int(4.5 * dt))
+            pks, _ = find_peaks(acf)
+            idx = argmin(abs(pks - lag))
+
+            stridereg[i] = acf[idx]
 
         # broadcast step regularity into gait for each step
         gait[self.k_] = stridereg[gait_aux['inertial data i']]
