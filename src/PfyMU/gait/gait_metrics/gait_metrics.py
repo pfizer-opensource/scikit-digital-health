@@ -429,7 +429,7 @@ class HarmonicRatioV(EventMetric):
             ))
             stridef = 1 / gait['PARAM:stride time'][idx]  # current stride frequency
             # get the indices for the first 20 harmonics
-            ix_stridef = argmin(self._freq / dt - stridef) * self._harmonics
+            ix_stridef = argmin(abs(self._freq / dt - stridef)) * self._harmonics
 
             # index 1 is harmonic 2 -> even harmonics / odd harmonics
             gait[self.k_][idx] = sum(F[ix_stridef[1::2]]) / sum(F[ix_stridef[::2]])
