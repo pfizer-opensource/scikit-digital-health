@@ -157,27 +157,27 @@ class Gait(_BaseProcess):
 
         Examples
         --------
-        >>> class NewGaitMetric(gait_metrics.GaitMetric):
+        >>> class NewGaitMetric(gait_metrics.EventMetric):
         >>>     pass
         >>>
         >>> gait = Gait()
         >>> gait.add_metrics(NewGaitMetric)
 
-        >>> class NewGaitMetric(gait_metrics.GaitMetric):
+        >>> class NewGaitMetric(gait_metrics.EventMetric):
         >>>     pass
-        >>> class NewGaitMetric2(gait_metrics.GaitMetric):
+        >>> class NewGaitMetric2(gait_metrics.EventMetric):
         >>>     pass
         >>>
         >>> gait = Gait()
         >>> gait.add_metrics([NewGaitMetric, NewGaitMetric2])
         """
         if isinstance(metrics, Iterable):
-            if all(isinstance(i(), gait_metrics.GaitMetric) for i in metrics):
+            if all(isinstance(i(), gait_metrics.EventMetric) for i in metrics):
                 self._params.extend(metrics)
             else:
                 raise ValueError('Must provide either a GaitMetric or iterable of GaitMetrics')
         else:
-            if isinstance(metrics(), gait_metrics.GaitMetric):
+            if isinstance(metrics(), gait_metrics.EventMetric):
                 self._params.append(metrics)
 
     def predict(self, *args, **kwargs):
