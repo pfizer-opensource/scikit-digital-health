@@ -29,7 +29,8 @@ stride length: step_length_i + step_length_i+1
 
 gait speed: stride_length / stride time
 """
-from numpy import zeros, nanmean, mean, std, sum, sqrt, nan, nonzero, abs, round, float_
+from numpy import zeros, nanmean, mean, std, sum, sqrt, nan, nonzero, argmin, abs, round, float_, \
+    int_, fft, arange
 from scipy.signal import butter, sosfiltfilt
 
 
@@ -39,7 +40,7 @@ from PfyMU.gait.gait_metrics.base import EventMetric, BoutMetric, basic_asymmetr
 __all__ = ['StrideTime', 'StanceTime', 'SwingTime', 'StepTime', 'InitialDoubleSupport',
            'TerminalDoubleSupport', 'DoubleSupport', 'SingleSupport', 'StepLength',
            'StrideLength', 'GaitSpeed', 'Cadence', 'GaitSymmetryIndex', 'IntraStepCovariance',
-           'IntraStrideCovariance', 'StepRegularityV', 'StrideRegularityV',
+           'IntraStrideCovariance', 'HarmonicRatioV', 'StepRegularityV', 'StrideRegularityV',
            'AutocorrelationSymmetryV']
 
 
@@ -388,6 +389,50 @@ class IntraStepCovariance(EventMetric):
                 gait_aux['accel'][gait_aux['inertial data i'][idx]][:, gait_aux['vert axis']],
                 i1[i], i2[i], i3[i], biased=False
             )
+
+
+class HarmonicRatioV(EventMetric):
+    """
+    Harmonic Ratio (HR) assesses the symmetry of the 2 steps that occur during each stride. Defined
+    as the sum of the amplitude of the even harmonics (of average stride frequency) divided by the
+    sum of the amplitude of the odd harmonics. Higher values indicate better symmetry between the
+    steps occuring during an individual stride
+
+    References
+    ----------
+    .. [1] J. L. Roche, K. A. Lowry, J. M. Vanswearingen, J. S. Brach, and M. S. Redfern,
+        “Harmonic Ratios: A quantification of step to step symmetry,” J Biomech, vol. 46, no. 4,
+        pp. 828–831, Feb. 2013, doi: 10.1016/j.jbiomech.2012.12.008.
+    .. [2] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
+        Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
+        Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
+    """
+
+    def __init__(self):
+        super().__init__('harmonic ratio - V', depends=[StrideTime])
+        self._freq = fft.rfftfreq(1024)  # precompute the frequencies (still need to be scaled)
+        # TODO add check for stride frequency, if too low, bump this up higher?
+        self._harmonics = arange(1, 21, dtype=int_)
+
+    def _predict(self, dt, leg_length, gait, gait_aux):
+        mask, mask_ofst = self._predict_init(gait, init=True, offset=2)
+
+        i1 = gait['IC'][mask]
+        i2 = gait['IC'][mask_ofst]
+
+        va = gait_aux['vert axis']  # shorthand
+
+        for i, idx in enumerate(nonzero(mask)[0]):
+            F = abs(fft.rfft(
+                gait_aux['accel'][gait_aux['inertial data i'][idx]][i1[i]:i2[i], va],
+                n=1024
+            ))
+            stridef = 1 / gait['PARAM:stride time'][idx]  # current stride frequency
+            # get the indices for the first 20 harmonics
+            ix_stridef = argmin(self._freq / dt - stridef) * self._harmonics
+
+            # index 1 is harmonic 2 -> even harmonics / odd harmonics
+            gait[self.k_][idx] = sum(F[ix_stridef[1::2]]) / sum(F[ix_stridef[::2]])
 
 
 # ===========================================================
