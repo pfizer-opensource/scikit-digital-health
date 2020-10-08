@@ -31,7 +31,7 @@ gait speed: stride_length / stride time
 """
 from numpy import zeros, nanmean, mean, nanstd, std, sum, sqrt, nan, nonzero, argmin, abs, round, \
     float_, int_, fft, arange
-from scipy.signal import butter, sosfiltfilt
+from scipy.signal import butter, sosfiltfilt, find_peaks
 
 
 from PfyMU.gait.gait_metrics.base import EventMetric, BoutMetric, basic_asymmetry
@@ -42,6 +42,30 @@ __all__ = ['StrideTime', 'StanceTime', 'SwingTime', 'StepTime', 'InitialDoubleSu
            'StrideLength', 'GaitSpeed', 'Cadence', 'GaitSymmetryIndex', 'IntraStepCovariance',
            'IntraStrideCovariance', 'HarmonicRatioV', 'PhaseCoordinationIndex', 'StepRegularityV',
            'StrideRegularityV', 'AutocorrelationSymmetryV']
+
+
+def _autocovariancefunction(x, max_lag, biased=False):
+    if x.ndim == 1:
+        N = x.size
+        ac = zeros(max_lag, dtype=float_)
+        axis = -1
+    elif x.ndim == 2:
+        N = x.shape[0]
+        ac = zeros((max_lag, x.shape[1]), dtype=float_)
+        axis = 0
+    else:
+        raise ValueError('Too many dimensions (>2) for x')
+
+    for i in range(max_lag):
+        ac[i] = sum(
+            (x[:N-i] - mean(x[:N-i], axis=axis)) * (x[i:] - mean(x[i:], axis=axis)), axis=axis
+        )
+        if biased:
+            ac[i] /= (N * std(x[:N-i], ddof=1) * std(x[i:], ddof=1))
+        else:
+            ac[i] /= ((N - i) * std(x[:N-i], ddof=1) * std(x[i:], ddof=1))
+
+    return ac
 
 
 def _autocovariance_lag(x, lag, biased=False):
@@ -439,7 +463,7 @@ class HarmonicRatioV(EventMetric):
 #     GAIT BOUT-LEVEL METRICS
 # ===========================================================
 class PhaseCoordinationIndex(BoutMetric):
-    """
+    r"""
     Phase Coordination Index (PCI) assesses symmetry between steps during straight overground gait.
     Computed for an entire bout, it is a measure of the deviation from symmetrical steps (ie half a
     stride is equal to exactly 1 step duration). Lower values indicate better symmetry and
@@ -459,20 +483,24 @@ class PhaseCoordinationIndex(BoutMetric):
     -----
     The computation of PCI relies on the assumption that healthy gait is perfectly even, with
     step times being exactly half of stride times. This assumption informs the definition
-    of the PCI, where the perfect step phase is set to :math:`180^\\circ`. To compute PCI, the
+    of the PCI, where the perfect step phase is set to :math:`180^\circ`. To compute PCI, the
     phase is first computed for each stride as the relative step to stride time in degrees,
 
-    :math:`\\psi_i = 360^\\circle\\left(\\frac{hs_{i+1}-hs_{i}}{hs_{i+2}-hs{i}}\\right)`
+    :math:`\varphi_i = 360^\circ\left(\frac{hs_{i+1}-hs_{i}}{hs_{i+2}-hs{i}}\right)`
 
     where :math:`hs_i` is the *ith* heel-strike. Then over the whole bout, the mean absolute
-    difference from :math:`180^\\circ` is computed as :math:`\\psi_{ABS}`,
+    difference from :math:`180^\circ` is computed as :math:`\varphi_{ABS}`,
 
-    :math:`\\psi_{ABS} = \\frac{1}{N}\\sum_{i=1}^{N}|\\psi_i - 180^\\circle|`
+    :math:`\varphi_{ABS} = \frac{1}{N}\sum_{i=1}^{N}|\varphi_i - 180^\circ|`
 
-    The coefficient of variation is also computed as the standard deviation divided by the mean,
-    labeled as :math:`\\psi_{CV}`. Finally, the PCI is computed,
+    The coefficient of variation (:math:`\varphi_{CV}`) is also computed for phase,
 
-    :math:`PCI = \\psi_{CV} + 100\\frac{\\psi_{ABS}{180}`
+    :math:`\varphi_{CV} = 100\frac{s_{\varphi}}{\bar{\varphi}}`
+
+    where :math:`\bar{\varphi}` and :math:`s_{\varphi}` are the sample mean and standard deviation
+    of :math:`\varphi` respectively. Finally, the PCI is computed,
+
+    :math:`PCI = \varphi_{CV} + 100\frac{\varphi_{ABS}}{180}`
     """
     def __init__(self):
         super().__init__('phase coordination index')
@@ -493,17 +521,54 @@ class PhaseCoordinationIndex(BoutMetric):
 
 
 class GaitSymmetryIndex(BoutMetric):
-    """
+    r"""
     Gait Symmetry Index (GSI) assesses symmetry between steps during straight overground gait. It
-    is computed for a whole bout.
-
-    Values closer to 1 indicate higher symmetry, while values close to 0 indicate lower symmetry
+    is computed for a whole bout. Values closer to 1 indicate higher symmetry, while values close
+    to 0 indicate lower symmetry
 
     References
     ----------
-    .. [1] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
+    .. [1] W. Zhang, M. Smuck, C. Legault, M. A. Ith, A. Muaremi, and K. Aminian, “Gait Symmetry
+        Assessment with a Low Back 3D Accelerometer in Post-Stroke Patients,” Sensors, vol. 18,
+        no. 10, p. 3322, Oct. 2018, doi: 10.3390/s18103322.
+    .. [2] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
         Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
         Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
+    .. [3] H. P. von Schroeder, R. D. Coutts, P. D. Lyden, E. Billings, and V. L. Nickel, “Gait
+        parameters following stroke: a practical assessment,” Journal of Rehabilitation Research
+        and Development, vol. 32, no. 1, pp. 25–31, Feb. 1995.
+
+    Notes
+    -----
+    GSI is computed using the biased autocovariance of the acceleration after being filtered
+    through a 4th order 10Hz cutoff butterworth low-pass filter. [1]_ and [2]_ use the
+    autocorrelation, instead of autocovariance, however subtracting from the compared signals
+    results in a better mathematical comparison of the symmetry of the acceleration profile of the
+    gait. The biased autocovariance is used to suppress the value at higher lags [1]_. In order to
+    ensure that full steps/strides are capture, the maximum lag for the autocorrelation is set to
+    4s, which should include several strides in healthy adults, and account for more than
+    2.5 strides in impaired populations, such as hemiplegic stroke patients [3]_.
+
+    With the autocovariances computed for all 3 acceleration axes, the coefficient of stride
+    repetition (:math:`C_{stride}`) is computed for lag :math:`m` per
+
+    .. math:: C_{stride}(m) = K_{AP}(m) + K_{V}(m) + K_{ML}(m)
+
+    where :math:`K_{x}` is the autocovariance in the :math:`x` direction - Anterior-Posterior (AP),
+    Medial-Lateral (ML), and vertical (V). The coefficient of step repetition (:math:`C_{step}`)
+    is the norm of :math:`C_{stride}`
+
+    .. math:: C_{step}(m) = \sqrt{C_{stride}(m)} = \sqrt{K_{AP}(m) + K_{V}(m) + K_{ML}(m)}
+
+    Under the assumption that perfectly symmetrical gait will have step durations equal to half
+    the stride duration, the GSI is computed per
+
+    .. math:: GSI = C_{step}(0.5m_{stride}) / \sqrt{3}
+
+    where :math:`m_{stride}` is the lag for the average stride in the gait bout, and corresponds to
+    a local maximum in the autocovariance function. To find the peak corresponding to
+    :math:`m_{stride}` the peak nearest to the average stride time for the bout is used. GSI is
+    normalized by :math:`\sqrt{3}` in order to have a maximum value of 1.
     """
     def __init__(self):
         super().__init__('gait symmetry index')
@@ -515,12 +580,17 @@ class GaitSymmetryIndex(BoutMetric):
         sos = butter(4, 2 * 10 * dt, btype='low', output='sos')
         for i, acc in enumerate(gait_aux['accel']):
             lag = int(
-                round(nanmean(gait['PARAM:step time'][gait_aux['inertial data i'] == i]) / dt)
+                round(nanmean(gait['PARAM:stride time'][gait_aux['inertial data i'] == i]) / dt)
             )
             # GSI uses biased autocovariance
-            ac = _autocovariance_lag(sosfiltfilt(sos, acc, axis=0), lag, biased=True)
+            ac = _autocovariancefunction(sosfiltfilt(sos, acc, axis=0), int(4.5 * dt), biased=True)
 
-            gsi[i] = sqrt(sum(ac)) / sqrt(3)
+            # C_stride is the sum of 3 axes
+            pks, _ = find_peaks(sum(ac, axis=1))
+            # find the closest peak to the computed ideal half stride lag
+            idx = int(0.5 * argmin(abs(pks - lag)))
+
+            gsi[i] = sqrt(sum(ac[idx])) / sqrt(3)
 
         gait[self.k_] = gsi[gait_aux['inertial data i']]
 
