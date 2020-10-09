@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Welcome to SciKit-IMU's documentation!
-=================================
+======================================
 
 .. image:: https://github.com/PfizerRD/scikit-imu/workflows/skimu/badge.svg
    :alt: GitHub Actions Badge
