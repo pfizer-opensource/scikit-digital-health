@@ -1,2 +1,2 @@
-.. automodule:: PfyMU.gait
+.. automodule:: skimu.gait
     :ignore-module-all:

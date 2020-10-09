@@ -1,4 +1,4 @@
-.. _PfyMU api reference
+.. _skimu api reference
 
 API Reference
 ================

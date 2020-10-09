@@ -1,2 +1,2 @@
-.. automodule:: PfyMU.features
+.. automodule:: skimu.features
     :ignore-module-all:

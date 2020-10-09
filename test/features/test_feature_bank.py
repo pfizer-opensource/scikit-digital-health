@@ -1,6 +1,6 @@
 from numpy import allclose
 
-from PfyMU.features import *
+from skimu.features import *
 
 
 class TestBank:

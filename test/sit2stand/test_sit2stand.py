@@ -1,6 +1,6 @@
 from ..base_conftest import *
 
-from PfyMU.sit2stand import Sit2Stand
+from skimu.sit2stand import Sit2Stand
 
 
 class TestSit2StandStillness(BaseProcessTester):

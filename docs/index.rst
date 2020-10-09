@@ -3,13 +3,13 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to PfyMU's documentation!
+Welcome to SciKit-IMU's documentation!
 =================================
 
 .. image:: https://github.com/PfizerRD/PfyMU/workflows/PfyMU/badge.svg)
    :alt: GitHub Actions Badge
 
-PfyMU is a Python package with methods for reading, pre-processing, manipulating, and analyzing Inertial Meausurement Unit data. `PfyMU` contains the following sub-modules:
+PfyMU is a Python package with methods for reading, pre-processing, manipulating, and analyzing Inertial Meausurement Unit data. `SciKit-IMU` contains the following sub-modules:
 
 sit2stand
 ---------

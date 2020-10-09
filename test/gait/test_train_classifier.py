@@ -1,7 +1,7 @@
 from pytest import mark
 
-from PfyMU.features import compute_window_samples
-from PfyMU.gait.train_classifier import load_datasets
+from skimu.features import compute_window_samples
+from skimu.gait.train_classifier import load_datasets
 
 
 class TestLoadDatasets:

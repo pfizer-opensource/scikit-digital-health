@@ -135,6 +135,6 @@ dmypy.json
 .pyre/
 
 # Project specific
-!src/PfyMU/features/lib/
+!src/skimu/features/lib/
 /docs/ref/gait/generated/
 /docs/**/generated/

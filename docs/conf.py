@@ -16,14 +16,14 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'PfyMU'
+project = 'SciKit-IMU'
 copyright = '2020, Pfizer DMTI Data Science'
 author = 'Pfizer DMTI Data Science'
 
-import PfyMU
-version = PfyMU.__version__[:3]
+import skimu
+version = skimu.__version__[:3]
 # The full version, including alpha/beta/rc tags
-release = PfyMU.__version__
+release = skimu.__version__
 
 # -- General configuration ---------------------------------------------------
 

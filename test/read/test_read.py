@@ -3,8 +3,8 @@ from numpy import allclose
 
 from ..base_conftest import *
 
-from PfyMU.read import ReadCWA, ReadBin
-from PfyMU.read.get_window_start_stop import get_window_start_stop
+from skimu.read import ReadCWA, ReadBin
+from skimu.read.get_window_start_stop import get_window_start_stop
 
 
 @pytest.mark.parametrize(

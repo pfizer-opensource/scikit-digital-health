@@ -8,7 +8,7 @@ from warnings import warn
 
 from numpy import zeros
 
-from PfyMU.base import _BaseProcess
+from skimu.base import _BaseProcess
 """
 Add other imports here. Per python stardards, imports should follow the above pattern:
 top - python standard libraries

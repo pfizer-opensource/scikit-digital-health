@@ -9,12 +9,12 @@ from numpy import allclose
 
 from ..base_conftest import *
 
-from PfyMU.gait import Gait
-from PfyMU.gait.get_gait_classification import get_gait_classification_lgbm
-from PfyMU.gait.get_gait_bouts import get_gait_bouts
-from PfyMU.gait.get_gait_events import get_gait_events
-from PfyMU.gait.get_strides import get_strides
-from PfyMU.gait.get_bout_metrics_delta_h import get_bout_metrics_delta_h
+from skimu.gait import Gait
+from skimu.gait.get_gait_classification import get_gait_classification_lgbm
+from skimu.gait.get_gait_bouts import get_gait_bouts
+from skimu.gait.get_gait_events import get_gait_events
+from skimu.gait.get_strides import get_strides
+from skimu.gait.get_bout_metrics_delta_h import get_bout_metrics_delta_h
 
 
 class TestGetGaitClassificationLGBM:

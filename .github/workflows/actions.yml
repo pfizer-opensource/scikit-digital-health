@@ -1,4 +1,4 @@
-name: PfyMU
+name: skimu
 
 on:
   pull_request:
@@ -22,7 +22,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install flake8 pytest h5py wheel
-    - name: Install PfyMU
+    - name: Install skimu
       run: |
         # if macOS, make sure to set the environment variables so that it can find gfortran-9
         if [ "$RUNNER_OS" == "macOS" ]; then

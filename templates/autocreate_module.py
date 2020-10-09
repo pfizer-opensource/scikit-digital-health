@@ -17,10 +17,10 @@ def file_replace(lines, name, replace_with):
 
 
 init_contents = '''"""
-MODULE DESCRIPTION (:mod:`PfyMU.{mod_lower}`)
+MODULE DESCRIPTION (:mod:`skimu.{mod_lower}`)
 =======================================
 
-.. currentmodule:: PfyMU.{mod_lower}
+.. currentmodule:: skimu.{mod_lower}
 
 Heading 1
 ---------
@@ -34,7 +34,7 @@ Heading 2
 ---------
 contents
 """
-from PfyMU.{mod_lower}.{mod_lower} import {mod}
+from skimu.{mod_lower}.{mod_lower} import {mod}
 
 '''
 
@@ -59,7 +59,7 @@ if __name__ == "__main__":
     file_replace(lines, 'short_description', short_descr)
     file_replace(lines, 'year', year)
 
-    folder = Path('src/PfyMU') / module_name.lower()
+    folder = Path('src/skimu') / module_name.lower()
 
     folder.mkdir()
 
