@@ -6,5 +6,6 @@ API Reference
 .. toctree::
     :maxdepth: 2
 
+    read
     gait
     features
