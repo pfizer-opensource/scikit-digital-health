@@ -1,6 +1,6 @@
 """
 Signal Features (:mod:`skimu.features`)
-====================================
+=======================================
 
 .. currentmodule:: skimu.features
 
@@ -46,7 +46,7 @@ Features
     DetailPowerRatio
 
 Utility Functions
------------------------
+-----------------
 
 .. autosummary::
     :toctree: generated/

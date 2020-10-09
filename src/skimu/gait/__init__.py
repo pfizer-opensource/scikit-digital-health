@@ -1,6 +1,6 @@
 """
 IMU Gait Analysis (:mod:`skimu.gait`)
-====================================
+=====================================
 
 .. currentmodule:: skimu.gait
 
