@@ -14,21 +14,21 @@ __all__ = ['Mean', 'MeanCrossRate', 'StdDev', 'Skewness', 'Kurtosis']
 
 
 class Mean(Feature):
+    """
+    The signal mean.
+
+    Methods
+    -------
+    compute(signal[, columns=None, windowed=False])
+
+    Examples
+    --------
+    >>> signal = np.arange(15).reshape((5, 3))
+    >>> mn = features.Mean()
+    >>> mn.compute(signal)
+    array([6., 7., 8.])
+    """
     def __init__(self):
-        """
-        Compute the signal mean.
-
-        Methods
-        -------
-        compute(signal[, columns=None, windowed=False])
-
-        Examples
-        --------
-        >>> signal = np.arange(15).reshape((5, 3))
-        >>> mn = features.Mean()
-        >>> mn.compute(signal)
-        array([6., 7., 8.])
-        """
         super().__init__('Mean', {})
 
     def _compute(self, x, fs):
@@ -38,15 +38,14 @@ class Mean(Feature):
 
 
 class MeanCrossRate(Feature):
-    def __init__(self):
-        """
-        Calculate the number of times the signal crosses the mean value, expressed as a percentage
-        of the signal length in samples.
+    """
+    Number of signal mean value crossings. Expressed as a percentage of signal length.
 
-        Methods
-        -------
-        compute(signal[, columns=None, windowed=False])
-        """
+    Methods
+    -------
+    compute(signal[, columns=None, windowed=False])
+    """
+    def __init__(self):
         super(MeanCrossRate, self).__init__('MeanCrossRate', {})
 
     def _compute(self, x, fs):
@@ -59,20 +58,20 @@ class MeanCrossRate(Feature):
 
 
 class StdDev(Feature):
+    """
+    The signal standard deviation
+
+    Methods
+    -------
+    compute(signal[, columns=None, windowed=False])
+
+    Examples
+    --------
+    >>> signal = np.arange(15).reshape((5, 3))
+    >>> features.StDev().compute(signal)
+    array([[4.74341649, 4.74341649, 4.74341649]])
+    """
     def __init__(self):
-        """
-        Compute the signal standard deviation.
-
-        Methods
-        -------
-        compute(signal[, columns=None, windowed=False])
-
-        Examples
-        --------
-        >>> signal = np.arange(15).reshape((5, 3))
-        >>> features.StDev().compute(signal)
-        array([[4.74341649, 4.74341649, 4.74341649]])
-        """
         super().__init__('StdDev', {})
 
     def _compute(self, x, fs):
@@ -82,14 +81,14 @@ class StdDev(Feature):
 
 
 class Skewness(Feature):
-    def __init__(self):
-        """
-        Compute the skewness of a signal. NaN inputs will be propagated through to the result.
+    """
+    The skewness of a signal. NaN inputs will be propagated through to the result.
 
-        Methods
-        -------
-        compute(signal[, columns=None, windowed=False])
-        """
+    Methods
+    -------
+    compute(signal[, columns=None, windowed=False])
+    """
+    def __init__(self):
         super().__init__('Skewness', {})
 
     def _compute(self, x, fs):
@@ -99,14 +98,14 @@ class Skewness(Feature):
 
 
 class Kurtosis(Feature):
-    def __init__(self):
-        """
-        Compute the kurtosis of a signal. NaN inputs will be propagated through to the result.
+    """
+    The kurtosis of a signal. NaN inputs will be propagated through to the result.
 
-        Methods
-        -------
-        compute(signal[, columns=None, windowed=False])
-        """
+    Methods
+    -------
+    compute(signal[, columns=None, windowed=False])
+    """
+    def __init__(self):
         super().__init__('Kurtosis', {})
 
     def _compute(self, x, fs):
