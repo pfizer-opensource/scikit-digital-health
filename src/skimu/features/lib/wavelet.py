@@ -39,9 +39,9 @@ class DetailPower(Feature):
         else:
             self.f_band = [1.0, 3.0]
 
-    def compute(self, signal, fs=None, *, columns=None, windowed=False):
+    def compute(self, *args, **kwargs):
         """
-        compute(signal, fs[, columns=None, windowed=False])
+        compute(signal, fs, *, columns=None, windowed=False)
 
         Compute the detail power
 
@@ -61,7 +61,7 @@ class DetailPower(Feature):
         feature : {numpy.ndarray, pandas.DataFrame}
             Computed feature, returned as the same type as the input signal
         """
-        return super().compute(signal, fs=fs, columns=columns, windowed=windowed)
+        return super().compute(*args, **kwargs)
 
     def _compute(self, x, fs):
         super()._compute(x, fs)
@@ -126,9 +126,9 @@ class DetailPowerRatio(Feature):
         else:
             self.f_band = [1.0, 10.0]
 
-    def compute(self, signal, fs=None, *, columns=None, windowed=False):
+    def compute(self, *args, **kwargs):
         """
-        compute(signal, fs[, columns=None, windowed=False])
+        compute(signal, fs, *, columns=None, windowed=False)
 
         Compute the detail power ratio
 
@@ -148,7 +148,7 @@ class DetailPowerRatio(Feature):
         feature : {numpy.ndarray, pandas.DataFrame}
             Computed feature, returned as the same type as the input signal
         """
-        return super().compute(signal, fs=fs, columns=columns, windowed=windowed)
+        return super().compute(*args, **kwargs)
 
     def _compute(self, x, fs):
         super()._compute(x, fs)
