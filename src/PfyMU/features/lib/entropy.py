@@ -14,14 +14,15 @@ __all__ = ['SignalEntropy', 'SampleEntropy', 'PermutationEntropy']
 
 
 class SignalEntropy(Feature):
-    def __init__(self):
-        """
-        Compute the signal entropy of a given signal.
+    """
+    A Measure of the information contained in a signal. Also described as a measure of how
+    surprising the outcome of a variable is.
 
-        Methods
-        -------
-        compute(signal[, columns=None, windowed=False])
-        """
+    Methods
+    -------
+    compute(signal[, columns=None, windowed=False])
+    """
+    def __init__(self):
         super(SignalEntropy, self).__init__('SignalEntropy', {})
 
     def _compute(self, x, fs):
@@ -32,15 +33,16 @@ class SignalEntropy(Feature):
 
 class SampleEntropy(Feature):
     def __init__(self, m=4, r=1.0):
-        """
-        Compute the sample entropy of a given signal, which is the negative log that if the
-        distance between two sets of `m` points is less than `r`, then the distance between two
-        sets of `m+1` points is also less than `r`
+        r"""
+        A measure of the complexity of a time-series signal. Sample entropy is a modification of
+        approximate entropy, but has the benefit of being data-length independent and having
+        an easier implementation. Smaller values indicate more self-similarity in the dataset,
+        and/or less noise.
 
         Parameters
         ----------
         m : int, optional
-            Set length for comparison. Default is 4
+            Set length for comparison (aka embedding dimension). Default is 4
         r : float, optional
             Maximum distance between sets. Default is 1.0
 
@@ -50,6 +52,16 @@ class SampleEntropy(Feature):
 
         Notes
         -----
+        Sample entropy first computes the probability that if two sets of length :math:`m`
+        simultaneous data points have distance :math:`<r`, then two sets of length :math:`m+`
+        simultaneous data points also have distance :math:`<r`, and then takes the negative
+        natural logarithm of this probability.
+
+        .. math:: E_{sample} = -ln\frac{A}{B}
+
+        where :math:`A=`number of :math:`m+1` vector pairs with distance :math:`<r`
+        and :math:`B=`number of :math:`m` vector pairs with distance :math:`<r`
+
         The distance metric used is the Chebyshev distance, which is defined as the maximum
         absolute value of the sample-by-sample difference between two sets of the same length
 
@@ -74,9 +86,8 @@ class SampleEntropy(Feature):
 class PermutationEntropy(Feature):
     def __init__(self, order=3, delay=1, normalize=False):
         """
-        Calculate permutation entropy of signals. Permutation entropy is a meausure of the signal
-        complexity based on how the temporal signal behaves according to a series of ordinal
-        patterns.
+        A meausure of the signal complexity. Based on how the temporal signal behaves according to
+        a series of ordinal patterns.
 
         Parameters
         ----------
