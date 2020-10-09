@@ -112,6 +112,13 @@ class Bank:
         feat_names : list, optional
             Feature names. Only returned if `signal` is a ndarray and `columns`
             was provided
+
+        Raises
+        ------
+        NoFeaturesError
+            If no features have been added to compute
+        ValueError
+            If the number of provided column names doesn't match the number of columns in the data
         """
         if not self._feat_list:
             raise NoFeaturesError('No features to compute.')
