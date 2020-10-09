@@ -38,6 +38,30 @@ class JerkMetric(Feature):
         super(JerkMetric, self).__init__('JerkMetric', {})
         self.normalize = normalize
 
+    def compute(self, *args, **kwargs):
+        """
+        compute(signal, fs, *, columns=None, windowed=False)
+
+        Compute the jerk metric
+
+        Parameters
+        ----------
+        signal : {numpy.ndarray, pandas.DataFrame}
+            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
+        fs : float, optional
+            Sampling frequency in Hz
+        columns : array_like, optional
+            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
+        windowed : bool, optional
+            If the signal has already been windowed. Default is False.
+
+        Returns
+        -------
+        jerk_metric : {numpy.ndarray, pandas.DataFrame}
+            Computed feature, returned as the same type as the input signal
+        """
+        return super().compute(*args, **kwargs)
+
     def _compute(self, x, fs):
         super(JerkMetric, self)._compute(x, fs)
         self._result = _cython.JerkMetric(x, fs)
@@ -104,6 +128,30 @@ class DimensionlessJerk(Feature):
             self.i_type = t_map[signal_type]
         except KeyError:
             raise ValueError(f"'signal_type' ({signal_type}) unrecognized.")
+
+    def compute(self, *args, **kwargs):
+        """
+        compute(signal, fs, *, columns=None, windowed=False)
+
+        Compute the dimensionless jerk metric
+
+        Parameters
+        ----------
+        signal : {numpy.ndarray, pandas.DataFrame}
+            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
+        fs : float, optional
+            Sampling frequency in Hz
+        columns : array_like, optional
+            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
+        windowed : bool, optional
+            If the signal has already been windowed. Default is False.
+
+        Returns
+        -------
+        dimless_jerk_metric : {numpy.ndarray, pandas.DataFrame}
+            Computed feature, returned as the same type as the input signal
+        """
+        return super().compute(*args, **kwargs)
 
     def _compute(self, x, fs):
         super(DimensionlessJerk, self)._compute(x, fs)
