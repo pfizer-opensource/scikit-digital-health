@@ -24,10 +24,6 @@ class DetailPower(Feature):
     freq_band : array_like
         2-element array-like of the frequency band (Hz) to get the power in. Default is [1, 3]
 
-    Methods
-    -------
-    compute(signal, fs[, columns=None, windowed=False])
-
     References
     ----------
     .. [1] Sekine, M. et al. "Classification of waist-acceleration signals in a continuous
@@ -42,6 +38,30 @@ class DetailPower(Feature):
             self.f_band = sort(freq_band)
         else:
             self.f_band = [1.0, 3.0]
+
+    def compute(self, signal, fs=None, *, columns=None, windowed=False):
+        """
+        compute(signal, fs[, columns=None, windowed=False])
+
+        Compute the detail power
+
+        Parameters
+        ----------
+        signal : {numpy.ndarray, pandas.DataFrame}
+            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
+        fs : float, optional
+            Sampling frequency in Hz
+        columns : array_like, optional
+            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
+        windowed : bool, optional
+            If the signal has already been windowed. Default is False.
+
+        Returns
+        -------
+        feature : {numpy.ndarray, pandas.DataFrame}
+            Computed feature, returned as the same type as the input signal
+        """
+        return super().compute(signal, fs=fs, columns=columns, windowed=windowed)
 
     def _compute(self, x, fs):
         super()._compute(x, fs)
@@ -85,10 +105,6 @@ class DetailPowerRatio(Feature):
     freq_band : array_like
         2-element array-like of the frequency band (Hz) to get the power in. Default is [1, 10]
 
-    Methods
-    -------
-    compute(signal, fs[, columns=None, windowed=False])
-
     Notes
     -----
     In the original paper [1]_, the result is multiplied by 100 to obtain a percentage. This
@@ -109,6 +125,30 @@ class DetailPowerRatio(Feature):
             self.f_band = sort(freq_band)
         else:
             self.f_band = [1.0, 10.0]
+
+    def compute(self, signal, fs=None, *, columns=None, windowed=False):
+        """
+        compute(signal, fs[, columns=None, windowed=False])
+
+        Compute the detail power ratio
+
+        Parameters
+        ----------
+        signal : {numpy.ndarray, pandas.DataFrame}
+            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
+        fs : float, optional
+            Sampling frequency in Hz
+        columns : array_like, optional
+            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
+        windowed : bool, optional
+            If the signal has already been windowed. Default is False.
+
+        Returns
+        -------
+        feature : {numpy.ndarray, pandas.DataFrame}
+            Computed feature, returned as the same type as the input signal
+        """
+        return super().compute(signal, fs=fs, columns=columns, windowed=windowed)
 
     def _compute(self, x, fs):
         super()._compute(x, fs)
