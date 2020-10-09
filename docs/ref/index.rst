@@ -7,5 +7,6 @@ API Reference
     :maxdepth: 2
 
     read
-    gait
     features
+    gait
+    sit2stand
