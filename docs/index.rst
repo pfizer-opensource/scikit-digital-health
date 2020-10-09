@@ -1,4 +1,4 @@
-.. PfyMU documentation master file, created by
+.. _skimu documentation master file, created by
    sphinx-quickstart on Tue Oct  6 14:50:59 2020.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
@@ -6,10 +6,10 @@
 Welcome to SciKit-IMU's documentation!
 =================================
 
-.. image:: https://github.com/PfizerRD/PfyMU/workflows/PfyMU/badge.svg)
+.. image:: https://github.com/PfizerRD/scikit-imu/workflows/skimu/badge.svg)
    :alt: GitHub Actions Badge
 
-PfyMU is a Python package with methods for reading, pre-processing, manipulating, and analyzing Inertial Meausurement Unit data. `SciKit-IMU` contains the following sub-modules:
+`Scikit-IMU` is a Python package with methods for reading, pre-processing, manipulating, and analyzing Inertial Meausurement Unit data. `SciKit-IMU` contains the following sub-modules:
 
 sit2stand
 ---------

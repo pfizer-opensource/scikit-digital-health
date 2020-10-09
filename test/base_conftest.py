@@ -99,7 +99,7 @@ class TestRunLocationError(Exception):
 
 
 def resolve_data_path(file, module=None):
-    if Path.cwd().name == 'PfyMU':
+    if Path.cwd().name == 'scikit-imu':
         path = Path(f'test/data/{file}')
     elif Path.cwd().name == 'test':
         path = Path(f'data/{file}')

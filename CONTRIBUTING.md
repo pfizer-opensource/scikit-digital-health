@@ -13,7 +13,7 @@ In order to make sure these standards are met, __before__ issuing a pull request
 Through GitHub Actions, the test suite (using `pytest`) will be run through on different OSs and python versions. To make sure that your tests are working properly (at least on your OS/python version), at the very least you should run `pytest` from the root directory before any pull requests
 
 # Adding modules
-The goal of `PfyMU` is to have one package with a defined architechture that allows for easy pipeline generation with multiple stages that may or may not depend on previous stages. To that end, there are several pre-defined base classes that will help setting up modules that are intended to directly interface with the pipeline infrastructure.
+The goal of `scikit-imu` is to have one package with a defined architechture that allows for easy pipeline generation with multiple stages that may or may not depend on previous stages. To that end, there are several pre-defined base classes that will help setting up modules that are intended to directly interface with the pipeline infrastructure.
 
 While you should fully read this document, there is the option to create a template module that will take care of some of the boilerplate that has to be present (and is described below). If you want to use this, from the root directory, run
 
@@ -21,19 +21,19 @@ While you should fully read this document, there is the option to create a templ
 python templates/autocreate_module.py
 ```
 
-You will be prompted for the module name, author name, and a short description, after which the module will be created in `src/PfyMU`
+You will be prompted for the module name, author name, and a short description, after which the module will be created in `src/skimu`
 
 ### 1. Create a new module directory
-Under `src/PfyMU/` create a new directory with the desired name (for this example, we will use `preprocessing`), and create the normal files for a new python package (`__init__.py`, etc)
+Under `src/skimu/` create a new directory with the desired name (for this example, we will use `preprocessing`), and create the normal files for a new python package (`__init__.py`, etc)
 
 ### 2. Create the module class that will be added to the pipeline
 Below is an example file that contains the class that will be added to the pipeline to use its processing
 
 ```python
-# src/PfyMU/preprocessing/preprocessing.py
+# src/skimu/preprocessing/preprocessing.py
 import ...  # import installed modules (eg numpy, etc)
 
-from PfyMU.base import _BaseProcess  # import the base process class
+from skimu.base import _BaseProcess  # import the base process class
 
 class PreProcessing(_BaseProcess):
     """
@@ -154,7 +154,7 @@ If there is too much code to be contained inside the `PreProcessing._predict` ca
 3. Functions with a common theme can live in 1 file, with the common name matching that of the file
 4. A "utility.py" file might make sense for any functions that have general utility *outside* of this specific module (ie something from `preprocessing/utility.py` getting called from `gait/gait.py`)
 
-For examples of these, check out the `gait` module within `PfyMU` - there are examples of 1 function per file, as well as multiple functions per file (`get_gait_metrics.py`)
+For examples of these, check out the `gait` module within `scikit-imu` - there are examples of 1 function per file, as well as multiple functions per file (`get_gait_metrics.py`)
 
 However, these are just guidelines in order to maintain some clarity with multiple different functions split over multiple files. If you have a good reason to do something different, just try to maintain clarity for future users.
 
@@ -164,7 +164,7 @@ There is no defined/suggested structure for the above helper functions, if a cla
 An example of this can be seen again in the `sit2stand` module, where `detector.py` contains a `Detector` class that is used in `sit2stand.py`, both in the code as a helper function, but *also* inside the `Sit2Stand.__repr__`
 
 ### 3. Make sure everything is setup/imported
-Make sure all imports are handled in `src/PfyMU/preprocessing/__init__.py`, as well as adding `preprocessing` imports to the `src/PfyMU/__init__.py`.
+Make sure all imports are handled in `src/skimu/preprocessing/__init__.py`, as well as adding `preprocessing` imports to the `src/skimu/__init__.py`.
 
 ### 4. Make any additions to setup.py
 If you don't have any data files (any non python files that need to be distributed with the package), or low level (c, cython, or fortran) extensions, everything should be good for the actual module, and you can skip to the Testing section
@@ -185,16 +185,16 @@ def configuration(parent_package='', top_path=None):
     # DATA FILES
     # ========================
     config.add_data_files(
-        ('PfyMU/gait/model', 'src/PfyMU/gait/model/final_features.json'),
-        ('PfyMU/gait/model', 'src/PfyMU/gait/model/lgbm_gait_classifier_no-stairs.lgbm'),
-        ('PfyMU/preprocessing/data', 'src/PfyMU/preprocessing/data/preprocessing_info.dat')        # Added this file
+        ('skimu/gait/model', 'src/skimu/gait/model/final_features.json'),
+        ('skimu/gait/model', 'src/skimu/gait/model/lgbm_gait_classifier_no-stairs.lgbm'),
+        ('skimu/preprocessing/data', 'src/skimu/preprocessing/data/preprocessing_info.dat')        # Added this file
     )
 
     # alternatively add this directory, any files/folders under this directory will be added recursively
-    config.add_data_dir('src/PfyMU/preprocessing/data')
+    config.add_data_dir('src/skimu/preprocessing/data')
     # ========================
 
-    config.get_version('src/PfyMU/version.py')
+    config.get_version('src/skimu/version.py')
 
     return config
 ```
@@ -210,18 +210,18 @@ def configuration(parent_package='', top_path=None):
     # EXTENSIONS
     # ========================
     # Fortran code that is NOT being compiled with f2py - it is being built as a fortran function that will be imported into C code
-    config.add_library('fcwa_convert', sources='src/PfyMU/read/_extensions/cwa_convert.f95')
+    config.add_library('fcwa_convert', sources='src/skimu/read/_extensions/cwa_convert.f95')
     # C code that contains the necessary CPython API calls to allow it to be imported and used in python
     config.add_extension(
-        'PfyMU/read/_extensions/cwa_convert',  # note the path WITHOUT src/
-        sources='src/PfyMU/read/_extensions/cwa_convert.c',  # note the path WITH src/
+        'skimu/read/_extensions/cwa_convert',  # note the path WITHOUT src/
+        sources='src/skimu/read/_extensions/cwa_convert.c',  # note the path WITH src/
         libraries=['fcwa_convert']  # link the previously built fortran library
     )
     # standard C code extension that does not use a fortran library. 
     # Adding a Fortran extension follows the same syntax (numpy will do the heavy lifting for whatever compilation is required)
     config.add_extension(
-        'PfyMU/read/_extensions/bin_convert',
-        sources='src/PfyMU/read/_extensions/bin_convert.c'
+        'skimu/read/_extensions/bin_convert',
+        sources='src/skimu/read/_extensions/bin_convert.c'
     )
 
     # dealing with Cython extensions. 
@@ -254,12 +254,12 @@ Documentation is fairly simple - most of the documentation will already be done 
 Then, to document the whole module, a docstring is created in the `__init__.py` file:
 
 ```python
-# src/PfyMU/preprocessing/__init__.py
+# src/skimu/preprocessing/__init__.py
 """
-IMU PreProcessing (:mod:`PfyMU.preprocessing`)
+IMU PreProcessing (:mod:`skimu.preprocessing`)
 ====================================
 
-.. currentmodule:: PfyMU.preprocessing
+.. currentmodule:: skimu.preprocessing
 
 Pipeline gait processing
 ------------------------
@@ -273,17 +273,17 @@ Headline 2
 ----------
 contents
 """
-from PfyMU.preprocessing.preprocessing import PreProcessing
+from skimu.preprocessing.preprocessing import PreProcessing
 ```
 
-The docstring is written like a `.rst` header file (which is how it will get interpreted). For an example in `PfyMU`, see the [gait init file](src/PfyMU/gait/__init__.py).  For an example of a good module documentation from NumPY, see the [FFT](https://numpy.org/doc/stable/reference/routines.fft.html) page.
+The docstring is written like a `.rst` header file (which is how it will get interpreted). For an example in `skimu`, see the [gait init file](src/skimu/gait/__init__.py).  For an example of a good module documentation from NumPY, see the [FFT](https://numpy.org/doc/stable/reference/routines.fft.html) page.
 
 With this documentation written, the last thing is to add a short `.rst` file inside the actual documentation folder, which will instruct `sphinx` to read the documentation for this module.
 
 ```rst
 .. _this_file: docs/ref/preprocessing.rst
 
-.. automodule:: PfyMU.gait
+.. automodule:: skimu.preprocessing
     :ignore-module-all:
 
 ```
@@ -292,7 +292,7 @@ Then add this new file to `docs/ref/index.rst`:
 
 ```rst
 .. _this_file: docs/ref/index.rst
-.. _PfyMU api reference
+.. _skimu api reference
 
 API Reference
 ================
@@ -317,12 +317,12 @@ make html
 The generated HTML documentation is then in `docs/build/html`. Simply open `docs/build/html/index.html` in your browser and navigate around the documentation.
 
 ## Adding Tests for a new module
-In order to make sure that any tests are run on installed versions of `PfyMU`, the test directory is outside the `src` directory. Again, convenience base process testing classes are available to make setting up testing easy and quick.  All testing is done using Pytest
+In order to make sure that any tests are run on installed versions of `scikit-imu`, the test directory is outside the `src` directory. Again, convenience base process testing classes are available to make setting up testing easy and quick.  All testing is done using Pytest
 
 The first step is to create a new directory for your new module under the `test` directory, and add an `__init__.py` file to allow for relative importing, the test file, and a `conftest.py` file if desired:
 
 ```
-PfyMU
+scikit-imu
 ├── src
 ├── test
 │   └──preprocessing
@@ -339,7 +339,7 @@ import pytest
 
 from ..base_conftest import *  # import BaseProcessTester, and resolve_data_path - a useful utility for making sure tests run in all 3 possible locations
 
-from PfyMU.preprocessing import PreProcess
+from skimu.preprocessing import PreProcess
 
 
 class TestPreProcess(BaseProcessTester):
