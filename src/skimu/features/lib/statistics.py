@@ -15,13 +15,31 @@ __all__ = ['Range', 'IQR', 'RMS', 'Autocorrelation', 'LinearSlope']
 class Range(Feature):
     """
     The difference between the maximum and minimum value.
-
-    Methods
-    -------
-    compute(signal[, columns=None, windowed=False])
     """
     def __init__(self):
         super().__init__("Range", {})
+
+    def compute(self, *args, **kwargs):
+        """
+        compute(signal, *, columns=None, windowed=False)
+
+        Compute the range
+
+        Parameters
+        ----------
+        signal : {numpy.ndarray, pandas.DataFrame}
+            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
+        columns : array_like, optional
+            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
+        windowed : bool, optional
+            If the signal has already been windowed. Default is False.
+
+        Returns
+        -------
+        range : {numpy.ndarray, pandas.DataFrame}
+            Signal range, returned as the same type as `signal`
+        """
+        return super().compute(*args, **kwargs)
 
     def _compute(self, x, fs):
         super()._compute(x, fs)
@@ -32,13 +50,31 @@ class Range(Feature):
 class IQR(Feature):
     """
     The difference between the 75th percentile and 25th percentile of the values.
-
-    Methods
-    -------
-    compute(signal[, columns=None, windowed=False])
     """
     def __init__(self):
         super(IQR, self).__init__("IQR", {})
+
+    def compute(self, *args, **kwargs):
+        """
+        compute(signal, *, columns=None, windowed=False)
+
+        Compute the range
+
+        Parameters
+        ----------
+        signal : {numpy.ndarray, pandas.DataFrame}
+            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
+        columns : array_like, optional
+            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
+        windowed : bool, optional
+            If the signal has already been windowed. Default is False.
+
+        Returns
+        -------
+        iqr : {numpy.ndarray, pandas.DataFrame}
+            Signal IQR, returned as the same type as `signal`
+        """
+        return super().compute(*args, **kwargs)
 
     def _compute(self, x, fs):
         super(IQR, self)._compute(x, fs)
@@ -57,6 +93,28 @@ class RMS(Feature):
     def __init__(self):
         super(RMS, self).__init__('RMS', {})
 
+    def compute(self, *args, **kwargs):
+        """
+        compute(signal, *, columns=None, windowed=False)
+
+        Compute the range
+
+        Parameters
+        ----------
+        signal : {numpy.ndarray, pandas.DataFrame}
+            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
+        columns : array_like, optional
+            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
+        windowed : bool, optional
+            If the signal has already been windowed. Default is False.
+
+        Returns
+        -------
+        rms : {numpy.ndarray, pandas.DataFrame}
+            Signal RMS, returned as the same type as `signal`
+        """
+        return super().compute(*args, **kwargs)
+
     def _compute(self, x, fs):
         super(RMS, self)._compute(x, fs)
 
@@ -73,10 +131,6 @@ class Autocorrelation(Feature):
         Amount of lag (in samples) to use for the autocorrelation. Default is 1 sample.
     normalize : bool, optional
         Normalize the result using the mean/std. deviation. Default is True
-
-    Methods
-    -------
-    compute(signal[, columns=None, windowed=False])
     """
     def __init__(self, lag=1, normalize=True):
         super(Autocorrelation, self).__init__(
@@ -85,6 +139,28 @@ class Autocorrelation(Feature):
 
         self.lag = lag
         self.normalize = normalize
+
+    def compute(self, *args, **kwargs):
+        """
+        compute(signal, *, columns=None, windowed=False)
+
+        Compute the autocorrelation
+
+        Parameters
+        ----------
+        signal : {numpy.ndarray, pandas.DataFrame}
+            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
+        columns : array_like, optional
+            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
+        windowed : bool, optional
+            If the signal has already been windowed. Default is False.
+
+        Returns
+        -------
+        ac : {numpy.ndarray, pandas.DataFrame}
+            Signal autocorrelation, returned as the same type as `signal`
+        """
+        return super().compute(*args, **kwargs)
 
     def _compute(self, x, fs):
         super(Autocorrelation, self)._compute(x, fs)
@@ -95,13 +171,31 @@ class Autocorrelation(Feature):
 class LinearSlope(Feature):
     """
     The slope from linear regression of the signal
-
-    Methods
-    -------
-    compute(signal[, columns=None, windowed=False])
     """
     def __init__(self):
         super(LinearSlope, self).__init__('LinearSlope', {})
+
+    def compute(self, *args, **kwargs):
+        """
+        compute(signal, *, columns=None, windowed=False)
+
+        Compute the linear regression slope
+
+        Parameters
+        ----------
+        signal : {numpy.ndarray, pandas.DataFrame}
+            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
+        columns : array_like, optional
+            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
+        windowed : bool, optional
+            If the signal has already been windowed. Default is False.
+
+        Returns
+        -------
+        slope : {numpy.ndarray, pandas.DataFrame}
+            Signal slope, returned as the same type as `signal`
+        """
+        return super().compute(*args, **kwargs)
 
     def _compute(self, x, fs):
         super(LinearSlope, self)._compute(x, fs)
