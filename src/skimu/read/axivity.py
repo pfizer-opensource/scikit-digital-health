@@ -71,12 +71,12 @@ class ReadCWA(_BaseProcess):
                 raise ValueError("Base must be in [0, 23] and period must be in [1, 23]")
 
     def predict(self, *args, **kwargs):
-        f"""
+        """
         Read the data from the axivity file
 
         Parameters
         ----------
-        file : {{str, Path}}
+        file : {str, Path}
             Path to the file to read. Must either be a string, or be able to be converted by
             `str(file)`
         
@@ -96,11 +96,11 @@ class ReadCWA(_BaseProcess):
         -----
         The keys in `data` depend on which data the file contained. Potential keys are:
         
-        - {self._acc}: acceleration [g]
-        - {self._gyro}: angular velocity [deg/s]
-        - {self._mag}: magnetic field readings [uT]
-        - {self._time}: timestamps [s]
-        - {self._days}: window indices
+        - accel: acceleration [g]
+        - gyro: angular velocity [deg/s]
+        - magnet: magnetic field readings [uT]
+        - time: timestamps [s]
+        - day_ends: window indices
         """
         return super().predict(*args, **kwargs)
 
