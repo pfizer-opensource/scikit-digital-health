@@ -14,21 +14,22 @@ __all__ = ['DominantFrequency', 'DominantFrequencyValue', 'PowerSpectralSum', 'S
 
 
 class DominantFrequency(Feature):
+    """
+    The primary frequency in the signal. Computed using the FFT and finding the maximum value of
+    the power spectral density in the specified range of frequencies.
+
+    Parameters
+    ----------
+    low_cutoff : float, optional
+        Low value of the frequency range to look in. Default is 0.0 Hz
+    high_cutoff : float, optional
+        High value of the frequency range to look in. Default is 5.0 Hz
+
+    Methods
+    -------
+    compute(signal, fs[, columns=None, windowed=False])
+    """
     def __init__(self, low_cutoff=0.0, high_cutoff=5.0):
-        """
-        Compute the dominant frequency in the range specified
-
-        Parameters
-        ----------
-        low_cutoff : float, optional
-            Low value of the frequency range to look in. Default is 0.0 Hz
-        high_cutoff : float, optional
-            High value of the frequency range to look in. Default is 5.0 Hz
-
-        Methods
-        -------
-        compute(signal, fs[, columns=None, windowed=False])
-        """
         super(DominantFrequency, self).__init__('DominantFrequency', {'low_cutoff': low_cutoff,
                                                                       'high_cutoff': high_cutoff})
 
@@ -44,21 +45,21 @@ class DominantFrequency(Feature):
 
 
 class DominantFrequencyValue(Feature):
+    """
+    The power spectral density maximum value. Taken inside the range of frequencies specified.
+
+    Parameters
+    ----------
+    low_cutoff : float, optional
+        Low value of the frequency range to look in. Default is 0.0 Hz
+    high_cutoff : float, optional
+        High value of the frequency range to look in. Default is 5.0 Hz
+
+    Methods
+    -------
+    compute(signal, fs[, columns=None, windowed=False])
+    """
     def __init__(self, low_cutoff=0.0, high_cutoff=5.0):
-        """
-        Compute the maximum power spectral density estimate in the specified range of frequencies.
-
-        Parameters
-        ----------
-        low_cutoff : float, optional
-            Low value of the frequency range to look in. Default is 0.0 Hz
-        high_cutoff : float, optional
-            High value of the frequency range to look in. Default is 5.0 Hz
-
-        Methods
-        -------
-        compute(signal, fs[, columns=None, windowed=False])
-        """
         super(DominantFrequencyValue, self).__init__(
             'DominantFrequencyValue', {'low_cutoff': low_cutoff, 'high_cutoff': high_cutoff})
 
@@ -74,22 +75,22 @@ class DominantFrequencyValue(Feature):
 
 
 class PowerSpectralSum(Feature):
+    r"""
+    Sum of power spectral density values. The sum of power spectral density values in a
+    1.0Hz wide band around the primary (dominant) frequency (:math:`f_{dom}\pm 0.5`)
+
+    Parameters
+    ----------
+    low_cutoff : float, optional
+        Low value of the frequency range to look in. Default is 0.0 Hz
+    high_cutoff : float, optional
+        High value of the frequency range to look in. Default is 5.0 Hz
+
+    Methods
+    -------
+    compute(signal, fs[, columns=None, windowed=False])
+    """
     def __init__(self, low_cutoff=0.0, high_cutoff=5.0):
-        """
-        Compute sum of the power spectral density estimate in a 1.0Hz band around the dominant
-        frequency
-
-        Parameters
-        ----------
-        low_cutoff : float, optional
-            Low value of the frequency range to look in. Default is 0.0 Hz
-        high_cutoff : float, optional
-            High value of the frequency range to look in. Default is 5.0 Hz
-
-        Methods
-        -------
-        compute(signal, fs[, columns=None, windowed=False])
-        """
         super(PowerSpectralSum, self).__init__('PowerSpectralSum', {'low_cutoff': low_cutoff,
                                                                     'high_cutoff': high_cutoff})
 
@@ -105,22 +106,24 @@ class PowerSpectralSum(Feature):
 
 
 class SpectralFlatness(Feature):
+    """
+    A measure of the "tonality" or resonant structure of a signal. Provides a quantification of
+    how tone-like a signal is, as opposed to being noise-like. For this case, tonality is defined
+    in a sense as the amount of peaks in the power spectrum, opposed to a flat signal representing
+    white noise.
+
+    Parameters
+    ----------
+    low_cutoff : float, optional
+        Low value of the frequency range to look in. Default is 0.0 Hz
+    high_cutoff : float, optional
+        High value of the frequency range to look in. Default is 5.0 Hz
+
+    Methods
+    -------
+    compute(signal, fs[, columns=None, windowed=False])
+    """
     def __init__(self, low_cutoff=0.0, high_cutoff=5.0):
-        """
-        Compute the spectral flatness in a range of frequencies. The spectral flatness is a
-        measure of the "tonality" or resonant structure of a signal (as opposed to just noise).
-
-        Parameters
-        ----------
-        low_cutoff : float, optional
-            Low value of the frequency range to look in. Default is 0.0 Hz
-        high_cutoff : float, optional
-            High value of the frequency range to look in. Default is 5.0 Hz
-
-        Methods
-        -------
-        compute(signal, fs[, columns=None, windowed=False])
-        """
         super(SpectralFlatness, self).__init__('SpectralFlatness', {'low_cutoff': low_cutoff,
                                                                     'high_cutoff': high_cutoff})
 
@@ -136,22 +139,22 @@ class SpectralFlatness(Feature):
 
 
 class SpectralEntropy(Feature):
+    """
+    A measure of the information contained in the power spectral density estimate. Similar
+    to :py:class:`SignalEntropy` but for the power spectral density.
+
+    Parameters
+    ----------
+    low_cutoff : float, optional
+        Low value of the frequency range to look in. Default is 0.0 Hz
+    high_cutoff : float, optional
+        High value of the frequency range to look in. Default is 5.0 Hz
+
+    Methods
+    -------
+    compute(signal, fs[, columns=None, windowed=False])
+    """
     def __init__(self, low_cutoff=0.0, high_cutoff=5.0):
-        """
-        Compute the spectral entropy in a specified frequency range. Spectral entropy is a
-        measure of the information contained in the power spectral density estimate.
-
-        Parameters
-        ----------
-        low_cutoff : float, optional
-            Low value of the frequency range to look in. Default is 0.0 Hz
-        high_cutoff : float, optional
-            High value of the frequency range to look in. Default is 5.0 Hz
-
-        Methods
-        -------
-        compute(signal, fs[, columns=None, windowed=False])
-        """
         super(SpectralEntropy, self).__init__('SpectralEntropy', {'low_cutoff': low_cutoff,
                                                                   'high_cutoff': high_cutoff})
 
