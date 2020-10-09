@@ -58,7 +58,7 @@ class DetailPower(Feature):
 
         Returns
         -------
-        feature : {numpy.ndarray, pandas.DataFrame}
+        power : {numpy.ndarray, pandas.DataFrame}
             Computed feature, returned as the same type as the input signal
         """
         return super().compute(*args, **kwargs)
@@ -145,7 +145,7 @@ class DetailPowerRatio(Feature):
 
         Returns
         -------
-        feature : {numpy.ndarray, pandas.DataFrame}
+        power_ratio : {numpy.ndarray, pandas.DataFrame}
             Computed feature, returned as the same type as the input signal
         """
         return super().compute(*args, **kwargs)
