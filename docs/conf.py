@@ -38,7 +38,8 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
     'sphinx.ext.autosummary',
-    'numpydoc'
+    'numpydoc',
+    'sphinx.ext.coverage'
 ]
 
 # this is needed for some reason...
