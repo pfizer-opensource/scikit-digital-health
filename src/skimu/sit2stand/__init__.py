@@ -5,7 +5,7 @@ IMU Sit-to-Stand Analysis (:mod:`skimu.sit2stand`)
 .. currentmodule:: skimu.sit2stand
 
 Pipeline sit-to-stand processing
--------------------
+--------------------------------
 
 .. autosummary::
     :toctree: generated/
