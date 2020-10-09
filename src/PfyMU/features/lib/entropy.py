@@ -32,43 +32,43 @@ class SignalEntropy(Feature):
 
 
 class SampleEntropy(Feature):
+    r"""
+    A measure of the complexity of a time-series signal. Sample entropy is a modification of
+    approximate entropy, but has the benefit of being data-length independent and having
+    an easier implementation. Smaller values indicate more self-similarity in the dataset,
+    and/or less noise.
+
+    Parameters
+    ----------
+    m : int, optional
+        Set length for comparison (aka embedding dimension). Default is 4
+    r : float, optional
+        Maximum distance between sets. Default is 1.0
+
+    Methods
+    -------
+    compute(signal[, columns=None, windowed=False])
+
+    Notes
+    -----
+    Sample entropy first computes the probability that if two sets of length :math:`m`
+    simultaneous data points have distance :math:`<r`, then two sets of length :math:`m+`
+    simultaneous data points also have distance :math:`<r`, and then takes the negative
+    natural logarithm of this probability.
+
+    .. math:: E_{sample} = -ln\frac{A}{B}
+
+    where :math:`A=`number of :math:`m+1` vector pairs with distance :math:`<r`
+    and :math:`B=`number of :math:`m` vector pairs with distance :math:`<r`
+
+    The distance metric used is the Chebyshev distance, which is defined as the maximum
+    absolute value of the sample-by-sample difference between two sets of the same length
+
+    References
+    ----------
+    https://archive.physionet.org/physiotools/sampen/c/sampen.c
+    """
     def __init__(self, m=4, r=1.0):
-        r"""
-        A measure of the complexity of a time-series signal. Sample entropy is a modification of
-        approximate entropy, but has the benefit of being data-length independent and having
-        an easier implementation. Smaller values indicate more self-similarity in the dataset,
-        and/or less noise.
-
-        Parameters
-        ----------
-        m : int, optional
-            Set length for comparison (aka embedding dimension). Default is 4
-        r : float, optional
-            Maximum distance between sets. Default is 1.0
-
-        Methods
-        -------
-        compute(signal[, columns=None, windowed=False])
-
-        Notes
-        -----
-        Sample entropy first computes the probability that if two sets of length :math:`m`
-        simultaneous data points have distance :math:`<r`, then two sets of length :math:`m+`
-        simultaneous data points also have distance :math:`<r`, and then takes the negative
-        natural logarithm of this probability.
-
-        .. math:: E_{sample} = -ln\frac{A}{B}
-
-        where :math:`A=`number of :math:`m+1` vector pairs with distance :math:`<r`
-        and :math:`B=`number of :math:`m` vector pairs with distance :math:`<r`
-
-        The distance metric used is the Chebyshev distance, which is defined as the maximum
-        absolute value of the sample-by-sample difference between two sets of the same length
-
-        References
-        ----------
-        https://archive.physionet.org/physiotools/sampen/c/sampen.c
-        """
         super(SampleEntropy, self).__init__('SampleEntropy', {'m': m, 'r': r})
 
         self.m = m
@@ -84,24 +84,24 @@ class SampleEntropy(Feature):
 
 
 class PermutationEntropy(Feature):
+    """
+    A meausure of the signal complexity. Based on how the temporal signal behaves according to
+    a series of ordinal patterns.
+
+    Parameters
+    ----------
+    order : int, optional
+        Order (length of sub-signals) to use in the computation. Default is 3
+    delay : int, optional
+        Time-delay to use in computing the sub-signals. Default is 1 sample.
+    normalize : bool, optional
+        Normalize the output between 0 and 1. Default is False.
+
+    Methods
+    -------
+    compute(signal, fs[, columns=None, windowed=False])
+    """
     def __init__(self, order=3, delay=1, normalize=False):
-        """
-        A meausure of the signal complexity. Based on how the temporal signal behaves according to
-        a series of ordinal patterns.
-
-        Parameters
-        ----------
-        order : int, optional
-            Order (length of sub-signals) to use in the computation. Default is 3
-        delay : int, optional
-            Time-delay to use in computing the sub-signals. Default is 1 sample.
-        normalize : bool, optional
-            Normalize the output between 0 and 1. Default is False.
-
-        Methods
-        -------
-        compute(signal, fs[, columns=None, windowed=False])
-        """
         super(PermutationEntropy, self).__init__(
             "PermutationEntropy", {'order': order, 'delay': delay, 'normalize': normalize}
         )
