@@ -13,14 +13,14 @@ __all__ = ['Range', 'IQR', 'RMS', 'Autocorrelation', 'LinearSlope']
 
 
 class Range(Feature):
-    def __init__(self):
-        """
-        Compute the difference between the maximum and minimum value in a signal
+    """
+    The difference between the maximum and minimum value.
 
-        Methods
-        -------
-        compute(signal[, columns=None, windowed=False])
-        """
+    Methods
+    -------
+    compute(signal[, columns=None, windowed=False])
+    """
+    def __init__(self):
         super().__init__("Range", {})
 
     def _compute(self, x, fs):
@@ -30,15 +30,14 @@ class Range(Feature):
 
 
 class IQR(Feature):
-    def __init__(self):
-        """
-        Compute the difference between the 75th percentile and 25th percentile of the values in
-        a signal.
+    """
+    The difference between the 75th percentile and 25th percentile of the values.
 
-        Methods
-        -------
-        compute(signal[, columns=None, windowed=False])
-        """
+    Methods
+    -------
+    compute(signal[, columns=None, windowed=False])
+    """
+    def __init__(self):
         super(IQR, self).__init__("IQR", {})
 
     def _compute(self, x, fs):
@@ -48,14 +47,14 @@ class IQR(Feature):
 
 
 class RMS(Feature):
-    def __init__(self):
-        """
-        Compute the Root Mean Square value of the signal
+    """
+    The root mean square value of the signal
 
-        Methods
-        -------
-        compute(signal[, columns=None, windowed=False])
-        """
+    Methods
+    -------
+    compute(signal[, columns=None, windowed=False])
+    """
+    def __init__(self):
         super(RMS, self).__init__('RMS', {})
 
     def _compute(self, x, fs):
@@ -65,21 +64,21 @@ class RMS(Feature):
 
 
 class Autocorrelation(Feature):
+    """
+    The similarity in profile between the signal and a time shifted version of the signal.
+
+    Parameters
+    ----------
+    lag : int, optional
+        Amount of lag (in samples) to use for the autocorrelation. Default is 1 sample.
+    normalize : bool, optional
+        Normalize the result using the mean/std. deviation. Default is True
+
+    Methods
+    -------
+    compute(signal[, columns=None, windowed=False])
+    """
     def __init__(self, lag=1, normalize=True):
-        """
-        Compute the autocorrelation of a signal at the given lag
-
-        Parameters
-        ----------
-        lag : int, optional
-            Amount of lag (in samples) to use for the autocorrelation. Default is 1 sample.
-        normalize : bool, optional
-            Normalize the result using the mean/std. deviation. Default is True
-
-        Methods
-        -------
-        compute(signal[, columns=None, windowed=False])
-        """
         super(Autocorrelation, self).__init__(
             'Autocorrelation', {'lag': lag, 'normalize': normalize}
         )
@@ -94,14 +93,14 @@ class Autocorrelation(Feature):
 
 
 class LinearSlope(Feature):
-    def __init__(self):
-        """
-        Compute the linear slope for the signal
+    """
+    The slope from linear regression of the signal
 
-        Methods
-        -------
-        compute(signal[, columns=None, windowed=False])
-        """
+    Methods
+    -------
+    compute(signal[, columns=None, windowed=False])
+    """
+    def __init__(self):
         super(LinearSlope, self).__init__('LinearSlope', {})
 
     def _compute(self, x, fs):
