@@ -58,7 +58,7 @@ class IQR(Feature):
         """
         compute(signal, *, columns=None, windowed=False)
 
-        Compute the range
+        Compute the IQR
 
         Parameters
         ----------
@@ -97,7 +97,7 @@ class RMS(Feature):
         """
         compute(signal, *, columns=None, windowed=False)
 
-        Compute the range
+        Compute the RMS
 
         Parameters
         ----------
