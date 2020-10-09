@@ -19,10 +19,10 @@ class UnexpectedAxesError(Exception):
 
 class ReadCWA(_BaseProcess):
     """
-    Read a binary CWA file from an axivity sensor into memory. The units for acceleration data
-    are return in `g`, and the units for angular velocity data are return in `deg/s`. If
-    providing a base and period value, included in the output will be the indices to create
-    windows starting at the `base` time, with a length of `period`.
+    Read a binary CWA file from an axivity sensor into memory. Acceleration is return in units of
+    'g' while angular velocity (if available) is returned in units of `deg/s`. If providing a base
+    and period value, included in the output will be the indices to create windows starting at
+    the `base` time, with a length of `period`.
 
     Parameters
     ----------
