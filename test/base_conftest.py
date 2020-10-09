@@ -99,7 +99,7 @@ class TestRunLocationError(Exception):
 
 
 def resolve_data_path(file, module=None):
-    if Path.cwd().name == 'skimu':
+    if Path.cwd().name == 'PfyMU':
         path = Path(f'test/data/{file}')
     elif Path.cwd().name == 'test':
         path = Path(f'data/{file}')
