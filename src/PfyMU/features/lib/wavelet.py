@@ -14,26 +14,26 @@ __all__ = ['DetailPower', 'DetailPowerRatio']
 
 
 class DetailPower(Feature):
+    """
+    The summed power in the detail levels that span the chosen frequency band.
+
+    Parameters
+    ----------
+    wavelet : str
+        Wavelet to use. Options are the discrete wavelets in `PyWavelets`. Default is 'coif4'
+    freq_band : array_like
+        2-element array-like of the frequency band (Hz) to get the power in. Default is [1, 3]
+
+    Methods
+    -------
+    compute(signal, fs[, columns=None, windowed=False])
+
+    References
+    ----------
+    .. [1] Sekine, M. et al. "Classification of waist-acceleration signals in a continuous
+    walking record." Medical Engineering & Physics. Vol. 22. Pp 285-291. 2000.
+    """
     def __init__(self, wavelet='coif4', freq_band=None):
-        """
-        Compute the power in the detail levels that span the chosen frequency band
-
-        Parameters
-        ----------
-        wavelet : str
-            Wavelet to use. Options are the discrete wavelets in `PyWavelets`. Default is 'coif4'
-        freq_band : array_like
-            2-element array-like of the frequency band (Hz) to get the power in. Default is [1, 3]
-
-        Methods
-        -------
-        compute(signal, fs[, columns=None, windowed=False])
-
-        References
-        ----------
-        .. [1] Sekine, M. et al. "Classification of waist-acceleration signals in a continuous
-        walking record." Medical Engineering & Physics. Vol. 22. Pp 285-291. 2000.
-        """
         super().__init__('DetailPower', {'wavelet': wavelet, 'freq_band': freq_band})
 
         self.wave = wavelet
@@ -73,33 +73,34 @@ class DetailPower(Feature):
 
 
 class DetailPowerRatio(Feature):
+    """
+    The ratio of the power in the detail signals that span the specified frequency band. Uses
+    the discrete wavelet transform to break down the signal into constituent components at
+    different frequencies.
+
+    Parameters
+    ----------
+    wavelet : str
+        Wavelet to use. Options are the discrete wavelets in `PyWavelets`. Default is 'coif4'
+    freq_band : array_like
+        2-element array-like of the frequency band (Hz) to get the power in. Default is [1, 10]
+
+    Methods
+    -------
+    compute(signal, fs[, columns=None, windowed=False])
+
+    Notes
+    -----
+    In the original paper [1]_, the result is multiplied by 100 to obtain a percentage. This
+    final multiplication is not included in order to obtain results that have a scale that
+    closer matches the typical 0-1 (or -1 to 1) scale for machine learning features.
+
+    References
+    ----------
+    .. [1] Sekine, M. et al. "Classification of waist-acceleration signals in a continuous
+    walking record." Medical Engineering & Physics. Vol. 22. Pp 285-291. 2000.
+    """
     def __init__(self, wavelet='coif4', freq_band=None):
-        """
-        Compute the ratio of the power in the detail signals of the Discrete Wavelet Transform
-        to the original signal.
-
-        Parameters
-        ----------
-        wavelet : str
-            Wavelet to use. Options are the discrete wavelets in `PyWavelets`. Default is 'coif4'
-        freq_band : array_like
-            2-element array-like of the frequency band (Hz) to get the power in. Default is [1, 10]
-
-        Methods
-        -------
-        compute(signal, fs[, columns=None, windowed=False])
-
-        Notes
-        -----
-        In the original paper [1]_, the result is multiplied by 100 to obtain a percentage. This
-        final multiplication is not included in order to obtain results that have a scale that
-        closer matches the typical 0-1 (or -1 to 1) scale for machine learning features.
-
-        References
-        ----------
-        .. [1] Sekine, M. et al. "Classification of waist-acceleration signals in a continuous
-        walking record." Medical Engineering & Physics. Vol. 22. Pp 285-291. 2000.
-        """
         super().__init__('DetailPowerRatio', {'wavelet': wavelet, 'freq_band': freq_band})
 
         self.wave = wavelet
