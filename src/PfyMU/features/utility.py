@@ -50,6 +50,13 @@ def standardize_signal(signal, windowed=False, window_length=None, step=None, co
         3D signal with standard setup
     columns : array-like
         Column names used in signal computation
+
+    Raises
+    ------
+    DimensionError
+        If the signal has more than 3 dimensions
+    InputTypeError
+        If the signal is not a numpy.ndarray or pandas.DataFrame
     """
     # get a numpy array of the signal
     if isinstance(signal, ndarray):
@@ -108,6 +115,11 @@ def compute_window_samples(fs, window_length, window_step):
         Window length in samples
     step_n : int
         Window step in samples
+
+    Raises
+    ------
+    ValueError
+        If `window_step` is negative, or if `window_step` is a float not in (0.0, 1.0]
 
     Notes
     -----
@@ -172,6 +184,11 @@ def get_windowed_view(x, win_len, stepsize):
     -------
     x_win : numpy.ndarray
         2D array of windows of the original data, with shape (-1, L)
+
+    Raises
+    ------
+    ValueError
+        If `x` has more than 2 dimensions, or if `x` is not C-contiguous in memory
     """
     if not (x.ndim in [1, 2]):
         raise ValueError('Array cannot have more than 2 dimensions to window properly.')
