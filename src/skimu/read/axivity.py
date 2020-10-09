@@ -20,7 +20,7 @@ class UnexpectedAxesError(Exception):
 class ReadCWA(_BaseProcess):
     """
     Read a binary CWA file from an axivity sensor into memory. The units for acceleration data
-    are return in `g`s, and the units for angular velocity data are return in `deg/s`. If
+    are return in `g`, and the units for angular velocity data are return in `deg/s`. If
     providing a base and period value, included in the output will be the indices to create
     windows starting at the `base` time, with a length of `period`.
 
@@ -36,11 +36,13 @@ class ReadCWA(_BaseProcess):
     Examples
     --------
     Setup a reader with no windowing:
+
     >>> reader = ReadCWA()
     >>> reader.predict('example.cwa')
     {'accel': ..., 'time': ..., ...}
 
     Setup a reader that does windowing between 8:00 AM and 8:00 PM (20:00):
+
     >>> reader = ReadCWA(base=8, period=12)  # 8 + 12 = 20
     >>> reader.predict('example.cwa')
     {'accel': ..., 'time': ..., 'day_ends': [130, 13951, ...], ...}
