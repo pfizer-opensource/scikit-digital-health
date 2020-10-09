@@ -11,19 +11,19 @@ __all__ = ['ComplexityInvariantDistance', 'RangeCountPercentage', 'RatioBeyondRS
 
 
 class ComplexityInvariantDistance(Feature):
+    """
+    A distance metric that accounts for signal complexity.
+
+    Parameters
+    ----------
+    normalize : bool, optional
+        Normalize the signal. Default is True.
+
+    Methods
+    -------
+    compute(signal[, columns=None, windowed=False])
+    """
     def __init__(self, normalize=True):
-        """
-        Compute a measure of distance in a signal that is invariant to its complexity
-
-        Parameters
-        ----------
-        normalize : bool, optional
-            Normalize the signal. Default is True.
-
-        Methods
-        -------
-        compute(signal[, columns=None, windowed=False])
-        """
         super(ComplexityInvariantDistance, self).__init__(
             'ComplexityInvariantDistance', {'normalize': normalize}
         )
@@ -35,21 +35,21 @@ class ComplexityInvariantDistance(Feature):
 
 
 class RangeCountPercentage(Feature):
+    """
+    The percent of the signal that falls between specified values
+
+    Parameters
+    ----------
+    range_min : {int, float}, optional
+        Minimum value of the range. Default value is -1.0
+    range_max : {int, float}, optional
+        Maximum value of the range. Default value is 1.0
+
+    Methods
+    -------
+    compute(signal[, columns=None, windowed=False])
+    """
     def __init__(self, range_min=-1.0, range_max=1.0):
-        """
-        Compute the percent of the signal that falls between the minimum and maximum values
-
-        Parameters
-        ----------
-        range_min : {int, float}, optional
-            Minimum value of the range. Default value is -1.0
-        range_max : {int, float}, optional
-            Maximum value of the range. Default value is 1.0
-
-        Methods
-        -------
-        compute(signal[, columns=None, windowed=False])
-        """
         super(RangeCountPercentage, self).__init__(
             'RangeCountPercentage',
             {'range_min': range_min, 'range_max': range_max}
@@ -65,21 +65,19 @@ class RangeCountPercentage(Feature):
 
 
 class RatioBeyondRSigma(Feature):
+    """
+    The percent of the signal outside :math:`r` standard deviations from the mean.
+
+    Parameters
+    ----------
+    r : float, optional
+        Number of standard deviations above or below the mean the range includes. Default is 2.0
+
+    Methods
+    -------
+    compute(signal[, columns=None, windowed=False])
+    """
     def __init__(self, r=2.0):
-        """
-        Compute the percent of the signal that is farther than :math:`r\\sigma(x)` away from the
-        mean of the signal.
-
-        Parameters
-        ----------
-        r : float, optional
-            Number of standard deviations above or below the mean the range includes. Default is
-            2.0
-
-        Methods
-        -------
-        compute(signal[, columns=None, windowed=False])
-        """
         super(RatioBeyondRSigma, self).__init__(
             'RatioBeyondRSigma',
             {'r': r}
