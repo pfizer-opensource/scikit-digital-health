@@ -141,6 +141,7 @@ def compute_window_samples(fs, window_length, window_step):
 
     Compute the window length for a 4.5s window with a step of 1 sample, and a sampling
     rate of 100Hz
+
     >>> compute_window_samples(100.0, 4.5, 1)
     (450, 1)
     """
