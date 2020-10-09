@@ -98,6 +98,8 @@ def standardize_signal(signal, windowed=False, window_length=None, step=None, co
 
 def compute_window_samples(fs, window_length, window_step):
     """
+    Compute the number of samples for a window. Takes the sampling frequency, window length, and
+    window step in common representations and converts them into number of samples.
 
     Parameters
     ----------
