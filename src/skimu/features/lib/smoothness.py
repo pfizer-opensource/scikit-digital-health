@@ -58,7 +58,7 @@ class JerkMetric(Feature):
         Returns
         -------
         jerk_metric : {numpy.ndarray, pandas.DataFrame}
-            Computed feature, returned as the same type as the input signal
+            Computed jerk metric, returned as the same type as the input signal
         """
         return super().compute(*args, **kwargs)
 
@@ -131,7 +131,7 @@ class DimensionlessJerk(Feature):
 
     def compute(self, *args, **kwargs):
         """
-        compute(signal, fs, *, columns=None, windowed=False)
+        compute(signal, *, columns=None, windowed=False)
 
         Compute the dimensionless jerk metric
 
@@ -139,8 +139,6 @@ class DimensionlessJerk(Feature):
         ----------
         signal : {numpy.ndarray, pandas.DataFrame}
             Either a numpy array (up to 3D) or a pandas dataframe containing the signal
-        fs : float, optional
-            Sampling frequency in Hz
         columns : array_like, optional
             Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
         windowed : bool, optional
@@ -149,7 +147,7 @@ class DimensionlessJerk(Feature):
         Returns
         -------
         dimless_jerk_metric : {numpy.ndarray, pandas.DataFrame}
-            Computed feature, returned as the same type as the input signal
+            Computed [log] dimensionless jerk metric, returned as the same type as the input signal
         """
         return super().compute(*args, **kwargs)
 
@@ -197,6 +195,30 @@ class SPARC(Feature):
         self.padlevel = padlevel
         self.fc = fc
         self.amp_thresh = amplitude_threshold
+
+    def compute(self, *args, **kwargs):
+        """
+        compute(signal, fs, *, columns=None, windowed=False)
+
+        Compute the SPARC
+
+        Parameters
+        ----------
+        signal : {numpy.ndarray, pandas.DataFrame}
+            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
+        fs : float, optional
+            Sampling frequency in Hz
+        columns : array_like, optional
+            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
+        windowed : bool, optional
+            If the signal has already been windowed. Default is False.
+
+        Returns
+        -------
+        sparc : {numpy.ndarray, pandas.DataFrame}
+            Computed SPARC, returned as the same type as the input signal
+        """
+        return super().compute(*args, **kwargs)
 
     def _compute(self, x, fs):
         super(SPARC, self)._compute(x, fs)

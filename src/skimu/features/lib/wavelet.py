@@ -27,7 +27,7 @@ class DetailPower(Feature):
     References
     ----------
     .. [1] Sekine, M. et al. "Classification of waist-acceleration signals in a continuous
-    walking record." Medical Engineering & Physics. Vol. 22. Pp 285-291. 2000.
+        walking record." Medical Engineering & Physics. Vol. 22. Pp 285-291. 2000.
     """
     def __init__(self, wavelet='coif4', freq_band=None):
         super().__init__('DetailPower', {'wavelet': wavelet, 'freq_band': freq_band})
@@ -59,7 +59,7 @@ class DetailPower(Feature):
         Returns
         -------
         power : {numpy.ndarray, pandas.DataFrame}
-            Computed feature, returned as the same type as the input signal
+            Computed detail power, returned as the same type as the input signal
         """
         return super().compute(*args, **kwargs)
 
@@ -114,7 +114,7 @@ class DetailPowerRatio(Feature):
     References
     ----------
     .. [1] Sekine, M. et al. "Classification of waist-acceleration signals in a continuous
-    walking record." Medical Engineering & Physics. Vol. 22. Pp 285-291. 2000.
+        walking record." Medical Engineering & Physics. Vol. 22. Pp 285-291. 2000.
     """
     def __init__(self, wavelet='coif4', freq_band=None):
         super().__init__('DetailPowerRatio', {'wavelet': wavelet, 'freq_band': freq_band})
@@ -146,7 +146,7 @@ class DetailPowerRatio(Feature):
         Returns
         -------
         power_ratio : {numpy.ndarray, pandas.DataFrame}
-            Computed feature, returned as the same type as the input signal
+            Computed detail power ratio, returned as the same type as the input signal
         """
         return super().compute(*args, **kwargs)
 

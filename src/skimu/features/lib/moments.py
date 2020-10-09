@@ -66,7 +66,7 @@ class MeanCrossRate(Feature):
         """
         compute(signal *, columns=None, windowed=False)
 
-        Compute the detail power ratio
+        Compute the mean cross rate
 
         Parameters
         ----------
@@ -181,7 +181,7 @@ class Kurtosis(Feature):
 
     def compute(self, *args, **kwargs):
         """
-        compute(signal, fs, *, columns=None, windowed=False)
+        compute(signal, *, columns=None, windowed=False)
 
         Compute the kurtosis
 
@@ -189,8 +189,6 @@ class Kurtosis(Feature):
         ----------
         signal : {numpy.ndarray, pandas.DataFrame}
             Either a numpy array (up to 3D) or a pandas dataframe containing the signal
-        fs : float, optional
-            Sampling frequency in Hz
         columns : array_like, optional
             Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
         windowed : bool, optional
