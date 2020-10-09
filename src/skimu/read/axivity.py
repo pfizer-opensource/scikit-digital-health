@@ -72,6 +72,8 @@ class ReadCWA(_BaseProcess):
 
     def predict(self, *args, **kwargs):
         """
+        predict(file)
+
         Read the data from the axivity file
 
         Parameters
