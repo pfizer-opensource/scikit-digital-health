@@ -284,6 +284,7 @@ With this documentation written, the last thing is to add a short `.rst` file in
 .. _this_file: docs/ref/preprocessing.rst
 
 .. automodule:: PfyMU.gait
+    :ignore-module-all:
 
 ```
 
