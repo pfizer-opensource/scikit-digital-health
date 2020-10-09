@@ -29,6 +29,38 @@ class NoFeaturesError(Exception):
 
 
 class Bank:
+    """
+    A feature bank for ease in creating a table of features for a given signal, applying the
+    windowing as specified.
+
+    Parameters
+    ----------
+    window_length : float
+        Window length in seconds. If not provided (None), will do no windowing. Default is None
+    window_step : {float, int}
+        Window step - the spacing between the start of windows. This can be specified several
+        different ways (see Notes). Default is 1.0
+
+    Notes
+    -----
+    Computation of the window step depends on the type of input provided, and the range.
+    - `window_step` is a float in (0.0, 1.0]: specifies the fraction of a window to skip to
+    get to the start of the next window
+    - `window_step` is an integer > 1: specifies the number of samples to skip to get to the
+    start of the next window
+
+    Examples
+    --------
+    >>> fb = Bank()
+    >>> # add features to the Bank
+    >>> fb + Mean()
+    >>> fb + Range()
+    >>> # add specific axes of features to the Bank
+    >>> fb + SignalEntropy()[0]
+    >>> fb + IQR()[[1, 2]]
+    >>> fb + SignalEntropy()[2]  # this will reuse the same instance created above
+    >>> features = fb.compute(signal)
+    """
     __slots__ = ('_feat_list', '_n_feats', '_eq_idx', 'wlen_s', 'wstep')
 
     def __str__(self):
@@ -42,37 +74,6 @@ class Bank:
         return ret
 
     def __init__(self, window_length=None, window_step=1.0):
-        """
-        A feature bank for ease in creating a table of features for a given signal, applying the
-        windowing as specified.
-
-        Parameters
-        ----------
-        window_length : float
-            Window length in seconds. If not provided (None), will do no windowing. Default is None
-        window_step : {float, int}
-            Window step - the spacing between the start of windows. This can be specified several
-            different ways (see Notes). Default is 1.0
-        Notes
-        -----
-        Computation of the window step depends on the type of input provided, and the range.
-        - `window_step` is a float in (0.0, 1.0]: specifies the fraction of a window to skip to
-        get to the start of the next window
-        - `window_step` is an integer > 1: specifies the number of samples to skip to get to the
-        start of the next window
-
-        Examples
-        --------
-        >>> fb = Bank()
-        >>> # add features to the Bank
-        >>> fb + Mean()
-        >>> fb + Range()
-        >>> # add specific axes of features to the Bank
-        >>> fb + SignalEntropy()[0]
-        >>> fb + IQR()[[1, 2]]
-        >>> fb + SignalEntropy()[2]  # this will reuse the same instance created above
-        >>> features = fb.compute(signal)
-        """
         # storage for the features to calculate
         self._feat_list = []
         # storage for the number of features that will be calculated
@@ -87,6 +88,7 @@ class Bank:
     def compute(self, signal, fs=None, columns=None, windowed=False):
         """
         Compute the features in the Bank.
+
         Parameters
         ----------
         signal : {numpy.ndarray, pandas.DataFrame}
@@ -97,15 +99,19 @@ class Bank:
             require sampling frequency in the computation (see feature documentation), or if
             windowing `signal`.
         columns : array-like, optional
-            Columns to use from the pandas.DataFrame. If signal is an ndarray, providing columns
+            Columns to use from the pandas.DataFrame. If signal is a ndarray, providing columns
             will provide a return of the column/feature name combinations that matches the columns
             in the returned ndarray
         windowed : bool, optional
             If the signal has already been windowed. Default is False.
+
         Returns
         -------
         features : {numpy.ndarray, pandas.DataFrame}
             Table of computed features in the same type as the input.
+        feat_names : list, optional
+            Feature names. Only returned if `signal` is a ndarray and `columns`
+            was provided
         """
         if not self._feat_list:
             raise NoFeaturesError('No features to compute.')
@@ -252,6 +258,7 @@ class Feature:
     def __init__(self, name, eq_params):
         """
         Base feature class. intended to be overwritten
+
         Parameters
         ----------
         name : str
@@ -275,6 +282,7 @@ class Feature:
     def compute(self, signal, fs=None, *, columns=None, windowed=False):
         """
         Compute the feature.
+
         Parameters
         ----------
         signal : {numpy.ndarray, pandas.DataFrame}
@@ -285,6 +293,7 @@ class Feature:
             Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
         windowed : bool, optional
             If the signal has already been windowed. Default is False.
+
         Returns
         -------
         feature : {numpy.ndarray, pandas.DataFrame}
