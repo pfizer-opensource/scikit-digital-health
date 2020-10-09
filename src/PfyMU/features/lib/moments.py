@@ -23,8 +23,9 @@ class Mean(Feature):
 
     Examples
     --------
+    >>> import numpy as np
     >>> signal = np.arange(15).reshape((5, 3))
-    >>> mn = features.Mean()
+    >>> mn = Mean()
     >>> mn.compute(signal)
     array([6., 7., 8.])
     """
@@ -67,8 +68,9 @@ class StdDev(Feature):
 
     Examples
     --------
+    >>> import numpy as np
     >>> signal = np.arange(15).reshape((5, 3))
-    >>> features.StDev().compute(signal)
+    >>> StDev().compute(signal)
     array([[4.74341649, 4.74341649, 4.74341649]])
     """
     def __init__(self):
