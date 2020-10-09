@@ -4,12 +4,12 @@
 {
     "distutils": {
         "depends": [],
-        "name": "PfyMU.features.lib._cython.entropy",
+        "name": "skimu.features.lib._cython.entropy",
         "sources": [
-            "src/PfyMU/features/lib/_cython/entropy.pyx"
+            "src/skimu/features/lib/_cython/entropy.pyx"
         ]
     },
-    "module_name": "PfyMU.features.lib._cython.entropy"
+    "module_name": "skimu.features.lib._cython.entropy"
 }
 END: Cython Metadata */
 
@@ -604,8 +604,8 @@ static CYTHON_INLINE float __PYX_NAN() {
   #endif
 #endif
 
-#define __PYX_HAVE__PfyMU__features__lib___cython__entropy
-#define __PYX_HAVE_API__PfyMU__features__lib___cython__entropy
+#define __PYX_HAVE__skimu__features__lib___cython__entropy
+#define __PYX_HAVE_API__skimu__features__lib___cython__entropy
 /* Early includes */
 #include <math.h>
 #include "pythread.h"
@@ -821,7 +821,7 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "src/PfyMU/features/lib/_cython/entropy.pyx",
+  "src/skimu/features/lib/_cython/entropy.pyx",
   "stringsource",
 };
 /* MemviewSliceStruct.proto */
@@ -1716,10 +1716,10 @@ static PyObject *__pyx_memoryviewslice_assign_item_from_object(struct __pyx_memo
 
 /* Module declarations from 'libc.math' */
 
-/* Module declarations from 'PfyMU.features.lib._cython.common' */
-static void (*__pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d)(__Pyx_memviewslice, double *, double *); /*proto*/
+/* Module declarations from 'skimu.features.lib._cython.common' */
+static void (*__pyx_f_5skimu_8features_3lib_7_cython_6common_mean_sd_1d)(__Pyx_memviewslice, double *, double *); /*proto*/
 
-/* Module declarations from 'PfyMU.features.lib._cython.entropy' */
+/* Module declarations from 'skimu.features.lib._cython.entropy' */
 static PyTypeObject *__pyx_array_type = 0;
 static PyTypeObject *__pyx_MemviewEnum_type = 0;
 static PyTypeObject *__pyx_memoryview_type = 0;
@@ -1731,8 +1731,8 @@ static PyObject *contiguous = 0;
 static PyObject *indirect_contiguous = 0;
 static int __pyx_memoryview_thread_locks_used;
 static PyThread_type_lock __pyx_memoryview_thread_locks[8];
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_hist(__Pyx_memviewslice, int, double, double, Py_ssize_t, int __pyx_skip_dispatch); /*proto*/
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_histogram(__Pyx_memviewslice, __Pyx_memviewslice, int __pyx_skip_dispatch); /*proto*/
+static PyObject *__pyx_f_5skimu_8features_3lib_7_cython_7entropy_hist(__Pyx_memviewslice, int, double, double, Py_ssize_t, int __pyx_skip_dispatch); /*proto*/
+static PyObject *__pyx_f_5skimu_8features_3lib_7_cython_7entropy_histogram(__Pyx_memviewslice, __Pyx_memviewslice, int __pyx_skip_dispatch); /*proto*/
 static struct __pyx_array_obj *__pyx_array_new(PyObject *, Py_ssize_t, char *, char *, char *); /*proto*/
 static void *__pyx_align_pointer(void *, size_t); /*proto*/
 static PyObject *__pyx_memoryview_new(PyObject *, int, int, __Pyx_TypeInfo *); /*proto*/
@@ -1770,11 +1770,11 @@ static __Pyx_TypeInfo __Pyx_TypeInfo_double__const__ = { "const double", NULL, s
 static __Pyx_TypeInfo __Pyx_TypeInfo_double = { "double", NULL, sizeof(double), { 0 }, 0, 'R', 0, 0 };
 static __Pyx_TypeInfo __Pyx_TypeInfo_int = { "int", NULL, sizeof(int), { 0 }, 0, IS_UNSIGNED(int) ? 'U' : 'I', IS_UNSIGNED(int), 0 };
 static __Pyx_TypeInfo __Pyx_TypeInfo_long = { "long", NULL, sizeof(long), { 0 }, 0, IS_UNSIGNED(long) ? 'U' : 'I', IS_UNSIGNED(long), 0 };
-#define __Pyx_MODULE_NAME "PfyMU.features.lib._cython.entropy"
-extern int __pyx_module_is_main_PfyMU__features__lib___cython__entropy;
-int __pyx_module_is_main_PfyMU__features__lib___cython__entropy = 0;
+#define __Pyx_MODULE_NAME "skimu.features.lib._cython.entropy"
+extern int __pyx_module_is_main_skimu__features__lib___cython__entropy;
+int __pyx_module_is_main_skimu__features__lib___cython__entropy = 0;
 
-/* Implementation of 'PfyMU.features.lib._cython.entropy' */
+/* Implementation of 'skimu.features.lib._cython.entropy' */
 static PyObject *__pyx_builtin_range;
 static PyObject *__pyx_builtin_ValueError;
 static PyObject *__pyx_builtin_MemoryError;
@@ -1913,11 +1913,11 @@ static const char __pyx_k_Incompatible_checksums_s_vs_0xb0[] = "Incompatible che
 static const char __pyx_k_Indirect_dimensions_not_supporte[] = "Indirect dimensions not supported";
 static const char __pyx_k_Invalid_mode_expected_c_or_fortr[] = "Invalid mode, expected 'c' or 'fortran', got %s";
 static const char __pyx_k_Out_of_bounds_on_buffer_access_a[] = "Out of bounds on buffer access (axis %d)";
-static const char __pyx_k_PfyMU_features_lib__cython_entro[] = "PfyMU.features.lib._cython.entropy";
 static const char __pyx_k_Unable_to_convert_item_to_object[] = "Unable to convert item to object";
 static const char __pyx_k_got_differing_extents_in_dimensi[] = "got differing extents in dimension %d (got %d and %d)";
 static const char __pyx_k_no_default___reduce___due_to_non[] = "no default __reduce__ due to non-trivial __cinit__";
-static const char __pyx_k_src_PfyMU_features_lib__cython_e[] = "src/PfyMU/features/lib/_cython/entropy.pyx";
+static const char __pyx_k_skimu_features_lib__cython_entro[] = "skimu.features.lib._cython.entropy";
+static const char __pyx_k_src_skimu_features_lib__cython_e[] = "src/skimu/features/lib/_cython/entropy.pyx";
 static const char __pyx_k_unable_to_allocate_shape_and_str[] = "unable to allocate shape and strides.";
 static PyObject *__pyx_n_s_A;
 static PyObject *__pyx_n_s_ASCII;
@@ -1943,7 +1943,6 @@ static PyObject *__pyx_n_s_N;
 static PyObject *__pyx_n_b_O;
 static PyObject *__pyx_kp_s_Out_of_bounds_on_buffer_access_a;
 static PyObject *__pyx_n_s_P;
-static PyObject *__pyx_n_s_PfyMU_features_lib__cython_entro;
 static PyObject *__pyx_n_s_PickleError;
 static PyObject *__pyx_n_s_SampleEntropy;
 static PyObject *__pyx_n_s_SignalEntropy;
@@ -2040,7 +2039,8 @@ static PyObject *__pyx_n_s_setstate_cython;
 static PyObject *__pyx_n_s_shape;
 static PyObject *__pyx_n_s_signal;
 static PyObject *__pyx_n_s_size;
-static PyObject *__pyx_kp_s_src_PfyMU_features_lib__cython_e;
+static PyObject *__pyx_n_s_skimu_features_lib__cython_entro;
+static PyObject *__pyx_kp_s_src_skimu_features_lib__cython_e;
 static PyObject *__pyx_n_s_start;
 static PyObject *__pyx_n_s_std;
 static PyObject *__pyx_n_s_step;
@@ -2057,10 +2057,10 @@ static PyObject *__pyx_n_s_unpack;
 static PyObject *__pyx_n_s_update;
 static PyObject *__pyx_n_s_wind;
 static PyObject *__pyx_n_s_zeros;
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_hist(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_signal, int __pyx_v_ncells, double __pyx_v_min_val, double __pyx_v_max_val, Py_ssize_t __pyx_v_N); /* proto */
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_2histogram(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_signal, __Pyx_memviewslice __pyx_v_descriptor); /* proto */
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_4SignalEntropy(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_signal); /* proto */
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_signal, int __pyx_v_M, double __pyx_v_r); /* proto */
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_7entropy_hist(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_signal, int __pyx_v_ncells, double __pyx_v_min_val, double __pyx_v_max_val, Py_ssize_t __pyx_v_N); /* proto */
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_7entropy_2histogram(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_signal, __Pyx_memviewslice __pyx_v_descriptor); /* proto */
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_7entropy_4SignalEntropy(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_signal); /* proto */
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_7entropy_6SampleEntropy(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_signal, int __pyx_v_M, double __pyx_v_r); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __pyx_array_obj *__pyx_v_self, PyObject *__pyx_v_shape, Py_ssize_t __pyx_v_itemsize, PyObject *__pyx_v_format, PyObject *__pyx_v_mode, int __pyx_v_allocate_buffer); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array_2__getbuffer__(struct __pyx_array_obj *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
 static void __pyx_array___pyx_pf_15View_dot_MemoryView_5array_4__dealloc__(struct __pyx_array_obj *__pyx_v_self); /* proto */
@@ -2144,7 +2144,7 @@ static PyObject *__pyx_codeobj__23;
 static PyObject *__pyx_codeobj__30;
 /* Late includes */
 
-/* "PfyMU/features/lib/_cython/entropy.pyx":10
+/* "skimu/features/lib/_cython/entropy.pyx":10
  * 
  * 
  * cpdef hist(const double[:] signal, int ncells, double min_val, double max_val, Py_ssize_t N):             # <<<<<<<<<<<<<<
@@ -2152,8 +2152,8 @@ static PyObject *__pyx_codeobj__30;
  *     counts = zeros(ncells, dtype=intc)
  */
 
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_7entropy_1hist(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_hist(__Pyx_memviewslice __pyx_v_signal, int __pyx_v_ncells, double __pyx_v_min_val, double __pyx_v_max_val, Py_ssize_t __pyx_v_N, CYTHON_UNUSED int __pyx_skip_dispatch) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_7entropy_1hist(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_f_5skimu_8features_3lib_7_cython_7entropy_hist(__Pyx_memviewslice __pyx_v_signal, int __pyx_v_ncells, double __pyx_v_min_val, double __pyx_v_max_val, Py_ssize_t __pyx_v_N, CYTHON_UNUSED int __pyx_skip_dispatch) {
   Py_ssize_t __pyx_v_i;
   PyObject *__pyx_v_counts = NULL;
   __Pyx_memviewslice __pyx_v_c_view = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -2177,7 +2177,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_hist(__Pyx_memv
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("hist", 0);
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":12
+  /* "skimu/features/lib/_cython/entropy.pyx":12
  * cpdef hist(const double[:] signal, int ncells, double min_val, double max_val, Py_ssize_t N):
  *     cdef Py_ssize_t i
  *     counts = zeros(ncells, dtype=intc)             # <<<<<<<<<<<<<<
@@ -2207,7 +2207,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_hist(__Pyx_memv
   __pyx_v_counts = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":14
+  /* "skimu/features/lib/_cython/entropy.pyx":14
  *     counts = zeros(ncells, dtype=intc)
  * 
  *     cdef int[:] c_view = counts             # <<<<<<<<<<<<<<
@@ -2219,7 +2219,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_hist(__Pyx_memv
   __pyx_t_5.memview = NULL;
   __pyx_t_5.data = NULL;
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":16
+  /* "skimu/features/lib/_cython/entropy.pyx":16
  *     cdef int[:] c_view = counts
  *     cdef int idx
  *     cdef double bin_width = (max_val - min_val) / <double>(ncells)             # <<<<<<<<<<<<<<
@@ -2233,7 +2233,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_hist(__Pyx_memv
   }
   __pyx_v_bin_width = (__pyx_t_6 / ((double)__pyx_v_ncells));
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":18
+  /* "skimu/features/lib/_cython/entropy.pyx":18
  *     cdef double bin_width = (max_val - min_val) / <double>(ncells)
  * 
  *     if bin_width == 0.0:             # <<<<<<<<<<<<<<
@@ -2243,7 +2243,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_hist(__Pyx_memv
   __pyx_t_7 = ((__pyx_v_bin_width == 0.0) != 0);
   if (__pyx_t_7) {
 
-    /* "PfyMU/features/lib/_cython/entropy.pyx":19
+    /* "skimu/features/lib/_cython/entropy.pyx":19
  * 
  *     if bin_width == 0.0:
  *         bin_width = 1.0  # prevent 0 division             # <<<<<<<<<<<<<<
@@ -2252,7 +2252,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_hist(__Pyx_memv
  */
     __pyx_v_bin_width = 1.0;
 
-    /* "PfyMU/features/lib/_cython/entropy.pyx":18
+    /* "skimu/features/lib/_cython/entropy.pyx":18
  *     cdef double bin_width = (max_val - min_val) / <double>(ncells)
  * 
  *     if bin_width == 0.0:             # <<<<<<<<<<<<<<
@@ -2261,7 +2261,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_hist(__Pyx_memv
  */
   }
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":21
+  /* "skimu/features/lib/_cython/entropy.pyx":21
  *         bin_width = 1.0  # prevent 0 division
  * 
  *     for i in range(N):             # <<<<<<<<<<<<<<
@@ -2273,7 +2273,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_hist(__Pyx_memv
   for (__pyx_t_10 = 0; __pyx_t_10 < __pyx_t_9; __pyx_t_10+=1) {
     __pyx_v_i = __pyx_t_10;
 
-    /* "PfyMU/features/lib/_cython/entropy.pyx":22
+    /* "skimu/features/lib/_cython/entropy.pyx":22
  * 
  *     for i in range(N):
  *         if isnan(signal[i]):             # <<<<<<<<<<<<<<
@@ -2284,7 +2284,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_hist(__Pyx_memv
     __pyx_t_7 = (isnan((*((double const  *) ( /* dim=0 */ (__pyx_v_signal.data + __pyx_t_11 * __pyx_v_signal.strides[0]) )))) != 0);
     if (__pyx_t_7) {
 
-      /* "PfyMU/features/lib/_cython/entropy.pyx":23
+      /* "skimu/features/lib/_cython/entropy.pyx":23
  *     for i in range(N):
  *         if isnan(signal[i]):
  *             continue             # <<<<<<<<<<<<<<
@@ -2293,7 +2293,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_hist(__Pyx_memv
  */
       goto __pyx_L4_continue;
 
-      /* "PfyMU/features/lib/_cython/entropy.pyx":22
+      /* "skimu/features/lib/_cython/entropy.pyx":22
  * 
  *     for i in range(N):
  *         if isnan(signal[i]):             # <<<<<<<<<<<<<<
@@ -2302,7 +2302,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_hist(__Pyx_memv
  */
     }
 
-    /* "PfyMU/features/lib/_cython/entropy.pyx":25
+    /* "skimu/features/lib/_cython/entropy.pyx":25
  *             continue
  * 
  *         idx = <int>((signal[i] - min_val) / bin_width)             # <<<<<<<<<<<<<<
@@ -2317,7 +2317,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_hist(__Pyx_memv
     }
     __pyx_v_idx = ((int)(__pyx_t_6 / __pyx_v_bin_width));
 
-    /* "PfyMU/features/lib/_cython/entropy.pyx":26
+    /* "skimu/features/lib/_cython/entropy.pyx":26
  * 
  *         idx = <int>((signal[i] - min_val) / bin_width)
  *         if idx == ncells:             # <<<<<<<<<<<<<<
@@ -2327,7 +2327,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_hist(__Pyx_memv
     __pyx_t_7 = ((__pyx_v_idx == __pyx_v_ncells) != 0);
     if (__pyx_t_7) {
 
-      /* "PfyMU/features/lib/_cython/entropy.pyx":27
+      /* "skimu/features/lib/_cython/entropy.pyx":27
  *         idx = <int>((signal[i] - min_val) / bin_width)
  *         if idx == ncells:
  *             idx -= 1             # <<<<<<<<<<<<<<
@@ -2336,7 +2336,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_hist(__Pyx_memv
  */
       __pyx_v_idx = (__pyx_v_idx - 1);
 
-      /* "PfyMU/features/lib/_cython/entropy.pyx":26
+      /* "skimu/features/lib/_cython/entropy.pyx":26
  * 
  *         idx = <int>((signal[i] - min_val) / bin_width)
  *         if idx == ncells:             # <<<<<<<<<<<<<<
@@ -2345,7 +2345,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_hist(__Pyx_memv
  */
     }
 
-    /* "PfyMU/features/lib/_cython/entropy.pyx":29
+    /* "skimu/features/lib/_cython/entropy.pyx":29
  *             idx -= 1
  * 
  *         c_view[idx] += 1             # <<<<<<<<<<<<<<
@@ -2357,7 +2357,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_hist(__Pyx_memv
     __pyx_L4_continue:;
   }
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":31
+  /* "skimu/features/lib/_cython/entropy.pyx":31
  *         c_view[idx] += 1
  * 
  *     return counts             # <<<<<<<<<<<<<<
@@ -2369,7 +2369,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_hist(__Pyx_memv
   __pyx_r = __pyx_v_counts;
   goto __pyx_L0;
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":10
+  /* "skimu/features/lib/_cython/entropy.pyx":10
  * 
  * 
  * cpdef hist(const double[:] signal, int ncells, double min_val, double max_val, Py_ssize_t N):             # <<<<<<<<<<<<<<
@@ -2384,7 +2384,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_hist(__Pyx_memv
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
   __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.entropy.hist", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.entropy.hist", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_counts);
@@ -2395,8 +2395,8 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_hist(__Pyx_memv
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_7entropy_1hist(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_7entropy_1hist(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_7entropy_1hist(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_7entropy_1hist(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_signal = { 0, 0, { 0 }, { 0 }, { 0 } };
   int __pyx_v_ncells;
   double __pyx_v_min_val;
@@ -2480,18 +2480,18 @@ static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_7entropy_1hist(PyObject
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("hist", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 10, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.entropy.hist", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.entropy.hist", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_hist(__pyx_self, __pyx_v_signal, __pyx_v_ncells, __pyx_v_min_val, __pyx_v_max_val, __pyx_v_N);
+  __pyx_r = __pyx_pf_5skimu_8features_3lib_7_cython_7entropy_hist(__pyx_self, __pyx_v_signal, __pyx_v_ncells, __pyx_v_min_val, __pyx_v_max_val, __pyx_v_N);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_hist(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_signal, int __pyx_v_ncells, double __pyx_v_min_val, double __pyx_v_max_val, Py_ssize_t __pyx_v_N) {
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_7entropy_hist(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_signal, int __pyx_v_ncells, double __pyx_v_min_val, double __pyx_v_max_val, Py_ssize_t __pyx_v_N) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -2501,7 +2501,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_hist(CYTHON_UN
   __Pyx_RefNannySetupContext("hist", 0);
   __Pyx_XDECREF(__pyx_r);
   if (unlikely(!__pyx_v_signal.memview)) { __Pyx_RaiseUnboundLocalError("signal"); __PYX_ERR(0, 10, __pyx_L1_error) }
-  __pyx_t_1 = __pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_hist(__pyx_v_signal, __pyx_v_ncells, __pyx_v_min_val, __pyx_v_max_val, __pyx_v_N, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 10, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5skimu_8features_3lib_7_cython_7entropy_hist(__pyx_v_signal, __pyx_v_ncells, __pyx_v_min_val, __pyx_v_max_val, __pyx_v_N, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 10, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -2510,7 +2510,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_hist(CYTHON_UN
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.entropy.hist", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.entropy.hist", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __PYX_XDEC_MEMVIEW(&__pyx_v_signal, 1);
@@ -2519,7 +2519,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_hist(CYTHON_UN
   return __pyx_r;
 }
 
-/* "PfyMU/features/lib/_cython/entropy.pyx":34
+/* "skimu/features/lib/_cython/entropy.pyx":34
  * 
  * 
  * cpdef histogram(const double[:] signal, double[:] descriptor):             # <<<<<<<<<<<<<<
@@ -2527,8 +2527,8 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_hist(CYTHON_UN
  *     cdef double min_val = nanmin(signal)
  */
 
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_7entropy_3histogram(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_histogram(__Pyx_memviewslice __pyx_v_signal, __Pyx_memviewslice __pyx_v_descriptor, CYTHON_UNUSED int __pyx_skip_dispatch) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_7entropy_3histogram(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_f_5skimu_8features_3lib_7_cython_7entropy_histogram(__Pyx_memviewslice __pyx_v_signal, __Pyx_memviewslice __pyx_v_descriptor, CYTHON_UNUSED int __pyx_skip_dispatch) {
   Py_ssize_t __pyx_v_N;
   double __pyx_v_min_val;
   double __pyx_v_max_val;
@@ -2551,7 +2551,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_histogram(__Pyx
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("histogram", 0);
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":35
+  /* "skimu/features/lib/_cython/entropy.pyx":35
  * 
  * cpdef histogram(const double[:] signal, double[:] descriptor):
  *     cdef Py_ssize_t N = signal.size             # <<<<<<<<<<<<<<
@@ -2567,7 +2567,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_histogram(__Pyx
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_N = __pyx_t_3;
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":36
+  /* "skimu/features/lib/_cython/entropy.pyx":36
  * cpdef histogram(const double[:] signal, double[:] descriptor):
  *     cdef Py_ssize_t N = signal.size
  *     cdef double min_val = nanmin(signal)             # <<<<<<<<<<<<<<
@@ -2598,7 +2598,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_histogram(__Pyx
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_min_val = __pyx_t_6;
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":37
+  /* "skimu/features/lib/_cython/entropy.pyx":37
  *     cdef Py_ssize_t N = signal.size
  *     cdef double min_val = nanmin(signal)
  *     cdef double max_val = nanmax(signal)             # <<<<<<<<<<<<<<
@@ -2629,7 +2629,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_histogram(__Pyx
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_max_val = __pyx_t_6;
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":38
+  /* "skimu/features/lib/_cython/entropy.pyx":38
  *     cdef double min_val = nanmin(signal)
  *     cdef double max_val = nanmax(signal)
  *     cdef double delta = (max_val - min_val) / <double>(N - 1)             # <<<<<<<<<<<<<<
@@ -2644,7 +2644,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_histogram(__Pyx
   }
   __pyx_v_delta = (__pyx_t_6 / __pyx_t_7);
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":40
+  /* "skimu/features/lib/_cython/entropy.pyx":40
  *     cdef double delta = (max_val - min_val) / <double>(N - 1)
  * 
  *     descriptor[0] = min_val - delta / 2             # <<<<<<<<<<<<<<
@@ -2654,7 +2654,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_histogram(__Pyx
   __pyx_t_8 = 0;
   *((double *) ( /* dim=0 */ (__pyx_v_descriptor.data + __pyx_t_8 * __pyx_v_descriptor.strides[0]) )) = (__pyx_v_min_val - (__pyx_v_delta / 2.0));
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":41
+  /* "skimu/features/lib/_cython/entropy.pyx":41
  * 
  *     descriptor[0] = min_val - delta / 2
  *     descriptor[1] = max_val + delta / 2             # <<<<<<<<<<<<<<
@@ -2664,7 +2664,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_histogram(__Pyx
   __pyx_t_9 = 1;
   *((double *) ( /* dim=0 */ (__pyx_v_descriptor.data + __pyx_t_9 * __pyx_v_descriptor.strides[0]) )) = (__pyx_v_max_val + (__pyx_v_delta / 2.0));
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":42
+  /* "skimu/features/lib/_cython/entropy.pyx":42
  *     descriptor[0] = min_val - delta / 2
  *     descriptor[1] = max_val + delta / 2
  *     descriptor[2] = ceil(sqrt(N))             # <<<<<<<<<<<<<<
@@ -2674,7 +2674,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_histogram(__Pyx
   __pyx_t_10 = 2;
   *((double *) ( /* dim=0 */ (__pyx_v_descriptor.data + __pyx_t_10 * __pyx_v_descriptor.strides[0]) )) = ceil(sqrt(__pyx_v_N));
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":44
+  /* "skimu/features/lib/_cython/entropy.pyx":44
  *     descriptor[2] = ceil(sqrt(N))
  * 
  *     return hist(signal, <int>(descriptor[2]), min_val, max_val, N)             # <<<<<<<<<<<<<<
@@ -2683,13 +2683,13 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_histogram(__Pyx
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_11 = 2;
-  __pyx_t_2 = __pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_hist(__pyx_v_signal, ((int)(*((double *) ( /* dim=0 */ (__pyx_v_descriptor.data + __pyx_t_11 * __pyx_v_descriptor.strides[0]) )))), __pyx_v_min_val, __pyx_v_max_val, __pyx_v_N, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __pyx_t_2 = __pyx_f_5skimu_8features_3lib_7_cython_7entropy_hist(__pyx_v_signal, ((int)(*((double *) ( /* dim=0 */ (__pyx_v_descriptor.data + __pyx_t_11 * __pyx_v_descriptor.strides[0]) )))), __pyx_v_min_val, __pyx_v_max_val, __pyx_v_N, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 44, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":34
+  /* "skimu/features/lib/_cython/entropy.pyx":34
  * 
  * 
  * cpdef histogram(const double[:] signal, double[:] descriptor):             # <<<<<<<<<<<<<<
@@ -2703,7 +2703,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_histogram(__Pyx
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.entropy.histogram", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.entropy.histogram", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -2712,8 +2712,8 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_histogram(__Pyx
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_7entropy_3histogram(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_7entropy_3histogram(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_7entropy_3histogram(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_7entropy_3histogram(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_signal = { 0, 0, { 0 }, { 0 }, { 0 } };
   __Pyx_memviewslice __pyx_v_descriptor = { 0, 0, { 0 }, { 0 }, { 0 } };
   int __pyx_lineno = 0;
@@ -2764,18 +2764,18 @@ static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_7entropy_3histogram(PyO
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("histogram", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 34, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.entropy.histogram", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.entropy.histogram", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_2histogram(__pyx_self, __pyx_v_signal, __pyx_v_descriptor);
+  __pyx_r = __pyx_pf_5skimu_8features_3lib_7_cython_7entropy_2histogram(__pyx_self, __pyx_v_signal, __pyx_v_descriptor);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_2histogram(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_signal, __Pyx_memviewslice __pyx_v_descriptor) {
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_7entropy_2histogram(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_signal, __Pyx_memviewslice __pyx_v_descriptor) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -2786,7 +2786,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_2histogram(CYT
   __Pyx_XDECREF(__pyx_r);
   if (unlikely(!__pyx_v_signal.memview)) { __Pyx_RaiseUnboundLocalError("signal"); __PYX_ERR(0, 34, __pyx_L1_error) }
   if (unlikely(!__pyx_v_descriptor.memview)) { __Pyx_RaiseUnboundLocalError("descriptor"); __PYX_ERR(0, 34, __pyx_L1_error) }
-  __pyx_t_1 = __pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_histogram(__pyx_v_signal, __pyx_v_descriptor, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 34, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5skimu_8features_3lib_7_cython_7entropy_histogram(__pyx_v_signal, __pyx_v_descriptor, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 34, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -2795,7 +2795,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_2histogram(CYT
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.entropy.histogram", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.entropy.histogram", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __PYX_XDEC_MEMVIEW(&__pyx_v_signal, 1);
@@ -2805,7 +2805,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_2histogram(CYT
   return __pyx_r;
 }
 
-/* "PfyMU/features/lib/_cython/entropy.pyx":47
+/* "skimu/features/lib/_cython/entropy.pyx":47
  * 
  * 
  * def SignalEntropy(const double[:, :, :] signal):             # <<<<<<<<<<<<<<
@@ -2814,9 +2814,9 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_2histogram(CYT
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_7entropy_5SignalEntropy(PyObject *__pyx_self, PyObject *__pyx_arg_signal); /*proto*/
-static PyMethodDef __pyx_mdef_5PfyMU_8features_3lib_7_cython_7entropy_5SignalEntropy = {"SignalEntropy", (PyCFunction)__pyx_pw_5PfyMU_8features_3lib_7_cython_7entropy_5SignalEntropy, METH_O, 0};
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_7entropy_5SignalEntropy(PyObject *__pyx_self, PyObject *__pyx_arg_signal) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_7entropy_5SignalEntropy(PyObject *__pyx_self, PyObject *__pyx_arg_signal); /*proto*/
+static PyMethodDef __pyx_mdef_5skimu_8features_3lib_7_cython_7entropy_5SignalEntropy = {"SignalEntropy", (PyCFunction)__pyx_pw_5skimu_8features_3lib_7_cython_7entropy_5SignalEntropy, METH_O, 0};
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_7entropy_5SignalEntropy(PyObject *__pyx_self, PyObject *__pyx_arg_signal) {
   __Pyx_memviewslice __pyx_v_signal = { 0, 0, { 0 }, { 0 }, { 0 } };
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
@@ -2829,18 +2829,18 @@ static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_7entropy_5SignalEntropy
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.entropy.SignalEntropy", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.entropy.SignalEntropy", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_4SignalEntropy(__pyx_self, __pyx_v_signal);
+  __pyx_r = __pyx_pf_5skimu_8features_3lib_7_cython_7entropy_4SignalEntropy(__pyx_self, __pyx_v_signal);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_4SignalEntropy(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_signal) {
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_7entropy_4SignalEntropy(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_signal) {
   Py_ssize_t __pyx_v_M;
   Py_ssize_t __pyx_v_N;
   Py_ssize_t __pyx_v_P;
@@ -2891,7 +2891,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_4SignalEntropy
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("SignalEntropy", 0);
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":48
+  /* "skimu/features/lib/_cython/entropy.pyx":48
  * 
  * def SignalEntropy(const double[:, :, :] signal):
  *     cdef Py_ssize_t M = signal.shape[0], N = signal.shape[1], P = signal.shape[2]             # <<<<<<<<<<<<<<
@@ -2902,7 +2902,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_4SignalEntropy
   __pyx_v_N = (__pyx_v_signal.shape[1]);
   __pyx_v_P = (__pyx_v_signal.shape[2]);
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":50
+  /* "skimu/features/lib/_cython/entropy.pyx":50
  *     cdef Py_ssize_t M = signal.shape[0], N = signal.shape[1], P = signal.shape[2]
  * 
  *     res = zeros((M, P), dtype=npy_double)             # <<<<<<<<<<<<<<
@@ -2942,7 +2942,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_4SignalEntropy
   __pyx_v_res = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":52
+  /* "skimu/features/lib/_cython/entropy.pyx":52
  *     res = zeros((M, P), dtype=npy_double)
  * 
  *     cdef double[:, ::1] result = res             # <<<<<<<<<<<<<<
@@ -2954,7 +2954,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_4SignalEntropy
   __pyx_t_5.memview = NULL;
   __pyx_t_5.data = NULL;
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":53
+  /* "skimu/features/lib/_cython/entropy.pyx":53
  * 
  *     cdef double[:, ::1] result = res
  *     cdef double[::1] d = zeros(3, dtype=npy_double)             # <<<<<<<<<<<<<<
@@ -2979,7 +2979,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_4SignalEntropy
   __pyx_t_6.memview = NULL;
   __pyx_t_6.data = NULL;
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":54
+  /* "skimu/features/lib/_cython/entropy.pyx":54
  *     cdef double[:, ::1] result = res
  *     cdef double[::1] d = zeros(3, dtype=npy_double)
  *     cdef double[::1] data_norm = zeros(N, dtype=npy_double)             # <<<<<<<<<<<<<<
@@ -3012,7 +3012,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_4SignalEntropy
   __pyx_t_6.memview = NULL;
   __pyx_t_6.data = NULL;
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":59
+  /* "skimu/features/lib/_cython/entropy.pyx":59
  *     cdef Py_ssize_t i, j, k, n
  * 
  *     for i in range(M):             # <<<<<<<<<<<<<<
@@ -3024,7 +3024,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_4SignalEntropy
   for (__pyx_t_9 = 0; __pyx_t_9 < __pyx_t_8; __pyx_t_9+=1) {
     __pyx_v_i = __pyx_t_9;
 
-    /* "PfyMU/features/lib/_cython/entropy.pyx":60
+    /* "skimu/features/lib/_cython/entropy.pyx":60
  * 
  *     for i in range(M):
  *         for k in range(P):             # <<<<<<<<<<<<<<
@@ -3036,7 +3036,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_4SignalEntropy
     for (__pyx_t_12 = 0; __pyx_t_12 < __pyx_t_11; __pyx_t_12+=1) {
       __pyx_v_k = __pyx_t_12;
 
-      /* "PfyMU/features/lib/_cython/entropy.pyx":61
+      /* "skimu/features/lib/_cython/entropy.pyx":61
  *     for i in range(M):
  *         for k in range(P):
  *             std = 0.             # <<<<<<<<<<<<<<
@@ -3045,7 +3045,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_4SignalEntropy
  */
       __pyx_v_std = 0.;
 
-      /* "PfyMU/features/lib/_cython/entropy.pyx":62
+      /* "skimu/features/lib/_cython/entropy.pyx":62
  *         for k in range(P):
  *             std = 0.
  *             mean = 0.             # <<<<<<<<<<<<<<
@@ -3054,7 +3054,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_4SignalEntropy
  */
       __pyx_v_mean = 0.;
 
-      /* "PfyMU/features/lib/_cython/entropy.pyx":63
+      /* "skimu/features/lib/_cython/entropy.pyx":63
  *             std = 0.
  *             mean = 0.
  *             mean_sd_1d(signal[i, :, k], &mean, &std)             # <<<<<<<<<<<<<<
@@ -3080,12 +3080,12 @@ __pyx_t_13.strides[0] = __pyx_v_signal.strides[1];
         __pyx_t_13.data += __pyx_tmp_idx * __pyx_tmp_stride;
 }
 
-__pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_mean), (&__pyx_v_std));
+__pyx_f_5skimu_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_mean), (&__pyx_v_std));
       __PYX_XDEC_MEMVIEW(&__pyx_t_13, 1);
       __pyx_t_13.memview = NULL;
       __pyx_t_13.data = NULL;
 
-      /* "PfyMU/features/lib/_cython/entropy.pyx":65
+      /* "skimu/features/lib/_cython/entropy.pyx":65
  *             mean_sd_1d(signal[i, :, k], &mean, &std)
  * 
  *             if std == 0:             # <<<<<<<<<<<<<<
@@ -3095,7 +3095,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_
       __pyx_t_14 = ((__pyx_v_std == 0.0) != 0);
       if (__pyx_t_14) {
 
-        /* "PfyMU/features/lib/_cython/entropy.pyx":66
+        /* "skimu/features/lib/_cython/entropy.pyx":66
  * 
  *             if std == 0:
  *                 std = 1.  # ensure no division by 0             # <<<<<<<<<<<<<<
@@ -3104,7 +3104,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_
  */
         __pyx_v_std = 1.;
 
-        /* "PfyMU/features/lib/_cython/entropy.pyx":65
+        /* "skimu/features/lib/_cython/entropy.pyx":65
  *             mean_sd_1d(signal[i, :, k], &mean, &std)
  * 
  *             if std == 0:             # <<<<<<<<<<<<<<
@@ -3113,7 +3113,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_
  */
       }
 
-      /* "PfyMU/features/lib/_cython/entropy.pyx":67
+      /* "skimu/features/lib/_cython/entropy.pyx":67
  *             if std == 0:
  *                 std = 1.  # ensure no division by 0
  *             for j in range(N):             # <<<<<<<<<<<<<<
@@ -3125,7 +3125,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_
       for (__pyx_t_17 = 0; __pyx_t_17 < __pyx_t_16; __pyx_t_17+=1) {
         __pyx_v_j = __pyx_t_17;
 
-        /* "PfyMU/features/lib/_cython/entropy.pyx":68
+        /* "skimu/features/lib/_cython/entropy.pyx":68
  *                 std = 1.  # ensure no division by 0
  *             for j in range(N):
  *                 data_norm[j] = signal[i, j, k] / std             # <<<<<<<<<<<<<<
@@ -3144,19 +3144,19 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_
         *((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_data_norm.data) + __pyx_t_20)) )) = (__pyx_t_21 / __pyx_v_std);
       }
 
-      /* "PfyMU/features/lib/_cython/entropy.pyx":70
+      /* "skimu/features/lib/_cython/entropy.pyx":70
  *                 data_norm[j] = signal[i, j, k] / std
  * 
  *             h = histogram(data_norm, d)             # <<<<<<<<<<<<<<
  * 
  *             if (d[0] == d[1]):  # data is constant
  */
-      __pyx_t_1 = __pyx_f_5PfyMU_8features_3lib_7_cython_7entropy_histogram(__pyx_v_data_norm, __pyx_v_d, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 70, __pyx_L1_error)
+      __pyx_t_1 = __pyx_f_5skimu_8features_3lib_7_cython_7entropy_histogram(__pyx_v_data_norm, __pyx_v_d, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 70, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_XDECREF_SET(__pyx_v_h, __pyx_t_1);
       __pyx_t_1 = 0;
 
-      /* "PfyMU/features/lib/_cython/entropy.pyx":72
+      /* "skimu/features/lib/_cython/entropy.pyx":72
  *             h = histogram(data_norm, d)
  * 
  *             if (d[0] == d[1]):  # data is constant             # <<<<<<<<<<<<<<
@@ -3168,7 +3168,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_
       __pyx_t_14 = (((*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_d.data) + __pyx_t_19)) ))) == (*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_d.data) + __pyx_t_18)) )))) != 0);
       if (__pyx_t_14) {
 
-        /* "PfyMU/features/lib/_cython/entropy.pyx":73
+        /* "skimu/features/lib/_cython/entropy.pyx":73
  * 
  *             if (d[0] == d[1]):  # data is constant
  *                 result[i] = 0.0  # no information             # <<<<<<<<<<<<<<
@@ -3204,7 +3204,7 @@ __pyx_t_6.strides[0] = __pyx_v_result.strides[1];
         __pyx_t_6.memview = NULL;
         __pyx_t_6.data = NULL;
 
-        /* "PfyMU/features/lib/_cython/entropy.pyx":74
+        /* "skimu/features/lib/_cython/entropy.pyx":74
  *             if (d[0] == d[1]):  # data is constant
  *                 result[i] = 0.0  # no information
  *                 continue             # <<<<<<<<<<<<<<
@@ -3213,7 +3213,7 @@ __pyx_t_6.strides[0] = __pyx_v_result.strides[1];
  */
         goto __pyx_L5_continue;
 
-        /* "PfyMU/features/lib/_cython/entropy.pyx":72
+        /* "skimu/features/lib/_cython/entropy.pyx":72
  *             h = histogram(data_norm, d)
  * 
  *             if (d[0] == d[1]):  # data is constant             # <<<<<<<<<<<<<<
@@ -3222,7 +3222,7 @@ __pyx_t_6.strides[0] = __pyx_v_result.strides[1];
  */
       }
 
-      /* "PfyMU/features/lib/_cython/entropy.pyx":76
+      /* "skimu/features/lib/_cython/entropy.pyx":76
  *                 continue
  * 
  *             count = 0             # <<<<<<<<<<<<<<
@@ -3231,7 +3231,7 @@ __pyx_t_6.strides[0] = __pyx_v_result.strides[1];
  */
       __pyx_v_count = 0.0;
 
-      /* "PfyMU/features/lib/_cython/entropy.pyx":77
+      /* "skimu/features/lib/_cython/entropy.pyx":77
  * 
  *             count = 0
  *             estimate = 0             # <<<<<<<<<<<<<<
@@ -3240,7 +3240,7 @@ __pyx_t_6.strides[0] = __pyx_v_result.strides[1];
  */
       __pyx_v_estimate = 0.0;
 
-      /* "PfyMU/features/lib/_cython/entropy.pyx":79
+      /* "skimu/features/lib/_cython/entropy.pyx":79
  *             estimate = 0
  * 
  *             for n in range(<int>(d[2])):             # <<<<<<<<<<<<<<
@@ -3253,7 +3253,7 @@ __pyx_t_6.strides[0] = __pyx_v_result.strides[1];
       for (__pyx_t_15 = 0; __pyx_t_15 < __pyx_t_23; __pyx_t_15+=1) {
         __pyx_v_n = __pyx_t_15;
 
-        /* "PfyMU/features/lib/_cython/entropy.pyx":80
+        /* "skimu/features/lib/_cython/entropy.pyx":80
  * 
  *             for n in range(<int>(d[2])):
  *                 h_n = h[n]             # <<<<<<<<<<<<<<
@@ -3266,7 +3266,7 @@ __pyx_t_6.strides[0] = __pyx_v_result.strides[1];
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         __pyx_v_h_n = __pyx_t_21;
 
-        /* "PfyMU/features/lib/_cython/entropy.pyx":81
+        /* "skimu/features/lib/_cython/entropy.pyx":81
  *             for n in range(<int>(d[2])):
  *                 h_n = h[n]
  *                 if h_n > 0:             # <<<<<<<<<<<<<<
@@ -3276,7 +3276,7 @@ __pyx_t_6.strides[0] = __pyx_v_result.strides[1];
         __pyx_t_14 = ((__pyx_v_h_n > 0.0) != 0);
         if (__pyx_t_14) {
 
-          /* "PfyMU/features/lib/_cython/entropy.pyx":82
+          /* "skimu/features/lib/_cython/entropy.pyx":82
  *                 h_n = h[n]
  *                 if h_n > 0:
  *                     logf = log(h_n)             # <<<<<<<<<<<<<<
@@ -3285,7 +3285,7 @@ __pyx_t_6.strides[0] = __pyx_v_result.strides[1];
  */
           __pyx_v_logf = log(__pyx_v_h_n);
 
-          /* "PfyMU/features/lib/_cython/entropy.pyx":81
+          /* "skimu/features/lib/_cython/entropy.pyx":81
  *             for n in range(<int>(d[2])):
  *                 h_n = h[n]
  *                 if h_n > 0:             # <<<<<<<<<<<<<<
@@ -3295,7 +3295,7 @@ __pyx_t_6.strides[0] = __pyx_v_result.strides[1];
           goto __pyx_L13;
         }
 
-        /* "PfyMU/features/lib/_cython/entropy.pyx":84
+        /* "skimu/features/lib/_cython/entropy.pyx":84
  *                     logf = log(h_n)
  *                 else:
  *                     logf = 0.0             # <<<<<<<<<<<<<<
@@ -3307,7 +3307,7 @@ __pyx_t_6.strides[0] = __pyx_v_result.strides[1];
         }
         __pyx_L13:;
 
-        /* "PfyMU/features/lib/_cython/entropy.pyx":86
+        /* "skimu/features/lib/_cython/entropy.pyx":86
  *                     logf = 0.0
  * 
  *                 count += h_n             # <<<<<<<<<<<<<<
@@ -3316,7 +3316,7 @@ __pyx_t_6.strides[0] = __pyx_v_result.strides[1];
  */
         __pyx_v_count = (__pyx_v_count + __pyx_v_h_n);
 
-        /* "PfyMU/features/lib/_cython/entropy.pyx":87
+        /* "skimu/features/lib/_cython/entropy.pyx":87
  * 
  *                 count += h_n
  *                 estimate -= h_n * logf             # <<<<<<<<<<<<<<
@@ -3326,7 +3326,7 @@ __pyx_t_6.strides[0] = __pyx_v_result.strides[1];
         __pyx_v_estimate = (__pyx_v_estimate - (__pyx_v_h_n * __pyx_v_logf));
       }
 
-      /* "PfyMU/features/lib/_cython/entropy.pyx":89
+      /* "skimu/features/lib/_cython/entropy.pyx":89
  *                 estimate -= h_n * logf
  * 
  *             nbias = -(d[2] - 1) / (2 * count)             # <<<<<<<<<<<<<<
@@ -3342,7 +3342,7 @@ __pyx_t_6.strides[0] = __pyx_v_result.strides[1];
       }
       __pyx_v_nbias = (__pyx_t_21 / __pyx_t_24);
 
-      /* "PfyMU/features/lib/_cython/entropy.pyx":90
+      /* "skimu/features/lib/_cython/entropy.pyx":90
  * 
  *             nbias = -(d[2] - 1) / (2 * count)
  *             estimate = estimate / count + log(count) + log((d[1] - d[0]) / d[2]) - nbias             # <<<<<<<<<<<<<<
@@ -3364,7 +3364,7 @@ __pyx_t_6.strides[0] = __pyx_v_result.strides[1];
       }
       __pyx_v_estimate = ((((__pyx_v_estimate / __pyx_v_count) + log(__pyx_v_count)) + log((__pyx_t_24 / __pyx_t_21))) - __pyx_v_nbias);
 
-      /* "PfyMU/features/lib/_cython/entropy.pyx":91
+      /* "skimu/features/lib/_cython/entropy.pyx":91
  *             nbias = -(d[2] - 1) / (2 * count)
  *             estimate = estimate / count + log(count) + log((d[1] - d[0]) / d[2]) - nbias
  *             result[i, k] = exp(estimate**2) - 1 - 1             # <<<<<<<<<<<<<<
@@ -3378,7 +3378,7 @@ __pyx_t_6.strides[0] = __pyx_v_result.strides[1];
     }
   }
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":93
+  /* "skimu/features/lib/_cython/entropy.pyx":93
  *             result[i, k] = exp(estimate**2) - 1 - 1
  * 
  *     return res             # <<<<<<<<<<<<<<
@@ -3390,7 +3390,7 @@ __pyx_t_6.strides[0] = __pyx_v_result.strides[1];
   __pyx_r = __pyx_v_res;
   goto __pyx_L0;
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":47
+  /* "skimu/features/lib/_cython/entropy.pyx":47
  * 
  * 
  * def SignalEntropy(const double[:, :, :] signal):             # <<<<<<<<<<<<<<
@@ -3407,7 +3407,7 @@ __pyx_t_6.strides[0] = __pyx_v_result.strides[1];
   __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_t_6, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_t_13, 1);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.entropy.SignalEntropy", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.entropy.SignalEntropy", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __PYX_XDEC_MEMVIEW(&__pyx_v_signal, 1);
@@ -3421,7 +3421,7 @@ __pyx_t_6.strides[0] = __pyx_v_result.strides[1];
   return __pyx_r;
 }
 
-/* "PfyMU/features/lib/_cython/entropy.pyx":96
+/* "skimu/features/lib/_cython/entropy.pyx":96
  * 
  * 
  * def SampleEntropy(const double[:, :, :] signal, int M, double r):             # <<<<<<<<<<<<<<
@@ -3430,9 +3430,9 @@ __pyx_t_6.strides[0] = __pyx_v_result.strides[1];
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_7entropy_7SampleEntropy(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_5PfyMU_8features_3lib_7_cython_7entropy_7SampleEntropy = {"SampleEntropy", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5PfyMU_8features_3lib_7_cython_7entropy_7SampleEntropy, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_7entropy_7SampleEntropy(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_7entropy_7SampleEntropy(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_5skimu_8features_3lib_7_cython_7entropy_7SampleEntropy = {"SampleEntropy", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5skimu_8features_3lib_7_cython_7entropy_7SampleEntropy, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_7entropy_7SampleEntropy(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_signal = { 0, 0, { 0 }, { 0 }, { 0 } };
   int __pyx_v_M;
   double __pyx_v_r;
@@ -3494,18 +3494,18 @@ static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_7entropy_7SampleEntropy
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("SampleEntropy", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 96, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.entropy.SampleEntropy", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.entropy.SampleEntropy", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy(__pyx_self, __pyx_v_signal, __pyx_v_M, __pyx_v_r);
+  __pyx_r = __pyx_pf_5skimu_8features_3lib_7_cython_7entropy_6SampleEntropy(__pyx_self, __pyx_v_signal, __pyx_v_M, __pyx_v_r);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_signal, int __pyx_v_M, double __pyx_v_r) {
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_7entropy_6SampleEntropy(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_signal, int __pyx_v_M, double __pyx_v_r) {
   Py_ssize_t __pyx_v_n;
   Py_ssize_t __pyx_v_k;
   Py_ssize_t __pyx_v_p;
@@ -3580,7 +3580,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("SampleEntropy", 0);
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":97
+  /* "skimu/features/lib/_cython/entropy.pyx":97
  * 
  * def SampleEntropy(const double[:, :, :] signal, int M, double r):
  *     cdef Py_ssize_t n = signal.shape[1], k = signal.shape[2], p = signal.shape[0]             # <<<<<<<<<<<<<<
@@ -3591,7 +3591,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
   __pyx_v_k = (__pyx_v_signal.shape[2]);
   __pyx_v_p = (__pyx_v_signal.shape[0]);
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":98
+  /* "skimu/features/lib/_cython/entropy.pyx":98
  * def SampleEntropy(const double[:, :, :] signal, int M, double r):
  *     cdef Py_ssize_t n = signal.shape[1], k = signal.shape[2], p = signal.shape[0]
  *     entropy = zeros((p, M, k), dtype=npy_double)             # <<<<<<<<<<<<<<
@@ -3636,7 +3636,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
   __pyx_v_entropy = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":99
+  /* "skimu/features/lib/_cython/entropy.pyx":99
  *     cdef Py_ssize_t n = signal.shape[1], k = signal.shape[2], p = signal.shape[0]
  *     entropy = zeros((p, M, k), dtype=npy_double)
  *     cdef double[:, :, ::1] ent = entropy             # <<<<<<<<<<<<<<
@@ -3648,7 +3648,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
   __pyx_t_6.memview = NULL;
   __pyx_t_6.data = NULL;
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":101
+  /* "skimu/features/lib/_cython/entropy.pyx":101
  *     cdef double[:, :, ::1] ent = entropy
  *     cdef long nj, j
  *     cdef long[:] run = zeros(n, dtype=int), lastrun = zeros(n, dtype=int)             # <<<<<<<<<<<<<<
@@ -3700,7 +3700,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
   __pyx_t_7.memview = NULL;
   __pyx_t_7.data = NULL;
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":103
+  /* "skimu/features/lib/_cython/entropy.pyx":103
  *     cdef long[:] run = zeros(n, dtype=int), lastrun = zeros(n, dtype=int)
  *     cdef long N, M1
  *     cdef double[:, :, :] A = zeros((p, M, k), dtype=npy_double), B = zeros((p, M, k), dtype=npy_double)             # <<<<<<<<<<<<<<
@@ -3788,7 +3788,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
   __pyx_t_8.memview = NULL;
   __pyx_t_8.data = NULL;
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":107
+  /* "skimu/features/lib/_cython/entropy.pyx":107
  * 
  *     cdef Py_ssize_t i, jj, mm, kk, axis, wind
  *     for wind in range(p):             # <<<<<<<<<<<<<<
@@ -3800,7 +3800,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
   for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_10; __pyx_t_11+=1) {
     __pyx_v_wind = __pyx_t_11;
 
-    /* "PfyMU/features/lib/_cython/entropy.pyx":108
+    /* "skimu/features/lib/_cython/entropy.pyx":108
  *     cdef Py_ssize_t i, jj, mm, kk, axis, wind
  *     for wind in range(p):
  *         for axis in range(k):             # <<<<<<<<<<<<<<
@@ -3812,7 +3812,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
     for (__pyx_t_14 = 0; __pyx_t_14 < __pyx_t_13; __pyx_t_14+=1) {
       __pyx_v_axis = __pyx_t_14;
 
-      /* "PfyMU/features/lib/_cython/entropy.pyx":109
+      /* "skimu/features/lib/_cython/entropy.pyx":109
  *     for wind in range(p):
  *         for axis in range(k):
  *             run[:] = 0             # <<<<<<<<<<<<<<
@@ -3834,7 +3834,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
           }
       }
 
-      /* "PfyMU/features/lib/_cython/entropy.pyx":110
+      /* "skimu/features/lib/_cython/entropy.pyx":110
  *         for axis in range(k):
  *             run[:] = 0
  *             lastrun[:] = 0             # <<<<<<<<<<<<<<
@@ -3856,7 +3856,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
           }
       }
 
-      /* "PfyMU/features/lib/_cython/entropy.pyx":111
+      /* "skimu/features/lib/_cython/entropy.pyx":111
  *             run[:] = 0
  *             lastrun[:] = 0
  *             for i in range(n-1):             # <<<<<<<<<<<<<<
@@ -3868,7 +3868,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
       for (__pyx_t_17 = 0; __pyx_t_17 < __pyx_t_16; __pyx_t_17+=1) {
         __pyx_v_i = __pyx_t_17;
 
-        /* "PfyMU/features/lib/_cython/entropy.pyx":112
+        /* "skimu/features/lib/_cython/entropy.pyx":112
  *             lastrun[:] = 0
  *             for i in range(n-1):
  *                 nj = n - i - 1             # <<<<<<<<<<<<<<
@@ -3877,7 +3877,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
  */
         __pyx_v_nj = ((__pyx_v_n - __pyx_v_i) - 1);
 
-        /* "PfyMU/features/lib/_cython/entropy.pyx":113
+        /* "skimu/features/lib/_cython/entropy.pyx":113
  *             for i in range(n-1):
  *                 nj = n - i - 1
  *                 Y1 = signal[wind, i, axis]             # <<<<<<<<<<<<<<
@@ -3889,7 +3889,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
         __pyx_t_20 = __pyx_v_axis;
         __pyx_v_Y1 = (*((double const  *) ( /* dim=2 */ (( /* dim=1 */ (( /* dim=0 */ (__pyx_v_signal.data + __pyx_t_18 * __pyx_v_signal.strides[0]) ) + __pyx_t_19 * __pyx_v_signal.strides[1]) ) + __pyx_t_20 * __pyx_v_signal.strides[2]) )));
 
-        /* "PfyMU/features/lib/_cython/entropy.pyx":114
+        /* "skimu/features/lib/_cython/entropy.pyx":114
  *                 nj = n - i - 1
  *                 Y1 = signal[wind, i, axis]
  *                 for jj in range(nj):             # <<<<<<<<<<<<<<
@@ -3901,7 +3901,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
         for (__pyx_t_23 = 0; __pyx_t_23 < __pyx_t_22; __pyx_t_23+=1) {
           __pyx_v_jj = __pyx_t_23;
 
-          /* "PfyMU/features/lib/_cython/entropy.pyx":115
+          /* "skimu/features/lib/_cython/entropy.pyx":115
  *                 Y1 = signal[wind, i, axis]
  *                 for jj in range(nj):
  *                     j = jj + i + 1             # <<<<<<<<<<<<<<
@@ -3910,7 +3910,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
  */
           __pyx_v_j = ((__pyx_v_jj + __pyx_v_i) + 1);
 
-          /* "PfyMU/features/lib/_cython/entropy.pyx":116
+          /* "skimu/features/lib/_cython/entropy.pyx":116
  *                 for jj in range(nj):
  *                     j = jj + i + 1
  *                     if (((signal[wind, j, axis] - Y1) < r) and ((Y1 - signal[wind, j, axis]) < r)):             # <<<<<<<<<<<<<<
@@ -3934,7 +3934,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
           __pyx_L12_bool_binop_done:;
           if (__pyx_t_24) {
 
-            /* "PfyMU/features/lib/_cython/entropy.pyx":117
+            /* "skimu/features/lib/_cython/entropy.pyx":117
  *                     j = jj + i + 1
  *                     if (((signal[wind, j, axis] - Y1) < r) and ((Y1 - signal[wind, j, axis]) < r)):
  *                         run[jj] = lastrun[jj] + 1             # <<<<<<<<<<<<<<
@@ -3945,7 +3945,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
             __pyx_t_19 = __pyx_v_jj;
             *((long *) ( /* dim=0 */ (__pyx_v_run.data + __pyx_t_19 * __pyx_v_run.strides[0]) )) = ((*((long *) ( /* dim=0 */ (__pyx_v_lastrun.data + __pyx_t_20 * __pyx_v_lastrun.strides[0]) ))) + 1);
 
-            /* "PfyMU/features/lib/_cython/entropy.pyx":118
+            /* "skimu/features/lib/_cython/entropy.pyx":118
  *                     if (((signal[wind, j, axis] - Y1) < r) and ((Y1 - signal[wind, j, axis]) < r)):
  *                         run[jj] = lastrun[jj] + 1
  *                         M1 = M if (M < run[jj]) else run[jj]             # <<<<<<<<<<<<<<
@@ -3961,7 +3961,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
             }
             __pyx_v_M1 = __pyx_t_26;
 
-            /* "PfyMU/features/lib/_cython/entropy.pyx":119
+            /* "skimu/features/lib/_cython/entropy.pyx":119
  *                         run[jj] = lastrun[jj] + 1
  *                         M1 = M if (M < run[jj]) else run[jj]
  *                         for mm in range(M1):             # <<<<<<<<<<<<<<
@@ -3973,7 +3973,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
             for (__pyx_t_28 = 0; __pyx_t_28 < __pyx_t_27; __pyx_t_28+=1) {
               __pyx_v_mm = __pyx_t_28;
 
-              /* "PfyMU/features/lib/_cython/entropy.pyx":120
+              /* "skimu/features/lib/_cython/entropy.pyx":120
  *                         M1 = M if (M < run[jj]) else run[jj]
  *                         for mm in range(M1):
  *                             A[wind, mm, axis] += 1             # <<<<<<<<<<<<<<
@@ -3985,7 +3985,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
               __pyx_t_29 = __pyx_v_axis;
               *((double *) ( /* dim=2 */ (( /* dim=1 */ (( /* dim=0 */ (__pyx_v_A.data + __pyx_t_20 * __pyx_v_A.strides[0]) ) + __pyx_t_18 * __pyx_v_A.strides[1]) ) + __pyx_t_29 * __pyx_v_A.strides[2]) )) += 1.0;
 
-              /* "PfyMU/features/lib/_cython/entropy.pyx":121
+              /* "skimu/features/lib/_cython/entropy.pyx":121
  *                         for mm in range(M1):
  *                             A[wind, mm, axis] += 1
  *                             if (j < (n - 1)):             # <<<<<<<<<<<<<<
@@ -3995,7 +3995,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
               __pyx_t_24 = ((__pyx_v_j < (__pyx_v_n - 1)) != 0);
               if (__pyx_t_24) {
 
-                /* "PfyMU/features/lib/_cython/entropy.pyx":122
+                /* "skimu/features/lib/_cython/entropy.pyx":122
  *                             A[wind, mm, axis] += 1
  *                             if (j < (n - 1)):
  *                                 B[wind, mm, axis] += 1             # <<<<<<<<<<<<<<
@@ -4007,7 +4007,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
                 __pyx_t_32 = __pyx_v_axis;
                 *((double *) ( /* dim=2 */ (( /* dim=1 */ (( /* dim=0 */ (__pyx_v_B.data + __pyx_t_30 * __pyx_v_B.strides[0]) ) + __pyx_t_31 * __pyx_v_B.strides[1]) ) + __pyx_t_32 * __pyx_v_B.strides[2]) )) += 1.0;
 
-                /* "PfyMU/features/lib/_cython/entropy.pyx":121
+                /* "skimu/features/lib/_cython/entropy.pyx":121
  *                         for mm in range(M1):
  *                             A[wind, mm, axis] += 1
  *                             if (j < (n - 1)):             # <<<<<<<<<<<<<<
@@ -4017,7 +4017,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
               }
             }
 
-            /* "PfyMU/features/lib/_cython/entropy.pyx":116
+            /* "skimu/features/lib/_cython/entropy.pyx":116
  *                 for jj in range(nj):
  *                     j = jj + i + 1
  *                     if (((signal[wind, j, axis] - Y1) < r) and ((Y1 - signal[wind, j, axis]) < r)):             # <<<<<<<<<<<<<<
@@ -4027,7 +4027,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
             goto __pyx_L11;
           }
 
-          /* "PfyMU/features/lib/_cython/entropy.pyx":124
+          /* "skimu/features/lib/_cython/entropy.pyx":124
  *                                 B[wind, mm, axis] += 1
  *                     else:
  *                         run[jj] = 0             # <<<<<<<<<<<<<<
@@ -4041,7 +4041,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
           __pyx_L11:;
         }
 
-        /* "PfyMU/features/lib/_cython/entropy.pyx":125
+        /* "skimu/features/lib/_cython/entropy.pyx":125
  *                     else:
  *                         run[jj] = 0
  *                 for kk in range(nj):             # <<<<<<<<<<<<<<
@@ -4053,7 +4053,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
         for (__pyx_t_23 = 0; __pyx_t_23 < __pyx_t_22; __pyx_t_23+=1) {
           __pyx_v_kk = __pyx_t_23;
 
-          /* "PfyMU/features/lib/_cython/entropy.pyx":126
+          /* "skimu/features/lib/_cython/entropy.pyx":126
  *                         run[jj] = 0
  *                 for kk in range(nj):
  *                     lastrun[kk] = run[kk]             # <<<<<<<<<<<<<<
@@ -4068,7 +4068,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
     }
   }
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":128
+  /* "skimu/features/lib/_cython/entropy.pyx":128
  *                     lastrun[kk] = run[kk]
  * 
  *     N = <long>(n * (n - 1) / 2)             # <<<<<<<<<<<<<<
@@ -4077,7 +4077,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
  */
   __pyx_v_N = ((long)(((double)(__pyx_v_n * (__pyx_v_n - 1))) / 2.0));
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":130
+  /* "skimu/features/lib/_cython/entropy.pyx":130
  *     N = <long>(n * (n - 1) / 2)
  * 
  *     for wind in range(p):             # <<<<<<<<<<<<<<
@@ -4089,7 +4089,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
   for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_10; __pyx_t_11+=1) {
     __pyx_v_wind = __pyx_t_11;
 
-    /* "PfyMU/features/lib/_cython/entropy.pyx":131
+    /* "skimu/features/lib/_cython/entropy.pyx":131
  * 
  *     for wind in range(p):
  *         for axis in range(k):             # <<<<<<<<<<<<<<
@@ -4101,7 +4101,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
     for (__pyx_t_14 = 0; __pyx_t_14 < __pyx_t_13; __pyx_t_14+=1) {
       __pyx_v_axis = __pyx_t_14;
 
-      /* "PfyMU/features/lib/_cython/entropy.pyx":132
+      /* "skimu/features/lib/_cython/entropy.pyx":132
  *     for wind in range(p):
  *         for axis in range(k):
  *             ent[wind, 0, axis] = -log(A[wind, 0, axis] / N)             # <<<<<<<<<<<<<<
@@ -4121,7 +4121,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
       __pyx_t_34 = __pyx_v_axis;
       *((double *) ( /* dim=2 */ ((char *) (((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_ent.data + __pyx_t_37 * __pyx_v_ent.strides[0]) ) + __pyx_t_36 * __pyx_v_ent.strides[1]) )) + __pyx_t_34)) )) = (-log((__pyx_t_38 / ((double)__pyx_v_N))));
 
-      /* "PfyMU/features/lib/_cython/entropy.pyx":134
+      /* "skimu/features/lib/_cython/entropy.pyx":134
  *             ent[wind, 0, axis] = -log(A[wind, 0, axis] / N)
  * 
  *             for mm in range(1, M):             # <<<<<<<<<<<<<<
@@ -4133,7 +4133,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
       for (__pyx_t_15 = 1; __pyx_t_15 < __pyx_t_40; __pyx_t_15+=1) {
         __pyx_v_mm = __pyx_t_15;
 
-        /* "PfyMU/features/lib/_cython/entropy.pyx":135
+        /* "skimu/features/lib/_cython/entropy.pyx":135
  * 
  *             for mm in range(1, M):
  *                 if (B[wind, mm-1, axis] == 0) or (A[wind, mm, axis] == 0):             # <<<<<<<<<<<<<<
@@ -4157,7 +4157,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
         __pyx_L26_bool_binop_done:;
         if (__pyx_t_24) {
 
-          /* "PfyMU/features/lib/_cython/entropy.pyx":136
+          /* "skimu/features/lib/_cython/entropy.pyx":136
  *             for mm in range(1, M):
  *                 if (B[wind, mm-1, axis] == 0) or (A[wind, mm, axis] == 0):
  *                     ent[wind, mm, axis] = 100.0  # set to a large value. TODO evaluate this value             # <<<<<<<<<<<<<<
@@ -4169,7 +4169,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
           __pyx_t_43 = __pyx_v_axis;
           *((double *) ( /* dim=2 */ ((char *) (((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_ent.data + __pyx_t_41 * __pyx_v_ent.strides[0]) ) + __pyx_t_42 * __pyx_v_ent.strides[1]) )) + __pyx_t_43)) )) = 100.0;
 
-          /* "PfyMU/features/lib/_cython/entropy.pyx":135
+          /* "skimu/features/lib/_cython/entropy.pyx":135
  * 
  *             for mm in range(1, M):
  *                 if (B[wind, mm-1, axis] == 0) or (A[wind, mm, axis] == 0):             # <<<<<<<<<<<<<<
@@ -4179,7 +4179,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
           goto __pyx_L25;
         }
 
-        /* "PfyMU/features/lib/_cython/entropy.pyx":138
+        /* "skimu/features/lib/_cython/entropy.pyx":138
  *                     ent[wind, mm, axis] = 100.0  # set to a large value. TODO evaluate this value
  *                 else:
  *                     ent[wind, mm, axis] = -log(A[wind, mm, axis] / B[wind, mm - 1, axis])             # <<<<<<<<<<<<<<
@@ -4209,7 +4209,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
     }
   }
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":140
+  /* "skimu/features/lib/_cython/entropy.pyx":140
  *                     ent[wind, mm, axis] = -log(A[wind, mm, axis] / B[wind, mm - 1, axis])
  * 
  *     return entropy             # <<<<<<<<<<<<<<
@@ -4221,7 +4221,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
   __pyx_r = __pyx_v_entropy;
   goto __pyx_L0;
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":96
+  /* "skimu/features/lib/_cython/entropy.pyx":96
  * 
  * 
  * def SampleEntropy(const double[:, :, :] signal, int M, double r):             # <<<<<<<<<<<<<<
@@ -4239,7 +4239,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_7entropy_6SampleEntropy
   __PYX_XDEC_MEMVIEW(&__pyx_t_6, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_t_7, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_t_8, 1);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.entropy.SampleEntropy", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.entropy.SampleEntropy", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_entropy);
@@ -17394,7 +17394,7 @@ static PyBufferProcs __pyx_tp_as_buffer_array = {
 
 static PyTypeObject __pyx_type___pyx_array = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.entropy.array", /*tp_name*/
+  "skimu.features.lib._cython.entropy.array", /*tp_name*/
   sizeof(struct __pyx_array_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc_array, /*tp_dealloc*/
@@ -17513,7 +17513,7 @@ static PyMethodDef __pyx_methods_Enum[] = {
 
 static PyTypeObject __pyx_type___pyx_MemviewEnum = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.entropy.Enum", /*tp_name*/
+  "skimu.features.lib._cython.entropy.Enum", /*tp_name*/
   sizeof(struct __pyx_MemviewEnum_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc_Enum, /*tp_dealloc*/
@@ -17774,7 +17774,7 @@ static PyBufferProcs __pyx_tp_as_buffer_memoryview = {
 
 static PyTypeObject __pyx_type___pyx_memoryview = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.entropy.memoryview", /*tp_name*/
+  "skimu.features.lib._cython.entropy.memoryview", /*tp_name*/
   sizeof(struct __pyx_memoryview_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc_memoryview, /*tp_dealloc*/
@@ -17912,7 +17912,7 @@ static struct PyGetSetDef __pyx_getsets__memoryviewslice[] = {
 
 static PyTypeObject __pyx_type___pyx_memoryviewslice = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.entropy._memoryviewslice", /*tp_name*/
+  "skimu.features.lib._cython.entropy._memoryviewslice", /*tp_name*/
   sizeof(struct __pyx_memoryviewslice_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc__memoryviewslice, /*tp_dealloc*/
@@ -17988,8 +17988,8 @@ static PyTypeObject __pyx_type___pyx_memoryviewslice = {
 };
 
 static PyMethodDef __pyx_methods[] = {
-  {"hist", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5PfyMU_8features_3lib_7_cython_7entropy_1hist, METH_VARARGS|METH_KEYWORDS, 0},
-  {"histogram", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5PfyMU_8features_3lib_7_cython_7entropy_3histogram, METH_VARARGS|METH_KEYWORDS, 0},
+  {"hist", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5skimu_8features_3lib_7_cython_7entropy_1hist, METH_VARARGS|METH_KEYWORDS, 0},
+  {"histogram", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5skimu_8features_3lib_7_cython_7entropy_3histogram, METH_VARARGS|METH_KEYWORDS, 0},
   {0, 0, 0, 0}
 };
 
@@ -18059,7 +18059,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_b_O, __pyx_k_O, sizeof(__pyx_k_O), 0, 0, 0, 1},
   {&__pyx_kp_s_Out_of_bounds_on_buffer_access_a, __pyx_k_Out_of_bounds_on_buffer_access_a, sizeof(__pyx_k_Out_of_bounds_on_buffer_access_a), 0, 0, 1, 0},
   {&__pyx_n_s_P, __pyx_k_P, sizeof(__pyx_k_P), 0, 0, 1, 1},
-  {&__pyx_n_s_PfyMU_features_lib__cython_entro, __pyx_k_PfyMU_features_lib__cython_entro, sizeof(__pyx_k_PfyMU_features_lib__cython_entro), 0, 0, 1, 1},
   {&__pyx_n_s_PickleError, __pyx_k_PickleError, sizeof(__pyx_k_PickleError), 0, 0, 1, 1},
   {&__pyx_n_s_SampleEntropy, __pyx_k_SampleEntropy, sizeof(__pyx_k_SampleEntropy), 0, 0, 1, 1},
   {&__pyx_n_s_SignalEntropy, __pyx_k_SignalEntropy, sizeof(__pyx_k_SignalEntropy), 0, 0, 1, 1},
@@ -18156,7 +18155,8 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_shape, __pyx_k_shape, sizeof(__pyx_k_shape), 0, 0, 1, 1},
   {&__pyx_n_s_signal, __pyx_k_signal, sizeof(__pyx_k_signal), 0, 0, 1, 1},
   {&__pyx_n_s_size, __pyx_k_size, sizeof(__pyx_k_size), 0, 0, 1, 1},
-  {&__pyx_kp_s_src_PfyMU_features_lib__cython_e, __pyx_k_src_PfyMU_features_lib__cython_e, sizeof(__pyx_k_src_PfyMU_features_lib__cython_e), 0, 0, 1, 0},
+  {&__pyx_n_s_skimu_features_lib__cython_entro, __pyx_k_skimu_features_lib__cython_entro, sizeof(__pyx_k_skimu_features_lib__cython_entro), 0, 0, 1, 1},
+  {&__pyx_kp_s_src_skimu_features_lib__cython_e, __pyx_k_src_skimu_features_lib__cython_e, sizeof(__pyx_k_src_skimu_features_lib__cython_e), 0, 0, 1, 0},
   {&__pyx_n_s_start, __pyx_k_start, sizeof(__pyx_k_start), 0, 0, 1, 1},
   {&__pyx_n_s_std, __pyx_k_std, sizeof(__pyx_k_std), 0, 0, 1, 1},
   {&__pyx_n_s_step, __pyx_k_step, sizeof(__pyx_k_step), 0, 0, 1, 1},
@@ -18193,7 +18193,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":53
+  /* "skimu/features/lib/_cython/entropy.pyx":53
  * 
  *     cdef double[:, ::1] result = res
  *     cdef double[::1] d = zeros(3, dtype=npy_double)             # <<<<<<<<<<<<<<
@@ -18396,7 +18396,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__19);
   __Pyx_GIVEREF(__pyx_tuple__19);
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":47
+  /* "skimu/features/lib/_cython/entropy.pyx":47
  * 
  * 
  * def SignalEntropy(const double[:, :, :] signal):             # <<<<<<<<<<<<<<
@@ -18406,9 +18406,9 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__20 = PyTuple_Pack(21, __pyx_n_s_signal, __pyx_n_s_signal, __pyx_n_s_M, __pyx_n_s_N, __pyx_n_s_P, __pyx_n_s_res, __pyx_n_s_result, __pyx_n_s_d, __pyx_n_s_data_norm, __pyx_n_s_logf, __pyx_n_s_nbias, __pyx_n_s_count, __pyx_n_s_estimate, __pyx_n_s_h_n, __pyx_n_s_std, __pyx_n_s_mean, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_k, __pyx_n_s_n, __pyx_n_s_h); if (unlikely(!__pyx_tuple__20)) __PYX_ERR(0, 47, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__20);
   __Pyx_GIVEREF(__pyx_tuple__20);
-  __pyx_codeobj__21 = (PyObject*)__Pyx_PyCode_New(1, 0, 21, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__20, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_src_PfyMU_features_lib__cython_e, __pyx_n_s_SignalEntropy, 47, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__21)) __PYX_ERR(0, 47, __pyx_L1_error)
+  __pyx_codeobj__21 = (PyObject*)__Pyx_PyCode_New(1, 0, 21, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__20, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_src_skimu_features_lib__cython_e, __pyx_n_s_SignalEntropy, 47, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__21)) __PYX_ERR(0, 47, __pyx_L1_error)
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":96
+  /* "skimu/features/lib/_cython/entropy.pyx":96
  * 
  * 
  * def SampleEntropy(const double[:, :, :] signal, int M, double r):             # <<<<<<<<<<<<<<
@@ -18418,7 +18418,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__22 = PyTuple_Pack(23, __pyx_n_s_signal, __pyx_n_s_M, __pyx_n_s_r, __pyx_n_s_n, __pyx_n_s_k, __pyx_n_s_p, __pyx_n_s_entropy, __pyx_n_s_ent, __pyx_n_s_nj, __pyx_n_s_j, __pyx_n_s_run, __pyx_n_s_lastrun, __pyx_n_s_N, __pyx_n_s_M1, __pyx_n_s_A, __pyx_n_s_B, __pyx_n_s_Y1, __pyx_n_s_i, __pyx_n_s_jj, __pyx_n_s_mm, __pyx_n_s_kk, __pyx_n_s_axis, __pyx_n_s_wind); if (unlikely(!__pyx_tuple__22)) __PYX_ERR(0, 96, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__22);
   __Pyx_GIVEREF(__pyx_tuple__22);
-  __pyx_codeobj__23 = (PyObject*)__Pyx_PyCode_New(3, 0, 23, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__22, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_src_PfyMU_features_lib__cython_e, __pyx_n_s_SampleEntropy, 96, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__23)) __PYX_ERR(0, 96, __pyx_L1_error)
+  __pyx_codeobj__23 = (PyObject*)__Pyx_PyCode_New(3, 0, 23, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__22, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_src_skimu_features_lib__cython_e, __pyx_n_s_SampleEntropy, 96, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__23)) __PYX_ERR(0, 96, __pyx_L1_error)
 
   /* "View.MemoryView":286
  *         return self.name
@@ -18629,8 +18629,8 @@ static int __Pyx_modinit_function_import_code(void) {
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__Pyx_modinit_function_import_code", 0);
   /*--- Function import code ---*/
-  __pyx_t_1 = PyImport_ImportModule("PfyMU.features.lib._cython.common"); if (!__pyx_t_1) __PYX_ERR(0, 1, __pyx_L1_error)
-  if (__Pyx_ImportFunction(__pyx_t_1, "mean_sd_1d", (void (**)(void))&__pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d, "void (__Pyx_memviewslice, double *, double *)") < 0) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_t_1 = PyImport_ImportModule("skimu.features.lib._cython.common"); if (!__pyx_t_1) __PYX_ERR(0, 1, __pyx_L1_error)
+  if (__Pyx_ImportFunction(__pyx_t_1, "mean_sd_1d", (void (**)(void))&__pyx_f_5skimu_8features_3lib_7_cython_6common_mean_sd_1d, "void (__Pyx_memviewslice, double *, double *)") < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   Py_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_RefNannyFinishContext();
   return 0;
@@ -18816,14 +18816,14 @@ if (!__Pyx_RefNanny) {
   #if PY_MAJOR_VERSION < 3 && (__PYX_DEFAULT_STRING_ENCODING_IS_ASCII || __PYX_DEFAULT_STRING_ENCODING_IS_DEFAULT)
   if (__Pyx_init_sys_getdefaultencoding_params() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
-  if (__pyx_module_is_main_PfyMU__features__lib___cython__entropy) {
+  if (__pyx_module_is_main_skimu__features__lib___cython__entropy) {
     if (PyObject_SetAttr(__pyx_m, __pyx_n_s_name_2, __pyx_n_s_main) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   }
   #if PY_MAJOR_VERSION >= 3
   {
     PyObject *modules = PyImport_GetModuleDict(); if (unlikely(!modules)) __PYX_ERR(0, 1, __pyx_L1_error)
-    if (!PyDict_GetItemString(modules, "PfyMU.features.lib._cython.entropy")) {
-      if (unlikely(PyDict_SetItemString(modules, "PfyMU.features.lib._cython.entropy", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
+    if (!PyDict_GetItemString(modules, "skimu.features.lib._cython.entropy")) {
+      if (unlikely(PyDict_SetItemString(modules, "skimu.features.lib._cython.entropy", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
     }
   }
   #endif
@@ -18844,7 +18844,7 @@ if (!__Pyx_RefNanny) {
   if (__Pyx_patch_abc() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":5
+  /* "skimu/features/lib/_cython/entropy.pyx":5
  * # cython: wraparound = False
  * cimport cython
  * from numpy import zeros, double as npy_double, intc, nanmin, nanmax             # <<<<<<<<<<<<<<
@@ -18893,31 +18893,31 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":47
+  /* "skimu/features/lib/_cython/entropy.pyx":47
  * 
  * 
  * def SignalEntropy(const double[:, :, :] signal):             # <<<<<<<<<<<<<<
  *     cdef Py_ssize_t M = signal.shape[0], N = signal.shape[1], P = signal.shape[2]
  * 
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5PfyMU_8features_3lib_7_cython_7entropy_5SignalEntropy, NULL, __pyx_n_s_PfyMU_features_lib__cython_entro); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 47, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5skimu_8features_3lib_7_cython_7entropy_5SignalEntropy, NULL, __pyx_n_s_skimu_features_lib__cython_entro); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 47, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_SignalEntropy, __pyx_t_2) < 0) __PYX_ERR(0, 47, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":96
+  /* "skimu/features/lib/_cython/entropy.pyx":96
  * 
  * 
  * def SampleEntropy(const double[:, :, :] signal, int M, double r):             # <<<<<<<<<<<<<<
  *     cdef Py_ssize_t n = signal.shape[1], k = signal.shape[2], p = signal.shape[0]
  *     entropy = zeros((p, M, k), dtype=npy_double)
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5PfyMU_8features_3lib_7_cython_7entropy_7SampleEntropy, NULL, __pyx_n_s_PfyMU_features_lib__cython_entro); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 96, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5skimu_8features_3lib_7_cython_7entropy_7SampleEntropy, NULL, __pyx_n_s_skimu_features_lib__cython_entro); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 96, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_SampleEntropy, __pyx_t_2) < 0) __PYX_ERR(0, 96, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "PfyMU/features/lib/_cython/entropy.pyx":1
+  /* "skimu/features/lib/_cython/entropy.pyx":1
  * # cython: infer_types = True             # <<<<<<<<<<<<<<
  * # cython: boundscheck = False
  * # cython: wraparound = False
@@ -19088,11 +19088,11 @@ if (!__Pyx_RefNanny) {
   __Pyx_XDECREF(__pyx_t_2);
   if (__pyx_m) {
     if (__pyx_d) {
-      __Pyx_AddTraceback("init PfyMU.features.lib._cython.entropy", __pyx_clineno, __pyx_lineno, __pyx_filename);
+      __Pyx_AddTraceback("init skimu.features.lib._cython.entropy", __pyx_clineno, __pyx_lineno, __pyx_filename);
     }
     Py_CLEAR(__pyx_m);
   } else if (!PyErr_Occurred()) {
-    PyErr_SetString(PyExc_ImportError, "init PfyMU.features.lib._cython.entropy");
+    PyErr_SetString(PyExc_ImportError, "init skimu.features.lib._cython.entropy");
   }
   __pyx_L0:;
   __Pyx_RefNannyFinishContext();

@@ -3,12 +3,12 @@
 /* BEGIN: Cython Metadata
 {
     "distutils": {
-        "name": "PfyMU.features.lib._cython.rangeCount",
+        "name": "skimu.features.lib._cython.rangeCount",
         "sources": [
-            "src/PfyMU/features/lib/_cython/rangeCount.pyx"
+            "src/skimu/features/lib/_cython/rangeCount.pyx"
         ]
     },
-    "module_name": "PfyMU.features.lib._cython.rangeCount"
+    "module_name": "skimu.features.lib._cython.rangeCount"
 }
 END: Cython Metadata */
 
@@ -603,8 +603,8 @@ static CYTHON_INLINE float __PYX_NAN() {
   #endif
 #endif
 
-#define __PYX_HAVE__PfyMU__features__lib___cython__rangeCount
-#define __PYX_HAVE_API__PfyMU__features__lib___cython__rangeCount
+#define __PYX_HAVE__skimu__features__lib___cython__rangeCount
+#define __PYX_HAVE_API__skimu__features__lib___cython__rangeCount
 /* Early includes */
 #include "pythread.h"
 #include <string.h>
@@ -819,7 +819,7 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "src/PfyMU/features/lib/_cython/rangeCount.pyx",
+  "src/skimu/features/lib/_cython/rangeCount.pyx",
   "stringsource",
 };
 /* MemviewSliceStruct.proto */
@@ -1685,7 +1685,7 @@ static PyObject *__pyx_memoryviewslice_assign_item_from_object(struct __pyx_memo
 
 /* Module declarations from 'cython' */
 
-/* Module declarations from 'PfyMU.features.lib._cython.rangeCount' */
+/* Module declarations from 'skimu.features.lib._cython.rangeCount' */
 static PyTypeObject *__pyx_array_type = 0;
 static PyTypeObject *__pyx_MemviewEnum_type = 0;
 static PyTypeObject *__pyx_memoryview_type = 0;
@@ -1732,11 +1732,11 @@ static void __pyx_memoryview__slice_assign_scalar(char *, Py_ssize_t *, Py_ssize
 static PyObject *__pyx_unpickle_Enum__set_state(struct __pyx_MemviewEnum_obj *, PyObject *); /*proto*/
 static __Pyx_TypeInfo __Pyx_TypeInfo_double__const__ = { "const double", NULL, sizeof(double const ), { 0 }, 0, 'R', 0, 0 };
 static __Pyx_TypeInfo __Pyx_TypeInfo_double = { "double", NULL, sizeof(double), { 0 }, 0, 'R', 0, 0 };
-#define __Pyx_MODULE_NAME "PfyMU.features.lib._cython.rangeCount"
-extern int __pyx_module_is_main_PfyMU__features__lib___cython__rangeCount;
-int __pyx_module_is_main_PfyMU__features__lib___cython__rangeCount = 0;
+#define __Pyx_MODULE_NAME "skimu.features.lib._cython.rangeCount"
+extern int __pyx_module_is_main_skimu__features__lib___cython__rangeCount;
+int __pyx_module_is_main_skimu__features__lib___cython__rangeCount = 0;
 
-/* Implementation of 'PfyMU.features.lib._cython.rangeCount' */
+/* Implementation of 'skimu.features.lib._cython.rangeCount' */
 static PyObject *__pyx_builtin_range;
 static PyObject *__pyx_builtin_ValueError;
 static PyObject *__pyx_builtin_MemoryError;
@@ -1842,11 +1842,11 @@ static const char __pyx_k_Incompatible_checksums_s_vs_0xb0[] = "Incompatible che
 static const char __pyx_k_Indirect_dimensions_not_supporte[] = "Indirect dimensions not supported";
 static const char __pyx_k_Invalid_mode_expected_c_or_fortr[] = "Invalid mode, expected 'c' or 'fortran', got %s";
 static const char __pyx_k_Out_of_bounds_on_buffer_access_a[] = "Out of bounds on buffer access (axis %d)";
-static const char __pyx_k_PfyMU_features_lib__cython_range[] = "PfyMU.features.lib._cython.rangeCount";
 static const char __pyx_k_Unable_to_convert_item_to_object[] = "Unable to convert item to object";
 static const char __pyx_k_got_differing_extents_in_dimensi[] = "got differing extents in dimension %d (got %d and %d)";
 static const char __pyx_k_no_default___reduce___due_to_non[] = "no default __reduce__ due to non-trivial __cinit__";
-static const char __pyx_k_src_PfyMU_features_lib__cython_r[] = "src/PfyMU/features/lib/_cython/rangeCount.pyx";
+static const char __pyx_k_skimu_features_lib__cython_range[] = "skimu.features.lib._cython.rangeCount";
+static const char __pyx_k_src_skimu_features_lib__cython_r[] = "src/skimu/features/lib/_cython/rangeCount.pyx";
 static const char __pyx_k_unable_to_allocate_shape_and_str[] = "unable to allocate shape and strides.";
 static PyObject *__pyx_n_s_ASCII;
 static PyObject *__pyx_kp_s_Buffer_view_does_not_expose_stri;
@@ -1866,7 +1866,6 @@ static PyObject *__pyx_kp_s_MemoryView_of_r_at_0x_x;
 static PyObject *__pyx_kp_s_MemoryView_of_r_object;
 static PyObject *__pyx_n_b_O;
 static PyObject *__pyx_kp_s_Out_of_bounds_on_buffer_access_a;
-static PyObject *__pyx_n_s_PfyMU_features_lib__cython_range;
 static PyObject *__pyx_n_s_PickleError;
 static PyObject *__pyx_n_s_RangeCount;
 static PyObject *__pyx_n_s_TypeError;
@@ -1934,7 +1933,8 @@ static PyObject *__pyx_n_s_setstate;
 static PyObject *__pyx_n_s_setstate_cython;
 static PyObject *__pyx_n_s_shape;
 static PyObject *__pyx_n_s_size;
-static PyObject *__pyx_kp_s_src_PfyMU_features_lib__cython_r;
+static PyObject *__pyx_n_s_skimu_features_lib__cython_range;
+static PyObject *__pyx_kp_s_src_skimu_features_lib__cython_r;
 static PyObject *__pyx_n_s_start;
 static PyObject *__pyx_n_s_step;
 static PyObject *__pyx_n_s_stop;
@@ -1953,7 +1953,7 @@ static PyObject *__pyx_n_s_xcount;
 static PyObject *__pyx_n_s_xmax;
 static PyObject *__pyx_n_s_xmin;
 static PyObject *__pyx_n_s_zeros;
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_10rangeCount_RangeCount(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_xmin, double __pyx_v_xmax); /* proto */
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_10rangeCount_RangeCount(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_xmin, double __pyx_v_xmax); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __pyx_array_obj *__pyx_v_self, PyObject *__pyx_v_shape, Py_ssize_t __pyx_v_itemsize, PyObject *__pyx_v_format, PyObject *__pyx_v_mode, int __pyx_v_allocate_buffer); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array_2__getbuffer__(struct __pyx_array_obj *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
 static void __pyx_array___pyx_pf_15View_dot_MemoryView_5array_4__dealloc__(struct __pyx_array_obj *__pyx_v_self); /* proto */
@@ -2033,7 +2033,7 @@ static PyObject *__pyx_codeobj__20;
 static PyObject *__pyx_codeobj__27;
 /* Late includes */
 
-/* "PfyMU/features/lib/_cython/rangeCount.pyx":8
+/* "skimu/features/lib/_cython/rangeCount.pyx":8
  * 
  * 
  * def RangeCount(const double[:, :, :] x, double xmin, double xmax):             # <<<<<<<<<<<<<<
@@ -2042,9 +2042,9 @@ static PyObject *__pyx_codeobj__27;
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_10rangeCount_1RangeCount(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_5PfyMU_8features_3lib_7_cython_10rangeCount_1RangeCount = {"RangeCount", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5PfyMU_8features_3lib_7_cython_10rangeCount_1RangeCount, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_10rangeCount_1RangeCount(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_10rangeCount_1RangeCount(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_5skimu_8features_3lib_7_cython_10rangeCount_1RangeCount = {"RangeCount", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5skimu_8features_3lib_7_cython_10rangeCount_1RangeCount, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_10rangeCount_1RangeCount(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_x = { 0, 0, { 0 }, { 0 }, { 0 } };
   double __pyx_v_xmin;
   double __pyx_v_xmax;
@@ -2106,18 +2106,18 @@ static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_10rangeCount_1RangeCoun
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("RangeCount", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 8, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.rangeCount.RangeCount", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.rangeCount.RangeCount", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5PfyMU_8features_3lib_7_cython_10rangeCount_RangeCount(__pyx_self, __pyx_v_x, __pyx_v_xmin, __pyx_v_xmax);
+  __pyx_r = __pyx_pf_5skimu_8features_3lib_7_cython_10rangeCount_RangeCount(__pyx_self, __pyx_v_x, __pyx_v_xmin, __pyx_v_xmax);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_10rangeCount_RangeCount(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_xmin, double __pyx_v_xmax) {
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_10rangeCount_RangeCount(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_xmin, double __pyx_v_xmax) {
   Py_ssize_t __pyx_v_m;
   Py_ssize_t __pyx_v_n;
   Py_ssize_t __pyx_v_p;
@@ -2154,7 +2154,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_10rangeCount_RangeCount
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("RangeCount", 0);
 
-  /* "PfyMU/features/lib/_cython/rangeCount.pyx":9
+  /* "skimu/features/lib/_cython/rangeCount.pyx":9
  * 
  * def RangeCount(const double[:, :, :] x, double xmin, double xmax):
  *     cdef Py_ssize_t m = x.shape[0], n = x.shape[1], p = x.shape[2], i, j, k             # <<<<<<<<<<<<<<
@@ -2165,7 +2165,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_10rangeCount_RangeCount
   __pyx_v_n = (__pyx_v_x.shape[1]);
   __pyx_v_p = (__pyx_v_x.shape[2]);
 
-  /* "PfyMU/features/lib/_cython/rangeCount.pyx":10
+  /* "skimu/features/lib/_cython/rangeCount.pyx":10
  * def RangeCount(const double[:, :, :] x, double xmin, double xmax):
  *     cdef Py_ssize_t m = x.shape[0], n = x.shape[1], p = x.shape[2], i, j, k
  *     xcount = zeros((m, p), dtype=np_double)             # <<<<<<<<<<<<<<
@@ -2205,7 +2205,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_10rangeCount_RangeCount
   __pyx_v_xcount = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "PfyMU/features/lib/_cython/rangeCount.pyx":11
+  /* "skimu/features/lib/_cython/rangeCount.pyx":11
  *     cdef Py_ssize_t m = x.shape[0], n = x.shape[1], p = x.shape[2], i, j, k
  *     xcount = zeros((m, p), dtype=np_double)
  *     cdef double[:, :] count = xcount             # <<<<<<<<<<<<<<
@@ -2217,7 +2217,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_10rangeCount_RangeCount
   __pyx_t_5.memview = NULL;
   __pyx_t_5.data = NULL;
 
-  /* "PfyMU/features/lib/_cython/rangeCount.pyx":13
+  /* "skimu/features/lib/_cython/rangeCount.pyx":13
  *     cdef double[:, :] count = xcount
  * 
  *     for i in range(m):             # <<<<<<<<<<<<<<
@@ -2229,7 +2229,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_10rangeCount_RangeCount
   for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
     __pyx_v_i = __pyx_t_8;
 
-    /* "PfyMU/features/lib/_cython/rangeCount.pyx":14
+    /* "skimu/features/lib/_cython/rangeCount.pyx":14
  * 
  *     for i in range(m):
  *         for j in range(n):             # <<<<<<<<<<<<<<
@@ -2241,7 +2241,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_10rangeCount_RangeCount
     for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_10; __pyx_t_11+=1) {
       __pyx_v_j = __pyx_t_11;
 
-      /* "PfyMU/features/lib/_cython/rangeCount.pyx":15
+      /* "skimu/features/lib/_cython/rangeCount.pyx":15
  *     for i in range(m):
  *         for j in range(n):
  *             for k in range(p):             # <<<<<<<<<<<<<<
@@ -2253,7 +2253,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_10rangeCount_RangeCount
       for (__pyx_t_14 = 0; __pyx_t_14 < __pyx_t_13; __pyx_t_14+=1) {
         __pyx_v_k = __pyx_t_14;
 
-        /* "PfyMU/features/lib/_cython/rangeCount.pyx":16
+        /* "skimu/features/lib/_cython/rangeCount.pyx":16
  *         for j in range(n):
  *             for k in range(p):
  *                 if (xmin <= x[i, j, k] < xmax):             # <<<<<<<<<<<<<<
@@ -2271,7 +2271,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_10rangeCount_RangeCount
         __pyx_t_20 = (__pyx_t_19 != 0);
         if (__pyx_t_20) {
 
-          /* "PfyMU/features/lib/_cython/rangeCount.pyx":17
+          /* "skimu/features/lib/_cython/rangeCount.pyx":17
  *             for k in range(p):
  *                 if (xmin <= x[i, j, k] < xmax):
  *                     count[i, k] += 1.             # <<<<<<<<<<<<<<
@@ -2282,7 +2282,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_10rangeCount_RangeCount
           __pyx_t_16 = __pyx_v_k;
           *((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_count.data + __pyx_t_17 * __pyx_v_count.strides[0]) ) + __pyx_t_16 * __pyx_v_count.strides[1]) )) += 1.;
 
-          /* "PfyMU/features/lib/_cython/rangeCount.pyx":16
+          /* "skimu/features/lib/_cython/rangeCount.pyx":16
  *         for j in range(n):
  *             for k in range(p):
  *                 if (xmin <= x[i, j, k] < xmax):             # <<<<<<<<<<<<<<
@@ -2294,7 +2294,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_10rangeCount_RangeCount
     }
   }
 
-  /* "PfyMU/features/lib/_cython/rangeCount.pyx":18
+  /* "skimu/features/lib/_cython/rangeCount.pyx":18
  *                 if (xmin <= x[i, j, k] < xmax):
  *                     count[i, k] += 1.
  *     for i in range(m):             # <<<<<<<<<<<<<<
@@ -2306,7 +2306,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_10rangeCount_RangeCount
   for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
     __pyx_v_i = __pyx_t_8;
 
-    /* "PfyMU/features/lib/_cython/rangeCount.pyx":19
+    /* "skimu/features/lib/_cython/rangeCount.pyx":19
  *                     count[i, k] += 1.
  *     for i in range(m):
  *         for k in range(p):             # <<<<<<<<<<<<<<
@@ -2318,7 +2318,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_10rangeCount_RangeCount
     for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_10; __pyx_t_11+=1) {
       __pyx_v_k = __pyx_t_11;
 
-      /* "PfyMU/features/lib/_cython/rangeCount.pyx":20
+      /* "skimu/features/lib/_cython/rangeCount.pyx":20
  *     for i in range(m):
  *         for k in range(p):
  *             count[i, k] /= n             # <<<<<<<<<<<<<<
@@ -2330,7 +2330,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_10rangeCount_RangeCount
     }
   }
 
-  /* "PfyMU/features/lib/_cython/rangeCount.pyx":21
+  /* "skimu/features/lib/_cython/rangeCount.pyx":21
  *         for k in range(p):
  *             count[i, k] /= n
  *     return xcount             # <<<<<<<<<<<<<<
@@ -2340,7 +2340,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_10rangeCount_RangeCount
   __pyx_r = __pyx_v_xcount;
   goto __pyx_L0;
 
-  /* "PfyMU/features/lib/_cython/rangeCount.pyx":8
+  /* "skimu/features/lib/_cython/rangeCount.pyx":8
  * 
  * 
  * def RangeCount(const double[:, :, :] x, double xmin, double xmax):             # <<<<<<<<<<<<<<
@@ -2355,7 +2355,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_10rangeCount_RangeCount
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
   __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.rangeCount.RangeCount", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.rangeCount.RangeCount", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_xcount);
@@ -15506,7 +15506,7 @@ static PyBufferProcs __pyx_tp_as_buffer_array = {
 
 static PyTypeObject __pyx_type___pyx_array = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.rangeCount.array", /*tp_name*/
+  "skimu.features.lib._cython.rangeCount.array", /*tp_name*/
   sizeof(struct __pyx_array_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc_array, /*tp_dealloc*/
@@ -15625,7 +15625,7 @@ static PyMethodDef __pyx_methods_Enum[] = {
 
 static PyTypeObject __pyx_type___pyx_MemviewEnum = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.rangeCount.Enum", /*tp_name*/
+  "skimu.features.lib._cython.rangeCount.Enum", /*tp_name*/
   sizeof(struct __pyx_MemviewEnum_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc_Enum, /*tp_dealloc*/
@@ -15886,7 +15886,7 @@ static PyBufferProcs __pyx_tp_as_buffer_memoryview = {
 
 static PyTypeObject __pyx_type___pyx_memoryview = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.rangeCount.memoryview", /*tp_name*/
+  "skimu.features.lib._cython.rangeCount.memoryview", /*tp_name*/
   sizeof(struct __pyx_memoryview_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc_memoryview, /*tp_dealloc*/
@@ -16024,7 +16024,7 @@ static struct PyGetSetDef __pyx_getsets__memoryviewslice[] = {
 
 static PyTypeObject __pyx_type___pyx_memoryviewslice = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.rangeCount._memoryviewslice", /*tp_name*/
+  "skimu.features.lib._cython.rangeCount._memoryviewslice", /*tp_name*/
   sizeof(struct __pyx_memoryviewslice_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc__memoryviewslice, /*tp_dealloc*/
@@ -16163,7 +16163,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_MemoryView_of_r_object, __pyx_k_MemoryView_of_r_object, sizeof(__pyx_k_MemoryView_of_r_object), 0, 0, 1, 0},
   {&__pyx_n_b_O, __pyx_k_O, sizeof(__pyx_k_O), 0, 0, 0, 1},
   {&__pyx_kp_s_Out_of_bounds_on_buffer_access_a, __pyx_k_Out_of_bounds_on_buffer_access_a, sizeof(__pyx_k_Out_of_bounds_on_buffer_access_a), 0, 0, 1, 0},
-  {&__pyx_n_s_PfyMU_features_lib__cython_range, __pyx_k_PfyMU_features_lib__cython_range, sizeof(__pyx_k_PfyMU_features_lib__cython_range), 0, 0, 1, 1},
   {&__pyx_n_s_PickleError, __pyx_k_PickleError, sizeof(__pyx_k_PickleError), 0, 0, 1, 1},
   {&__pyx_n_s_RangeCount, __pyx_k_RangeCount, sizeof(__pyx_k_RangeCount), 0, 0, 1, 1},
   {&__pyx_n_s_TypeError, __pyx_k_TypeError, sizeof(__pyx_k_TypeError), 0, 0, 1, 1},
@@ -16231,7 +16230,8 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_setstate_cython, __pyx_k_setstate_cython, sizeof(__pyx_k_setstate_cython), 0, 0, 1, 1},
   {&__pyx_n_s_shape, __pyx_k_shape, sizeof(__pyx_k_shape), 0, 0, 1, 1},
   {&__pyx_n_s_size, __pyx_k_size, sizeof(__pyx_k_size), 0, 0, 1, 1},
-  {&__pyx_kp_s_src_PfyMU_features_lib__cython_r, __pyx_k_src_PfyMU_features_lib__cython_r, sizeof(__pyx_k_src_PfyMU_features_lib__cython_r), 0, 0, 1, 0},
+  {&__pyx_n_s_skimu_features_lib__cython_range, __pyx_k_skimu_features_lib__cython_range, sizeof(__pyx_k_skimu_features_lib__cython_range), 0, 0, 1, 1},
+  {&__pyx_kp_s_src_skimu_features_lib__cython_r, __pyx_k_src_skimu_features_lib__cython_r, sizeof(__pyx_k_src_skimu_features_lib__cython_r), 0, 0, 1, 0},
   {&__pyx_n_s_start, __pyx_k_start, sizeof(__pyx_k_start), 0, 0, 1, 1},
   {&__pyx_n_s_step, __pyx_k_step, sizeof(__pyx_k_step), 0, 0, 1, 1},
   {&__pyx_n_s_stop, __pyx_k_stop, sizeof(__pyx_k_stop), 0, 0, 1, 1},
@@ -16462,7 +16462,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__18);
   __Pyx_GIVEREF(__pyx_tuple__18);
 
-  /* "PfyMU/features/lib/_cython/rangeCount.pyx":8
+  /* "skimu/features/lib/_cython/rangeCount.pyx":8
  * 
  * 
  * def RangeCount(const double[:, :, :] x, double xmin, double xmax):             # <<<<<<<<<<<<<<
@@ -16472,7 +16472,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__19 = PyTuple_Pack(11, __pyx_n_s_x, __pyx_n_s_xmin, __pyx_n_s_xmax, __pyx_n_s_m, __pyx_n_s_n, __pyx_n_s_p, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_k, __pyx_n_s_xcount, __pyx_n_s_count); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(0, 8, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__19);
   __Pyx_GIVEREF(__pyx_tuple__19);
-  __pyx_codeobj__20 = (PyObject*)__Pyx_PyCode_New(3, 0, 11, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__19, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_src_PfyMU_features_lib__cython_r, __pyx_n_s_RangeCount, 8, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__20)) __PYX_ERR(0, 8, __pyx_L1_error)
+  __pyx_codeobj__20 = (PyObject*)__Pyx_PyCode_New(3, 0, 11, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__19, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_src_skimu_features_lib__cython_r, __pyx_n_s_RangeCount, 8, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__20)) __PYX_ERR(0, 8, __pyx_L1_error)
 
   /* "View.MemoryView":286
  *         return self.name
@@ -16858,14 +16858,14 @@ if (!__Pyx_RefNanny) {
   #if PY_MAJOR_VERSION < 3 && (__PYX_DEFAULT_STRING_ENCODING_IS_ASCII || __PYX_DEFAULT_STRING_ENCODING_IS_DEFAULT)
   if (__Pyx_init_sys_getdefaultencoding_params() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
-  if (__pyx_module_is_main_PfyMU__features__lib___cython__rangeCount) {
+  if (__pyx_module_is_main_skimu__features__lib___cython__rangeCount) {
     if (PyObject_SetAttr(__pyx_m, __pyx_n_s_name_2, __pyx_n_s_main) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   }
   #if PY_MAJOR_VERSION >= 3
   {
     PyObject *modules = PyImport_GetModuleDict(); if (unlikely(!modules)) __PYX_ERR(0, 1, __pyx_L1_error)
-    if (!PyDict_GetItemString(modules, "PfyMU.features.lib._cython.rangeCount")) {
-      if (unlikely(PyDict_SetItemString(modules, "PfyMU.features.lib._cython.rangeCount", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
+    if (!PyDict_GetItemString(modules, "skimu.features.lib._cython.rangeCount")) {
+      if (unlikely(PyDict_SetItemString(modules, "skimu.features.lib._cython.rangeCount", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
     }
   }
   #endif
@@ -16886,7 +16886,7 @@ if (!__Pyx_RefNanny) {
   if (__Pyx_patch_abc() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
 
-  /* "PfyMU/features/lib/_cython/rangeCount.pyx":5
+  /* "skimu/features/lib/_cython/rangeCount.pyx":5
  * # cython: wraparound = False
  * cimport cython
  * from numpy import zeros, double as np_double             # <<<<<<<<<<<<<<
@@ -16914,19 +16914,19 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "PfyMU/features/lib/_cython/rangeCount.pyx":8
+  /* "skimu/features/lib/_cython/rangeCount.pyx":8
  * 
  * 
  * def RangeCount(const double[:, :, :] x, double xmin, double xmax):             # <<<<<<<<<<<<<<
  *     cdef Py_ssize_t m = x.shape[0], n = x.shape[1], p = x.shape[2], i, j, k
  *     xcount = zeros((m, p), dtype=np_double)
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5PfyMU_8features_3lib_7_cython_10rangeCount_1RangeCount, NULL, __pyx_n_s_PfyMU_features_lib__cython_range); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 8, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5skimu_8features_3lib_7_cython_10rangeCount_1RangeCount, NULL, __pyx_n_s_skimu_features_lib__cython_range); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 8, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_RangeCount, __pyx_t_2) < 0) __PYX_ERR(0, 8, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "PfyMU/features/lib/_cython/rangeCount.pyx":1
+  /* "skimu/features/lib/_cython/rangeCount.pyx":1
  * # cython: infer_types = True             # <<<<<<<<<<<<<<
  * # cython: boundscheck = False
  * # cython: wraparound = False
@@ -17097,11 +17097,11 @@ if (!__Pyx_RefNanny) {
   __Pyx_XDECREF(__pyx_t_2);
   if (__pyx_m) {
     if (__pyx_d) {
-      __Pyx_AddTraceback("init PfyMU.features.lib._cython.rangeCount", __pyx_clineno, __pyx_lineno, __pyx_filename);
+      __Pyx_AddTraceback("init skimu.features.lib._cython.rangeCount", __pyx_clineno, __pyx_lineno, __pyx_filename);
     }
     Py_CLEAR(__pyx_m);
   } else if (!PyErr_Occurred()) {
-    PyErr_SetString(PyExc_ImportError, "init PfyMU.features.lib._cython.rangeCount");
+    PyErr_SetString(PyExc_ImportError, "init skimu.features.lib._cython.rangeCount");
   }
   __pyx_L0:;
   __Pyx_RefNannyFinishContext();

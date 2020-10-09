@@ -3,12 +3,12 @@
 /* BEGIN: Cython Metadata
 {
     "distutils": {
-        "name": "PfyMU.features.lib._cython.autocorrelation",
+        "name": "skimu.features.lib._cython.autocorrelation",
         "sources": [
-            "src/PfyMU/features/lib/_cython/autocorrelation.pyx"
+            "src/skimu/features/lib/_cython/autocorrelation.pyx"
         ]
     },
-    "module_name": "PfyMU.features.lib._cython.autocorrelation"
+    "module_name": "skimu.features.lib._cython.autocorrelation"
 }
 END: Cython Metadata */
 
@@ -603,8 +603,8 @@ static CYTHON_INLINE float __PYX_NAN() {
   #endif
 #endif
 
-#define __PYX_HAVE__PfyMU__features__lib___cython__autocorrelation
-#define __PYX_HAVE_API__PfyMU__features__lib___cython__autocorrelation
+#define __PYX_HAVE__skimu__features__lib___cython__autocorrelation
+#define __PYX_HAVE_API__skimu__features__lib___cython__autocorrelation
 /* Early includes */
 #include "pythread.h"
 #include <string.h>
@@ -819,7 +819,7 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "src/PfyMU/features/lib/_cython/autocorrelation.pyx",
+  "src/skimu/features/lib/_cython/autocorrelation.pyx",
   "stringsource",
 };
 /* MemviewSliceStruct.proto */
@@ -1688,10 +1688,10 @@ static PyObject *__pyx_memoryviewslice_assign_item_from_object(struct __pyx_memo
 
 /* Module declarations from 'cython' */
 
-/* Module declarations from 'PfyMU.features.lib._cython.common' */
-static void (*__pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d)(__Pyx_memviewslice, double *, double *); /*proto*/
+/* Module declarations from 'skimu.features.lib._cython.common' */
+static void (*__pyx_f_5skimu_8features_3lib_7_cython_6common_mean_sd_1d)(__Pyx_memviewslice, double *, double *); /*proto*/
 
-/* Module declarations from 'PfyMU.features.lib._cython.autocorrelation' */
+/* Module declarations from 'skimu.features.lib._cython.autocorrelation' */
 static PyTypeObject *__pyx_array_type = 0;
 static PyTypeObject *__pyx_MemviewEnum_type = 0;
 static PyTypeObject *__pyx_memoryview_type = 0;
@@ -1738,11 +1738,11 @@ static void __pyx_memoryview__slice_assign_scalar(char *, Py_ssize_t *, Py_ssize
 static PyObject *__pyx_unpickle_Enum__set_state(struct __pyx_MemviewEnum_obj *, PyObject *); /*proto*/
 static __Pyx_TypeInfo __Pyx_TypeInfo_double__const__ = { "const double", NULL, sizeof(double const ), { 0 }, 0, 'R', 0, 0 };
 static __Pyx_TypeInfo __Pyx_TypeInfo_double = { "double", NULL, sizeof(double), { 0 }, 0, 'R', 0, 0 };
-#define __Pyx_MODULE_NAME "PfyMU.features.lib._cython.autocorrelation"
-extern int __pyx_module_is_main_PfyMU__features__lib___cython__autocorrelation;
-int __pyx_module_is_main_PfyMU__features__lib___cython__autocorrelation = 0;
+#define __Pyx_MODULE_NAME "skimu.features.lib._cython.autocorrelation"
+extern int __pyx_module_is_main_skimu__features__lib___cython__autocorrelation;
+int __pyx_module_is_main_skimu__features__lib___cython__autocorrelation = 0;
 
-/* Implementation of 'PfyMU.features.lib._cython.autocorrelation' */
+/* Implementation of 'skimu.features.lib._cython.autocorrelation' */
 static PyObject *__pyx_builtin_range;
 static PyObject *__pyx_builtin_ValueError;
 static PyObject *__pyx_builtin_MemoryError;
@@ -1852,11 +1852,11 @@ static const char __pyx_k_Incompatible_checksums_s_vs_0xb0[] = "Incompatible che
 static const char __pyx_k_Indirect_dimensions_not_supporte[] = "Indirect dimensions not supported";
 static const char __pyx_k_Invalid_mode_expected_c_or_fortr[] = "Invalid mode, expected 'c' or 'fortran', got %s";
 static const char __pyx_k_Out_of_bounds_on_buffer_access_a[] = "Out of bounds on buffer access (axis %d)";
-static const char __pyx_k_PfyMU_features_lib__cython_autoc[] = "PfyMU.features.lib._cython.autocorrelation";
 static const char __pyx_k_Unable_to_convert_item_to_object[] = "Unable to convert item to object";
 static const char __pyx_k_got_differing_extents_in_dimensi[] = "got differing extents in dimension %d (got %d and %d)";
 static const char __pyx_k_no_default___reduce___due_to_non[] = "no default __reduce__ due to non-trivial __cinit__";
-static const char __pyx_k_src_PfyMU_features_lib__cython_a[] = "src/PfyMU/features/lib/_cython/autocorrelation.pyx";
+static const char __pyx_k_skimu_features_lib__cython_autoc[] = "skimu.features.lib._cython.autocorrelation";
+static const char __pyx_k_src_skimu_features_lib__cython_a[] = "src/skimu/features/lib/_cython/autocorrelation.pyx";
 static const char __pyx_k_unable_to_allocate_shape_and_str[] = "unable to allocate shape and strides.";
 static PyObject *__pyx_n_s_ASCII;
 static PyObject *__pyx_n_s_Autocorrelation;
@@ -1877,7 +1877,6 @@ static PyObject *__pyx_kp_s_MemoryView_of_r_at_0x_x;
 static PyObject *__pyx_kp_s_MemoryView_of_r_object;
 static PyObject *__pyx_n_b_O;
 static PyObject *__pyx_kp_s_Out_of_bounds_on_buffer_access_a;
-static PyObject *__pyx_n_s_PfyMU_features_lib__cython_autoc;
 static PyObject *__pyx_n_s_PickleError;
 static PyObject *__pyx_n_s_TypeError;
 static PyObject *__pyx_kp_s_Unable_to_convert_item_to_object;
@@ -1949,7 +1948,8 @@ static PyObject *__pyx_n_s_setstate;
 static PyObject *__pyx_n_s_setstate_cython;
 static PyObject *__pyx_n_s_shape;
 static PyObject *__pyx_n_s_size;
-static PyObject *__pyx_kp_s_src_PfyMU_features_lib__cython_a;
+static PyObject *__pyx_n_s_skimu_features_lib__cython_autoc;
+static PyObject *__pyx_kp_s_src_skimu_features_lib__cython_a;
 static PyObject *__pyx_n_s_start;
 static PyObject *__pyx_n_s_std1;
 static PyObject *__pyx_n_s_std2;
@@ -1967,7 +1967,7 @@ static PyObject *__pyx_n_s_unpack;
 static PyObject *__pyx_n_s_update;
 static PyObject *__pyx_n_s_x;
 static PyObject *__pyx_n_s_zeros;
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_15autocorrelation_Autocorrelation(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, int __pyx_v_lag, int __pyx_v_normalize); /* proto */
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_15autocorrelation_Autocorrelation(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, int __pyx_v_lag, int __pyx_v_normalize); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __pyx_array_obj *__pyx_v_self, PyObject *__pyx_v_shape, Py_ssize_t __pyx_v_itemsize, PyObject *__pyx_v_format, PyObject *__pyx_v_mode, int __pyx_v_allocate_buffer); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array_2__getbuffer__(struct __pyx_array_obj *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
 static void __pyx_array___pyx_pf_15View_dot_MemoryView_5array_4__dealloc__(struct __pyx_array_obj *__pyx_v_self); /* proto */
@@ -2047,7 +2047,7 @@ static PyObject *__pyx_codeobj__20;
 static PyObject *__pyx_codeobj__27;
 /* Late includes */
 
-/* "PfyMU/features/lib/_cython/autocorrelation.pyx":9
+/* "skimu/features/lib/_cython/autocorrelation.pyx":9
  * 
  * 
  * def Autocorrelation(const double[:, :, :] x, int lag, bint normalize):             # <<<<<<<<<<<<<<
@@ -2056,9 +2056,9 @@ static PyObject *__pyx_codeobj__27;
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_15autocorrelation_1Autocorrelation(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_5PfyMU_8features_3lib_7_cython_15autocorrelation_1Autocorrelation = {"Autocorrelation", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5PfyMU_8features_3lib_7_cython_15autocorrelation_1Autocorrelation, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_15autocorrelation_1Autocorrelation(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_15autocorrelation_1Autocorrelation(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_5skimu_8features_3lib_7_cython_15autocorrelation_1Autocorrelation = {"Autocorrelation", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5skimu_8features_3lib_7_cython_15autocorrelation_1Autocorrelation, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_15autocorrelation_1Autocorrelation(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_x = { 0, 0, { 0 }, { 0 }, { 0 } };
   int __pyx_v_lag;
   int __pyx_v_normalize;
@@ -2120,18 +2120,18 @@ static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_15autocorrelation_1Auto
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("Autocorrelation", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 9, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.autocorrelation.Autocorrelation", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.autocorrelation.Autocorrelation", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5PfyMU_8features_3lib_7_cython_15autocorrelation_Autocorrelation(__pyx_self, __pyx_v_x, __pyx_v_lag, __pyx_v_normalize);
+  __pyx_r = __pyx_pf_5skimu_8features_3lib_7_cython_15autocorrelation_Autocorrelation(__pyx_self, __pyx_v_x, __pyx_v_lag, __pyx_v_normalize);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_15autocorrelation_Autocorrelation(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, int __pyx_v_lag, int __pyx_v_normalize) {
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_15autocorrelation_Autocorrelation(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, int __pyx_v_lag, int __pyx_v_normalize) {
   Py_ssize_t __pyx_v_m;
   Py_ssize_t __pyx_v_n;
   Py_ssize_t __pyx_v_p;
@@ -2180,7 +2180,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_15autocorrelation_Autoc
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("Autocorrelation", 0);
 
-  /* "PfyMU/features/lib/_cython/autocorrelation.pyx":10
+  /* "skimu/features/lib/_cython/autocorrelation.pyx":10
  * 
  * def Autocorrelation(const double[:, :, :] x, int lag, bint normalize):
  *     cdef Py_ssize_t m = x.shape[0], n = x.shape[1], p = x.shape[2], i, j, k             # <<<<<<<<<<<<<<
@@ -2191,7 +2191,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_15autocorrelation_Autoc
   __pyx_v_n = (__pyx_v_x.shape[1]);
   __pyx_v_p = (__pyx_v_x.shape[2]);
 
-  /* "PfyMU/features/lib/_cython/autocorrelation.pyx":13
+  /* "skimu/features/lib/_cython/autocorrelation.pyx":13
  *     cdef double mean1, mean2, std1, std2
  * 
  *     autocorr = zeros((m, p), dtype=npy_double)             # <<<<<<<<<<<<<<
@@ -2231,7 +2231,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_15autocorrelation_Autoc
   __pyx_v_autocorr = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "PfyMU/features/lib/_cython/autocorrelation.pyx":14
+  /* "skimu/features/lib/_cython/autocorrelation.pyx":14
  * 
  *     autocorr = zeros((m, p), dtype=npy_double)
  *     cdef double[:, :] ac = autocorr             # <<<<<<<<<<<<<<
@@ -2243,7 +2243,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_15autocorrelation_Autoc
   __pyx_t_5.memview = NULL;
   __pyx_t_5.data = NULL;
 
-  /* "PfyMU/features/lib/_cython/autocorrelation.pyx":16
+  /* "skimu/features/lib/_cython/autocorrelation.pyx":16
  *     cdef double[:, :] ac = autocorr
  * 
  *     if normalize:             # <<<<<<<<<<<<<<
@@ -2253,7 +2253,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_15autocorrelation_Autoc
   __pyx_t_6 = (__pyx_v_normalize != 0);
   if (__pyx_t_6) {
 
-    /* "PfyMU/features/lib/_cython/autocorrelation.pyx":17
+    /* "skimu/features/lib/_cython/autocorrelation.pyx":17
  * 
  *     if normalize:
  *         for i in range(m):             # <<<<<<<<<<<<<<
@@ -2265,7 +2265,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_15autocorrelation_Autoc
     for (__pyx_t_9 = 0; __pyx_t_9 < __pyx_t_8; __pyx_t_9+=1) {
       __pyx_v_i = __pyx_t_9;
 
-      /* "PfyMU/features/lib/_cython/autocorrelation.pyx":18
+      /* "skimu/features/lib/_cython/autocorrelation.pyx":18
  *     if normalize:
  *         for i in range(m):
  *             for k in range(p):             # <<<<<<<<<<<<<<
@@ -2277,7 +2277,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_15autocorrelation_Autoc
       for (__pyx_t_12 = 0; __pyx_t_12 < __pyx_t_11; __pyx_t_12+=1) {
         __pyx_v_k = __pyx_t_12;
 
-        /* "PfyMU/features/lib/_cython/autocorrelation.pyx":19
+        /* "skimu/features/lib/_cython/autocorrelation.pyx":19
  *         for i in range(m):
  *             for k in range(p):
  *                 mean_sd_1d(x[i, :n-lag, k], &mean1, &std1)             # <<<<<<<<<<<<<<
@@ -2317,12 +2317,12 @@ __pyx_t_14 = -1;
         __pyx_t_13.data += __pyx_tmp_idx * __pyx_tmp_stride;
 }
 
-__pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_mean1), (&__pyx_v_std1));
+__pyx_f_5skimu_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_mean1), (&__pyx_v_std1));
         __PYX_XDEC_MEMVIEW(&__pyx_t_13, 1);
         __pyx_t_13.memview = NULL;
         __pyx_t_13.data = NULL;
 
-        /* "PfyMU/features/lib/_cython/autocorrelation.pyx":20
+        /* "skimu/features/lib/_cython/autocorrelation.pyx":20
  *             for k in range(p):
  *                 mean_sd_1d(x[i, :n-lag, k], &mean1, &std1)
  *                 mean_sd_1d(x[i, lag:, k], &mean2, &std2)             # <<<<<<<<<<<<<<
@@ -2362,12 +2362,12 @@ __pyx_t_14 = -1;
         __pyx_t_13.data += __pyx_tmp_idx * __pyx_tmp_stride;
 }
 
-__pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_mean2), (&__pyx_v_std2));
+__pyx_f_5skimu_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_mean2), (&__pyx_v_std2));
         __PYX_XDEC_MEMVIEW(&__pyx_t_13, 1);
         __pyx_t_13.memview = NULL;
         __pyx_t_13.data = NULL;
 
-        /* "PfyMU/features/lib/_cython/autocorrelation.pyx":22
+        /* "skimu/features/lib/_cython/autocorrelation.pyx":22
  *                 mean_sd_1d(x[i, lag:, k], &mean2, &std2)
  * 
  *                 for j in range(n-lag):             # <<<<<<<<<<<<<<
@@ -2379,7 +2379,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_
         for (__pyx_t_17 = 0; __pyx_t_17 < __pyx_t_16; __pyx_t_17+=1) {
           __pyx_v_j = __pyx_t_17;
 
-          /* "PfyMU/features/lib/_cython/autocorrelation.pyx":23
+          /* "skimu/features/lib/_cython/autocorrelation.pyx":23
  * 
  *                 for j in range(n-lag):
  *                     ac[i, k] += (x[i, j, k] - mean1) * (x[i, j+lag, k] - mean2)             # <<<<<<<<<<<<<<
@@ -2397,7 +2397,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_
           *((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_ac.data + __pyx_t_24 * __pyx_v_ac.strides[0]) ) + __pyx_t_25 * __pyx_v_ac.strides[1]) )) += (((*((double const  *) ( /* dim=2 */ (( /* dim=1 */ (( /* dim=0 */ (__pyx_v_x.data + __pyx_t_18 * __pyx_v_x.strides[0]) ) + __pyx_t_19 * __pyx_v_x.strides[1]) ) + __pyx_t_20 * __pyx_v_x.strides[2]) ))) - __pyx_v_mean1) * ((*((double const  *) ( /* dim=2 */ (( /* dim=1 */ (( /* dim=0 */ (__pyx_v_x.data + __pyx_t_21 * __pyx_v_x.strides[0]) ) + __pyx_t_22 * __pyx_v_x.strides[1]) ) + __pyx_t_23 * __pyx_v_x.strides[2]) ))) - __pyx_v_mean2));
         }
 
-        /* "PfyMU/features/lib/_cython/autocorrelation.pyx":24
+        /* "skimu/features/lib/_cython/autocorrelation.pyx":24
  *                 for j in range(n-lag):
  *                     ac[i, k] += (x[i, j, k] - mean1) * (x[i, j+lag, k] - mean2)
  *                 ac[i, k] /= (n - lag) * std1 * std2             # <<<<<<<<<<<<<<
@@ -2410,7 +2410,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_
       }
     }
 
-    /* "PfyMU/features/lib/_cython/autocorrelation.pyx":16
+    /* "skimu/features/lib/_cython/autocorrelation.pyx":16
  *     cdef double[:, :] ac = autocorr
  * 
  *     if normalize:             # <<<<<<<<<<<<<<
@@ -2420,7 +2420,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_
     goto __pyx_L3;
   }
 
-  /* "PfyMU/features/lib/_cython/autocorrelation.pyx":26
+  /* "skimu/features/lib/_cython/autocorrelation.pyx":26
  *                 ac[i, k] /= (n - lag) * std1 * std2
  *     else:
  *         for i in range(m):             # <<<<<<<<<<<<<<
@@ -2433,7 +2433,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_
     for (__pyx_t_9 = 0; __pyx_t_9 < __pyx_t_8; __pyx_t_9+=1) {
       __pyx_v_i = __pyx_t_9;
 
-      /* "PfyMU/features/lib/_cython/autocorrelation.pyx":27
+      /* "skimu/features/lib/_cython/autocorrelation.pyx":27
  *     else:
  *         for i in range(m):
  *             for k in range(p):             # <<<<<<<<<<<<<<
@@ -2445,7 +2445,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_
       for (__pyx_t_12 = 0; __pyx_t_12 < __pyx_t_11; __pyx_t_12+=1) {
         __pyx_v_k = __pyx_t_12;
 
-        /* "PfyMU/features/lib/_cython/autocorrelation.pyx":28
+        /* "skimu/features/lib/_cython/autocorrelation.pyx":28
  *         for i in range(m):
  *             for k in range(p):
  *                 mean_sd_1d(x[i, :n-lag, k], &mean1, &std1)             # <<<<<<<<<<<<<<
@@ -2485,12 +2485,12 @@ __pyx_t_14 = -1;
         __pyx_t_13.data += __pyx_tmp_idx * __pyx_tmp_stride;
 }
 
-__pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_mean1), (&__pyx_v_std1));
+__pyx_f_5skimu_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_mean1), (&__pyx_v_std1));
         __PYX_XDEC_MEMVIEW(&__pyx_t_13, 1);
         __pyx_t_13.memview = NULL;
         __pyx_t_13.data = NULL;
 
-        /* "PfyMU/features/lib/_cython/autocorrelation.pyx":29
+        /* "skimu/features/lib/_cython/autocorrelation.pyx":29
  *             for k in range(p):
  *                 mean_sd_1d(x[i, :n-lag, k], &mean1, &std1)
  *                 mean_sd_1d(x[i, lag:, k], &mean2, &std2)             # <<<<<<<<<<<<<<
@@ -2530,12 +2530,12 @@ __pyx_t_14 = -1;
         __pyx_t_13.data += __pyx_tmp_idx * __pyx_tmp_stride;
 }
 
-__pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_mean2), (&__pyx_v_std2));
+__pyx_f_5skimu_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_mean2), (&__pyx_v_std2));
         __PYX_XDEC_MEMVIEW(&__pyx_t_13, 1);
         __pyx_t_13.memview = NULL;
         __pyx_t_13.data = NULL;
 
-        /* "PfyMU/features/lib/_cython/autocorrelation.pyx":31
+        /* "skimu/features/lib/_cython/autocorrelation.pyx":31
  *                 mean_sd_1d(x[i, lag:, k], &mean2, &std2)
  * 
  *                 for j in range(n-lag):             # <<<<<<<<<<<<<<
@@ -2547,7 +2547,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_
         for (__pyx_t_17 = 0; __pyx_t_17 < __pyx_t_16; __pyx_t_17+=1) {
           __pyx_v_j = __pyx_t_17;
 
-          /* "PfyMU/features/lib/_cython/autocorrelation.pyx":32
+          /* "skimu/features/lib/_cython/autocorrelation.pyx":32
  * 
  *                 for j in range(n-lag):
  *                     ac[i, k] += x[i, j, k] * x[i, j+lag, k]             # <<<<<<<<<<<<<<
@@ -2565,7 +2565,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_
           *((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_ac.data + __pyx_t_28 * __pyx_v_ac.strides[0]) ) + __pyx_t_29 * __pyx_v_ac.strides[1]) )) += ((*((double const  *) ( /* dim=2 */ (( /* dim=1 */ (( /* dim=0 */ (__pyx_v_x.data + __pyx_t_21 * __pyx_v_x.strides[0]) ) + __pyx_t_20 * __pyx_v_x.strides[1]) ) + __pyx_t_19 * __pyx_v_x.strides[2]) ))) * (*((double const  *) ( /* dim=2 */ (( /* dim=1 */ (( /* dim=0 */ (__pyx_v_x.data + __pyx_t_18 * __pyx_v_x.strides[0]) ) + __pyx_t_26 * __pyx_v_x.strides[1]) ) + __pyx_t_27 * __pyx_v_x.strides[2]) ))));
         }
 
-        /* "PfyMU/features/lib/_cython/autocorrelation.pyx":33
+        /* "skimu/features/lib/_cython/autocorrelation.pyx":33
  *                 for j in range(n-lag):
  *                     ac[i, k] += x[i, j, k] * x[i, j+lag, k]
  *                 ac[i, k] /= std1 * std2             # <<<<<<<<<<<<<<
@@ -2580,7 +2580,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_
   }
   __pyx_L3:;
 
-  /* "PfyMU/features/lib/_cython/autocorrelation.pyx":35
+  /* "skimu/features/lib/_cython/autocorrelation.pyx":35
  *                 ac[i, k] /= std1 * std2
  * 
  *     return autocorr             # <<<<<<<<<<<<<<
@@ -2590,7 +2590,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_
   __pyx_r = __pyx_v_autocorr;
   goto __pyx_L0;
 
-  /* "PfyMU/features/lib/_cython/autocorrelation.pyx":9
+  /* "skimu/features/lib/_cython/autocorrelation.pyx":9
  * 
  * 
  * def Autocorrelation(const double[:, :, :] x, int lag, bint normalize):             # <<<<<<<<<<<<<<
@@ -2606,7 +2606,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_
   __Pyx_XDECREF(__pyx_t_4);
   __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_t_13, 1);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.autocorrelation.Autocorrelation", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.autocorrelation.Autocorrelation", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_autocorr);
@@ -15757,7 +15757,7 @@ static PyBufferProcs __pyx_tp_as_buffer_array = {
 
 static PyTypeObject __pyx_type___pyx_array = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.autocorrelation.array", /*tp_name*/
+  "skimu.features.lib._cython.autocorrelation.array", /*tp_name*/
   sizeof(struct __pyx_array_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc_array, /*tp_dealloc*/
@@ -15876,7 +15876,7 @@ static PyMethodDef __pyx_methods_Enum[] = {
 
 static PyTypeObject __pyx_type___pyx_MemviewEnum = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.autocorrelation.Enum", /*tp_name*/
+  "skimu.features.lib._cython.autocorrelation.Enum", /*tp_name*/
   sizeof(struct __pyx_MemviewEnum_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc_Enum, /*tp_dealloc*/
@@ -16137,7 +16137,7 @@ static PyBufferProcs __pyx_tp_as_buffer_memoryview = {
 
 static PyTypeObject __pyx_type___pyx_memoryview = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.autocorrelation.memoryview", /*tp_name*/
+  "skimu.features.lib._cython.autocorrelation.memoryview", /*tp_name*/
   sizeof(struct __pyx_memoryview_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc_memoryview, /*tp_dealloc*/
@@ -16275,7 +16275,7 @@ static struct PyGetSetDef __pyx_getsets__memoryviewslice[] = {
 
 static PyTypeObject __pyx_type___pyx_memoryviewslice = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.autocorrelation._memoryviewslice", /*tp_name*/
+  "skimu.features.lib._cython.autocorrelation._memoryviewslice", /*tp_name*/
   sizeof(struct __pyx_memoryviewslice_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc__memoryviewslice, /*tp_dealloc*/
@@ -16415,7 +16415,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_MemoryView_of_r_object, __pyx_k_MemoryView_of_r_object, sizeof(__pyx_k_MemoryView_of_r_object), 0, 0, 1, 0},
   {&__pyx_n_b_O, __pyx_k_O, sizeof(__pyx_k_O), 0, 0, 0, 1},
   {&__pyx_kp_s_Out_of_bounds_on_buffer_access_a, __pyx_k_Out_of_bounds_on_buffer_access_a, sizeof(__pyx_k_Out_of_bounds_on_buffer_access_a), 0, 0, 1, 0},
-  {&__pyx_n_s_PfyMU_features_lib__cython_autoc, __pyx_k_PfyMU_features_lib__cython_autoc, sizeof(__pyx_k_PfyMU_features_lib__cython_autoc), 0, 0, 1, 1},
   {&__pyx_n_s_PickleError, __pyx_k_PickleError, sizeof(__pyx_k_PickleError), 0, 0, 1, 1},
   {&__pyx_n_s_TypeError, __pyx_k_TypeError, sizeof(__pyx_k_TypeError), 0, 0, 1, 1},
   {&__pyx_kp_s_Unable_to_convert_item_to_object, __pyx_k_Unable_to_convert_item_to_object, sizeof(__pyx_k_Unable_to_convert_item_to_object), 0, 0, 1, 0},
@@ -16487,7 +16486,8 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_setstate_cython, __pyx_k_setstate_cython, sizeof(__pyx_k_setstate_cython), 0, 0, 1, 1},
   {&__pyx_n_s_shape, __pyx_k_shape, sizeof(__pyx_k_shape), 0, 0, 1, 1},
   {&__pyx_n_s_size, __pyx_k_size, sizeof(__pyx_k_size), 0, 0, 1, 1},
-  {&__pyx_kp_s_src_PfyMU_features_lib__cython_a, __pyx_k_src_PfyMU_features_lib__cython_a, sizeof(__pyx_k_src_PfyMU_features_lib__cython_a), 0, 0, 1, 0},
+  {&__pyx_n_s_skimu_features_lib__cython_autoc, __pyx_k_skimu_features_lib__cython_autoc, sizeof(__pyx_k_skimu_features_lib__cython_autoc), 0, 0, 1, 1},
+  {&__pyx_kp_s_src_skimu_features_lib__cython_a, __pyx_k_src_skimu_features_lib__cython_a, sizeof(__pyx_k_src_skimu_features_lib__cython_a), 0, 0, 1, 0},
   {&__pyx_n_s_start, __pyx_k_start, sizeof(__pyx_k_start), 0, 0, 1, 1},
   {&__pyx_n_s_std1, __pyx_k_std1, sizeof(__pyx_k_std1), 0, 0, 1, 1},
   {&__pyx_n_s_std2, __pyx_k_std2, sizeof(__pyx_k_std2), 0, 0, 1, 1},
@@ -16717,7 +16717,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__18);
   __Pyx_GIVEREF(__pyx_tuple__18);
 
-  /* "PfyMU/features/lib/_cython/autocorrelation.pyx":9
+  /* "skimu/features/lib/_cython/autocorrelation.pyx":9
  * 
  * 
  * def Autocorrelation(const double[:, :, :] x, int lag, bint normalize):             # <<<<<<<<<<<<<<
@@ -16727,7 +16727,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__19 = PyTuple_Pack(15, __pyx_n_s_x, __pyx_n_s_lag, __pyx_n_s_normalize, __pyx_n_s_m, __pyx_n_s_n, __pyx_n_s_p, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_k, __pyx_n_s_mean1, __pyx_n_s_mean2, __pyx_n_s_std1, __pyx_n_s_std2, __pyx_n_s_autocorr, __pyx_n_s_ac); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(0, 9, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__19);
   __Pyx_GIVEREF(__pyx_tuple__19);
-  __pyx_codeobj__20 = (PyObject*)__Pyx_PyCode_New(3, 0, 15, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__19, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_src_PfyMU_features_lib__cython_a, __pyx_n_s_Autocorrelation, 9, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__20)) __PYX_ERR(0, 9, __pyx_L1_error)
+  __pyx_codeobj__20 = (PyObject*)__Pyx_PyCode_New(3, 0, 15, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__19, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_src_skimu_features_lib__cython_a, __pyx_n_s_Autocorrelation, 9, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__20)) __PYX_ERR(0, 9, __pyx_L1_error)
 
   /* "View.MemoryView":286
  *         return self.name
@@ -16937,8 +16937,8 @@ static int __Pyx_modinit_function_import_code(void) {
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__Pyx_modinit_function_import_code", 0);
   /*--- Function import code ---*/
-  __pyx_t_1 = PyImport_ImportModule("PfyMU.features.lib._cython.common"); if (!__pyx_t_1) __PYX_ERR(0, 1, __pyx_L1_error)
-  if (__Pyx_ImportFunction(__pyx_t_1, "mean_sd_1d", (void (**)(void))&__pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d, "void (__Pyx_memviewslice, double *, double *)") < 0) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_t_1 = PyImport_ImportModule("skimu.features.lib._cython.common"); if (!__pyx_t_1) __PYX_ERR(0, 1, __pyx_L1_error)
+  if (__Pyx_ImportFunction(__pyx_t_1, "mean_sd_1d", (void (**)(void))&__pyx_f_5skimu_8features_3lib_7_cython_6common_mean_sd_1d, "void (__Pyx_memviewslice, double *, double *)") < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   Py_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_RefNannyFinishContext();
   return 0;
@@ -17124,14 +17124,14 @@ if (!__Pyx_RefNanny) {
   #if PY_MAJOR_VERSION < 3 && (__PYX_DEFAULT_STRING_ENCODING_IS_ASCII || __PYX_DEFAULT_STRING_ENCODING_IS_DEFAULT)
   if (__Pyx_init_sys_getdefaultencoding_params() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
-  if (__pyx_module_is_main_PfyMU__features__lib___cython__autocorrelation) {
+  if (__pyx_module_is_main_skimu__features__lib___cython__autocorrelation) {
     if (PyObject_SetAttr(__pyx_m, __pyx_n_s_name_2, __pyx_n_s_main) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   }
   #if PY_MAJOR_VERSION >= 3
   {
     PyObject *modules = PyImport_GetModuleDict(); if (unlikely(!modules)) __PYX_ERR(0, 1, __pyx_L1_error)
-    if (!PyDict_GetItemString(modules, "PfyMU.features.lib._cython.autocorrelation")) {
-      if (unlikely(PyDict_SetItemString(modules, "PfyMU.features.lib._cython.autocorrelation", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
+    if (!PyDict_GetItemString(modules, "skimu.features.lib._cython.autocorrelation")) {
+      if (unlikely(PyDict_SetItemString(modules, "skimu.features.lib._cython.autocorrelation", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
     }
   }
   #endif
@@ -17152,7 +17152,7 @@ if (!__Pyx_RefNanny) {
   if (__Pyx_patch_abc() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
 
-  /* "PfyMU/features/lib/_cython/autocorrelation.pyx":5
+  /* "skimu/features/lib/_cython/autocorrelation.pyx":5
  * # cython: wraparound = False
  * cimport cython
  * from numpy import zeros, double as npy_double             # <<<<<<<<<<<<<<
@@ -17180,19 +17180,19 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "PfyMU/features/lib/_cython/autocorrelation.pyx":9
+  /* "skimu/features/lib/_cython/autocorrelation.pyx":9
  * 
  * 
  * def Autocorrelation(const double[:, :, :] x, int lag, bint normalize):             # <<<<<<<<<<<<<<
  *     cdef Py_ssize_t m = x.shape[0], n = x.shape[1], p = x.shape[2], i, j, k
  *     cdef double mean1, mean2, std1, std2
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5PfyMU_8features_3lib_7_cython_15autocorrelation_1Autocorrelation, NULL, __pyx_n_s_PfyMU_features_lib__cython_autoc); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 9, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5skimu_8features_3lib_7_cython_15autocorrelation_1Autocorrelation, NULL, __pyx_n_s_skimu_features_lib__cython_autoc); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 9, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_Autocorrelation, __pyx_t_2) < 0) __PYX_ERR(0, 9, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "PfyMU/features/lib/_cython/autocorrelation.pyx":1
+  /* "skimu/features/lib/_cython/autocorrelation.pyx":1
  * # cython: infer_types = True             # <<<<<<<<<<<<<<
  * # cython: boundscheck = False
  * # cython: wraparound = False
@@ -17363,11 +17363,11 @@ if (!__Pyx_RefNanny) {
   __Pyx_XDECREF(__pyx_t_2);
   if (__pyx_m) {
     if (__pyx_d) {
-      __Pyx_AddTraceback("init PfyMU.features.lib._cython.autocorrelation", __pyx_clineno, __pyx_lineno, __pyx_filename);
+      __Pyx_AddTraceback("init skimu.features.lib._cython.autocorrelation", __pyx_clineno, __pyx_lineno, __pyx_filename);
     }
     Py_CLEAR(__pyx_m);
   } else if (!PyErr_Occurred()) {
-    PyErr_SetString(PyExc_ImportError, "init PfyMU.features.lib._cython.autocorrelation");
+    PyErr_SetString(PyExc_ImportError, "init skimu.features.lib._cython.autocorrelation");
   }
   __pyx_L0:;
   __Pyx_RefNannyFinishContext();

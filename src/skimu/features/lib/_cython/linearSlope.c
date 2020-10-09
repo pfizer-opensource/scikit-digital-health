@@ -4,12 +4,12 @@
 {
     "distutils": {
         "depends": [],
-        "name": "PfyMU.features.lib._cython.linearSlope",
+        "name": "skimu.features.lib._cython.linearSlope",
         "sources": [
-            "src/PfyMU/features/lib/_cython/linearSlope.pyx"
+            "src/skimu/features/lib/_cython/linearSlope.pyx"
         ]
     },
-    "module_name": "PfyMU.features.lib._cython.linearSlope"
+    "module_name": "skimu.features.lib._cython.linearSlope"
 }
 END: Cython Metadata */
 
@@ -604,8 +604,8 @@ static CYTHON_INLINE float __PYX_NAN() {
   #endif
 #endif
 
-#define __PYX_HAVE__PfyMU__features__lib___cython__linearSlope
-#define __PYX_HAVE_API__PfyMU__features__lib___cython__linearSlope
+#define __PYX_HAVE__skimu__features__lib___cython__linearSlope
+#define __PYX_HAVE_API__skimu__features__lib___cython__linearSlope
 /* Early includes */
 #include <math.h>
 #include "pythread.h"
@@ -821,7 +821,7 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "src/PfyMU/features/lib/_cython/linearSlope.pyx",
+  "src/skimu/features/lib/_cython/linearSlope.pyx",
   "stringsource",
 };
 /* MemviewSliceStruct.proto */
@@ -1704,10 +1704,10 @@ static PyObject *__pyx_memoryviewslice_assign_item_from_object(struct __pyx_memo
 
 /* Module declarations from 'libc.math' */
 
-/* Module declarations from 'PfyMU.features.lib._cython.common' */
-static void (*__pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_1d)(__Pyx_memviewslice, double *); /*proto*/
+/* Module declarations from 'skimu.features.lib._cython.common' */
+static void (*__pyx_f_5skimu_8features_3lib_7_cython_6common_mean_1d)(__Pyx_memviewslice, double *); /*proto*/
 
-/* Module declarations from 'PfyMU.features.lib._cython.linearSlope' */
+/* Module declarations from 'skimu.features.lib._cython.linearSlope' */
 static PyTypeObject *__pyx_array_type = 0;
 static PyTypeObject *__pyx_MemviewEnum_type = 0;
 static PyTypeObject *__pyx_memoryview_type = 0;
@@ -1719,9 +1719,9 @@ static PyObject *contiguous = 0;
 static PyObject *indirect_contiguous = 0;
 static int __pyx_memoryview_thread_locks_used;
 static PyThread_type_lock __pyx_memoryview_thread_locks[8];
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_covariance(__Pyx_memviewslice, __Pyx_memviewslice, int, int __pyx_skip_dispatch); /*proto*/
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_linregress(__Pyx_memviewslice, __Pyx_memviewslice, int __pyx_skip_dispatch); /*proto*/
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_LinRegression(__Pyx_memviewslice, __Pyx_memviewslice, int __pyx_skip_dispatch); /*proto*/
+static PyObject *__pyx_f_5skimu_8features_3lib_7_cython_11linearSlope_covariance(__Pyx_memviewslice, __Pyx_memviewslice, int, int __pyx_skip_dispatch); /*proto*/
+static PyObject *__pyx_f_5skimu_8features_3lib_7_cython_11linearSlope_linregress(__Pyx_memviewslice, __Pyx_memviewslice, int __pyx_skip_dispatch); /*proto*/
+static PyObject *__pyx_f_5skimu_8features_3lib_7_cython_11linearSlope_LinRegression(__Pyx_memviewslice, __Pyx_memviewslice, int __pyx_skip_dispatch); /*proto*/
 static struct __pyx_array_obj *__pyx_array_new(PyObject *, Py_ssize_t, char *, char *, char *); /*proto*/
 static void *__pyx_align_pointer(void *, size_t); /*proto*/
 static PyObject *__pyx_memoryview_new(PyObject *, int, int, __Pyx_TypeInfo *); /*proto*/
@@ -1757,11 +1757,11 @@ static void __pyx_memoryview__slice_assign_scalar(char *, Py_ssize_t *, Py_ssize
 static PyObject *__pyx_unpickle_Enum__set_state(struct __pyx_MemviewEnum_obj *, PyObject *); /*proto*/
 static __Pyx_TypeInfo __Pyx_TypeInfo_double__const__ = { "const double", NULL, sizeof(double const ), { 0 }, 0, 'R', 0, 0 };
 static __Pyx_TypeInfo __Pyx_TypeInfo_double = { "double", NULL, sizeof(double), { 0 }, 0, 'R', 0, 0 };
-#define __Pyx_MODULE_NAME "PfyMU.features.lib._cython.linearSlope"
-extern int __pyx_module_is_main_PfyMU__features__lib___cython__linearSlope;
-int __pyx_module_is_main_PfyMU__features__lib___cython__linearSlope = 0;
+#define __Pyx_MODULE_NAME "skimu.features.lib._cython.linearSlope"
+extern int __pyx_module_is_main_skimu__features__lib___cython__linearSlope;
+int __pyx_module_is_main_skimu__features__lib___cython__linearSlope = 0;
 
-/* Implementation of 'PfyMU.features.lib._cython.linearSlope' */
+/* Implementation of 'skimu.features.lib._cython.linearSlope' */
 static PyObject *__pyx_builtin_range;
 static PyObject *__pyx_builtin_ValueError;
 static PyObject *__pyx_builtin_MemoryError;
@@ -1962,9 +1962,9 @@ static PyObject *__pyx_n_s_update;
 static PyObject *__pyx_n_s_x;
 static PyObject *__pyx_n_s_y;
 static PyObject *__pyx_n_s_zeros;
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_11linearSlope_covariance(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, __Pyx_memviewslice __pyx_v_y, int __pyx_v_ddof); /* proto */
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_11linearSlope_2linregress(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, __Pyx_memviewslice __pyx_v_y); /* proto */
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_11linearSlope_4LinRegression(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, __Pyx_memviewslice __pyx_v_y); /* proto */
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_11linearSlope_covariance(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, __Pyx_memviewslice __pyx_v_y, int __pyx_v_ddof); /* proto */
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_11linearSlope_2linregress(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, __Pyx_memviewslice __pyx_v_y); /* proto */
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_11linearSlope_4LinRegression(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, __Pyx_memviewslice __pyx_v_y); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __pyx_array_obj *__pyx_v_self, PyObject *__pyx_v_shape, Py_ssize_t __pyx_v_itemsize, PyObject *__pyx_v_format, PyObject *__pyx_v_mode, int __pyx_v_allocate_buffer); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array_2__getbuffer__(struct __pyx_array_obj *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
 static void __pyx_array___pyx_pf_15View_dot_MemoryView_5array_4__dealloc__(struct __pyx_array_obj *__pyx_v_self); /* proto */
@@ -2044,7 +2044,7 @@ static PyObject *__pyx_tuple__26;
 static PyObject *__pyx_codeobj__27;
 /* Late includes */
 
-/* "PfyMU/features/lib/_cython/linearSlope.pyx":10
+/* "skimu/features/lib/_cython/linearSlope.pyx":10
  * 
  * 
  * cpdef covariance(const double[:] x, const double[:] y, int ddof):             # <<<<<<<<<<<<<<
@@ -2052,8 +2052,8 @@ static PyObject *__pyx_codeobj__27;
  * 
  */
 
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_11linearSlope_1covariance(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_covariance(__Pyx_memviewslice __pyx_v_x, __Pyx_memviewslice __pyx_v_y, int __pyx_v_ddof, CYTHON_UNUSED int __pyx_skip_dispatch) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_11linearSlope_1covariance(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_f_5skimu_8features_3lib_7_cython_11linearSlope_covariance(__Pyx_memviewslice __pyx_v_x, __Pyx_memviewslice __pyx_v_y, int __pyx_v_ddof, CYTHON_UNUSED int __pyx_skip_dispatch) {
   Py_ssize_t __pyx_v_n;
   Py_ssize_t __pyx_v_i;
   double __pyx_v_kx;
@@ -2078,7 +2078,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_covariance
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("covariance", 0);
 
-  /* "PfyMU/features/lib/_cython/linearSlope.pyx":11
+  /* "skimu/features/lib/_cython/linearSlope.pyx":11
  * 
  * cpdef covariance(const double[:] x, const double[:] y, int ddof):
  *     cdef Py_ssize_t n = x.size, i             # <<<<<<<<<<<<<<
@@ -2094,7 +2094,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_covariance
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_n = __pyx_t_3;
 
-  /* "PfyMU/features/lib/_cython/linearSlope.pyx":13
+  /* "skimu/features/lib/_cython/linearSlope.pyx":13
  *     cdef Py_ssize_t n = x.size, i
  * 
  *     cdef double kx = x[0], ky = y[0]             # <<<<<<<<<<<<<<
@@ -2108,7 +2108,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_covariance
   if (__pyx_t_4 < 0) __pyx_t_4 += __pyx_v_y.shape[0];
   __pyx_v_ky = (*((double const  *) ( /* dim=0 */ (__pyx_v_y.data + __pyx_t_4 * __pyx_v_y.strides[0]) )));
 
-  /* "PfyMU/features/lib/_cython/linearSlope.pyx":14
+  /* "skimu/features/lib/_cython/linearSlope.pyx":14
  * 
  *     cdef double kx = x[0], ky = y[0]
  *     cdef double Ex = 0., Ey = 0., Exy = 0., cov             # <<<<<<<<<<<<<<
@@ -2119,7 +2119,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_covariance
   __pyx_v_Ey = 0.;
   __pyx_v_Exy = 0.;
 
-  /* "PfyMU/features/lib/_cython/linearSlope.pyx":16
+  /* "skimu/features/lib/_cython/linearSlope.pyx":16
  *     cdef double Ex = 0., Ey = 0., Exy = 0., cov
  * 
  *     for i in range(n):             # <<<<<<<<<<<<<<
@@ -2131,7 +2131,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_covariance
   for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_5; __pyx_t_6+=1) {
     __pyx_v_i = __pyx_t_6;
 
-    /* "PfyMU/features/lib/_cython/linearSlope.pyx":17
+    /* "skimu/features/lib/_cython/linearSlope.pyx":17
  * 
  *     for i in range(n):
  *         Ex += (x[i] - kx)             # <<<<<<<<<<<<<<
@@ -2142,7 +2142,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_covariance
     if (__pyx_t_4 < 0) __pyx_t_4 += __pyx_v_x.shape[0];
     __pyx_v_Ex = (__pyx_v_Ex + ((*((double const  *) ( /* dim=0 */ (__pyx_v_x.data + __pyx_t_4 * __pyx_v_x.strides[0]) ))) - __pyx_v_kx));
 
-    /* "PfyMU/features/lib/_cython/linearSlope.pyx":18
+    /* "skimu/features/lib/_cython/linearSlope.pyx":18
  *     for i in range(n):
  *         Ex += (x[i] - kx)
  *         Ey += (y[i] - ky)             # <<<<<<<<<<<<<<
@@ -2153,7 +2153,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_covariance
     if (__pyx_t_4 < 0) __pyx_t_4 += __pyx_v_y.shape[0];
     __pyx_v_Ey = (__pyx_v_Ey + ((*((double const  *) ( /* dim=0 */ (__pyx_v_y.data + __pyx_t_4 * __pyx_v_y.strides[0]) ))) - __pyx_v_ky));
 
-    /* "PfyMU/features/lib/_cython/linearSlope.pyx":19
+    /* "skimu/features/lib/_cython/linearSlope.pyx":19
  *         Ex += (x[i] - kx)
  *         Ey += (y[i] - ky)
  *         Exy += (x[i] - kx) * (y[i] - ky)             # <<<<<<<<<<<<<<
@@ -2167,7 +2167,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_covariance
     __pyx_v_Exy = (__pyx_v_Exy + (((*((double const  *) ( /* dim=0 */ (__pyx_v_x.data + __pyx_t_4 * __pyx_v_x.strides[0]) ))) - __pyx_v_kx) * ((*((double const  *) ( /* dim=0 */ (__pyx_v_y.data + __pyx_t_7 * __pyx_v_y.strides[0]) ))) - __pyx_v_ky)));
   }
 
-  /* "PfyMU/features/lib/_cython/linearSlope.pyx":21
+  /* "skimu/features/lib/_cython/linearSlope.pyx":21
  *         Exy += (x[i] - kx) * (y[i] - ky)
  * 
  *     cov = (Exy - (Ex * Ey) / (n - ddof)) / (n - ddof)             # <<<<<<<<<<<<<<
@@ -2188,7 +2188,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_covariance
   }
   __pyx_v_cov = (__pyx_t_9 / ((double)__pyx_t_3));
 
-  /* "PfyMU/features/lib/_cython/linearSlope.pyx":22
+  /* "skimu/features/lib/_cython/linearSlope.pyx":22
  * 
  *     cov = (Exy - (Ex * Ey) / (n - ddof)) / (n - ddof)
  *     return cov             # <<<<<<<<<<<<<<
@@ -2202,7 +2202,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_covariance
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "PfyMU/features/lib/_cython/linearSlope.pyx":10
+  /* "skimu/features/lib/_cython/linearSlope.pyx":10
  * 
  * 
  * cpdef covariance(const double[:] x, const double[:] y, int ddof):             # <<<<<<<<<<<<<<
@@ -2214,7 +2214,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_covariance
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.linearSlope.covariance", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.linearSlope.covariance", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -2223,8 +2223,8 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_covariance
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_11linearSlope_1covariance(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_11linearSlope_1covariance(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_11linearSlope_1covariance(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_11linearSlope_1covariance(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_x = { 0, 0, { 0 }, { 0 }, { 0 } };
   __Pyx_memviewslice __pyx_v_y = { 0, 0, { 0 }, { 0 }, { 0 } };
   int __pyx_v_ddof;
@@ -2286,18 +2286,18 @@ static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_11linearSlope_1covarian
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("covariance", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 10, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.linearSlope.covariance", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.linearSlope.covariance", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5PfyMU_8features_3lib_7_cython_11linearSlope_covariance(__pyx_self, __pyx_v_x, __pyx_v_y, __pyx_v_ddof);
+  __pyx_r = __pyx_pf_5skimu_8features_3lib_7_cython_11linearSlope_covariance(__pyx_self, __pyx_v_x, __pyx_v_y, __pyx_v_ddof);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_11linearSlope_covariance(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, __Pyx_memviewslice __pyx_v_y, int __pyx_v_ddof) {
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_11linearSlope_covariance(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, __Pyx_memviewslice __pyx_v_y, int __pyx_v_ddof) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -2308,7 +2308,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_11linearSlope_covarianc
   __Pyx_XDECREF(__pyx_r);
   if (unlikely(!__pyx_v_x.memview)) { __Pyx_RaiseUnboundLocalError("x"); __PYX_ERR(0, 10, __pyx_L1_error) }
   if (unlikely(!__pyx_v_y.memview)) { __Pyx_RaiseUnboundLocalError("y"); __PYX_ERR(0, 10, __pyx_L1_error) }
-  __pyx_t_1 = __pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_covariance(__pyx_v_x, __pyx_v_y, __pyx_v_ddof, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 10, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5skimu_8features_3lib_7_cython_11linearSlope_covariance(__pyx_v_x, __pyx_v_y, __pyx_v_ddof, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 10, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -2317,7 +2317,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_11linearSlope_covarianc
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.linearSlope.covariance", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.linearSlope.covariance", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __PYX_XDEC_MEMVIEW(&__pyx_v_x, 1);
@@ -2327,7 +2327,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_11linearSlope_covarianc
   return __pyx_r;
 }
 
-/* "PfyMU/features/lib/_cython/linearSlope.pyx":25
+/* "skimu/features/lib/_cython/linearSlope.pyx":25
  * 
  * 
  * cpdef linregress(const double[:] x, const double[:] y):             # <<<<<<<<<<<<<<
@@ -2335,8 +2335,8 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_11linearSlope_covarianc
  *     if n != y.size:
  */
 
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_11linearSlope_3linregress(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_linregress(__Pyx_memviewslice __pyx_v_x, __Pyx_memviewslice __pyx_v_y, CYTHON_UNUSED int __pyx_skip_dispatch) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_11linearSlope_3linregress(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_f_5skimu_8features_3lib_7_cython_11linearSlope_linregress(__Pyx_memviewslice __pyx_v_x, __Pyx_memviewslice __pyx_v_y, CYTHON_UNUSED int __pyx_skip_dispatch) {
   Py_ssize_t __pyx_v_n;
   double __pyx_v_xmean;
   double __pyx_v_ymean;
@@ -2358,7 +2358,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_linregress
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("linregress", 0);
 
-  /* "PfyMU/features/lib/_cython/linearSlope.pyx":26
+  /* "skimu/features/lib/_cython/linearSlope.pyx":26
  * 
  * cpdef linregress(const double[:] x, const double[:] y):
  *     cdef Py_ssize_t n = x.size             # <<<<<<<<<<<<<<
@@ -2374,7 +2374,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_linregress
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_n = __pyx_t_3;
 
-  /* "PfyMU/features/lib/_cython/linearSlope.pyx":27
+  /* "skimu/features/lib/_cython/linearSlope.pyx":27
  * cpdef linregress(const double[:] x, const double[:] y):
  *     cdef Py_ssize_t n = x.size
  *     if n != y.size:             # <<<<<<<<<<<<<<
@@ -2395,7 +2395,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_linregress
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (unlikely(__pyx_t_5)) {
 
-    /* "PfyMU/features/lib/_cython/linearSlope.pyx":28
+    /* "skimu/features/lib/_cython/linearSlope.pyx":28
  *     cdef Py_ssize_t n = x.size
  *     if n != y.size:
  *         raise ValueError('Inputs must be the same size.')             # <<<<<<<<<<<<<<
@@ -2408,7 +2408,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_linregress
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __PYX_ERR(0, 28, __pyx_L1_error)
 
-    /* "PfyMU/features/lib/_cython/linearSlope.pyx":27
+    /* "skimu/features/lib/_cython/linearSlope.pyx":27
  * cpdef linregress(const double[:] x, const double[:] y):
  *     cdef Py_ssize_t n = x.size
  *     if n != y.size:             # <<<<<<<<<<<<<<
@@ -2417,7 +2417,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_linregress
  */
   }
 
-  /* "PfyMU/features/lib/_cython/linearSlope.pyx":29
+  /* "skimu/features/lib/_cython/linearSlope.pyx":29
  *     if n != y.size:
  *         raise ValueError('Inputs must be the same size.')
  *     if n < 2:             # <<<<<<<<<<<<<<
@@ -2427,7 +2427,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_linregress
   __pyx_t_5 = ((__pyx_v_n < 2) != 0);
   if (unlikely(__pyx_t_5)) {
 
-    /* "PfyMU/features/lib/_cython/linearSlope.pyx":30
+    /* "skimu/features/lib/_cython/linearSlope.pyx":30
  *         raise ValueError('Inputs must be the same size.')
  *     if n < 2:
  *         raise ValueError('Inputs must have more than 1 element.')             # <<<<<<<<<<<<<<
@@ -2440,7 +2440,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_linregress
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __PYX_ERR(0, 30, __pyx_L1_error)
 
-    /* "PfyMU/features/lib/_cython/linearSlope.pyx":29
+    /* "skimu/features/lib/_cython/linearSlope.pyx":29
  *     if n != y.size:
  *         raise ValueError('Inputs must be the same size.')
  *     if n < 2:             # <<<<<<<<<<<<<<
@@ -2449,64 +2449,64 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_linregress
  */
   }
 
-  /* "PfyMU/features/lib/_cython/linearSlope.pyx":35
+  /* "skimu/features/lib/_cython/linearSlope.pyx":35
  *     cdef double slope, intercept
  * 
  *     mean_1d(x, &xmean)             # <<<<<<<<<<<<<<
  *     mean_1d(y, &ymean)
  * 
  */
-  __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_1d(__pyx_v_x, (&__pyx_v_xmean));
+  __pyx_f_5skimu_8features_3lib_7_cython_6common_mean_1d(__pyx_v_x, (&__pyx_v_xmean));
 
-  /* "PfyMU/features/lib/_cython/linearSlope.pyx":36
+  /* "skimu/features/lib/_cython/linearSlope.pyx":36
  * 
  *     mean_1d(x, &xmean)
  *     mean_1d(y, &ymean)             # <<<<<<<<<<<<<<
  * 
  *     # average sum of squares
  */
-  __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_1d(__pyx_v_y, (&__pyx_v_ymean));
+  __pyx_f_5skimu_8features_3lib_7_cython_6common_mean_1d(__pyx_v_y, (&__pyx_v_ymean));
 
-  /* "PfyMU/features/lib/_cython/linearSlope.pyx":39
+  /* "skimu/features/lib/_cython/linearSlope.pyx":39
  * 
  *     # average sum of squares
  *     ssxm = covariance(x, x, 0)             # <<<<<<<<<<<<<<
  *     ssym = covariance(y, y, 0)
  *     ssxym = covariance(x, y, 0)
  */
-  __pyx_t_1 = __pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_covariance(__pyx_v_x, __pyx_v_x, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 39, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5skimu_8features_3lib_7_cython_11linearSlope_covariance(__pyx_v_x, __pyx_v_x, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 39, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_6 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_6 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 39, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_ssxm = __pyx_t_6;
 
-  /* "PfyMU/features/lib/_cython/linearSlope.pyx":40
+  /* "skimu/features/lib/_cython/linearSlope.pyx":40
  *     # average sum of squares
  *     ssxm = covariance(x, x, 0)
  *     ssym = covariance(y, y, 0)             # <<<<<<<<<<<<<<
  *     ssxym = covariance(x, y, 0)
  * 
  */
-  __pyx_t_1 = __pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_covariance(__pyx_v_y, __pyx_v_y, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 40, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5skimu_8features_3lib_7_cython_11linearSlope_covariance(__pyx_v_y, __pyx_v_y, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 40, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_6 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_6 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 40, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_ssym = __pyx_t_6;
 
-  /* "PfyMU/features/lib/_cython/linearSlope.pyx":41
+  /* "skimu/features/lib/_cython/linearSlope.pyx":41
  *     ssxm = covariance(x, x, 0)
  *     ssym = covariance(y, y, 0)
  *     ssxym = covariance(x, y, 0)             # <<<<<<<<<<<<<<
  * 
  *     slope = ssxym / ssxm
  */
-  __pyx_t_1 = __pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_covariance(__pyx_v_x, __pyx_v_y, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 41, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5skimu_8features_3lib_7_cython_11linearSlope_covariance(__pyx_v_x, __pyx_v_y, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 41, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_6 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_6 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 41, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_ssxym = __pyx_t_6;
 
-  /* "PfyMU/features/lib/_cython/linearSlope.pyx":43
+  /* "skimu/features/lib/_cython/linearSlope.pyx":43
  *     ssxym = covariance(x, y, 0)
  * 
  *     slope = ssxym / ssxm             # <<<<<<<<<<<<<<
@@ -2519,7 +2519,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_linregress
   }
   __pyx_v_slope = (__pyx_v_ssxym / __pyx_v_ssxm);
 
-  /* "PfyMU/features/lib/_cython/linearSlope.pyx":44
+  /* "skimu/features/lib/_cython/linearSlope.pyx":44
  * 
  *     slope = ssxym / ssxm
  *     intercept = ymean - slope * xmean             # <<<<<<<<<<<<<<
@@ -2528,7 +2528,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_linregress
  */
   __pyx_v_intercept = (__pyx_v_ymean - (__pyx_v_slope * __pyx_v_xmean));
 
-  /* "PfyMU/features/lib/_cython/linearSlope.pyx":46
+  /* "skimu/features/lib/_cython/linearSlope.pyx":46
  *     intercept = ymean - slope * xmean
  * 
  *     return slope, intercept             # <<<<<<<<<<<<<<
@@ -2552,7 +2552,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_linregress
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "PfyMU/features/lib/_cython/linearSlope.pyx":25
+  /* "skimu/features/lib/_cython/linearSlope.pyx":25
  * 
  * 
  * cpdef linregress(const double[:] x, const double[:] y):             # <<<<<<<<<<<<<<
@@ -2565,7 +2565,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_linregress
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.linearSlope.linregress", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.linearSlope.linregress", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -2574,8 +2574,8 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_linregress
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_11linearSlope_3linregress(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_11linearSlope_3linregress(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_11linearSlope_3linregress(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_11linearSlope_3linregress(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_x = { 0, 0, { 0 }, { 0 }, { 0 } };
   __Pyx_memviewslice __pyx_v_y = { 0, 0, { 0 }, { 0 }, { 0 } };
   int __pyx_lineno = 0;
@@ -2626,18 +2626,18 @@ static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_11linearSlope_3linregre
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("linregress", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 25, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.linearSlope.linregress", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.linearSlope.linregress", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5PfyMU_8features_3lib_7_cython_11linearSlope_2linregress(__pyx_self, __pyx_v_x, __pyx_v_y);
+  __pyx_r = __pyx_pf_5skimu_8features_3lib_7_cython_11linearSlope_2linregress(__pyx_self, __pyx_v_x, __pyx_v_y);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_11linearSlope_2linregress(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, __Pyx_memviewslice __pyx_v_y) {
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_11linearSlope_2linregress(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, __Pyx_memviewslice __pyx_v_y) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -2648,7 +2648,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_11linearSlope_2linregre
   __Pyx_XDECREF(__pyx_r);
   if (unlikely(!__pyx_v_x.memview)) { __Pyx_RaiseUnboundLocalError("x"); __PYX_ERR(0, 25, __pyx_L1_error) }
   if (unlikely(!__pyx_v_y.memview)) { __Pyx_RaiseUnboundLocalError("y"); __PYX_ERR(0, 25, __pyx_L1_error) }
-  __pyx_t_1 = __pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_linregress(__pyx_v_x, __pyx_v_y, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 25, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5skimu_8features_3lib_7_cython_11linearSlope_linregress(__pyx_v_x, __pyx_v_y, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 25, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -2657,7 +2657,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_11linearSlope_2linregre
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.linearSlope.linregress", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.linearSlope.linregress", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __PYX_XDEC_MEMVIEW(&__pyx_v_x, 1);
@@ -2667,7 +2667,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_11linearSlope_2linregre
   return __pyx_r;
 }
 
-/* "PfyMU/features/lib/_cython/linearSlope.pyx":49
+/* "skimu/features/lib/_cython/linearSlope.pyx":49
  * 
  * 
  * cpdef LinRegression(const double[:] x, const double[:, :, :] y):             # <<<<<<<<<<<<<<
@@ -2675,8 +2675,8 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_11linearSlope_2linregre
  * 
  */
 
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_11linearSlope_5LinRegression(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_LinRegression(__Pyx_memviewslice __pyx_v_x, __Pyx_memviewslice __pyx_v_y, CYTHON_UNUSED int __pyx_skip_dispatch) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_11linearSlope_5LinRegression(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_f_5skimu_8features_3lib_7_cython_11linearSlope_LinRegression(__Pyx_memviewslice __pyx_v_x, __Pyx_memviewslice __pyx_v_y, CYTHON_UNUSED int __pyx_skip_dispatch) {
   Py_ssize_t __pyx_v_m;
   Py_ssize_t __pyx_v_p;
   Py_ssize_t __pyx_v_i;
@@ -2711,7 +2711,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_LinRegress
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("LinRegression", 0);
 
-  /* "PfyMU/features/lib/_cython/linearSlope.pyx":50
+  /* "skimu/features/lib/_cython/linearSlope.pyx":50
  * 
  * cpdef LinRegression(const double[:] x, const double[:, :, :] y):
  *     cdef Py_ssize_t m = y.shape[0], p = y.shape[2], i, k             # <<<<<<<<<<<<<<
@@ -2721,7 +2721,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_LinRegress
   __pyx_v_m = (__pyx_v_y.shape[0]);
   __pyx_v_p = (__pyx_v_y.shape[2]);
 
-  /* "PfyMU/features/lib/_cython/linearSlope.pyx":52
+  /* "skimu/features/lib/_cython/linearSlope.pyx":52
  *     cdef Py_ssize_t m = y.shape[0], p = y.shape[2], i, k
  * 
  *     slp = zeros((m, p), dtype=npy_double)             # <<<<<<<<<<<<<<
@@ -2761,7 +2761,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_LinRegress
   __pyx_v_slp = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "PfyMU/features/lib/_cython/linearSlope.pyx":53
+  /* "skimu/features/lib/_cython/linearSlope.pyx":53
  * 
  *     slp = zeros((m, p), dtype=npy_double)
  *     itcpt = zeros((m, p), dtype=npy_double)             # <<<<<<<<<<<<<<
@@ -2801,7 +2801,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_LinRegress
   __pyx_v_itcpt = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "PfyMU/features/lib/_cython/linearSlope.pyx":54
+  /* "skimu/features/lib/_cython/linearSlope.pyx":54
  *     slp = zeros((m, p), dtype=npy_double)
  *     itcpt = zeros((m, p), dtype=npy_double)
  *     cdef double[:, :] slope = slp, intercept = itcpt             # <<<<<<<<<<<<<<
@@ -2817,7 +2817,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_LinRegress
   __pyx_t_5.memview = NULL;
   __pyx_t_5.data = NULL;
 
-  /* "PfyMU/features/lib/_cython/linearSlope.pyx":57
+  /* "skimu/features/lib/_cython/linearSlope.pyx":57
  *     cdef double[:, :]  x2d
  * 
  *     for i in range(m):             # <<<<<<<<<<<<<<
@@ -2829,7 +2829,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_LinRegress
   for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
     __pyx_v_i = __pyx_t_8;
 
-    /* "PfyMU/features/lib/_cython/linearSlope.pyx":58
+    /* "skimu/features/lib/_cython/linearSlope.pyx":58
  * 
  *     for i in range(m):
  *         for k in range(p):             # <<<<<<<<<<<<<<
@@ -2841,7 +2841,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_LinRegress
     for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_10; __pyx_t_11+=1) {
       __pyx_v_k = __pyx_t_11;
 
-      /* "PfyMU/features/lib/_cython/linearSlope.pyx":59
+      /* "skimu/features/lib/_cython/linearSlope.pyx":59
  *     for i in range(m):
  *         for k in range(p):
  *             slope[i, k], intercept[i, k] = linregress(x, y[i, :, k])             # <<<<<<<<<<<<<<
@@ -2873,7 +2873,7 @@ __pyx_t_12.strides[0] = __pyx_v_y.strides[1];
         __pyx_t_12.data += __pyx_tmp_idx * __pyx_tmp_stride;
 }
 
-__pyx_t_4 = __pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_linregress(__pyx_v_x, __pyx_t_12, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 59, __pyx_L1_error)
+__pyx_t_4 = __pyx_f_5skimu_8features_3lib_7_cython_11linearSlope_linregress(__pyx_v_x, __pyx_t_12, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 59, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __PYX_XDEC_MEMVIEW(&__pyx_t_12, 1);
       __pyx_t_12.memview = NULL;
@@ -2941,7 +2941,7 @@ __pyx_t_4 = __pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_linregress(__py
     }
   }
 
-  /* "PfyMU/features/lib/_cython/linearSlope.pyx":61
+  /* "skimu/features/lib/_cython/linearSlope.pyx":61
  *             slope[i, k], intercept[i, k] = linregress(x, y[i, :, k])
  * 
  *     return slp, itcpt             # <<<<<<<<<<<<<<
@@ -2960,7 +2960,7 @@ __pyx_t_4 = __pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_linregress(__py
   __pyx_t_4 = 0;
   goto __pyx_L0;
 
-  /* "PfyMU/features/lib/_cython/linearSlope.pyx":49
+  /* "skimu/features/lib/_cython/linearSlope.pyx":49
  * 
  * 
  * cpdef LinRegression(const double[:] x, const double[:, :, :] y):             # <<<<<<<<<<<<<<
@@ -2976,7 +2976,7 @@ __pyx_t_4 = __pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_linregress(__py
   __Pyx_XDECREF(__pyx_t_4);
   __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_t_12, 1);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.linearSlope.LinRegression", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.linearSlope.LinRegression", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_slp);
@@ -2989,8 +2989,8 @@ __pyx_t_4 = __pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_linregress(__py
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_11linearSlope_5LinRegression(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_11linearSlope_5LinRegression(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_11linearSlope_5LinRegression(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_11linearSlope_5LinRegression(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_x = { 0, 0, { 0 }, { 0 }, { 0 } };
   __Pyx_memviewslice __pyx_v_y = { 0, 0, { 0 }, { 0 }, { 0 } };
   int __pyx_lineno = 0;
@@ -3041,18 +3041,18 @@ static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_11linearSlope_5LinRegre
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("LinRegression", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 49, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.linearSlope.LinRegression", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.linearSlope.LinRegression", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5PfyMU_8features_3lib_7_cython_11linearSlope_4LinRegression(__pyx_self, __pyx_v_x, __pyx_v_y);
+  __pyx_r = __pyx_pf_5skimu_8features_3lib_7_cython_11linearSlope_4LinRegression(__pyx_self, __pyx_v_x, __pyx_v_y);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_11linearSlope_4LinRegression(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, __Pyx_memviewslice __pyx_v_y) {
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_11linearSlope_4LinRegression(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, __Pyx_memviewslice __pyx_v_y) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -3063,7 +3063,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_11linearSlope_4LinRegre
   __Pyx_XDECREF(__pyx_r);
   if (unlikely(!__pyx_v_x.memview)) { __Pyx_RaiseUnboundLocalError("x"); __PYX_ERR(0, 49, __pyx_L1_error) }
   if (unlikely(!__pyx_v_y.memview)) { __Pyx_RaiseUnboundLocalError("y"); __PYX_ERR(0, 49, __pyx_L1_error) }
-  __pyx_t_1 = __pyx_f_5PfyMU_8features_3lib_7_cython_11linearSlope_LinRegression(__pyx_v_x, __pyx_v_y, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 49, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5skimu_8features_3lib_7_cython_11linearSlope_LinRegression(__pyx_v_x, __pyx_v_y, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 49, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -3072,7 +3072,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_11linearSlope_4LinRegre
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.linearSlope.LinRegression", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.linearSlope.LinRegression", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __PYX_XDEC_MEMVIEW(&__pyx_v_x, 1);
@@ -16222,7 +16222,7 @@ static PyBufferProcs __pyx_tp_as_buffer_array = {
 
 static PyTypeObject __pyx_type___pyx_array = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.linearSlope.array", /*tp_name*/
+  "skimu.features.lib._cython.linearSlope.array", /*tp_name*/
   sizeof(struct __pyx_array_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc_array, /*tp_dealloc*/
@@ -16341,7 +16341,7 @@ static PyMethodDef __pyx_methods_Enum[] = {
 
 static PyTypeObject __pyx_type___pyx_MemviewEnum = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.linearSlope.Enum", /*tp_name*/
+  "skimu.features.lib._cython.linearSlope.Enum", /*tp_name*/
   sizeof(struct __pyx_MemviewEnum_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc_Enum, /*tp_dealloc*/
@@ -16602,7 +16602,7 @@ static PyBufferProcs __pyx_tp_as_buffer_memoryview = {
 
 static PyTypeObject __pyx_type___pyx_memoryview = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.linearSlope.memoryview", /*tp_name*/
+  "skimu.features.lib._cython.linearSlope.memoryview", /*tp_name*/
   sizeof(struct __pyx_memoryview_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc_memoryview, /*tp_dealloc*/
@@ -16740,7 +16740,7 @@ static struct PyGetSetDef __pyx_getsets__memoryviewslice[] = {
 
 static PyTypeObject __pyx_type___pyx_memoryviewslice = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.linearSlope._memoryviewslice", /*tp_name*/
+  "skimu.features.lib._cython.linearSlope._memoryviewslice", /*tp_name*/
   sizeof(struct __pyx_memoryviewslice_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc__memoryviewslice, /*tp_dealloc*/
@@ -16816,9 +16816,9 @@ static PyTypeObject __pyx_type___pyx_memoryviewslice = {
 };
 
 static PyMethodDef __pyx_methods[] = {
-  {"covariance", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5PfyMU_8features_3lib_7_cython_11linearSlope_1covariance, METH_VARARGS|METH_KEYWORDS, 0},
-  {"linregress", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5PfyMU_8features_3lib_7_cython_11linearSlope_3linregress, METH_VARARGS|METH_KEYWORDS, 0},
-  {"LinRegression", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5PfyMU_8features_3lib_7_cython_11linearSlope_5LinRegression, METH_VARARGS|METH_KEYWORDS, 0},
+  {"covariance", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5skimu_8features_3lib_7_cython_11linearSlope_1covariance, METH_VARARGS|METH_KEYWORDS, 0},
+  {"linregress", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5skimu_8features_3lib_7_cython_11linearSlope_3linregress, METH_VARARGS|METH_KEYWORDS, 0},
+  {"LinRegression", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5skimu_8features_3lib_7_cython_11linearSlope_5LinRegression, METH_VARARGS|METH_KEYWORDS, 0},
   {0, 0, 0, 0}
 };
 
@@ -16981,7 +16981,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "PfyMU/features/lib/_cython/linearSlope.pyx":28
+  /* "skimu/features/lib/_cython/linearSlope.pyx":28
  *     cdef Py_ssize_t n = x.size
  *     if n != y.size:
  *         raise ValueError('Inputs must be the same size.')             # <<<<<<<<<<<<<<
@@ -16992,7 +16992,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple_);
   __Pyx_GIVEREF(__pyx_tuple_);
 
-  /* "PfyMU/features/lib/_cython/linearSlope.pyx":30
+  /* "skimu/features/lib/_cython/linearSlope.pyx":30
  *         raise ValueError('Inputs must be the same size.')
  *     if n < 2:
  *         raise ValueError('Inputs must have more than 1 element.')             # <<<<<<<<<<<<<<
@@ -17403,8 +17403,8 @@ static int __Pyx_modinit_function_import_code(void) {
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__Pyx_modinit_function_import_code", 0);
   /*--- Function import code ---*/
-  __pyx_t_1 = PyImport_ImportModule("PfyMU.features.lib._cython.common"); if (!__pyx_t_1) __PYX_ERR(0, 1, __pyx_L1_error)
-  if (__Pyx_ImportFunction(__pyx_t_1, "mean_1d", (void (**)(void))&__pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_1d, "void (__Pyx_memviewslice, double *)") < 0) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_t_1 = PyImport_ImportModule("skimu.features.lib._cython.common"); if (!__pyx_t_1) __PYX_ERR(0, 1, __pyx_L1_error)
+  if (__Pyx_ImportFunction(__pyx_t_1, "mean_1d", (void (**)(void))&__pyx_f_5skimu_8features_3lib_7_cython_6common_mean_1d, "void (__Pyx_memviewslice, double *)") < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   Py_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_RefNannyFinishContext();
   return 0;
@@ -17590,14 +17590,14 @@ if (!__Pyx_RefNanny) {
   #if PY_MAJOR_VERSION < 3 && (__PYX_DEFAULT_STRING_ENCODING_IS_ASCII || __PYX_DEFAULT_STRING_ENCODING_IS_DEFAULT)
   if (__Pyx_init_sys_getdefaultencoding_params() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
-  if (__pyx_module_is_main_PfyMU__features__lib___cython__linearSlope) {
+  if (__pyx_module_is_main_skimu__features__lib___cython__linearSlope) {
     if (PyObject_SetAttr(__pyx_m, __pyx_n_s_name_2, __pyx_n_s_main) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   }
   #if PY_MAJOR_VERSION >= 3
   {
     PyObject *modules = PyImport_GetModuleDict(); if (unlikely(!modules)) __PYX_ERR(0, 1, __pyx_L1_error)
-    if (!PyDict_GetItemString(modules, "PfyMU.features.lib._cython.linearSlope")) {
-      if (unlikely(PyDict_SetItemString(modules, "PfyMU.features.lib._cython.linearSlope", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
+    if (!PyDict_GetItemString(modules, "skimu.features.lib._cython.linearSlope")) {
+      if (unlikely(PyDict_SetItemString(modules, "skimu.features.lib._cython.linearSlope", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
     }
   }
   #endif
@@ -17618,7 +17618,7 @@ if (!__Pyx_RefNanny) {
   if (__Pyx_patch_abc() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
 
-  /* "PfyMU/features/lib/_cython/linearSlope.pyx":5
+  /* "skimu/features/lib/_cython/linearSlope.pyx":5
  * # cython: boundscheck = False
  * cimport cython
  * from numpy import zeros, double as npy_double, reshape             # <<<<<<<<<<<<<<
@@ -17653,7 +17653,7 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "PfyMU/features/lib/_cython/linearSlope.pyx":1
+  /* "skimu/features/lib/_cython/linearSlope.pyx":1
  * # cython: infer_types = True             # <<<<<<<<<<<<<<
  * # cython: wraparound = True
  * # cython: boundscheck = False
@@ -17824,11 +17824,11 @@ if (!__Pyx_RefNanny) {
   __Pyx_XDECREF(__pyx_t_2);
   if (__pyx_m) {
     if (__pyx_d) {
-      __Pyx_AddTraceback("init PfyMU.features.lib._cython.linearSlope", __pyx_clineno, __pyx_lineno, __pyx_filename);
+      __Pyx_AddTraceback("init skimu.features.lib._cython.linearSlope", __pyx_clineno, __pyx_lineno, __pyx_filename);
     }
     Py_CLEAR(__pyx_m);
   } else if (!PyErr_Occurred()) {
-    PyErr_SetString(PyExc_ImportError, "init PfyMU.features.lib._cython.linearSlope");
+    PyErr_SetString(PyExc_ImportError, "init skimu.features.lib._cython.linearSlope");
   }
   __pyx_L0:;
   __Pyx_RefNannyFinishContext();

@@ -4,12 +4,12 @@
 {
     "distutils": {
         "depends": [],
-        "name": "PfyMU.features.lib._cython.ratioBeyondRSigma",
+        "name": "skimu.features.lib._cython.ratioBeyondRSigma",
         "sources": [
-            "src/PfyMU/features/lib/_cython/ratioBeyondRSigma.pyx"
+            "src/skimu/features/lib/_cython/ratioBeyondRSigma.pyx"
         ]
     },
-    "module_name": "PfyMU.features.lib._cython.ratioBeyondRSigma"
+    "module_name": "skimu.features.lib._cython.ratioBeyondRSigma"
 }
 END: Cython Metadata */
 
@@ -604,8 +604,8 @@ static CYTHON_INLINE float __PYX_NAN() {
   #endif
 #endif
 
-#define __PYX_HAVE__PfyMU__features__lib___cython__ratioBeyondRSigma
-#define __PYX_HAVE_API__PfyMU__features__lib___cython__ratioBeyondRSigma
+#define __PYX_HAVE__skimu__features__lib___cython__ratioBeyondRSigma
+#define __PYX_HAVE_API__skimu__features__lib___cython__ratioBeyondRSigma
 /* Early includes */
 #include <math.h>
 #include "pythread.h"
@@ -821,7 +821,7 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "src/PfyMU/features/lib/_cython/ratioBeyondRSigma.pyx",
+  "src/skimu/features/lib/_cython/ratioBeyondRSigma.pyx",
   "stringsource",
 };
 /* MemviewSliceStruct.proto */
@@ -1692,10 +1692,10 @@ static PyObject *__pyx_memoryviewslice_assign_item_from_object(struct __pyx_memo
 
 /* Module declarations from 'libc.math' */
 
-/* Module declarations from 'PfyMU.features.lib._cython.common' */
-static void (*__pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d)(__Pyx_memviewslice, double *, double *); /*proto*/
+/* Module declarations from 'skimu.features.lib._cython.common' */
+static void (*__pyx_f_5skimu_8features_3lib_7_cython_6common_mean_sd_1d)(__Pyx_memviewslice, double *, double *); /*proto*/
 
-/* Module declarations from 'PfyMU.features.lib._cython.ratioBeyondRSigma' */
+/* Module declarations from 'skimu.features.lib._cython.ratioBeyondRSigma' */
 static PyTypeObject *__pyx_array_type = 0;
 static PyTypeObject *__pyx_MemviewEnum_type = 0;
 static PyTypeObject *__pyx_memoryview_type = 0;
@@ -1742,11 +1742,11 @@ static void __pyx_memoryview__slice_assign_scalar(char *, Py_ssize_t *, Py_ssize
 static PyObject *__pyx_unpickle_Enum__set_state(struct __pyx_MemviewEnum_obj *, PyObject *); /*proto*/
 static __Pyx_TypeInfo __Pyx_TypeInfo_double__const__ = { "const double", NULL, sizeof(double const ), { 0 }, 0, 'R', 0, 0 };
 static __Pyx_TypeInfo __Pyx_TypeInfo_double = { "double", NULL, sizeof(double), { 0 }, 0, 'R', 0, 0 };
-#define __Pyx_MODULE_NAME "PfyMU.features.lib._cython.ratioBeyondRSigma"
-extern int __pyx_module_is_main_PfyMU__features__lib___cython__ratioBeyondRSigma;
-int __pyx_module_is_main_PfyMU__features__lib___cython__ratioBeyondRSigma = 0;
+#define __Pyx_MODULE_NAME "skimu.features.lib._cython.ratioBeyondRSigma"
+extern int __pyx_module_is_main_skimu__features__lib___cython__ratioBeyondRSigma;
+int __pyx_module_is_main_skimu__features__lib___cython__ratioBeyondRSigma = 0;
 
-/* Implementation of 'PfyMU.features.lib._cython.ratioBeyondRSigma' */
+/* Implementation of 'skimu.features.lib._cython.ratioBeyondRSigma' */
 static PyObject *__pyx_builtin_range;
 static PyObject *__pyx_builtin_ValueError;
 static PyObject *__pyx_builtin_MemoryError;
@@ -1855,11 +1855,11 @@ static const char __pyx_k_Incompatible_checksums_s_vs_0xb0[] = "Incompatible che
 static const char __pyx_k_Indirect_dimensions_not_supporte[] = "Indirect dimensions not supported";
 static const char __pyx_k_Invalid_mode_expected_c_or_fortr[] = "Invalid mode, expected 'c' or 'fortran', got %s";
 static const char __pyx_k_Out_of_bounds_on_buffer_access_a[] = "Out of bounds on buffer access (axis %d)";
-static const char __pyx_k_PfyMU_features_lib__cython_ratio[] = "PfyMU.features.lib._cython.ratioBeyondRSigma";
 static const char __pyx_k_Unable_to_convert_item_to_object[] = "Unable to convert item to object";
 static const char __pyx_k_got_differing_extents_in_dimensi[] = "got differing extents in dimension %d (got %d and %d)";
 static const char __pyx_k_no_default___reduce___due_to_non[] = "no default __reduce__ due to non-trivial __cinit__";
-static const char __pyx_k_src_PfyMU_features_lib__cython_r[] = "src/PfyMU/features/lib/_cython/ratioBeyondRSigma.pyx";
+static const char __pyx_k_skimu_features_lib__cython_ratio[] = "skimu.features.lib._cython.ratioBeyondRSigma";
+static const char __pyx_k_src_skimu_features_lib__cython_r[] = "src/skimu/features/lib/_cython/ratioBeyondRSigma.pyx";
 static const char __pyx_k_unable_to_allocate_shape_and_str[] = "unable to allocate shape and strides.";
 static PyObject *__pyx_n_s_ASCII;
 static PyObject *__pyx_kp_s_Buffer_view_does_not_expose_stri;
@@ -1880,7 +1880,6 @@ static PyObject *__pyx_kp_s_MemoryView_of_r_at_0x_x;
 static PyObject *__pyx_kp_s_MemoryView_of_r_object;
 static PyObject *__pyx_n_b_O;
 static PyObject *__pyx_kp_s_Out_of_bounds_on_buffer_access_a;
-static PyObject *__pyx_n_s_PfyMU_features_lib__cython_ratio;
 static PyObject *__pyx_n_s_PickleError;
 static PyObject *__pyx_n_s_RatioBeyondRSigma;
 static PyObject *__pyx_n_s_TypeError;
@@ -1952,7 +1951,8 @@ static PyObject *__pyx_n_s_setstate_cython;
 static PyObject *__pyx_n_s_shape;
 static PyObject *__pyx_n_s_sigma;
 static PyObject *__pyx_n_s_size;
-static PyObject *__pyx_kp_s_src_PfyMU_features_lib__cython_r;
+static PyObject *__pyx_n_s_skimu_features_lib__cython_ratio;
+static PyObject *__pyx_kp_s_src_skimu_features_lib__cython_r;
 static PyObject *__pyx_n_s_start;
 static PyObject *__pyx_n_s_step;
 static PyObject *__pyx_n_s_stop;
@@ -1969,7 +1969,7 @@ static PyObject *__pyx_n_s_update;
 static PyObject *__pyx_n_s_x;
 static PyObject *__pyx_n_s_xcount;
 static PyObject *__pyx_n_s_zeros;
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17ratioBeyondRSigma_RatioBeyondRSigma(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_r); /* proto */
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_17ratioBeyondRSigma_RatioBeyondRSigma(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_r); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __pyx_array_obj *__pyx_v_self, PyObject *__pyx_v_shape, Py_ssize_t __pyx_v_itemsize, PyObject *__pyx_v_format, PyObject *__pyx_v_mode, int __pyx_v_allocate_buffer); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array_2__getbuffer__(struct __pyx_array_obj *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
 static void __pyx_array___pyx_pf_15View_dot_MemoryView_5array_4__dealloc__(struct __pyx_array_obj *__pyx_v_self); /* proto */
@@ -2049,7 +2049,7 @@ static PyObject *__pyx_codeobj__20;
 static PyObject *__pyx_codeobj__27;
 /* Late includes */
 
-/* "PfyMU/features/lib/_cython/ratioBeyondRSigma.pyx":10
+/* "skimu/features/lib/_cython/ratioBeyondRSigma.pyx":10
  * 
  * 
  * def RatioBeyondRSigma(const double[:, :, :] x, double r):             # <<<<<<<<<<<<<<
@@ -2058,9 +2058,9 @@ static PyObject *__pyx_codeobj__27;
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17ratioBeyondRSigma_1RatioBeyondRSigma(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_5PfyMU_8features_3lib_7_cython_17ratioBeyondRSigma_1RatioBeyondRSigma = {"RatioBeyondRSigma", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5PfyMU_8features_3lib_7_cython_17ratioBeyondRSigma_1RatioBeyondRSigma, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17ratioBeyondRSigma_1RatioBeyondRSigma(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_17ratioBeyondRSigma_1RatioBeyondRSigma(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_5skimu_8features_3lib_7_cython_17ratioBeyondRSigma_1RatioBeyondRSigma = {"RatioBeyondRSigma", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5skimu_8features_3lib_7_cython_17ratioBeyondRSigma_1RatioBeyondRSigma, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_17ratioBeyondRSigma_1RatioBeyondRSigma(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_x = { 0, 0, { 0 }, { 0 }, { 0 } };
   double __pyx_v_r;
   int __pyx_lineno = 0;
@@ -2111,18 +2111,18 @@ static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17ratioBeyondRSigma_1Ra
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("RatioBeyondRSigma", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 10, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.ratioBeyondRSigma.RatioBeyondRSigma", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.ratioBeyondRSigma.RatioBeyondRSigma", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5PfyMU_8features_3lib_7_cython_17ratioBeyondRSigma_RatioBeyondRSigma(__pyx_self, __pyx_v_x, __pyx_v_r);
+  __pyx_r = __pyx_pf_5skimu_8features_3lib_7_cython_17ratioBeyondRSigma_RatioBeyondRSigma(__pyx_self, __pyx_v_x, __pyx_v_r);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17ratioBeyondRSigma_RatioBeyondRSigma(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_r) {
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_17ratioBeyondRSigma_RatioBeyondRSigma(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_r) {
   Py_ssize_t __pyx_v_m;
   Py_ssize_t __pyx_v_n;
   Py_ssize_t __pyx_v_p;
@@ -2160,7 +2160,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17ratioBeyondRSigma_Rat
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("RatioBeyondRSigma", 0);
 
-  /* "PfyMU/features/lib/_cython/ratioBeyondRSigma.pyx":11
+  /* "skimu/features/lib/_cython/ratioBeyondRSigma.pyx":11
  * 
  * def RatioBeyondRSigma(const double[:, :, :] x, double r):
  *     cdef Py_ssize_t m = x.shape[0], n = x.shape[1], p = x.shape[2], i, j, k             # <<<<<<<<<<<<<<
@@ -2171,7 +2171,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17ratioBeyondRSigma_Rat
   __pyx_v_n = (__pyx_v_x.shape[1]);
   __pyx_v_p = (__pyx_v_x.shape[2]);
 
-  /* "PfyMU/features/lib/_cython/ratioBeyondRSigma.pyx":12
+  /* "skimu/features/lib/_cython/ratioBeyondRSigma.pyx":12
  * def RatioBeyondRSigma(const double[:, :, :] x, double r):
  *     cdef Py_ssize_t m = x.shape[0], n = x.shape[1], p = x.shape[2], i, j, k
  *     xcount = zeros((m, p), dtype=npy_double, order='C')             # <<<<<<<<<<<<<<
@@ -2212,7 +2212,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17ratioBeyondRSigma_Rat
   __pyx_v_xcount = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "PfyMU/features/lib/_cython/ratioBeyondRSigma.pyx":13
+  /* "skimu/features/lib/_cython/ratioBeyondRSigma.pyx":13
  *     cdef Py_ssize_t m = x.shape[0], n = x.shape[1], p = x.shape[2], i, j, k
  *     xcount = zeros((m, p), dtype=npy_double, order='C')
  *     cdef double[:, ::1] count = xcount             # <<<<<<<<<<<<<<
@@ -2224,7 +2224,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17ratioBeyondRSigma_Rat
   __pyx_t_5.memview = NULL;
   __pyx_t_5.data = NULL;
 
-  /* "PfyMU/features/lib/_cython/ratioBeyondRSigma.pyx":14
+  /* "skimu/features/lib/_cython/ratioBeyondRSigma.pyx":14
  *     xcount = zeros((m, p), dtype=npy_double, order='C')
  *     cdef double[:, ::1] count = xcount
  *     cdef double mu = 0., sigma = 0.             # <<<<<<<<<<<<<<
@@ -2234,7 +2234,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17ratioBeyondRSigma_Rat
   __pyx_v_mu = 0.;
   __pyx_v_sigma = 0.;
 
-  /* "PfyMU/features/lib/_cython/ratioBeyondRSigma.pyx":16
+  /* "skimu/features/lib/_cython/ratioBeyondRSigma.pyx":16
  *     cdef double mu = 0., sigma = 0.
  * 
  *     for i in range(m):             # <<<<<<<<<<<<<<
@@ -2246,7 +2246,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17ratioBeyondRSigma_Rat
   for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
     __pyx_v_i = __pyx_t_8;
 
-    /* "PfyMU/features/lib/_cython/ratioBeyondRSigma.pyx":17
+    /* "skimu/features/lib/_cython/ratioBeyondRSigma.pyx":17
  * 
  *     for i in range(m):
  *         for k in range(p):             # <<<<<<<<<<<<<<
@@ -2258,7 +2258,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17ratioBeyondRSigma_Rat
     for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_10; __pyx_t_11+=1) {
       __pyx_v_k = __pyx_t_11;
 
-      /* "PfyMU/features/lib/_cython/ratioBeyondRSigma.pyx":18
+      /* "skimu/features/lib/_cython/ratioBeyondRSigma.pyx":18
  *     for i in range(m):
  *         for k in range(p):
  *             mu = 0.             # <<<<<<<<<<<<<<
@@ -2267,7 +2267,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17ratioBeyondRSigma_Rat
  */
       __pyx_v_mu = 0.;
 
-      /* "PfyMU/features/lib/_cython/ratioBeyondRSigma.pyx":19
+      /* "skimu/features/lib/_cython/ratioBeyondRSigma.pyx":19
  *         for k in range(p):
  *             mu = 0.
  *             sigma = 0.             # <<<<<<<<<<<<<<
@@ -2276,7 +2276,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17ratioBeyondRSigma_Rat
  */
       __pyx_v_sigma = 0.;
 
-      /* "PfyMU/features/lib/_cython/ratioBeyondRSigma.pyx":20
+      /* "skimu/features/lib/_cython/ratioBeyondRSigma.pyx":20
  *             mu = 0.
  *             sigma = 0.
  *             mean_sd_1d(x[i, :, k], &mu, &sigma)             # <<<<<<<<<<<<<<
@@ -2302,12 +2302,12 @@ __pyx_t_12.strides[0] = __pyx_v_x.strides[1];
         __pyx_t_12.data += __pyx_tmp_idx * __pyx_tmp_stride;
 }
 
-__pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_12, (&__pyx_v_mu), (&__pyx_v_sigma));
+__pyx_f_5skimu_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_12, (&__pyx_v_mu), (&__pyx_v_sigma));
       __PYX_XDEC_MEMVIEW(&__pyx_t_12, 1);
       __pyx_t_12.memview = NULL;
       __pyx_t_12.data = NULL;
 
-      /* "PfyMU/features/lib/_cython/ratioBeyondRSigma.pyx":21
+      /* "skimu/features/lib/_cython/ratioBeyondRSigma.pyx":21
  *             sigma = 0.
  *             mean_sd_1d(x[i, :, k], &mu, &sigma)
  *             sigma *= r             # <<<<<<<<<<<<<<
@@ -2316,7 +2316,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_12, (&__pyx_v_
  */
       __pyx_v_sigma = (__pyx_v_sigma * __pyx_v_r);
 
-      /* "PfyMU/features/lib/_cython/ratioBeyondRSigma.pyx":22
+      /* "skimu/features/lib/_cython/ratioBeyondRSigma.pyx":22
  *             mean_sd_1d(x[i, :, k], &mu, &sigma)
  *             sigma *= r
  *             for j in range(n):             # <<<<<<<<<<<<<<
@@ -2328,7 +2328,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_12, (&__pyx_v_
       for (__pyx_t_15 = 0; __pyx_t_15 < __pyx_t_14; __pyx_t_15+=1) {
         __pyx_v_j = __pyx_t_15;
 
-        /* "PfyMU/features/lib/_cython/ratioBeyondRSigma.pyx":23
+        /* "skimu/features/lib/_cython/ratioBeyondRSigma.pyx":23
  *             sigma *= r
  *             for j in range(n):
  *                 if (abs(x[i, j, k] - mu) > sigma):             # <<<<<<<<<<<<<<
@@ -2341,7 +2341,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_12, (&__pyx_v_
         __pyx_t_19 = ((fabs(((*((double const  *) ( /* dim=2 */ (( /* dim=1 */ (( /* dim=0 */ (__pyx_v_x.data + __pyx_t_16 * __pyx_v_x.strides[0]) ) + __pyx_t_17 * __pyx_v_x.strides[1]) ) + __pyx_t_18 * __pyx_v_x.strides[2]) ))) - __pyx_v_mu)) > __pyx_v_sigma) != 0);
         if (__pyx_t_19) {
 
-          /* "PfyMU/features/lib/_cython/ratioBeyondRSigma.pyx":24
+          /* "skimu/features/lib/_cython/ratioBeyondRSigma.pyx":24
  *             for j in range(n):
  *                 if (abs(x[i, j, k] - mu) > sigma):
  *                     count[i, k] += 1             # <<<<<<<<<<<<<<
@@ -2352,7 +2352,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_12, (&__pyx_v_
           __pyx_t_17 = __pyx_v_k;
           *((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_count.data + __pyx_t_18 * __pyx_v_count.strides[0]) )) + __pyx_t_17)) )) += 1.0;
 
-          /* "PfyMU/features/lib/_cython/ratioBeyondRSigma.pyx":23
+          /* "skimu/features/lib/_cython/ratioBeyondRSigma.pyx":23
  *             sigma *= r
  *             for j in range(n):
  *                 if (abs(x[i, j, k] - mu) > sigma):             # <<<<<<<<<<<<<<
@@ -2364,7 +2364,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_12, (&__pyx_v_
     }
   }
 
-  /* "PfyMU/features/lib/_cython/ratioBeyondRSigma.pyx":25
+  /* "skimu/features/lib/_cython/ratioBeyondRSigma.pyx":25
  *                 if (abs(x[i, j, k] - mu) > sigma):
  *                     count[i, k] += 1
  *     for i in range(m):             # <<<<<<<<<<<<<<
@@ -2376,7 +2376,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_12, (&__pyx_v_
   for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
     __pyx_v_i = __pyx_t_8;
 
-    /* "PfyMU/features/lib/_cython/ratioBeyondRSigma.pyx":26
+    /* "skimu/features/lib/_cython/ratioBeyondRSigma.pyx":26
  *                     count[i, k] += 1
  *     for i in range(m):
  *         for j in range(p):             # <<<<<<<<<<<<<<
@@ -2388,7 +2388,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_12, (&__pyx_v_
     for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_10; __pyx_t_11+=1) {
       __pyx_v_j = __pyx_t_11;
 
-      /* "PfyMU/features/lib/_cython/ratioBeyondRSigma.pyx":27
+      /* "skimu/features/lib/_cython/ratioBeyondRSigma.pyx":27
  *     for i in range(m):
  *         for j in range(p):
  *             count[i, j] /= n             # <<<<<<<<<<<<<<
@@ -2400,7 +2400,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_12, (&__pyx_v_
     }
   }
 
-  /* "PfyMU/features/lib/_cython/ratioBeyondRSigma.pyx":28
+  /* "skimu/features/lib/_cython/ratioBeyondRSigma.pyx":28
  *         for j in range(p):
  *             count[i, j] /= n
  *     return xcount             # <<<<<<<<<<<<<<
@@ -2410,7 +2410,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_12, (&__pyx_v_
   __pyx_r = __pyx_v_xcount;
   goto __pyx_L0;
 
-  /* "PfyMU/features/lib/_cython/ratioBeyondRSigma.pyx":10
+  /* "skimu/features/lib/_cython/ratioBeyondRSigma.pyx":10
  * 
  * 
  * def RatioBeyondRSigma(const double[:, :, :] x, double r):             # <<<<<<<<<<<<<<
@@ -2426,7 +2426,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_12, (&__pyx_v_
   __Pyx_XDECREF(__pyx_t_4);
   __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_t_12, 1);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.ratioBeyondRSigma.RatioBeyondRSigma", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.ratioBeyondRSigma.RatioBeyondRSigma", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_xcount);
@@ -15577,7 +15577,7 @@ static PyBufferProcs __pyx_tp_as_buffer_array = {
 
 static PyTypeObject __pyx_type___pyx_array = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.ratioBeyondRSigma.array", /*tp_name*/
+  "skimu.features.lib._cython.ratioBeyondRSigma.array", /*tp_name*/
   sizeof(struct __pyx_array_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc_array, /*tp_dealloc*/
@@ -15696,7 +15696,7 @@ static PyMethodDef __pyx_methods_Enum[] = {
 
 static PyTypeObject __pyx_type___pyx_MemviewEnum = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.ratioBeyondRSigma.Enum", /*tp_name*/
+  "skimu.features.lib._cython.ratioBeyondRSigma.Enum", /*tp_name*/
   sizeof(struct __pyx_MemviewEnum_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc_Enum, /*tp_dealloc*/
@@ -15957,7 +15957,7 @@ static PyBufferProcs __pyx_tp_as_buffer_memoryview = {
 
 static PyTypeObject __pyx_type___pyx_memoryview = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.ratioBeyondRSigma.memoryview", /*tp_name*/
+  "skimu.features.lib._cython.ratioBeyondRSigma.memoryview", /*tp_name*/
   sizeof(struct __pyx_memoryview_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc_memoryview, /*tp_dealloc*/
@@ -16095,7 +16095,7 @@ static struct PyGetSetDef __pyx_getsets__memoryviewslice[] = {
 
 static PyTypeObject __pyx_type___pyx_memoryviewslice = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.ratioBeyondRSigma._memoryviewslice", /*tp_name*/
+  "skimu.features.lib._cython.ratioBeyondRSigma._memoryviewslice", /*tp_name*/
   sizeof(struct __pyx_memoryviewslice_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc__memoryviewslice, /*tp_dealloc*/
@@ -16235,7 +16235,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_MemoryView_of_r_object, __pyx_k_MemoryView_of_r_object, sizeof(__pyx_k_MemoryView_of_r_object), 0, 0, 1, 0},
   {&__pyx_n_b_O, __pyx_k_O, sizeof(__pyx_k_O), 0, 0, 0, 1},
   {&__pyx_kp_s_Out_of_bounds_on_buffer_access_a, __pyx_k_Out_of_bounds_on_buffer_access_a, sizeof(__pyx_k_Out_of_bounds_on_buffer_access_a), 0, 0, 1, 0},
-  {&__pyx_n_s_PfyMU_features_lib__cython_ratio, __pyx_k_PfyMU_features_lib__cython_ratio, sizeof(__pyx_k_PfyMU_features_lib__cython_ratio), 0, 0, 1, 1},
   {&__pyx_n_s_PickleError, __pyx_k_PickleError, sizeof(__pyx_k_PickleError), 0, 0, 1, 1},
   {&__pyx_n_s_RatioBeyondRSigma, __pyx_k_RatioBeyondRSigma, sizeof(__pyx_k_RatioBeyondRSigma), 0, 0, 1, 1},
   {&__pyx_n_s_TypeError, __pyx_k_TypeError, sizeof(__pyx_k_TypeError), 0, 0, 1, 1},
@@ -16307,7 +16306,8 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_shape, __pyx_k_shape, sizeof(__pyx_k_shape), 0, 0, 1, 1},
   {&__pyx_n_s_sigma, __pyx_k_sigma, sizeof(__pyx_k_sigma), 0, 0, 1, 1},
   {&__pyx_n_s_size, __pyx_k_size, sizeof(__pyx_k_size), 0, 0, 1, 1},
-  {&__pyx_kp_s_src_PfyMU_features_lib__cython_r, __pyx_k_src_PfyMU_features_lib__cython_r, sizeof(__pyx_k_src_PfyMU_features_lib__cython_r), 0, 0, 1, 0},
+  {&__pyx_n_s_skimu_features_lib__cython_ratio, __pyx_k_skimu_features_lib__cython_ratio, sizeof(__pyx_k_skimu_features_lib__cython_ratio), 0, 0, 1, 1},
+  {&__pyx_kp_s_src_skimu_features_lib__cython_r, __pyx_k_src_skimu_features_lib__cython_r, sizeof(__pyx_k_src_skimu_features_lib__cython_r), 0, 0, 1, 0},
   {&__pyx_n_s_start, __pyx_k_start, sizeof(__pyx_k_start), 0, 0, 1, 1},
   {&__pyx_n_s_step, __pyx_k_step, sizeof(__pyx_k_step), 0, 0, 1, 1},
   {&__pyx_n_s_stop, __pyx_k_stop, sizeof(__pyx_k_stop), 0, 0, 1, 1},
@@ -16536,7 +16536,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__18);
   __Pyx_GIVEREF(__pyx_tuple__18);
 
-  /* "PfyMU/features/lib/_cython/ratioBeyondRSigma.pyx":10
+  /* "skimu/features/lib/_cython/ratioBeyondRSigma.pyx":10
  * 
  * 
  * def RatioBeyondRSigma(const double[:, :, :] x, double r):             # <<<<<<<<<<<<<<
@@ -16546,7 +16546,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__19 = PyTuple_Pack(12, __pyx_n_s_x, __pyx_n_s_r, __pyx_n_s_m, __pyx_n_s_n, __pyx_n_s_p, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_k, __pyx_n_s_xcount, __pyx_n_s_count, __pyx_n_s_mu, __pyx_n_s_sigma); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(0, 10, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__19);
   __Pyx_GIVEREF(__pyx_tuple__19);
-  __pyx_codeobj__20 = (PyObject*)__Pyx_PyCode_New(2, 0, 12, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__19, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_src_PfyMU_features_lib__cython_r, __pyx_n_s_RatioBeyondRSigma, 10, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__20)) __PYX_ERR(0, 10, __pyx_L1_error)
+  __pyx_codeobj__20 = (PyObject*)__Pyx_PyCode_New(2, 0, 12, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__19, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_src_skimu_features_lib__cython_r, __pyx_n_s_RatioBeyondRSigma, 10, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__20)) __PYX_ERR(0, 10, __pyx_L1_error)
 
   /* "View.MemoryView":286
  *         return self.name
@@ -16756,8 +16756,8 @@ static int __Pyx_modinit_function_import_code(void) {
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__Pyx_modinit_function_import_code", 0);
   /*--- Function import code ---*/
-  __pyx_t_1 = PyImport_ImportModule("PfyMU.features.lib._cython.common"); if (!__pyx_t_1) __PYX_ERR(0, 1, __pyx_L1_error)
-  if (__Pyx_ImportFunction(__pyx_t_1, "mean_sd_1d", (void (**)(void))&__pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d, "void (__Pyx_memviewslice, double *, double *)") < 0) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_t_1 = PyImport_ImportModule("skimu.features.lib._cython.common"); if (!__pyx_t_1) __PYX_ERR(0, 1, __pyx_L1_error)
+  if (__Pyx_ImportFunction(__pyx_t_1, "mean_sd_1d", (void (**)(void))&__pyx_f_5skimu_8features_3lib_7_cython_6common_mean_sd_1d, "void (__Pyx_memviewslice, double *, double *)") < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   Py_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_RefNannyFinishContext();
   return 0;
@@ -16943,14 +16943,14 @@ if (!__Pyx_RefNanny) {
   #if PY_MAJOR_VERSION < 3 && (__PYX_DEFAULT_STRING_ENCODING_IS_ASCII || __PYX_DEFAULT_STRING_ENCODING_IS_DEFAULT)
   if (__Pyx_init_sys_getdefaultencoding_params() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
-  if (__pyx_module_is_main_PfyMU__features__lib___cython__ratioBeyondRSigma) {
+  if (__pyx_module_is_main_skimu__features__lib___cython__ratioBeyondRSigma) {
     if (PyObject_SetAttr(__pyx_m, __pyx_n_s_name_2, __pyx_n_s_main) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   }
   #if PY_MAJOR_VERSION >= 3
   {
     PyObject *modules = PyImport_GetModuleDict(); if (unlikely(!modules)) __PYX_ERR(0, 1, __pyx_L1_error)
-    if (!PyDict_GetItemString(modules, "PfyMU.features.lib._cython.ratioBeyondRSigma")) {
-      if (unlikely(PyDict_SetItemString(modules, "PfyMU.features.lib._cython.ratioBeyondRSigma", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
+    if (!PyDict_GetItemString(modules, "skimu.features.lib._cython.ratioBeyondRSigma")) {
+      if (unlikely(PyDict_SetItemString(modules, "skimu.features.lib._cython.ratioBeyondRSigma", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
     }
   }
   #endif
@@ -16971,7 +16971,7 @@ if (!__Pyx_RefNanny) {
   if (__Pyx_patch_abc() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
 
-  /* "PfyMU/features/lib/_cython/ratioBeyondRSigma.pyx":5
+  /* "skimu/features/lib/_cython/ratioBeyondRSigma.pyx":5
  * # cython: wraparound = False
  * cimport cython
  * from numpy import zeros, double as npy_double             # <<<<<<<<<<<<<<
@@ -16999,19 +16999,19 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "PfyMU/features/lib/_cython/ratioBeyondRSigma.pyx":10
+  /* "skimu/features/lib/_cython/ratioBeyondRSigma.pyx":10
  * 
  * 
  * def RatioBeyondRSigma(const double[:, :, :] x, double r):             # <<<<<<<<<<<<<<
  *     cdef Py_ssize_t m = x.shape[0], n = x.shape[1], p = x.shape[2], i, j, k
  *     xcount = zeros((m, p), dtype=npy_double, order='C')
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5PfyMU_8features_3lib_7_cython_17ratioBeyondRSigma_1RatioBeyondRSigma, NULL, __pyx_n_s_PfyMU_features_lib__cython_ratio); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 10, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5skimu_8features_3lib_7_cython_17ratioBeyondRSigma_1RatioBeyondRSigma, NULL, __pyx_n_s_skimu_features_lib__cython_ratio); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 10, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_RatioBeyondRSigma, __pyx_t_2) < 0) __PYX_ERR(0, 10, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "PfyMU/features/lib/_cython/ratioBeyondRSigma.pyx":1
+  /* "skimu/features/lib/_cython/ratioBeyondRSigma.pyx":1
  * # cython: infer_types = True             # <<<<<<<<<<<<<<
  * # cython: boundscheck = False
  * # cython: wraparound = False
@@ -17182,11 +17182,11 @@ if (!__Pyx_RefNanny) {
   __Pyx_XDECREF(__pyx_t_2);
   if (__pyx_m) {
     if (__pyx_d) {
-      __Pyx_AddTraceback("init PfyMU.features.lib._cython.ratioBeyondRSigma", __pyx_clineno, __pyx_lineno, __pyx_filename);
+      __Pyx_AddTraceback("init skimu.features.lib._cython.ratioBeyondRSigma", __pyx_clineno, __pyx_lineno, __pyx_filename);
     }
     Py_CLEAR(__pyx_m);
   } else if (!PyErr_Occurred()) {
-    PyErr_SetString(PyExc_ImportError, "init PfyMU.features.lib._cython.ratioBeyondRSigma");
+    PyErr_SetString(PyExc_ImportError, "init skimu.features.lib._cython.ratioBeyondRSigma");
   }
   __pyx_L0:;
   __Pyx_RefNannyFinishContext();

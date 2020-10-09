@@ -4,12 +4,12 @@
 {
     "distutils": {
         "depends": [],
-        "name": "PfyMU.features.lib._cython.rootMeanVariance",
+        "name": "skimu.features.lib._cython.rootMeanVariance",
         "sources": [
-            "src/PfyMU/features/lib/_cython/rootMeanVariance.pyx"
+            "src/skimu/features/lib/_cython/rootMeanVariance.pyx"
         ]
     },
-    "module_name": "PfyMU.features.lib._cython.rootMeanVariance"
+    "module_name": "skimu.features.lib._cython.rootMeanVariance"
 }
 END: Cython Metadata */
 
@@ -604,8 +604,8 @@ static CYTHON_INLINE float __PYX_NAN() {
   #endif
 #endif
 
-#define __PYX_HAVE__PfyMU__features__lib___cython__rootMeanVariance
-#define __PYX_HAVE_API__PfyMU__features__lib___cython__rootMeanVariance
+#define __PYX_HAVE__skimu__features__lib___cython__rootMeanVariance
+#define __PYX_HAVE_API__skimu__features__lib___cython__rootMeanVariance
 /* Early includes */
 #include <math.h>
 #include "pythread.h"
@@ -821,7 +821,7 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "src/PfyMU/features/lib/_cython/rootMeanVariance.pyx",
+  "src/skimu/features/lib/_cython/rootMeanVariance.pyx",
   "stringsource",
 };
 /* MemviewSliceStruct.proto */
@@ -1692,11 +1692,11 @@ static PyObject *__pyx_memoryviewslice_assign_item_from_object(struct __pyx_memo
 
 /* Module declarations from 'libc.math' */
 
-/* Module declarations from 'PfyMU.features.lib._cython.common' */
-static void (*__pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_1d)(__Pyx_memviewslice, double *); /*proto*/
-static void (*__pyx_f_5PfyMU_8features_3lib_7_cython_6common_variance_1d)(__Pyx_memviewslice, double *, int); /*proto*/
+/* Module declarations from 'skimu.features.lib._cython.common' */
+static void (*__pyx_f_5skimu_8features_3lib_7_cython_6common_mean_1d)(__Pyx_memviewslice, double *); /*proto*/
+static void (*__pyx_f_5skimu_8features_3lib_7_cython_6common_variance_1d)(__Pyx_memviewslice, double *, int); /*proto*/
 
-/* Module declarations from 'PfyMU.features.lib._cython.rootMeanVariance' */
+/* Module declarations from 'skimu.features.lib._cython.rootMeanVariance' */
 static PyTypeObject *__pyx_array_type = 0;
 static PyTypeObject *__pyx_MemviewEnum_type = 0;
 static PyTypeObject *__pyx_memoryview_type = 0;
@@ -1708,7 +1708,7 @@ static PyObject *contiguous = 0;
 static PyObject *indirect_contiguous = 0;
 static int __pyx_memoryview_thread_locks_used;
 static PyThread_type_lock __pyx_memoryview_thread_locks[8];
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_16rootMeanVariance_RootMeanVariance(__Pyx_memviewslice, int __pyx_skip_dispatch); /*proto*/
+static PyObject *__pyx_f_5skimu_8features_3lib_7_cython_16rootMeanVariance_RootMeanVariance(__Pyx_memviewslice, int __pyx_skip_dispatch); /*proto*/
 static struct __pyx_array_obj *__pyx_array_new(PyObject *, Py_ssize_t, char *, char *, char *); /*proto*/
 static void *__pyx_align_pointer(void *, size_t); /*proto*/
 static PyObject *__pyx_memoryview_new(PyObject *, int, int, __Pyx_TypeInfo *); /*proto*/
@@ -1744,11 +1744,11 @@ static void __pyx_memoryview__slice_assign_scalar(char *, Py_ssize_t *, Py_ssize
 static PyObject *__pyx_unpickle_Enum__set_state(struct __pyx_MemviewEnum_obj *, PyObject *); /*proto*/
 static __Pyx_TypeInfo __Pyx_TypeInfo_double__const__ = { "const double", NULL, sizeof(double const ), { 0 }, 0, 'R', 0, 0 };
 static __Pyx_TypeInfo __Pyx_TypeInfo_double = { "double", NULL, sizeof(double), { 0 }, 0, 'R', 0, 0 };
-#define __Pyx_MODULE_NAME "PfyMU.features.lib._cython.rootMeanVariance"
-extern int __pyx_module_is_main_PfyMU__features__lib___cython__rootMeanVariance;
-int __pyx_module_is_main_PfyMU__features__lib___cython__rootMeanVariance = 0;
+#define __Pyx_MODULE_NAME "skimu.features.lib._cython.rootMeanVariance"
+extern int __pyx_module_is_main_skimu__features__lib___cython__rootMeanVariance;
+int __pyx_module_is_main_skimu__features__lib___cython__rootMeanVariance = 0;
 
-/* Implementation of 'PfyMU.features.lib._cython.rootMeanVariance' */
+/* Implementation of 'skimu.features.lib._cython.rootMeanVariance' */
 static PyObject *__pyx_builtin_range;
 static PyObject *__pyx_builtin_ValueError;
 static PyObject *__pyx_builtin_MemoryError;
@@ -1939,7 +1939,7 @@ static PyObject *__pyx_kp_s_unable_to_allocate_shape_and_str;
 static PyObject *__pyx_n_s_unpack;
 static PyObject *__pyx_n_s_update;
 static PyObject *__pyx_n_s_zeros;
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_16rootMeanVariance_RootMeanVariance(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x); /* proto */
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_16rootMeanVariance_RootMeanVariance(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __pyx_array_obj *__pyx_v_self, PyObject *__pyx_v_shape, Py_ssize_t __pyx_v_itemsize, PyObject *__pyx_v_format, PyObject *__pyx_v_mode, int __pyx_v_allocate_buffer); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array_2__getbuffer__(struct __pyx_array_obj *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
 static void __pyx_array___pyx_pf_15View_dot_MemoryView_5array_4__dealloc__(struct __pyx_array_obj *__pyx_v_self); /* proto */
@@ -2017,7 +2017,7 @@ static PyObject *__pyx_tuple__24;
 static PyObject *__pyx_codeobj__25;
 /* Late includes */
 
-/* "PfyMU/features/lib/_cython/rootMeanVariance.pyx":11
+/* "skimu/features/lib/_cython/rootMeanVariance.pyx":11
  * 
  * 
  * cpdef RootMeanVariance(const double[:, :, :] x):             # <<<<<<<<<<<<<<
@@ -2025,8 +2025,8 @@ static PyObject *__pyx_codeobj__25;
  *     cdef double[:] var = zeros(p, dtype=npy_double)
  */
 
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_16rootMeanVariance_1RootMeanVariance(PyObject *__pyx_self, PyObject *__pyx_arg_x); /*proto*/
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_16rootMeanVariance_RootMeanVariance(__Pyx_memviewslice __pyx_v_x, CYTHON_UNUSED int __pyx_skip_dispatch) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_16rootMeanVariance_1RootMeanVariance(PyObject *__pyx_self, PyObject *__pyx_arg_x); /*proto*/
+static PyObject *__pyx_f_5skimu_8features_3lib_7_cython_16rootMeanVariance_RootMeanVariance(__Pyx_memviewslice __pyx_v_x, CYTHON_UNUSED int __pyx_skip_dispatch) {
   Py_ssize_t __pyx_v_m;
   CYTHON_UNUSED Py_ssize_t __pyx_v_n;
   Py_ssize_t __pyx_v_p;
@@ -2056,7 +2056,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_16rootMeanVariance_RootM
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("RootMeanVariance", 0);
 
-  /* "PfyMU/features/lib/_cython/rootMeanVariance.pyx":12
+  /* "skimu/features/lib/_cython/rootMeanVariance.pyx":12
  * 
  * cpdef RootMeanVariance(const double[:, :, :] x):
  *     cdef Py_ssize_t m = x.shape[0], n = x.shape[1], p = x.shape[2], i, k             # <<<<<<<<<<<<<<
@@ -2067,7 +2067,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_16rootMeanVariance_RootM
   __pyx_v_n = (__pyx_v_x.shape[1]);
   __pyx_v_p = (__pyx_v_x.shape[2]);
 
-  /* "PfyMU/features/lib/_cython/rootMeanVariance.pyx":13
+  /* "skimu/features/lib/_cython/rootMeanVariance.pyx":13
  * cpdef RootMeanVariance(const double[:, :, :] x):
  *     cdef Py_ssize_t m = x.shape[0], n = x.shape[1], p = x.shape[2], i, k
  *     cdef double[:] var = zeros(p, dtype=npy_double)             # <<<<<<<<<<<<<<
@@ -2100,7 +2100,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_16rootMeanVariance_RootM
   __pyx_t_5.memview = NULL;
   __pyx_t_5.data = NULL;
 
-  /* "PfyMU/features/lib/_cython/rootMeanVariance.pyx":15
+  /* "skimu/features/lib/_cython/rootMeanVariance.pyx":15
  *     cdef double[:] var = zeros(p, dtype=npy_double)
  * 
  *     activity = zeros(m, dtype=npy_double)             # <<<<<<<<<<<<<<
@@ -2130,7 +2130,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_16rootMeanVariance_RootM
   __pyx_v_activity = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "PfyMU/features/lib/_cython/rootMeanVariance.pyx":16
+  /* "skimu/features/lib/_cython/rootMeanVariance.pyx":16
  * 
  *     activity = zeros(m, dtype=npy_double)
  *     cdef double[:] act_idx = activity             # <<<<<<<<<<<<<<
@@ -2142,7 +2142,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_16rootMeanVariance_RootM
   __pyx_t_5.memview = NULL;
   __pyx_t_5.data = NULL;
 
-  /* "PfyMU/features/lib/_cython/rootMeanVariance.pyx":18
+  /* "skimu/features/lib/_cython/rootMeanVariance.pyx":18
  *     cdef double[:] act_idx = activity
  * 
  *     for i in range(m):             # <<<<<<<<<<<<<<
@@ -2154,7 +2154,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_16rootMeanVariance_RootM
   for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
     __pyx_v_i = __pyx_t_8;
 
-    /* "PfyMU/features/lib/_cython/rootMeanVariance.pyx":19
+    /* "skimu/features/lib/_cython/rootMeanVariance.pyx":19
  * 
  *     for i in range(m):
  *         for k in range(p):             # <<<<<<<<<<<<<<
@@ -2166,7 +2166,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_16rootMeanVariance_RootM
     for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_10; __pyx_t_11+=1) {
       __pyx_v_k = __pyx_t_11;
 
-      /* "PfyMU/features/lib/_cython/rootMeanVariance.pyx":20
+      /* "skimu/features/lib/_cython/rootMeanVariance.pyx":20
  *     for i in range(m):
  *         for k in range(p):
  *             variance_1d(x[i, :, k], &var[k], 1)             # <<<<<<<<<<<<<<
@@ -2193,13 +2193,13 @@ __pyx_t_12.strides[0] = __pyx_v_x.strides[1];
 }
 
 __pyx_t_13 = __pyx_v_k;
-      __pyx_f_5PfyMU_8features_3lib_7_cython_6common_variance_1d(__pyx_t_12, (&(*((double *) ( /* dim=0 */ (__pyx_v_var.data + __pyx_t_13 * __pyx_v_var.strides[0]) )))), 1);
+      __pyx_f_5skimu_8features_3lib_7_cython_6common_variance_1d(__pyx_t_12, (&(*((double *) ( /* dim=0 */ (__pyx_v_var.data + __pyx_t_13 * __pyx_v_var.strides[0]) )))), 1);
       __PYX_XDEC_MEMVIEW(&__pyx_t_12, 1);
       __pyx_t_12.memview = NULL;
       __pyx_t_12.data = NULL;
     }
 
-    /* "PfyMU/features/lib/_cython/rootMeanVariance.pyx":21
+    /* "skimu/features/lib/_cython/rootMeanVariance.pyx":21
  *         for k in range(p):
  *             variance_1d(x[i, :, k], &var[k], 1)
  *         mean_1d(var, &act_idx[i])             # <<<<<<<<<<<<<<
@@ -2207,9 +2207,9 @@ __pyx_t_13 = __pyx_v_k;
  * 
  */
     __pyx_t_13 = __pyx_v_i;
-    __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_1d(__pyx_v_var, (&(*((double *) ( /* dim=0 */ (__pyx_v_act_idx.data + __pyx_t_13 * __pyx_v_act_idx.strides[0]) )))));
+    __pyx_f_5skimu_8features_3lib_7_cython_6common_mean_1d(__pyx_v_var, (&(*((double *) ( /* dim=0 */ (__pyx_v_act_idx.data + __pyx_t_13 * __pyx_v_act_idx.strides[0]) )))));
 
-    /* "PfyMU/features/lib/_cython/rootMeanVariance.pyx":22
+    /* "skimu/features/lib/_cython/rootMeanVariance.pyx":22
  *             variance_1d(x[i, :, k], &var[k], 1)
  *         mean_1d(var, &act_idx[i])
  *         act_idx[i] = sqrt(act_idx[i])             # <<<<<<<<<<<<<<
@@ -2221,7 +2221,7 @@ __pyx_t_13 = __pyx_v_k;
     *((double *) ( /* dim=0 */ (__pyx_v_act_idx.data + __pyx_t_14 * __pyx_v_act_idx.strides[0]) )) = sqrt((*((double *) ( /* dim=0 */ (__pyx_v_act_idx.data + __pyx_t_13 * __pyx_v_act_idx.strides[0]) ))));
   }
 
-  /* "PfyMU/features/lib/_cython/rootMeanVariance.pyx":24
+  /* "skimu/features/lib/_cython/rootMeanVariance.pyx":24
  *         act_idx[i] = sqrt(act_idx[i])
  * 
  *     return activity             # <<<<<<<<<<<<<<
@@ -2231,7 +2231,7 @@ __pyx_t_13 = __pyx_v_k;
   __pyx_r = __pyx_v_activity;
   goto __pyx_L0;
 
-  /* "PfyMU/features/lib/_cython/rootMeanVariance.pyx":11
+  /* "skimu/features/lib/_cython/rootMeanVariance.pyx":11
  * 
  * 
  * cpdef RootMeanVariance(const double[:, :, :] x):             # <<<<<<<<<<<<<<
@@ -2247,7 +2247,7 @@ __pyx_t_13 = __pyx_v_k;
   __Pyx_XDECREF(__pyx_t_4);
   __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_t_12, 1);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.rootMeanVariance.RootMeanVariance", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.rootMeanVariance.RootMeanVariance", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
   __PYX_XDEC_MEMVIEW(&__pyx_v_var, 1);
@@ -2259,8 +2259,8 @@ __pyx_t_13 = __pyx_v_k;
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_16rootMeanVariance_1RootMeanVariance(PyObject *__pyx_self, PyObject *__pyx_arg_x); /*proto*/
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_16rootMeanVariance_1RootMeanVariance(PyObject *__pyx_self, PyObject *__pyx_arg_x) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_16rootMeanVariance_1RootMeanVariance(PyObject *__pyx_self, PyObject *__pyx_arg_x); /*proto*/
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_16rootMeanVariance_1RootMeanVariance(PyObject *__pyx_self, PyObject *__pyx_arg_x) {
   __Pyx_memviewslice __pyx_v_x = { 0, 0, { 0 }, { 0 }, { 0 } };
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
@@ -2273,18 +2273,18 @@ static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_16rootMeanVariance_1Roo
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.rootMeanVariance.RootMeanVariance", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.rootMeanVariance.RootMeanVariance", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5PfyMU_8features_3lib_7_cython_16rootMeanVariance_RootMeanVariance(__pyx_self, __pyx_v_x);
+  __pyx_r = __pyx_pf_5skimu_8features_3lib_7_cython_16rootMeanVariance_RootMeanVariance(__pyx_self, __pyx_v_x);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_16rootMeanVariance_RootMeanVariance(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x) {
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_16rootMeanVariance_RootMeanVariance(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -2294,7 +2294,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_16rootMeanVariance_Root
   __Pyx_RefNannySetupContext("RootMeanVariance", 0);
   __Pyx_XDECREF(__pyx_r);
   if (unlikely(!__pyx_v_x.memview)) { __Pyx_RaiseUnboundLocalError("x"); __PYX_ERR(0, 11, __pyx_L1_error) }
-  __pyx_t_1 = __pyx_f_5PfyMU_8features_3lib_7_cython_16rootMeanVariance_RootMeanVariance(__pyx_v_x, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 11, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5skimu_8features_3lib_7_cython_16rootMeanVariance_RootMeanVariance(__pyx_v_x, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 11, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -2303,7 +2303,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_16rootMeanVariance_Root
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.rootMeanVariance.RootMeanVariance", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.rootMeanVariance.RootMeanVariance", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __PYX_XDEC_MEMVIEW(&__pyx_v_x, 1);
@@ -15452,7 +15452,7 @@ static PyBufferProcs __pyx_tp_as_buffer_array = {
 
 static PyTypeObject __pyx_type___pyx_array = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.rootMeanVariance.array", /*tp_name*/
+  "skimu.features.lib._cython.rootMeanVariance.array", /*tp_name*/
   sizeof(struct __pyx_array_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc_array, /*tp_dealloc*/
@@ -15571,7 +15571,7 @@ static PyMethodDef __pyx_methods_Enum[] = {
 
 static PyTypeObject __pyx_type___pyx_MemviewEnum = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.rootMeanVariance.Enum", /*tp_name*/
+  "skimu.features.lib._cython.rootMeanVariance.Enum", /*tp_name*/
   sizeof(struct __pyx_MemviewEnum_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc_Enum, /*tp_dealloc*/
@@ -15832,7 +15832,7 @@ static PyBufferProcs __pyx_tp_as_buffer_memoryview = {
 
 static PyTypeObject __pyx_type___pyx_memoryview = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.rootMeanVariance.memoryview", /*tp_name*/
+  "skimu.features.lib._cython.rootMeanVariance.memoryview", /*tp_name*/
   sizeof(struct __pyx_memoryview_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc_memoryview, /*tp_dealloc*/
@@ -15970,7 +15970,7 @@ static struct PyGetSetDef __pyx_getsets__memoryviewslice[] = {
 
 static PyTypeObject __pyx_type___pyx_memoryviewslice = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.rootMeanVariance._memoryviewslice", /*tp_name*/
+  "skimu.features.lib._cython.rootMeanVariance._memoryviewslice", /*tp_name*/
   sizeof(struct __pyx_memoryviewslice_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc__memoryviewslice, /*tp_dealloc*/
@@ -16046,7 +16046,7 @@ static PyTypeObject __pyx_type___pyx_memoryviewslice = {
 };
 
 static PyMethodDef __pyx_methods[] = {
-  {"RootMeanVariance", (PyCFunction)__pyx_pw_5PfyMU_8features_3lib_7_cython_16rootMeanVariance_1RootMeanVariance, METH_O, 0},
+  {"RootMeanVariance", (PyCFunction)__pyx_pw_5skimu_8features_3lib_7_cython_16rootMeanVariance_1RootMeanVariance, METH_O, 0},
   {0, 0, 0, 0}
 };
 
@@ -16604,9 +16604,9 @@ static int __Pyx_modinit_function_import_code(void) {
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__Pyx_modinit_function_import_code", 0);
   /*--- Function import code ---*/
-  __pyx_t_1 = PyImport_ImportModule("PfyMU.features.lib._cython.common"); if (!__pyx_t_1) __PYX_ERR(0, 1, __pyx_L1_error)
-  if (__Pyx_ImportFunction(__pyx_t_1, "mean_1d", (void (**)(void))&__pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_1d, "void (__Pyx_memviewslice, double *)") < 0) __PYX_ERR(0, 1, __pyx_L1_error)
-  if (__Pyx_ImportFunction(__pyx_t_1, "variance_1d", (void (**)(void))&__pyx_f_5PfyMU_8features_3lib_7_cython_6common_variance_1d, "void (__Pyx_memviewslice, double *, int)") < 0) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_t_1 = PyImport_ImportModule("skimu.features.lib._cython.common"); if (!__pyx_t_1) __PYX_ERR(0, 1, __pyx_L1_error)
+  if (__Pyx_ImportFunction(__pyx_t_1, "mean_1d", (void (**)(void))&__pyx_f_5skimu_8features_3lib_7_cython_6common_mean_1d, "void (__Pyx_memviewslice, double *)") < 0) __PYX_ERR(0, 1, __pyx_L1_error)
+  if (__Pyx_ImportFunction(__pyx_t_1, "variance_1d", (void (**)(void))&__pyx_f_5skimu_8features_3lib_7_cython_6common_variance_1d, "void (__Pyx_memviewslice, double *, int)") < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   Py_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_RefNannyFinishContext();
   return 0;
@@ -16792,14 +16792,14 @@ if (!__Pyx_RefNanny) {
   #if PY_MAJOR_VERSION < 3 && (__PYX_DEFAULT_STRING_ENCODING_IS_ASCII || __PYX_DEFAULT_STRING_ENCODING_IS_DEFAULT)
   if (__Pyx_init_sys_getdefaultencoding_params() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
-  if (__pyx_module_is_main_PfyMU__features__lib___cython__rootMeanVariance) {
+  if (__pyx_module_is_main_skimu__features__lib___cython__rootMeanVariance) {
     if (PyObject_SetAttr(__pyx_m, __pyx_n_s_name_2, __pyx_n_s_main) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   }
   #if PY_MAJOR_VERSION >= 3
   {
     PyObject *modules = PyImport_GetModuleDict(); if (unlikely(!modules)) __PYX_ERR(0, 1, __pyx_L1_error)
-    if (!PyDict_GetItemString(modules, "PfyMU.features.lib._cython.rootMeanVariance")) {
-      if (unlikely(PyDict_SetItemString(modules, "PfyMU.features.lib._cython.rootMeanVariance", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
+    if (!PyDict_GetItemString(modules, "skimu.features.lib._cython.rootMeanVariance")) {
+      if (unlikely(PyDict_SetItemString(modules, "skimu.features.lib._cython.rootMeanVariance", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
     }
   }
   #endif
@@ -16820,7 +16820,7 @@ if (!__Pyx_RefNanny) {
   if (__Pyx_patch_abc() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
 
-  /* "PfyMU/features/lib/_cython/rootMeanVariance.pyx":5
+  /* "skimu/features/lib/_cython/rootMeanVariance.pyx":5
  * # cython: boundscheck = False
  * cimport cython
  * from numpy import zeros, double as npy_double, array             # <<<<<<<<<<<<<<
@@ -16855,7 +16855,7 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "PfyMU/features/lib/_cython/rootMeanVariance.pyx":1
+  /* "skimu/features/lib/_cython/rootMeanVariance.pyx":1
  * # cython: infer_types = True             # <<<<<<<<<<<<<<
  * # cython: wraparound = False
  * # cython: boundscheck = False
@@ -17026,11 +17026,11 @@ if (!__Pyx_RefNanny) {
   __Pyx_XDECREF(__pyx_t_2);
   if (__pyx_m) {
     if (__pyx_d) {
-      __Pyx_AddTraceback("init PfyMU.features.lib._cython.rootMeanVariance", __pyx_clineno, __pyx_lineno, __pyx_filename);
+      __Pyx_AddTraceback("init skimu.features.lib._cython.rootMeanVariance", __pyx_clineno, __pyx_lineno, __pyx_filename);
     }
     Py_CLEAR(__pyx_m);
   } else if (!PyErr_Occurred()) {
-    PyErr_SetString(PyExc_ImportError, "init PfyMU.features.lib._cython.rootMeanVariance");
+    PyErr_SetString(PyExc_ImportError, "init skimu.features.lib._cython.rootMeanVariance");
   }
   __pyx_L0:;
   __Pyx_RefNannyFinishContext();

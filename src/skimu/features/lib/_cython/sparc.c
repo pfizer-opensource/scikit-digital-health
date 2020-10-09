@@ -4,12 +4,12 @@
 {
     "distutils": {
         "depends": [],
-        "name": "PfyMU.features.lib._cython.sparc",
+        "name": "skimu.features.lib._cython.sparc",
         "sources": [
-            "src/PfyMU/features/lib/_cython/sparc.pyx"
+            "src/skimu/features/lib/_cython/sparc.pyx"
         ]
     },
-    "module_name": "PfyMU.features.lib._cython.sparc"
+    "module_name": "skimu.features.lib._cython.sparc"
 }
 END: Cython Metadata */
 
@@ -604,8 +604,8 @@ static CYTHON_INLINE float __PYX_NAN() {
   #endif
 #endif
 
-#define __PYX_HAVE__PfyMU__features__lib___cython__sparc
-#define __PYX_HAVE_API__PfyMU__features__lib___cython__sparc
+#define __PYX_HAVE__skimu__features__lib___cython__sparc
+#define __PYX_HAVE_API__skimu__features__lib___cython__sparc
 /* Early includes */
 #include <math.h>
 #include "pythread.h"
@@ -821,7 +821,7 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "src/PfyMU/features/lib/_cython/sparc.pyx",
+  "src/skimu/features/lib/_cython/sparc.pyx",
   "stringsource",
 };
 /* MemviewSliceStruct.proto */
@@ -1701,7 +1701,7 @@ static PyObject *__pyx_memoryviewslice_assign_item_from_object(struct __pyx_memo
 
 /* Module declarations from 'libc.math' */
 
-/* Module declarations from 'PfyMU.features.lib._cython.sparc' */
+/* Module declarations from 'skimu.features.lib._cython.sparc' */
 static PyTypeObject *__pyx_array_type = 0;
 static PyTypeObject *__pyx_MemviewEnum_type = 0;
 static PyTypeObject *__pyx_memoryview_type = 0;
@@ -1713,8 +1713,8 @@ static PyObject *contiguous = 0;
 static PyObject *indirect_contiguous = 0;
 static int __pyx_memoryview_thread_locks_used;
 static PyThread_type_lock __pyx_memoryview_thread_locks[8];
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(__Pyx_memviewslice, double, int, double, double, int __pyx_skip_dispatch); /*proto*/
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_SPARC(__Pyx_memviewslice, double, int, double, double, int __pyx_skip_dispatch); /*proto*/
+static PyObject *__pyx_f_5skimu_8features_3lib_7_cython_5sparc_sparc_1d(__Pyx_memviewslice, double, int, double, double, int __pyx_skip_dispatch); /*proto*/
+static PyObject *__pyx_f_5skimu_8features_3lib_7_cython_5sparc_SPARC(__Pyx_memviewslice, double, int, double, double, int __pyx_skip_dispatch); /*proto*/
 static struct __pyx_array_obj *__pyx_array_new(PyObject *, Py_ssize_t, char *, char *, char *); /*proto*/
 static void *__pyx_align_pointer(void *, size_t); /*proto*/
 static PyObject *__pyx_memoryview_new(PyObject *, int, int, __Pyx_TypeInfo *); /*proto*/
@@ -1750,11 +1750,11 @@ static void __pyx_memoryview__slice_assign_scalar(char *, Py_ssize_t *, Py_ssize
 static PyObject *__pyx_unpickle_Enum__set_state(struct __pyx_MemviewEnum_obj *, PyObject *); /*proto*/
 static __Pyx_TypeInfo __Pyx_TypeInfo_double__const__ = { "const double", NULL, sizeof(double const ), { 0 }, 0, 'R', 0, 0 };
 static __Pyx_TypeInfo __Pyx_TypeInfo_double = { "double", NULL, sizeof(double), { 0 }, 0, 'R', 0, 0 };
-#define __Pyx_MODULE_NAME "PfyMU.features.lib._cython.sparc"
-extern int __pyx_module_is_main_PfyMU__features__lib___cython__sparc;
-int __pyx_module_is_main_PfyMU__features__lib___cython__sparc = 0;
+#define __Pyx_MODULE_NAME "skimu.features.lib._cython.sparc"
+extern int __pyx_module_is_main_skimu__features__lib___cython__sparc;
+int __pyx_module_is_main_skimu__features__lib___cython__sparc = 0;
 
-/* Implementation of 'PfyMU.features.lib._cython.sparc' */
+/* Implementation of 'skimu.features.lib._cython.sparc' */
 static PyObject *__pyx_builtin_range;
 static PyObject *__pyx_builtin_ValueError;
 static PyObject *__pyx_builtin_MemoryError;
@@ -1969,8 +1969,8 @@ static PyObject *__pyx_n_s_unpack;
 static PyObject *__pyx_n_s_update;
 static PyObject *__pyx_n_s_x;
 static PyObject *__pyx_n_s_zeros;
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fsample, int __pyx_v_padlevel, double __pyx_v_fcut, double __pyx_v_amp_thresh); /* proto */
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_5sparc_2SPARC(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fsample, int __pyx_v_padlevel, double __pyx_v_fcut, double __pyx_v_amp_thresh); /* proto */
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_5sparc_sparc_1d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fsample, int __pyx_v_padlevel, double __pyx_v_fcut, double __pyx_v_amp_thresh); /* proto */
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_5sparc_2SPARC(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fsample, int __pyx_v_padlevel, double __pyx_v_fcut, double __pyx_v_amp_thresh); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __pyx_array_obj *__pyx_v_self, PyObject *__pyx_v_shape, Py_ssize_t __pyx_v_itemsize, PyObject *__pyx_v_format, PyObject *__pyx_v_mode, int __pyx_v_allocate_buffer); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array_2__getbuffer__(struct __pyx_array_obj *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
 static void __pyx_array___pyx_pf_15View_dot_MemoryView_5array_4__dealloc__(struct __pyx_array_obj *__pyx_v_self); /* proto */
@@ -2048,7 +2048,7 @@ static PyObject *__pyx_tuple__24;
 static PyObject *__pyx_codeobj__25;
 /* Late includes */
 
-/* "PfyMU/features/lib/_cython/sparc.pyx":10
+/* "skimu/features/lib/_cython/sparc.pyx":10
  * 
  * 
  * cpdef sparc_1d(const double[:] x, double fsample, int padlevel, double fcut,             # <<<<<<<<<<<<<<
@@ -2056,8 +2056,8 @@ static PyObject *__pyx_codeobj__25;
  *     cdef Py_ssize_t n = x.size, j, ixf, ixa0 = 0, ixa
  */
 
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_5sparc_1sparc_1d(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(__Pyx_memviewslice __pyx_v_x, double __pyx_v_fsample, int __pyx_v_padlevel, double __pyx_v_fcut, double __pyx_v_amp_thresh, CYTHON_UNUSED int __pyx_skip_dispatch) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_5sparc_1sparc_1d(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_f_5skimu_8features_3lib_7_cython_5sparc_sparc_1d(__Pyx_memviewslice __pyx_v_x, double __pyx_v_fsample, int __pyx_v_padlevel, double __pyx_v_fcut, double __pyx_v_amp_thresh, CYTHON_UNUSED int __pyx_skip_dispatch) {
   Py_ssize_t __pyx_v_n;
   Py_ssize_t __pyx_v_j;
   Py_ssize_t __pyx_v_ixf;
@@ -2093,7 +2093,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(__Pyx_me
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("sparc_1d", 0);
 
-  /* "PfyMU/features/lib/_cython/sparc.pyx":12
+  /* "skimu/features/lib/_cython/sparc.pyx":12
  * cpdef sparc_1d(const double[:] x, double fsample, int padlevel, double fcut,
  *             double amp_thresh):
  *     cdef Py_ssize_t n = x.size, j, ixf, ixa0 = 0, ixa             # <<<<<<<<<<<<<<
@@ -2110,7 +2110,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(__Pyx_me
   __pyx_v_n = __pyx_t_3;
   __pyx_v_ixa0 = 0;
 
-  /* "PfyMU/features/lib/_cython/sparc.pyx":13
+  /* "skimu/features/lib/_cython/sparc.pyx":13
  *             double amp_thresh):
  *     cdef Py_ssize_t n = x.size, j, ixf, ixa0 = 0, ixa
  *     cdef double sal = 0., frange             # <<<<<<<<<<<<<<
@@ -2119,7 +2119,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(__Pyx_me
  */
   __pyx_v_sal = 0.;
 
-  /* "PfyMU/features/lib/_cython/sparc.pyx":15
+  /* "skimu/features/lib/_cython/sparc.pyx":15
  *     cdef double sal = 0., frange
  * 
  *     cdef int nfft = 2**(<int>(ceil(log2(n)) + padlevel))             # <<<<<<<<<<<<<<
@@ -2128,7 +2128,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(__Pyx_me
  */
   __pyx_v_nfft = __Pyx_pow_long(2, ((long)((int)(ceil(log2(__pyx_v_n)) + __pyx_v_padlevel))));
 
-  /* "PfyMU/features/lib/_cython/sparc.pyx":16
+  /* "skimu/features/lib/_cython/sparc.pyx":16
  * 
  *     cdef int nfft = 2**(<int>(ceil(log2(n)) + padlevel))
  *     ixf = <Py_ssize_t>(floor(fcut / fsample * (nfft-1)))             # <<<<<<<<<<<<<<
@@ -2141,7 +2141,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(__Pyx_me
   }
   __pyx_v_ixf = ((Py_ssize_t)floor(((__pyx_v_fcut / __pyx_v_fsample) * (__pyx_v_nfft - 1))));
 
-  /* "PfyMU/features/lib/_cython/sparc.pyx":17
+  /* "skimu/features/lib/_cython/sparc.pyx":17
  *     cdef int nfft = 2**(<int>(ceil(log2(n)) + padlevel))
  *     ixf = <Py_ssize_t>(floor(fcut / fsample * (nfft-1)))
  *     cdef double[:] freq = arange(0, fsample, fsample / nfft)             # <<<<<<<<<<<<<<
@@ -2216,7 +2216,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(__Pyx_me
   __pyx_t_9.memview = NULL;
   __pyx_t_9.data = NULL;
 
-  /* "PfyMU/features/lib/_cython/sparc.pyx":20
+  /* "skimu/features/lib/_cython/sparc.pyx":20
  * 
  *     # normalized magnitude spectrum
  *     cdef double[:] Mf = npy_abs(rfft(x, n=nfft))             # <<<<<<<<<<<<<<
@@ -2267,7 +2267,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(__Pyx_me
   __pyx_t_9.memview = NULL;
   __pyx_t_9.data = NULL;
 
-  /* "PfyMU/features/lib/_cython/sparc.pyx":21
+  /* "skimu/features/lib/_cython/sparc.pyx":21
  *     # normalized magnitude spectrum
  *     cdef double[:] Mf = npy_abs(rfft(x, n=nfft))
  *     cdef double max_Mf = 0.             # <<<<<<<<<<<<<<
@@ -2276,7 +2276,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(__Pyx_me
  */
   __pyx_v_max_Mf = 0.;
 
-  /* "PfyMU/features/lib/_cython/sparc.pyx":22
+  /* "skimu/features/lib/_cython/sparc.pyx":22
  *     cdef double[:] Mf = npy_abs(rfft(x, n=nfft))
  *     cdef double max_Mf = 0.
  *     for j in range(ixf + 1):             # <<<<<<<<<<<<<<
@@ -2288,7 +2288,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(__Pyx_me
   for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_10; __pyx_t_11+=1) {
     __pyx_v_j = __pyx_t_11;
 
-    /* "PfyMU/features/lib/_cython/sparc.pyx":23
+    /* "skimu/features/lib/_cython/sparc.pyx":23
  *     cdef double max_Mf = 0.
  *     for j in range(ixf + 1):
  *         if Mf[j] > max_Mf:             # <<<<<<<<<<<<<<
@@ -2299,7 +2299,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(__Pyx_me
     __pyx_t_13 = (((*((double *) ( /* dim=0 */ (__pyx_v_Mf.data + __pyx_t_12 * __pyx_v_Mf.strides[0]) ))) > __pyx_v_max_Mf) != 0);
     if (__pyx_t_13) {
 
-      /* "PfyMU/features/lib/_cython/sparc.pyx":24
+      /* "skimu/features/lib/_cython/sparc.pyx":24
  *     for j in range(ixf + 1):
  *         if Mf[j] > max_Mf:
  *             max_Mf = Mf[j]             # <<<<<<<<<<<<<<
@@ -2309,7 +2309,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(__Pyx_me
       __pyx_t_12 = __pyx_v_j;
       __pyx_v_max_Mf = (*((double *) ( /* dim=0 */ (__pyx_v_Mf.data + __pyx_t_12 * __pyx_v_Mf.strides[0]) )));
 
-      /* "PfyMU/features/lib/_cython/sparc.pyx":23
+      /* "skimu/features/lib/_cython/sparc.pyx":23
  *     cdef double max_Mf = 0.
  *     for j in range(ixf + 1):
  *         if Mf[j] > max_Mf:             # <<<<<<<<<<<<<<
@@ -2319,7 +2319,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(__Pyx_me
     }
   }
 
-  /* "PfyMU/features/lib/_cython/sparc.pyx":25
+  /* "skimu/features/lib/_cython/sparc.pyx":25
  *         if Mf[j] > max_Mf:
  *             max_Mf = Mf[j]
  *     amp_thresh *= max_Mf             # <<<<<<<<<<<<<<
@@ -2328,7 +2328,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(__Pyx_me
  */
   __pyx_v_amp_thresh = (__pyx_v_amp_thresh * __pyx_v_max_Mf);
 
-  /* "PfyMU/features/lib/_cython/sparc.pyx":31
+  /* "skimu/features/lib/_cython/sparc.pyx":31
  *     # noise from affecting the next step (amplitude threshold based cutoff for
  *     # arc length calculation)
  *     ixa = ixf             # <<<<<<<<<<<<<<
@@ -2337,7 +2337,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(__Pyx_me
  */
   __pyx_v_ixa = __pyx_v_ixf;
 
-  /* "PfyMU/features/lib/_cython/sparc.pyx":32
+  /* "skimu/features/lib/_cython/sparc.pyx":32
  *     # arc length calculation)
  *     ixa = ixf
  *     while Mf[ixa0] < amp_thresh and ixa0 < nfft:             # <<<<<<<<<<<<<<
@@ -2357,7 +2357,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(__Pyx_me
     __pyx_L8_bool_binop_done:;
     if (!__pyx_t_13) break;
 
-    /* "PfyMU/features/lib/_cython/sparc.pyx":33
+    /* "skimu/features/lib/_cython/sparc.pyx":33
  *     ixa = ixf
  *     while Mf[ixa0] < amp_thresh and ixa0 < nfft:
  *         ixa0 += 1             # <<<<<<<<<<<<<<
@@ -2367,7 +2367,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(__Pyx_me
     __pyx_v_ixa0 = (__pyx_v_ixa0 + 1);
   }
 
-  /* "PfyMU/features/lib/_cython/sparc.pyx":34
+  /* "skimu/features/lib/_cython/sparc.pyx":34
  *     while Mf[ixa0] < amp_thresh and ixa0 < nfft:
  *         ixa0 += 1
  *     while Mf[ixa] < amp_thresh and ixa > 0:             # <<<<<<<<<<<<<<
@@ -2387,7 +2387,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(__Pyx_me
     __pyx_L12_bool_binop_done:;
     if (!__pyx_t_13) break;
 
-    /* "PfyMU/features/lib/_cython/sparc.pyx":35
+    /* "skimu/features/lib/_cython/sparc.pyx":35
  *         ixa0 += 1
  *     while Mf[ixa] < amp_thresh and ixa > 0:
  *         ixa -= 1             # <<<<<<<<<<<<<<
@@ -2397,7 +2397,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(__Pyx_me
     __pyx_v_ixa = (__pyx_v_ixa - 1);
   }
 
-  /* "PfyMU/features/lib/_cython/sparc.pyx":37
+  /* "skimu/features/lib/_cython/sparc.pyx":37
  *         ixa -= 1
  * 
  *     frange = freq[ixa] - freq[ixa0]             # <<<<<<<<<<<<<<
@@ -2408,7 +2408,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(__Pyx_me
   __pyx_t_15 = __pyx_v_ixa0;
   __pyx_v_frange = ((*((double *) ( /* dim=0 */ (__pyx_v_freq.data + __pyx_t_12 * __pyx_v_freq.strides[0]) ))) - (*((double *) ( /* dim=0 */ (__pyx_v_freq.data + __pyx_t_15 * __pyx_v_freq.strides[0]) ))));
 
-  /* "PfyMU/features/lib/_cython/sparc.pyx":38
+  /* "skimu/features/lib/_cython/sparc.pyx":38
  * 
  *     frange = freq[ixa] - freq[ixa0]
  *     for j in range(ixa0+1, ixa+1):             # <<<<<<<<<<<<<<
@@ -2420,7 +2420,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(__Pyx_me
   for (__pyx_t_11 = (__pyx_v_ixa0 + 1); __pyx_t_11 < __pyx_t_10; __pyx_t_11+=1) {
     __pyx_v_j = __pyx_t_11;
 
-    /* "PfyMU/features/lib/_cython/sparc.pyx":39
+    /* "skimu/features/lib/_cython/sparc.pyx":39
  *     frange = freq[ixa] - freq[ixa0]
  *     for j in range(ixa0+1, ixa+1):
  *         sal -= sqrt(((freq[j] - freq[j-1]) / frange)**2             # <<<<<<<<<<<<<<
@@ -2435,7 +2435,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(__Pyx_me
       __PYX_ERR(0, 39, __pyx_L1_error)
     }
 
-    /* "PfyMU/features/lib/_cython/sparc.pyx":40
+    /* "skimu/features/lib/_cython/sparc.pyx":40
  *     for j in range(ixa0+1, ixa+1):
  *         sal -= sqrt(((freq[j] - freq[j-1]) / frange)**2
  *                     + ((Mf[j] - Mf[j-1]) / max_Mf)**2)             # <<<<<<<<<<<<<<
@@ -2450,7 +2450,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(__Pyx_me
       __PYX_ERR(0, 40, __pyx_L1_error)
     }
 
-    /* "PfyMU/features/lib/_cython/sparc.pyx":39
+    /* "skimu/features/lib/_cython/sparc.pyx":39
  *     frange = freq[ixa] - freq[ixa0]
  *     for j in range(ixa0+1, ixa+1):
  *         sal -= sqrt(((freq[j] - freq[j-1]) / frange)**2             # <<<<<<<<<<<<<<
@@ -2460,7 +2460,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(__Pyx_me
     __pyx_v_sal = (__pyx_v_sal - sqrt((pow((__pyx_t_16 / __pyx_v_frange), 2.0) + pow((__pyx_t_17 / __pyx_v_max_Mf), 2.0))));
   }
 
-  /* "PfyMU/features/lib/_cython/sparc.pyx":42
+  /* "skimu/features/lib/_cython/sparc.pyx":42
  *                     + ((Mf[j] - Mf[j-1]) / max_Mf)**2)
  * 
  *     return sal             # <<<<<<<<<<<<<<
@@ -2474,7 +2474,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(__Pyx_me
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "PfyMU/features/lib/_cython/sparc.pyx":10
+  /* "skimu/features/lib/_cython/sparc.pyx":10
  * 
  * 
  * cpdef sparc_1d(const double[:] x, double fsample, int padlevel, double fcut,             # <<<<<<<<<<<<<<
@@ -2491,7 +2491,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(__Pyx_me
   __Pyx_XDECREF(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_8);
   __PYX_XDEC_MEMVIEW(&__pyx_t_9, 1);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.sparc.sparc_1d", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.sparc.sparc_1d", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
   __PYX_XDEC_MEMVIEW(&__pyx_v_freq, 1);
@@ -2502,8 +2502,8 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(__Pyx_me
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_5sparc_1sparc_1d(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_5sparc_1sparc_1d(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_5sparc_1sparc_1d(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_5sparc_1sparc_1d(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_x = { 0, 0, { 0 }, { 0 }, { 0 } };
   double __pyx_v_fsample;
   int __pyx_v_padlevel;
@@ -2587,18 +2587,18 @@ static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_5sparc_1sparc_1d(PyObje
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("sparc_1d", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 10, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.sparc.sparc_1d", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.sparc.sparc_1d", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(__pyx_self, __pyx_v_x, __pyx_v_fsample, __pyx_v_padlevel, __pyx_v_fcut, __pyx_v_amp_thresh);
+  __pyx_r = __pyx_pf_5skimu_8features_3lib_7_cython_5sparc_sparc_1d(__pyx_self, __pyx_v_x, __pyx_v_fsample, __pyx_v_padlevel, __pyx_v_fcut, __pyx_v_amp_thresh);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fsample, int __pyx_v_padlevel, double __pyx_v_fcut, double __pyx_v_amp_thresh) {
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_5sparc_sparc_1d(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fsample, int __pyx_v_padlevel, double __pyx_v_fcut, double __pyx_v_amp_thresh) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -2608,7 +2608,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(CYTHON_
   __Pyx_RefNannySetupContext("sparc_1d", 0);
   __Pyx_XDECREF(__pyx_r);
   if (unlikely(!__pyx_v_x.memview)) { __Pyx_RaiseUnboundLocalError("x"); __PYX_ERR(0, 10, __pyx_L1_error) }
-  __pyx_t_1 = __pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(__pyx_v_x, __pyx_v_fsample, __pyx_v_padlevel, __pyx_v_fcut, __pyx_v_amp_thresh, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 10, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5skimu_8features_3lib_7_cython_5sparc_sparc_1d(__pyx_v_x, __pyx_v_fsample, __pyx_v_padlevel, __pyx_v_fcut, __pyx_v_amp_thresh, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 10, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -2617,7 +2617,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(CYTHON_
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.sparc.sparc_1d", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.sparc.sparc_1d", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __PYX_XDEC_MEMVIEW(&__pyx_v_x, 1);
@@ -2626,7 +2626,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(CYTHON_
   return __pyx_r;
 }
 
-/* "PfyMU/features/lib/_cython/sparc.pyx":45
+/* "skimu/features/lib/_cython/sparc.pyx":45
  * 
  * 
  * cpdef SPARC(const double[:, :, :] x, double fsample, int padlevel, double fcut,             # <<<<<<<<<<<<<<
@@ -2634,8 +2634,8 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(CYTHON_
  *     cdef Py_ssize_t m = x.shape[0], p = x.shape[2], i, k
  */
 
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_5sparc_3SPARC(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_SPARC(__Pyx_memviewslice __pyx_v_x, double __pyx_v_fsample, int __pyx_v_padlevel, double __pyx_v_fcut, double __pyx_v_amp_thresh, CYTHON_UNUSED int __pyx_skip_dispatch) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_5sparc_3SPARC(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_f_5skimu_8features_3lib_7_cython_5sparc_SPARC(__Pyx_memviewslice __pyx_v_x, double __pyx_v_fsample, int __pyx_v_padlevel, double __pyx_v_fcut, double __pyx_v_amp_thresh, CYTHON_UNUSED int __pyx_skip_dispatch) {
   Py_ssize_t __pyx_v_m;
   Py_ssize_t __pyx_v_p;
   Py_ssize_t __pyx_v_i;
@@ -2664,7 +2664,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_SPARC(__Pyx_memvi
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("SPARC", 0);
 
-  /* "PfyMU/features/lib/_cython/sparc.pyx":47
+  /* "skimu/features/lib/_cython/sparc.pyx":47
  * cpdef SPARC(const double[:, :, :] x, double fsample, int padlevel, double fcut,
  *                double amp_thresh):
  *     cdef Py_ssize_t m = x.shape[0], p = x.shape[2], i, k             # <<<<<<<<<<<<<<
@@ -2674,7 +2674,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_SPARC(__Pyx_memvi
   __pyx_v_m = (__pyx_v_x.shape[0]);
   __pyx_v_p = (__pyx_v_x.shape[2]);
 
-  /* "PfyMU/features/lib/_cython/sparc.pyx":49
+  /* "skimu/features/lib/_cython/sparc.pyx":49
  *     cdef Py_ssize_t m = x.shape[0], p = x.shape[2], i, k
  * 
  *     sparclen = zeros((m, p), dtype=npy_double, order='C')             # <<<<<<<<<<<<<<
@@ -2715,7 +2715,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_SPARC(__Pyx_memvi
   __pyx_v_sparclen = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "PfyMU/features/lib/_cython/sparc.pyx":50
+  /* "skimu/features/lib/_cython/sparc.pyx":50
  * 
  *     sparclen = zeros((m, p), dtype=npy_double, order='C')
  *     cdef double[:, ::1] sal = sparclen             # <<<<<<<<<<<<<<
@@ -2727,7 +2727,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_SPARC(__Pyx_memvi
   __pyx_t_5.memview = NULL;
   __pyx_t_5.data = NULL;
 
-  /* "PfyMU/features/lib/_cython/sparc.pyx":52
+  /* "skimu/features/lib/_cython/sparc.pyx":52
  *     cdef double[:, ::1] sal = sparclen
  * 
  *     for i in range(m):             # <<<<<<<<<<<<<<
@@ -2739,7 +2739,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_SPARC(__Pyx_memvi
   for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
     __pyx_v_i = __pyx_t_8;
 
-    /* "PfyMU/features/lib/_cython/sparc.pyx":53
+    /* "skimu/features/lib/_cython/sparc.pyx":53
  * 
  *     for i in range(m):
  *         for k in range(p):             # <<<<<<<<<<<<<<
@@ -2751,7 +2751,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_SPARC(__Pyx_memvi
     for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_10; __pyx_t_11+=1) {
       __pyx_v_k = __pyx_t_11;
 
-      /* "PfyMU/features/lib/_cython/sparc.pyx":54
+      /* "skimu/features/lib/_cython/sparc.pyx":54
  *     for i in range(m):
  *         for k in range(p):
  *             sal[i, k] = sparc_1d(x[i, :, k], fsample, padlevel, fcut, amp_thresh)             # <<<<<<<<<<<<<<
@@ -2777,7 +2777,7 @@ __pyx_t_12.strides[0] = __pyx_v_x.strides[1];
         __pyx_t_12.data += __pyx_tmp_idx * __pyx_tmp_stride;
 }
 
-__pyx_t_2 = __pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(__pyx_t_12, __pyx_v_fsample, __pyx_v_padlevel, __pyx_v_fcut, __pyx_v_amp_thresh, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 54, __pyx_L1_error)
+__pyx_t_2 = __pyx_f_5skimu_8features_3lib_7_cython_5sparc_sparc_1d(__pyx_t_12, __pyx_v_fsample, __pyx_v_padlevel, __pyx_v_fcut, __pyx_v_amp_thresh, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 54, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __PYX_XDEC_MEMVIEW(&__pyx_t_12, 1);
       __pyx_t_12.memview = NULL;
@@ -2790,7 +2790,7 @@ __pyx_t_2 = __pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(__pyx_t_12, _
     }
   }
 
-  /* "PfyMU/features/lib/_cython/sparc.pyx":56
+  /* "skimu/features/lib/_cython/sparc.pyx":56
  *             sal[i, k] = sparc_1d(x[i, :, k], fsample, padlevel, fcut, amp_thresh)
  * 
  *     return sparclen             # <<<<<<<<<<<<<<
@@ -2800,7 +2800,7 @@ __pyx_t_2 = __pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(__pyx_t_12, _
   __pyx_r = __pyx_v_sparclen;
   goto __pyx_L0;
 
-  /* "PfyMU/features/lib/_cython/sparc.pyx":45
+  /* "skimu/features/lib/_cython/sparc.pyx":45
  * 
  * 
  * cpdef SPARC(const double[:, :, :] x, double fsample, int padlevel, double fcut,             # <<<<<<<<<<<<<<
@@ -2816,7 +2816,7 @@ __pyx_t_2 = __pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(__pyx_t_12, _
   __Pyx_XDECREF(__pyx_t_4);
   __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_t_12, 1);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.sparc.SPARC", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.sparc.SPARC", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_sparclen);
@@ -2827,8 +2827,8 @@ __pyx_t_2 = __pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_sparc_1d(__pyx_t_12, _
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_5sparc_3SPARC(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_5sparc_3SPARC(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_5sparc_3SPARC(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_5sparc_3SPARC(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_x = { 0, 0, { 0 }, { 0 }, { 0 } };
   double __pyx_v_fsample;
   int __pyx_v_padlevel;
@@ -2912,18 +2912,18 @@ static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_5sparc_3SPARC(PyObject 
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("SPARC", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 45, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.sparc.SPARC", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.sparc.SPARC", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5PfyMU_8features_3lib_7_cython_5sparc_2SPARC(__pyx_self, __pyx_v_x, __pyx_v_fsample, __pyx_v_padlevel, __pyx_v_fcut, __pyx_v_amp_thresh);
+  __pyx_r = __pyx_pf_5skimu_8features_3lib_7_cython_5sparc_2SPARC(__pyx_self, __pyx_v_x, __pyx_v_fsample, __pyx_v_padlevel, __pyx_v_fcut, __pyx_v_amp_thresh);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_5sparc_2SPARC(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fsample, int __pyx_v_padlevel, double __pyx_v_fcut, double __pyx_v_amp_thresh) {
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_5sparc_2SPARC(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fsample, int __pyx_v_padlevel, double __pyx_v_fcut, double __pyx_v_amp_thresh) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -2933,7 +2933,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_5sparc_2SPARC(CYTHON_UN
   __Pyx_RefNannySetupContext("SPARC", 0);
   __Pyx_XDECREF(__pyx_r);
   if (unlikely(!__pyx_v_x.memview)) { __Pyx_RaiseUnboundLocalError("x"); __PYX_ERR(0, 45, __pyx_L1_error) }
-  __pyx_t_1 = __pyx_f_5PfyMU_8features_3lib_7_cython_5sparc_SPARC(__pyx_v_x, __pyx_v_fsample, __pyx_v_padlevel, __pyx_v_fcut, __pyx_v_amp_thresh, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 45, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5skimu_8features_3lib_7_cython_5sparc_SPARC(__pyx_v_x, __pyx_v_fsample, __pyx_v_padlevel, __pyx_v_fcut, __pyx_v_amp_thresh, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 45, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -2942,7 +2942,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_5sparc_2SPARC(CYTHON_UN
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.sparc.SPARC", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.sparc.SPARC", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __PYX_XDEC_MEMVIEW(&__pyx_v_x, 1);
@@ -16091,7 +16091,7 @@ static PyBufferProcs __pyx_tp_as_buffer_array = {
 
 static PyTypeObject __pyx_type___pyx_array = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.sparc.array", /*tp_name*/
+  "skimu.features.lib._cython.sparc.array", /*tp_name*/
   sizeof(struct __pyx_array_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc_array, /*tp_dealloc*/
@@ -16210,7 +16210,7 @@ static PyMethodDef __pyx_methods_Enum[] = {
 
 static PyTypeObject __pyx_type___pyx_MemviewEnum = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.sparc.Enum", /*tp_name*/
+  "skimu.features.lib._cython.sparc.Enum", /*tp_name*/
   sizeof(struct __pyx_MemviewEnum_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc_Enum, /*tp_dealloc*/
@@ -16471,7 +16471,7 @@ static PyBufferProcs __pyx_tp_as_buffer_memoryview = {
 
 static PyTypeObject __pyx_type___pyx_memoryview = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.sparc.memoryview", /*tp_name*/
+  "skimu.features.lib._cython.sparc.memoryview", /*tp_name*/
   sizeof(struct __pyx_memoryview_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc_memoryview, /*tp_dealloc*/
@@ -16609,7 +16609,7 @@ static struct PyGetSetDef __pyx_getsets__memoryviewslice[] = {
 
 static PyTypeObject __pyx_type___pyx_memoryviewslice = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.sparc._memoryviewslice", /*tp_name*/
+  "skimu.features.lib._cython.sparc._memoryviewslice", /*tp_name*/
   sizeof(struct __pyx_memoryviewslice_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc__memoryviewslice, /*tp_dealloc*/
@@ -16685,8 +16685,8 @@ static PyTypeObject __pyx_type___pyx_memoryviewslice = {
 };
 
 static PyMethodDef __pyx_methods[] = {
-  {"sparc_1d", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5PfyMU_8features_3lib_7_cython_5sparc_1sparc_1d, METH_VARARGS|METH_KEYWORDS, 0},
-  {"SPARC", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5PfyMU_8features_3lib_7_cython_5sparc_3SPARC, METH_VARARGS|METH_KEYWORDS, 0},
+  {"sparc_1d", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5skimu_8features_3lib_7_cython_5sparc_1sparc_1d, METH_VARARGS|METH_KEYWORDS, 0},
+  {"SPARC", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5skimu_8features_3lib_7_cython_5sparc_3SPARC, METH_VARARGS|METH_KEYWORDS, 0},
   {0, 0, 0, 0}
 };
 
@@ -17432,14 +17432,14 @@ if (!__Pyx_RefNanny) {
   #if PY_MAJOR_VERSION < 3 && (__PYX_DEFAULT_STRING_ENCODING_IS_ASCII || __PYX_DEFAULT_STRING_ENCODING_IS_DEFAULT)
   if (__Pyx_init_sys_getdefaultencoding_params() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
-  if (__pyx_module_is_main_PfyMU__features__lib___cython__sparc) {
+  if (__pyx_module_is_main_skimu__features__lib___cython__sparc) {
     if (PyObject_SetAttr(__pyx_m, __pyx_n_s_name_2, __pyx_n_s_main) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   }
   #if PY_MAJOR_VERSION >= 3
   {
     PyObject *modules = PyImport_GetModuleDict(); if (unlikely(!modules)) __PYX_ERR(0, 1, __pyx_L1_error)
-    if (!PyDict_GetItemString(modules, "PfyMU.features.lib._cython.sparc")) {
-      if (unlikely(PyDict_SetItemString(modules, "PfyMU.features.lib._cython.sparc", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
+    if (!PyDict_GetItemString(modules, "skimu.features.lib._cython.sparc")) {
+      if (unlikely(PyDict_SetItemString(modules, "skimu.features.lib._cython.sparc", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
     }
   }
   #endif
@@ -17460,7 +17460,7 @@ if (!__Pyx_RefNanny) {
   if (__Pyx_patch_abc() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
 
-  /* "PfyMU/features/lib/_cython/sparc.pyx":5
+  /* "skimu/features/lib/_cython/sparc.pyx":5
  * # cython: boundscheck = False
  * cimport cython
  * from numpy import zeros, double as npy_double, arange, abs as npy_abs             # <<<<<<<<<<<<<<
@@ -17502,7 +17502,7 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "PfyMU/features/lib/_cython/sparc.pyx":6
+  /* "skimu/features/lib/_cython/sparc.pyx":6
  * cimport cython
  * from numpy import zeros, double as npy_double, arange, abs as npy_abs
  * from numpy.fft import rfft             # <<<<<<<<<<<<<<
@@ -17523,7 +17523,7 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "PfyMU/features/lib/_cython/sparc.pyx":1
+  /* "skimu/features/lib/_cython/sparc.pyx":1
  * # cython: infer_types = True             # <<<<<<<<<<<<<<
  * # cython: wraparound = False
  * # cython: boundscheck = False
@@ -17694,11 +17694,11 @@ if (!__Pyx_RefNanny) {
   __Pyx_XDECREF(__pyx_t_2);
   if (__pyx_m) {
     if (__pyx_d) {
-      __Pyx_AddTraceback("init PfyMU.features.lib._cython.sparc", __pyx_clineno, __pyx_lineno, __pyx_filename);
+      __Pyx_AddTraceback("init skimu.features.lib._cython.sparc", __pyx_clineno, __pyx_lineno, __pyx_filename);
     }
     Py_CLEAR(__pyx_m);
   } else if (!PyErr_Occurred()) {
-    PyErr_SetString(PyExc_ImportError, "init PfyMU.features.lib._cython.sparc");
+    PyErr_SetString(PyExc_ImportError, "init skimu.features.lib._cython.sparc");
   }
   __pyx_L0:;
   __Pyx_RefNannyFinishContext();

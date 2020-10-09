@@ -4,12 +4,12 @@
 {
     "distutils": {
         "depends": [],
-        "name": "PfyMU.features.lib._cython.complexityInvariantDistance",
+        "name": "skimu.features.lib._cython.complexityInvariantDistance",
         "sources": [
-            "src/PfyMU/features/lib/_cython/complexityInvariantDistance.pyx"
+            "src/skimu/features/lib/_cython/complexityInvariantDistance.pyx"
         ]
     },
-    "module_name": "PfyMU.features.lib._cython.complexityInvariantDistance"
+    "module_name": "skimu.features.lib._cython.complexityInvariantDistance"
 }
 END: Cython Metadata */
 
@@ -604,8 +604,8 @@ static CYTHON_INLINE float __PYX_NAN() {
   #endif
 #endif
 
-#define __PYX_HAVE__PfyMU__features__lib___cython__complexityInvariantDistance
-#define __PYX_HAVE_API__PfyMU__features__lib___cython__complexityInvariantDistance
+#define __PYX_HAVE__skimu__features__lib___cython__complexityInvariantDistance
+#define __PYX_HAVE_API__skimu__features__lib___cython__complexityInvariantDistance
 /* Early includes */
 #include <math.h>
 #include "pythread.h"
@@ -821,7 +821,7 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "src/PfyMU/features/lib/_cython/complexityInvariantDistance.pyx",
+  "src/skimu/features/lib/_cython/complexityInvariantDistance.pyx",
   "stringsource",
 };
 /* MemviewSliceStruct.proto */
@@ -1692,10 +1692,10 @@ static PyObject *__pyx_memoryviewslice_assign_item_from_object(struct __pyx_memo
 
 /* Module declarations from 'libc.math' */
 
-/* Module declarations from 'PfyMU.features.lib._cython.common' */
-static void (*__pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d)(__Pyx_memviewslice, double *, double *); /*proto*/
+/* Module declarations from 'skimu.features.lib._cython.common' */
+static void (*__pyx_f_5skimu_8features_3lib_7_cython_6common_mean_sd_1d)(__Pyx_memviewslice, double *, double *); /*proto*/
 
-/* Module declarations from 'PfyMU.features.lib._cython.complexityInvariantDistance' */
+/* Module declarations from 'skimu.features.lib._cython.complexityInvariantDistance' */
 static PyTypeObject *__pyx_array_type = 0;
 static PyTypeObject *__pyx_MemviewEnum_type = 0;
 static PyTypeObject *__pyx_memoryview_type = 0;
@@ -1707,7 +1707,7 @@ static PyObject *contiguous = 0;
 static PyObject *indirect_contiguous = 0;
 static int __pyx_memoryview_thread_locks_used;
 static PyThread_type_lock __pyx_memoryview_thread_locks[8];
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_27complexityInvariantDistance_CID(__Pyx_memviewslice, int, int __pyx_skip_dispatch); /*proto*/
+static PyObject *__pyx_f_5skimu_8features_3lib_7_cython_27complexityInvariantDistance_CID(__Pyx_memviewslice, int, int __pyx_skip_dispatch); /*proto*/
 static struct __pyx_array_obj *__pyx_array_new(PyObject *, Py_ssize_t, char *, char *, char *); /*proto*/
 static void *__pyx_align_pointer(void *, size_t); /*proto*/
 static PyObject *__pyx_memoryview_new(PyObject *, int, int, __Pyx_TypeInfo *); /*proto*/
@@ -1743,11 +1743,11 @@ static void __pyx_memoryview__slice_assign_scalar(char *, Py_ssize_t *, Py_ssize
 static PyObject *__pyx_unpickle_Enum__set_state(struct __pyx_MemviewEnum_obj *, PyObject *); /*proto*/
 static __Pyx_TypeInfo __Pyx_TypeInfo_double__const__ = { "const double", NULL, sizeof(double const ), { 0 }, 0, 'R', 0, 0 };
 static __Pyx_TypeInfo __Pyx_TypeInfo_double = { "double", NULL, sizeof(double), { 0 }, 0, 'R', 0, 0 };
-#define __Pyx_MODULE_NAME "PfyMU.features.lib._cython.complexityInvariantDistance"
-extern int __pyx_module_is_main_PfyMU__features__lib___cython__complexityInvariantDistance;
-int __pyx_module_is_main_PfyMU__features__lib___cython__complexityInvariantDistance = 0;
+#define __Pyx_MODULE_NAME "skimu.features.lib._cython.complexityInvariantDistance"
+extern int __pyx_module_is_main_skimu__features__lib___cython__complexityInvariantDistance;
+int __pyx_module_is_main_skimu__features__lib___cython__complexityInvariantDistance = 0;
 
-/* Implementation of 'PfyMU.features.lib._cython.complexityInvariantDistance' */
+/* Implementation of 'skimu.features.lib._cython.complexityInvariantDistance' */
 static PyObject *__pyx_builtin_range;
 static PyObject *__pyx_builtin_ValueError;
 static PyObject *__pyx_builtin_MemoryError;
@@ -1940,7 +1940,7 @@ static PyObject *__pyx_n_s_unpack;
 static PyObject *__pyx_n_s_update;
 static PyObject *__pyx_n_s_x;
 static PyObject *__pyx_n_s_zeros;
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_27complexityInvariantDistance_CID(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, int __pyx_v_normalize); /* proto */
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_27complexityInvariantDistance_CID(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, int __pyx_v_normalize); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __pyx_array_obj *__pyx_v_self, PyObject *__pyx_v_shape, Py_ssize_t __pyx_v_itemsize, PyObject *__pyx_v_format, PyObject *__pyx_v_mode, int __pyx_v_allocate_buffer); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array_2__getbuffer__(struct __pyx_array_obj *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
 static void __pyx_array___pyx_pf_15View_dot_MemoryView_5array_4__dealloc__(struct __pyx_array_obj *__pyx_v_self); /* proto */
@@ -2018,7 +2018,7 @@ static PyObject *__pyx_tuple__24;
 static PyObject *__pyx_codeobj__25;
 /* Late includes */
 
-/* "PfyMU/features/lib/_cython/complexityInvariantDistance.pyx":10
+/* "skimu/features/lib/_cython/complexityInvariantDistance.pyx":10
  * 
  * 
  * cpdef CID(const double[:, :, :] x, bint normalize):             # <<<<<<<<<<<<<<
@@ -2026,8 +2026,8 @@ static PyObject *__pyx_codeobj__25;
  * 
  */
 
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_27complexityInvariantDistance_1CID(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_27complexityInvariantDistance_CID(__Pyx_memviewslice __pyx_v_x, int __pyx_v_normalize, CYTHON_UNUSED int __pyx_skip_dispatch) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_27complexityInvariantDistance_1CID(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_f_5skimu_8features_3lib_7_cython_27complexityInvariantDistance_CID(__Pyx_memviewslice __pyx_v_x, int __pyx_v_normalize, CYTHON_UNUSED int __pyx_skip_dispatch) {
   Py_ssize_t __pyx_v_m;
   Py_ssize_t __pyx_v_n;
   Py_ssize_t __pyx_v_p;
@@ -2072,7 +2072,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_27complexityInvariantDis
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("CID", 0);
 
-  /* "PfyMU/features/lib/_cython/complexityInvariantDistance.pyx":11
+  /* "skimu/features/lib/_cython/complexityInvariantDistance.pyx":11
  * 
  * cpdef CID(const double[:, :, :] x, bint normalize):
  *     cdef Py_ssize_t m = x.shape[0], n = x.shape[1], p = x.shape[2], i, j, k             # <<<<<<<<<<<<<<
@@ -2083,7 +2083,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_27complexityInvariantDis
   __pyx_v_n = (__pyx_v_x.shape[1]);
   __pyx_v_p = (__pyx_v_x.shape[2]);
 
-  /* "PfyMU/features/lib/_cython/complexityInvariantDistance.pyx":13
+  /* "skimu/features/lib/_cython/complexityInvariantDistance.pyx":13
  *     cdef Py_ssize_t m = x.shape[0], n = x.shape[1], p = x.shape[2], i, j, k
  * 
  *     dist = zeros((m, p), dtype=npy_double)             # <<<<<<<<<<<<<<
@@ -2123,7 +2123,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_27complexityInvariantDis
   __pyx_v_dist = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "PfyMU/features/lib/_cython/complexityInvariantDistance.pyx":14
+  /* "skimu/features/lib/_cython/complexityInvariantDistance.pyx":14
  * 
  *     dist = zeros((m, p), dtype=npy_double)
  *     cdef double[:, ::1] cid = dist             # <<<<<<<<<<<<<<
@@ -2135,7 +2135,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_27complexityInvariantDis
   __pyx_t_5.memview = NULL;
   __pyx_t_5.data = NULL;
 
-  /* "PfyMU/features/lib/_cython/complexityInvariantDistance.pyx":15
+  /* "skimu/features/lib/_cython/complexityInvariantDistance.pyx":15
  *     dist = zeros((m, p), dtype=npy_double)
  *     cdef double[:, ::1] cid = dist
  *     cdef double mu = 0., sigma = 0.             # <<<<<<<<<<<<<<
@@ -2145,7 +2145,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_27complexityInvariantDis
   __pyx_v_mu = 0.;
   __pyx_v_sigma = 0.;
 
-  /* "PfyMU/features/lib/_cython/complexityInvariantDistance.pyx":17
+  /* "skimu/features/lib/_cython/complexityInvariantDistance.pyx":17
  *     cdef double mu = 0., sigma = 0.
  * 
  *     for i in range(m):             # <<<<<<<<<<<<<<
@@ -2157,7 +2157,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_27complexityInvariantDis
   for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
     __pyx_v_i = __pyx_t_8;
 
-    /* "PfyMU/features/lib/_cython/complexityInvariantDistance.pyx":18
+    /* "skimu/features/lib/_cython/complexityInvariantDistance.pyx":18
  * 
  *     for i in range(m):
  *         for k in range(p):             # <<<<<<<<<<<<<<
@@ -2169,7 +2169,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_27complexityInvariantDis
     for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_10; __pyx_t_11+=1) {
       __pyx_v_k = __pyx_t_11;
 
-      /* "PfyMU/features/lib/_cython/complexityInvariantDistance.pyx":19
+      /* "skimu/features/lib/_cython/complexityInvariantDistance.pyx":19
  *     for i in range(m):
  *         for k in range(p):
  *             if normalize:             # <<<<<<<<<<<<<<
@@ -2179,7 +2179,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_27complexityInvariantDis
       __pyx_t_12 = (__pyx_v_normalize != 0);
       if (__pyx_t_12) {
 
-        /* "PfyMU/features/lib/_cython/complexityInvariantDistance.pyx":20
+        /* "skimu/features/lib/_cython/complexityInvariantDistance.pyx":20
  *         for k in range(p):
  *             if normalize:
  *                 mu = 0.             # <<<<<<<<<<<<<<
@@ -2188,7 +2188,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_27complexityInvariantDis
  */
         __pyx_v_mu = 0.;
 
-        /* "PfyMU/features/lib/_cython/complexityInvariantDistance.pyx":21
+        /* "skimu/features/lib/_cython/complexityInvariantDistance.pyx":21
  *             if normalize:
  *                 mu = 0.
  *                 sigma = 0.             # <<<<<<<<<<<<<<
@@ -2197,7 +2197,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_27complexityInvariantDis
  */
         __pyx_v_sigma = 0.;
 
-        /* "PfyMU/features/lib/_cython/complexityInvariantDistance.pyx":22
+        /* "skimu/features/lib/_cython/complexityInvariantDistance.pyx":22
  *                 mu = 0.
  *                 sigma = 0.
  *                 mean_sd_1d(x[i, :, k], &mu, &sigma)             # <<<<<<<<<<<<<<
@@ -2223,12 +2223,12 @@ __pyx_t_13.strides[0] = __pyx_v_x.strides[1];
         __pyx_t_13.data += __pyx_tmp_idx * __pyx_tmp_stride;
 }
 
-__pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_mu), (&__pyx_v_sigma));
+__pyx_f_5skimu_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_mu), (&__pyx_v_sigma));
         __PYX_XDEC_MEMVIEW(&__pyx_t_13, 1);
         __pyx_t_13.memview = NULL;
         __pyx_t_13.data = NULL;
 
-        /* "PfyMU/features/lib/_cython/complexityInvariantDistance.pyx":23
+        /* "skimu/features/lib/_cython/complexityInvariantDistance.pyx":23
  *                 sigma = 0.
  *                 mean_sd_1d(x[i, :, k], &mu, &sigma)
  *                 if sigma != 0.:             # <<<<<<<<<<<<<<
@@ -2238,7 +2238,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_
         __pyx_t_12 = ((__pyx_v_sigma != 0.) != 0);
         if (__pyx_t_12) {
 
-          /* "PfyMU/features/lib/_cython/complexityInvariantDistance.pyx":24
+          /* "skimu/features/lib/_cython/complexityInvariantDistance.pyx":24
  *                 mean_sd_1d(x[i, :, k], &mu, &sigma)
  *                 if sigma != 0.:
  *                     for j in range(1, n):             # <<<<<<<<<<<<<<
@@ -2250,7 +2250,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_
           for (__pyx_t_16 = 1; __pyx_t_16 < __pyx_t_15; __pyx_t_16+=1) {
             __pyx_v_j = __pyx_t_16;
 
-            /* "PfyMU/features/lib/_cython/complexityInvariantDistance.pyx":25
+            /* "skimu/features/lib/_cython/complexityInvariantDistance.pyx":25
  *                 if sigma != 0.:
  *                     for j in range(1, n):
  *                       cid[i, k] += ((x[i, j, k] - x[i, j-1, k]) / sigma)**2             # <<<<<<<<<<<<<<
@@ -2273,7 +2273,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_
             *((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_cid.data + __pyx_t_22 * __pyx_v_cid.strides[0]) )) + __pyx_t_21)) )) += pow((__pyx_t_23 / __pyx_v_sigma), 2.0);
           }
 
-          /* "PfyMU/features/lib/_cython/complexityInvariantDistance.pyx":23
+          /* "skimu/features/lib/_cython/complexityInvariantDistance.pyx":23
  *                 sigma = 0.
  *                 mean_sd_1d(x[i, :, k], &mu, &sigma)
  *                 if sigma != 0.:             # <<<<<<<<<<<<<<
@@ -2282,7 +2282,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_
  */
         }
 
-        /* "PfyMU/features/lib/_cython/complexityInvariantDistance.pyx":19
+        /* "skimu/features/lib/_cython/complexityInvariantDistance.pyx":19
  *     for i in range(m):
  *         for k in range(p):
  *             if normalize:             # <<<<<<<<<<<<<<
@@ -2292,7 +2292,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_
         goto __pyx_L7;
       }
 
-      /* "PfyMU/features/lib/_cython/complexityInvariantDistance.pyx":27
+      /* "skimu/features/lib/_cython/complexityInvariantDistance.pyx":27
  *                       cid[i, k] += ((x[i, j, k] - x[i, j-1, k]) / sigma)**2
  *             else:  # if not normalizing
  *                 for j in range(1, n):             # <<<<<<<<<<<<<<
@@ -2305,7 +2305,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_
         for (__pyx_t_16 = 1; __pyx_t_16 < __pyx_t_15; __pyx_t_16+=1) {
           __pyx_v_j = __pyx_t_16;
 
-          /* "PfyMU/features/lib/_cython/complexityInvariantDistance.pyx":28
+          /* "skimu/features/lib/_cython/complexityInvariantDistance.pyx":28
  *             else:  # if not normalizing
  *                 for j in range(1, n):
  *                     cid[i, k] += (x[i, j, k] - x[i, j-1, k])**2             # <<<<<<<<<<<<<<
@@ -2327,7 +2327,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_
     }
   }
 
-  /* "PfyMU/features/lib/_cython/complexityInvariantDistance.pyx":30
+  /* "skimu/features/lib/_cython/complexityInvariantDistance.pyx":30
  *                     cid[i, k] += (x[i, j, k] - x[i, j-1, k])**2
  * 
  *     for i in range(m):             # <<<<<<<<<<<<<<
@@ -2339,7 +2339,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_
   for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
     __pyx_v_i = __pyx_t_8;
 
-    /* "PfyMU/features/lib/_cython/complexityInvariantDistance.pyx":31
+    /* "skimu/features/lib/_cython/complexityInvariantDistance.pyx":31
  * 
  *     for i in range(m):
  *         for k in range(p):             # <<<<<<<<<<<<<<
@@ -2351,7 +2351,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_
     for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_10; __pyx_t_11+=1) {
       __pyx_v_k = __pyx_t_11;
 
-      /* "PfyMU/features/lib/_cython/complexityInvariantDistance.pyx":32
+      /* "skimu/features/lib/_cython/complexityInvariantDistance.pyx":32
  *     for i in range(m):
  *         for k in range(p):
  *             cid[i, k] = sqrt(cid[i, k])             # <<<<<<<<<<<<<<
@@ -2366,7 +2366,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_
     }
   }
 
-  /* "PfyMU/features/lib/_cython/complexityInvariantDistance.pyx":34
+  /* "skimu/features/lib/_cython/complexityInvariantDistance.pyx":34
  *             cid[i, k] = sqrt(cid[i, k])
  * 
  *     return dist             # <<<<<<<<<<<<<<
@@ -2376,7 +2376,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_
   __pyx_r = __pyx_v_dist;
   goto __pyx_L0;
 
-  /* "PfyMU/features/lib/_cython/complexityInvariantDistance.pyx":10
+  /* "skimu/features/lib/_cython/complexityInvariantDistance.pyx":10
  * 
  * 
  * cpdef CID(const double[:, :, :] x, bint normalize):             # <<<<<<<<<<<<<<
@@ -2392,7 +2392,7 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_
   __Pyx_XDECREF(__pyx_t_4);
   __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_t_13, 1);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.complexityInvariantDistance.CID", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.complexityInvariantDistance.CID", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_dist);
@@ -2403,8 +2403,8 @@ __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__pyx_t_13, (&__pyx_v_
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_27complexityInvariantDistance_1CID(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_27complexityInvariantDistance_1CID(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_27complexityInvariantDistance_1CID(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_27complexityInvariantDistance_1CID(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_x = { 0, 0, { 0 }, { 0 }, { 0 } };
   int __pyx_v_normalize;
   int __pyx_lineno = 0;
@@ -2455,18 +2455,18 @@ static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_27complexityInvariantDi
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("CID", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 10, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.complexityInvariantDistance.CID", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.complexityInvariantDistance.CID", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5PfyMU_8features_3lib_7_cython_27complexityInvariantDistance_CID(__pyx_self, __pyx_v_x, __pyx_v_normalize);
+  __pyx_r = __pyx_pf_5skimu_8features_3lib_7_cython_27complexityInvariantDistance_CID(__pyx_self, __pyx_v_x, __pyx_v_normalize);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_27complexityInvariantDistance_CID(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, int __pyx_v_normalize) {
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_27complexityInvariantDistance_CID(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_x, int __pyx_v_normalize) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -2476,7 +2476,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_27complexityInvariantDi
   __Pyx_RefNannySetupContext("CID", 0);
   __Pyx_XDECREF(__pyx_r);
   if (unlikely(!__pyx_v_x.memview)) { __Pyx_RaiseUnboundLocalError("x"); __PYX_ERR(0, 10, __pyx_L1_error) }
-  __pyx_t_1 = __pyx_f_5PfyMU_8features_3lib_7_cython_27complexityInvariantDistance_CID(__pyx_v_x, __pyx_v_normalize, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 10, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5skimu_8features_3lib_7_cython_27complexityInvariantDistance_CID(__pyx_v_x, __pyx_v_normalize, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 10, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -2485,7 +2485,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_27complexityInvariantDi
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.complexityInvariantDistance.CID", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.complexityInvariantDistance.CID", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __PYX_XDEC_MEMVIEW(&__pyx_v_x, 1);
@@ -15634,7 +15634,7 @@ static PyBufferProcs __pyx_tp_as_buffer_array = {
 
 static PyTypeObject __pyx_type___pyx_array = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.complexityInvariantDistance.array", /*tp_name*/
+  "skimu.features.lib._cython.complexityInvariantDistance.array", /*tp_name*/
   sizeof(struct __pyx_array_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc_array, /*tp_dealloc*/
@@ -15753,7 +15753,7 @@ static PyMethodDef __pyx_methods_Enum[] = {
 
 static PyTypeObject __pyx_type___pyx_MemviewEnum = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.complexityInvariantDistance.Enum", /*tp_name*/
+  "skimu.features.lib._cython.complexityInvariantDistance.Enum", /*tp_name*/
   sizeof(struct __pyx_MemviewEnum_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc_Enum, /*tp_dealloc*/
@@ -16014,7 +16014,7 @@ static PyBufferProcs __pyx_tp_as_buffer_memoryview = {
 
 static PyTypeObject __pyx_type___pyx_memoryview = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.complexityInvariantDistance.memoryview", /*tp_name*/
+  "skimu.features.lib._cython.complexityInvariantDistance.memoryview", /*tp_name*/
   sizeof(struct __pyx_memoryview_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc_memoryview, /*tp_dealloc*/
@@ -16152,7 +16152,7 @@ static struct PyGetSetDef __pyx_getsets__memoryviewslice[] = {
 
 static PyTypeObject __pyx_type___pyx_memoryviewslice = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.complexityInvariantDistance._memoryviewslice", /*tp_name*/
+  "skimu.features.lib._cython.complexityInvariantDistance._memoryviewslice", /*tp_name*/
   sizeof(struct __pyx_memoryviewslice_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc__memoryviewslice, /*tp_dealloc*/
@@ -16228,7 +16228,7 @@ static PyTypeObject __pyx_type___pyx_memoryviewslice = {
 };
 
 static PyMethodDef __pyx_methods[] = {
-  {"CID", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5PfyMU_8features_3lib_7_cython_27complexityInvariantDistance_1CID, METH_VARARGS|METH_KEYWORDS, 0},
+  {"CID", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5skimu_8features_3lib_7_cython_27complexityInvariantDistance_1CID, METH_VARARGS|METH_KEYWORDS, 0},
   {0, 0, 0, 0}
 };
 
@@ -16787,8 +16787,8 @@ static int __Pyx_modinit_function_import_code(void) {
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__Pyx_modinit_function_import_code", 0);
   /*--- Function import code ---*/
-  __pyx_t_1 = PyImport_ImportModule("PfyMU.features.lib._cython.common"); if (!__pyx_t_1) __PYX_ERR(0, 1, __pyx_L1_error)
-  if (__Pyx_ImportFunction(__pyx_t_1, "mean_sd_1d", (void (**)(void))&__pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d, "void (__Pyx_memviewslice, double *, double *)") < 0) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_t_1 = PyImport_ImportModule("skimu.features.lib._cython.common"); if (!__pyx_t_1) __PYX_ERR(0, 1, __pyx_L1_error)
+  if (__Pyx_ImportFunction(__pyx_t_1, "mean_sd_1d", (void (**)(void))&__pyx_f_5skimu_8features_3lib_7_cython_6common_mean_sd_1d, "void (__Pyx_memviewslice, double *, double *)") < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   Py_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_RefNannyFinishContext();
   return 0;
@@ -16974,14 +16974,14 @@ if (!__Pyx_RefNanny) {
   #if PY_MAJOR_VERSION < 3 && (__PYX_DEFAULT_STRING_ENCODING_IS_ASCII || __PYX_DEFAULT_STRING_ENCODING_IS_DEFAULT)
   if (__Pyx_init_sys_getdefaultencoding_params() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
-  if (__pyx_module_is_main_PfyMU__features__lib___cython__complexityInvariantDistance) {
+  if (__pyx_module_is_main_skimu__features__lib___cython__complexityInvariantDistance) {
     if (PyObject_SetAttr(__pyx_m, __pyx_n_s_name_2, __pyx_n_s_main) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   }
   #if PY_MAJOR_VERSION >= 3
   {
     PyObject *modules = PyImport_GetModuleDict(); if (unlikely(!modules)) __PYX_ERR(0, 1, __pyx_L1_error)
-    if (!PyDict_GetItemString(modules, "PfyMU.features.lib._cython.complexityInvariantDistance")) {
-      if (unlikely(PyDict_SetItemString(modules, "PfyMU.features.lib._cython.complexityInvariantDistance", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
+    if (!PyDict_GetItemString(modules, "skimu.features.lib._cython.complexityInvariantDistance")) {
+      if (unlikely(PyDict_SetItemString(modules, "skimu.features.lib._cython.complexityInvariantDistance", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
     }
   }
   #endif
@@ -17002,7 +17002,7 @@ if (!__Pyx_RefNanny) {
   if (__Pyx_patch_abc() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
 
-  /* "PfyMU/features/lib/_cython/complexityInvariantDistance.pyx":5
+  /* "skimu/features/lib/_cython/complexityInvariantDistance.pyx":5
  * # cython: wraparound = False
  * cimport cython
  * from numpy import zeros, double as npy_double             # <<<<<<<<<<<<<<
@@ -17030,7 +17030,7 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "PfyMU/features/lib/_cython/complexityInvariantDistance.pyx":1
+  /* "skimu/features/lib/_cython/complexityInvariantDistance.pyx":1
  * # cython: infer_types = True             # <<<<<<<<<<<<<<
  * # cython: boundscheck = False
  * # cython: wraparound = False
@@ -17201,11 +17201,11 @@ if (!__Pyx_RefNanny) {
   __Pyx_XDECREF(__pyx_t_2);
   if (__pyx_m) {
     if (__pyx_d) {
-      __Pyx_AddTraceback("init PfyMU.features.lib._cython.complexityInvariantDistance", __pyx_clineno, __pyx_lineno, __pyx_filename);
+      __Pyx_AddTraceback("init skimu.features.lib._cython.complexityInvariantDistance", __pyx_clineno, __pyx_lineno, __pyx_filename);
     }
     Py_CLEAR(__pyx_m);
   } else if (!PyErr_Occurred()) {
-    PyErr_SetString(PyExc_ImportError, "init PfyMU.features.lib._cython.complexityInvariantDistance");
+    PyErr_SetString(PyExc_ImportError, "init skimu.features.lib._cython.complexityInvariantDistance");
   }
   __pyx_L0:;
   __Pyx_RefNannyFinishContext();

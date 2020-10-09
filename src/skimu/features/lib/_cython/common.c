@@ -4,12 +4,12 @@
 {
     "distutils": {
         "depends": [],
-        "name": "PfyMU.features.lib._cython.common",
+        "name": "skimu.features.lib._cython.common",
         "sources": [
-            "src/PfyMU/features/lib/_cython/common.pyx"
+            "src/skimu/features/lib/_cython/common.pyx"
         ]
     },
-    "module_name": "PfyMU.features.lib._cython.common"
+    "module_name": "skimu.features.lib._cython.common"
 }
 END: Cython Metadata */
 
@@ -604,8 +604,8 @@ static CYTHON_INLINE float __PYX_NAN() {
   #endif
 #endif
 
-#define __PYX_HAVE__PfyMU__features__lib___cython__common
-#define __PYX_HAVE_API__PfyMU__features__lib___cython__common
+#define __PYX_HAVE__skimu__features__lib___cython__common
+#define __PYX_HAVE_API__skimu__features__lib___cython__common
 /* Early includes */
 #include <math.h>
 #include "pythread.h"
@@ -821,7 +821,7 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "src/PfyMU/features/lib/_cython/common.pyx",
+  "src/skimu/features/lib/_cython/common.pyx",
   "stringsource",
 };
 /* ForceInitThreads.proto */
@@ -1671,7 +1671,7 @@ static PyObject *__pyx_memoryviewslice_assign_item_from_object(struct __pyx_memo
 
 /* Module declarations from 'libc.math' */
 
-/* Module declarations from 'PfyMU.features.lib._cython.common' */
+/* Module declarations from 'skimu.features.lib._cython.common' */
 static PyTypeObject *__pyx_array_type = 0;
 static PyTypeObject *__pyx_MemviewEnum_type = 0;
 static PyTypeObject *__pyx_memoryview_type = 0;
@@ -1716,11 +1716,11 @@ static void __pyx_memoryview_refcount_objects_in_slice(char *, Py_ssize_t *, Py_
 static void __pyx_memoryview_slice_assign_scalar(__Pyx_memviewslice *, int, size_t, void *, int); /*proto*/
 static void __pyx_memoryview__slice_assign_scalar(char *, Py_ssize_t *, Py_ssize_t *, int, size_t, void *); /*proto*/
 static PyObject *__pyx_unpickle_Enum__set_state(struct __pyx_MemviewEnum_obj *, PyObject *); /*proto*/
-#define __Pyx_MODULE_NAME "PfyMU.features.lib._cython.common"
-extern int __pyx_module_is_main_PfyMU__features__lib___cython__common;
-int __pyx_module_is_main_PfyMU__features__lib___cython__common = 0;
+#define __Pyx_MODULE_NAME "skimu.features.lib._cython.common"
+extern int __pyx_module_is_main_skimu__features__lib___cython__common;
+int __pyx_module_is_main_skimu__features__lib___cython__common = 0;
 
-/* Implementation of 'PfyMU.features.lib._cython.common' */
+/* Implementation of 'skimu.features.lib._cython.common' */
 static PyObject *__pyx_builtin_range;
 static PyObject *__pyx_builtin_ValueError;
 static PyObject *__pyx_builtin_MemoryError;
@@ -1976,7 +1976,7 @@ static PyObject *__pyx_tuple__24;
 static PyObject *__pyx_codeobj__25;
 /* Late includes */
 
-/* "PfyMU/features/lib/_cython/common.pyx":8
+/* "skimu/features/lib/_cython/common.pyx":8
  * 
  * # MEAN ONLY FUNCTIONS
  * cdef void mean_1d(const double[:] x, double* mean):             # <<<<<<<<<<<<<<
@@ -1984,7 +1984,7 @@ static PyObject *__pyx_codeobj__25;
  * 
  */
 
-static void __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_1d(__Pyx_memviewslice __pyx_v_x, double *__pyx_v_mean) {
+static void __pyx_f_5skimu_8features_3lib_7_cython_6common_mean_1d(__Pyx_memviewslice __pyx_v_x, double *__pyx_v_mean) {
   Py_ssize_t __pyx_v_n;
   Py_ssize_t __pyx_v_i;
   __Pyx_RefNannyDeclarations
@@ -2000,7 +2000,7 @@ static void __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_1d(__Pyx_memview
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("mean_1d", 0);
 
-  /* "PfyMU/features/lib/_cython/common.pyx":9
+  /* "skimu/features/lib/_cython/common.pyx":9
  * # MEAN ONLY FUNCTIONS
  * cdef void mean_1d(const double[:] x, double* mean):
  *     cdef Py_ssize_t n = x.size, i             # <<<<<<<<<<<<<<
@@ -2016,7 +2016,7 @@ static void __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_1d(__Pyx_memview
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_n = __pyx_t_3;
 
-  /* "PfyMU/features/lib/_cython/common.pyx":11
+  /* "skimu/features/lib/_cython/common.pyx":11
  *     cdef Py_ssize_t n = x.size, i
  * 
  *     for i in range(n):             # <<<<<<<<<<<<<<
@@ -2028,7 +2028,7 @@ static void __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_1d(__Pyx_memview
   for (__pyx_t_5 = 0; __pyx_t_5 < __pyx_t_4; __pyx_t_5+=1) {
     __pyx_v_i = __pyx_t_5;
 
-    /* "PfyMU/features/lib/_cython/common.pyx":12
+    /* "skimu/features/lib/_cython/common.pyx":12
  * 
  *     for i in range(n):
  *         mean[0] += x[i]             # <<<<<<<<<<<<<<
@@ -2040,7 +2040,7 @@ static void __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_1d(__Pyx_memview
     (__pyx_v_mean[__pyx_t_6]) = ((__pyx_v_mean[__pyx_t_6]) + (*((double const  *) ( /* dim=0 */ (__pyx_v_x.data + __pyx_t_7 * __pyx_v_x.strides[0]) ))));
   }
 
-  /* "PfyMU/features/lib/_cython/common.pyx":13
+  /* "skimu/features/lib/_cython/common.pyx":13
  *     for i in range(n):
  *         mean[0] += x[i]
  *     mean[0] /= n             # <<<<<<<<<<<<<<
@@ -2054,7 +2054,7 @@ static void __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_1d(__Pyx_memview
   }
   (__pyx_v_mean[__pyx_t_6]) = ((__pyx_v_mean[__pyx_t_6]) / __pyx_v_n);
 
-  /* "PfyMU/features/lib/_cython/common.pyx":8
+  /* "skimu/features/lib/_cython/common.pyx":8
  * 
  * # MEAN ONLY FUNCTIONS
  * cdef void mean_1d(const double[:] x, double* mean):             # <<<<<<<<<<<<<<
@@ -2067,12 +2067,12 @@ static void __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_1d(__Pyx_memview
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_WriteUnraisable("PfyMU.features.lib._cython.common.mean_1d", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
+  __Pyx_WriteUnraisable("skimu.features.lib._cython.common.mean_1d", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
   __pyx_L0:;
   __Pyx_RefNannyFinishContext();
 }
 
-/* "PfyMU/features/lib/_cython/common.pyx":17
+/* "skimu/features/lib/_cython/common.pyx":17
  * 
  * # VARIANCE ONLY FUNCTIONS
  * cdef void variance_1d(const double[:] x, double* var, int ddof):             # <<<<<<<<<<<<<<
@@ -2080,7 +2080,7 @@ static void __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_1d(__Pyx_memview
  * 
  */
 
-static void __pyx_f_5PfyMU_8features_3lib_7_cython_6common_variance_1d(__Pyx_memviewslice __pyx_v_x, double *__pyx_v_var, int __pyx_v_ddof) {
+static void __pyx_f_5skimu_8features_3lib_7_cython_6common_variance_1d(__Pyx_memviewslice __pyx_v_x, double *__pyx_v_var, int __pyx_v_ddof) {
   Py_ssize_t __pyx_v_n;
   Py_ssize_t __pyx_v_i;
   double __pyx_v_k;
@@ -2100,7 +2100,7 @@ static void __pyx_f_5PfyMU_8features_3lib_7_cython_6common_variance_1d(__Pyx_mem
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("variance_1d", 0);
 
-  /* "PfyMU/features/lib/_cython/common.pyx":18
+  /* "skimu/features/lib/_cython/common.pyx":18
  * # VARIANCE ONLY FUNCTIONS
  * cdef void variance_1d(const double[:] x, double* var, int ddof):
  *     cdef Py_ssize_t n = x.size, i             # <<<<<<<<<<<<<<
@@ -2116,7 +2116,7 @@ static void __pyx_f_5PfyMU_8features_3lib_7_cython_6common_variance_1d(__Pyx_mem
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_n = __pyx_t_3;
 
-  /* "PfyMU/features/lib/_cython/common.pyx":20
+  /* "skimu/features/lib/_cython/common.pyx":20
  *     cdef Py_ssize_t n = x.size, i
  * 
  *     cdef double k = x[0]             # <<<<<<<<<<<<<<
@@ -2126,7 +2126,7 @@ static void __pyx_f_5PfyMU_8features_3lib_7_cython_6common_variance_1d(__Pyx_mem
   __pyx_t_4 = 0;
   __pyx_v_k = (*((double const  *) ( /* dim=0 */ (__pyx_v_x.data + __pyx_t_4 * __pyx_v_x.strides[0]) )));
 
-  /* "PfyMU/features/lib/_cython/common.pyx":21
+  /* "skimu/features/lib/_cython/common.pyx":21
  * 
  *     cdef double k = x[0]
  *     cdef double Ex = 0., Ex2 = 0.             # <<<<<<<<<<<<<<
@@ -2136,7 +2136,7 @@ static void __pyx_f_5PfyMU_8features_3lib_7_cython_6common_variance_1d(__Pyx_mem
   __pyx_v_Ex = 0.;
   __pyx_v_Ex2 = 0.;
 
-  /* "PfyMU/features/lib/_cython/common.pyx":23
+  /* "skimu/features/lib/_cython/common.pyx":23
  *     cdef double Ex = 0., Ex2 = 0.
  * 
  *     for i in range(n):             # <<<<<<<<<<<<<<
@@ -2148,7 +2148,7 @@ static void __pyx_f_5PfyMU_8features_3lib_7_cython_6common_variance_1d(__Pyx_mem
   for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_5; __pyx_t_6+=1) {
     __pyx_v_i = __pyx_t_6;
 
-    /* "PfyMU/features/lib/_cython/common.pyx":24
+    /* "skimu/features/lib/_cython/common.pyx":24
  * 
  *     for i in range(n):
  *         Ex += x[i] - k             # <<<<<<<<<<<<<<
@@ -2158,7 +2158,7 @@ static void __pyx_f_5PfyMU_8features_3lib_7_cython_6common_variance_1d(__Pyx_mem
     __pyx_t_4 = __pyx_v_i;
     __pyx_v_Ex = (__pyx_v_Ex + ((*((double const  *) ( /* dim=0 */ (__pyx_v_x.data + __pyx_t_4 * __pyx_v_x.strides[0]) ))) - __pyx_v_k));
 
-    /* "PfyMU/features/lib/_cython/common.pyx":25
+    /* "skimu/features/lib/_cython/common.pyx":25
  *     for i in range(n):
  *         Ex += x[i] - k
  *         Ex2 += (x[i] - k)**2             # <<<<<<<<<<<<<<
@@ -2169,7 +2169,7 @@ static void __pyx_f_5PfyMU_8features_3lib_7_cython_6common_variance_1d(__Pyx_mem
     __pyx_v_Ex2 = (__pyx_v_Ex2 + pow(((*((double const  *) ( /* dim=0 */ (__pyx_v_x.data + __pyx_t_4 * __pyx_v_x.strides[0]) ))) - __pyx_v_k), 2.0));
   }
 
-  /* "PfyMU/features/lib/_cython/common.pyx":27
+  /* "skimu/features/lib/_cython/common.pyx":27
  *         Ex2 += (x[i] - k)**2
  * 
  *     var[0] = (Ex2 - (Ex**2 / n)) / (n - ddof)             # <<<<<<<<<<<<<<
@@ -2189,7 +2189,7 @@ static void __pyx_f_5PfyMU_8features_3lib_7_cython_6common_variance_1d(__Pyx_mem
   }
   (__pyx_v_var[0]) = (__pyx_t_8 / ((double)__pyx_t_3));
 
-  /* "PfyMU/features/lib/_cython/common.pyx":17
+  /* "skimu/features/lib/_cython/common.pyx":17
  * 
  * # VARIANCE ONLY FUNCTIONS
  * cdef void variance_1d(const double[:] x, double* var, int ddof):             # <<<<<<<<<<<<<<
@@ -2202,12 +2202,12 @@ static void __pyx_f_5PfyMU_8features_3lib_7_cython_6common_variance_1d(__Pyx_mem
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_WriteUnraisable("PfyMU.features.lib._cython.common.variance_1d", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
+  __Pyx_WriteUnraisable("skimu.features.lib._cython.common.variance_1d", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
   __pyx_L0:;
   __Pyx_RefNannyFinishContext();
 }
 
-/* "PfyMU/features/lib/_cython/common.pyx":31
+/* "skimu/features/lib/_cython/common.pyx":31
  * 
  * # MEAN & STD DEV FUNCTIONS
  * cdef void mean_sd_1d(const double[:] x, double* mean, double* std):             # <<<<<<<<<<<<<<
@@ -2215,7 +2215,7 @@ static void __pyx_f_5PfyMU_8features_3lib_7_cython_6common_variance_1d(__Pyx_mem
  * 
  */
 
-static void __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__Pyx_memviewslice __pyx_v_x, double *__pyx_v_mean, double *__pyx_v_std) {
+static void __pyx_f_5skimu_8features_3lib_7_cython_6common_mean_sd_1d(__Pyx_memviewslice __pyx_v_x, double *__pyx_v_mean, double *__pyx_v_std) {
   Py_ssize_t __pyx_v_n;
   Py_ssize_t __pyx_v_i;
   double __pyx_v_k;
@@ -2236,7 +2236,7 @@ static void __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__Pyx_memv
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("mean_sd_1d", 0);
 
-  /* "PfyMU/features/lib/_cython/common.pyx":32
+  /* "skimu/features/lib/_cython/common.pyx":32
  * # MEAN & STD DEV FUNCTIONS
  * cdef void mean_sd_1d(const double[:] x, double* mean, double* std):
  *     cdef Py_ssize_t n = x.size, i             # <<<<<<<<<<<<<<
@@ -2252,7 +2252,7 @@ static void __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__Pyx_memv
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_n = __pyx_t_3;
 
-  /* "PfyMU/features/lib/_cython/common.pyx":34
+  /* "skimu/features/lib/_cython/common.pyx":34
  *     cdef Py_ssize_t n = x.size, i
  * 
  *     cdef double k = x[0]             # <<<<<<<<<<<<<<
@@ -2262,7 +2262,7 @@ static void __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__Pyx_memv
   __pyx_t_4 = 0;
   __pyx_v_k = (*((double const  *) ( /* dim=0 */ (__pyx_v_x.data + __pyx_t_4 * __pyx_v_x.strides[0]) )));
 
-  /* "PfyMU/features/lib/_cython/common.pyx":35
+  /* "skimu/features/lib/_cython/common.pyx":35
  * 
  *     cdef double k = x[0]
  *     cdef double Ex = 0., Ex2 = 0.             # <<<<<<<<<<<<<<
@@ -2272,7 +2272,7 @@ static void __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__Pyx_memv
   __pyx_v_Ex = 0.;
   __pyx_v_Ex2 = 0.;
 
-  /* "PfyMU/features/lib/_cython/common.pyx":36
+  /* "skimu/features/lib/_cython/common.pyx":36
  *     cdef double k = x[0]
  *     cdef double Ex = 0., Ex2 = 0.
  *     mean[0] = 0.             # <<<<<<<<<<<<<<
@@ -2281,7 +2281,7 @@ static void __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__Pyx_memv
  */
   (__pyx_v_mean[0]) = 0.;
 
-  /* "PfyMU/features/lib/_cython/common.pyx":38
+  /* "skimu/features/lib/_cython/common.pyx":38
  *     mean[0] = 0.
  * 
  *     for i in range(n):             # <<<<<<<<<<<<<<
@@ -2293,7 +2293,7 @@ static void __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__Pyx_memv
   for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_5; __pyx_t_6+=1) {
     __pyx_v_i = __pyx_t_6;
 
-    /* "PfyMU/features/lib/_cython/common.pyx":39
+    /* "skimu/features/lib/_cython/common.pyx":39
  * 
  *     for i in range(n):
  *         mean[0] += x[i]             # <<<<<<<<<<<<<<
@@ -2304,7 +2304,7 @@ static void __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__Pyx_memv
     __pyx_t_4 = __pyx_v_i;
     (__pyx_v_mean[__pyx_t_7]) = ((__pyx_v_mean[__pyx_t_7]) + (*((double const  *) ( /* dim=0 */ (__pyx_v_x.data + __pyx_t_4 * __pyx_v_x.strides[0]) ))));
 
-    /* "PfyMU/features/lib/_cython/common.pyx":40
+    /* "skimu/features/lib/_cython/common.pyx":40
  *     for i in range(n):
  *         mean[0] += x[i]
  *         Ex += x[i] - k             # <<<<<<<<<<<<<<
@@ -2314,7 +2314,7 @@ static void __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__Pyx_memv
     __pyx_t_4 = __pyx_v_i;
     __pyx_v_Ex = (__pyx_v_Ex + ((*((double const  *) ( /* dim=0 */ (__pyx_v_x.data + __pyx_t_4 * __pyx_v_x.strides[0]) ))) - __pyx_v_k));
 
-    /* "PfyMU/features/lib/_cython/common.pyx":41
+    /* "skimu/features/lib/_cython/common.pyx":41
  *         mean[0] += x[i]
  *         Ex += x[i] - k
  *         Ex2 += (x[i] - k)**2             # <<<<<<<<<<<<<<
@@ -2325,7 +2325,7 @@ static void __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__Pyx_memv
     __pyx_v_Ex2 = (__pyx_v_Ex2 + pow(((*((double const  *) ( /* dim=0 */ (__pyx_v_x.data + __pyx_t_4 * __pyx_v_x.strides[0]) ))) - __pyx_v_k), 2.0));
   }
 
-  /* "PfyMU/features/lib/_cython/common.pyx":43
+  /* "skimu/features/lib/_cython/common.pyx":43
  *         Ex2 += (x[i] - k)**2
  * 
  *     std[0] = sqrt((Ex2 - (Ex**2 / n)) / (n - 1))             # <<<<<<<<<<<<<<
@@ -2344,7 +2344,7 @@ static void __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__Pyx_memv
   }
   (__pyx_v_std[0]) = sqrt((__pyx_t_9 / ((double)__pyx_t_3)));
 
-  /* "PfyMU/features/lib/_cython/common.pyx":44
+  /* "skimu/features/lib/_cython/common.pyx":44
  * 
  *     std[0] = sqrt((Ex2 - (Ex**2 / n)) / (n - 1))
  *     mean[0] /= n             # <<<<<<<<<<<<<<
@@ -2356,7 +2356,7 @@ static void __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__Pyx_memv
   }
   (__pyx_v_mean[__pyx_t_7]) = ((__pyx_v_mean[__pyx_t_7]) / __pyx_v_n);
 
-  /* "PfyMU/features/lib/_cython/common.pyx":31
+  /* "skimu/features/lib/_cython/common.pyx":31
  * 
  * # MEAN & STD DEV FUNCTIONS
  * cdef void mean_sd_1d(const double[:] x, double* mean, double* std):             # <<<<<<<<<<<<<<
@@ -2369,7 +2369,7 @@ static void __pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d(__Pyx_memv
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_WriteUnraisable("PfyMU.features.lib._cython.common.mean_sd_1d", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
+  __Pyx_WriteUnraisable("skimu.features.lib._cython.common.mean_sd_1d", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
   __pyx_L0:;
   __Pyx_RefNannyFinishContext();
 }
@@ -15514,7 +15514,7 @@ static PyBufferProcs __pyx_tp_as_buffer_array = {
 
 static PyTypeObject __pyx_type___pyx_array = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.common.array", /*tp_name*/
+  "skimu.features.lib._cython.common.array", /*tp_name*/
   sizeof(struct __pyx_array_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc_array, /*tp_dealloc*/
@@ -15633,7 +15633,7 @@ static PyMethodDef __pyx_methods_Enum[] = {
 
 static PyTypeObject __pyx_type___pyx_MemviewEnum = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.common.Enum", /*tp_name*/
+  "skimu.features.lib._cython.common.Enum", /*tp_name*/
   sizeof(struct __pyx_MemviewEnum_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc_Enum, /*tp_dealloc*/
@@ -15894,7 +15894,7 @@ static PyBufferProcs __pyx_tp_as_buffer_memoryview = {
 
 static PyTypeObject __pyx_type___pyx_memoryview = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.common.memoryview", /*tp_name*/
+  "skimu.features.lib._cython.common.memoryview", /*tp_name*/
   sizeof(struct __pyx_memoryview_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc_memoryview, /*tp_dealloc*/
@@ -16032,7 +16032,7 @@ static struct PyGetSetDef __pyx_getsets__memoryviewslice[] = {
 
 static PyTypeObject __pyx_type___pyx_memoryviewslice = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.common._memoryviewslice", /*tp_name*/
+  "skimu.features.lib._cython.common._memoryviewslice", /*tp_name*/
   sizeof(struct __pyx_memoryviewslice_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc__memoryviewslice, /*tp_dealloc*/
@@ -16569,9 +16569,9 @@ static int __Pyx_modinit_function_export_code(void) {
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__Pyx_modinit_function_export_code", 0);
   /*--- Function export code ---*/
-  if (__Pyx_ExportFunction("mean_1d", (void (*)(void))__pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_1d, "void (__Pyx_memviewslice, double *)") < 0) __PYX_ERR(0, 1, __pyx_L1_error)
-  if (__Pyx_ExportFunction("variance_1d", (void (*)(void))__pyx_f_5PfyMU_8features_3lib_7_cython_6common_variance_1d, "void (__Pyx_memviewslice, double *, int)") < 0) __PYX_ERR(0, 1, __pyx_L1_error)
-  if (__Pyx_ExportFunction("mean_sd_1d", (void (*)(void))__pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_sd_1d, "void (__Pyx_memviewslice, double *, double *)") < 0) __PYX_ERR(0, 1, __pyx_L1_error)
+  if (__Pyx_ExportFunction("mean_1d", (void (*)(void))__pyx_f_5skimu_8features_3lib_7_cython_6common_mean_1d, "void (__Pyx_memviewslice, double *)") < 0) __PYX_ERR(0, 1, __pyx_L1_error)
+  if (__Pyx_ExportFunction("variance_1d", (void (*)(void))__pyx_f_5skimu_8features_3lib_7_cython_6common_variance_1d, "void (__Pyx_memviewslice, double *, int)") < 0) __PYX_ERR(0, 1, __pyx_L1_error)
+  if (__Pyx_ExportFunction("mean_sd_1d", (void (*)(void))__pyx_f_5skimu_8features_3lib_7_cython_6common_mean_sd_1d, "void (__Pyx_memviewslice, double *, double *)") < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -16843,14 +16843,14 @@ if (!__Pyx_RefNanny) {
   #if PY_MAJOR_VERSION < 3 && (__PYX_DEFAULT_STRING_ENCODING_IS_ASCII || __PYX_DEFAULT_STRING_ENCODING_IS_DEFAULT)
   if (__Pyx_init_sys_getdefaultencoding_params() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
-  if (__pyx_module_is_main_PfyMU__features__lib___cython__common) {
+  if (__pyx_module_is_main_skimu__features__lib___cython__common) {
     if (PyObject_SetAttr(__pyx_m, __pyx_n_s_name_2, __pyx_n_s_main) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   }
   #if PY_MAJOR_VERSION >= 3
   {
     PyObject *modules = PyImport_GetModuleDict(); if (unlikely(!modules)) __PYX_ERR(0, 1, __pyx_L1_error)
-    if (!PyDict_GetItemString(modules, "PfyMU.features.lib._cython.common")) {
-      if (unlikely(PyDict_SetItemString(modules, "PfyMU.features.lib._cython.common", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
+    if (!PyDict_GetItemString(modules, "skimu.features.lib._cython.common")) {
+      if (unlikely(PyDict_SetItemString(modules, "skimu.features.lib._cython.common", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
     }
   }
   #endif
@@ -16871,7 +16871,7 @@ if (!__Pyx_RefNanny) {
   if (__Pyx_patch_abc() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
 
-  /* "PfyMU/features/lib/_cython/common.pyx":1
+  /* "skimu/features/lib/_cython/common.pyx":1
  * # cython: infer_types = True             # <<<<<<<<<<<<<<
  * # cython: boundscheck = False
  * # cython: wraparound = False
@@ -17041,11 +17041,11 @@ if (!__Pyx_RefNanny) {
   __Pyx_XDECREF(__pyx_t_1);
   if (__pyx_m) {
     if (__pyx_d) {
-      __Pyx_AddTraceback("init PfyMU.features.lib._cython.common", __pyx_clineno, __pyx_lineno, __pyx_filename);
+      __Pyx_AddTraceback("init skimu.features.lib._cython.common", __pyx_clineno, __pyx_lineno, __pyx_filename);
     }
     Py_CLEAR(__pyx_m);
   } else if (!PyErr_Occurred()) {
-    PyErr_SetString(PyExc_ImportError, "init PfyMU.features.lib._cython.common");
+    PyErr_SetString(PyExc_ImportError, "init skimu.features.lib._cython.common");
   }
   __pyx_L0:;
   __Pyx_RefNannyFinishContext();

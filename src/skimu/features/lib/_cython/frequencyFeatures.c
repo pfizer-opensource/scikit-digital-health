@@ -4,12 +4,12 @@
 {
     "distutils": {
         "depends": [],
-        "name": "PfyMU.features.lib._cython.frequencyFeatures",
+        "name": "skimu.features.lib._cython.frequencyFeatures",
         "sources": [
-            "src/PfyMU/features/lib/_cython/frequencyFeatures.pyx"
+            "src/skimu/features/lib/_cython/frequencyFeatures.pyx"
         ]
     },
-    "module_name": "PfyMU.features.lib._cython.frequencyFeatures"
+    "module_name": "skimu.features.lib._cython.frequencyFeatures"
 }
 END: Cython Metadata */
 
@@ -604,8 +604,8 @@ static CYTHON_INLINE float __PYX_NAN() {
   #endif
 #endif
 
-#define __PYX_HAVE__PfyMU__features__lib___cython__frequencyFeatures
-#define __PYX_HAVE_API__PfyMU__features__lib___cython__frequencyFeatures
+#define __PYX_HAVE__skimu__features__lib___cython__frequencyFeatures
+#define __PYX_HAVE_API__skimu__features__lib___cython__frequencyFeatures
 /* Early includes */
 #include <math.h>
 #include "pythread.h"
@@ -843,7 +843,7 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "src/PfyMU/features/lib/_cython/frequencyFeatures.pyx",
+  "src/skimu/features/lib/_cython/frequencyFeatures.pyx",
   "stringsource",
 };
 /* MemviewSliceStruct.proto */
@@ -968,22 +968,22 @@ static CYTHON_INLINE __pyx_t_double_complex __pyx_t_double_complex_from_parts(do
 
 
 /*--- Type declarations ---*/
-struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures;
+struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures;
 struct __pyx_array_obj;
 struct __pyx_MemviewEnum_obj;
 struct __pyx_memoryview_obj;
 struct __pyx_memoryviewslice_obj;
 
-/* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":35
+/* "skimu/features/lib/_cython/frequencyFeatures.pyx":35
  * 
  * 
  * cdef class FrequencyFeatures:             # <<<<<<<<<<<<<<
  *     # private attributes
  *     cdef bint base_run
  */
-struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures {
+struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures {
   PyObject_HEAD
-  struct __pyx_vtabstruct_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_vtab;
+  struct __pyx_vtabstruct_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_vtab;
   int base_run;
   Py_ssize_t M;
   Py_ssize_t N;
@@ -1088,7 +1088,7 @@ struct __pyx_memoryviewslice_obj {
 
 
 
-/* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":35
+/* "skimu/features/lib/_cython/frequencyFeatures.pyx":35
  * 
  * 
  * cdef class FrequencyFeatures:             # <<<<<<<<<<<<<<
@@ -1096,15 +1096,15 @@ struct __pyx_memoryviewslice_obj {
  *     cdef bint base_run
  */
 
-struct __pyx_vtabstruct_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures {
-  PyObject *(*_base_fn)(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch);
-  PyObject *(*get_dominant_freq)(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch);
-  PyObject *(*get_dominant_freq_value)(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch);
-  PyObject *(*get_power)(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch);
-  PyObject *(*get_spectral_flatness)(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch);
-  PyObject *(*get_spectral_entropy)(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch);
+struct __pyx_vtabstruct_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures {
+  PyObject *(*_base_fn)(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch);
+  PyObject *(*get_dominant_freq)(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch);
+  PyObject *(*get_dominant_freq_value)(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch);
+  PyObject *(*get_power)(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch);
+  PyObject *(*get_spectral_flatness)(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch);
+  PyObject *(*get_spectral_entropy)(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch);
 };
-static struct __pyx_vtabstruct_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_vtabptr_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures;
+static struct __pyx_vtabstruct_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_vtabptr_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures;
 
 
 /* "View.MemoryView":105
@@ -1879,12 +1879,12 @@ static int __Pyx_ImportFunction(PyObject *module, const char *funcname, void (**
 /* InitStrings.proto */
 static int __Pyx_InitStrings(__Pyx_StringTabEntry *t);
 
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures__base_fn(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut, int __pyx_skip_dispatch); /* proto*/
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_dominant_freq(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut, int __pyx_skip_dispatch); /* proto*/
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_dominant_freq_value(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut, int __pyx_skip_dispatch); /* proto*/
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_power(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut, int __pyx_skip_dispatch); /* proto*/
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_spectral_flatness(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut, int __pyx_skip_dispatch); /* proto*/
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_spectral_entropy(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut, int __pyx_skip_dispatch); /* proto*/
+static PyObject *__pyx_f_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures__base_fn(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut, int __pyx_skip_dispatch); /* proto*/
+static PyObject *__pyx_f_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_dominant_freq(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut, int __pyx_skip_dispatch); /* proto*/
+static PyObject *__pyx_f_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_dominant_freq_value(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut, int __pyx_skip_dispatch); /* proto*/
+static PyObject *__pyx_f_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_power(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut, int __pyx_skip_dispatch); /* proto*/
+static PyObject *__pyx_f_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_spectral_flatness(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut, int __pyx_skip_dispatch); /* proto*/
+static PyObject *__pyx_f_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_spectral_entropy(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut, int __pyx_skip_dispatch); /* proto*/
 static PyObject *__pyx_array_get_memview(struct __pyx_array_obj *__pyx_v_self); /* proto*/
 static char *__pyx_memoryview_get_item_pointer(struct __pyx_memoryview_obj *__pyx_v_self, PyObject *__pyx_v_index); /* proto*/
 static PyObject *__pyx_memoryview_is_slice(struct __pyx_memoryview_obj *__pyx_v_self, PyObject *__pyx_v_obj); /* proto*/
@@ -1902,11 +1902,11 @@ static PyObject *__pyx_memoryviewslice_assign_item_from_object(struct __pyx_memo
 
 /* Module declarations from 'libc.math' */
 
-/* Module declarations from 'PfyMU.features.lib._cython.common' */
-static void (*__pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_1d)(__Pyx_memviewslice, double *); /*proto*/
+/* Module declarations from 'skimu.features.lib._cython.common' */
+static void (*__pyx_f_5skimu_8features_3lib_7_cython_6common_mean_1d)(__Pyx_memviewslice, double *); /*proto*/
 
-/* Module declarations from 'PfyMU.features.lib._cython.frequencyFeatures' */
-static PyTypeObject *__pyx_ptype_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures = 0;
+/* Module declarations from 'skimu.features.lib._cython.frequencyFeatures' */
+static PyTypeObject *__pyx_ptype_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures = 0;
 static PyTypeObject *__pyx_array_type = 0;
 static PyTypeObject *__pyx_MemviewEnum_type = 0;
 static PyTypeObject *__pyx_memoryview_type = 0;
@@ -1918,9 +1918,9 @@ static PyObject *contiguous = 0;
 static PyObject *indirect_contiguous = 0;
 static int __pyx_memoryview_thread_locks_used;
 static PyThread_type_lock __pyx_memoryview_thread_locks[8];
-static double __pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_gmean(__Pyx_memviewslice); /*proto*/
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_linspace(double, double, int); /*proto*/
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures___pyx_unpickle_FrequencyFeatures__set_state(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, PyObject *); /*proto*/
+static double __pyx_f_5skimu_8features_3lib_7_cython_17frequencyFeatures_gmean(__Pyx_memviewslice); /*proto*/
+static PyObject *__pyx_f_5skimu_8features_3lib_7_cython_17frequencyFeatures_linspace(double, double, int); /*proto*/
+static PyObject *__pyx_f_5skimu_8features_3lib_7_cython_17frequencyFeatures___pyx_unpickle_FrequencyFeatures__set_state(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, PyObject *); /*proto*/
 static struct __pyx_array_obj *__pyx_array_new(PyObject *, Py_ssize_t, char *, char *, char *); /*proto*/
 static void *__pyx_align_pointer(void *, size_t); /*proto*/
 static PyObject *__pyx_memoryview_new(PyObject *, int, int, __Pyx_TypeInfo *); /*proto*/
@@ -1958,11 +1958,11 @@ static __Pyx_TypeInfo __Pyx_TypeInfo_double = { "double", NULL, sizeof(double), 
 static __Pyx_TypeInfo __Pyx_TypeInfo_long = { "long", NULL, sizeof(long), { 0 }, 0, IS_UNSIGNED(long) ? 'U' : 'I', IS_UNSIGNED(long), 0 };
 static __Pyx_TypeInfo __Pyx_TypeInfo___pyx_t_double_complex = { "double complex", NULL, sizeof(__pyx_t_double_complex), { 0 }, 0, 'C', 0, 0 };
 static __Pyx_TypeInfo __Pyx_TypeInfo_double__const__ = { "const double", NULL, sizeof(double const ), { 0 }, 0, 'R', 0, 0 };
-#define __Pyx_MODULE_NAME "PfyMU.features.lib._cython.frequencyFeatures"
-extern int __pyx_module_is_main_PfyMU__features__lib___cython__frequencyFeatures;
-int __pyx_module_is_main_PfyMU__features__lib___cython__frequencyFeatures = 0;
+#define __Pyx_MODULE_NAME "skimu.features.lib._cython.frequencyFeatures"
+extern int __pyx_module_is_main_skimu__features__lib___cython__frequencyFeatures;
+int __pyx_module_is_main_skimu__features__lib___cython__frequencyFeatures = 0;
 
-/* Implementation of 'PfyMU.features.lib._cython.frequencyFeatures' */
+/* Implementation of 'skimu.features.lib._cython.frequencyFeatures' */
 static PyObject *__pyx_builtin_range;
 static PyObject *__pyx_builtin_ValueError;
 static PyObject *__pyx_builtin_MemoryError;
@@ -2075,10 +2075,10 @@ static const char __pyx_k_Incompatible_checksums_s_vs_0xb0[] = "Incompatible che
 static const char __pyx_k_Indirect_dimensions_not_supporte[] = "Indirect dimensions not supported";
 static const char __pyx_k_Invalid_mode_expected_c_or_fortr[] = "Invalid mode, expected 'c' or 'fortran', got %s";
 static const char __pyx_k_Out_of_bounds_on_buffer_access_a[] = "Out of bounds on buffer access (axis %d)";
-static const char __pyx_k_PfyMU_features_lib__cython_frequ[] = "PfyMU.features.lib._cython.frequencyFeatures";
 static const char __pyx_k_Unable_to_convert_item_to_object[] = "Unable to convert item to object";
 static const char __pyx_k_got_differing_extents_in_dimensi[] = "got differing extents in dimension %d (got %d and %d)";
 static const char __pyx_k_no_default___reduce___due_to_non[] = "no default __reduce__ due to non-trivial __cinit__";
+static const char __pyx_k_skimu_features_lib__cython_frequ[] = "skimu.features.lib._cython.frequencyFeatures";
 static const char __pyx_k_unable_to_allocate_shape_and_str[] = "unable to allocate shape and strides.";
 static PyObject *__pyx_n_s_ASCII;
 static PyObject *__pyx_kp_s_Buffer_view_does_not_expose_stri;
@@ -2100,7 +2100,6 @@ static PyObject *__pyx_kp_s_MemoryView_of_r_at_0x_x;
 static PyObject *__pyx_kp_s_MemoryView_of_r_object;
 static PyObject *__pyx_n_b_O;
 static PyObject *__pyx_kp_s_Out_of_bounds_on_buffer_access_a;
-static PyObject *__pyx_n_s_PfyMU_features_lib__cython_frequ;
 static PyObject *__pyx_n_s_PickleError;
 static PyObject *__pyx_n_s_TypeError;
 static PyObject *__pyx_kp_s_Unable_to_convert_item_to_object;
@@ -2175,6 +2174,7 @@ static PyObject *__pyx_n_s_setstate;
 static PyObject *__pyx_n_s_setstate_cython;
 static PyObject *__pyx_n_s_shape;
 static PyObject *__pyx_n_s_size;
+static PyObject *__pyx_n_s_skimu_features_lib__cython_frequ;
 static PyObject *__pyx_n_s_start;
 static PyObject *__pyx_n_s_step;
 static PyObject *__pyx_n_s_stop;
@@ -2191,16 +2191,16 @@ static PyObject *__pyx_n_s_unpack;
 static PyObject *__pyx_n_s_update;
 static PyObject *__pyx_n_s_x;
 static PyObject *__pyx_n_s_zeros;
-static int __pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures___init__(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_2_base_fn(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut); /* proto */
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_4get_dominant_freq(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut); /* proto */
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_6get_dominant_freq_value(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut); /* proto */
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_8get_power(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut); /* proto */
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_10get_spectral_flatness(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut); /* proto */
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_12get_spectral_entropy(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut); /* proto */
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_14__reduce_cython__(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_16__setstate_cython__(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, PyObject *__pyx_v___pyx_state); /* proto */
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures___pyx_unpickle_FrequencyFeatures(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v___pyx_type, long __pyx_v___pyx_checksum, PyObject *__pyx_v___pyx_state); /* proto */
+static int __pyx_pf_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures___init__(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_2_base_fn(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut); /* proto */
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_4get_dominant_freq(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut); /* proto */
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_6get_dominant_freq_value(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut); /* proto */
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_8get_power(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut); /* proto */
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_10get_spectral_flatness(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut); /* proto */
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_12get_spectral_entropy(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut); /* proto */
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_14__reduce_cython__(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_16__setstate_cython__(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, PyObject *__pyx_v___pyx_state); /* proto */
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_17frequencyFeatures___pyx_unpickle_FrequencyFeatures(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v___pyx_type, long __pyx_v___pyx_checksum, PyObject *__pyx_v___pyx_state); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __pyx_array_obj *__pyx_v_self, PyObject *__pyx_v_shape, Py_ssize_t __pyx_v_itemsize, PyObject *__pyx_v_format, PyObject *__pyx_v_mode, int __pyx_v_allocate_buffer); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array_2__getbuffer__(struct __pyx_array_obj *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
 static void __pyx_array___pyx_pf_15View_dot_MemoryView_5array_4__dealloc__(struct __pyx_array_obj *__pyx_v_self); /* proto */
@@ -2243,7 +2243,7 @@ static PyObject *__pyx_pf_15View_dot_MemoryView_16_memoryviewslice_4base___get__
 static PyObject *__pyx_pf___pyx_memoryviewslice___reduce_cython__(CYTHON_UNUSED struct __pyx_memoryviewslice_obj *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf___pyx_memoryviewslice_2__setstate_cython__(CYTHON_UNUSED struct __pyx_memoryviewslice_obj *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
 static PyObject *__pyx_pf_15View_dot_MemoryView___pyx_unpickle_Enum(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v___pyx_type, long __pyx_v___pyx_checksum, PyObject *__pyx_v___pyx_state); /* proto */
-static PyObject *__pyx_tp_new_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
+static PyObject *__pyx_tp_new_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_array(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_Enum(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_memoryview(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
@@ -2283,7 +2283,7 @@ static PyObject *__pyx_codeobj__20;
 static PyObject *__pyx_codeobj__27;
 /* Late includes */
 
-/* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":10
+/* "skimu/features/lib/_cython/frequencyFeatures.pyx":10
  * 
  * 
  * cdef double gmean(const double[:] x):             # <<<<<<<<<<<<<<
@@ -2291,7 +2291,7 @@ static PyObject *__pyx_codeobj__27;
  *     cdef double logsum = 0.0, prod = 1.0
  */
 
-static double __pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_gmean(__Pyx_memviewslice __pyx_v_x) {
+static double __pyx_f_5skimu_8features_3lib_7_cython_17frequencyFeatures_gmean(__Pyx_memviewslice __pyx_v_x) {
   Py_ssize_t __pyx_v_n;
   Py_ssize_t __pyx_v_i;
   double __pyx_v_logsum;
@@ -2314,7 +2314,7 @@ static double __pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_gmean(_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("gmean", 0);
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":11
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":11
  * 
  * cdef double gmean(const double[:] x):
  *     cdef Py_ssize_t n = x.size, i             # <<<<<<<<<<<<<<
@@ -2330,7 +2330,7 @@ static double __pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_gmean(_
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_n = __pyx_t_3;
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":12
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":12
  * cdef double gmean(const double[:] x):
  *     cdef Py_ssize_t n = x.size, i
  *     cdef double logsum = 0.0, prod = 1.0             # <<<<<<<<<<<<<<
@@ -2340,7 +2340,7 @@ static double __pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_gmean(_
   __pyx_v_logsum = 0.0;
   __pyx_v_prod = 1.0;
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":13
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":13
  *     cdef Py_ssize_t n = x.size, i
  *     cdef double logsum = 0.0, prod = 1.0
  *     cdef double large = 1.e64, small = 1.e-64             # <<<<<<<<<<<<<<
@@ -2350,7 +2350,7 @@ static double __pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_gmean(_
   __pyx_v_large = 1.e64;
   __pyx_v_small = 1.e-64;
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":15
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":15
  *     cdef double large = 1.e64, small = 1.e-64
  * 
  *     for i in range(n):             # <<<<<<<<<<<<<<
@@ -2362,7 +2362,7 @@ static double __pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_gmean(_
   for (__pyx_t_5 = 0; __pyx_t_5 < __pyx_t_4; __pyx_t_5+=1) {
     __pyx_v_i = __pyx_t_5;
 
-    /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":16
+    /* "skimu/features/lib/_cython/frequencyFeatures.pyx":16
  * 
  *     for i in range(n):
  *         prod *= x[i]             # <<<<<<<<<<<<<<
@@ -2372,7 +2372,7 @@ static double __pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_gmean(_
     __pyx_t_6 = __pyx_v_i;
     __pyx_v_prod = (__pyx_v_prod * (*((double const  *) ( /* dim=0 */ (__pyx_v_x.data + __pyx_t_6 * __pyx_v_x.strides[0]) ))));
 
-    /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":17
+    /* "skimu/features/lib/_cython/frequencyFeatures.pyx":17
  *     for i in range(n):
  *         prod *= x[i]
  *         if (prod > large) or (prod < small):             # <<<<<<<<<<<<<<
@@ -2390,7 +2390,7 @@ static double __pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_gmean(_
     __pyx_L6_bool_binop_done:;
     if (__pyx_t_7) {
 
-      /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":18
+      /* "skimu/features/lib/_cython/frequencyFeatures.pyx":18
  *         prod *= x[i]
  *         if (prod > large) or (prod < small):
  *             logsum += log(prod)             # <<<<<<<<<<<<<<
@@ -2399,7 +2399,7 @@ static double __pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_gmean(_
  */
       __pyx_v_logsum = (__pyx_v_logsum + log(__pyx_v_prod));
 
-      /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":19
+      /* "skimu/features/lib/_cython/frequencyFeatures.pyx":19
  *         if (prod > large) or (prod < small):
  *             logsum += log(prod)
  *             prod = 1.             # <<<<<<<<<<<<<<
@@ -2408,7 +2408,7 @@ static double __pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_gmean(_
  */
       __pyx_v_prod = 1.;
 
-      /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":17
+      /* "skimu/features/lib/_cython/frequencyFeatures.pyx":17
  *     for i in range(n):
  *         prod *= x[i]
  *         if (prod > large) or (prod < small):             # <<<<<<<<<<<<<<
@@ -2418,7 +2418,7 @@ static double __pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_gmean(_
     }
   }
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":21
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":21
  *             prod = 1.
  * 
  *     return exp((logsum + log(prod)) / n)             # <<<<<<<<<<<<<<
@@ -2433,7 +2433,7 @@ static double __pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_gmean(_
   __pyx_r = exp((__pyx_t_9 / ((double)__pyx_v_n)));
   goto __pyx_L0;
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":10
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":10
  * 
  * 
  * cdef double gmean(const double[:] x):             # <<<<<<<<<<<<<<
@@ -2445,14 +2445,14 @@ static double __pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_gmean(_
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_WriteUnraisable("PfyMU.features.lib._cython.frequencyFeatures.gmean", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
+  __Pyx_WriteUnraisable("skimu.features.lib._cython.frequencyFeatures.gmean", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
   __pyx_r = 0;
   __pyx_L0:;
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":24
+/* "skimu/features/lib/_cython/frequencyFeatures.pyx":24
  * 
  * 
  * cdef linspace(double start, double stop, int N):             # <<<<<<<<<<<<<<
@@ -2460,7 +2460,7 @@ static double __pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_gmean(_
  *     cdef double step = (stop - start) / N
  */
 
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_linspace(double __pyx_v_start, double __pyx_v_stop, int __pyx_v_N) {
+static PyObject *__pyx_f_5skimu_8features_3lib_7_cython_17frequencyFeatures_linspace(double __pyx_v_start, double __pyx_v_stop, int __pyx_v_N) {
   __Pyx_memviewslice __pyx_v_arr = { 0, 0, { 0 }, { 0 }, { 0 } };
   double __pyx_v_step;
   Py_ssize_t __pyx_v_i;
@@ -2481,7 +2481,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_lins
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("linspace", 0);
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":25
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":25
  * 
  * cdef linspace(double start, double stop, int N):
  *     cdef double[:] arr = zeros(N)             # <<<<<<<<<<<<<<
@@ -2514,7 +2514,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_lins
   __pyx_t_5.memview = NULL;
   __pyx_t_5.data = NULL;
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":26
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":26
  * cdef linspace(double start, double stop, int N):
  *     cdef double[:] arr = zeros(N)
  *     cdef double step = (stop - start) / N             # <<<<<<<<<<<<<<
@@ -2528,7 +2528,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_lins
   }
   __pyx_v_step = (__pyx_t_6 / ((double)__pyx_v_N));
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":29
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":29
  *     cdef Py_ssize_t i
  * 
  *     for i in range(N):             # <<<<<<<<<<<<<<
@@ -2540,7 +2540,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_lins
   for (__pyx_t_9 = 0; __pyx_t_9 < __pyx_t_8; __pyx_t_9+=1) {
     __pyx_v_i = __pyx_t_9;
 
-    /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":30
+    /* "skimu/features/lib/_cython/frequencyFeatures.pyx":30
  * 
  *     for i in range(N):
  *         arr[i] = i * step + start             # <<<<<<<<<<<<<<
@@ -2551,7 +2551,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_lins
     *((double *) ( /* dim=0 */ (__pyx_v_arr.data + __pyx_t_10 * __pyx_v_arr.strides[0]) )) = ((__pyx_v_i * __pyx_v_step) + __pyx_v_start);
   }
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":32
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":32
  *         arr[i] = i * step + start
  * 
  *     return arr             # <<<<<<<<<<<<<<
@@ -2565,7 +2565,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_lins
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":24
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":24
  * 
  * 
  * cdef linspace(double start, double stop, int N):             # <<<<<<<<<<<<<<
@@ -2580,7 +2580,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_lins
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
   __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.frequencyFeatures.linspace", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.frequencyFeatures.linspace", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
   __PYX_XDEC_MEMVIEW(&__pyx_v_arr, 1);
@@ -2589,7 +2589,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_lins
   return __pyx_r;
 }
 
-/* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":54
+/* "skimu/features/lib/_cython/frequencyFeatures.pyx":54
  *     cdef double[:, :, :] sp_norm
  * 
  *     def __init__(self):             # <<<<<<<<<<<<<<
@@ -2598,22 +2598,22 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_lins
  */
 
 /* Python wrapper */
-static int __pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_1__init__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static int __pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_1__init__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static int __pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_1__init__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static int __pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_1__init__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   int __pyx_r;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__init__ (wrapper)", 0);
   if (unlikely(PyTuple_GET_SIZE(__pyx_args) > 0)) {
     __Pyx_RaiseArgtupleInvalid("__init__", 1, 0, 0, PyTuple_GET_SIZE(__pyx_args)); return -1;}
   if (unlikely(__pyx_kwds) && unlikely(PyDict_Size(__pyx_kwds) > 0) && unlikely(!__Pyx_CheckKeywordStrings(__pyx_kwds, "__init__", 0))) return -1;
-  __pyx_r = __pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures___init__(((struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self));
+  __pyx_r = __pyx_pf_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures___init__(((struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static int __pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures___init__(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self) {
+static int __pyx_pf_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures___init__(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self) {
   int __pyx_r;
   __Pyx_RefNannyDeclarations
   double __pyx_t_1;
@@ -2622,7 +2622,7 @@ static int __pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Frequen
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":55
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":55
  * 
  *     def __init__(self):
  *         self.base_run = False             # <<<<<<<<<<<<<<
@@ -2631,7 +2631,7 @@ static int __pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Frequen
  */
   __pyx_v_self->base_run = 0;
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":56
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":56
  *     def __init__(self):
  *         self.base_run = False
  *         self.invlog2 = 1 / log(2.0)             # <<<<<<<<<<<<<<
@@ -2645,7 +2645,7 @@ static int __pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Frequen
   }
   __pyx_v_self->invlog2 = (1.0 / __pyx_t_1);
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":54
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":54
  *     cdef double[:, :, :] sp_norm
  * 
  *     def __init__(self):             # <<<<<<<<<<<<<<
@@ -2657,14 +2657,14 @@ static int __pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Frequen
   __pyx_r = 0;
   goto __pyx_L0;
   __pyx_L1_error:;
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.frequencyFeatures.FrequencyFeatures.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.frequencyFeatures.FrequencyFeatures.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = -1;
   __pyx_L0:;
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":58
+/* "skimu/features/lib/_cython/frequencyFeatures.pyx":58
  *         self.invlog2 = 1 / log(2.0)
  * 
  *     cpdef _base_fn(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):             # <<<<<<<<<<<<<<
@@ -2672,8 +2672,8 @@ static int __pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Frequen
  *         self.M = x.shape[0]
  */
 
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_3_base_fn(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures__base_fn(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut, int __pyx_skip_dispatch) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_3_base_fn(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_f_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures__base_fn(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut, int __pyx_skip_dispatch) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -2708,7 +2708,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
       #endif
       __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_base_fn); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 58, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_3_base_fn)) {
+      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_3_base_fn)) {
         __Pyx_XDECREF(__pyx_r);
         if (unlikely(!__pyx_v_x.memview)) { __Pyx_RaiseUnboundLocalError("x"); __PYX_ERR(0, 58, __pyx_L1_error) }
         __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_x, 3, (PyObject *(*)(char *)) __pyx_memview_get_double__const__, (int (*)(char *, PyObject *)) NULL, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 58, __pyx_L1_error)
@@ -2797,7 +2797,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
     #endif
   }
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":60
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":60
  *     cpdef _base_fn(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
  *         # Book-keeping
  *         self.M = x.shape[0]             # <<<<<<<<<<<<<<
@@ -2806,7 +2806,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
  */
   __pyx_v_self->M = (__pyx_v_x.shape[0]);
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":61
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":61
  *         # Book-keeping
  *         self.M = x.shape[0]
  *         self.N = x.shape[1]             # <<<<<<<<<<<<<<
@@ -2815,7 +2815,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
  */
   __pyx_v_self->N = (__pyx_v_x.shape[1]);
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":62
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":62
  *         self.M = x.shape[0]
  *         self.N = x.shape[1]
  *         self.P = x.shape[2]             # <<<<<<<<<<<<<<
@@ -2824,7 +2824,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
  */
   __pyx_v_self->P = (__pyx_v_x.shape[2]);
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":64
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":64
  *         self.P = x.shape[2]
  * 
  *         self.maxf = zeros((self.M, self.P))             # <<<<<<<<<<<<<<
@@ -2868,7 +2868,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
   __pyx_t_11.memview = NULL;
   __pyx_t_11.data = NULL;
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":65
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":65
  * 
  *         self.maxf = zeros((self.M, self.P))
  *         self.maxfv = zeros((self.M, self.P))             # <<<<<<<<<<<<<<
@@ -2912,7 +2912,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
   __pyx_t_11.memview = NULL;
   __pyx_t_11.data = NULL;
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":66
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":66
  *         self.maxf = zeros((self.M, self.P))
  *         self.maxfv = zeros((self.M, self.P))
  *         self.df_ratio = zeros((self.M, self.P))             # <<<<<<<<<<<<<<
@@ -2956,7 +2956,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
   __pyx_t_11.memview = NULL;
   __pyx_t_11.data = NULL;
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":67
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":67
  *         self.maxfv = zeros((self.M, self.P))
  *         self.df_ratio = zeros((self.M, self.P))
  *         self.spec_flat = zeros((self.M, self.P))             # <<<<<<<<<<<<<<
@@ -3000,7 +3000,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
   __pyx_t_11.memview = NULL;
   __pyx_t_11.data = NULL;
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":68
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":68
  *         self.df_ratio = zeros((self.M, self.P))
  *         self.spec_flat = zeros((self.M, self.P))
  *         self.spec_ent = zeros((self.M, self.P))             # <<<<<<<<<<<<<<
@@ -3044,7 +3044,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
   __pyx_t_11.memview = NULL;
   __pyx_t_11.data = NULL;
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":71
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":71
  * 
  *         # function
  *         self.nfft = 2 ** (<int>(log(self.N) * self.invlog2))             # <<<<<<<<<<<<<<
@@ -3053,14 +3053,14 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
  */
   __pyx_v_self->nfft = __Pyx_pow_long(2, ((long)((int)(log(__pyx_v_self->N) * __pyx_v_self->invlog2))));
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":72
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":72
  *         # function
  *         self.nfft = 2 ** (<int>(log(self.N) * self.invlog2))
  *         self.freq = linspace(0, 0.5 * fs, self.nfft)             # <<<<<<<<<<<<<<
  * 
  *         self.ihcut = <int>(floor(hi_cut / (fs / 2) * (self.nfft - 1)) + 1)  # high cutoff index
  */
-  __pyx_t_1 = __pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_linspace(0.0, (0.5 * __pyx_v_fs), __pyx_v_self->nfft); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 72, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5skimu_8features_3lib_7_cython_17frequencyFeatures_linspace(0.0, (0.5 * __pyx_v_fs), __pyx_v_self->nfft); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 72, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_12 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_t_1, PyBUF_WRITABLE); if (unlikely(!__pyx_t_12.memview)) __PYX_ERR(0, 72, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -3069,7 +3069,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
   __pyx_t_12.memview = NULL;
   __pyx_t_12.data = NULL;
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":74
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":74
  *         self.freq = linspace(0, 0.5 * fs, self.nfft)
  * 
  *         self.ihcut = <int>(floor(hi_cut / (fs / 2) * (self.nfft - 1)) + 1)  # high cutoff index             # <<<<<<<<<<<<<<
@@ -3083,7 +3083,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
   }
   __pyx_v_self->ihcut = ((int)(floor(((__pyx_v_hi_cut / __pyx_t_13) * (__pyx_v_self->nfft - 1))) + 1.0));
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":75
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":75
  * 
  *         self.ihcut = <int>(floor(hi_cut / (fs / 2) * (self.nfft - 1)) + 1)  # high cutoff index
  *         self.ilcut = <int>(ceil(low_cut / (fs / 2) * (self.nfft - 1)))  # low cutoff index             # <<<<<<<<<<<<<<
@@ -3097,7 +3097,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
   }
   __pyx_v_self->ilcut = ((int)ceil(((__pyx_v_low_cut / __pyx_t_13) * (__pyx_v_self->nfft - 1))));
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":77
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":77
  *         self.ilcut = <int>(ceil(low_cut / (fs / 2) * (self.nfft - 1)))  # low cutoff index
  * 
  *         if self.ihcut > self.nfft:             # <<<<<<<<<<<<<<
@@ -3107,7 +3107,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
   __pyx_t_14 = ((__pyx_v_self->ihcut > __pyx_v_self->nfft) != 0);
   if (__pyx_t_14) {
 
-    /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":78
+    /* "skimu/features/lib/_cython/frequencyFeatures.pyx":78
  * 
  *         if self.ihcut > self.nfft:
  *             self.ihcut = <int>(self.nfft)             # <<<<<<<<<<<<<<
@@ -3116,7 +3116,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
  */
     __pyx_v_self->ihcut = ((int)__pyx_v_self->nfft);
 
-    /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":77
+    /* "skimu/features/lib/_cython/frequencyFeatures.pyx":77
  *         self.ilcut = <int>(ceil(low_cut / (fs / 2) * (self.nfft - 1)))  # low cutoff index
  * 
  *         if self.ihcut > self.nfft:             # <<<<<<<<<<<<<<
@@ -3125,7 +3125,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
  */
   }
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":79
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":79
  *         if self.ihcut > self.nfft:
  *             self.ihcut = <int>(self.nfft)
  *         self.lic2 = log(self.ihcut - self.ilcut) * self.invlog2             # <<<<<<<<<<<<<<
@@ -3134,7 +3134,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
  */
   __pyx_v_self->lic2 = (log((__pyx_v_self->ihcut - __pyx_v_self->ilcut)) * __pyx_v_self->invlog2);
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":81
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":81
  *         self.lic2 = log(self.ihcut - self.ilcut) * self.invlog2
  * 
  *         self.sp_hat = fft.fft(x, 2 * self.nfft, axis=1)             # <<<<<<<<<<<<<<
@@ -3173,7 +3173,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
   __pyx_t_15.memview = NULL;
   __pyx_t_15.data = NULL;
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":82
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":82
  * 
  *         self.sp_hat = fft.fft(x, 2 * self.nfft, axis=1)
  *         self.sp_norm = real(self.sp_hat[:, self.ilcut:self.ihcut, :]             # <<<<<<<<<<<<<<
@@ -3218,7 +3218,7 @@ __pyx_t_10 = __pyx_memoryview_fromslice(__pyx_t_15, 3, (PyObject *(*)(char *)) _
   __pyx_t_15.memview = NULL;
   __pyx_t_15.data = NULL;
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":83
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":83
  *         self.sp_hat = fft.fft(x, 2 * self.nfft, axis=1)
  *         self.sp_norm = real(self.sp_hat[:, self.ilcut:self.ihcut, :]
  *                             * conjugate(self.sp_hat[:, self.ilcut:self.ihcut, :]))             # <<<<<<<<<<<<<<
@@ -3299,7 +3299,7 @@ __pyx_t_5 = __pyx_memoryview_fromslice(__pyx_t_15, 3, (PyObject *(*)(char *)) __
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":82
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":82
  * 
  *         self.sp_hat = fft.fft(x, 2 * self.nfft, axis=1)
  *         self.sp_norm = real(self.sp_hat[:, self.ilcut:self.ihcut, :]             # <<<<<<<<<<<<<<
@@ -3313,7 +3313,7 @@ __pyx_t_5 = __pyx_memoryview_fromslice(__pyx_t_15, 3, (PyObject *(*)(char *)) __
   __pyx_t_16.memview = NULL;
   __pyx_t_16.data = NULL;
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":85
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":85
  *                             * conjugate(self.sp_hat[:, self.ilcut:self.ihcut, :]))
  * 
  *         self.sp_norm = self.sp_norm / nsum(self.sp_norm, axis=1, keepdims=True) + 1e-10             # <<<<<<<<<<<<<<
@@ -3356,7 +3356,7 @@ __pyx_t_5 = __pyx_memoryview_fromslice(__pyx_t_15, 3, (PyObject *(*)(char *)) __
   __pyx_t_16.memview = NULL;
   __pyx_t_16.data = NULL;
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":87
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":87
  *         self.sp_norm = self.sp_norm / nsum(self.sp_norm, axis=1, keepdims=True) + 1e-10
  * 
  *         self.imax = argmax(self.sp_norm, axis=1)             # <<<<<<<<<<<<<<
@@ -3388,7 +3388,7 @@ __pyx_t_5 = __pyx_memoryview_fromslice(__pyx_t_15, 3, (PyObject *(*)(char *)) __
   __pyx_t_17.memview = NULL;
   __pyx_t_17.data = NULL;
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":58
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":58
  *         self.invlog2 = 1 / log(2.0)
  * 
  *     cpdef _base_fn(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):             # <<<<<<<<<<<<<<
@@ -3414,7 +3414,7 @@ __pyx_t_5 = __pyx_memoryview_fromslice(__pyx_t_15, 3, (PyObject *(*)(char *)) __
   __PYX_XDEC_MEMVIEW(&__pyx_t_15, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_t_16, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_t_17, 1);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.frequencyFeatures.FrequencyFeatures._base_fn", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.frequencyFeatures.FrequencyFeatures._base_fn", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -3423,8 +3423,8 @@ __pyx_t_5 = __pyx_memoryview_fromslice(__pyx_t_15, 3, (PyObject *(*)(char *)) __
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_3_base_fn(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_3_base_fn(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_3_base_fn(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_3_base_fn(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_x = { 0, 0, { 0 }, { 0 }, { 0 } };
   double __pyx_v_fs;
   double __pyx_v_low_cut;
@@ -3497,18 +3497,18 @@ static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("_base_fn", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 58, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.frequencyFeatures.FrequencyFeatures._base_fn", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.frequencyFeatures.FrequencyFeatures._base_fn", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_2_base_fn(((struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self), __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut);
+  __pyx_r = __pyx_pf_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_2_base_fn(((struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self), __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_2_base_fn(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut) {
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_2_base_fn(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -3518,7 +3518,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
   __Pyx_RefNannySetupContext("_base_fn", 0);
   __Pyx_XDECREF(__pyx_r);
   if (unlikely(!__pyx_v_x.memview)) { __Pyx_RaiseUnboundLocalError("x"); __PYX_ERR(0, 58, __pyx_L1_error) }
-  __pyx_t_1 = __pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures__base_fn(__pyx_v_self, __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures__base_fn(__pyx_v_self, __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 58, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -3527,7 +3527,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.frequencyFeatures.FrequencyFeatures._base_fn", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.frequencyFeatures.FrequencyFeatures._base_fn", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __PYX_XDEC_MEMVIEW(&__pyx_v_x, 1);
@@ -3536,7 +3536,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
   return __pyx_r;
 }
 
-/* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":92
+/* "skimu/features/lib/_cython/frequencyFeatures.pyx":92
  *         # self.base_run = True
  * 
  *     cpdef get_dominant_freq(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):             # <<<<<<<<<<<<<<
@@ -3544,8 +3544,8 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
  *             self._base_fn(x, fs, low_cut, hi_cut)
  */
 
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_5get_dominant_freq(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_dominant_freq(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut, int __pyx_skip_dispatch) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_5get_dominant_freq(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_f_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_dominant_freq(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut, int __pyx_skip_dispatch) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -3585,7 +3585,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
       #endif
       __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_dominant_freq); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 92, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_5get_dominant_freq)) {
+      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_5get_dominant_freq)) {
         __Pyx_XDECREF(__pyx_r);
         if (unlikely(!__pyx_v_x.memview)) { __Pyx_RaiseUnboundLocalError("x"); __PYX_ERR(0, 92, __pyx_L1_error) }
         __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_x, 3, (PyObject *(*)(char *)) __pyx_memview_get_double__const__, (int (*)(char *, PyObject *)) NULL, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 92, __pyx_L1_error)
@@ -3674,7 +3674,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
     #endif
   }
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":93
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":93
  * 
  *     cpdef get_dominant_freq(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
  *         if not self.base_run:             # <<<<<<<<<<<<<<
@@ -3684,18 +3684,18 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
   __pyx_t_11 = ((!(__pyx_v_self->base_run != 0)) != 0);
   if (__pyx_t_11) {
 
-    /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":94
+    /* "skimu/features/lib/_cython/frequencyFeatures.pyx":94
  *     cpdef get_dominant_freq(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
  *         if not self.base_run:
  *             self._base_fn(x, fs, low_cut, hi_cut)             # <<<<<<<<<<<<<<
  * 
  *         for self.i in range(self.M):
  */
-    __pyx_t_1 = ((struct __pyx_vtabstruct_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self->__pyx_vtab)->_base_fn(__pyx_v_self, __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 94, __pyx_L1_error)
+    __pyx_t_1 = ((struct __pyx_vtabstruct_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self->__pyx_vtab)->_base_fn(__pyx_v_self, __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 94, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":93
+    /* "skimu/features/lib/_cython/frequencyFeatures.pyx":93
  * 
  *     cpdef get_dominant_freq(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
  *         if not self.base_run:             # <<<<<<<<<<<<<<
@@ -3704,7 +3704,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
  */
   }
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":96
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":96
  *             self._base_fn(x, fs, low_cut, hi_cut)
  * 
  *         for self.i in range(self.M):             # <<<<<<<<<<<<<<
@@ -3716,7 +3716,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
   for (__pyx_t_14 = 0; __pyx_t_14 < __pyx_t_13; __pyx_t_14+=1) {
     __pyx_v_self->i = __pyx_t_14;
 
-    /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":97
+    /* "skimu/features/lib/_cython/frequencyFeatures.pyx":97
  * 
  *         for self.i in range(self.M):
  *             for self.k in range(self.P):             # <<<<<<<<<<<<<<
@@ -3728,7 +3728,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
     for (__pyx_t_17 = 0; __pyx_t_17 < __pyx_t_16; __pyx_t_17+=1) {
       __pyx_v_self->k = __pyx_t_17;
 
-      /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":98
+      /* "skimu/features/lib/_cython/frequencyFeatures.pyx":98
  *         for self.i in range(self.M):
  *             for self.k in range(self.P):
  *                 self.maxf[self.i, self.k] = self.freq[self.imax[self.i, self.k] + self.ilcut]             # <<<<<<<<<<<<<<
@@ -3747,7 +3747,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
     }
   }
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":100
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":100
  *                 self.maxf[self.i, self.k] = self.freq[self.imax[self.i, self.k] + self.ilcut]
  * 
  *         return self.maxf             # <<<<<<<<<<<<<<
@@ -3762,7 +3762,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":92
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":92
  *         # self.base_run = True
  * 
  *     cpdef get_dominant_freq(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):             # <<<<<<<<<<<<<<
@@ -3781,7 +3781,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
   __Pyx_XDECREF(__pyx_t_7);
   __Pyx_XDECREF(__pyx_t_8);
   __Pyx_XDECREF(__pyx_t_10);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_dominant_freq", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_dominant_freq", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -3790,8 +3790,8 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_5get_dominant_freq(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_5get_dominant_freq(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_5get_dominant_freq(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_5get_dominant_freq(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_x = { 0, 0, { 0 }, { 0 }, { 0 } };
   double __pyx_v_fs;
   double __pyx_v_low_cut;
@@ -3864,18 +3864,18 @@ static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("get_dominant_freq", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 92, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_dominant_freq", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_dominant_freq", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_4get_dominant_freq(((struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self), __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut);
+  __pyx_r = __pyx_pf_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_4get_dominant_freq(((struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self), __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_4get_dominant_freq(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut) {
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_4get_dominant_freq(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -3885,7 +3885,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
   __Pyx_RefNannySetupContext("get_dominant_freq", 0);
   __Pyx_XDECREF(__pyx_r);
   if (unlikely(!__pyx_v_x.memview)) { __Pyx_RaiseUnboundLocalError("x"); __PYX_ERR(0, 92, __pyx_L1_error) }
-  __pyx_t_1 = __pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_dominant_freq(__pyx_v_self, __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 92, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_dominant_freq(__pyx_v_self, __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 92, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -3894,7 +3894,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_dominant_freq", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_dominant_freq", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __PYX_XDEC_MEMVIEW(&__pyx_v_x, 1);
@@ -3903,7 +3903,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
   return __pyx_r;
 }
 
-/* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":102
+/* "skimu/features/lib/_cython/frequencyFeatures.pyx":102
  *         return self.maxf
  * 
  *     cpdef get_dominant_freq_value(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):             # <<<<<<<<<<<<<<
@@ -3911,8 +3911,8 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
  *             self._base_fn(x, fs, low_cut, hi_cut)
  */
 
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_7get_dominant_freq_value(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_dominant_freq_value(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut, int __pyx_skip_dispatch) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_7get_dominant_freq_value(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_f_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_dominant_freq_value(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut, int __pyx_skip_dispatch) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -3954,7 +3954,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
       #endif
       __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_dominant_freq_value); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 102, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_7get_dominant_freq_value)) {
+      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_7get_dominant_freq_value)) {
         __Pyx_XDECREF(__pyx_r);
         if (unlikely(!__pyx_v_x.memview)) { __Pyx_RaiseUnboundLocalError("x"); __PYX_ERR(0, 102, __pyx_L1_error) }
         __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_x, 3, (PyObject *(*)(char *)) __pyx_memview_get_double__const__, (int (*)(char *, PyObject *)) NULL, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 102, __pyx_L1_error)
@@ -4043,7 +4043,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
     #endif
   }
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":103
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":103
  * 
  *     cpdef get_dominant_freq_value(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
  *         if not self.base_run:             # <<<<<<<<<<<<<<
@@ -4053,18 +4053,18 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
   __pyx_t_11 = ((!(__pyx_v_self->base_run != 0)) != 0);
   if (__pyx_t_11) {
 
-    /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":104
+    /* "skimu/features/lib/_cython/frequencyFeatures.pyx":104
  *     cpdef get_dominant_freq_value(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
  *         if not self.base_run:
  *             self._base_fn(x, fs, low_cut, hi_cut)             # <<<<<<<<<<<<<<
  * 
  *         for self.i in range(self.M):
  */
-    __pyx_t_1 = ((struct __pyx_vtabstruct_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self->__pyx_vtab)->_base_fn(__pyx_v_self, __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 104, __pyx_L1_error)
+    __pyx_t_1 = ((struct __pyx_vtabstruct_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self->__pyx_vtab)->_base_fn(__pyx_v_self, __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 104, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":103
+    /* "skimu/features/lib/_cython/frequencyFeatures.pyx":103
  * 
  *     cpdef get_dominant_freq_value(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
  *         if not self.base_run:             # <<<<<<<<<<<<<<
@@ -4073,7 +4073,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
  */
   }
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":106
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":106
  *             self._base_fn(x, fs, low_cut, hi_cut)
  * 
  *         for self.i in range(self.M):             # <<<<<<<<<<<<<<
@@ -4085,7 +4085,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
   for (__pyx_t_14 = 0; __pyx_t_14 < __pyx_t_13; __pyx_t_14+=1) {
     __pyx_v_self->i = __pyx_t_14;
 
-    /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":107
+    /* "skimu/features/lib/_cython/frequencyFeatures.pyx":107
  * 
  *         for self.i in range(self.M):
  *             for self.k in range(self.P):             # <<<<<<<<<<<<<<
@@ -4097,7 +4097,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
     for (__pyx_t_17 = 0; __pyx_t_17 < __pyx_t_16; __pyx_t_17+=1) {
       __pyx_v_self->k = __pyx_t_17;
 
-      /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":108
+      /* "skimu/features/lib/_cython/frequencyFeatures.pyx":108
  *         for self.i in range(self.M):
  *             for self.k in range(self.P):
  *                 self.maxfv[self.i, self.k] = self.sp_norm[self.i, self.imax[self.i, self.k], self.k]             # <<<<<<<<<<<<<<
@@ -4118,7 +4118,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
     }
   }
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":110
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":110
  *                 self.maxfv[self.i, self.k] = self.sp_norm[self.i, self.imax[self.i, self.k], self.k]
  * 
  *         return self.maxfv             # <<<<<<<<<<<<<<
@@ -4133,7 +4133,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":102
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":102
  *         return self.maxf
  * 
  *     cpdef get_dominant_freq_value(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):             # <<<<<<<<<<<<<<
@@ -4152,7 +4152,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
   __Pyx_XDECREF(__pyx_t_7);
   __Pyx_XDECREF(__pyx_t_8);
   __Pyx_XDECREF(__pyx_t_10);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_dominant_freq_value", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_dominant_freq_value", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -4161,8 +4161,8 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_7get_dominant_freq_value(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_7get_dominant_freq_value(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_7get_dominant_freq_value(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_7get_dominant_freq_value(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_x = { 0, 0, { 0 }, { 0 }, { 0 } };
   double __pyx_v_fs;
   double __pyx_v_low_cut;
@@ -4235,18 +4235,18 @@ static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("get_dominant_freq_value", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 102, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_dominant_freq_value", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_dominant_freq_value", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_6get_dominant_freq_value(((struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self), __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut);
+  __pyx_r = __pyx_pf_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_6get_dominant_freq_value(((struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self), __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_6get_dominant_freq_value(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut) {
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_6get_dominant_freq_value(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -4256,7 +4256,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
   __Pyx_RefNannySetupContext("get_dominant_freq_value", 0);
   __Pyx_XDECREF(__pyx_r);
   if (unlikely(!__pyx_v_x.memview)) { __Pyx_RaiseUnboundLocalError("x"); __PYX_ERR(0, 102, __pyx_L1_error) }
-  __pyx_t_1 = __pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_dominant_freq_value(__pyx_v_self, __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 102, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_dominant_freq_value(__pyx_v_self, __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 102, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -4265,7 +4265,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_dominant_freq_value", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_dominant_freq_value", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __PYX_XDEC_MEMVIEW(&__pyx_v_x, 1);
@@ -4274,7 +4274,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
   return __pyx_r;
 }
 
-/* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":112
+/* "skimu/features/lib/_cython/frequencyFeatures.pyx":112
  *         return self.maxfv
  * 
  *     cpdef get_power(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):             # <<<<<<<<<<<<<<
@@ -4282,8 +4282,8 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
  *             self._base_fn(x, fs, low_cut, hi_cut)
  */
 
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_9get_power(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_power(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut, int __pyx_skip_dispatch) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_9get_power(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_f_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_power(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut, int __pyx_skip_dispatch) {
   CYTHON_UNUSED PyObject *__pyx_v__ = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -4328,7 +4328,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
       #endif
       __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_power); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 112, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_9get_power)) {
+      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_9get_power)) {
         __Pyx_XDECREF(__pyx_r);
         if (unlikely(!__pyx_v_x.memview)) { __Pyx_RaiseUnboundLocalError("x"); __PYX_ERR(0, 112, __pyx_L1_error) }
         __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_x, 3, (PyObject *(*)(char *)) __pyx_memview_get_double__const__, (int (*)(char *, PyObject *)) NULL, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 112, __pyx_L1_error)
@@ -4417,7 +4417,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
     #endif
   }
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":113
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":113
  * 
  *     cpdef get_power(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
  *         if not self.base_run:             # <<<<<<<<<<<<<<
@@ -4427,18 +4427,18 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
   __pyx_t_11 = ((!(__pyx_v_self->base_run != 0)) != 0);
   if (__pyx_t_11) {
 
-    /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":114
+    /* "skimu/features/lib/_cython/frequencyFeatures.pyx":114
  *     cpdef get_power(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
  *         if not self.base_run:
  *             self._base_fn(x, fs, low_cut, hi_cut)             # <<<<<<<<<<<<<<
  * 
  *         # TODO remove the base run setting
  */
-    __pyx_t_1 = ((struct __pyx_vtabstruct_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self->__pyx_vtab)->_base_fn(__pyx_v_self, __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 114, __pyx_L1_error)
+    __pyx_t_1 = ((struct __pyx_vtabstruct_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self->__pyx_vtab)->_base_fn(__pyx_v_self, __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 114, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":113
+    /* "skimu/features/lib/_cython/frequencyFeatures.pyx":113
  * 
  *     cpdef get_power(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
  *         if not self.base_run:             # <<<<<<<<<<<<<<
@@ -4447,7 +4447,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
  */
   }
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":117
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":117
  * 
  *         # TODO remove the base run setting
  *         self.base_run = True             # <<<<<<<<<<<<<<
@@ -4456,19 +4456,19 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
  */
   __pyx_v_self->base_run = 1;
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":118
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":118
  *         # TODO remove the base run setting
  *         self.base_run = True
  *         _ = self.get_dominant_freq(x, fs, low_cut, hi_cut)             # <<<<<<<<<<<<<<
  *         self.base_run = False  # turn off for now
  * 
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self->__pyx_vtab)->get_dominant_freq(__pyx_v_self, __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 118, __pyx_L1_error)
+  __pyx_t_1 = ((struct __pyx_vtabstruct_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self->__pyx_vtab)->get_dominant_freq(__pyx_v_self, __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 118, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v__ = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":119
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":119
  *         self.base_run = True
  *         _ = self.get_dominant_freq(x, fs, low_cut, hi_cut)
  *         self.base_run = False  # turn off for now             # <<<<<<<<<<<<<<
@@ -4477,7 +4477,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
  */
   __pyx_v_self->base_run = 0;
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":121
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":121
  *         self.base_run = False  # turn off for now
  * 
  *         for self.i in range(self.M):             # <<<<<<<<<<<<<<
@@ -4489,7 +4489,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
   for (__pyx_t_14 = 0; __pyx_t_14 < __pyx_t_13; __pyx_t_14+=1) {
     __pyx_v_self->i = __pyx_t_14;
 
-    /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":122
+    /* "skimu/features/lib/_cython/frequencyFeatures.pyx":122
  * 
  *         for self.i in range(self.M):
  *             for self.j in range(self.ihcut - self.ilcut):             # <<<<<<<<<<<<<<
@@ -4501,7 +4501,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
     for (__pyx_t_16 = 0; __pyx_t_16 < __pyx_t_15; __pyx_t_16+=1) {
       __pyx_v_self->j = __pyx_t_16;
 
-      /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":123
+      /* "skimu/features/lib/_cython/frequencyFeatures.pyx":123
  *         for self.i in range(self.M):
  *             for self.j in range(self.ihcut - self.ilcut):
  *                 for self.k in range(self.P):             # <<<<<<<<<<<<<<
@@ -4513,7 +4513,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
       for (__pyx_t_19 = 0; __pyx_t_19 < __pyx_t_18; __pyx_t_19+=1) {
         __pyx_v_self->k = __pyx_t_19;
 
-        /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":124
+        /* "skimu/features/lib/_cython/frequencyFeatures.pyx":124
  *             for self.j in range(self.ihcut - self.ilcut):
  *                 for self.k in range(self.P):
  *                     if ((self.maxf[self.i, self.k] - 0.5) < self.freq[self.j + self.ilcut] < (self.maxf[self.i, self.k] + 0.5)):             # <<<<<<<<<<<<<<
@@ -4536,7 +4536,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
         __pyx_t_25 = (__pyx_t_11 != 0);
         if (__pyx_t_25) {
 
-          /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":125
+          /* "skimu/features/lib/_cython/frequencyFeatures.pyx":125
  *                 for self.k in range(self.P):
  *                     if ((self.maxf[self.i, self.k] - 0.5) < self.freq[self.j + self.ilcut] < (self.maxf[self.i, self.k] + 0.5)):
  *                         self.df_ratio[self.i, self.k] += self.sp_norm[self.i, self.j, self.k]             # <<<<<<<<<<<<<<
@@ -4552,7 +4552,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
           __pyx_t_26 = __pyx_v_self->k;
           *((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->df_ratio.data + __pyx_t_22 * __pyx_v_self->df_ratio.strides[0]) ) + __pyx_t_26 * __pyx_v_self->df_ratio.strides[1]) )) += (*((double *) ( /* dim=2 */ (( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->sp_norm.data + __pyx_t_21 * __pyx_v_self->sp_norm.strides[0]) ) + __pyx_t_20 * __pyx_v_self->sp_norm.strides[1]) ) + __pyx_t_24 * __pyx_v_self->sp_norm.strides[2]) )));
 
-          /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":124
+          /* "skimu/features/lib/_cython/frequencyFeatures.pyx":124
  *             for self.j in range(self.ihcut - self.ilcut):
  *                 for self.k in range(self.P):
  *                     if ((self.maxf[self.i, self.k] - 0.5) < self.freq[self.j + self.ilcut] < (self.maxf[self.i, self.k] + 0.5)):             # <<<<<<<<<<<<<<
@@ -4564,7 +4564,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
     }
   }
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":127
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":127
  *                         self.df_ratio[self.i, self.k] += self.sp_norm[self.i, self.j, self.k]
  * 
  *         return self.df_ratio             # <<<<<<<<<<<<<<
@@ -4579,7 +4579,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":112
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":112
  *         return self.maxfv
  * 
  *     cpdef get_power(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):             # <<<<<<<<<<<<<<
@@ -4598,7 +4598,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
   __Pyx_XDECREF(__pyx_t_7);
   __Pyx_XDECREF(__pyx_t_8);
   __Pyx_XDECREF(__pyx_t_10);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_power", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_power", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v__);
@@ -4608,8 +4608,8 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_9get_power(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_9get_power(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_9get_power(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_9get_power(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_x = { 0, 0, { 0 }, { 0 }, { 0 } };
   double __pyx_v_fs;
   double __pyx_v_low_cut;
@@ -4682,18 +4682,18 @@ static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("get_power", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 112, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_power", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_power", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_8get_power(((struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self), __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut);
+  __pyx_r = __pyx_pf_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_8get_power(((struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self), __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_8get_power(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut) {
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_8get_power(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -4703,7 +4703,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
   __Pyx_RefNannySetupContext("get_power", 0);
   __Pyx_XDECREF(__pyx_r);
   if (unlikely(!__pyx_v_x.memview)) { __Pyx_RaiseUnboundLocalError("x"); __PYX_ERR(0, 112, __pyx_L1_error) }
-  __pyx_t_1 = __pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_power(__pyx_v_self, __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 112, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_power(__pyx_v_self, __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 112, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -4712,7 +4712,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_power", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_power", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __PYX_XDEC_MEMVIEW(&__pyx_v_x, 1);
@@ -4721,7 +4721,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
   return __pyx_r;
 }
 
-/* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":129
+/* "skimu/features/lib/_cython/frequencyFeatures.pyx":129
  *         return self.df_ratio
  * 
  *     cpdef get_spectral_flatness(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):             # <<<<<<<<<<<<<<
@@ -4729,8 +4729,8 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
  *             self._base_fn(x, fs, low_cut, hi_cut)
  */
 
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_11get_spectral_flatness(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_spectral_flatness(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut, int __pyx_skip_dispatch) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_11get_spectral_flatness(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_f_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_spectral_flatness(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut, int __pyx_skip_dispatch) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -4770,7 +4770,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
       #endif
       __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_spectral_flatness); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 129, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_11get_spectral_flatness)) {
+      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_11get_spectral_flatness)) {
         __Pyx_XDECREF(__pyx_r);
         if (unlikely(!__pyx_v_x.memview)) { __Pyx_RaiseUnboundLocalError("x"); __PYX_ERR(0, 129, __pyx_L1_error) }
         __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_x, 3, (PyObject *(*)(char *)) __pyx_memview_get_double__const__, (int (*)(char *, PyObject *)) NULL, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 129, __pyx_L1_error)
@@ -4859,7 +4859,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
     #endif
   }
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":130
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":130
  * 
  *     cpdef get_spectral_flatness(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
  *         if not self.base_run:             # <<<<<<<<<<<<<<
@@ -4869,18 +4869,18 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
   __pyx_t_11 = ((!(__pyx_v_self->base_run != 0)) != 0);
   if (__pyx_t_11) {
 
-    /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":131
+    /* "skimu/features/lib/_cython/frequencyFeatures.pyx":131
  *     cpdef get_spectral_flatness(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
  *         if not self.base_run:
  *             self._base_fn(x, fs, low_cut, hi_cut)             # <<<<<<<<<<<<<<
  * 
  *         for self.i in range(self.M):
  */
-    __pyx_t_1 = ((struct __pyx_vtabstruct_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self->__pyx_vtab)->_base_fn(__pyx_v_self, __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 131, __pyx_L1_error)
+    __pyx_t_1 = ((struct __pyx_vtabstruct_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self->__pyx_vtab)->_base_fn(__pyx_v_self, __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 131, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":130
+    /* "skimu/features/lib/_cython/frequencyFeatures.pyx":130
  * 
  *     cpdef get_spectral_flatness(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
  *         if not self.base_run:             # <<<<<<<<<<<<<<
@@ -4889,7 +4889,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
  */
   }
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":133
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":133
  *             self._base_fn(x, fs, low_cut, hi_cut)
  * 
  *         for self.i in range(self.M):             # <<<<<<<<<<<<<<
@@ -4901,7 +4901,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
   for (__pyx_t_14 = 0; __pyx_t_14 < __pyx_t_13; __pyx_t_14+=1) {
     __pyx_v_self->i = __pyx_t_14;
 
-    /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":134
+    /* "skimu/features/lib/_cython/frequencyFeatures.pyx":134
  * 
  *         for self.i in range(self.M):
  *             for self.k in range(self.P):             # <<<<<<<<<<<<<<
@@ -4913,7 +4913,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
     for (__pyx_t_17 = 0; __pyx_t_17 < __pyx_t_16; __pyx_t_17+=1) {
       __pyx_v_self->k = __pyx_t_17;
 
-      /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":135
+      /* "skimu/features/lib/_cython/frequencyFeatures.pyx":135
  *         for self.i in range(self.M):
  *             for self.k in range(self.P):
  *                 self.mean = 0.             # <<<<<<<<<<<<<<
@@ -4922,7 +4922,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
  */
       __pyx_v_self->mean = 0.;
 
-      /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":136
+      /* "skimu/features/lib/_cython/frequencyFeatures.pyx":136
  *             for self.k in range(self.P):
  *                 self.mean = 0.
  *                 mean_1d(self.sp_norm[self.i, :, self.k], &self.mean)             # <<<<<<<<<<<<<<
@@ -4949,12 +4949,12 @@ __pyx_t_18.strides[0] = __pyx_v_self->sp_norm.strides[1];
         __pyx_t_18.data += __pyx_tmp_idx * __pyx_tmp_stride;
 }
 
-__pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_1d(__pyx_t_18, (&__pyx_v_self->mean));
+__pyx_f_5skimu_8features_3lib_7_cython_6common_mean_1d(__pyx_t_18, (&__pyx_v_self->mean));
       __PYX_XDEC_MEMVIEW(&__pyx_t_18, 1);
       __pyx_t_18.memview = NULL;
       __pyx_t_18.data = NULL;
 
-      /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":137
+      /* "skimu/features/lib/_cython/frequencyFeatures.pyx":137
  *                 self.mean = 0.
  *                 mean_1d(self.sp_norm[self.i, :, self.k], &self.mean)
  *                 self.spec_flat[self.i, self.k] = 10. * log(gmean(self.sp_norm[self.i, :, self.k]) / self.mean) / log(10.0)             # <<<<<<<<<<<<<<
@@ -4981,7 +4981,7 @@ __pyx_t_18.strides[0] = __pyx_v_self->sp_norm.strides[1];
         __pyx_t_18.data += __pyx_tmp_idx * __pyx_tmp_stride;
 }
 
-__pyx_t_19 = __pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_gmean(__pyx_t_18);
+__pyx_t_19 = __pyx_f_5skimu_8features_3lib_7_cython_17frequencyFeatures_gmean(__pyx_t_18);
       __PYX_XDEC_MEMVIEW(&__pyx_t_18, 1);
       __pyx_t_18.memview = NULL;
       __pyx_t_18.data = NULL;
@@ -5002,7 +5002,7 @@ __pyx_t_19 = __pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_gmean(__
     }
   }
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":139
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":139
  *                 self.spec_flat[self.i, self.k] = 10. * log(gmean(self.sp_norm[self.i, :, self.k]) / self.mean) / log(10.0)
  * 
  *         return self.spec_flat             # <<<<<<<<<<<<<<
@@ -5017,7 +5017,7 @@ __pyx_t_19 = __pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_gmean(__
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":129
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":129
  *         return self.df_ratio
  * 
  *     cpdef get_spectral_flatness(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):             # <<<<<<<<<<<<<<
@@ -5037,7 +5037,7 @@ __pyx_t_19 = __pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_gmean(__
   __Pyx_XDECREF(__pyx_t_8);
   __Pyx_XDECREF(__pyx_t_10);
   __PYX_XDEC_MEMVIEW(&__pyx_t_18, 1);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_spectral_flatness", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_spectral_flatness", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -5046,8 +5046,8 @@ __pyx_t_19 = __pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_gmean(__
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_11get_spectral_flatness(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_11get_spectral_flatness(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_11get_spectral_flatness(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_11get_spectral_flatness(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_x = { 0, 0, { 0 }, { 0 }, { 0 } };
   double __pyx_v_fs;
   double __pyx_v_low_cut;
@@ -5120,18 +5120,18 @@ static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("get_spectral_flatness", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 129, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_spectral_flatness", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_spectral_flatness", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_10get_spectral_flatness(((struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self), __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut);
+  __pyx_r = __pyx_pf_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_10get_spectral_flatness(((struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self), __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_10get_spectral_flatness(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut) {
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_10get_spectral_flatness(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -5141,7 +5141,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
   __Pyx_RefNannySetupContext("get_spectral_flatness", 0);
   __Pyx_XDECREF(__pyx_r);
   if (unlikely(!__pyx_v_x.memview)) { __Pyx_RaiseUnboundLocalError("x"); __PYX_ERR(0, 129, __pyx_L1_error) }
-  __pyx_t_1 = __pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_spectral_flatness(__pyx_v_self, __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 129, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_spectral_flatness(__pyx_v_self, __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 129, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5150,7 +5150,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_spectral_flatness", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_spectral_flatness", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __PYX_XDEC_MEMVIEW(&__pyx_v_x, 1);
@@ -5159,7 +5159,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
   return __pyx_r;
 }
 
-/* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":141
+/* "skimu/features/lib/_cython/frequencyFeatures.pyx":141
  *         return self.spec_flat
  * 
  *     cpdef get_spectral_entropy(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):             # <<<<<<<<<<<<<<
@@ -5167,8 +5167,8 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
  *             self._base_fn(x, fs, low_cut, hi_cut)
  */
 
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_13get_spectral_entropy(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_spectral_entropy(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut, int __pyx_skip_dispatch) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_13get_spectral_entropy(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_f_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_spectral_entropy(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut, int __pyx_skip_dispatch) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -5210,7 +5210,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
       #endif
       __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_spectral_entropy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 141, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_13get_spectral_entropy)) {
+      if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_13get_spectral_entropy)) {
         __Pyx_XDECREF(__pyx_r);
         if (unlikely(!__pyx_v_x.memview)) { __Pyx_RaiseUnboundLocalError("x"); __PYX_ERR(0, 141, __pyx_L1_error) }
         __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_x, 3, (PyObject *(*)(char *)) __pyx_memview_get_double__const__, (int (*)(char *, PyObject *)) NULL, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 141, __pyx_L1_error)
@@ -5299,7 +5299,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
     #endif
   }
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":142
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":142
  * 
  *     cpdef get_spectral_entropy(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
  *         if not self.base_run:             # <<<<<<<<<<<<<<
@@ -5309,18 +5309,18 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
   __pyx_t_11 = ((!(__pyx_v_self->base_run != 0)) != 0);
   if (__pyx_t_11) {
 
-    /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":143
+    /* "skimu/features/lib/_cython/frequencyFeatures.pyx":143
  *     cpdef get_spectral_entropy(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
  *         if not self.base_run:
  *             self._base_fn(x, fs, low_cut, hi_cut)             # <<<<<<<<<<<<<<
  * 
  *         for self.i in range(self.M):
  */
-    __pyx_t_1 = ((struct __pyx_vtabstruct_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self->__pyx_vtab)->_base_fn(__pyx_v_self, __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 143, __pyx_L1_error)
+    __pyx_t_1 = ((struct __pyx_vtabstruct_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self->__pyx_vtab)->_base_fn(__pyx_v_self, __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 143, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":142
+    /* "skimu/features/lib/_cython/frequencyFeatures.pyx":142
  * 
  *     cpdef get_spectral_entropy(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):
  *         if not self.base_run:             # <<<<<<<<<<<<<<
@@ -5329,7 +5329,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
  */
   }
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":145
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":145
  *             self._base_fn(x, fs, low_cut, hi_cut)
  * 
  *         for self.i in range(self.M):             # <<<<<<<<<<<<<<
@@ -5341,7 +5341,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
   for (__pyx_t_14 = 0; __pyx_t_14 < __pyx_t_13; __pyx_t_14+=1) {
     __pyx_v_self->i = __pyx_t_14;
 
-    /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":146
+    /* "skimu/features/lib/_cython/frequencyFeatures.pyx":146
  * 
  *         for self.i in range(self.M):
  *             for self.j in range(self.ihcut - self.ilcut):             # <<<<<<<<<<<<<<
@@ -5353,7 +5353,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
     for (__pyx_t_16 = 0; __pyx_t_16 < __pyx_t_15; __pyx_t_16+=1) {
       __pyx_v_self->j = __pyx_t_16;
 
-      /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":147
+      /* "skimu/features/lib/_cython/frequencyFeatures.pyx":147
  *         for self.i in range(self.M):
  *             for self.j in range(self.ihcut - self.ilcut):
  *                 for self.k in range(self.P):             # <<<<<<<<<<<<<<
@@ -5365,7 +5365,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
       for (__pyx_t_19 = 0; __pyx_t_19 < __pyx_t_18; __pyx_t_19+=1) {
         __pyx_v_self->k = __pyx_t_19;
 
-        /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":148
+        /* "skimu/features/lib/_cython/frequencyFeatures.pyx":148
  *             for self.j in range(self.ihcut - self.ilcut):
  *                 for self.k in range(self.P):
  *                     self.logps = log(self.sp_norm[self.i, self.j, self.k]) * self.invlog2             # <<<<<<<<<<<<<<
@@ -5378,7 +5378,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
         __pyx_t_22 = __pyx_v_self->k;
         __pyx_v_self->logps = (log((*((double *) ( /* dim=2 */ (( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->sp_norm.data + __pyx_t_20 * __pyx_v_self->sp_norm.strides[0]) ) + __pyx_t_21 * __pyx_v_self->sp_norm.strides[1]) ) + __pyx_t_22 * __pyx_v_self->sp_norm.strides[2]) )))) * __pyx_v_self->invlog2);
 
-        /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":149
+        /* "skimu/features/lib/_cython/frequencyFeatures.pyx":149
  *                 for self.k in range(self.P):
  *                     self.logps = log(self.sp_norm[self.i, self.j, self.k]) * self.invlog2
  *                     self.spec_ent[self.i, self.k] -= self.logps * self.sp_norm[self.i, self.j, self.k]             # <<<<<<<<<<<<<<
@@ -5396,7 +5396,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
       }
     }
 
-    /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":150
+    /* "skimu/features/lib/_cython/frequencyFeatures.pyx":150
  *                     self.logps = log(self.sp_norm[self.i, self.j, self.k]) * self.invlog2
  *                     self.spec_ent[self.i, self.k] -= self.logps * self.sp_norm[self.i, self.j, self.k]
  *             for self.k in range(self.P):             # <<<<<<<<<<<<<<
@@ -5408,7 +5408,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
     for (__pyx_t_18 = 0; __pyx_t_18 < __pyx_t_17; __pyx_t_18+=1) {
       __pyx_v_self->k = __pyx_t_18;
 
-      /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":151
+      /* "skimu/features/lib/_cython/frequencyFeatures.pyx":151
  *                     self.spec_ent[self.i, self.k] -= self.logps * self.sp_norm[self.i, self.j, self.k]
  *             for self.k in range(self.P):
  *                 self.spec_ent[self.i, self.k] /= self.lic2             # <<<<<<<<<<<<<<
@@ -5422,7 +5422,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
     }
   }
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":153
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":153
  *                 self.spec_ent[self.i, self.k] /= self.lic2
  * 
  *         return self.spec_ent             # <<<<<<<<<<<<<<
@@ -5436,7 +5436,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":141
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":141
  *         return self.spec_flat
  * 
  *     cpdef get_spectral_entropy(self, const double[:, :, :] x, double fs, double low_cut, double hi_cut):             # <<<<<<<<<<<<<<
@@ -5455,7 +5455,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
   __Pyx_XDECREF(__pyx_t_7);
   __Pyx_XDECREF(__pyx_t_8);
   __Pyx_XDECREF(__pyx_t_10);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_spectral_entropy", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_spectral_entropy", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -5464,8 +5464,8 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17Fr
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_13get_spectral_entropy(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_13get_spectral_entropy(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_13get_spectral_entropy(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_13get_spectral_entropy(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_x = { 0, 0, { 0 }, { 0 }, { 0 } };
   double __pyx_v_fs;
   double __pyx_v_low_cut;
@@ -5538,18 +5538,18 @@ static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("get_spectral_entropy", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 141, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_spectral_entropy", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_spectral_entropy", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_12get_spectral_entropy(((struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self), __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut);
+  __pyx_r = __pyx_pf_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_12get_spectral_entropy(((struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self), __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_12get_spectral_entropy(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut) {
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_12get_spectral_entropy(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, __Pyx_memviewslice __pyx_v_x, double __pyx_v_fs, double __pyx_v_low_cut, double __pyx_v_hi_cut) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -5559,7 +5559,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
   __Pyx_RefNannySetupContext("get_spectral_entropy", 0);
   __Pyx_XDECREF(__pyx_r);
   if (unlikely(!__pyx_v_x.memview)) { __Pyx_RaiseUnboundLocalError("x"); __PYX_ERR(0, 141, __pyx_L1_error) }
-  __pyx_t_1 = __pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_spectral_entropy(__pyx_v_self, __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 141, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_spectral_entropy(__pyx_v_self, __pyx_v_x, __pyx_v_fs, __pyx_v_low_cut, __pyx_v_hi_cut, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 141, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5568,7 +5568,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_spectral_entropy", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.frequencyFeatures.FrequencyFeatures.get_spectral_entropy", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __PYX_XDEC_MEMVIEW(&__pyx_v_x, 1);
@@ -5584,19 +5584,19 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_15__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_15__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_15__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_15__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__reduce_cython__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_14__reduce_cython__(((struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self));
+  __pyx_r = __pyx_pf_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_14__reduce_cython__(((struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_14__reduce_cython__(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self) {
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_14__reduce_cython__(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self) {
   PyObject *__pyx_v_state = 0;
   PyObject *__pyx_v__dict = 0;
   int __pyx_v_use_setstate;
@@ -5963,7 +5963,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
   __Pyx_XDECREF(__pyx_t_22);
   __Pyx_XDECREF(__pyx_t_23);
   __Pyx_XDECREF(__pyx_t_24);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.frequencyFeatures.FrequencyFeatures.__reduce_cython__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.frequencyFeatures.FrequencyFeatures.__reduce_cython__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_state);
@@ -5981,19 +5981,19 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_17__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state); /*proto*/
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_17__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_17__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state); /*proto*/
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_17__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__setstate_cython__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_16__setstate_cython__(((struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self), ((PyObject *)__pyx_v___pyx_state));
+  __pyx_r = __pyx_pf_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_16__setstate_cython__(((struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v_self), ((PyObject *)__pyx_v___pyx_state));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_16__setstate_cython__(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_16__setstate_cython__(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -6008,7 +6008,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
  *     __pyx_unpickle_FrequencyFeatures__set_state(self, __pyx_state)             # <<<<<<<<<<<<<<
  */
   if (!(likely(PyTuple_CheckExact(__pyx_v___pyx_state))||((__pyx_v___pyx_state) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "tuple", Py_TYPE(__pyx_v___pyx_state)->tp_name), 0))) __PYX_ERR(1, 17, __pyx_L1_error)
-  __pyx_t_1 = __pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures___pyx_unpickle_FrequencyFeatures__set_state(__pyx_v_self, ((PyObject*)__pyx_v___pyx_state)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 17, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5skimu_8features_3lib_7_cython_17frequencyFeatures___pyx_unpickle_FrequencyFeatures__set_state(__pyx_v_self, ((PyObject*)__pyx_v___pyx_state)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 17, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
@@ -6024,7 +6024,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
   goto __pyx_L0;
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.frequencyFeatures.FrequencyFeatures.__setstate_cython__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.frequencyFeatures.FrequencyFeatures.__setstate_cython__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -6039,9 +6039,9 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17F
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_1__pyx_unpickle_FrequencyFeatures(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_1__pyx_unpickle_FrequencyFeatures = {"__pyx_unpickle_FrequencyFeatures", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_1__pyx_unpickle_FrequencyFeatures, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_1__pyx_unpickle_FrequencyFeatures(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_1__pyx_unpickle_FrequencyFeatures(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_5skimu_8features_3lib_7_cython_17frequencyFeatures_1__pyx_unpickle_FrequencyFeatures = {"__pyx_unpickle_FrequencyFeatures", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_1__pyx_unpickle_FrequencyFeatures, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_1__pyx_unpickle_FrequencyFeatures(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v___pyx_type = 0;
   long __pyx_v___pyx_checksum;
   PyObject *__pyx_v___pyx_state = 0;
@@ -6103,18 +6103,18 @@ static PyObject *__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_1__
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("__pyx_unpickle_FrequencyFeatures", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 1, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.frequencyFeatures.__pyx_unpickle_FrequencyFeatures", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.frequencyFeatures.__pyx_unpickle_FrequencyFeatures", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures___pyx_unpickle_FrequencyFeatures(__pyx_self, __pyx_v___pyx_type, __pyx_v___pyx_checksum, __pyx_v___pyx_state);
+  __pyx_r = __pyx_pf_5skimu_8features_3lib_7_cython_17frequencyFeatures___pyx_unpickle_FrequencyFeatures(__pyx_self, __pyx_v___pyx_type, __pyx_v___pyx_checksum, __pyx_v___pyx_state);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures___pyx_unpickle_FrequencyFeatures(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v___pyx_type, long __pyx_v___pyx_checksum, PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pf_5skimu_8features_3lib_7_cython_17frequencyFeatures___pyx_unpickle_FrequencyFeatures(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v___pyx_type, long __pyx_v___pyx_checksum, PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_v___pyx_PickleError = 0;
   PyObject *__pyx_v___pyx_result = 0;
   PyObject *__pyx_r = NULL;
@@ -6211,7 +6211,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures___p
  *     if __pyx_state is not None:
  *         __pyx_unpickle_FrequencyFeatures__set_state(<FrequencyFeatures> __pyx_result, __pyx_state)
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures), __pyx_n_s_new); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 7, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures), __pyx_n_s_new); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 7, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -6250,7 +6250,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures___p
  * cdef __pyx_unpickle_FrequencyFeatures__set_state(FrequencyFeatures __pyx_result, tuple __pyx_state):
  */
     if (!(likely(PyTuple_CheckExact(__pyx_v___pyx_state))||((__pyx_v___pyx_state) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "tuple", Py_TYPE(__pyx_v___pyx_state)->tp_name), 0))) __PYX_ERR(1, 9, __pyx_L1_error)
-    __pyx_t_3 = __pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures___pyx_unpickle_FrequencyFeatures__set_state(((struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v___pyx_result), ((PyObject*)__pyx_v___pyx_state)); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 9, __pyx_L1_error)
+    __pyx_t_3 = __pyx_f_5skimu_8features_3lib_7_cython_17frequencyFeatures___pyx_unpickle_FrequencyFeatures__set_state(((struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)__pyx_v___pyx_result), ((PyObject*)__pyx_v___pyx_state)); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 9, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
@@ -6287,7 +6287,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures___p
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.frequencyFeatures.__pyx_unpickle_FrequencyFeatures", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.frequencyFeatures.__pyx_unpickle_FrequencyFeatures", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v___pyx_PickleError);
@@ -6305,7 +6305,7 @@ static PyObject *__pyx_pf_5PfyMU_8features_3lib_7_cython_17frequencyFeatures___p
  *     if len(__pyx_state) > 23 and hasattr(__pyx_result, '__dict__'):
  */
 
-static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures___pyx_unpickle_FrequencyFeatures__set_state(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v___pyx_result, PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_f_5skimu_8features_3lib_7_cython_17frequencyFeatures___pyx_unpickle_FrequencyFeatures__set_state(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *__pyx_v___pyx_result, PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   Py_ssize_t __pyx_t_1;
@@ -6582,7 +6582,7 @@ static PyObject *__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures___py
   __Pyx_XDECREF(__pyx_t_12);
   __Pyx_XDECREF(__pyx_t_13);
   __Pyx_XDECREF(__pyx_t_14);
-  __Pyx_AddTraceback("PfyMU.features.lib._cython.frequencyFeatures.__pyx_unpickle_FrequencyFeatures__set_state", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("skimu.features.lib._cython.frequencyFeatures.__pyx_unpickle_FrequencyFeatures__set_state", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -19607,10 +19607,10 @@ static PyObject *__pyx_unpickle_Enum__set_state(struct __pyx_MemviewEnum_obj *__
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
-static struct __pyx_vtabstruct_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures __pyx_vtable_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures;
+static struct __pyx_vtabstruct_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures __pyx_vtable_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures;
 
-static PyObject *__pyx_tp_new_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures(PyTypeObject *t, CYTHON_UNUSED PyObject *a, CYTHON_UNUSED PyObject *k) {
-  struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *p;
+static PyObject *__pyx_tp_new_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures(PyTypeObject *t, CYTHON_UNUSED PyObject *a, CYTHON_UNUSED PyObject *k) {
+  struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *p;
   PyObject *o;
   if (likely((t->tp_flags & Py_TPFLAGS_IS_ABSTRACT) == 0)) {
     o = (*t->tp_alloc)(t, 0);
@@ -19618,8 +19618,8 @@ static PyObject *__pyx_tp_new_5PfyMU_8features_3lib_7_cython_17frequencyFeatures
     o = (PyObject *) PyBaseObject_Type.tp_new(t, __pyx_empty_tuple, 0);
   }
   if (unlikely(!o)) return 0;
-  p = ((struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)o);
-  p->__pyx_vtab = __pyx_vtabptr_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures;
+  p = ((struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)o);
+  p->__pyx_vtab = __pyx_vtabptr_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures;
   p->maxf.data = NULL;
   p->maxf.memview = NULL;
   p->maxfv.data = NULL;
@@ -19641,8 +19641,8 @@ static PyObject *__pyx_tp_new_5PfyMU_8features_3lib_7_cython_17frequencyFeatures
   return o;
 }
 
-static void __pyx_tp_dealloc_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures(PyObject *o) {
-  struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *p = (struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)o;
+static void __pyx_tp_dealloc_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures(PyObject *o) {
+  struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *p = (struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *)o;
   #if CYTHON_USE_TP_FINALIZE
   if (unlikely(PyType_HasFeature(Py_TYPE(o), Py_TPFLAGS_HAVE_FINALIZE) && Py_TYPE(o)->tp_finalize) && (!PyType_IS_GC(Py_TYPE(o)) || !_PyGC_FINALIZED(o))) {
     if (PyObject_CallFinalizerFromDealloc(o)) return;
@@ -19660,24 +19660,24 @@ static void __pyx_tp_dealloc_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_
   (*Py_TYPE(o)->tp_free)(o);
 }
 
-static PyMethodDef __pyx_methods_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures[] = {
-  {"_base_fn", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_3_base_fn, METH_VARARGS|METH_KEYWORDS, 0},
-  {"get_dominant_freq", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_5get_dominant_freq, METH_VARARGS|METH_KEYWORDS, 0},
-  {"get_dominant_freq_value", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_7get_dominant_freq_value, METH_VARARGS|METH_KEYWORDS, 0},
-  {"get_power", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_9get_power, METH_VARARGS|METH_KEYWORDS, 0},
-  {"get_spectral_flatness", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_11get_spectral_flatness, METH_VARARGS|METH_KEYWORDS, 0},
-  {"get_spectral_entropy", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_13get_spectral_entropy, METH_VARARGS|METH_KEYWORDS, 0},
-  {"__reduce_cython__", (PyCFunction)__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_15__reduce_cython__, METH_NOARGS, 0},
-  {"__setstate_cython__", (PyCFunction)__pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_17__setstate_cython__, METH_O, 0},
+static PyMethodDef __pyx_methods_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures[] = {
+  {"_base_fn", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_3_base_fn, METH_VARARGS|METH_KEYWORDS, 0},
+  {"get_dominant_freq", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_5get_dominant_freq, METH_VARARGS|METH_KEYWORDS, 0},
+  {"get_dominant_freq_value", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_7get_dominant_freq_value, METH_VARARGS|METH_KEYWORDS, 0},
+  {"get_power", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_9get_power, METH_VARARGS|METH_KEYWORDS, 0},
+  {"get_spectral_flatness", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_11get_spectral_flatness, METH_VARARGS|METH_KEYWORDS, 0},
+  {"get_spectral_entropy", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_13get_spectral_entropy, METH_VARARGS|METH_KEYWORDS, 0},
+  {"__reduce_cython__", (PyCFunction)__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_15__reduce_cython__, METH_NOARGS, 0},
+  {"__setstate_cython__", (PyCFunction)__pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_17__setstate_cython__, METH_O, 0},
   {0, 0, 0, 0}
 };
 
-static PyTypeObject __pyx_type_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures = {
+static PyTypeObject __pyx_type_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.frequencyFeatures.FrequencyFeatures", /*tp_name*/
-  sizeof(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures), /*tp_basicsize*/
+  "skimu.features.lib._cython.frequencyFeatures.FrequencyFeatures", /*tp_name*/
+  sizeof(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures), /*tp_basicsize*/
   0, /*tp_itemsize*/
-  __pyx_tp_dealloc_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures, /*tp_dealloc*/
+  __pyx_tp_dealloc_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures, /*tp_dealloc*/
   #if PY_VERSION_HEX < 0x030800b4
   0, /*tp_print*/
   #endif
@@ -19710,7 +19710,7 @@ static PyTypeObject __pyx_type_5PfyMU_8features_3lib_7_cython_17frequencyFeature
   0, /*tp_weaklistoffset*/
   0, /*tp_iter*/
   0, /*tp_iternext*/
-  __pyx_methods_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures, /*tp_methods*/
+  __pyx_methods_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures, /*tp_methods*/
   0, /*tp_members*/
   0, /*tp_getset*/
   0, /*tp_base*/
@@ -19718,9 +19718,9 @@ static PyTypeObject __pyx_type_5PfyMU_8features_3lib_7_cython_17frequencyFeature
   0, /*tp_descr_get*/
   0, /*tp_descr_set*/
   0, /*tp_dictoffset*/
-  __pyx_pw_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_1__init__, /*tp_init*/
+  __pyx_pw_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_1__init__, /*tp_init*/
   0, /*tp_alloc*/
-  __pyx_tp_new_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures, /*tp_new*/
+  __pyx_tp_new_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures, /*tp_new*/
   0, /*tp_free*/
   0, /*tp_is_gc*/
   0, /*tp_bases*/
@@ -19863,7 +19863,7 @@ static PyBufferProcs __pyx_tp_as_buffer_array = {
 
 static PyTypeObject __pyx_type___pyx_array = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.frequencyFeatures.array", /*tp_name*/
+  "skimu.features.lib._cython.frequencyFeatures.array", /*tp_name*/
   sizeof(struct __pyx_array_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc_array, /*tp_dealloc*/
@@ -19982,7 +19982,7 @@ static PyMethodDef __pyx_methods_Enum[] = {
 
 static PyTypeObject __pyx_type___pyx_MemviewEnum = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.frequencyFeatures.Enum", /*tp_name*/
+  "skimu.features.lib._cython.frequencyFeatures.Enum", /*tp_name*/
   sizeof(struct __pyx_MemviewEnum_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc_Enum, /*tp_dealloc*/
@@ -20243,7 +20243,7 @@ static PyBufferProcs __pyx_tp_as_buffer_memoryview = {
 
 static PyTypeObject __pyx_type___pyx_memoryview = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.frequencyFeatures.memoryview", /*tp_name*/
+  "skimu.features.lib._cython.frequencyFeatures.memoryview", /*tp_name*/
   sizeof(struct __pyx_memoryview_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc_memoryview, /*tp_dealloc*/
@@ -20381,7 +20381,7 @@ static struct PyGetSetDef __pyx_getsets__memoryviewslice[] = {
 
 static PyTypeObject __pyx_type___pyx_memoryviewslice = {
   PyVarObject_HEAD_INIT(0, 0)
-  "PfyMU.features.lib._cython.frequencyFeatures._memoryviewslice", /*tp_name*/
+  "skimu.features.lib._cython.frequencyFeatures._memoryviewslice", /*tp_name*/
   sizeof(struct __pyx_memoryviewslice_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc__memoryviewslice, /*tp_dealloc*/
@@ -20522,7 +20522,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_MemoryView_of_r_object, __pyx_k_MemoryView_of_r_object, sizeof(__pyx_k_MemoryView_of_r_object), 0, 0, 1, 0},
   {&__pyx_n_b_O, __pyx_k_O, sizeof(__pyx_k_O), 0, 0, 0, 1},
   {&__pyx_kp_s_Out_of_bounds_on_buffer_access_a, __pyx_k_Out_of_bounds_on_buffer_access_a, sizeof(__pyx_k_Out_of_bounds_on_buffer_access_a), 0, 0, 1, 0},
-  {&__pyx_n_s_PfyMU_features_lib__cython_frequ, __pyx_k_PfyMU_features_lib__cython_frequ, sizeof(__pyx_k_PfyMU_features_lib__cython_frequ), 0, 0, 1, 1},
   {&__pyx_n_s_PickleError, __pyx_k_PickleError, sizeof(__pyx_k_PickleError), 0, 0, 1, 1},
   {&__pyx_n_s_TypeError, __pyx_k_TypeError, sizeof(__pyx_k_TypeError), 0, 0, 1, 1},
   {&__pyx_kp_s_Unable_to_convert_item_to_object, __pyx_k_Unable_to_convert_item_to_object, sizeof(__pyx_k_Unable_to_convert_item_to_object), 0, 0, 1, 0},
@@ -20597,6 +20596,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_setstate_cython, __pyx_k_setstate_cython, sizeof(__pyx_k_setstate_cython), 0, 0, 1, 1},
   {&__pyx_n_s_shape, __pyx_k_shape, sizeof(__pyx_k_shape), 0, 0, 1, 1},
   {&__pyx_n_s_size, __pyx_k_size, sizeof(__pyx_k_size), 0, 0, 1, 1},
+  {&__pyx_n_s_skimu_features_lib__cython_frequ, __pyx_k_skimu_features_lib__cython_frequ, sizeof(__pyx_k_skimu_features_lib__cython_frequ), 0, 0, 1, 1},
   {&__pyx_n_s_start, __pyx_k_start, sizeof(__pyx_k_start), 0, 0, 1, 1},
   {&__pyx_n_s_step, __pyx_k_step, sizeof(__pyx_k_step), 0, 0, 1, 1},
   {&__pyx_n_s_stop, __pyx_k_stop, sizeof(__pyx_k_stop), 0, 0, 1, 1},
@@ -20963,24 +20963,24 @@ static int __Pyx_modinit_type_init_code(void) {
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__Pyx_modinit_type_init_code", 0);
   /*--- Type init code ---*/
-  __pyx_vtabptr_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures = &__pyx_vtable_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures;
-  __pyx_vtable_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures._base_fn = (PyObject *(*)(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch))__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures__base_fn;
-  __pyx_vtable_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures.get_dominant_freq = (PyObject *(*)(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch))__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_dominant_freq;
-  __pyx_vtable_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures.get_dominant_freq_value = (PyObject *(*)(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch))__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_dominant_freq_value;
-  __pyx_vtable_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures.get_power = (PyObject *(*)(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch))__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_power;
-  __pyx_vtable_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures.get_spectral_flatness = (PyObject *(*)(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch))__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_spectral_flatness;
-  __pyx_vtable_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures.get_spectral_entropy = (PyObject *(*)(struct __pyx_obj_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch))__pyx_f_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_spectral_entropy;
-  if (PyType_Ready(&__pyx_type_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures) < 0) __PYX_ERR(0, 35, __pyx_L1_error)
+  __pyx_vtabptr_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures = &__pyx_vtable_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures;
+  __pyx_vtable_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures._base_fn = (PyObject *(*)(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch))__pyx_f_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures__base_fn;
+  __pyx_vtable_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures.get_dominant_freq = (PyObject *(*)(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch))__pyx_f_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_dominant_freq;
+  __pyx_vtable_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures.get_dominant_freq_value = (PyObject *(*)(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch))__pyx_f_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_dominant_freq_value;
+  __pyx_vtable_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures.get_power = (PyObject *(*)(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch))__pyx_f_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_power;
+  __pyx_vtable_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures.get_spectral_flatness = (PyObject *(*)(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch))__pyx_f_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_spectral_flatness;
+  __pyx_vtable_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures.get_spectral_entropy = (PyObject *(*)(struct __pyx_obj_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures *, __Pyx_memviewslice, double, double, double, int __pyx_skip_dispatch))__pyx_f_5skimu_8features_3lib_7_cython_17frequencyFeatures_17FrequencyFeatures_get_spectral_entropy;
+  if (PyType_Ready(&__pyx_type_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures) < 0) __PYX_ERR(0, 35, __pyx_L1_error)
   #if PY_VERSION_HEX < 0x030800B1
-  __pyx_type_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures.tp_print = 0;
+  __pyx_type_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures.tp_print = 0;
   #endif
-  if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_type_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures.tp_dictoffset && __pyx_type_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures.tp_getattro == PyObject_GenericGetAttr)) {
-    __pyx_type_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures.tp_getattro = __Pyx_PyObject_GenericGetAttr;
+  if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_type_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures.tp_dictoffset && __pyx_type_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures.tp_getattro == PyObject_GenericGetAttr)) {
+    __pyx_type_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures.tp_getattro = __Pyx_PyObject_GenericGetAttr;
   }
-  if (__Pyx_SetVtable(__pyx_type_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures.tp_dict, __pyx_vtabptr_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures) < 0) __PYX_ERR(0, 35, __pyx_L1_error)
-  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_FrequencyFeatures, (PyObject *)&__pyx_type_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures) < 0) __PYX_ERR(0, 35, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures) < 0) __PYX_ERR(0, 35, __pyx_L1_error)
-  __pyx_ptype_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures = &__pyx_type_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures;
+  if (__Pyx_SetVtable(__pyx_type_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures.tp_dict, __pyx_vtabptr_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures) < 0) __PYX_ERR(0, 35, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_FrequencyFeatures, (PyObject *)&__pyx_type_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures) < 0) __PYX_ERR(0, 35, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures) < 0) __PYX_ERR(0, 35, __pyx_L1_error)
+  __pyx_ptype_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures = &__pyx_type_5skimu_8features_3lib_7_cython_17frequencyFeatures_FrequencyFeatures;
   __pyx_vtabptr_array = &__pyx_vtable_array;
   __pyx_vtable_array.get_memview = (PyObject *(*)(struct __pyx_array_obj *))__pyx_array_get_memview;
   if (PyType_Ready(&__pyx_type___pyx_array) < 0) __PYX_ERR(1, 105, __pyx_L1_error)
@@ -21063,8 +21063,8 @@ static int __Pyx_modinit_function_import_code(void) {
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__Pyx_modinit_function_import_code", 0);
   /*--- Function import code ---*/
-  __pyx_t_1 = PyImport_ImportModule("PfyMU.features.lib._cython.common"); if (!__pyx_t_1) __PYX_ERR(0, 1, __pyx_L1_error)
-  if (__Pyx_ImportFunction(__pyx_t_1, "mean_1d", (void (**)(void))&__pyx_f_5PfyMU_8features_3lib_7_cython_6common_mean_1d, "void (__Pyx_memviewslice, double *)") < 0) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_t_1 = PyImport_ImportModule("skimu.features.lib._cython.common"); if (!__pyx_t_1) __PYX_ERR(0, 1, __pyx_L1_error)
+  if (__Pyx_ImportFunction(__pyx_t_1, "mean_1d", (void (**)(void))&__pyx_f_5skimu_8features_3lib_7_cython_6common_mean_1d, "void (__Pyx_memviewslice, double *)") < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   Py_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_RefNannyFinishContext();
   return 0;
@@ -21250,14 +21250,14 @@ if (!__Pyx_RefNanny) {
   #if PY_MAJOR_VERSION < 3 && (__PYX_DEFAULT_STRING_ENCODING_IS_ASCII || __PYX_DEFAULT_STRING_ENCODING_IS_DEFAULT)
   if (__Pyx_init_sys_getdefaultencoding_params() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
-  if (__pyx_module_is_main_PfyMU__features__lib___cython__frequencyFeatures) {
+  if (__pyx_module_is_main_skimu__features__lib___cython__frequencyFeatures) {
     if (PyObject_SetAttr(__pyx_m, __pyx_n_s_name_2, __pyx_n_s_main) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   }
   #if PY_MAJOR_VERSION >= 3
   {
     PyObject *modules = PyImport_GetModuleDict(); if (unlikely(!modules)) __PYX_ERR(0, 1, __pyx_L1_error)
-    if (!PyDict_GetItemString(modules, "PfyMU.features.lib._cython.frequencyFeatures")) {
-      if (unlikely(PyDict_SetItemString(modules, "PfyMU.features.lib._cython.frequencyFeatures", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
+    if (!PyDict_GetItemString(modules, "skimu.features.lib._cython.frequencyFeatures")) {
+      if (unlikely(PyDict_SetItemString(modules, "skimu.features.lib._cython.frequencyFeatures", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
     }
   }
   #endif
@@ -21278,7 +21278,7 @@ if (!__Pyx_RefNanny) {
   if (__Pyx_patch_abc() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":4
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":4
  * # cython: boundscheck = False
  * # cython: wraparound = False
  * from numpy import fft, sum as nsum, less_equal, zeros, conjugate, argmax, real             # <<<<<<<<<<<<<<
@@ -21346,12 +21346,12 @@ if (!__Pyx_RefNanny) {
  *     cdef object __pyx_PickleError
  *     cdef object __pyx_result
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5PfyMU_8features_3lib_7_cython_17frequencyFeatures_1__pyx_unpickle_FrequencyFeatures, NULL, __pyx_n_s_PfyMU_features_lib__cython_frequ); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5skimu_8features_3lib_7_cython_17frequencyFeatures_1__pyx_unpickle_FrequencyFeatures, NULL, __pyx_n_s_skimu_features_lib__cython_frequ); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_pyx_unpickle_FrequencyFeatures, __pyx_t_2) < 0) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "PfyMU/features/lib/_cython/frequencyFeatures.pyx":1
+  /* "skimu/features/lib/_cython/frequencyFeatures.pyx":1
  * # cython: infer_types = True             # <<<<<<<<<<<<<<
  * # cython: boundscheck = False
  * # cython: wraparound = False
@@ -21522,11 +21522,11 @@ if (!__Pyx_RefNanny) {
   __Pyx_XDECREF(__pyx_t_2);
   if (__pyx_m) {
     if (__pyx_d) {
-      __Pyx_AddTraceback("init PfyMU.features.lib._cython.frequencyFeatures", __pyx_clineno, __pyx_lineno, __pyx_filename);
+      __Pyx_AddTraceback("init skimu.features.lib._cython.frequencyFeatures", __pyx_clineno, __pyx_lineno, __pyx_filename);
     }
     Py_CLEAR(__pyx_m);
   } else if (!PyErr_Occurred()) {
-    PyErr_SetString(PyExc_ImportError, "init PfyMU.features.lib._cython.frequencyFeatures");
+    PyErr_SetString(PyExc_ImportError, "init skimu.features.lib._cython.frequencyFeatures");
   }
   __pyx_L0:;
   __Pyx_RefNannyFinishContext();
