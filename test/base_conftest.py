@@ -56,10 +56,10 @@ class BaseProcessTester:
                 ptime = pred[key] - truth[key][0]
                 ttime = truth[key] - truth[key][0]
                 assert allclose(ptime, ttime, atol=self.atol_time), \
-                    f"{self.process.name} test for value ({key}) not close to truth"
+                    f"{self.process._proc_name} test for value ({key}) not close to truth"
             else:
                 assert allclose(pred[key], truth[key], atol=self.atol), \
-                    f"{self.process.name} test for value ({key}) not close to truth"
+                    f"{self.process._proc_name} test for value ({key}) not close to truth"
 
 
 @fixture(scope='module')
@@ -99,7 +99,7 @@ class TestRunLocationError(Exception):
 
 
 def resolve_data_path(file, module=None):
-    if Path.cwd().name == 'PfyMU':
+    if Path.cwd().name == 'scikit-imu':
         path = Path(f'test/data/{file}')
     elif Path.cwd().name == 'test':
         path = Path(f'data/{file}')

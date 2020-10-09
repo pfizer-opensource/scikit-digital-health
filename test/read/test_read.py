@@ -3,8 +3,8 @@ from numpy import allclose
 
 from ..base_conftest import *
 
-from PfyMU.read import ReadCWA, ReadBin
-from PfyMU.read.utility import _get_window_start_stop
+from skimu.read import ReadCWA, ReadBin
+from skimu.read.get_window_start_stop import get_window_start_stop
 
 
 @pytest.mark.parametrize(
@@ -20,7 +20,7 @@ from PfyMU.read.utility import _get_window_start_stop
 def test_get_window_start_stop(days_type, windowing_data):
     w_input, w_output = windowing_data(days_type)
 
-    starts, stops = _get_window_start_stop(*w_input)
+    starts, stops = get_window_start_stop(*w_input)
 
     assert allclose(starts, w_output[0])
     assert allclose(stops, w_output[1])

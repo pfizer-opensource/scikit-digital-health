@@ -3,7 +3,6 @@ from numpy import allclose, broadcast_to, zeros
 from pandas.testing import assert_frame_equal
 from pandas import DataFrame
 import h5py
-from pathlib import Path
 
 from ..base_conftest import resolve_data_path
 

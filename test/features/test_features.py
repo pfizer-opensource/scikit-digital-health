@@ -1,5 +1,5 @@
 from .conftest import BaseTestFeature
-from PfyMU.features import *
+from skimu.features import *
 
 
 # STATISTICAL MOMENT FEATURES

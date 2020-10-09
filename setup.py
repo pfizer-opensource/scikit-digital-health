@@ -172,16 +172,16 @@ def configuration(parent_package='', top_path=None):
     # ========================
     config.add_library(
         'fcwa_convert',
-        sources='src/PfyMU/read/_extensions/cwa_convert.f95'
+        sources='src/skimu/read/_extensions/cwa_convert.f95'
     )
     config.add_extension(
-        'PfyMU/read/_extensions/cwa_convert',
-        sources='src/PfyMU/read/_extensions/cwa_convert.c',
+        'skimu/read/_extensions/cwa_convert',
+        sources='src/skimu/read/_extensions/cwa_convert.c',
         libraries=['fcwa_convert']
     )
     config.add_extension(
-        'PfyMU/read/_extensions/bin_convert',
-        sources='src/PfyMU/read/_extensions/bin_convert.c'
+        'skimu/read/_extensions/bin_convert',
+        sources='src/skimu/read/_extensions/bin_convert.c'
     )
 
     if os.environ.get('CYTHONIZE', 'False') == 'True':
@@ -202,13 +202,13 @@ def configuration(parent_package='', top_path=None):
 
     # DATA FILES
     # ========================
-    config.add_data_files([
-        'src/PfyMU/gait/model/final_features.json',
-        'src/PfyMU/gait/model/lgbm_gait_classifier_no-stairs.lgbm'
-    ])
+    config.add_data_files(
+        ('skimu/gait/model', 'src/skimu/gait/model/final_features.json'),
+        ('skimu/gait/model', 'src/skimu/gait/model/lgbm_gait_classifier_no-stairs.lgbm')
+    )
     # ========================
 
-    config.get_version('src/PfyMU/version.py')
+    config.get_version('src/skimu/version.py')
 
     return config
 
@@ -218,19 +218,19 @@ def setup_package():
 
     with open("README.md", "r") as fh:
         long_description = fh.read()
-    with open('src/PfyMU/version.py') as fid:
+    with open('src/skimu/version.py') as fid:
         vers = fid.readlines()[-1].split()[-1].strip("\"'")
 
     setup_kwargs = dict(
-        name='PfyMU',
+        name='scikit-imu',
         maintainer=MAINTAINERS,
         maintainer_email=MAINTAINER_EMAILS,
         description="Python general purpose IMU data processing package.",
         long_description=long_description,
         long_description_content_type="text/markdown",
-        # download_url="https:/pypi.org/PfyMU",  # download link, likely PyPi
+        # download_url="https:/pypi.org/skimu",  # download link, likely PyPi
         # project_urls={
-        #     "Documentation": "https://PfyMU.readthedocs.io./en/latest/"
+        #     "Documentation": "https://skimu.readthedocs.io./en/latest/"
         # },
         packages=find_packages('src'),
         package_dir={'': 'src'},
