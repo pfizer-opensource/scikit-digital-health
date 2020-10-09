@@ -96,11 +96,11 @@ class ReadCWA(_BaseProcess):
         -----
         The keys in `data` depend on which data the file contained. Potential keys are:
         
-        - accel: acceleration [g]
-        - gyro: angular velocity [deg/s]
-        - magnet: magnetic field readings [uT]
-        - time: timestamps [s]
-        - day_ends: window indices
+        - `accel`: acceleration [g]
+        - `gyro`: angular velocity [deg/s]
+        - `magnet`: magnetic field readings [uT]
+        - `time`: timestamps [s]
+        - `day_ends`: window indices
         """
         return super().predict(*args, **kwargs)
 

@@ -89,11 +89,11 @@ class ReadBin(_BaseProcess):
         -----
         The keys in `data` depend on which data the file contained. Potential keys are:
 
-        - accel: acceleration [g]
-        - time: timestamps [s]
-        - light: light values [unknown]
-        - temperature: temperature [deg C]
-        - day_ends: window indices
+        - `accel`: acceleration [g]
+        - `time`: timestamps [s]
+        - `light`: light values [unknown]
+        - `temperature`: temperature [deg C]
+        - `day_ends`: window indices
         """
         return super().predict(*args, **kwargs)
 
