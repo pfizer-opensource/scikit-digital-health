@@ -158,7 +158,7 @@ class Sit2Stand(_BaseProcess):
 
     def predict(self, *args, **kwargs):
         """
-        predict(*, time, accel)
+        predict(time, accel)
 
         Predict the sit-to-stand transfers, and compute per-transition quantities
 
