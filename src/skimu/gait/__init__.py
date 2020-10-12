@@ -93,7 +93,10 @@ functionality behind the scenes. The definition and initialization is very strai
 
 .. code-block:: python
 
-    class NewMetric(gait_metrics.EventMetric):
+    from skimu.gait.gait_metrics import EventMetric, basic_symmetry
+
+
+    class NewMetric(EventMetric):
         def __init__(self):
             super().__init__('new metric', depends=[gait_metrics.StrideTime])
 
@@ -106,7 +109,10 @@ To implement the feature computation, the `_predict` method should be defined
 
 .. code-block:: python
 
-    class NewMetric(gait_metrics.EventMetric):
+    from skimu.gait.gait_metrics import EventMetric
+
+
+    class NewMetric(EventMetric):
         ...
         def _predict(self, dt, leg_length, gait, gait_aux):
             mask, mask_ofst= self._predict_init(gait, True, 1)
@@ -124,7 +130,8 @@ The arguments to the `_predict` method are as follows:
 - `gait_aux`: dictionary containing the acceleration (3D, key: `'accel'`), vertical acceleration
   axis (`'vert axis'`), vertical velocity (`'vert velocity'`) and vertical position
   (`'vert position'`) for each bout of gait. Additionally contains a mapping from individual steps
-  to bouts (`'inertial data i'`).
+  to bouts (`'inertial data i'`), or from bouts to a non-unique value per step (see bout metric
+  example)
 
 There are a few convenience functionalities, namely the `_predict_init` function, and the
 `self.k_` attribute. The `_predict_init` function optionally does up to two things:
@@ -138,7 +145,49 @@ There are a few convenience functionalities, namely the `_predict_init` function
 The `self.k_` attribute simply stores the full name of the metric for easy/shorthand access.
 Finally, if the custom metric has a basic symmetry value computed by subtracting sequential
 values, this can be quickly implemented by adding the decorator `gait_metrics.basic_symmetry`
-above the `_predict` definition.
+above the `_predict` definition:
+
+.. code-block:: python
+
+    from skimu.gait.gait_metrics import EventMetric, basic_symmetry
+
+
+    class NewMetric(EventMetric):
+        ...
+        @basic_symmetry
+        def _predict(self, dt, leg_length, gait, gait_aux):
+            ...
+
+
+Below is a full example of a bout metric, with broadcasting from individual per-bout values to
+having repeating values for each step in the bout (since the `gait` dictionary is fundamentally
+defined on a per-event level):
+
+.. code-block:: python
+
+    from skimu.gait.gait_metrics import BoutMetric
+
+
+    class StepRegularityV(BoutMetric):
+        def __init__(self):
+            super().__init__('step regularity - V', depends=[StepTime])
+
+        def _predict(self, dt, leg_length, gait, gait_aux):
+            # initialize 1 value per bout
+            stepreg = zeros(len(gait_aux['accel']), dtype=float_)
+
+            for i, acc in enumerate(gait_aux['accel']):
+                lag = int(
+                    round(nanmean(gait['PARAM:step time'][gait_aux['inertial data i'] == i]) / dt)
+                )
+                acf = _autocovariancefunction(acc[:, gait_aux['vert axis']], int(4.5 * dt))
+                pks, _ = find_peaks(acf)
+                idx = argmin(abs(pks - lag))
+
+                stepreg[i] = acf[idx]
+
+            # broadcast step regularity into gait for each step
+            gait[self.k_] = stepreg[gait_aux['inertial data i']]
 """
 from skimu.gait.gait import Gait
 from skimu.gait import gait
