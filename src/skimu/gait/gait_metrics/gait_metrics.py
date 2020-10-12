@@ -717,7 +717,7 @@ class RegularityIndexV(BoutMetric):
 
     Notes
     -----
-    The vertical axis regularity index :math:`R_V` is simply defined [2]_ per
+    The vertical axis regularity index :math:`R_V` is simply defined per
 
     .. math:: R_V = 1 - |R_{(stride, V)} - R_{(step, V)}|\frac{2}{R_{(stride, V)} + R_{(step, V)}}
 
@@ -726,9 +726,9 @@ class RegularityIndexV(BoutMetric):
 
     The Regularity Index term came from [1]_, where it was defined without the subtraction from 1.
     However, the definition from [2]_ (under the term "symmetry") keeps the values in the same
-    range as others (including step/stride regularity) for ease of interpretation. "Regularity
-    Index" however serves to eliminate confusion given other metrics already labeled with
-    "symmetry" in the name.
+    range as others (including step/stride regularity), aiding in ease of interpretation.
+    "Regularity Index" however serves to eliminate confusion given other metrics already labeled
+    with "symmetry" in the name.
 
     References
     ----------
