@@ -707,3 +707,38 @@ class AutocovarianceSymmetryV(BoutMetric):
         gait[self.k_] = abs(
             gait['BOUTPARAM:step regularity - V'] - gait['BOUTPARAM:stride regularity - V']
         )
+
+
+class RegularityIndexV(BoutMetric):
+    r"""
+    The combination of both step and stride regularity into one metric. The goal is to provide an
+    assessment of the regularity for consecutive steps and strides, for the vertical axis
+    acceleration.
+
+    Notes
+    -----
+    The vertical axis regularity index :math:`R_V` is simply defined [1]_ per
+
+    .. math:: R_V = \frac{|R_{(stride, V)} - R_{(step, V)}}{(R_{(stride, V)} + R_{(step, V)})/2}
+
+    where :math:`R_{(stride, V}}` is the stride regularity for the vertical axis (same notation for
+    step regularity).
+
+    References
+    ----------
+    .. [1] L. Angelini et al., “Is a Wearable Sensor-Based Characterisation of Gait Robust Enough
+        to Overcome Differences Between Measurement Protocols? A Multi-Centric Pragmatic Study in
+        Patients with Multiple Sclerosis,” Sensors, vol. 20, no. 1, Art. no. 1, Jan. 2020,
+        doi: 10.3390/s20010079.
+
+    """
+    def __init__(self):
+        super().__init__(
+            'regularity index - V', depends=[StepRegularityV, StrideRegularityV]
+        )
+
+    def _predict(self, dt, leg_length, gait, gait_aux):
+        str_v = 'BOUTPARAM:stride regularity - V'
+        ste_v = 'BOUTPARAM:step regularity - V'
+
+        gait[self.k_] = 2 * abs(gait[str_v] - gait[ste_v]) / (gait[ste_v] + gait[str_v])
