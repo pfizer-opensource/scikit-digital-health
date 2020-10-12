@@ -7,7 +7,7 @@ Pfizer DMTI 2020
 from warnings import warn
 from collections import Iterable
 
-from numpy import mean, diff, abs, argmax, sign, round, array
+from numpy import ndarray, mean, diff, abs, argmax, sign, round, array, full, bool_
 
 from skimu.base import _BaseProcess
 from skimu.gait.get_gait_classification import get_gait_classification_lgbm
@@ -190,6 +190,8 @@ class Gait(_BaseProcess):
 
     def predict(self, *args, **kwargs):
         """
+        predict(time, accel, *, gyro=None, height=None, gait_pred=None)
+
         Get the gait events and metrics from a time series signal
 
         Parameters
@@ -207,13 +209,16 @@ class Gait(_BaseProcess):
             Either height (False) or leg length (True) of the subject who wore the inertial
             measurement device, in meters, depending on `leg_length`. If not provided,
             spatial metrics will not be computed
-        gait_pred : numpy.ndarray, optional
-            (N, ) array of boolean predictions of gait. If not provided, gait classification
-            will be performed on the acceleration data
+        gait_pred : {any, numpy.ndarray}, optional
+            (N, ) array of boolean predictions of gait, or any value that is not None. If not an
+            ndarray but not None, the entire recording will be taken as gait. If not provided
+            (or None), gait classification will be performed on the acceleration data.
 
         Returns
         -------
         gait_results : dict
+            The computed gait metrics. For a list of metrics and their definitions, see
+            :ref:`event-level-gait-metrics` and :ref:`bout-level-gait-metrics`.
         """
         return super().predict(*args, **kwargs)
 
@@ -221,6 +226,7 @@ class Gait(_BaseProcess):
                  **kwargs):
         """
         predict(time=None, accel=None, *, gyro=None, height=None, gait_pred=None)
+
         Get the gait events and metrics from a time series signal
 
         Parameters
@@ -269,8 +275,12 @@ class Gait(_BaseProcess):
         if gait_pred is None:
             gait_pred = get_gait_classification_lgbm(accel, 1 / dt)
         else:
-            if gait_pred.size != accel.shape[0]:
-                raise ValueError('Number of gait predictions must much number of accel samples')
+            if isinstance(gait_pred, ndarray):
+                if gait_pred.size != accel.shape[0]:
+                    raise ValueError(
+                        'Number of gait predictions must much number of accel samples')
+            else:
+                gait_pred = full(accel.shape[0], True, dtype=bool_)
 
         # figure out vertical axis
         acc_mean = mean(accel, axis=0)

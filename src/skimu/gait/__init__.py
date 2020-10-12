@@ -12,6 +12,8 @@ Pipeline gait processing
 
     Gait
 
+.. _event-level-gait-metrics:
+
 Event Level Gait Metrics
 ------------------------
 
@@ -33,6 +35,8 @@ Event Level Gait Metrics
     IntraStepCovarianceV
     IntraStrideCovarianceV
     HarmonicRatioV
+
+.. _bout-level-gait-metrics:
 
 Bout Level Gait Metrics
 -----------------------
