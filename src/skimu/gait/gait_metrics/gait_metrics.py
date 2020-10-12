@@ -713,16 +713,22 @@ class RegularityIndexV(BoutMetric):
     r"""
     The combination of both step and stride regularity into one metric. The goal is to provide an
     assessment of the regularity for consecutive steps and strides, for the vertical axis
-    acceleration.
+    acceleration. Values closer to 1 indicate high levels of symmetry between left and right steps.
 
     Notes
     -----
-    The vertical axis regularity index :math:`R_V` is simply defined [1]_ per
+    The vertical axis regularity index :math:`R_V` is simply defined [2]_ per
 
-    .. math:: R_V = |R_{(stride, V)} - R_{(step, V)}|\frac{2}{R_{(stride, V)} + R_{(step, V)}}
+    .. math:: R_V = 1 - |R_{(stride, V)} - R_{(step, V)}|\frac{2}{R_{(stride, V)} + R_{(step, V)}}
 
     where :math:`R_{(stride, V)}` is the stride regularity for the vertical axis (same notation for
     step regularity).
+
+    The Regularity Index term came from [1]_, where it was defined without the subtraction from 1.
+    However, the definition from [2]_ (under the term "symmetry") keeps the values in the same
+    range as others (including step/stride regularity) for ease of interpretation. "Regularity
+    Index" however serves to eliminate confusion given other metrics already labeled with
+    "symmetry" in the name.
 
     References
     ----------
@@ -730,6 +736,10 @@ class RegularityIndexV(BoutMetric):
         to Overcome Differences Between Measurement Protocols? A Multi-Centric Pragmatic Study in
         Patients with Multiple Sclerosis,” Sensors, vol. 20, no. 1, Art. no. 1, Jan. 2020,
         doi: 10.3390/s20010079.
+    .. [2] L. Angelini et al., “Wearable sensors can reliably quantify gait alterations associated
+        with disability in people with progressive multiple sclerosis in a clinical setting,”
+        J Neurol, vol. 267, no. 10, pp. 2897–2909, Oct. 2020, doi: 10.1007/s00415-020-09928-8.
+
 
     """
     def __init__(self):
@@ -741,4 +751,4 @@ class RegularityIndexV(BoutMetric):
         str_v = 'BOUTPARAM:stride regularity - V'
         ste_v = 'BOUTPARAM:step regularity - V'
 
-        gait[self.k_] = 2 * abs(gait[str_v] - gait[ste_v]) / (gait[ste_v] + gait[str_v])
+        gait[self.k_] = 1 - (2 * abs(gait[str_v] - gait[ste_v]) / (gait[ste_v] + gait[str_v]))
