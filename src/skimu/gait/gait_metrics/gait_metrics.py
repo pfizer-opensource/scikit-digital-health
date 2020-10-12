@@ -41,7 +41,7 @@ __all__ = ['StrideTime', 'StanceTime', 'SwingTime', 'StepTime', 'InitialDoubleSu
            'TerminalDoubleSupport', 'DoubleSupport', 'SingleSupport', 'StepLength',
            'StrideLength', 'GaitSpeed', 'Cadence', 'GaitSymmetryIndex', 'IntraStepCovarianceV',
            'IntraStrideCovarianceV', 'HarmonicRatioV', 'PhaseCoordinationIndex', 'StepRegularityV',
-           'StrideRegularityV', 'AutocovarianceSymmetryV']
+           'StrideRegularityV', 'AutocovarianceSymmetryV', 'RegularityIndexV']
 
 
 def _autocovariancefunction(x, max_lag, biased=False):

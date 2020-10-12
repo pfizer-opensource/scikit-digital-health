@@ -49,6 +49,7 @@ Bout Level Gait Metrics
     StepRegularityV
     StrideRegularityV
     AutocovarianceSymmetryV
+    RegularityIndexV
 """
 from skimu.gait.gait import Gait
 from skimu.gait import gait
