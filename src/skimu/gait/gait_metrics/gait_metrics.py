@@ -719,9 +719,9 @@ class RegularityIndexV(BoutMetric):
     -----
     The vertical axis regularity index :math:`R_V` is simply defined [1]_ per
 
-    .. math:: R_V = \frac{|R_{(stride, V)} - R_{(step, V)}}{(R_{(stride, V)} + R_{(step, V)})/2}
+    .. math:: R_V = |R_{(stride, V)} - R_{(step, V)}|\frac{2}{R_{(stride, V)} + R_{(step, V)}}
 
-    where :math:`R_{(stride, V}}` is the stride regularity for the vertical axis (same notation for
+    where :math:`R_{(stride, V)}` is the stride regularity for the vertical axis (same notation for
     step regularity).
 
     References
