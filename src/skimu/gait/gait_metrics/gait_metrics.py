@@ -577,7 +577,7 @@ class GaitSymmetryIndex(BoutMetric):
                 round(nanmean(gait['PARAM:stride time'][gait_aux['inertial data i'] == i]) / dt)
             )
             # GSI uses biased autocovariance
-            ac = _autocovariancefunction(sosfiltfilt(sos, acc, axis=0), int(4.5 * dt), biased=True)
+            ac = _autocovariancefunction(sosfiltfilt(sos, acc, axis=0), int(4.5 / dt), biased=True)
 
             # C_stride is the sum of 3 axes
             pks, _ = find_peaks(sum(ac, axis=1))
@@ -626,7 +626,7 @@ class StepRegularityV(BoutMetric):
             lag = int(
                 round(nanmean(gait['PARAM:step time'][gait_aux['inertial data i'] == i]) / dt)
             )
-            acf = _autocovariancefunction(acc[:, gait_aux['vert axis']], int(4.5 * dt))
+            acf = _autocovariancefunction(acc[:, gait_aux['vert axis']], int(4.5 / dt))
             pks, _ = find_peaks(acf)
             idx = argmin(abs(pks - lag))
 
@@ -676,7 +676,7 @@ class StrideRegularityV(BoutMetric):
             lag = int(
                 round(nanmean(gait['PARAM:stride time'][gait_aux['inertial data i'] == i]) / dt)
             )
-            acf = _autocovariancefunction(acc[:, gait_aux['vert axis']], int(4.5 * dt))
+            acf = _autocovariancefunction(acc[:, gait_aux['vert axis']], int(4.5 / dt))
             pks, _ = find_peaks(acf)
             idx = argmin(abs(pks - lag))
 
