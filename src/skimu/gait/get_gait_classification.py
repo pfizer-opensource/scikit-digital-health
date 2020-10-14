@@ -41,7 +41,7 @@ def get_gait_classification_lgbm(accel, fs):
         suffix = '20hz'
 
     wlen = int(goal_fs * 3)
-    wstep = int(0.75 * wlen)
+    wstep = wlen
     thresh = 0.7  # mean + 1 standard deviation of best threshold for maximizing F1 score
 
     # down/up sample if necessary
