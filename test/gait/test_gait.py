@@ -91,8 +91,3 @@ class TestGait(BaseProcessTester):
             filter_order=4,
             filter_cutoff=20.0
         )
-
-    # def test(self, get_sample_data, get_truth_data):
-    #     super(TestGait, self).test(get_sample_data, get_truth_data)
-    #     # FIXME add actual tests
-    #     assert True
