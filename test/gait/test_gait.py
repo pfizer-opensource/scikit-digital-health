@@ -91,3 +91,13 @@ class TestGait(BaseProcessTester):
             filter_order=4,
             filter_cutoff=20.0
         )
+
+    def test_leg_length_warning(self, get_sample_data):
+        data = get_sample_data(
+            self.sample_data_file,
+            self.sample_data_keys
+        )
+        data['height'] = None
+
+        with pytest.warns(UserWarning):
+            self.process._predict(**data)
