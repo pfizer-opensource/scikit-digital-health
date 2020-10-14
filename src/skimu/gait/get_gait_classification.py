@@ -33,7 +33,13 @@ def get_gait_classification_lgbm(accel, fs):
     fs : float
         Sampling frequency of the data
     """
-    goal_fs = 50.0  # goal fs for classifier
+    if fs >= 50.0:
+        goal_fs = 50.0  # goal fs for classifier
+        suffix = '50hz'
+    else:
+        goal_fs = 20.0  # lower goal_fs if original frequency is less than 50Hz
+        suffix = '20hz'
+
     wlen = int(goal_fs * 3)
     wstep = int(0.75 * wlen)
     thresh = 0.7  # mean + 1 standard deviation of best threshold for maximizing F1 score
@@ -73,11 +79,11 @@ def get_gait_classification_lgbm(accel, fs):
     # load the model
     if version_info >= (3, 7):
         with resources.path(
-                'skimu.gait.model', 'lgbm_gait_classifier_no-stairs.lgbm') as file_path:
+                'skimu.gait.model', f'lgbm_gait_classifier_no-stairs_{suffix}.lgbm') as file_path:
             bst = lgb.Booster(model_file=str(file_path))
     else:
         with importlib_resources.path(
-                'skimu.gait.model', 'lgbm_gait_classifier_no-stairs.lgbm') as file_path:
+                'skimu.gait.model', f'lgbm_gait_classifier_no-stairs_{suffix}.lgbm') as file_path:
             bst = lgb.Booster(model_file=str(file_path))
 
     # predict
