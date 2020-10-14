@@ -204,7 +204,8 @@ def configuration(parent_package='', top_path=None):
     # ========================
     config.add_data_files(
         ('skimu/gait/model', 'src/skimu/gait/model/final_features.json'),
-        ('skimu/gait/model', 'src/skimu/gait/model/lgbm_gait_classifier_no-stairs.lgbm')
+        ('skimu/gait/model', 'src/skimu/gait/model/lgbm_gait_classifier_no-stairs_50hz.lgbm'),
+        ('skimu/gait/model', 'src/skimu/gait/model/lgbm_gait_classifier_no-stairs_20hz.lgbm')
     )
     # ========================
 
