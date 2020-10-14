@@ -83,7 +83,7 @@ class TestGait(BaseProcessTester):
 
         cls.process = Gait(
             use_cwt_scale_relation=True,
-            min_bout_time=5.0,
+            min_bout_time=8.0,
             max_bout_separation_time=0.5,
             max_stride_time=2.25,
             loading_factor=0.2,
