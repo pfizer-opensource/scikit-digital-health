@@ -50,7 +50,31 @@ class TestGait(BaseProcessTester):
         cls.truth_data_file = resolve_data_path('gait_data.h5', 'gait')
         cls.truth_suffix = None
         cls.truth_data_keys = [
-            'PARAM:stride time'
+            'IC',
+            'FC',
+            'delta h',
+            'b valid cycle',
+            'PARAM:stride time',
+            'PARAM:stance time',
+            'PARAM:swing time',
+            'PARAM:step time',
+            'PARAM:initial double support',
+            'PARAM:terminal double support',
+            'PARAM:double support',
+            'PARAM:single support',
+            'PARAM:step length',
+            'PARAM:stride length',
+            'PARAM:gait speed',
+            'PARAM:cadence',
+            'PARAM:intra-step covariance - V',
+            'PARAM:intra-stride covariance - V',
+            'PARAM:harmonic ratio - V',
+            'BOUTPARAM:phase coordination index',
+            'BOUTPARAM:gait symmetry index',
+            'BOUTPARAM:step regularity - V',
+            'BOUTPARAM:stride regularity - V',
+            'BOUTPARAM:autocovariance symmetry - V',
+            'BOUTPARAM:regularity index - V'
         ]
         cls.sample_data_keys.extend([
             'height'
@@ -68,7 +92,7 @@ class TestGait(BaseProcessTester):
             filter_cutoff=20.0
         )
 
-    def test(self, get_sample_data, get_truth_data):
-        # super(TestGait, self).test(get_sample_data, get_truth_data)
-        # FIXME add actual tests
-        assert True
+    # def test(self, get_sample_data, get_truth_data):
+    #     super(TestGait, self).test(get_sample_data, get_truth_data)
+    #     # FIXME add actual tests
+    #     assert True
