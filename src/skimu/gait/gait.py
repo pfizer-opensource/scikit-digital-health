@@ -321,7 +321,7 @@ class Gait(_BaseProcess):
             for ibout, bout in enumerate(gait_bouts):
                 bstart = start + bout[0]
 
-                ic, fc, vert_acc, vert_vel, vert_pos = get_gait_events(
+                ic, fc, vert_acc = get_gait_events(
                     accel[bstart:start + bout[1], v_axis],
                     dt,
                     sign(acc_mean[v_axis]),
@@ -333,12 +333,6 @@ class Gait(_BaseProcess):
 
                 # add inertial data to the aux dict for use in gait metric calculation
                 gait_aux['accel'].append(accel[bstart:start+bout[1], :])
-                gait_aux['vert velocity'].append(vert_vel)
-                gait_aux['vert position'].append(vert_pos)
-
-                # add start index to gait event indices to get absolute indices
-                # ic += bstart
-                # fc += bstart
 
                 # get strides
                 sib = get_strides(gait, ig, ic, fc, dt, self.max_stride_time, self.loading_factor)
@@ -348,7 +342,7 @@ class Gait(_BaseProcess):
 
                 # get the initial gait metrics
                 get_bout_metrics_delta_h(
-                    gait, ig, ibout, dt, time, vert_pos, sib, bout, bstart
+                    gait, ig, ibout, dt, time, vert_acc, sib, bout, bstart
                 )
 
                 ig += sib

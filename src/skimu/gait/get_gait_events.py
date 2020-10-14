@@ -40,10 +40,6 @@ def get_gait_events(vert_accel, dt, va_sign, o_scale, filter_order, filter_cutof
         Indices of final contacts
     vert_accel : numpy.ndarray
         Filtered vertical acceleration
-    vert_velocity : numpy.ndarray
-        Vertical velocity
-    vert_position : numpy.ndarray
-        Vertical position
     """
     vert_accel = detrend(vert_accel)  # detrend data just in case
 
@@ -53,8 +49,6 @@ def get_gait_events(vert_accel, dt, va_sign, o_scale, filter_order, filter_cutof
 
     # first integrate the vertical acceleration to get vertical velocity
     vert_velocity = cumtrapz(filt_vert_accel, dx=dt, initial=0)
-    # integrate again for future use, after detrending
-    vert_position = cumtrapz(detrend(vert_velocity), dx=dt, initial=0)
 
     # if using the optimal scale relationship, get the optimal scale
     if use_optimal_scale:
@@ -89,4 +83,4 @@ def get_gait_events(vert_accel, dt, va_sign, o_scale, filter_order, filter_cutof
     """
     final_contact, *_ = find_peaks(-va_sign * coef2[0], height=0.5 * std(coef2[0]))
 
-    return init_contact, final_contact, filt_vert_accel, vert_velocity, vert_position
+    return init_contact, final_contact, filt_vert_accel
