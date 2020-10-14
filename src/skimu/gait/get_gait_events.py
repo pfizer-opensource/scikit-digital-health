@@ -44,8 +44,11 @@ def get_gait_events(vert_accel, dt, va_sign, o_scale, filter_order, filter_cutof
     vert_accel = detrend(vert_accel)  # detrend data just in case
 
     # low-pass filter
-    sos = butter(filter_order, 2 * filter_cutoff * dt, btype='low', output='sos')
-    filt_vert_accel = sosfiltfilt(sos, vert_accel)
+    if (1/dt) > 2 * filter_cutoff:
+        sos = butter(filter_order, 2 * filter_cutoff * dt, btype='low', output='sos')
+        filt_vert_accel = sosfiltfilt(sos, vert_accel)
+    else:
+        filt_vert_accel = vert_accel * 1.0  # make sure its a copy not a view
 
     # first integrate the vertical acceleration to get vertical velocity
     vert_velocity = cumtrapz(filt_vert_accel, dx=dt, initial=0)
