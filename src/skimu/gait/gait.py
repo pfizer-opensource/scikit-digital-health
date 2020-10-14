@@ -5,7 +5,7 @@ Lukas Adamowicz
 Pfizer DMTI 2020
 """
 from warnings import warn
-from collections import Iterable
+from collections.abc import Iterable
 
 from numpy import ndarray, mean, diff, abs, argmax, sign, round, array, full, bool_
 
