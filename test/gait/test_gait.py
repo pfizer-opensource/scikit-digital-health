@@ -112,3 +112,13 @@ class TestGait(BaseProcessTester):
 
         with pytest.raises(LowFrequencyError):
             self.process._predict(**data)
+
+    def test_gait_predictions_error(self, get_sample_data):
+        data = get_sample_data(
+            self.sample_data_file,
+            self.sample_data_keys
+        )
+        data['gait_pred'] = arange(0, 1, 0.1)
+
+        with pytest.raises(ValueError):
+            self.process._predict(**data)
