@@ -5,11 +5,12 @@ Lukas Adamowicz
 2020, Pfizer DMTI
 """
 import pytest
-from numpy import allclose
+from numpy import allclose, arange
 
 from ..base_conftest import *
 
 from skimu.gait import Gait
+from skimu.gait.gait import LowFrequencyError
 from skimu.gait.get_gait_classification import get_gait_classification_lgbm
 from skimu.gait.get_gait_bouts import get_gait_bouts
 from skimu.gait.get_gait_events import get_gait_events
@@ -100,4 +101,14 @@ class TestGait(BaseProcessTester):
         data['height'] = None
 
         with pytest.warns(UserWarning):
+            self.process._predict(**data)
+
+    def test_sample_rate_error(self, get_sample_data):
+        data = get_sample_data(
+            self.sample_data_file,
+            self.sample_data_keys
+        )
+        data['time'] = arange(0, 300, 0.5)
+
+        with pytest.raises(LowFrequencyError):
             self.process._predict(**data)
