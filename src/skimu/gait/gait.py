@@ -37,7 +37,8 @@ class Gait(_BaseProcess):
         continuous wavelet transform. Default is True. See Notes for a caveat of the
         relationship
     min_bout_time : float, optional
-        Minimum time in seconds for a gait bout. Default is 5s
+        Minimum time in seconds for a gait bout. Default is 8s (making a minimum of 3 3-second
+        windows)
     max_bout_separation_time : float, optional
         Maximum time in seconds between two bouts of gait for them to be merged into 1 gait
         bout. Default is 0.5s
@@ -140,7 +141,7 @@ class Gait(_BaseProcess):
         ret += f"filter_cutoff={self.filt_cut!r})"
         return ret
 
-    def __init__(self, use_cwt_scale_relation=True, min_bout_time=5.0,
+    def __init__(self, use_cwt_scale_relation=True, min_bout_time=8.0,
                  max_bout_separation_time=0.5, max_stride_time=2.25, loading_factor=0.2,
                  height_factor=0.53, leg_length=False, filter_order=4, filter_cutoff=20.0):
         super().__init__('Gait Process', True)
