@@ -19,6 +19,10 @@ from skimu.gait.gait_metrics import EventMetric, BoutMetric
 from skimu.gait.get_bout_metrics_delta_h import get_bout_metrics_delta_h
 
 
+class LowFrequencyError(Exception):
+    pass
+
+
 class Gait(_BaseProcess):
     """
     Process IMU data to extract metrics of gait. Detect gait, extract gait events (heel-strikes,
@@ -220,6 +224,11 @@ class Gait(_BaseProcess):
         gait_results : dict
             The computed gait metrics. For a list of metrics and their definitions, see
             :ref:`event-level-gait-metrics` and :ref:`bout-level-gait-metrics`.
+
+        Raises
+        ------
+        LowFrequencyError
+            If the sampling frequency is less than 20Hz
         """
         return super().predict(*args, **kwargs)
 
@@ -265,6 +274,9 @@ class Gait(_BaseProcess):
 
         # compute fs/delta t
         dt = mean(diff(time[:500]))
+
+        if (1 / dt) < 20.0:
+            raise LowFrequencyError(f"Frequency ({1/dt:.2f}Hz) is too low (<20Hz)")
 
         # check if windows exist for days
         if self._days in kwargs:
