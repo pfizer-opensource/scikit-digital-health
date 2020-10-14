@@ -58,7 +58,7 @@ class BaseProcessTester:
                 assert allclose(ptime, ttime, atol=self.atol_time), \
                     f"{self.process._proc_name} test for value ({key}) not close to truth"
             else:
-                assert allclose(pred[key], truth[key], atol=self.atol), \
+                assert allclose(pred[key], truth[key], atol=self.atol, equal_nan=True), \
                     f"{self.process._proc_name} test for value ({key}) not close to truth"
 
 
