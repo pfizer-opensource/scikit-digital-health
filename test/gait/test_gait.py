@@ -22,7 +22,7 @@ class TestGetGaitClassificationLGBM:
     def test(self, sample_accel, sample_fs, sample_gait_classification_truth):
         b_gait = get_gait_classification_lgbm(sample_accel, sample_fs)
 
-        assert b_gait.sum() == 15637
+        assert b_gait.sum() == 13020
         assert allclose(b_gait, sample_gait_classification_truth)
 
 
