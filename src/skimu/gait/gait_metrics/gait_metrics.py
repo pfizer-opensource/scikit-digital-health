@@ -42,8 +42,8 @@ from skimu.features.lib._cython.sparc import sparc_1d
 __all__ = ['StrideTime', 'StanceTime', 'SwingTime', 'StepTime', 'InitialDoubleSupport',
            'TerminalDoubleSupport', 'DoubleSupport', 'SingleSupport', 'StepLength',
            'StrideLength', 'GaitSpeed', 'Cadence', 'GaitSymmetryIndex', 'IntraStepCovarianceV',
-           'IntraStrideCovarianceV', 'HarmonicRatioV', 'PhaseCoordinationIndex', 'StepRegularityV',
-           'StrideRegularityV', 'AutocovarianceSymmetryV', 'RegularityIndexV']
+           'IntraStrideCovarianceV', 'HarmonicRatioV', 'StrideSPARC', 'PhaseCoordinationIndex',
+           'StepRegularityV', 'StrideRegularityV', 'AutocovarianceSymmetryV', 'RegularityIndexV']
 
 
 def _autocovariancefunction(x, max_lag, biased=False):
