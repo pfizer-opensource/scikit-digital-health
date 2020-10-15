@@ -70,6 +70,7 @@ class TestGait(BaseProcessTester):
             'PARAM:intra-step covariance - V',
             'PARAM:intra-stride covariance - V',
             'PARAM:harmonic ratio - V',
+            'PARAM:stride SPARC',
             'BOUTPARAM:phase coordination index',
             'BOUTPARAM:gait symmetry index',
             'BOUTPARAM:step regularity - V',
