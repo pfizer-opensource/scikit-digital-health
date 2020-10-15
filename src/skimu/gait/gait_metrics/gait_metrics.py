@@ -31,10 +31,12 @@ gait speed: stride_length / stride time
 """
 from numpy import zeros, nanmean, mean, nanstd, std, sum, sqrt, nan, nonzero, argmin, abs, round, \
     float_, int_, fft, arange
+from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt, find_peaks
 
 
 from skimu.gait.gait_metrics.base import EventMetric, BoutMetric, basic_asymmetry
+from skimu.features.lib._cython.sparc import sparc_1d
 
 
 __all__ = ['StrideTime', 'StanceTime', 'SwingTime', 'StepTime', 'InitialDoubleSupport',
@@ -451,6 +453,44 @@ class HarmonicRatioV(EventMetric):
 
             # index 1 is harmonic 2 -> even harmonics / odd harmonics
             gait[self.k_][idx] = sum(F[ix_stridef[1::2]]) / sum(F[ix_stridef[::2]])
+
+
+class StrideSPARC(EventMetric):
+    r"""
+    Assessment of the smoothness of the acceleration signal during a stride. SPARC is the
+    spectral arc length, which is a measure of how smooth a signal is. Higher values (smaller
+    negative) numbers indicate smoother strides.
+
+    Notes
+    -----
+    Per the recommendation from [1]_, the SPARC is computed on the magnitude of the acceleration
+    signal less gravity, during each stride.
+
+    References
+    ----------
+    .. [1] S. Balasubramanian, A. Melendez-Calderon, A. Roby-Brami, and E. Burdet, “On the
+        analysis of movement smoothness,” J NeuroEngineering Rehabil, vol. 12, no. 1, p. 112,
+        Dec. 2015, doi: 10.1186/s12984-015-0090-9.
+    """
+    def __init__(self):
+        super().__init__('stride SPARC - V')
+
+    def _predict(self, dt, leg_length, gait, gait_aux):
+        mask, mask_ofst = self._predict_init(gait, True, offset=2)
+
+        i1 = gait['IC'][mask]
+        i2 = gait['IC'][mask_ofst]
+
+        for i, idx in enumerate(nonzero(mask)[0]):
+            bout_i = gait_aux['inertial data i'][idx]
+
+            gait[self.k_][idx] = sparc_1d(
+                norm(gait_aux['accel'][bout_i][i1[i]:i2[i], :], axis=1) - 1,
+                1 / dt,  # fsample
+                4,  # padlevel
+                10.0,  # fcut
+                0.05  # amplitude threshold
+            )
 
 
 # ===========================================================
