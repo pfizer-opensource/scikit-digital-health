@@ -473,7 +473,7 @@ class StrideSPARC(EventMetric):
         Dec. 2015, doi: 10.1186/s12984-015-0090-9.
     """
     def __init__(self):
-        super().__init__('stride SPARC - V')
+        super().__init__('stride SPARC')
 
     def _predict(self, dt, leg_length, gait, gait_aux):
         mask, mask_ofst = self._predict_init(gait, True, offset=2)
