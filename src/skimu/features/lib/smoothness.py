@@ -35,7 +35,7 @@ class JerkMetric(Feature):
     .. math:: J = \frac{\hat{J}}{2s}
     """
     def __init__(self, normalize=True):
-        super(JerkMetric, self).__init__('JerkMetric', {})
+        super(JerkMetric, self).__init__('JerkMetric', {'normalize': normalize})
         self.normalize = normalize
 
     def compute(self, *args, **kwargs):
