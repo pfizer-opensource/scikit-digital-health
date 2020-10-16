@@ -147,7 +147,9 @@ def compute_window_samples(fs, window_length, window_step):
     """
     length_n = int(round(fs * window_length))
 
-    if isinstance(window_step, int):
+    if window_step is None or window_length is None:
+        return None, None
+    elif isinstance(window_step, int):
         if window_step > 0:
             step_n = window_step
         else:

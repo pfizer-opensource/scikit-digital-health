@@ -126,10 +126,7 @@ class Bank:
         self._n_feats = []
 
         # compute windowing # of samples if necessary
-        if self.wlen_s is not None and self.wstep is not None:
-            window_length, window_step = compute_window_samples(fs, self.wlen_s, self.wstep)
-        else:
-            window_length, window_step = None, None
+        window_length, window_step = compute_window_samples(fs, self.wlen_s, self.wstep)
 
         # standardize the input signal, and perform windowing if desired
         x, columns = standardize_signal(signal, windowed=windowed, window_length=window_length,
