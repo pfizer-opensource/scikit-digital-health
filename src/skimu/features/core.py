@@ -35,9 +35,9 @@ class Bank:
 
     Parameters
     ----------
-    window_length : float
+    window_length : {None, float}, optional
         Window length in seconds. If not provided (None), will do no windowing. Default is None
-    window_step : {float, int}
+    window_step : {None, float, int}, optional
         Window step - the spacing between the start of windows. This can be specified several
         different ways (see Notes). Default is 1.0
 
