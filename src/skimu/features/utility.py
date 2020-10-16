@@ -145,11 +145,12 @@ def compute_window_samples(fs, window_length, window_step):
     >>> compute_window_samples(100.0, 4.5, 1)
     (450, 1)
     """
-    length_n = int(round(fs * window_length))
-
     if window_step is None or window_length is None:
         return None, None
-    elif isinstance(window_step, int):
+
+    length_n = int(round(fs * window_length))
+
+    if isinstance(window_step, int):
         if window_step > 0:
             step_n = window_step
         else:
