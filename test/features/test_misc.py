@@ -5,6 +5,7 @@ from numpy import random
 
 from skimu.features import *
 from skimu.features import lib
+from skimu.features.core import DeferredFeature, NotAFeatureError
 
 
 class TestFeatureEquivalence:
@@ -81,3 +82,28 @@ class TestFeatureEquivalence:
         kwargs[key] = new
 
         return kwargs
+
+
+class TestDeferredFeature:
+    @pytest.mark.parametrize('f', lib.__all__)
+    def test_equivalence(self, f):
+        feature = getattr(lib, f)
+
+        df1 = DeferredFeature(feature(), ...)
+        df2 = DeferredFeature(feature(), ...)
+        f1 = feature()
+
+        assert df1 == df2
+        assert df1 == f1
+
+    def test_get_columns(self):
+        feat = DeferredFeature(Mean(), ...)
+
+        columns = feat.get_columns(['x', 'y'])
+
+        assert columns[0] == 'x_Mean()'
+        assert columns[1] == 'y_Mean()'
+
+    def test_parent_error(self):
+        with pytest.raises(NotAFeatureError):
+            DeferredFeature(list(), ...)
