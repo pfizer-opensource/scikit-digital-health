@@ -1,0 +1,19 @@
+[run]
+data_file = coverage/.coverage
+omit =
+    # setup files
+    *setup.py
+    # init files
+    *__init__.py
+    # version file
+    *version.py
+source = src/
+
+[report]
+# regexes for lines to exclude from consideration
+exclude_lines =
+    def __repr__
+    def __str__
+
+[html]
+directory = coverage
