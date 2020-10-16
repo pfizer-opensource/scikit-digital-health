@@ -116,6 +116,8 @@ class DimensionlessJerk(Feature):
         DJ = \frac{-\hat{J}_{type}}{s_{type}} \\
         DJ_{log} = -ln\left(\frac{\hat{J}_{type}}{s_{type}}\right)
     """
+    _signal_type_options = ['velocity', 'acceleration', 'jerk']
+
     def __init__(self, log=False, signal_type='acceleration'):
         super(DimensionlessJerk, self).__init__(
             'DimensionlessJerk', {'log': log, 'signal_type': signal_type}
