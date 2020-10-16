@@ -1,3 +1,5 @@
+import pytest
+
 from .conftest import BaseTestFeature
 from skimu.features import *
 
@@ -39,6 +41,11 @@ class TestPermutationEntropy(BaseTestFeature):
 # FREQUENCY FEATURES
 class TestDominantFrequency(BaseTestFeature):
     feature = DominantFrequency(low_cutoff=0.0, high_cutoff=12.0)
+
+    @pytest.mark.parametrize('fs_', ([5], 'a', (10,)))
+    def test_fs_error(self, fs_):
+        with pytest.raises(ValueError):
+            self.feature.compute(None, fs_)
 
 
 class TestDominantFrequencyValue(BaseTestFeature):
