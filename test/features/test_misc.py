@@ -96,6 +96,21 @@ class TestDeferredFeature:
         assert df1 == df2
         assert df1 == f1
 
+    @pytest.mark.parametrize(
+        ('f1', 'f2'),
+        (
+                (Mean(), JerkMetric()),
+                (DominantFrequency(), DetailPower())
+        )
+    )
+    def test_not_equal(self, f1, f2):
+        df1 = DeferredFeature(f1, ...)
+        df2 = DeferredFeature(f2, ...)
+
+        assert df1 != df2
+        assert df1 != f2
+        assert f1 != df2
+
     def test_get_columns(self):
         feat = DeferredFeature(Mean(), ...)
 
