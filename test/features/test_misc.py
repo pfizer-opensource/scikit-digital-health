@@ -125,6 +125,11 @@ class TestDeferredFeature:
         assert df2 != list()
         assert df2 != float()
 
+    def test_comp_index(self):
+        m = Mean()['xy', 'yz']
+
+        assert m.index == [0, 2]
+
     def test_get_columns(self):
         feat = DeferredFeature(Mean(), ...)
 
