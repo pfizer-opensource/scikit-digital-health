@@ -359,11 +359,11 @@ class Feature:
             elif key[0] in self._xyz_map:
                 index = [self._xyz_map[i] for i in key]
             else:
-                index = key
+                index = key if all(isinstance(i, int) for i in key) else None
 
         if index is None:
-            raise IndexError("Index must be a int, in ['x', 'y', 'z', 'xy', 'xz', 'yz'] or an "
-                             "array-like of those")
+            raise IndexError("Index must be an int, in ['x', 'y', 'z', 'xy', 'xz', 'yz'], an "
+                             "array-like of those, or an Ellipsis (...)")
 
         return DeferredFeature(self, index)
 
