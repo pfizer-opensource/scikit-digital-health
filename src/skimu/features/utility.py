@@ -178,23 +178,35 @@ def get_windowed_view(x, win_len, stepsize):
     x : numpy.ndarray
         1- or 2-D array of signals to window. Windows occur along the 0 axis. MUST BE C-CONTIGUOUS.
     win_len : int
-        Window length.
+        Window length (:math:`L`).
     stepsize : int
-        Stride length/step size. Number of places to step for the center of the windows being
-        created.
+        Stride length/step size (:math:`S`). Number of places to step for the center of the
+        windows being created.
 
     Returns
     -------
     x_win : numpy.ndarray
-        2D array of windows of the original data, with shape (-1, L)
+        Array of windows with `x.ndim+1` dimensions.
+
+    Notes
+    -----
+    Windowing always occurs along the 0th axis, so given an input shape (M[, N]), the number of
+    windows :math:`M_w` is computed per
+
+    .. math:: M_w = (M - L) // S + 1
+
+    where :math:`//` indicates floor division. Therefore, the resulting shape for a 1D input is
+    (M_w, L), and a 2D input is (M_w, L, N)
 
     Raises
     ------
+    DimensionError
+        If `x` has more than 2 dimensions.
     ValueError
-        If `x` has more than 2 dimensions, or if `x` is not C-contiguous in memory
+        If `x` is not C-contiguous in memory
     """
     if not (x.ndim in [1, 2]):
-        raise ValueError('Array cannot have more than 2 dimensions to window properly.')
+        raise DimensionError('Array cannot have more than 2 dimensions to window properly.')
     if not x.flags['C_CONTIGUOUS']:
         raise ValueError('Array must be C-contiguous to window properly.')
     if x.ndim == 1:
