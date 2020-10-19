@@ -271,7 +271,7 @@ class Gait(_BaseProcess):
             leg_length = None
         else:
             # if not providing leg length (default), multiply height by the height factor
-            if not self.leg_length:
+            if not self.prov_leg_length:
                 leg_length = self.height_factor * height
             else:
                 leg_length = height
@@ -282,11 +282,8 @@ class Gait(_BaseProcess):
         if (1 / dt) < 20.0:
             raise LowFrequencyError(f"Frequency ({1/dt:.2f}Hz) is too low (<20Hz)")
 
-        # check if windows exist for days
-        if self._days in kwargs:
-            days = kwargs[self._days]
-        else:
-            days = [(0, accel.shape[0])]
+        # get days if it exists, otherwise use the start and end of the data
+        days = kwargs.get(self._days, [(0, accel.shape[0])])
 
         # get the gait classifications if necessary
         if gait_pred is None:
