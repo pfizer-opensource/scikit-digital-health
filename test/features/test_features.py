@@ -85,6 +85,10 @@ class TestJerkMetric(BaseTestFeature):
 class TestDimensionlessJerk(BaseTestFeature):
     feature = DimensionlessJerk(log=True, signal_type='acceleration')
 
+    def test_signal_type_error(self):
+        with pytest.raises(ValueError):
+            dj = DimensionlessJerk(log=True, signal_type='random signal')
+
 
 class TestSPARC(BaseTestFeature):
     feature = SPARC(padlevel=4, fc=10.0, amplitude_threshold=0.05)
