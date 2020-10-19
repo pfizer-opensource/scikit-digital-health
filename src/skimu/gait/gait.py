@@ -334,7 +334,9 @@ class Gait(_BaseProcess):
                 )
 
                 # get strides
-                sib = get_strides(gait, gait_i, ic, fc, dt, self.max_stride_time, self.loading_factor)
+                sib = get_strides(
+                    gait, vert_acc, gait_i, ic, fc, dt, self.max_stride_time, self.loading_factor
+                )
 
                 # add inertial data to the aux dict for use in gait metric calculation
                 gait_aux['accel'].append(accel[bstart:start + bout[1], :])
