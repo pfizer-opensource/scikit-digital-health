@@ -334,12 +334,11 @@ class Gait(_BaseProcess):
                     self.use_opt_scale
                 )
 
-                # add inertial data to the aux dict for use in gait metric calculation
-                gait_aux['accel'].append(accel[bstart:start+bout[1], :])
-
                 # get strides
                 sib = get_strides(gait, ig, ic, fc, dt, self.max_stride_time, self.loading_factor)
 
+                # add inertial data to the aux dict for use in gait metric calculation
+                gait_aux['accel'].append(accel[bstart:start + bout[1], :])
                 # add the index for the corresponding accel/velocity/position
                 gait_aux['inertial data i'].extend([len(gait_aux['accel']) - 1] * sib)
 
