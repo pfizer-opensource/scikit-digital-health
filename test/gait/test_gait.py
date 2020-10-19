@@ -95,6 +95,11 @@ class TestGait(BaseProcessTester):
             filter_cutoff=20.0
         )
 
+    def test_leg_length_factor(self):
+        g = Gait(prov_leg_length=True, height_factor=0.53)
+
+        assert g.height_factor == 1.0
+
     def test_leg_length_warning(self, get_sample_data):
         data = get_sample_data(
             self.sample_data_file,
