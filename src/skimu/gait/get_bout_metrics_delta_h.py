@@ -4,14 +4,9 @@ Function for getting the initial gait metrics
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
-from numpy import nan, cov, std
+from numpy import nan
 from scipy.signal import detrend
 from scipy.integrate import cumtrapz
-
-
-def _autocov(x, i1, i2, i3):
-    ac = cov(x[i1:i2], x[i2:i3], bias=False)[0, 1]
-    return ac / (std(x[i1:i2], ddof=1) * std(x[i2:i3], ddof=1))
 
 
 def get_bout_metrics_delta_h(
