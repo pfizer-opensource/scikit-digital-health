@@ -156,10 +156,10 @@ class DimensionlessJerk(Feature):
     def _compute(self, x, fs):
         super(DimensionlessJerk, self)._compute(x, fs)
 
+        self._result = _cython.DimensionlessJerk(x, self.i_type)
+
         if self.log:
-            self._result = -log(abs(_cython.DimensionlessJerk(x, self.i_type)))
-        else:
-            self._result = _cython.DimensionlessJerk(x, self.i_type)
+            self._result = -log(abs(self._result))
 
 
 class SPARC(Feature):
