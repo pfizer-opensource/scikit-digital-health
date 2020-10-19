@@ -5,7 +5,7 @@ Lukas Adamowicz
 2020, Pfizer DMTI
 """
 import pytest
-from numpy import allclose, arange
+from numpy import allclose, arange, random, sin, pi
 
 from ..base_conftest import *
 
@@ -17,6 +17,7 @@ from skimu.gait.get_gait_events import get_gait_events
 from skimu.gait.get_strides import get_strides
 from skimu.gait.get_bout_metrics_delta_h import get_bout_metrics_delta_h
 from skimu.gait import gait_metrics
+from skimu.gait.gait_metrics.gait_metrics import _autocovariancefunction, _autocovariance
 
 
 class TestGetGaitClassificationLGBM:
@@ -40,6 +41,32 @@ class TestGetGaitBouts:
 class TestGetGaitEvents:
     def test(self):
         pass
+
+
+class TestEventMetricGetOffset:
+    def test_error(self):
+        with pytest.raises(ValueError):
+            gait_metrics.EventMetric._get_mask({}, 3)
+
+
+class TestACF:
+    def test_dim_error(self):
+        with pytest.raises(ValueError):
+            _autocovariancefunction(random.rand(5, 3, 3), 3, True)
+
+
+class TestAutocovariance:
+    def test_unbiased(self):
+        x = arange(0, 2*pi, 0.01)
+        y = sin(2 * x)
+
+        assert _autocovariance(y, 0, 314, 628, biased=False) > 0.99
+
+    def test_biased(self):
+        x = arange(0, 2*pi, 0.01)
+        y = sin(2 * x)
+
+        assert 0.49 < _autocovariance(y, 0, 314, 628, biased=True) < 0.50
 
 
 class TestGait(BaseProcessTester):
