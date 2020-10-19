@@ -277,15 +277,8 @@ class Gait(_BaseProcess):
 
         # compute fs/delta t
         dt = mean(diff(time[:500]))
-
         if (1 / dt) < 20.0:
             raise LowFrequencyError(f"Frequency ({1/dt:.2f}Hz) is too low (<20Hz)")
-
-        # get days if it exists, otherwise use the start and end of the data
-        days = kwargs.get(self._days, [(0, accel.shape[0])])
-
-        # get the gait classifications if necessary (delegated to subfunction)
-        gait_pred = get_gait_classification_lgbm(gait_pred, accel, 1 / dt)
 
         # figure out vertical axis
         acc_mean = mean(accel, axis=0)
@@ -295,6 +288,9 @@ class Gait(_BaseProcess):
         # 1.25 comes from original paper, corresponds to desired frequency
         # 0.4 comes from using the 'gaus1' wavelet
         scale_original = round(0.4 / (2 * 1.25 * dt)) - 1
+
+        # get days if it exists, otherwise use the start and end of the data
+        days = kwargs.get(self._days, [(0, accel.shape[0])])
 
         gait = {
             'Day N': [],
@@ -310,6 +306,9 @@ class Gait(_BaseProcess):
             'vert position': [],
             'inertial data i': []
         }
+
+        # get the gait classifications if necessary (delegated to subfunction)
+        gait_pred = get_gait_classification_lgbm(gait_pred, accel, 1 / dt)
 
         ig = 0  # keep track of where everything is in the cycle
 
