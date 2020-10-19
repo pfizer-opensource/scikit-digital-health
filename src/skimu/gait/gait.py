@@ -284,16 +284,8 @@ class Gait(_BaseProcess):
         # get days if it exists, otherwise use the start and end of the data
         days = kwargs.get(self._days, [(0, accel.shape[0])])
 
-        # get the gait classifications if necessary
-        if gait_pred is None:
-            gait_pred = get_gait_classification_lgbm(accel, 1 / dt)
-        else:
-            if isinstance(gait_pred, ndarray):
-                if gait_pred.size != accel.shape[0]:
-                    raise ValueError(
-                        'Number of gait predictions must much number of accel samples')
-            else:
-                gait_pred = full(accel.shape[0], True, dtype=bool_)
+        # get the gait classifications if necessary (delegated to subfunction)
+        gait_pred = get_gait_classification_lgbm(gait_pred, accel, 1 / dt)
 
         # figure out vertical axis
         acc_mean = mean(accel, axis=0)
