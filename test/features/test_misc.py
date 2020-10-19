@@ -120,10 +120,10 @@ class TestDeferredFeature:
         assert df1 != f2
         assert f1 != df2
         # misc other testing
-        assert f1 != list()
-        assert f1 != dict()
-        assert f2 != list()
-        assert f2 != float()
+        assert df1 != list()
+        assert df1 != dict()
+        assert df2 != list()
+        assert df2 != float()
 
     def test_get_columns(self):
         feat = DeferredFeature(Mean(), ...)
