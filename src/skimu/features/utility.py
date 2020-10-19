@@ -159,10 +159,7 @@ def compute_window_samples(fs, window_length, window_step):
         if 0.0 < window_step < 1.0:
             step_n = int(round(length_n * window_step))
 
-            if step_n < 1:
-                step_n = 1
-            if step_n > length_n:
-                step_n = length_n
+            step_n = max(min(step_n, length_n), 1)
 
         elif window_step == 1.0:
             step_n = length_n
