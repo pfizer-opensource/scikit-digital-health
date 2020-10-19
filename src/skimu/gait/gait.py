@@ -16,7 +16,6 @@ from skimu.gait.get_gait_events import get_gait_events
 from skimu.gait.get_strides import get_strides
 from skimu.gait import gait_metrics
 from skimu.gait.gait_metrics import EventMetric, BoutMetric
-from skimu.gait.get_bout_metrics_delta_h import get_bout_metrics_delta_h
 
 
 class LowFrequencyError(Exception):
@@ -310,7 +309,7 @@ class Gait(_BaseProcess):
         # get the gait classifications if necessary (delegated to subfunction)
         gait_pred = get_gait_classification_lgbm(gait_pred, accel, 1 / dt)
 
-        ig = 0  # keep track of where everything is in the cycle
+        gait_i = 0  # keep track of where everything is in the cycle
 
         for iday, day_idx in enumerate(days):
             start, stop = day_idx
@@ -335,19 +334,20 @@ class Gait(_BaseProcess):
                 )
 
                 # get strides
-                sib = get_strides(gait, ig, ic, fc, dt, self.max_stride_time, self.loading_factor)
+                sib = get_strides(gait, gait_i, ic, fc, dt, self.max_stride_time, self.loading_factor)
 
                 # add inertial data to the aux dict for use in gait metric calculation
                 gait_aux['accel'].append(accel[bstart:start + bout[1], :])
                 # add the index for the corresponding accel/velocity/position
                 gait_aux['inertial data i'].extend([len(gait_aux['accel']) - 1] * sib)
 
-                # get the initial gait metrics
-                get_bout_metrics_delta_h(
-                    gait, ig, ibout, dt, time, vert_acc, sib, bout, bstart
-                )
+                # save some default per bout metrics
+                gait['Bout N'].extend([ibout + 1] * sib)
+                gait['Bout Start'].extend([time[bstart]] * sib)
+                gait['Bout Duration'].extend([(bout[1] - bout[0]) * dt] * sib)
+                gait['Bout Steps'].extend([sum(gait['b valid cycle'][gait_i:])] * sib)
 
-                ig += sib
+                gait_i += sib
 
             # add the day number
             gait['Day N'].extend([iday + 1] * (len(gait['Bout N']) - len(gait['Day N'])))

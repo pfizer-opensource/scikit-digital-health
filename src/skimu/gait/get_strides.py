@@ -4,9 +4,12 @@ Function for getting strides from detected gait events
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
+from numpy import nan
+from scipy.signal import detrend
+from scipy.integrate import cumtrapz
 
 
-def get_strides(gait, gait_index, ic, fc, dt, max_stride_time, loading_factor):
+def get_strides(gait, vert_accel, gait_index, ic, fc, dt, max_stride_time, loading_factor):
     """
     Get the strides from detected gait initial and final contacts, with optimizations
 
@@ -14,6 +17,8 @@ def get_strides(gait, gait_index, ic, fc, dt, max_stride_time, loading_factor):
     ----------
     gait : dictionary
         Dictionary of gait values needed for computation or the results
+    vert_accel numpy.ndarray
+        (N, ) array of vertial acceleration
     gait_index : int
         Where in the lists in `gait` the last bout left off
     ic : numpy.ndarray
@@ -70,5 +75,21 @@ def get_strides(gait, gait_index, ic, fc, dt, max_stride_time, loading_factor):
         gait['b valid cycle'].extend([False] * 2)
     elif bout_n_steps > 0:
         gait['b valid cycle'].extend([False] * bout_n_steps)
+
+    for i in range(gait_index, gait_index + bout_n_steps - 1):
+        i1 = gait['IC'][i]
+        i2 = gait['IC'][i+1]
+
+        if gait['b valid cycle'][i]:
+            vacc = detrend(vert_accel[i1:i2])
+            vvel = cumtrapz(vacc, dx=dt, initial=0)
+            vpos = cumtrapz(vvel, dx=dt, initial=0)
+
+            gait['delta h'].append((vpos.max() - vpos.min()) * 9.81)  # conver to meters
+        else:
+            gait['delta h'].append(nan)
+
+    # make sure parameters here math the number of steps in gait
+    gait['delta h'].append(nan)
 
     return bout_n_steps
