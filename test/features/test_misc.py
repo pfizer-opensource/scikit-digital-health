@@ -2,10 +2,44 @@ import inspect
 
 import pytest
 from numpy import random
+import pandas as pd
 
 from skimu.features import *
 from skimu.features import lib
 from skimu.features.core import DeferredFeature, NotAFeatureError
+from skimu.features.utility import standardize_signal, DimensionError, InputTypeError
+
+
+class TestStandardizeSignal:
+    def test_dataframe(self):
+        df = pd.DataFrame(data=random.rand(500, 3), columns=['x', 'y', 'z'])
+
+        # test with windowing
+        res, cols = standardize_signal(df, windowed=False, window_length=50, step=50, columns=None)
+        assert res.shape == (10, 50, 3)
+
+        # test with windowing and columns
+        c = ['x', 'z']
+        res, cols = standardize_signal(df, windowed=False, window_length=50, step=50, columns=c)
+        assert res.shape == (10, 50, 2)
+        assert cols == c
+
+        # test without windowing
+        res, cols = standardize_signal(df, windowed=True, columns=None)
+        assert res.shape == (500, 3, 1)
+
+        # test without windowing with columns
+        res, cols = standardize_signal(df, windowed=True, columns=c)
+        assert res.shape == (500, 2, 1)
+        assert cols == c
+
+    def test_dim_error(self):
+        with pytest.raises(DimensionError):
+            standardize_signal(random.rand(5, 3, 3, 10), True, None, None, None)
+
+    def test_input_error(self):
+        with pytest.raises(InputTypeError):
+            standardize_signal([1, 2, 3], False, None, None, None)
 
 
 class TestFeatureEquivalence:
