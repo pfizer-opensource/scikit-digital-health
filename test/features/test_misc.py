@@ -31,6 +31,9 @@ class TestFeatureEquivalence:
         kwargs = self.get_kwargs(argspec, feature)
         f1 = feature(**kwargs)
 
+        # test with non feature item
+        assert all([f1 != i for i in [list(), float(), tuple(), dict()]])
+
         if len(argspec.args) <= 1:
             pytest.skip('No parameters to test feature difference')
         for i, arg in enumerate(argspec.args[1:]):
@@ -40,6 +43,12 @@ class TestFeatureEquivalence:
                 f2 = feature(**self.change_kwarg(kwargs, arg, feature))
 
                 assert f1 != f2
+                assert all([f2 != i for i in [list(), float(), tuple(), dict()]])
+
+    @pytest.mark.parametrize('idx', (1.1, 'a', [1.1, 'a'], (1.5, 2.5)))
+    def test_index_error(self, idx):
+        with pytest.raises(IndexError):
+            m = Mean()[idx]
 
     @staticmethod
     def get_kwargs(spec, feat):
@@ -110,6 +119,11 @@ class TestDeferredFeature:
         assert df1 != df2
         assert df1 != f2
         assert f1 != df2
+        # misc other testing
+        assert f1 != list()
+        assert f1 != dict()
+        assert f2 != list()
+        assert f2 != float()
 
     def test_get_columns(self):
         feat = DeferredFeature(Mean(), ...)
