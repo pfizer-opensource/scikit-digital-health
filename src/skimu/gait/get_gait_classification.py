@@ -83,8 +83,10 @@ def get_gait_classification_lgbm(accel, fs):
     accel_feats = feat_bank.compute(accel_w, fs=goal_fs, windowed=True)
 
     # load the model
-    lgb_file = f'lgbm_gait_classifier_no-stairs_{suffix}.lgbm'
-    bst = lgb.Booster(model_file=str(_resolve_path('skimu.gait.model', lgb_file)))
+    lgb_file = str(
+        _resolve_path('skimu.gait.model', f'lgbm_gait_classifier_no-stairs_{suffix}.lgbm')
+    )
+    bst = lgb.Booster(model_file=lgb_file)
 
     # predict
     gait_predictions = bst.predict(accel_feats, raw_score=False) > thresh
