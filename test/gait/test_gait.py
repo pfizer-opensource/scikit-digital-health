@@ -90,7 +90,7 @@ class TestGait(BaseProcessTester):
             max_stride_time=2.25,
             loading_factor=0.2,
             height_factor=0.53,
-            leg_length=False,
+            prov_leg_length=False,
             filter_order=4,
             filter_cutoff=20.0
         )
