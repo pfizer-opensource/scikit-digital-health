@@ -70,32 +70,6 @@ def _autocovariancefunction(x, max_lag, biased=False):
     return ac
 
 
-def _autocovariance_lag(x, lag, biased=False):
-    if x.ndim == 1:
-        N = x.size
-        m1 = mean(x[:N-lag])
-        m2 = mean(x[lag:])
-        s1 = std(x[:N-lag], ddof=1)
-        s2 = std(x[lag:], ddof=1)
-
-        ac = sum((x[:N-lag] - m1) * (x[lag:] - m2))
-    elif x.ndim == 2:
-        N = x.shape[0]
-        m1 = mean(x[:N-lag], axis=0)
-        m2 = mean(x[lag:], axis=0)
-        s1 = std(x[:N-lag], ddof=1, axis=0)
-        s2 = std(x[lag:], ddof=1, axis=0)
-
-        ac = sum((x[:N-lag] - m1) * (x[lag:] - m2), axis=0)
-    else:
-        raise ValueError('Too many dimensions (>2) for x')
-    if biased:
-        ac /= (N * s1 * s2)
-    else:
-        ac /= ((N - lag) * s1 * s2)
-    return ac
-
-
 def _autocovariance(x, i1, i2, i3, biased=False):
     if i3 > x.size:
         return nan
