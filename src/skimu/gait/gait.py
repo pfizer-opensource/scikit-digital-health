@@ -51,7 +51,7 @@ class Gait(_BaseProcess):
     height_factor : float, optional
         The factor multiplied by height to obtain an estimate of leg length.
         Default is 0.53 [4]_. Ignored if `leg_length` is `True`
-    leg_length : bool, optional
+    prov_leg_length : bool, optional
         If the actual leg length will be provided. Setting to true would have the same effect
         as setting height_factor to 1.0 while providing leg length. Default is False
     filter_order : int, optional
@@ -137,14 +137,14 @@ class Gait(_BaseProcess):
         ret += f"max_stride_time={self.max_stride_time!r}, "
         ret += f"loading_factor={self.loading_factor!r}, "
         ret += f"height_factor={self.height_factor!r}, "
-        ret += f"leg_length={self.leg_length!r}, "
+        ret += f"prov_leg_length={self.prov_leg_length!r}, "
         ret += f"filter_order={self.filt_ord!r}, "
         ret += f"filter_cutoff={self.filt_cut!r})"
         return ret
 
     def __init__(self, use_cwt_scale_relation=True, min_bout_time=8.0,
                  max_bout_separation_time=0.5, max_stride_time=2.25, loading_factor=0.2,
-                 height_factor=0.53, leg_length=False, filter_order=4, filter_cutoff=20.0):
+                 height_factor=0.53, prov_leg_length=False, filter_order=4, filter_cutoff=20.0):
         super().__init__('Gait Process', True)
 
         self.use_opt_scale = use_cwt_scale_relation
@@ -155,7 +155,7 @@ class Gait(_BaseProcess):
         self.loading_factor = loading_factor
 
         self.height_factor = height_factor
-        self.leg_length = leg_length
+        self.prov_leg_length = prov_leg_length
 
         self.filt_ord = filter_order
         self.filt_cut = filter_cutoff
