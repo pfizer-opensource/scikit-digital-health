@@ -22,6 +22,17 @@ else:
     import importlib_resources
 
 
+def _resolve_path(mod, file):
+    if version_info >= (3, 7):
+        with resources.path(mod, file) as file_path:
+            path = file_path
+    else:
+        with importlib_resources.path(mod, file) as file_path:
+            path = file_path
+
+    return path
+
+
 def get_gait_classification_lgbm(accel, fs):
     """
     Get classification of windows of accelerometer data using the LightGBM classifier
@@ -66,25 +77,14 @@ def get_gait_classification_lgbm(accel, fs):
 
     # get the feature bank
     feat_bank = Bank(window_length=None, window_step=None)  # make sure no windowing
-    if version_info >= (3, 7):
-        with resources.path('skimu.gait.model', 'final_features.json') as file_path:
-            feat_bank.load(file_path)
-    else:
-        with importlib_resources.path('skimu.gait.model', 'final_features.json') as file_path:
-            feat_bank.load(file_path)
+    feat_bank.load(_resolve_path('skimu.gait.model', 'final_features.json'))
 
     # compute the features
     accel_feats = feat_bank.compute(accel_w, fs=goal_fs, windowed=True)
 
     # load the model
-    if version_info >= (3, 7):
-        with resources.path(
-                'skimu.gait.model', f'lgbm_gait_classifier_no-stairs_{suffix}.lgbm') as file_path:
-            bst = lgb.Booster(model_file=str(file_path))
-    else:
-        with importlib_resources.path(
-                'skimu.gait.model', f'lgbm_gait_classifier_no-stairs_{suffix}.lgbm') as file_path:
-            bst = lgb.Booster(model_file=str(file_path))
+    lgb_file = f'lgbm_gait_classifier_no-stairs_{suffix}.lgbm'
+    bst = lgb.Booster(model_file=str(_resolve_path('skimu.gait.model', lgb_file)))
 
     # predict
     gait_predictions = bst.predict(accel_feats, raw_score=False) > thresh
