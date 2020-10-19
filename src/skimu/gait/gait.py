@@ -190,10 +190,12 @@ class Gait(_BaseProcess):
             if all(isinstance(i(), (EventMetric, BoutMetric)) for i in metrics):
                 self._params.extend(metrics)
             else:
-                raise ValueError('Must provide either a GaitMetric or iterable of GaitMetrics')
+                raise ValueError("Not all objects are EventMetric or BoutMetric")
         else:
             if isinstance(metrics(), (EventMetric, BoutMetric)):
                 self._params.append(metrics)
+            else:
+                raise ValueError(f'Metric {metrics!r} is not a EventMetric or BoutMetric')
 
     def predict(self, *args, **kwargs):
         """
