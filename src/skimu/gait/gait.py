@@ -154,8 +154,10 @@ class Gait(_BaseProcess):
         self.max_stride_time = max_stride_time
         self.loading_factor = loading_factor
 
-        self.height_factor = height_factor
-        self.prov_leg_length = prov_leg_length
+        if prov_leg_length:
+            self.height_factor = 1.0
+        else:
+            self.height_factor = height_factor
 
         self.filt_ord = filter_order
         self.filt_cut = filter_cutoff
@@ -270,11 +272,8 @@ class Gait(_BaseProcess):
             warn('height not provided, not computing spatial metrics', UserWarning)
             leg_length = None
         else:
-            # if not providing leg length (default), multiply height by the height factor
-            if not self.prov_leg_length:
-                leg_length = self.height_factor * height
-            else:
-                leg_length = height
+            # height factor is set to 1 if providing leg length
+            leg_length = self.height_factor * height
 
         # compute fs/delta t
         dt = mean(diff(time[:500]))
