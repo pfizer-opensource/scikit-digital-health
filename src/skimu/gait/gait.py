@@ -192,7 +192,7 @@ class Gait(_BaseProcess):
             else:
                 raise ValueError('Must provide either a GaitMetric or iterable of GaitMetrics')
         else:
-            if isinstance(metrics(), gait_metrics.EventMetric):
+            if isinstance(metrics(), (EventMetric, BoutMetric)):
                 self._params.append(metrics)
 
     def predict(self, *args, **kwargs):
