@@ -58,7 +58,7 @@ def _autocovariancefunction(x, max_lag, biased=False):
     else:
         raise ValueError('Too many dimensions (>2) for x')
 
-    for i in range(max_lag):
+    for i in range(min(max_lag, N-10)):
         ac[i] = sum(
             (x[:N-i] - mean(x[:N-i], axis=axis)) * (x[i:] - mean(x[i:], axis=axis)), axis=axis
         )
@@ -536,6 +536,10 @@ class GaitSymmetryIndex(BoutMetric):
 
     Notes
     -----
+    If the minimum gait window time is less than 4.5 seconds, there may be issues with this
+    metric for those with slow gait (those with stride lengths approaching the minimum gait
+    window time).
+
     GSI is computed using the biased autocovariance of the acceleration after being filtered
     through a 4th order 10Hz cutoff butterworth low-pass filter. [1]_ and [2]_ use the
     autocorrelation, instead of autocovariance, however subtracting from the compared signals
@@ -579,7 +583,7 @@ class GaitSymmetryIndex(BoutMetric):
         and Development, vol. 32, no. 1, pp. 25–31, Feb. 1995.
     """
     def __init__(self):
-        super().__init__('gait symmetry index')
+        super().__init__('gait symmetry index', depends=[StrideTime])
 
     def _predict(self, dt, leg_length, gait, gait_aux):
         gsi = zeros(len(gait_aux['accel']), dtype=float_)
@@ -612,6 +616,10 @@ class StepRegularityV(BoutMetric):
 
     Notes
     -----
+    If the minimum gait window time is less than 4.5 seconds, there may be issues with this
+    metric for those with slow gait (those with stride lengths approaching the minimum gait
+    window time).
+
     Step regularity is the value of the autocovariance function at a lag equal to the time
     for one step. While [2]_ uses the autocorrelation instead of the autocovariance like [1]_, the
     autocovariance is used here as it provides a mathematically better comparison of the
@@ -659,6 +667,10 @@ class StrideRegularityV(BoutMetric):
 
     Notes
     -----
+    If the minimum gait window time is less than 4.5 seconds, there may be issues with this
+    metric for those with slow gait (those with stride lengths approaching the minimum gait
+    window time).
+
     Stride regularity is the value of the autocovariance function at a lag equal to the time
     for one stride. While [2]_ uses the autocorrelation instead of the autocovariance like [1]_,
     the autocovariance is used here as it provides a mathematically better comparison of the
@@ -705,6 +717,12 @@ class AutocovarianceSymmetryV(BoutMetric):
     The absolute difference between stride and step regularity for the vertical axis.
     It quantifies the level of symmetry between the stride and step regularity and provide an
     overall metric of symmetry for the gait bout
+
+    Notes
+    -----
+    If the minimum gait window time is less than 4.5 seconds, there may be issues with this
+    metric for those with slow gait (those with stride lengths approaching the minimum gait
+    window time).
 
     References
     ----------
