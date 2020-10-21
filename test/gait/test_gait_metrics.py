@@ -15,6 +15,32 @@ from skimu.gait.gait_metrics import *
 from skimu.gait.gait_metrics.gait_metrics import _autocovariancefunction, _autocovariance
 
 
+class TestEventMetricGetOffset:
+    def test_error(self):
+        with pytest.raises(ValueError):
+            gait_metrics.EventMetric._get_mask({}, 3)
+
+
+class TestACF:
+    def test_dim_error(self):
+        with pytest.raises(ValueError):
+            _autocovariancefunction(np.random.rand(5, 3, 3), 3, True)
+
+
+class TestAutocovariance:
+    def test_unbiased(self):
+        x = np.arange(0, 2*np.pi, 0.01)
+        y = np.sin(2 * x)
+
+        assert _autocovariance(y, 0, 314, 628, biased=False) > 0.99
+
+    def test_biased(self):
+        x = np.arange(0, 2*np.pi, 0.01)
+        y = np.sin(2 * x)
+
+        assert 0.49 < _autocovariance(y, 0, 314, 628, biased=True) < 0.50
+
+
 class BaseTestMetric:
     @classmethod
     def setup_class(cls):
