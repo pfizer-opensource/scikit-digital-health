@@ -36,8 +36,7 @@ def get_gait_bouts(bool_gait, dt, max_bout_separation, min_bout_time):
     if bool_gait[-1]:
         stops = append(stops, bool_gait.size)
 
-    if starts.size != stops.size:
-        raise ValueError('Starts and stops of bouts do not match')
+    assert starts.size == stops.size, 'Starts and stops of bouts do not match'
 
     bouts = []
     nb = 0
