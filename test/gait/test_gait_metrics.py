@@ -12,6 +12,7 @@ import h5py
 from ..base_conftest import *
 
 from skimu.gait.gait_metrics import *
+from skimu.gait.gait_metrics import gait_metrics
 from skimu.gait.gait_metrics.gait_metrics import _autocovariancefunction, _autocovariance
 
 
@@ -44,7 +45,7 @@ class TestAutocovariance:
         x = np.arange(0, 2 * np.pi, 0.01)
         y = np.sin(2 * x)
 
-        assert _autocovariance(y, 0, 314, y.size+1, biased=True) == np.nan
+        assert np.isnan(_autocovariance(y, 0, 314, y.size+1, biased=True))
 
 
 class BaseTestMetric:
