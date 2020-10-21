@@ -511,7 +511,7 @@ class PhaseCoordinationIndex(BoutMetric):
         doi: 10.1155/2015/547065.
     """
     def __init__(self):
-        super().__init__('phase coordination index')
+        super().__init__('phase coordination index', depends=[StrideTime, StepTime])
 
     def _predict(self, dt, leg_length, gait, gait_aux):
         pci = zeros(len(gait_aux['accel']), dtype=float_)
