@@ -68,7 +68,7 @@ class TestAutocovariance:
         assert 0.49 < _autocovariance(y, 0, 314, 628, biased=True) < 0.50
 
 
-class TestGait(BaseProcessTester):
+class _TestGait(BaseProcessTester):
     @classmethod
     def setup_class(cls):
         super().setup_class()
