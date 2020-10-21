@@ -40,6 +40,12 @@ class TestAutocovariance:
 
         assert 0.49 < _autocovariance(y, 0, 314, 628, biased=True) < 0.50
 
+    def test_size_error(self):
+        x = np.arange(0, 2 * np.pi, 0.01)
+        y = np.sin(2 * x)
+
+        assert _autocovariance(y, 0, 314, y.size+1, biased=True) == np.nan
+
 
 class BaseTestMetric:
     @classmethod
