@@ -74,6 +74,24 @@ class BaseTestMetric:
         if self.res_bout1 is not None:
             assert np.allclose(sample_gait[self.metric.k_][:5], self.res_bout1, equal_nan=True)
 
+    def test_no_rerun(self, sample_gait, sample_gait_aux):
+        self.metric.predict(1 / 50, 1.0, sample_gait, sample_gait_aux)
+
+        res = sample_gait[self.metric.k_] * 1  # prevent views
+
+        sample_gait['IC'][0] -= 1
+        sample_gait['FC'][3] += 1
+        sample_gait['delta h'][2] += 0.0015
+
+        sample_gait_aux['accel'][0][:5] *= 0.85
+        sample_gait_aux['accel'][1][:5] *= 1.08
+
+        self.metric.predict(1 / 50, 1.0, sample_gait, sample_gait_aux)
+
+        # even though input has changed, the results should not because computation is not being
+        # re-run
+        assert np.allclose(res, sample_gait[self.metric.k_], equal_nan=True)
+
 
 """
 gait = {
