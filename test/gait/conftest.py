@@ -4,6 +4,7 @@ from pathlib import Path
 from pytest import fixture
 import h5py
 import numpy as np
+from scipy.interpolate import interp1d
 
 from ..base_conftest import *
 
@@ -24,6 +25,40 @@ def sample_fs():
         fs = 1 / np.mean(np.diff(f['Truth']['time']))
 
     return fs
+
+
+@fixture(scope='module')
+def get_sample_bout_accel():
+    def get_stuff(freq):
+        with h5py.File(resolve_data_path('ax3_data.h5', 'gait'), 'r') as f:
+            accel = f['Truth']['accel'][()]
+            fs = 1 / np.mean(np.diff(f['Truth']['time']))
+
+        if freq >= 50.0:
+            with h5py.File(resolve_data_path('gait_data.h5', 'gait'), 'r') as f:
+                bout = f['Truth']['Gait Classification']['gait_classification_50'].attrs.get('bout')
+
+            bout_acc = accel[bout[0]:bout[1], :]
+        else:
+            with h5py.File(resolve_data_path('gait_data.h5', 'gait'), 'r') as f:
+                bout = f['Truth']['Gait Classification']['gait_classification_50'].attrs.get('bout')
+
+            f = interp1d(
+                np.arange(0, accel.shape[0] / fs, 1 / fs),
+                accel,
+                kind='cubic',
+                bounds_error=False,
+                fill_value='extrapolate',
+                axis=0
+            )
+            acc_ds = f(np.arange(0, accel.shape[0] / fs, 1 / 20.0))
+
+            bout_acc = acc_ds[bout[0]:bout[1], :]
+
+        vaxis = np.argmax(np.mean(bout_acc))
+        return bout_acc, vaxis, np.sign(np.mean(bout_acc)[vaxis])
+
+    return get_stuff
 
 
 @fixture(scope='module')
