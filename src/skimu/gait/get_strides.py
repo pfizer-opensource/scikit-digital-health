@@ -44,7 +44,7 @@ def get_strides(gait, vert_accel, gait_index, ic, fc, timestamps, max_stride_tim
 
     # create sample times for events
     ic_times = timestamps[ic]
-    fc_times = timestamps[ic]
+    fc_times = timestamps[fc]
 
     # for easier use later
     gait_ic_times = []
