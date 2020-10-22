@@ -55,7 +55,7 @@ def get_gait_events(vert_accel, dt, timestamps, va_sign, o_scale, filter_order, 
         filt_vert_accel = vert_accel * 1.0  # make sure its a copy not a view
 
     # first integrate the vertical acceleration to get vertical velocity
-    vert_velocity = cumtrapz(filt_vert_accel, x=timestamps, initial=0)
+    vert_velocity = cumtrapz(filt_vert_accel, x=timestamps - timestamps[0], initial=0)
 
     # if using the optimal scale relationship, get the optimal scale
     if use_optimal_scale:
