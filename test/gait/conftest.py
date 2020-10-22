@@ -11,27 +11,27 @@ from ..base_conftest import *
 
 @fixture(scope='module')
 def sample_accel():
-    path = resolve_data_path('ax3_data.h5', 'gait')
+    path = resolve_data_path('gait_data.h5', 'gait')
     with h5py.File(path, 'r') as f:
-        accel = f['Truth']['accel'][()]
+        accel = f['accel'][()]
 
     return accel
 
 
 @fixture(scope='module')
 def sample_dt():
-    path = resolve_data_path('ax3_data.h5', 'gait')
+    path = resolve_data_path('gait_data.h5', 'gait')
     with h5py.File(path, 'r') as f:
-        dt = np.mean(np.diff(f['Truth']['time'][:500]))
+        dt = np.mean(np.diff(f['time'][:500]))
 
     return dt
 
 
 @fixture(scope='module')
 def sample_time():
-    path = resolve_data_path('ax3_data.h5', 'gait')
+    path = resolve_data_path('gait_data.h5', 'gait')
     with h5py.File(path, 'r') as f:
-        accel = f['Truth']['time'][()]
+        accel = f['time'][()]
 
     return accel
 
@@ -39,9 +39,9 @@ def sample_time():
 @fixture(scope='module')
 def get_sample_bout_accel():
     def get_stuff(freq):
-        with h5py.File(resolve_data_path('ax3_data.h5', 'gait'), 'r') as f:
-            accel = f['Truth']['accel'][()]
-            fs = 1 / np.mean(np.diff(f['Truth']['time']))
+        with h5py.File(resolve_data_path('gait_data.h5', 'gait'), 'r') as f:
+            accel = f['accel'][()]
+            fs = 1 / np.mean(np.diff(f['time']))
 
         if freq >= 50.0:
             with h5py.File(resolve_data_path('gait_data.h5', 'gait'), 'r') as f:
