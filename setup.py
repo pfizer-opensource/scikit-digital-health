@@ -149,7 +149,8 @@ REQUIREMENTS = [
     'scipy>=1.3.1',
     'pandas>=0.23.4',
     'lightgbm>=2.3.0',
-    'pywavelets'
+    'pywavelets',
+    'scikit-learn'  # needed for lightgbm
 ]
 
 if sys.version_info < (3, 7):
