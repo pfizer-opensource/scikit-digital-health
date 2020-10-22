@@ -21,44 +21,46 @@ from skimu.gait.gait_metrics.gait_metrics import _autocovariancefunction, _autoc
 
 
 class TestGetGaitClassificationLGBM:
-    def test(self, sample_accel, sample_fs, get_gait_classification_truth):
-        b_gait = get_gait_classification_lgbm(None, sample_accel, sample_fs)
-        b_gait_truth = get_gait_classification_truth(sample_fs)
+    def test(self, sample_accel, sample_dt, sample_time, get_gait_classification_truth):
+        b_gait = get_gait_classification_lgbm(None, sample_accel, sample_dt, sample_time)
+        b_gait_truth = get_gait_classification_truth(1 / sample_dt)
 
-        assert b_gait.sum() == 13020
+        assert b_gait.sum() == 14198
         assert allclose(b_gait, b_gait_truth)
 
-    def test_20hz(self, sample_accel, sample_fs, get_gait_classification_truth):
+    def test_20hz(self, sample_accel, sample_dt, sample_time, get_gait_classification_truth):
         # downsample to 20hz
         f = interp1d(
-            arange(0, sample_accel.shape[0] / sample_fs, 1 / sample_fs),
+            sample_time - sample_time[0],
             sample_accel,
             kind='cubic',
             bounds_error=False,
             fill_value='extrapolate',
             axis=0
         )
-        acc_ds = f(arange(0, sample_accel.shape[0] / sample_fs, 1 / 20.0))
 
-        b_gait = get_gait_classification_lgbm(None, acc_ds, 20.0)
+        time_ds = arange(0, sample_time[-1] - sample_time[0], 1 / 20.0)
+        acc_ds = f(time_ds)
+
+        b_gait = get_gait_classification_lgbm(None, acc_ds, 1 / 20.0, time_ds)
         b_gait_truth = get_gait_classification_truth(20.0)
 
-        assert b_gait.sum() == 1860
+        assert b_gait.sum() == 1920
         assert allclose(b_gait, b_gait_truth)
 
-    def test_pred_size_error(self, sample_accel):
+    def test_pred_size_error(self, sample_accel, sample_time):
         with pytest.raises(ValueError):
-            get_gait_classification_lgbm(random.rand(50) > 0.5, sample_accel, 50.0)
+            get_gait_classification_lgbm(random.rand(50) > 0.5, sample_accel, 1 / 50.0, sample_time)
 
     @pytest.mark.parametrize('pred', (True, False, 1, -135098135, 1.513e-600))
-    def test_pred_single_input(self, pred, sample_accel):
-        b_gait = get_gait_classification_lgbm(pred, sample_accel, 32.125)
+    def test_pred_single_input(self, pred, sample_accel, sample_time):
+        b_gait = get_gait_classification_lgbm(pred, sample_accel, 1 / 32.125, sample_time)
 
         assert all(b_gait)
 
-    def test_pred_array_input(self, sample_accel):
+    def test_pred_array_input(self, sample_accel, sample_time):
         pred = random.rand(sample_accel.shape[0]) < 0.5
-        b_gait = get_gait_classification_lgbm(pred, sample_accel, 55.0)
+        b_gait = get_gait_classification_lgbm(pred, sample_accel, 1 / 55.0, sample_time)
 
         assert b_gait is pred
         assert allclose(b_gait, pred)
