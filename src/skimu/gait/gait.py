@@ -7,7 +7,7 @@ Pfizer DMTI 2020
 from warnings import warn
 from collections.abc import Iterable
 
-from numpy import ndarray, mean, diff, abs, argmax, sign, round, array, full, bool_
+from numpy import mean, diff, abs, argmax, sign, round, array
 
 from skimu.base import _BaseProcess
 from skimu.gait.get_gait_classification import get_gait_classification_lgbm
@@ -307,7 +307,7 @@ class Gait(_BaseProcess):
         }
 
         # get the gait classifications if necessary (delegated to subfunction)
-        gait_pred = get_gait_classification_lgbm(gait_pred, accel, 1 / dt)
+        gait_pred = get_gait_classification_lgbm(gait_pred, accel, 1 / dt, time)
 
         gait_i = 0  # keep track of where everything is in the cycle
 
@@ -317,25 +317,22 @@ class Gait(_BaseProcess):
             # GET GAIT BOUTS
             # ======================================
             gait_bouts = get_gait_bouts(
-                gait_pred[start:stop], dt, self.max_bout_sep, self.min_bout
+                gait_pred[start:stop], time[start:stop], self.max_bout_sep, self.min_bout
             )
 
             for ibout, bout in enumerate(gait_bouts):
                 bstart = start + bout[0]
 
                 ic, fc, vert_acc = get_gait_events(
-                    accel[bstart:start + bout[1], v_axis],
-                    dt,
-                    sign(acc_mean[v_axis]),
-                    scale_original,
-                    self.filt_ord,
-                    self.filt_cut,
-                    self.use_opt_scale
+                    accel[bstart:start + bout[1], v_axis], dt, time[bstart:start + bout[1]],
+                    sign(acc_mean[v_axis]), scale_original,
+                    self.filt_ord, self.filt_cut, self.use_opt_scale
                 )
 
                 # get strides
                 sib = get_strides(
-                    gait, vert_acc, gait_i, ic, fc, dt, self.max_stride_time, self.loading_factor
+                    gait, vert_acc, gait_i, ic, fc, time[bstart:start + bout[1]],
+                    self.max_stride_time, self.loading_factor
                 )
 
                 # add inertial data to the aux dict for use in gait metric calculation

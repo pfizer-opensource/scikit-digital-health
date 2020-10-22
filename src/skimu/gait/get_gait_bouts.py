@@ -7,7 +7,7 @@ Pfizer DMTI 2020
 from numpy import where, diff, append, insert
 
 
-def get_gait_bouts(bool_gait, dt, max_bout_separation, min_bout_time):
+def get_gait_bouts(bool_gait, timestamps, max_bout_separation, min_bout_time):
     """
     Get the gait bouts from an array of per sample predictions of gait
 
@@ -15,8 +15,8 @@ def get_gait_bouts(bool_gait, dt, max_bout_separation, min_bout_time):
     ----------
     bool_gait : numpy.ndarray
         Array of boolean predictions of gait
-    dt : float
-        Sampling period
+    timestamps : numpy.ndarray
+        Array of timestmaps (in seconds) corresponding to acceleration sampling times.
     max_bout_separation : float
         Maximum time (s) between bouts in order to consider them 1 longer bout
     min_bout_time : float
@@ -27,6 +27,8 @@ def get_gait_bouts(bool_gait, dt, max_bout_separation, min_bout_time):
     bouts : numpy.ndarray
         (M, 2) array of starts and stops of gait bouts
     """
+    assert bool_gait.size == timestamps.size, "`bool_gait` and `timestamps` size must match"
+
     # add plus 1 to deal with index from diff
     starts = where(diff(bool_gait.astype(int)) == 1)[0] + 1
     stops = where(diff(bool_gait.astype(int)) == -1)[0] + 1
@@ -44,12 +46,12 @@ def get_gait_bouts(bool_gait, dt, max_bout_separation, min_bout_time):
         ncb = 0
 
         if (nb + ncb + 1) < starts.size:
-            tdiff = ((starts[nb + ncb + 1] - stops[nb + ncb]) * dt)
+            tdiff = timestamps[starts[nb + ncb + 1]] - timestamps[stops[nb + ncb]]
             while (tdiff < max_bout_separation) and ((nb + ncb + 2) < starts.size):
                 ncb += 1
-                tdiff = ((starts[nb + ncb + 1] - stops[nb + ncb]) * dt)
+                tdiff = timestamps[starts[nb + ncb + 1]] - timestamps[stops[nb + ncb]]
 
-        if ((stops[nb + ncb] - starts[nb]) * dt) > min_bout_time:
+        if (timestamps[stops[nb + ncb]] - timestamps[starts[nb]]) > min_bout_time:
             bouts.append((starts[nb], stops[nb + ncb]))
 
         nb += ncb + 1

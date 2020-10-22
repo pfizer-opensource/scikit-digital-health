@@ -4,7 +4,6 @@ Gait bout detection from accelerometer data
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
-from warnings import warn
 from sys import version_info
 
 from numpy import arange, zeros, ndarray, full, bool_
@@ -33,7 +32,7 @@ def _resolve_path(mod, file):
     return path
 
 
-def get_gait_classification_lgbm(gait_pred, accel, fs):
+def get_gait_classification_lgbm(gait_pred, accel, dt, timestamps):
     """
     Get classification of windows of accelerometer data using the LightGBM classifier
 
@@ -43,11 +42,16 @@ def get_gait_classification_lgbm(gait_pred, accel, fs):
         Provided gait predictions
     accel : numpy.ndarray
         (N, 3) array of acceleration values, in units of "g"
-    fs : float
-        Sampling frequency of the data
+    dt : float
+        Sampling period for the data
+    timestamps : numpy.ndarray
+        Array of timestmaps (in seconds) corresponding to acceleration sampling times.
     """
+    assert accel.shape[0] == timestamps.size, "`vert_accel` and `timestamps` # samples must match"
+
+    rel_time = timestamps - timestamps[0]
     if gait_pred is None:
-        if fs >= 50.0:
+        if 1 / dt >= 50.0:
             goal_fs = 50.0  # goal fs for classifier
             suffix = '50hz'
         else:
@@ -59,17 +63,17 @@ def get_gait_classification_lgbm(gait_pred, accel, fs):
         thresh = 0.7  # mean + 1 standard deviation of best threshold for maximizing F1 score
 
         # down-sample if necessary
-        if fs != goal_fs:
+        if 1 / dt != goal_fs:
             f_rs = interp1d(
-                arange(0, accel.shape[0]) / fs, accel, kind='cubic', axis=0, bounds_error=False,
+                rel_time, accel, kind='cubic', axis=0, bounds_error=False,
                 fill_value='extrapolate'
             )
-            accel_rs = f_rs(arange(0, accel.shape[0] / fs, 1 / goal_fs))
+            accel_rs = f_rs(arange(0, rel_time[-1], 1 / goal_fs))
         else:
             accel_rs = accel
 
         # band-pass filter
-        sos = butter(1, [2 * 0.25 / fs, 2 * 5 / fs], btype='band', output='sos')
+        sos = butter(1, [2 * 0.25 * dt, 2 * 5 * dt], btype='band', output='sos')
         accel_rs_f = sosfiltfilt(sos, norm(accel_rs, axis=1))
 
         # window
@@ -109,9 +113,9 @@ def get_gait_classification_lgbm(gait_pred, accel, fs):
         gait_pred_sample_rs = tmp >= 0.5  # final gait predictions, ps = per sample
 
         # upsample the gait predictions
-        f = interp1d(arange(0, accel.shape[0] / fs, 1 / goal_fs), gait_pred_sample_rs,
+        f = interp1d(arange(0, rel_time[-1], 1 / goal_fs), gait_pred_sample_rs,
                      kind='previous', bounds_error=False, fill_value=0)
-        gait_pred_sample = f(arange(0, accel.shape[0] / fs, 1 / fs))
+        gait_pred_sample = f(rel_time)
     else:
         if isinstance(gait_pred, ndarray):
             if gait_pred.size != accel.shape[0]:
