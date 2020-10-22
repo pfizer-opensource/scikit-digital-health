@@ -19,12 +19,21 @@ def sample_accel():
 
 
 @fixture(scope='module')
-def sample_fs():
+def sample_dt():
     path = resolve_data_path('ax3_data.h5', 'gait')
     with h5py.File(path, 'r') as f:
-        fs = 1 / np.mean(np.diff(f['Truth']['time'][:500]))
+        dt = np.mean(np.diff(f['Truth']['time'][:500]))
 
-    return fs
+    return dt
+
+
+@fixture(scope='module')
+def sample_time():
+    path = resolve_data_path('ax3_data.h5', 'gait')
+    with h5py.File(path, 'r') as f:
+        accel = f['Truth']['time'][()]
+
+    return accel
 
 
 @fixture(scope='module')
@@ -152,45 +161,6 @@ def get_bgait_samples_truth():  # boolean gait classification
     return get_stuff
 
 
-@fixture(scope='class')
-def sample_datasets():
-    study1_td = TempDir()
-    study1_path = Path(study1_td.name)
-    study2_td = TempDir()
-    study2_path = Path(study2_td.name)
-
-    for k in range(2):
-        # study 1
-        with h5py.File(study1_path / f'subject_{k}.h5', 'w') as f:
-            for j in range(3):
-                ag = f.create_group(f'activity{j}')
-                ag.attrs.create('Gait Label', 1 if j == 1 else 0)
-
-                for i in range(2):
-                    agt = ag.create_group(f'Trial {i}')
-                    agt.attrs.create('Sampling rate', 100.0)
-
-                    agt.create_dataset('Accelerometer', data=np.random.rand(1500, 3) + np.array([[0, 0, 1]]))
-
-    # study 2
-        with h5py.File(study2_path / f'subject_{k}.h5', 'w') as f:
-            for j in range(2):
-                ag = f.create_group(f'activity{j}')
-                ag.attrs.create('Gait Label', 1 if j == 1 else 0)
-
-                for i in range(3):
-                    agt = ag.create_group(f'Trial {i}')
-                    agt.attrs.create('Sampling rate', 50.0)
-
-                    agt.create_dataset('Accelerometer', data=np.random.rand(1000, 3) + np.array([[0, 1, 0]]))
-
-    yield [study1_path, study2_path]
-
-    # clean up the temporary directories
-    study1_td.cleanup()
-    study2_td.cleanup()
-
-
 @fixture
 def sample_gait():
     gait = {
@@ -233,3 +203,42 @@ def sample_gait_aux():
     }
 
     return gait_aux
+
+
+@fixture(scope='class')
+def sample_datasets():
+    study1_td = TempDir()
+    study1_path = Path(study1_td.name)
+    study2_td = TempDir()
+    study2_path = Path(study2_td.name)
+
+    for k in range(2):
+        # study 1
+        with h5py.File(study1_path / f'subject_{k}.h5', 'w') as f:
+            for j in range(3):
+                ag = f.create_group(f'activity{j}')
+                ag.attrs.create('Gait Label', 1 if j == 1 else 0)
+
+                for i in range(2):
+                    agt = ag.create_group(f'Trial {i}')
+                    agt.attrs.create('Sampling rate', 100.0)
+
+                    agt.create_dataset('Accelerometer', data=np.random.rand(1500, 3) + np.array([[0, 0, 1]]))
+
+    # study 2
+        with h5py.File(study2_path / f'subject_{k}.h5', 'w') as f:
+            for j in range(2):
+                ag = f.create_group(f'activity{j}')
+                ag.attrs.create('Gait Label', 1 if j == 1 else 0)
+
+                for i in range(3):
+                    agt = ag.create_group(f'Trial {i}')
+                    agt.attrs.create('Sampling rate', 50.0)
+
+                    agt.create_dataset('Accelerometer', data=np.random.rand(1000, 3) + np.array([[0, 1, 0]]))
+
+    yield [study1_path, study2_path]
+
+    # clean up the temporary directories
+    study1_td.cleanup()
+    study2_td.cleanup()
