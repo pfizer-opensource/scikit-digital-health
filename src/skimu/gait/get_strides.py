@@ -86,8 +86,8 @@ def get_strides(gait, vert_accel, gait_index, ic, fc, timestamps, max_stride_tim
 
         if gait['b valid cycle'][i]:
             vacc = detrend(vert_accel[i1:i2])
-            vvel = cumtrapz(vacc, x=timestamps, initial=0)
-            vpos = cumtrapz(vvel, x=timestamps, initial=0)
+            vvel = cumtrapz(vacc, x=timestamps[i1:i2], initial=0)
+            vpos = cumtrapz(vvel, x=timestamps[i2:i2], initial=0)
 
             gait['delta h'].append((vpos.max() - vpos.min()) * 9.81)  # conver to meters
         else:
