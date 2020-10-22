@@ -116,6 +116,7 @@ def get_bgait_samples_truth():  # boolean gait classification
 
         if case == 1:
             dt = 1 / 50
+            time = np.arange(0, 1000 * dt, dt)
             n_max_sep = 25  # 0.5 seconds
             n_min_time = 75  # 1.5 seconds
 
@@ -126,6 +127,7 @@ def get_bgait_samples_truth():  # boolean gait classification
             ]
         elif case == 2:
             dt = 1 / 100
+            time = np.arange(0, 1000 * dt, dt)
             n_max_sep = 50  # 0.5 seconds
             n_min_time = 200  # 2 seconds
 
@@ -135,6 +137,7 @@ def get_bgait_samples_truth():  # boolean gait classification
 
         elif case == 3:
             dt = 1 / 50
+            time = np.arange(0, 1000 * dt, dt)
             n_max_sep = 75  # 1.5 seconds
             n_min_time = 5  # 0.1 seconds
 
@@ -145,6 +148,7 @@ def get_bgait_samples_truth():  # boolean gait classification
             ]
         else:
             dt = 1 / 50
+            time = np.arange(0, 1000 * dt, dt)
             n_max_sep = 6  # 0.12 seconds
             n_min_time = 5  # 0.1 seconds
 
@@ -157,7 +161,7 @@ def get_bgait_samples_truth():  # boolean gait classification
                 (770, 780),
                 (990, 1000)
             ]
-        return bgait, dt, n_max_sep * dt, n_min_time * dt, bouts
+        return bgait, time, n_max_sep * dt, n_min_time * dt, bouts
     return get_stuff
 
 
