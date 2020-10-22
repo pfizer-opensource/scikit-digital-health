@@ -12,6 +12,7 @@ source = src/
 [report]
 # regexes for lines to exclude from consideration
 exclude_lines =
+    pragma: no cover
     def __repr__
     def __str__
     if version_info

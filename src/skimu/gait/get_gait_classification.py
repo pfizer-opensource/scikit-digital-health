@@ -18,7 +18,7 @@ from skimu.features import Bank
 
 if version_info >= (3, 7):
     from importlib import resources
-else:
+else:  # pragma: no cover
     import importlib_resources
 
 
@@ -26,7 +26,7 @@ def _resolve_path(mod, file):
     if version_info >= (3, 7):
         with resources.path(mod, file) as file_path:
             path = file_path
-    else:
+    else:  # pragma: no cover
         with importlib_resources.path(mod, file) as file_path:
             path = file_path
 
