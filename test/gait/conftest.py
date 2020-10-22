@@ -27,11 +27,17 @@ def sample_fs():
 
 
 @fixture(scope='module')
-def sample_gait_classification_truth():
-    with h5py.File(resolve_data_path('gait_data.h5', 'gait'), 'r') as f:
-        truth = f['Truth']['Gait Classification']['gait_classification'][()]
+def get_gait_classification_truth():
+    def get_stuff(freq):
+        if freq >= 50.0:
+            with h5py.File(resolve_data_path('gait_data.h5', 'gait'), 'r') as f:
+                truth = f['Truth']['Gait Classification']['gait_classification_50'][()]
+        else:
+            with h5py.File(resolve_data_path('gait_data.h5', 'gait'), 'r') as f:
+                truth = f['Truth']['Gait Classification']['gait_classification_20'][()]
 
-    return truth
+        return truth
+    return get_stuff
 
 
 @fixture(scope='module')

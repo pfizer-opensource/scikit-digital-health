@@ -5,7 +5,8 @@ Lukas Adamowicz
 2020, Pfizer DMTI
 """
 import pytest
-from numpy import allclose, arange, random, sin, pi
+from numpy import allclose, arange, random
+from scipy.interpolate import interp1d
 
 from ..base_conftest import *
 
@@ -20,11 +21,47 @@ from skimu.gait.gait_metrics.gait_metrics import _autocovariancefunction, _autoc
 
 
 class TestGetGaitClassificationLGBM:
-    def test(self, sample_accel, sample_fs, sample_gait_classification_truth):
+    def test(self, sample_accel, sample_fs, get_gait_classification_truth):
         b_gait = get_gait_classification_lgbm(None, sample_accel, sample_fs)
+        b_gait_truth = get_gait_classification_truth(sample_fs)
 
         assert b_gait.sum() == 13020
-        assert allclose(b_gait, sample_gait_classification_truth)
+        assert allclose(b_gait, b_gait_truth)
+
+    def test_20hz(self, sample_accel, sample_fs, get_gait_classification_truth):
+        # downsample to 20hz
+        f = interp1d(
+            arange(0, sample_accel.shape[0] / sample_fs, 1 / sample_fs),
+            sample_accel,
+            kind='cubic',
+            bounds_error=False,
+            fill_value='extrapolate',
+            axis=0
+        )
+        acc_ds = f(arange(0, sample_accel.shape[0] / sample_fs, 1 / 20.0))
+
+        b_gait = get_gait_classification_lgbm(None, acc_ds, 20.0)
+        b_gait_truth = get_gait_classification_truth(20.0)
+
+        assert b_gait.sum() == 1860
+        assert allclose(b_gait, b_gait_truth)
+
+    def test_pred_size_error(self, sample_accel):
+        with pytest.raises(ValueError):
+            get_gait_classification_lgbm(random.rand(50) > 0.5, sample_accel, 50.0)
+
+    @pytest.mark.parametrize('pred', (True, False, 1, -135098135, 1.513e-600))
+    def test_pred_single_input(self, pred, sample_accel):
+        b_gait = get_gait_classification_lgbm(pred, sample_accel, 32.125)
+
+        assert all(b_gait)
+
+    def test_pred_array_input(self, sample_accel):
+        pred = random.rand(sample_accel.shape[0]) < 0.5
+        b_gait = get_gait_classification_lgbm(pred, sample_accel, 55.0)
+
+        assert b_gait is pred
+        assert allclose(b_gait, pred)
 
 
 class TestGetGaitBouts:
