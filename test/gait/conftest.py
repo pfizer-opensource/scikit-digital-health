@@ -22,7 +22,7 @@ def sample_accel():
 def sample_fs():
     path = resolve_data_path('ax3_data.h5', 'gait')
     with h5py.File(path, 'r') as f:
-        fs = 1 / np.mean(np.diff(f['Truth']['time']))
+        fs = 1 / np.mean(np.diff(f['Truth']['time'][:500]))
 
     return fs
 
@@ -55,9 +55,21 @@ def get_sample_bout_accel():
 
             bout_acc = acc_ds[bout[0]:bout[1], :]
 
-        vaxis = np.argmax(np.mean(bout_acc))
-        return bout_acc, vaxis, np.sign(np.mean(bout_acc)[vaxis])
+        vaxis = np.argmax(np.mean(bout_acc, axis=0))
+        return bout_acc, vaxis, np.sign(np.mean(bout_acc, axis=0)[vaxis])
 
+    return get_stuff
+
+
+@fixture(scope='module')
+def get_contact_truth():
+    def get_stuff(bout=0):
+        with h5py.File(resolve_data_path('gait_data.h5', 'gait'), 'r') as f:
+            mask = f['Truth']['Bout N'][()] == bout
+            ic = f['Truth']['IC'][mask]
+            fc = f['Truth']['FC'][mask]
+
+        return ic, fc
     return get_stuff
 
 

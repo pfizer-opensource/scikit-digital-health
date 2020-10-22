@@ -76,13 +76,24 @@ class TestGetGaitBouts:
 
 class TestGetGaitEvents:
     @pytest.mark.parametrize('sign', (1, -1))
-    def test(self, sample_fs, get_sample_bout_accel, sign):
-        accel, axis = get_sample_bout_accel(sample_fs)
+    def test(self, sign, sample_fs, get_sample_bout_accel, get_contact_truth):
+        accel, axis, acc_sign = get_sample_bout_accel(sample_fs)
+        ic_truth, fc_truth = get_contact_truth(bout=1)  # index starts at 1 for this
 
-        ic, fc, _ = get_gait_events(accel[:, axis], sample_fs, )
+        o_scale = round(0.4 / (2 * 1.25 / sample_fs)) - 1
+
+        ic, fc, _ = get_gait_events(
+            sign * accel[:, axis],
+            1 / sample_fs,
+            sign * acc_sign,
+            o_scale, 4, 20.0, True
+        )
+
+        assert allclose(ic, ic_truth)
+        assert allclose(fc, fc_truth)
 
 
-class _TestGait(BaseProcessTester):
+class TestGait(BaseProcessTester):
     @classmethod
     def setup_class(cls):
         super().setup_class()
