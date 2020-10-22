@@ -54,7 +54,7 @@ def get_sample_bout_accel():
                 bout = f['Truth']['Gait Classification']['gait_classification_20'].attrs.get('bout')
 
             f = interp1d(
-                time,
+                time - time[0],
                 accel,
                 kind='cubic',
                 bounds_error=False,

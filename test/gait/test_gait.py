@@ -95,6 +95,24 @@ class TestGetGaitEvents:
         assert allclose(ic, ic_truth)
         assert allclose(fc, fc_truth)
 
+    @pytest.mark.parametrize('sign', (1, -1))
+    def test_20hz(self, sign, get_sample_bout_accel, get_contact_truth):
+        accel, time, axis, acc_sign = get_sample_bout_accel(20)
+        ic_truth, fc_truth = get_contact_truth(20)  # index starts at 1 for this
+
+        o_scale = round(0.4 / (2 * 1.25 / 20.0)) - 1
+
+        ic, fc, _ = get_gait_events(
+            sign * accel[:, axis],
+            1 / 20.0,
+            time,
+            sign * acc_sign,
+            o_scale, 4, 20.0, True
+        )
+
+        assert allclose(ic, ic_truth)
+        assert allclose(fc, fc_truth)
+
 
 class TestGait(BaseProcessTester):
     @classmethod
