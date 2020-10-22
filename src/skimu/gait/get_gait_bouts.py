@@ -46,12 +46,14 @@ def get_gait_bouts(bool_gait, timestamps, max_bout_separation, min_bout_time):
         ncb = 0
 
         if (nb + ncb + 1) < starts.size:
+            # should be start - stop because it is start_(i+1)
             tdiff = timestamps[starts[nb + ncb + 1]] - timestamps[stops[nb + ncb]]
             while (tdiff < max_bout_separation) and ((nb + ncb + 2) < starts.size):
                 ncb += 1
+                # should be start - stop because it is start_(i+1)
                 tdiff = timestamps[starts[nb + ncb + 1]] - timestamps[stops[nb + ncb]]
 
-        if (timestamps[stops[nb + ncb]] - timestamps[starts[nb]]) > min_bout_time:
+        if (timestamps[stops[nb + ncb]-1] - timestamps[starts[nb]]) > min_bout_time:
             bouts.append((starts[nb], stops[nb + ncb]))
 
         nb += ncb + 1
