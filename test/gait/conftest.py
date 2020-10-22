@@ -41,42 +41,50 @@ def get_sample_bout_accel():
     def get_stuff(freq):
         with h5py.File(resolve_data_path('gait_data.h5', 'gait'), 'r') as f:
             accel = f['accel'][()]
-            fs = 1 / np.mean(np.diff(f['time']))
+            time = f['time'][()]
 
         if freq >= 50.0:
             with h5py.File(resolve_data_path('gait_data.h5', 'gait'), 'r') as f:
                 bout = f['Truth']['Gait Classification']['gait_classification_50'].attrs.get('bout')
 
             bout_acc = accel[bout[0]:bout[1], :]
+            bout_time = time[bout[0]:bout[1]]
         else:
             with h5py.File(resolve_data_path('gait_data.h5', 'gait'), 'r') as f:
-                bout = f['Truth']['Gait Classification']['gait_classification_50'].attrs.get('bout')
+                bout = f['Truth']['Gait Classification']['gait_classification_20'].attrs.get('bout')
 
             f = interp1d(
-                np.arange(0, accel.shape[0] / fs, 1 / fs),
+                time,
                 accel,
                 kind='cubic',
                 bounds_error=False,
                 fill_value='extrapolate',
                 axis=0
             )
-            acc_ds = f(np.arange(0, accel.shape[0] / fs, 1 / 20.0))
+
+            time_ds = np.arange(0, time[-1] - time[0], 1 / 20.0)
+            acc_ds = f(time_ds)
 
             bout_acc = acc_ds[bout[0]:bout[1], :]
+            bout_time = time_ds[bout[0]:bout[1]]
 
         vaxis = np.argmax(np.mean(bout_acc, axis=0))
-        return bout_acc, vaxis, np.sign(np.mean(bout_acc, axis=0)[vaxis])
+        return bout_acc, bout_time, vaxis, np.sign(np.mean(bout_acc, axis=0)[vaxis])
 
     return get_stuff
 
 
 @fixture(scope='module')
 def get_contact_truth():
-    def get_stuff(bout=0):
-        with h5py.File(resolve_data_path('gait_data.h5', 'gait'), 'r') as f:
-            mask = f['Truth']['Bout N'][()] == bout
-            ic = f['Truth']['IC'][mask]
-            fc = f['Truth']['FC'][mask]
+    def get_stuff(fs):
+        if fs > 50.0:
+            with h5py.File(resolve_data_path('gait_data.h5', 'gait'), 'r') as f:
+                ic = f['Truth']['Gait Events']['ic_50'][()]
+                fc = f['Truth']['Gait Events']['fc_50'][()]
+        else:
+            with h5py.File(resolve_data_path('gait_data.h5', 'gait'), 'r') as f:
+                ic = f['Truth']['Gait Events']['ic_20'][()]
+                fc = f['Truth']['Gait Events']['fc_20'][()]
 
         return ic, fc
     return get_stuff
