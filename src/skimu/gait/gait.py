@@ -307,7 +307,7 @@ class Gait(_BaseProcess):
         }
 
         # get the gait classifications if necessary (delegated to subfunction)
-        gait_pred = get_gait_classification_lgbm(gait_pred, accel, 1 / dt, time)
+        gait_pred = get_gait_classification_lgbm(gait_pred, accel, dt, time)
 
         gait_i = 0  # keep track of where everything is in the cycle
 
