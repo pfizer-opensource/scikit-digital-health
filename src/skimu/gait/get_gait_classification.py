@@ -113,8 +113,11 @@ def get_gait_classification_lgbm(gait_pred, accel, dt, timestamps):
         gait_pred_sample_rs = tmp >= 0.5  # final gait predictions, ps = per sample
 
         # upsample the gait predictions
-        f = interp1d(arange(0, rel_time[-1], 1 / goal_fs), gait_pred_sample_rs,
-                     kind='previous', bounds_error=False, fill_value=0)
+        f = interp1d(
+            arange(0, rel_time[-1] + 1 / goal_fs, 1 / goal_fs)[:gait_pred_sample_rs.size],
+            gait_pred_sample_rs,
+            kind='previous', bounds_error=False, fill_value=0
+        )
         gait_pred_sample = f(rel_time)
     else:
         if isinstance(gait_pred, ndarray):
