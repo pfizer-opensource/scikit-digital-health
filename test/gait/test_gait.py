@@ -107,14 +107,14 @@ class TestGetGaitEvents:
             1 / 20.0,
             time,
             sign * acc_sign,
-            o_scale, 4, 20.0, True
+            o_scale, 4, 20.0, False  # also test original scale
         )
 
         assert allclose(ic, ic_truth)
         assert allclose(fc, fc_truth)
 
 
-class TestGait(BaseProcessTester):
+class _TestGait(BaseProcessTester):
     @classmethod
     def setup_class(cls):
         super().setup_class()
