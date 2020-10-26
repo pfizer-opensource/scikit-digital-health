@@ -4,7 +4,7 @@ import numpy as np
 from ..base_conftest import *
 
 from skimu.sit2stand import Sit2Stand
-from skimu.sit2stand.detector import moving_stats
+from skimu.sit2stand.detector import moving_stats, Detector
 
 
 class TestMovingStats:
@@ -42,6 +42,17 @@ class TestMovingStats:
 
         with pytest.raises(ValueError):
             moving_stats(a, 17)
+
+
+class TestDetector:
+    def test(self):
+        pass
+
+    def test_update_threshold(self):
+        det = Detector(stillness_constraint=True, gravity=9.81, thresholds={'duration factor': 5},
+                       gravity_pass_order=4, gravity_pass_cutoff=0.8, long_still=0.5, still_window=0.3)
+
+        assert det.thresh['duration factor'] == 5
 
 
 class TestSit2StandStillness(BaseProcessTester):
