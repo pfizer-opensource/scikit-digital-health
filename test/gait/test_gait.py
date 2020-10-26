@@ -160,7 +160,7 @@ class TestGetGaitStrides:
         assert all([isnan(i) for i in gait['delta h']])
 
 
-class _TestGait(BaseProcessTester):
+class TestGait(BaseProcessTester):
     @classmethod
     def setup_class(cls):
         super().setup_class()
