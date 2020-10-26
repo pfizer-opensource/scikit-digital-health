@@ -4,6 +4,8 @@ Base classes, functions, etc for the skimu library
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
+from datetime import date as dt_date
+from pandas import DataFrame
 
 
 class _BaseProcess:
@@ -41,3 +43,28 @@ class _BaseProcess:
             return result[1]
         else:
             return result[0]
+
+    def save_results(self, results, file_name):
+        """
+        Save the results of the processing pipeline to a csv file
+
+        Parameters
+        ----------
+        results : dict
+            Dictionary of results from the output of predict
+        file_name : str
+            File name. Can be optionally formatted (see Notes)
+
+        Notes
+        -----
+        Available format variables available:
+
+        - date: todays date expressed in yyyymmdd format
+        - name: process name
+        """
+        date = dt_date.today().strftime('%Y%m%d')
+        name = self._proc_name
+
+        file_name = file_name.format(date=date, name=name)
+
+        DataFrame(results).to_csv(file_name)
