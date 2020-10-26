@@ -173,6 +173,23 @@ def get_bgait_samples_truth():  # boolean gait classification
     return get_stuff
 
 
+@fixture(scope='module')
+def get_strides_truth():
+    def get_stuff(fs, keys):
+        gait = {}
+        if fs >= 50:
+            with h5py.File(resolve_data_path('gait_data.h5', 'gait'), 'r') as f:
+                for k in keys:
+                    gait[k] = f['Truth']['Strides'][f'{k}_50'][()]
+        else:
+            with h5py.File(resolve_data_path('gait_data.h5', 'gait'), 'r') as f:
+                for k in keys:
+                    gait[k] = f['Truth']['Strides'][f'{k}_20'][()]
+
+        return gait
+    return get_stuff
+
+
 @fixture
 def sample_gait():
     gait = {

@@ -114,6 +114,22 @@ class TestGetGaitEvents:
         assert allclose(fc, fc_truth)
 
 
+class TestGetGaitStrides:
+    def test(self, sample_dt, get_sample_bout_accel, get_contact_truth, get_strides_truth):
+        accel, time, axis, acc_sign = get_sample_bout_accel(1 / sample_dt)
+        ic, fc = get_contact_truth(1 / sample_dt)
+
+        keys = ['IC', 'FC', 'FC opp foot', 'b valid cycle', 'delta h']
+        gait_truth = get_strides_truth(1 / sample_dt, keys)
+
+        gait = {i: [] for i in keys}
+        bout_steps = get_strides(gait, accel[:, axis], 0, ic, fc, time, 2.25, 0.2)
+
+        assert bout_steps == 26
+        for k in keys:
+            assert allclose(gait[k], gait_truth[k], equal_nan=True)
+
+
 class _TestGait(BaseProcessTester):
     @classmethod
     def setup_class(cls):
