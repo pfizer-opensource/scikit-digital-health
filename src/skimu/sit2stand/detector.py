@@ -273,12 +273,14 @@ class Detector:
                     # possibly use the end of stillness if it is close enough
                     if -0.5 < (dt * (p_still - sts_start)) < 0.7:
                         sts_start = p_still
-                except IndexError:
+                # TODO add data for tests that could address this one
+                except IndexError:  # pragma: no cover :: no data for this currently
                     continue
             # transition end
             try:
                 sts_end = neg_zc[neg_zc > ppk][0]
-            except IndexError:
+            # TODO add data for tests that could address this one
+            except IndexError:  # pragma: no cover :: no data for this currently
                 continue
 
             # QUALITY CHECKS
@@ -300,7 +302,7 @@ class Detector:
             # check that there is enough displacement for an actual STS
             qc4 = (v_pos[t_end_i] - v_pos[t_start_i]) > self.thresh['stand displacement']
 
-            if not (qc1 & qc2 & qc3 & qc4):  # if not all checks are passed
+            if not (qc1 & qc2 & qc3 & qc4):  # if not all checks are passed :: pragma: no cover
                 continue
 
             # sit to stand assignment
