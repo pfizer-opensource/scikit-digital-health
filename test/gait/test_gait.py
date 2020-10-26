@@ -5,7 +5,7 @@ Lukas Adamowicz
 2020, Pfizer DMTI
 """
 import pytest
-from numpy import allclose, arange, random
+from numpy import allclose, arange, random, array, isnan
 from scipy.interpolate import interp1d
 
 from ..base_conftest import *
@@ -142,6 +142,22 @@ class TestGetGaitStrides:
         assert bout_steps == 31
         for k in keys:
             assert allclose(gait[k], gait_truth[k], equal_nan=True)
+
+    def test_short_bout(self):
+        time = arange(0, 10, 1/25)  # 25hz sample
+        ic = array([10, 23])
+        fc = array([12, 25, 37])
+
+        gait = {i: [] for i in ['IC', 'FC', 'FC opp foot', 'b valid cycle', 'delta h']}
+
+        bsteps = get_strides(gait, random.rand(time.size), 0, ic, fc, time, 2.25, 0.2)
+
+        assert bsteps == 2
+        assert allclose(gait['IC'], ic)
+        assert allclose(gait['FC'], fc[1:])
+        assert allclose(gait['FC opp foot'], fc[:-1])
+        assert all([not i for i in gait['b valid cycle']])
+        assert all([isnan(i) for i in gait['delta h']])
 
 
 class _TestGait(BaseProcessTester):
