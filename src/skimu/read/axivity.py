@@ -134,11 +134,11 @@ class ReadCWA(_BaseProcess):
         elif num_axes == 6:
             gyr_axes = slice(3)
             acc_axes = slice(3, 6)
-        elif num_axes == 9:
+        elif num_axes == 9:  # pragma: no cover :: don't have data to test this
             gyr_axes = slice(3)
             acc_axes = slice(3, 6)
             mag_axes = slice(6, 9)
-        else:
+        else:  # pragma: no cover :: not expected to reach here only if file is corrupt
             raise UnexpectedAxesError("Unexpected number of axes in the IMU data")
 
         results = {
@@ -148,7 +148,7 @@ class ReadCWA(_BaseProcess):
             results[self._acc] = imudata[:, acc_axes]
         if gyr_axes is not None:
             results[self._gyro] = imudata[:, gyr_axes]
-        if mag_axes is not None:
+        if mag_axes is not None:  # pragma: no cover :: don't have data to test this
             results[self._mag] = imudata[:, mag_axes]
 
         if self.window:

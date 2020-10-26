@@ -42,6 +42,10 @@ class TestReadAx3CWA(BaseProcessTester):
 
         cls.atol_time = 5e-5
 
+    def test_none_file(self):
+        with pytest.raises(ValueError):
+            self.process.predict(file=None)
+
     def test_window(self):
         r = ReadCWA(base=8, period=12)
 
@@ -79,7 +83,7 @@ class TestReadAx6CWA(BaseProcessTester):
             'accel',
             'gyro'
         ]
-        cls.process = ReadCWA(base=None, period=None)
+        cls.process = ReadCWA(base=8, period=12)
 
         cls.atol_time = 5e-5
         cls.atol = 5e-6
@@ -95,13 +99,18 @@ class TestReadBin(BaseProcessTester):
         cls.truth_data_file = resolve_data_path('gnactv_data.h5', 'read')
         cls.truth_data_keys = [
             'time',
-            'accel'
+            'accel',
+            'day_ends'
         ]
 
         cls.test_results = False
-        cls.process = ReadBin(base=None, period=None)
+        cls.process = ReadBin(base=8, period=12)
 
         cls.atol = 5e-5
+
+    def test_none_file(self):
+        with pytest.raises(ValueError):
+            self.process.predict(file=None)
 
     def test_window(self):
         r = ReadBin(base=8, period=12)
