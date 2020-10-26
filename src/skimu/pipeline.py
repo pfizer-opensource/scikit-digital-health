@@ -27,8 +27,10 @@ class Pipeline:
         Pipeline class that can have multiple steps that are processed sequentially
         """
         self._steps = []
+        self._save = []
+        self._current = 0  # iteration tracking
 
-    def add(self, process):
+    def add(self, process, save_results=False, save_name="{date}_{name}_results.cv"):
         """
         Add a processing step to the pipeline
 
@@ -36,40 +38,56 @@ class Pipeline:
         ----------
         process : Process
             Process class that forms the step to be run
+        save_results : bool
+            Whether or not to save the results of the process as a csv. Default is False.
+        save_name : str
+            Optionally formattable path for the save file. Ignored if `save_results` is False.
+            For options for the formatting, see any of the processes (e.g. :class:`Gait`,
+            :class:`Sit2Stand`). Default is "{date}_{name}_results.csv
         """
         if not isinstance(process, _BaseProcess):
             raise NotAProcessError("process is not a subclass of _BaseProcess, cannot be added "
                                    "to the pipeline")
 
         self._steps += [process]
+        # attach the save bool and save_name to the process
+        self._steps[-1].pipe_save = save_results
+        self._steps[-1].pipe_fname = save_name
 
-    def run(self, *args, **kwargs):
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        self._current += 1
+        if self._current < len(self._steps):
+            return self._steps[self._current]
+        raise StopIteration
+
+    def run(self, **kwargs):
         """
-        Run through the pipeline, sequentially processing steps
+        Run through the pipeline, sequentially processing steps. Inputs must be provided as
+        key-word arguments
 
         Parameters
         ----------
-        args
-            Any positional arguments. Will get passed to the first step of the pipeline
         kwargs
-            Any key-word arguments. Will get passed to the first step of the pipeline
+            Any key-word arguments. Will get passed to the first step of the pipeline, and
+            therefore they must contain at least what the first pipeline is expecting.
 
         Returns
         -------
         results : dict
             Dictionary of the results of any steps of the pipeline that return results
         """
+        # set self._current to restart processing
+        self._current = 0
         results = {}
 
-        # treat the first step specially due to args, kwargs input
-        inout, step_result = self._steps[0]._predict(*args, **kwargs)
-        if self._steps[0]._return_result:
-            results[self._steps[0]._proc_name] = step_result
-
-        # iterate over the rest of the processes
-        for process in self._steps[1:]:
-            inout, step_result = process._predict(**inout)
-            if process._return_result:
-                results[process._proc_name] = step_result
+        for proc in self:
+            kwargs, step_result = proc._predict(**kwargs)
+            if proc.pipe_save:
+                proc._save_results(step_result if proc._return_result else kwargs, proc.pipe_fname)
+            if proc._return_result:
+                results[proc._proc_name] = step_result
 
         return results
