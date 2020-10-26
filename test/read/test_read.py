@@ -42,6 +42,13 @@ class TestReadAx3CWA(BaseProcessTester):
 
         cls.atol_time = 5e-5
 
+    def test_window(self):
+        r = ReadCWA(base=8, period=12)
+
+        assert r.window
+        assert r.base == 8
+        assert r.period == 12
+
     def test_window_warning(self):
         with pytest.warns(UserWarning):
             ReadCWA(base=None, period=12)
@@ -95,6 +102,13 @@ class TestReadBin(BaseProcessTester):
         cls.process = ReadBin(base=None, period=None)
 
         cls.atol = 5e-5
+
+    def test_window(self):
+        r = ReadBin(base=8, period=12)
+
+        assert r.window
+        assert r.base == 8
+        assert r.period == 12
 
     def test_window_warning(self):
         with pytest.warns(UserWarning):
