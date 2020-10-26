@@ -134,7 +134,7 @@ class Sit2Stand(_BaseProcess):
             self.power_start_f, self.power_end_f = power_band
 
         self.std_height = power_std_height
-        self.std_trim = power_std_trim
+        self.std_trim = min(0, power_std_trim)
 
         if power_peak_kw is None:
             self.power_peak_kw = {'height': 90 / 9.81}  # convert for g
@@ -222,11 +222,9 @@ class Sit2Stand(_BaseProcess):
 
             # find the peaks in the power data
             if self.std_height:
-                if self.std_trim != 0:
-                    trim = int(self.std_trim / dt)
-                    self.power_peak_kw['height'] = std(power[trim:-trim], ddof=1)
-                else:
-                    self.power_peak_kw['height'] = std(power, ddof=1)
+                trim = int(self.std_trim / dt)
+                self.power_peak_kw['height'] = std(
+                    power[trim:-trim] if trim != 0 else power, ddof=1)
 
             power_peaks, _ = find_peaks(power, **self.power_peak_kw)
 
