@@ -5,7 +5,7 @@ Lukas Adamowicz
 Pfizer DMTI 2020
 """
 from numpy import array, zeros, ceil, around, mean, std, sum, abs, gradient, where, diff, insert, \
-    append, sign, median, ascontiguousarray, arange, sqrt, log2
+    append, sign, median, arange, sqrt, log2
 from numpy.fft import fft
 from numpy.linalg import norm
 from numpy.lib import stride_tricks
@@ -282,17 +282,24 @@ class Detector:
 
             # QUALITY CHECKS
             # ==============
-            if (time[sts_end] - time[sts_start]) > 4.5:  # threshold from various lit
-                continue
-            if (time[ppk] - time[sts_start]) > \
-                    (self.thresh['duration factor'] * (time[sts_end] - time[ppk])):
-                continue
-
             t_start_i = sts_start - prev_int_start  # integrated value start index
             t_end_i = sts_end - prev_int_start
-            if t_start_i == t_end_i:
-                continue
-            if (v_pos[t_end_i] - v_pos[t_start_i]) < self.thresh['stand displacement']:
+
+            # check that the STS time is not too long
+            qc1 = (time[sts_end] - time[sts_start]) < 4.5  # threshold from various lit
+
+            # check that the first half of the s2s is not too much longer than the second half
+            dt_half_1 = time[ppk] - time[sts_start]
+            dt_half_2 = time[sts_end] - time[ppk]
+            qc2 = dt_half_1 < (self.thresh['duration factor'] * dt_half_2)
+
+            # check that the start and end are not equal
+            qc3 = t_start_i != t_end_i
+
+            # check that there is enough displacement for an actual STS
+            qc4 = (v_pos[t_end_i] - v_pos[t_start_i]) > self.thresh['stand displacement']
+
+            if any([qc1, qc2, qc3, qc4]):
                 continue
 
             # sit to stand assignment
@@ -334,7 +341,8 @@ class Detector:
             (vdisp_ndarr < (self.thresh['displacement factor'] * median(vdisp_ndarr))).tolist()
         )
 
-    def _integrate(self, vert_accel, dt, still_at_end):
+    @staticmethod
+    def _integrate(vert_accel, dt, still_at_end):
         """
         Double integrate the acceleration along 1 axis to get velocity and position
 
