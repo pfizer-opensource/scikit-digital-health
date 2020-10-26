@@ -59,7 +59,6 @@ class BaseProcessTester:
                     f"{self.process._proc_name} test for value ({key}) not close to truth"
 
 
-@fixture(scope='module')
 def get_sample_data():
     def sample_data(file, data_names):
         res = {}
@@ -75,7 +74,6 @@ def get_sample_data():
     return sample_data
 
 
-@fixture(scope='module')
 def get_truth_data():
     def truth_data(file, data_names, path_suffix=None):
         truth = {}
