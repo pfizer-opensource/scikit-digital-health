@@ -181,10 +181,7 @@ class Sit2Stand(_BaseProcess):
         sos = butter(self.lp_ord, 2 * self.lp_cut * dt, btype='low', output='sos')
 
         # check if windows exist for days
-        if self._days in kwargs:
-            days = kwargs[self._days]
-        else:
-            days = [(0, accel.shape[0])]
+        days = kwargs.get(self._days, [(0, accel.shape[0])])
 
         # results storage
         sts = {
