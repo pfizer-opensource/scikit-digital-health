@@ -35,11 +35,15 @@ def moving_stats(seq, window):
         Padding at beginning of the moving average and standard deviation
     """
     def rolling_window(x, wind):
-        if not x.flags['C_CONTIGUOUS']:
+        if not x.flags['C_CONTIGUOUS']:  # pragma: no cover :: should never get here
             raise ValueError("Data must be C-contiguous in order to window for moving statistics")
         shape = x.shape[:-1] + (x.shape[-1] - wind + 1, wind)
         strides = x.strides + (x.strides[-1],)
         return stride_tricks.as_strided(x, shape=shape, strides=strides)
+
+    if seq.ndim != 1:
+        raise ValueError('seq must be 1D')
+    assert seq.flags['C_CONTIGUOUS'], 'seq must be C-contiguous'  # just in case
 
     m_mn = zeros(seq.shape)
     m_st = zeros(seq.shape)
@@ -48,9 +52,6 @@ def moving_stats(seq, window):
         window = 2
 
     pad = int(ceil(window / 2))
-
-    if not seq.flags['C_CONTIGUOUS']:
-        seq = ascontiguousarray(seq)
     rw_seq = rolling_window(seq, window)
 
     n = rw_seq.shape[0]
@@ -58,8 +59,8 @@ def moving_stats(seq, window):
     m_mn[pad:pad + n] = mean(rw_seq, axis=-1)
     m_st[pad:pad + n] = std(rw_seq, axis=-1, ddof=1)
 
-    m_mn[:pad], m_mn[pad + n:] = m_mn[pad], m_mn[-pad - 1]
-    m_st[:pad], m_st[pad + n:] = m_st[pad], m_st[-pad - 1]
+    m_mn[:pad], m_mn[pad + n:] = m_mn[pad], m_mn[-pad]
+    m_st[:pad], m_st[pad + n:] = m_st[pad], m_st[-pad]
     return m_mn, m_st, pad
 
 
