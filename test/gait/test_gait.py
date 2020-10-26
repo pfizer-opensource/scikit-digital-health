@@ -17,7 +17,6 @@ from skimu.gait.get_gait_bouts import get_gait_bouts
 from skimu.gait.get_gait_events import get_gait_events
 from skimu.gait.get_strides import get_strides
 from skimu.gait import gait_metrics
-from skimu.gait.gait_metrics.gait_metrics import _autocovariancefunction, _autocovariance
 
 
 class TestGetGaitClassificationLGBM:

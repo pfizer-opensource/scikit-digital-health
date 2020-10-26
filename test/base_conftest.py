@@ -43,12 +43,9 @@ class BaseProcessTester:
             self.truth_suffix
         )
 
-        inp, res = self.process._predict(**data)
+        res = self.process.predict(**data)
 
-        if self.test_results:
-            self.dict_allclose(res, truth_data, self.truth_data_keys)
-        else:
-            self.dict_allclose(inp, truth_data, self.truth_data_keys)
+        self.dict_allclose(res, truth_data, self.truth_data_keys)
 
     def dict_allclose(self, pred, truth, keys):
         for key in keys:

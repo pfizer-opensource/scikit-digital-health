@@ -38,7 +38,6 @@ class TestReadAx3CWA(BaseProcessTester):
             'time',
             'accel'
         ]
-        cls.test_results = False
         cls.process = ReadCWA(base=None, period=None)
 
         cls.atol_time = 5e-5
@@ -73,7 +72,6 @@ class TestReadAx6CWA(BaseProcessTester):
             'accel',
             'gyro'
         ]
-        cls.test_results = False
         cls.process = ReadCWA(base=None, period=None)
 
         cls.atol_time = 5e-5
