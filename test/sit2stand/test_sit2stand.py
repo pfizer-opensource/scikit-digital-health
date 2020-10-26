@@ -54,6 +54,27 @@ class TestDetector:
 
         assert det.thresh['duration factor'] == 5
 
+    @pytest.mark.parametrize('still', (True, False))
+    def test_get_end_still_error(self, still):
+        det = Detector(stillness_constraint=still)
+
+        t = np.arange(0, 45, 1/50)
+
+        with pytest.raises(IndexError):
+            if still:
+                det._get_end_still(t, np.array([150]), np.array([150]), 251)
+            else:
+                det._get_end_still(t, np.array([150]), np.array([150]), 1950)
+
+    @pytest.mark.parametrize('still', (True, False))
+    def test_get_start_still_error(self, still):
+        det = Detector(stillness_constraint=still)
+
+        t = np.arange(0, 45, 1 / 50)
+
+        with pytest.raises(IndexError):
+            det._get_start_still(t, np.array([1950]), np.array([1950]), 150)
+
 
 class TestSit2StandStillness(BaseProcessTester):
     @classmethod
