@@ -263,6 +263,7 @@ class Detector:
             if v_vel[ppk - prev_int_start] < self.thresh['transition velocity']:
                 continue
 
+            # transition start
             if self.stillness_constraint:
                 sts_start = end_still
             else:
@@ -299,7 +300,7 @@ class Detector:
             # check that there is enough displacement for an actual STS
             qc4 = (v_pos[t_end_i] - v_pos[t_start_i]) > self.thresh['stand displacement']
 
-            if any([qc1, qc2, qc3, qc4]):
+            if not (qc1 & qc2 & qc3 & qc4):  # if not all checks are passed
                 continue
 
             # sit to stand assignment
