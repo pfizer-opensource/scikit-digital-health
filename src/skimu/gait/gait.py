@@ -136,7 +136,6 @@ class Gait(_BaseProcess):
         ret += f"max_stride_time={self.max_stride_time!r}, "
         ret += f"loading_factor={self.loading_factor!r}, "
         ret += f"height_factor={self.height_factor!r}, "
-        ret += f"prov_leg_length={self.prov_leg_length!r}, "
         ret += f"filter_order={self.filt_ord!r}, "
         ret += f"filter_cutoff={self.filt_cut!r})"
         return ret
