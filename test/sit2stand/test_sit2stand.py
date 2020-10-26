@@ -113,6 +113,18 @@ class TestSit2StandStillness(BaseProcessTester):
             reconstruction_window=0.25
         )
 
+    @pytest.mark.parametrize('band', (None, 0.5))
+    def test_power_band(self, band):
+        s2s = Sit2Stand(power_band=band)
+
+        assert s2s.power_start_f == 0
+        assert s2s.power_end_f == 0.5
+
+    def test_power_peak_kw(self):
+        s2s = Sit2Stand(power_peak_kw=None)
+
+        assert s2s.power_peak_kw == {'height': 90 / 9.81}
+
 
 class TestSit2StandDisplacement(BaseProcessTester):
     @classmethod
