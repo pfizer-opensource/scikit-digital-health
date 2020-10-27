@@ -1,5 +1,7 @@
 from skimu.version import __version__
 
+from skimu.pipeline import Pipeline
+
 from skimu import gait
 from skimu import sit2stand
 from skimu import features
