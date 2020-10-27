@@ -28,7 +28,7 @@ class Pipeline:
         """
         self._steps = []
         self._save = []
-        self._current = 0  # iteration tracking
+        self._current = -1  # iteration tracking
 
     def add(self, process, save_results=False, save_name="{date}_{name}_results.cv"):
         """
@@ -61,6 +61,8 @@ class Pipeline:
         self._current += 1
         if self._current < len(self._steps):
             return self._steps[self._current]
+
+        self._current = -1  # reset for next run
         raise StopIteration
 
     def run(self, **kwargs):
@@ -80,7 +82,7 @@ class Pipeline:
             Dictionary of the results of any steps of the pipeline that return results
         """
         # set self._current to restart processing
-        self._current = 0
+        self._current = -1
         results = {}
 
         for proc in self:
