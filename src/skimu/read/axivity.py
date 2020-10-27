@@ -6,7 +6,7 @@ Pfizer DMTI 2020
 """
 from warnings import warn
 
-from numpy import vstack
+from numpy import vstack, round
 
 from skimu.base import _BaseProcess
 from skimu.read.get_window_start_stop import get_window_start_stop
@@ -142,7 +142,7 @@ class ReadCWA(_BaseProcess):
             raise UnexpectedAxesError("Unexpected number of axes in the IMU data")
 
         results = {
-            self._time: ts
+            self._time: round(ts, 4)  # this is approx precision for float64
         }
         if acc_axes is not None:
             results[self._acc] = imudata[:, acc_axes]

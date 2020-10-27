@@ -6,7 +6,7 @@ Pfizer DMTI 2020
 """
 from warnings import warn
 
-from numpy import vstack
+from numpy import vstack, round
 
 from skimu.base import _BaseProcess
 from skimu.read.get_window_start_stop import get_window_start_stop
@@ -111,7 +111,7 @@ class ReadBin(_BaseProcess):
         nmax, hdr, acc, time, light, temp, idx, dtime = bin_convert(file, self.base, self.period)
 
         results = {
-            self._time: time,
+            self._time: round(time, 4),
             self._acc: acc,
             self._temp: temp,
             'light': light
