@@ -142,7 +142,7 @@ class ReadCWA(_BaseProcess):
             raise UnexpectedAxesError("Unexpected number of axes in the IMU data")
 
         results = {
-            self._time: round(ts, 4)  # this is approx precision for float64
+            self._time: ts
         }
         if acc_axes is not None:
             results[self._acc] = imudata[:, acc_axes]

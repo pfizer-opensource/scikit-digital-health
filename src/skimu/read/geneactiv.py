@@ -111,7 +111,7 @@ class ReadBin(_BaseProcess):
         nmax, hdr, acc, time, light, temp, idx, dtime = bin_convert(file, self.base, self.period)
 
         results = {
-            self._time: round(time, 4),
+            self._time: time,
             self._acc: acc,
             self._temp: temp,
             'light': light
