@@ -106,7 +106,7 @@ class TestReadBin(BaseProcessTester):
         cls.test_results = False
         cls.process = ReadBin(base=8, period=12)
 
-        cls.atol = 5e-5
+        cls.atol = 5e-5  # this is for accel, because GeneActiv csv file values are truncated
 
     def test_none_file(self):
         with pytest.raises(ValueError):
