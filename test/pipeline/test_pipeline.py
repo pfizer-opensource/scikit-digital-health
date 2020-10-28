@@ -41,7 +41,7 @@ class TestPipeline:
         'BOUTPARAM:regularity index - V'
     ]
 
-    def test(self):
+    def test(self, get_truth_data):
         p = Pipeline()
 
         p.add(ReadCWA(base=None, period=None))
@@ -62,8 +62,7 @@ class TestPipeline:
         res = p.run(file=file, height=1.88)
 
         # get the truth data
-        f = get_truth_data()
-        gait_res = f(
+        gait_res = get_truth_data(
             resolve_data_path('gait_data.h5', 'pipeline'),
             self.gait_keys
         )
