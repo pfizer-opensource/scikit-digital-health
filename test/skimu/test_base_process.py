@@ -9,7 +9,7 @@ class TestBaseProcess:
 
         r = "Process(kw1=None, kw2=0, kw3=0.5, kw4='str', kw5=False)"
 
-        assert bp._proc_name == "Process"
+        assert bp._name == "Process"
         assert bp._return_result
         assert repr(bp) == r
         assert str(bp) == "Process"
