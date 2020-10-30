@@ -4,10 +4,16 @@ Pipeline class for stringing multiple features into 1 processing pipeline
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
+import json
+
 from skimu.base import _BaseProcess
 
 
 class NotAProcessError(Exception):
+    pass
+
+
+class ProcessNotFoundError(Exception):
     pass
 
 
@@ -31,6 +37,66 @@ class Pipeline:
         self._steps = []
         self._save = []
         self._current = -1  # iteration tracking
+
+    def save(self, file):
+        """
+        Save the pipeline to a file for consistent pipeline generation.
+
+        Parameters
+        ----------
+        file : {str, path-like}
+            File path to save the pipeline structure to
+        """
+        pipe = []
+        for step in self._steps:  # actually look at steps
+            pipe.append(
+                {
+                    step._proc_name: {
+                        'Parameters': step._kw,
+                        'save_result': step.pipe_save,
+                        'save_name': step.pipe_fname
+                    }
+                }
+            )
+
+        with open(file, 'w') as f:
+            json.dump(pipe, f)
+
+    def load(self, file):
+        """
+        Load a previously saved pipeline from a file
+
+        Parameters
+        ----------
+        file : {str, path-like}
+            File path to load the pipeline structure from
+        """
+        import skimu
+
+        with open(file, 'r') as f:
+            procs = json.load(f)
+
+        for proc in procs:
+            name = list(proc.keys())[0]
+            params = proc[name]["Parameters"]
+            save_result = proc[name]["save_result"]
+            save_name = proc[name]["save_name"]
+
+            try:
+                module = getattr(skimu, name.lower())
+            except AttributeError:
+                raise ModuleNotFoundError(f"Module '{name.lower()}' not found in skimu. "
+                                          f"Please open an issue on the scikit-imu GitHub page.")
+
+            try:
+                self.add(
+                    getattr(module, name)(**params),
+                    save_results=save_result,
+                    save_name=save_name
+                )
+            except (NotAProcessError, AttributeError) as e:
+                raise ProcessNotFoundError(f"The process '{name}' was not found. "
+                                           f"Not being added to pipeline") from e
 
     def add(self, process, save_results=False, save_name="{date}_{name}_results.cv"):
         """
