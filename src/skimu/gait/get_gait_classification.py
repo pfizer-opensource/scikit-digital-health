@@ -73,7 +73,7 @@ def get_gait_classification_lgbm(gait_pred, accel, dt, timestamps):
             accel_rs = accel
 
         # band-pass filter
-        sos = butter(1, [2 * 0.25 * dt, 2 * 5 * dt], btype='band', output='sos')
+        sos = butter(1, [2 * 0.25 / goal_fs, 2 * 5 / goal_fs], btype='band', output='sos')
         accel_rs_f = sosfiltfilt(sos, norm(accel_rs, axis=1))
 
         # window
