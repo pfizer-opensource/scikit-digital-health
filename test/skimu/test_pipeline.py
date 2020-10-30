@@ -88,7 +88,7 @@ class TestPipeline:
         }
         for key in gait_res:
             assert allclose(
-                res['Gait Process'][key],
+                res['Gait'][key],
                 gait_res[key],
                 equal_nan=True,
                 atol=atol.get(key, 1e-8)
