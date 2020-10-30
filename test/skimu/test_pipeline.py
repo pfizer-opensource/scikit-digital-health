@@ -65,13 +65,13 @@ class TestPipeline:
             save_name=ntf.name
         )
 
-        file = resolve_data_path('ax3_sample.cwa', 'pipeline')
+        file = resolve_data_path('ax3_sample.cwa', 'skimu')
 
         res = p.run(file=file, height=1.88)
 
         # get the truth data
         gait_res = get_truth_data(
-            resolve_data_path('gait_data.h5', 'pipeline'),
+            resolve_data_path('gait_data.h5', 'skimu'),
             self.gait_keys
         )
 

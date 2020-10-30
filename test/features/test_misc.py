@@ -7,7 +7,7 @@ import pandas as pd
 from skimu.features import *
 from skimu.features import lib
 from skimu.features.core import DeferredFeature, NotAFeatureError
-from skimu.features.utility import standardize_signal, DimensionError, InputTypeError
+from skimu.features.utility import standardize_signal, InputTypeError
 
 
 class TestStandardizeSignal:
