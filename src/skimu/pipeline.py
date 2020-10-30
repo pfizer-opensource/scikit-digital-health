@@ -161,6 +161,6 @@ class Pipeline:
             if proc.pipe_save:
                 proc.save_results(step_result if proc._return_result else kwargs, proc.pipe_fname)
             if proc._return_result:
-                results[proc._proc_name] = step_result
+                results[proc._name] = step_result
 
         return results

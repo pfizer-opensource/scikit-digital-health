@@ -73,7 +73,7 @@ class _BaseProcess:
         - name: process name
         """
         date = dt_date.today().strftime('%Y%m%d')
-        name = self._proc_name
+        name = self._name
 
         file_name = file_name.format(date=date, name=name)
 
