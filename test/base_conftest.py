@@ -96,6 +96,10 @@ class TestRunLocationError(Exception):
 
 
 def resolve_data_path(file, module=None):
+
+    if isinstance(file, bytes):
+        file = file.decode('utf-8')
+
     if Path.cwd().name == 'scikit-imu':
         path = Path(f'test/data/{file}')
     elif Path.cwd().name == 'test':
