@@ -6,6 +6,7 @@ API Reference
 .. toctree::
     :maxdepth: 2
 
+    skimu
     read
     features
     gait
