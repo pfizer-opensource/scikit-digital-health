@@ -1,6 +1,8 @@
-import pytest
+from tempfile import NamedTemporaryFile
 
+import pytest
 from numpy import allclose
+from pandas import read_csv
 
 from ..base_conftest import resolve_data_path, get_truth_data
 
@@ -44,18 +46,24 @@ class TestPipeline:
     def test(self, get_truth_data):
         p = Pipeline()
 
+        ntf = NamedTemporaryFile(mode='a')
+
         p.add(ReadCWA(base=None, period=None))
-        p.add(Gait(
-            use_cwt_scale_relation=True,
-            min_bout_time=8.0,
-            max_bout_separation_time=0.5,
-            max_stride_time=2.25,
-            loading_factor=0.2,
-            height_factor=0.53,
-            prov_leg_length=False,
-            filter_order=4,
-            filter_cutoff=20.0
-        ))
+        p.add(
+            Gait(
+                use_cwt_scale_relation=True,
+                min_bout_time=8.0,
+                max_bout_separation_time=0.5,
+                max_stride_time=2.25,
+                loading_factor=0.2,
+                height_factor=0.53,
+                prov_leg_length=False,
+                filter_order=4,
+                filter_cutoff=20.0
+            ),
+            save_results=True,
+            save_name=ntf.name
+        )
 
         file = resolve_data_path('ax3_sample.cwa', 'pipeline')
 
@@ -85,6 +93,19 @@ class TestPipeline:
                 equal_nan=True,
                 atol=atol.get(key, 1e-8)
             ), f'{key} does not match truth'
+
+        # get the data from the saved file
+        data = read_csv(ntf.name)
+
+        for key in gait_res:
+            assert allclose(
+                data[key].values,
+                gait_res[key],
+                equal_nan=True,
+                atol=atol.get(key, 1e-8)
+            ), f'{key} from saved data does not match truth'
+
+        ntf.close()
 
     @pytest.mark.parametrize('proc', (ReadCWA, Gait, Sit2Stand))
     def test_add(self, proc):
