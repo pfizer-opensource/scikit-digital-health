@@ -17,13 +17,6 @@ class InputTypeError(Exception):
     pass
 
 
-class DimensionError(Exception):
-    """
-    Custom error for if the input signal has too many dimensions
-    """
-    pass
-
-
 def standardize_signal(signal, windowed=False, window_length=None, step=None, columns=None):
     """
     Standardize an incoming signal to be consistent across conditions

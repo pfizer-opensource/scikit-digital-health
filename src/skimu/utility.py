@@ -10,6 +10,20 @@ from numpy.lib.stride_tricks import as_strided
 __all__ = ['compute_window_samples', 'get_windowed_view']
 
 
+class DimensionError(Exception):
+    """
+    Custom error for if the input signal has too many dimensions
+    """
+    pass
+
+
+class ContiguityError(Exception):
+    """
+    Custom error for if the input signal is not C-contiguous
+    """
+    pass
+
+
 def compute_window_samples(fs, window_length, window_step):
     """
     Compute the number of samples for a window. Takes the sampling frequency, window length, and
@@ -106,13 +120,13 @@ def get_windowed_view(x, window_length, step_size, ensure_c_contiguity=False):
         2- or 3-D array of windows of the original data, of shape (..., L[, ...])
     """
     if not (x.ndim in [1, 2]):
-        raise ValueError('Array cannot have more than 2 dimensions.')
+        raise DimensionError('Array cannot have more than 2 dimensions.')
 
     if ensure_c_contiguity:
         x = require(x, requirements=['C'])
     else:
         if not x.flags['C_CONTIGUOUS']:
-            raise ValueError("Input array must be C-contiguous.  See numpy.ascontiguousarray")
+            raise ContiguityError("Input array must be C-contiguous.  See numpy.ascontiguousarray")
 
     if x.ndim == 1:
         nrows = ((x.size - window_length) // step_size) + 1
