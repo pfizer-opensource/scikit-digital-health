@@ -20,30 +20,28 @@ class _BaseProcess:
     _days = 'day_ends'
 
     def __str__(self):
-        return self._proc_name.replace(' ', '')
+        return self._name
 
     def __repr__(self):
-        ret = f"{self._proc_name}("
+        ret = f"{self._name}("
         for k in self._kw:
             ret += f"{k}={self._kw[k]!r}, "
         ret = ret[:-2] + ")"
 
         return ret
 
-    def __init__(self, name, return_result=True, **kwargs):
+    def __init__(self, return_result=True, **kwargs):
         """
         Intended to be subclassed
 
         Parameters
         ----------
-        name : str
-            Name of the process
         return_result : bool, optional
             Return the result part of predict, or the input/output dictionary
         kwargs
             Key-word arguments which are passed to the sub-class
         """
-        self._proc_name = name
+        self._name = self.__class__.__name__
         self._return_result = return_result
 
         self._kw = kwargs
