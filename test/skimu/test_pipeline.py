@@ -115,6 +115,30 @@ class TestPipeline:
 
         self.run_pipeline(get_truth_data, p, self.gait_keys, self.atol, gait_res_file)
 
+    def test_save_load_not_process_error(self, pipe_file2):
+        p = Pipeline()
+        p.add(ReadCWA())
+
+        # manually add something wrong
+        class NotAProcess:
+            pass
+        nap = NotAProcess()
+        nap.pipe_save = False
+        nap.pipe_fname = 'test'
+
+        nap._kw = {'a': 5}
+        nap._name = 'NotAProcess'
+        nap.__class__.__module__ = 'skimu.notamodule'
+
+        p._steps.append(nap)
+
+        p.save(pipe_file2)
+
+        p2 = Pipeline()
+
+        with pytest.warns(UserWarning):
+            p2.load(pipe_file2)
+
     @pytest.mark.parametrize('proc', (ReadCWA, Gait, Sit2Stand))
     def test_add(self, proc):
         p = Pipeline()
