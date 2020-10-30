@@ -7,6 +7,81 @@ Pfizer DMTI 2020
 from numpy import require
 from numpy.lib.stride_tricks import as_strided
 
+__all__ = ['compute_window_samples', 'get_windowed_view']
+
+
+def compute_window_samples(fs, window_length, window_step):
+    """
+    Compute the number of samples for a window. Takes the sampling frequency, window length, and
+    window step in common representations and converts them into number of samples.
+
+    Parameters
+    ----------
+    fs : float
+        Sampling frequency in Hz.
+    window_length : float
+        Window length in seconds. If not provided (None), will do no windowing. Default is None
+    window_step : {float, int}
+        Window step - the spacing between the start of windows. This can be specified several
+        different ways (see Notes). Default is 1.0
+
+    Returns
+    -------
+    length_n : int
+        Window length in samples
+    step_n : int
+        Window step in samples
+
+    Raises
+    ------
+    ValueError
+        If `window_step` is negative, or if `window_step` is a float not in (0.0, 1.0]
+
+    Notes
+    -----
+    Computation of the window step depends on the type of input provided, and the range.
+    - `window_step` is a float in (0.0, 1.0]: specifies the fraction of a window to skip to get to
+    the start of the next window
+    - `window_step` is an integer > 1: specifies the number of samples to skip to get to the start
+    of the next window
+
+    Examples
+    --------
+    Compute the window length and step in samples for a 3s window with 50% overlap, with a
+    sampling rate of 50Hz
+
+    >>> compute_window_samples(50.0, 3.0, 0.5)
+    (150, 75)
+
+    Compute the window length for a 4.5s window with a step of 1 sample, and a sampling
+    rate of 100Hz
+
+    >>> compute_window_samples(100.0, 4.5, 1)
+    (450, 1)
+    """
+    if window_step is None or window_length is None:
+        return None, None
+
+    length_n = int(round(fs * window_length))
+
+    if isinstance(window_step, int):
+        if window_step > 0:
+            step_n = window_step
+        else:
+            raise ValueError("window_step cannot be negative")
+    elif isinstance(window_step, float):
+        if 0.0 < window_step < 1.0:
+            step_n = int(round(length_n * window_step))
+
+            step_n = max(min(step_n, length_n), 1)
+
+        elif window_step == 1.0:
+            step_n = length_n
+        else:
+            raise ValueError("float values for window_step must be in (0.0, 1.0]")
+
+    return length_n, step_n
+
 
 def get_windowed_view(x, window_length, step_size, ensure_c_contiguity=False):
     """

@@ -4,11 +4,10 @@ Utility functions for features
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
-from numpy import ndarray, ascontiguousarray, round
-from numpy.lib.stride_tricks import as_strided
+from numpy import ndarray, ascontiguousarray
 from pandas import DataFrame
 
-__all__ = ['compute_window_samples', 'get_windowed_view']
+from skimu.utility import get_windowed_view
 
 
 class InputTypeError(Exception):
@@ -94,130 +93,3 @@ def standardize_signal(signal, windowed=False, window_length=None, step=None, co
     ret += (columns, )
 
     return ret
-
-
-def compute_window_samples(fs, window_length, window_step):
-    """
-    Compute the number of samples for a window. Takes the sampling frequency, window length, and
-    window step in common representations and converts them into number of samples.
-
-    Parameters
-    ----------
-    fs : float
-        Sampling frequency in Hz.
-    window_length : float
-        Window length in seconds. If not provided (None), will do no windowing. Default is None
-    window_step : {float, int}
-        Window step - the spacing between the start of windows. This can be specified several
-        different ways (see Notes). Default is 1.0
-
-    Returns
-    -------
-    length_n : int
-        Window length in samples
-    step_n : int
-        Window step in samples
-
-    Raises
-    ------
-    ValueError
-        If `window_step` is negative, or if `window_step` is a float not in (0.0, 1.0]
-
-    Notes
-    -----
-    Computation of the window step depends on the type of input provided, and the range.
-    - `window_step` is a float in (0.0, 1.0]: specifies the fraction of a window to skip to get to
-    the start of the next window
-    - `window_step` is an integer > 1: specifies the number of samples to skip to get to the start
-    of the next window
-
-    Examples
-    --------
-    Compute the window length and step in samples for a 3s window with 50% overlap, with a
-    sampling rate of 50Hz
-
-    >>> compute_window_samples(50.0, 3.0, 0.5)
-    (150, 75)
-
-    Compute the window length for a 4.5s window with a step of 1 sample, and a sampling
-    rate of 100Hz
-
-    >>> compute_window_samples(100.0, 4.5, 1)
-    (450, 1)
-    """
-    if window_step is None or window_length is None:
-        return None, None
-
-    length_n = int(round(fs * window_length))
-
-    if isinstance(window_step, int):
-        if window_step > 0:
-            step_n = window_step
-        else:
-            raise ValueError("window_step cannot be negative")
-    elif isinstance(window_step, float):
-        if 0.0 < window_step < 1.0:
-            step_n = int(round(length_n * window_step))
-
-            step_n = max(min(step_n, length_n), 1)
-
-        elif window_step == 1.0:
-            step_n = length_n
-        else:
-            raise ValueError("float values for window_step must be in (0.0, 1.0]")
-
-    return length_n, step_n
-
-
-def get_windowed_view(x, win_len, stepsize):
-    """
-    Return a moving window view over the data.
-
-    Parameters
-    ----------
-    x : numpy.ndarray
-        1- or 2-D array of signals to window. Windows occur along the 0 axis. MUST BE C-CONTIGUOUS.
-    win_len : int
-        Window length (:math:`L`).
-    stepsize : int
-        Stride length/step size (:math:`S`). Number of places to step for the center of the
-        windows being created.
-
-    Returns
-    -------
-    x_win : numpy.ndarray
-        Array of windows with `x.ndim+1` dimensions.
-
-    Notes
-    -----
-    Windowing always occurs along the 0th axis, so given an input shape (M[, N]), the number of
-    windows :math:`M_w` is computed per
-
-    .. math:: M_w = (M - L) // S + 1
-
-    where :math:`//` indicates floor division. Therefore, the resulting shape for a 1D input is
-    (M_w, L), and a 2D input is (M_w, L, N)
-
-    Raises
-    ------
-    DimensionError
-        If `x` has more than 2 dimensions.
-    ValueError
-        If `x` is not C-contiguous in memory
-    """
-    if not (x.ndim in [1, 2]):
-        raise DimensionError('Array cannot have more than 2 dimensions to window properly.')
-    if not x.flags['C_CONTIGUOUS']:
-        raise ValueError('Array must be C-contiguous to window properly.')
-    if x.ndim == 1:
-        nrows = ((x.size - win_len) // stepsize) + 1
-        n = x.strides[0]
-        return as_strided(x, shape=(nrows, win_len), strides=(stepsize * n, n), writeable=False)
-    else:
-        k = x.shape[1]
-        nrows = ((x.shape[0] - win_len) // stepsize) + 1
-        n = x.strides[1]
-
-        new_shape = (nrows, win_len, k)
-        new_strides = (stepsize * k * n, k * n, n)
-        return as_strided(x, shape=new_shape, strides=new_strides, writeable=False)
