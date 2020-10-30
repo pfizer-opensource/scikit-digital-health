@@ -4,6 +4,14 @@ Scikit IMU (:mod:`skimu`)
 
 .. currentmodule:: skimu
 
+Pipeline Processing
+-------------------
+
+.. autosummary::
+    :toctree: generated/
+
+    Pipeline
+
 Utility Functions
 -----------------
 
