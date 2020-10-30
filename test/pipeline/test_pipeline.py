@@ -67,9 +67,24 @@ class TestPipeline:
             self.gait_keys
         )
 
+        # some parameters need higher tolerances due to slightly different accelerations
+        # some timestamp rounding causes slight changes in the filter cutoffs, effecting the
+        # acceleration values
+        atol = {
+            'delta h': 1e-3,
+            'PARAM:step length': 1e-3,
+            'PARAM:stride length': 1e-3,
+            'PARAM:gait speed': 1e-3,
+            'BOUTPARAM:gait symmetry index': 5e-5,
+            'BOUTPARAM:autocovariance symmetry - V': 5e-5
+        }
         for key in gait_res:
-            assert allclose(res['Gait Process'][key], gait_res[key], equal_nan=True), \
-                f'{key} does not match truth'
+            assert allclose(
+                res['Gait Process'][key],
+                gait_res[key],
+                equal_nan=True,
+                atol=atol.get(key, 1e-8)
+            ), f'{key} does not match truth'
 
     @pytest.mark.parametrize('proc', (ReadCWA, Gait, Sit2Stand))
     def test_add(self, proc):
