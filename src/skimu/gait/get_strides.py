@@ -75,7 +75,6 @@ def get_strides(gait, vert_accel, gait_index, ic, fc, timestamps, max_stride_tim
 
     if bout_n_steps > 2:
         gait['b valid cycle'].extend(gait_ic_times[2:] - gait_ic_times[:-2] < max_stride_time)
-        # gait['b valid cycle'].extend([(timestamps[gait['IC'][gait_index + i + 2]] - timestamps[gait['IC'][gait_index + i]]) < max_stride_time for i in range(bout_n_steps - 2)])
         gait['b valid cycle'].extend([False] * 2)
     elif bout_n_steps > 0:
         gait['b valid cycle'].extend([False] * bout_n_steps)
@@ -89,7 +88,7 @@ def get_strides(gait, vert_accel, gait_index, ic, fc, timestamps, max_stride_tim
             vvel = cumtrapz(vacc, x=timestamps[i1:i2], initial=0)
             vpos = cumtrapz(vvel, x=timestamps[i1:i2], initial=0)
 
-            gait['delta h'].append((vpos.max() - vpos.min()) * 9.81)  # conver to meters
+            gait['delta h'].append((vpos.max() - vpos.min()) * 9.81)  # convert to meters
         else:
             gait['delta h'].append(nan)
 
