@@ -22,7 +22,15 @@ class _BaseProcess:
     def __str__(self):
         return self._proc_name.replace(' ', '')
 
-    def __init__(self, name, return_result=True):
+    def __repr__(self):
+        ret = f"{self._proc_name}("
+        for k in self._kw:
+            ret += f"{k}={self._kw[k]!r}, "
+        ret = ret[:-2] + ")"
+
+        return ret
+
+    def __init__(self, name, return_result=True, **kwargs):
         """
         Intended to be subclassed
 
@@ -32,9 +40,13 @@ class _BaseProcess:
             Name of the process
         return_result : bool, optional
             Return the result part of predict, or the input/output dictionary
+        kwargs
+            Key-word arguments which are passed to the sub-class
         """
         self._proc_name = name
         self._return_result = return_result
+
+        self._kw = kwargs
 
     def predict(self, *args, **kwargs):
         result = self._predict(*args, **kwargs)
