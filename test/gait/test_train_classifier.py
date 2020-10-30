@@ -1,6 +1,6 @@
 from pytest import mark
 
-from skimu.features import compute_window_samples
+from skimu.utility import compute_window_samples
 from skimu.gait.train_classifier import load_datasets
 
 

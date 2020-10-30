@@ -7,7 +7,7 @@ Pfizer DMTI 2020
 from numpy import ndarray, ascontiguousarray
 from pandas import DataFrame
 
-from skimu.utility import get_windowed_view
+from skimu.utility import get_windowed_view, DimensionError
 
 
 class InputTypeError(Exception):
