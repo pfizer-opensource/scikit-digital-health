@@ -50,4 +50,4 @@ from skimu.features import core
 from skimu.features.lib import *
 from skimu.features import lib
 
-__all__ = core.__all__ + utility.__all__ + lib.__all__
+__all__ = core.__all__ + lib.__all__

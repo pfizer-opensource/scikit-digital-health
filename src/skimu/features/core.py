@@ -7,7 +7,8 @@ from numpy import ndarray, array, zeros, sum
 from pandas import DataFrame
 import json
 
-from skimu.features.utility import standardize_signal, compute_window_samples
+from skimu.utility import compute_window_samples
+from skimu.features.utility import standardize_signal
 
 
 __all__ = ['Bank']
