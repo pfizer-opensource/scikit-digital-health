@@ -108,7 +108,6 @@ class Sit2Stand(_BaseProcess):
             reconstruction_window=0.25
     ):
         super().__init__(
-            'STS Detection Process',
             True,
             # kwarg saving
             stillness_constraint=stillness_constraint,

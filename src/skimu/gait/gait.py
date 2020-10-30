@@ -132,7 +132,6 @@ class Gait(_BaseProcess):
                  max_bout_separation_time=0.5, max_stride_time=2.25, loading_factor=0.2,
                  height_factor=0.53, prov_leg_length=False, filter_order=4, filter_cutoff=20.0):
         super().__init__(
-            'Gait',
             True,
             # key-word arguments for storage
             use_cwt_scale_relation=use_cwt_scale_relation,

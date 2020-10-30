@@ -45,7 +45,6 @@ class ReadBin(_BaseProcess):
 
     def __init__(self, base=None, period=None):
         super().__init__(
-            'Read bin',
             False,
             # kwargs
             base=base,

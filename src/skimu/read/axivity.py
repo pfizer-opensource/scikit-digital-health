@@ -50,7 +50,6 @@ class ReadCWA(_BaseProcess):
 
     def __init__(self, base=None, period=None):
         super().__init__(
-            'Read CWA',
             False,
             # kwargs
             base=base,
