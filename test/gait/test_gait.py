@@ -24,7 +24,7 @@ class TestGetGaitClassificationLGBM:
         b_gait = get_gait_classification_lgbm(None, sample_accel, sample_dt, sample_time)
         b_gait_truth = get_gait_classification_truth(1 / sample_dt)
 
-        assert b_gait.sum() == 14198
+        assert b_gait.sum() == 20707
         assert allclose(b_gait, b_gait_truth)
 
     def test_20hz(self, sample_accel, sample_dt, sample_time, get_gait_classification_truth):
