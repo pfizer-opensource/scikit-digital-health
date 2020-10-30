@@ -51,7 +51,8 @@ class Pipeline:
         for step in self._steps:  # actually look at steps
             pipe.append(
                 {
-                    step._proc_name: {
+                    step._name: {
+                        'module': step.__class__.__module__.split('.', 1)[1],
                         'Parameters': step._kw,
                         'save_result': step.pipe_save,
                         'save_name': step.pipe_fname

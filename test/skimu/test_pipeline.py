@@ -1,5 +1,3 @@
-from tempfile import NamedTemporaryFile
-
 import pytest
 from numpy import allclose
 from pandas import read_csv
@@ -43,10 +41,51 @@ class TestPipeline:
         'BOUTPARAM:regularity index - V'
     ]
 
-    def test(self, get_truth_data):
-        p = Pipeline()
+    # some parameters need higher tolerances due to slightly different accelerations
+    # some timestamp rounding causes slight changes in the filter cutoffs, effecting the
+    # acceleration values
+    atol = {
+        'delta h': 1e-3,
+        'PARAM:step length': 1e-3,
+        'PARAM:stride length': 1e-3,
+        'PARAM:gait speed': 1e-3,
+        'BOUTPARAM:gait symmetry index': 5e-5,
+        'BOUTPARAM:autocovariance symmetry - V': 5e-5
+    }
 
-        ntf = NamedTemporaryFile(mode='a')
+    @staticmethod
+    def run_pipeline(get_truth_data, pipe, gait_keys, abs_tol, gait_results_file):
+        file = resolve_data_path('ax3_sample.cwa', 'skimu')
+
+        res = pipe.run(file=file, height=1.88)
+
+        # get the truth data
+        gait_res = get_truth_data(
+            resolve_data_path('gait_data.h5', 'skimu'),
+            gait_keys
+        )
+
+        for key in gait_res:
+            assert allclose(
+                res['Gait'][key],
+                gait_res[key],
+                equal_nan=True,
+                atol=abs_tol.get(key, 1e-8)
+            ), f'{key} does not match truth'
+
+        # get the data from the saved file
+        data = read_csv(gait_results_file)
+
+        for key in gait_res:
+            assert allclose(
+                data[key].values,
+                gait_res[key],
+                equal_nan=True,
+                atol=abs_tol.get(key, 1e-8)
+            ), f'{key} from saved data does not match truth'
+
+    def test(self, get_truth_data, gait_res_file, pipeline_file):
+        p = Pipeline()
 
         p.add(ReadCWA(base=None, period=None))
         p.add(
@@ -62,50 +101,19 @@ class TestPipeline:
                 filter_cutoff=20.0
             ),
             save_results=True,
-            save_name=ntf.name
+            save_name=gait_res_file
         )
 
-        file = resolve_data_path('ax3_sample.cwa', 'skimu')
+        # test saving the pipeline
+        p.save(pipeline_file)
 
-        res = p.run(file=file, height=1.88)
+        self.run_pipeline(get_truth_data, p, self.gait_keys, self.atol, gait_res_file)
 
-        # get the truth data
-        gait_res = get_truth_data(
-            resolve_data_path('gait_data.h5', 'skimu'),
-            self.gait_keys
-        )
+    def test_load_and_process(self, get_truth_data, gait_res_file, pipeline_file):
+        p = Pipeline()
+        p.load(pipeline_file)
 
-        # some parameters need higher tolerances due to slightly different accelerations
-        # some timestamp rounding causes slight changes in the filter cutoffs, effecting the
-        # acceleration values
-        atol = {
-            'delta h': 1e-3,
-            'PARAM:step length': 1e-3,
-            'PARAM:stride length': 1e-3,
-            'PARAM:gait speed': 1e-3,
-            'BOUTPARAM:gait symmetry index': 5e-5,
-            'BOUTPARAM:autocovariance symmetry - V': 5e-5
-        }
-        for key in gait_res:
-            assert allclose(
-                res['Gait'][key],
-                gait_res[key],
-                equal_nan=True,
-                atol=atol.get(key, 1e-8)
-            ), f'{key} does not match truth'
-
-        # get the data from the saved file
-        data = read_csv(ntf.name)
-
-        for key in gait_res:
-            assert allclose(
-                data[key].values,
-                gait_res[key],
-                equal_nan=True,
-                atol=atol.get(key, 1e-8)
-            ), f'{key} from saved data does not match truth'
-
-        ntf.close()
+        self.run_pipeline(get_truth_data, p, self.gait_keys, self.atol, gait_res_file)
 
     @pytest.mark.parametrize('proc', (ReadCWA, Gait, Sit2Stand))
     def test_add(self, proc):
