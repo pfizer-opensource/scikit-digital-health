@@ -5,8 +5,10 @@ Lukas Adamowicz
 Pfizer DMTI 2020
 """
 import json
+from operator import attrgetter
+from warnings import warn
 
-from skimu.base import _BaseProcess
+from skimu.base import _BaseProcess as Process
 
 
 class NotAProcessError(Exception):
@@ -79,25 +81,25 @@ class Pipeline:
 
         for proc in procs:
             name = list(proc.keys())[0]
+            mod = proc[name]["module"]
             params = proc[name]["Parameters"]
             save_result = proc[name]["save_result"]
             save_name = proc[name]["save_name"]
 
             try:
-                module = getattr(skimu, name.lower())
+                process = attrgetter(f"{mod}.{name}")(skimu)
             except AttributeError:
-                raise ModuleNotFoundError(f"Module '{name.lower()}' not found in skimu. "
-                                          f"Please open an issue on the scikit-imu GitHub page.")
-
-            try:
-                self.add(
-                    getattr(module, name)(**params),
-                    save_results=save_result,
-                    save_name=save_name
+                warn(
+                    f"Process (skimu.{mod}.{name}) not found. Not being added to pipeline",
+                    UserWarning
                 )
-            except (NotAProcessError, AttributeError) as e:
-                raise ProcessNotFoundError(f"The process '{name}' was not found. "
-                                           f"Not being added to pipeline") from e
+                continue
+
+            self.add(
+                process(**params),
+                save_results=save_result,
+                save_name=save_name
+            )
 
     def add(self, process, save_results=False, save_name="{date}_{name}_results.cv"):
         """
@@ -114,9 +116,9 @@ class Pipeline:
             For options for the formatting, see any of the processes (e.g. :class:`Gait`,
             :class:`Sit2Stand`). Default is "{date}_{name}_results.csv
         """
-        if not isinstance(process, _BaseProcess):
-            raise NotAProcessError("process is not a subclass of _BaseProcess, cannot be added "
-                                   "to the pipeline")
+        if not isinstance(process, Process):
+            raise NotAProcessError(f"process ({process._name}) is not a subclass of _BaseProcess, "
+                                   f"cannot be added to the pipeline")
 
         self._steps += [process]
         # attach the save bool and save_name to the process
