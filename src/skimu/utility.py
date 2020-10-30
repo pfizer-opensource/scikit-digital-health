@@ -100,6 +100,7 @@ def compute_window_samples(fs, window_length, window_step):
 def get_windowed_view(x, window_length, step_size, ensure_c_contiguity=False):
     """
     Return a moving window view over the data
+
     Parameters
     ----------
     x : numpy.ndarray
@@ -114,6 +115,7 @@ def get_windowed_view(x, window_length, step_size, ensure_c_contiguity=False):
         Create a new array with C-contiguity if the passed array is not C-contiguous.
         This *may* result in the memory requirements significantly increasing. Default is False,
         which will raise a ValueError if `x` is not C-contiguous
+
     Returns
     -------
     x_win : numpy.ndarray
