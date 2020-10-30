@@ -117,8 +117,8 @@ class Pipeline:
             :class:`Sit2Stand`). Default is "{date}_{name}_results.csv
         """
         if not isinstance(process, Process):
-            raise NotAProcessError(f"process is not a subclass of _BaseProcess, "
-                                   f"cannot be added to the pipeline")
+            raise NotAProcessError("process is not a subclass of _BaseProcess, "
+                                   "cannot be added to the pipeline")
 
         self._steps += [process]
         # attach the save bool and save_name to the process

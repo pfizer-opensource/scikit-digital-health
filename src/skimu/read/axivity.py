@@ -84,7 +84,7 @@ class ReadCWA(_BaseProcess):
         file : {str, Path}
             Path to the file to read. Must either be a string, or be able to be converted by
             `str(file)`
-        
+
         Returns
         -------
         data : dict
@@ -96,11 +96,11 @@ class ReadCWA(_BaseProcess):
             If the file name is not provided
         UnexpectedAxesError
             If the number of axes returned is not 3, 6 or 9
-        
+
         Notes
         -----
         The keys in `data` depend on which data the file contained. Potential keys are:
-        
+
         - `accel`: acceleration [g]
         - `gyro`: angular velocity [deg/s]
         - `magnet`: magnetic field readings [uT]

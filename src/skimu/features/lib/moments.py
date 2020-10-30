@@ -49,6 +49,7 @@ class Mean(Feature):
             Computed mean, returned as the same type as the input signal
         """
         return super().compute(*args, **kwargs)
+
     def _compute(self, x, fs):
         super()._compute(x, fs)
 
