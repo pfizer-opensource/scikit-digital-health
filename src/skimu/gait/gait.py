@@ -128,22 +128,23 @@ class Gait(_BaseProcess):
         gait_metrics.RegularityIndexV
     ]
 
-    def __repr__(self):
-        ret = "Gait("
-        ret += f"use_cwt_scale_relation={self.use_opt_scale!r}, "
-        ret += f"min_bout_time={self.min_bout!r}, "
-        ret += f"max_bout_separation_time={self.max_bout_sep!r}, "
-        ret += f"max_stride_time={self.max_stride_time!r}, "
-        ret += f"loading_factor={self.loading_factor!r}, "
-        ret += f"height_factor={self.height_factor!r}, "
-        ret += f"filter_order={self.filt_ord!r}, "
-        ret += f"filter_cutoff={self.filt_cut!r})"
-        return ret
-
     def __init__(self, use_cwt_scale_relation=True, min_bout_time=8.0,
                  max_bout_separation_time=0.5, max_stride_time=2.25, loading_factor=0.2,
                  height_factor=0.53, prov_leg_length=False, filter_order=4, filter_cutoff=20.0):
-        super().__init__('Gait Process', True)
+        super().__init__(
+            'Gait',
+            True,
+            # key-word arguments for storage
+            use_cwt_scale_relation=use_cwt_scale_relation,
+            min_bout_time=min_bout_time,
+            max_bout_separation_time=max_bout_separation_time,
+            max_stride_time=max_stride_time,
+            loading_factor=loading_factor,
+            height_factor=height_factor,
+            prov_leg_length=prov_leg_length,
+            filter_order=filter_order,
+            filter_cutoff=filter_cutoff
+        )
 
         self.use_opt_scale = use_cwt_scale_relation
         self.min_bout = min_bout_time

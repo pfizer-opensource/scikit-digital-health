@@ -6,7 +6,7 @@ Pfizer DMTI 2020
 """
 from warnings import warn
 
-from numpy import vstack, round
+from numpy import vstack
 
 from skimu.base import _BaseProcess
 from skimu.read.get_window_start_stop import get_window_start_stop
@@ -42,11 +42,15 @@ class ReadBin(_BaseProcess):
     >>> reader.predict('example.bin')
     {'accel': ..., 'time': ..., 'day_ends': [130, 13951, ...]}
     """
-    def __repr__(self):
-        return f"ReadBin(base={self.base!r}, period={self.period!r})"
 
     def __init__(self, base=None, period=None):
-        super().__init__('Read bin', False)
+        super().__init__(
+            'Read bin',
+            False,
+            # kwargs
+            base=base,
+            period=period
+        )
 
         if (base is None) and (period is None):
             self.window = False

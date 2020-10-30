@@ -88,18 +88,6 @@ class Sit2Stand(_BaseProcess):
         - jerk moving std: 3         :: max moving std jerk to be considered still (m/s^3)
 
     """
-    def __repr__(self):
-        ret = "Sit2Stand("
-        ret += f"{self.detector!r}, "
-        ret += f"continuous_wavelet={self.cwave!r}, "
-        ret += f"power_band=[{self.power_start_f!r}, {self.power_end_f!r}], "
-        ret += f"power_peak_kw={self.power_peak_kw!r}, "
-        ret += f"power_std_height={self.std_height!r}, "
-        ret += f"power_std_trim={self.std_trim!r}, "
-        ret += f"lowpass_order={self.lp_ord!r}, "
-        ret += f"lowpass_cutoff={self.lp_cut!r}, "
-        ret += f"reconstruction_window={self.rwindow!r})"
-        return ret
 
     def __init__(
             self, *,
@@ -119,7 +107,26 @@ class Sit2Stand(_BaseProcess):
             lowpass_cutoff=5,
             reconstruction_window=0.25
     ):
-        super().__init__('STS Detection Process', True)
+        super().__init__(
+            'STS Detection Process',
+            True,
+            # kwarg saving
+            stillness_constraint=stillness_constraint,
+            gravity=gravity,
+            thresholds=thresholds,
+            long_still=long_still,
+            still_window=still_window,
+            gravity_pass_order=gravity_pass_order,
+            gravity_pass_cutoff=gravity_pass_cutoff,
+            continuous_wavelet=continuous_wavelet,
+            power_band=power_band,
+            power_peak_kw=power_peak_kw,
+            power_std_height=power_std_height,
+            power_std_trim=power_std_trim,
+            lowpass_order=lowpass_order,
+            lowpass_cutoff=lowpass_cutoff,
+            reconstruction_window=reconstruction_window
+        )
 
         # FILTER PARAMETERS
         self.cwave = continuous_wavelet

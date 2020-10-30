@@ -6,7 +6,7 @@ Pfizer DMTI 2020
 """
 from warnings import warn
 
-from numpy import vstack, round
+from numpy import vstack
 
 from skimu.base import _BaseProcess
 from skimu.read.get_window_start_stop import get_window_start_stop
@@ -47,11 +47,15 @@ class ReadCWA(_BaseProcess):
     >>> reader.predict('example.cwa')
     {'accel': ..., 'time': ..., 'day_ends': [130, 13951, ...], ...}
     """
-    def __repr__(self):
-        return f"ReadCWA(base={self.base!r}, period={self.period!r})"
 
     def __init__(self, base=None, period=None):
-        super().__init__('Read CWA', False)
+        super().__init__(
+            'Read CWA',
+            False,
+            # kwargs
+            base=base,
+            period=None
+        )
 
         if (base is None) and (period is None):
             self.window = False
