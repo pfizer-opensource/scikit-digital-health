@@ -88,7 +88,7 @@ class Pipeline:
         for proc in self:
             kwargs, step_result = proc._predict(**kwargs)
             if proc.pipe_save:
-                proc._save_results(step_result if proc._return_result else kwargs, proc.pipe_fname)
+                proc.save_results(step_result if proc._return_result else kwargs, proc.pipe_fname)
             if proc._return_result:
                 results[proc._proc_name] = step_result
 
