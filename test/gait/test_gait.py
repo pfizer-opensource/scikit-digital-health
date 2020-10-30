@@ -124,7 +124,7 @@ class TestGetGaitStrides:
         gait = {i: [] for i in keys}
         bout_steps = get_strides(gait, accel[:, axis], 0, ic, fc, time, 2.25, 0.2)
 
-        assert bout_steps == 26
+        assert bout_steps == 45
         for k in keys:
             assert allclose(gait[k], gait_truth[k], equal_nan=True)
 
