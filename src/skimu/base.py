@@ -67,4 +67,4 @@ class _BaseProcess:
 
         file_name = file_name.format(date=date, name=name)
 
-        DataFrame(results).to_csv(file_name)
+        DataFrame(results).to_csv(file_name, index=False)
