@@ -24,15 +24,13 @@ class DetailPower(Feature):
     freq_band : array_like
         2-element array-like of the frequency band (Hz) to get the power in. Default is [1, 3]
 
-    Methods
-    -------
-    compute(signal, fs[, columns=None, windowed=False])
-
     References
     ----------
     .. [1] Sekine, M. et al. "Classification of waist-acceleration signals in a continuous
-    walking record." Medical Engineering & Physics. Vol. 22. Pp 285-291. 2000.
+        walking record." Medical Engineering & Physics. Vol. 22. Pp 285-291. 2000.
     """
+    _wavelet_options = pywt.wavelist(kind='discrete')
+
     def __init__(self, wavelet='coif4', freq_band=None):
         super().__init__('DetailPower', {'wavelet': wavelet, 'freq_band': freq_band})
 
@@ -42,6 +40,30 @@ class DetailPower(Feature):
             self.f_band = sort(freq_band)
         else:
             self.f_band = [1.0, 3.0]
+
+    def compute(self, *args, **kwargs):
+        """
+        compute(signal, fs, *, columns=None, windowed=False)
+
+        Compute the detail power
+
+        Parameters
+        ----------
+        signal : {numpy.ndarray, pandas.DataFrame}
+            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
+        fs : float, optional
+            Sampling frequency in Hz
+        columns : array_like, optional
+            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
+        windowed : bool, optional
+            If the signal has already been windowed. Default is False.
+
+        Returns
+        -------
+        power : {numpy.ndarray, pandas.DataFrame}
+            Computed detail power, returned as the same type as the input signal
+        """
+        return super().compute(*args, **kwargs)
 
     def _compute(self, x, fs):
         super()._compute(x, fs)
@@ -85,10 +107,6 @@ class DetailPowerRatio(Feature):
     freq_band : array_like
         2-element array-like of the frequency band (Hz) to get the power in. Default is [1, 10]
 
-    Methods
-    -------
-    compute(signal, fs[, columns=None, windowed=False])
-
     Notes
     -----
     In the original paper [1]_, the result is multiplied by 100 to obtain a percentage. This
@@ -98,8 +116,10 @@ class DetailPowerRatio(Feature):
     References
     ----------
     .. [1] Sekine, M. et al. "Classification of waist-acceleration signals in a continuous
-    walking record." Medical Engineering & Physics. Vol. 22. Pp 285-291. 2000.
+        walking record." Medical Engineering & Physics. Vol. 22. Pp 285-291. 2000.
     """
+    _wavelet_options = pywt.wavelist(kind='discrete')
+
     def __init__(self, wavelet='coif4', freq_band=None):
         super().__init__('DetailPowerRatio', {'wavelet': wavelet, 'freq_band': freq_band})
 
@@ -109,6 +129,30 @@ class DetailPowerRatio(Feature):
             self.f_band = sort(freq_band)
         else:
             self.f_band = [1.0, 10.0]
+
+    def compute(self, *args, **kwargs):
+        """
+        compute(signal, fs, *, columns=None, windowed=False)
+
+        Compute the detail power ratio
+
+        Parameters
+        ----------
+        signal : {numpy.ndarray, pandas.DataFrame}
+            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
+        fs : float, optional
+            Sampling frequency in Hz
+        columns : array_like, optional
+            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
+        windowed : bool, optional
+            If the signal has already been windowed. Default is False.
+
+        Returns
+        -------
+        power_ratio : {numpy.ndarray, pandas.DataFrame}
+            Computed detail power ratio, returned as the same type as the input signal
+        """
+        return super().compute(*args, **kwargs)
 
     def _compute(self, x, fs):
         super()._compute(x, fs)

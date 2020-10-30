@@ -3,6 +3,9 @@
 .idea/*
 .idea*
 
+# other
+.DS_Store
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -138,3 +141,4 @@ dmypy.json
 !src/skimu/features/lib/
 /docs/ref/gait/generated/
 /docs/**/generated/
+/coverage/

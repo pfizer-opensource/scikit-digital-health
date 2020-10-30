@@ -31,17 +31,19 @@ gait speed: stride_length / stride time
 """
 from numpy import zeros, nanmean, mean, nanstd, std, sum, sqrt, nan, nonzero, argmin, abs, round, \
     float_, int_, fft, arange
+from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt, find_peaks
 
 
 from skimu.gait.gait_metrics.base import EventMetric, BoutMetric, basic_asymmetry
+from skimu.features.lib._cython.sparc import sparc_1d
 
 
 __all__ = ['StrideTime', 'StanceTime', 'SwingTime', 'StepTime', 'InitialDoubleSupport',
            'TerminalDoubleSupport', 'DoubleSupport', 'SingleSupport', 'StepLength',
            'StrideLength', 'GaitSpeed', 'Cadence', 'GaitSymmetryIndex', 'IntraStepCovarianceV',
-           'IntraStrideCovarianceV', 'HarmonicRatioV', 'PhaseCoordinationIndex', 'StepRegularityV',
-           'StrideRegularityV', 'AutocovarianceSymmetryV']
+           'IntraStrideCovarianceV', 'HarmonicRatioV', 'StrideSPARC', 'PhaseCoordinationIndex',
+           'StepRegularityV', 'StrideRegularityV', 'AutocovarianceSymmetryV', 'RegularityIndexV']
 
 
 def _autocovariancefunction(x, max_lag, biased=False):
@@ -56,7 +58,7 @@ def _autocovariancefunction(x, max_lag, biased=False):
     else:
         raise ValueError('Too many dimensions (>2) for x')
 
-    for i in range(max_lag):
+    for i in range(min(max_lag, N-10)):
         ac[i] = sum(
             (x[:N-i] - mean(x[:N-i], axis=axis)) * (x[i:] - mean(x[i:], axis=axis)), axis=axis
         )
@@ -65,32 +67,6 @@ def _autocovariancefunction(x, max_lag, biased=False):
         else:
             ac[i] /= ((N - i) * std(x[:N-i], ddof=1) * std(x[i:], ddof=1))
 
-    return ac
-
-
-def _autocovariance_lag(x, lag, biased=False):
-    if x.ndim == 1:
-        N = x.size
-        m1 = mean(x[:N-lag])
-        m2 = mean(x[lag:])
-        s1 = std(x[:N-lag], ddof=1)
-        s2 = std(x[lag:], ddof=1)
-
-        ac = sum((x[:N-lag] - m1) * (x[lag:] - m2))
-    elif x.ndim == 2:
-        N = x.shape[0]
-        m1 = mean(x[:N-lag], axis=0)
-        m2 = mean(x[lag:], axis=0)
-        s1 = std(x[:N-lag], ddof=1, axis=0)
-        s2 = std(x[lag:], ddof=1, axis=0)
-
-        ac = sum((x[:N-lag] - m1) * (x[lag:] - m2), axis=0)
-    else:
-        raise ValueError('Too many dimensions (>2) for x')
-    if biased:
-        ac /= (N * s1 * s2)
-    else:
-        ac /= ((N - lag) * s1 * s2)
     return ac
 
 
@@ -453,6 +429,44 @@ class HarmonicRatioV(EventMetric):
             gait[self.k_][idx] = sum(F[ix_stridef[1::2]]) / sum(F[ix_stridef[::2]])
 
 
+class StrideSPARC(EventMetric):
+    r"""
+    Assessment of the smoothness of the acceleration signal during a stride. SPARC is the
+    spectral arc length, which is a measure of how smooth a signal is. Higher values (smaller
+    negative) numbers indicate smoother strides.
+
+    Notes
+    -----
+    Per the recommendation from [1]_, the SPARC is computed on the magnitude of the acceleration
+    signal less gravity, during each stride.
+
+    References
+    ----------
+    .. [1] S. Balasubramanian, A. Melendez-Calderon, A. Roby-Brami, and E. Burdet, “On the
+        analysis of movement smoothness,” J NeuroEngineering Rehabil, vol. 12, no. 1, p. 112,
+        Dec. 2015, doi: 10.1186/s12984-015-0090-9.
+    """
+    def __init__(self):
+        super().__init__('stride SPARC')
+
+    def _predict(self, dt, leg_length, gait, gait_aux):
+        mask, mask_ofst = self._predict_init(gait, True, offset=2)
+
+        i1 = gait['IC'][mask]
+        i2 = gait['IC'][mask_ofst]
+
+        for i, idx in enumerate(nonzero(mask)[0]):
+            bout_i = gait_aux['inertial data i'][idx]
+
+            gait[self.k_][idx] = sparc_1d(
+                norm(gait_aux['accel'][bout_i][i1[i]:i2[i], :], axis=1) - 1,
+                1 / dt,  # fsample
+                4,  # padlevel
+                10.0,  # fcut
+                0.05  # amplitude threshold
+            )
+
+
 # ===========================================================
 #     GAIT BOUT-LEVEL METRICS
 # ===========================================================
@@ -497,7 +511,7 @@ class PhaseCoordinationIndex(BoutMetric):
         doi: 10.1155/2015/547065.
     """
     def __init__(self):
-        super().__init__('phase coordination index')
+        super().__init__('phase coordination index', depends=[StrideTime, StepTime])
 
     def _predict(self, dt, leg_length, gait, gait_aux):
         pci = zeros(len(gait_aux['accel']), dtype=float_)
@@ -522,6 +536,10 @@ class GaitSymmetryIndex(BoutMetric):
 
     Notes
     -----
+    If the minimum gait window time is less than 4.5 seconds, there may be issues with this
+    metric for those with slow gait (those with stride lengths approaching the minimum gait
+    window time).
+
     GSI is computed using the biased autocovariance of the acceleration after being filtered
     through a 4th order 10Hz cutoff butterworth low-pass filter. [1]_ and [2]_ use the
     autocorrelation, instead of autocovariance, however subtracting from the compared signals
@@ -565,7 +583,7 @@ class GaitSymmetryIndex(BoutMetric):
         and Development, vol. 32, no. 1, pp. 25–31, Feb. 1995.
     """
     def __init__(self):
-        super().__init__('gait symmetry index')
+        super().__init__('gait symmetry index', depends=[StrideTime])
 
     def _predict(self, dt, leg_length, gait, gait_aux):
         gsi = zeros(len(gait_aux['accel']), dtype=float_)
@@ -577,7 +595,7 @@ class GaitSymmetryIndex(BoutMetric):
                 round(nanmean(gait['PARAM:stride time'][gait_aux['inertial data i'] == i]) / dt)
             )
             # GSI uses biased autocovariance
-            ac = _autocovariancefunction(sosfiltfilt(sos, acc, axis=0), int(4.5 * dt), biased=True)
+            ac = _autocovariancefunction(sosfiltfilt(sos, acc, axis=0), int(4.5 / dt), biased=True)
 
             # C_stride is the sum of 3 axes
             pks, _ = find_peaks(sum(ac, axis=1))
@@ -598,6 +616,10 @@ class StepRegularityV(BoutMetric):
 
     Notes
     -----
+    If the minimum gait window time is less than 4.5 seconds, there may be issues with this
+    metric for those with slow gait (those with stride lengths approaching the minimum gait
+    window time).
+
     Step regularity is the value of the autocovariance function at a lag equal to the time
     for one step. While [2]_ uses the autocorrelation instead of the autocovariance like [1]_, the
     autocovariance is used here as it provides a mathematically better comparison of the
@@ -626,7 +648,7 @@ class StepRegularityV(BoutMetric):
             lag = int(
                 round(nanmean(gait['PARAM:step time'][gait_aux['inertial data i'] == i]) / dt)
             )
-            acf = _autocovariancefunction(acc[:, gait_aux['vert axis']], int(4.5 * dt))
+            acf = _autocovariancefunction(acc[:, gait_aux['vert axis']], int(4.5 / dt))
             pks, _ = find_peaks(acf)
             idx = argmin(abs(pks - lag))
 
@@ -645,6 +667,10 @@ class StrideRegularityV(BoutMetric):
 
     Notes
     -----
+    If the minimum gait window time is less than 4.5 seconds, there may be issues with this
+    metric for those with slow gait (those with stride lengths approaching the minimum gait
+    window time).
+
     Stride regularity is the value of the autocovariance function at a lag equal to the time
     for one stride. While [2]_ uses the autocorrelation instead of the autocovariance like [1]_,
     the autocovariance is used here as it provides a mathematically better comparison of the
@@ -676,7 +702,7 @@ class StrideRegularityV(BoutMetric):
             lag = int(
                 round(nanmean(gait['PARAM:stride time'][gait_aux['inertial data i'] == i]) / dt)
             )
-            acf = _autocovariancefunction(acc[:, gait_aux['vert axis']], int(4.5 * dt))
+            acf = _autocovariancefunction(acc[:, gait_aux['vert axis']], int(4.5 / dt))
             pks, _ = find_peaks(acf)
             idx = argmin(abs(pks - lag))
 
@@ -691,6 +717,12 @@ class AutocovarianceSymmetryV(BoutMetric):
     The absolute difference between stride and step regularity for the vertical axis.
     It quantifies the level of symmetry between the stride and step regularity and provide an
     overall metric of symmetry for the gait bout
+
+    Notes
+    -----
+    If the minimum gait window time is less than 4.5 seconds, there may be issues with this
+    metric for those with slow gait (those with stride lengths approaching the minimum gait
+    window time).
 
     References
     ----------
@@ -707,3 +739,48 @@ class AutocovarianceSymmetryV(BoutMetric):
         gait[self.k_] = abs(
             gait['BOUTPARAM:step regularity - V'] - gait['BOUTPARAM:stride regularity - V']
         )
+
+
+class RegularityIndexV(BoutMetric):
+    r"""
+    The combination of both step and stride regularity into one metric. The goal is to provide an
+    assessment of the regularity for consecutive steps and strides, for the vertical axis
+    acceleration. Values closer to 1 indicate high levels of symmetry between left and right steps.
+
+    Notes
+    -----
+    The vertical axis regularity index :math:`R_V` is simply defined per
+
+    .. math:: R_V = 1 - |R_{(stride, V)} - R_{(step, V)}|\frac{2}{R_{(stride, V)} + R_{(step, V)}}
+
+    where :math:`R_{(stride, V)}` is the stride regularity for the vertical axis (same notation for
+    step regularity).
+
+    The Regularity Index term came from [1]_, where it was defined without the subtraction from 1.
+    However, the definition from [2]_ (under the term "symmetry") keeps the values in the same
+    range as others (including step/stride regularity), aiding in ease of interpretation.
+    "Regularity Index" however serves to eliminate confusion given other metrics already labeled
+    with "symmetry" in the name.
+
+    References
+    ----------
+    .. [1] L. Angelini et al., “Is a Wearable Sensor-Based Characterisation of Gait Robust Enough
+        to Overcome Differences Between Measurement Protocols? A Multi-Centric Pragmatic Study in
+        Patients with Multiple Sclerosis,” Sensors, vol. 20, no. 1, Art. no. 1, Jan. 2020,
+        doi: 10.3390/s20010079.
+    .. [2] L. Angelini et al., “Wearable sensors can reliably quantify gait alterations associated
+        with disability in people with progressive multiple sclerosis in a clinical setting,”
+        J Neurol, vol. 267, no. 10, pp. 2897–2909, Oct. 2020, doi: 10.1007/s00415-020-09928-8.
+
+
+    """
+    def __init__(self):
+        super().__init__(
+            'regularity index - V', depends=[StepRegularityV, StrideRegularityV]
+        )
+
+    def _predict(self, dt, leg_length, gait, gait_aux):
+        str_v = 'BOUTPARAM:stride regularity - V'
+        ste_v = 'BOUTPARAM:step regularity - V'
+
+        gait[self.k_] = 1 - (2 * abs(gait[str_v] - gait[ste_v]) / (gait[ste_v] + gait[str_v]))

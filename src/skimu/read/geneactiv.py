@@ -14,31 +14,42 @@ from skimu.read._extensions import bin_convert
 
 
 class ReadBin(_BaseProcess):
-    def __repr__(self):
-        return f"ReadBin(base={self.base!r}, period={self.period!r})"
+    """
+    Read a binary .bin file from a GeneActiv sensor into memory. Acceleration values are returned
+    in units of `g`. If providing a base and period value, included in the output will be the
+    indices to create windows starting at the `base` time, with a length of `period`.
+
+    Parameters
+    ----------
+    base : {None, int}, optional
+        Base hour [0, 23] in which to start a window of time. Default is None, which will not
+        do any windowing. Both `base` and `period` must be defined in order to window.
+    period : {None, int}, optional
+        Period for each window, in [1, 24]. Defines the number of hours per window. Default is
+        None, which will do no windowing. Both `period` and `base` must be defined to window
+
+    Examples
+    ========
+    Setup a reader with no windowing:
+
+    >>> reader = ReadBin()
+    >>> reader.predict('example.bin')
+    {'accel': ..., 'time': ...}
+
+    Setup a reader that does windowing between 8:00 AM and 8:00 PM (20:00):
+
+    >>> reader = ReadBin(base=8, period=12)  # 8 + 12 = 20
+    >>> reader.predict('example.bin')
+    {'accel': ..., 'time': ..., 'day_ends': [130, 13951, ...]}
+    """
 
     def __init__(self, base=None, period=None):
-        """
-        Read a binary .bin file from a GeneActiv sensor into memory. The units for acceleration
-        data will be `g`. If providing a base and period value, included in the output will be the
-        indices to create windows starting at the `base` time, with a length of `period`.
-
-        Parameters
-        ----------
-        base : {None, int}, optional
-            Base hour [0, 23] in which to start a window of time. Default is None, which will not
-            do any windowing. Both `base` and `period` must be defined in order to window.
-        period : {None, int}, optional
-            Period for each window, in [1, 24]. Defines the number of hours per window. Default is
-            None, which will do no windowing. Both `period` and `base` must be defined to window
-
-        Examples
-        ========
-        >>> # setup a reader to read, with windows from 08:00 to 20:00 (8AM to 8PM)
-        >>> reader = ReadBin(base=8, period=12)
-        >>> reader.predict('example.bin')
-        """
-        super().__init__('Read bin', False)
+        super().__init__(
+            False,
+            # kwargs
+            base=base,
+            period=period
+        )
 
         if (base is None) and (period is None):
             self.window = False
@@ -59,6 +70,8 @@ class ReadBin(_BaseProcess):
 
     def predict(self, *args, **kwargs):
         """
+        predict(file)
+
         Read the data from the axivity file
 
         Parameters
@@ -66,6 +79,26 @@ class ReadBin(_BaseProcess):
         file : {str, Path}
             Path to the file to read. Must either be a string, or be able to be converted by
             `str(file)`
+
+        Returns
+        -------
+        data : dict
+            Dictionary of the data contained in the file.
+
+        Raises
+        ------
+        ValueError
+            If the file name is not provided
+
+        Notes
+        -----
+        The keys in `data` depend on which data the file contained. Potential keys are:
+
+        - `accel`: acceleration [g]
+        - `time`: timestamps [s]
+        - `light`: light values [unknown]
+        - `temperature`: temperature [deg C]
+        - `day_ends`: window indices
         """
         return super().predict(*args, **kwargs)
 

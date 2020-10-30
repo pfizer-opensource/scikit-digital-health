@@ -17,10 +17,6 @@ class Mean(Feature):
     """
     The signal mean.
 
-    Methods
-    -------
-    compute(signal[, columns=None, windowed=False])
-
     Examples
     --------
     >>> import numpy as np
@@ -32,6 +28,28 @@ class Mean(Feature):
     def __init__(self):
         super().__init__('Mean', {})
 
+    def compute(self, *args, **kwargs):
+        """
+        compute(signal, *, columns=None, windowed=False)
+
+        Compute the mean
+
+        Parameters
+        ----------
+        signal : {numpy.ndarray, pandas.DataFrame}
+            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
+        columns : array_like, optional
+            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
+        windowed : bool, optional
+            If the signal has already been windowed. Default is False.
+
+        Returns
+        -------
+        mean : {numpy.ndarray, pandas.DataFrame}
+            Computed mean, returned as the same type as the input signal
+        """
+        return super().compute(*args, **kwargs)
+
     def _compute(self, x, fs):
         super()._compute(x, fs)
 
@@ -41,13 +59,33 @@ class Mean(Feature):
 class MeanCrossRate(Feature):
     """
     Number of signal mean value crossings. Expressed as a percentage of signal length.
-
-    Methods
-    -------
-    compute(signal[, columns=None, windowed=False])
     """
     def __init__(self):
         super(MeanCrossRate, self).__init__('MeanCrossRate', {})
+
+    def compute(self, *args, **kwargs):
+        """
+        compute(signal *, columns=None, windowed=False)
+
+        Compute the mean cross rate
+
+        Parameters
+        ----------
+        signal : {numpy.ndarray, pandas.DataFrame}
+            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
+        fs : float, optional
+            Sampling frequency in Hz
+        columns : array_like, optional
+            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
+        windowed : bool, optional
+            If the signal has already been windowed. Default is False.
+
+        Returns
+        -------
+        mcr : {numpy.ndarray, pandas.DataFrame}
+            Computed mean cross rate, returned as the same type as the input signal
+        """
+        return super().compute(*args, **kwargs)
 
     def _compute(self, x, fs):
         super(MeanCrossRate, self)._compute(x, fs)
@@ -62,19 +100,37 @@ class StdDev(Feature):
     """
     The signal standard deviation
 
-    Methods
-    -------
-    compute(signal[, columns=None, windowed=False])
-
     Examples
     --------
     >>> import numpy as np
     >>> signal = np.arange(15).reshape((5, 3))
-    >>> StDev().compute(signal)
+    >>> StdDev().compute(signal)
     array([[4.74341649, 4.74341649, 4.74341649]])
     """
     def __init__(self):
         super().__init__('StdDev', {})
+
+    def compute(self, *args, **kwargs):
+        """
+        compute(signal, *, columns=None, windowed=False)
+
+        Compute the standard deviation
+
+        Parameters
+        ----------
+        signal : {numpy.ndarray, pandas.DataFrame}
+            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
+        columns : array_like, optional
+            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
+        windowed : bool, optional
+            If the signal has already been windowed. Default is False.
+
+        Returns
+        -------
+        stdev : {numpy.ndarray, pandas.DataFrame}
+            Computed standard deviation, returned as the same type as the input signal
+        """
+        return super().compute(*args, **kwargs)
 
     def _compute(self, x, fs):
         super()._compute(x, fs)
@@ -85,13 +141,31 @@ class StdDev(Feature):
 class Skewness(Feature):
     """
     The skewness of a signal. NaN inputs will be propagated through to the result.
-
-    Methods
-    -------
-    compute(signal[, columns=None, windowed=False])
     """
     def __init__(self):
         super().__init__('Skewness', {})
+
+    def compute(self, *args, **kwargs):
+        """
+        compute(signal, *, columns=None, windowed=False)
+
+        Compute the skewness
+
+        Parameters
+        ----------
+        signal : {numpy.ndarray, pandas.DataFrame}
+            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
+        columns : array_like, optional
+            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
+        windowed : bool, optional
+            If the signal has already been windowed. Default is False.
+
+        Returns
+        -------
+        skew : {numpy.ndarray, pandas.DataFrame}
+            Computed skewness, returned as the same type as the input signal
+        """
+        return super().compute(*args, **kwargs)
 
     def _compute(self, x, fs):
         super()._compute(x, fs)
@@ -102,13 +176,31 @@ class Skewness(Feature):
 class Kurtosis(Feature):
     """
     The kurtosis of a signal. NaN inputs will be propagated through to the result.
-
-    Methods
-    -------
-    compute(signal[, columns=None, windowed=False])
     """
     def __init__(self):
         super().__init__('Kurtosis', {})
+
+    def compute(self, *args, **kwargs):
+        """
+        compute(signal, *, columns=None, windowed=False)
+
+        Compute the kurtosis
+
+        Parameters
+        ----------
+        signal : {numpy.ndarray, pandas.DataFrame}
+            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
+        columns : array_like, optional
+            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
+        windowed : bool, optional
+            If the signal has already been windowed. Default is False.
+
+        Returns
+        -------
+        kurt : {numpy.ndarray, pandas.DataFrame}
+            Computed kurtosis, returned as the same type as the input signal
+        """
+        return super().compute(*args, **kwargs)
 
     def _compute(self, x, fs):
         super()._compute(x, fs)

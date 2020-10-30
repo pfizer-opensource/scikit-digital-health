@@ -24,10 +24,6 @@ class DominantFrequency(Feature):
         Low value of the frequency range to look in. Default is 0.0 Hz
     high_cutoff : float, optional
         High value of the frequency range to look in. Default is 5.0 Hz
-
-    Methods
-    -------
-    compute(signal, fs[, columns=None, windowed=False])
     """
     def __init__(self, low_cutoff=0.0, high_cutoff=5.0):
         super(DominantFrequency, self).__init__('DominantFrequency', {'low_cutoff': low_cutoff,
@@ -35,6 +31,30 @@ class DominantFrequency(Feature):
 
         self.low_cut = low_cutoff
         self.high_cut = high_cutoff
+
+    def compute(self, *args, **kwargs):
+        """
+        compute(signal, fs, *, columns=None, windowed=False)
+
+        Compute the dominant frequency
+
+        Parameters
+        ----------
+        signal : {numpy.ndarray, pandas.DataFrame}
+            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
+        fs : float, optional
+            Sampling frequency in Hz
+        columns : array_like, optional
+            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
+        windowed : bool, optional
+            If the signal has already been windowed. Default is False.
+
+        Returns
+        -------
+        dom_freq : {numpy.ndarray, pandas.DataFrame}
+            Computed dominant frequency, returned as the same type as the input signal
+        """
+        return super().compute(*args, **kwargs)
 
     def _compute(self, x, fs):
         super(DominantFrequency, self)._compute(x, fs)
@@ -54,10 +74,6 @@ class DominantFrequencyValue(Feature):
         Low value of the frequency range to look in. Default is 0.0 Hz
     high_cutoff : float, optional
         High value of the frequency range to look in. Default is 5.0 Hz
-
-    Methods
-    -------
-    compute(signal, fs[, columns=None, windowed=False])
     """
     def __init__(self, low_cutoff=0.0, high_cutoff=5.0):
         super(DominantFrequencyValue, self).__init__(
@@ -65,6 +81,30 @@ class DominantFrequencyValue(Feature):
 
         self.low_cut = low_cutoff
         self.high_cut = high_cutoff
+
+    def compute(self, *args, **kwargs):
+        """
+        compute(signal, fs, *, columns=None, windowed=False)
+
+        Compute the dominant frequency value
+
+        Parameters
+        ----------
+        signal : {numpy.ndarray, pandas.DataFrame}
+            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
+        fs : float, optional
+            Sampling frequency in Hz
+        columns : array_like, optional
+            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
+        windowed : bool, optional
+            If the signal has already been windowed. Default is False.
+
+        Returns
+        -------
+        dom_freq_val : {numpy.ndarray, pandas.DataFrame}
+            Computed dominant frequency value, returned as the same type as the input signal
+        """
+        return super().compute(*args, **kwargs)
 
     def _compute(self, x, fs):
         super(DominantFrequencyValue, self)._compute(x, fs)
@@ -85,10 +125,6 @@ class PowerSpectralSum(Feature):
         Low value of the frequency range to look in. Default is 0.0 Hz
     high_cutoff : float, optional
         High value of the frequency range to look in. Default is 5.0 Hz
-
-    Methods
-    -------
-    compute(signal, fs[, columns=None, windowed=False])
     """
     def __init__(self, low_cutoff=0.0, high_cutoff=5.0):
         super(PowerSpectralSum, self).__init__('PowerSpectralSum', {'low_cutoff': low_cutoff,
@@ -96,6 +132,30 @@ class PowerSpectralSum(Feature):
 
         self.low_cut = low_cutoff
         self.high_cut = high_cutoff
+
+    def compute(self, *args, **kwargs):
+        """
+        compute(signal, fs, *, columns=None, windowed=False)
+
+        Compute the power spectral sum
+
+        Parameters
+        ----------
+        signal : {numpy.ndarray, pandas.DataFrame}
+            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
+        fs : float, optional
+            Sampling frequency in Hz
+        columns : array_like, optional
+            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
+        windowed : bool, optional
+            If the signal has already been windowed. Default is False.
+
+        Returns
+        -------
+        pss : {numpy.ndarray, pandas.DataFrame}
+            Computed power spectral sum, returned as the same type as the input signal
+        """
+        return super().compute(*args, **kwargs)
 
     def _compute(self, x, fs):
         super(PowerSpectralSum, self)._compute(x, fs)
@@ -118,10 +178,6 @@ class SpectralFlatness(Feature):
         Low value of the frequency range to look in. Default is 0.0 Hz
     high_cutoff : float, optional
         High value of the frequency range to look in. Default is 5.0 Hz
-
-    Methods
-    -------
-    compute(signal, fs[, columns=None, windowed=False])
     """
     def __init__(self, low_cutoff=0.0, high_cutoff=5.0):
         super(SpectralFlatness, self).__init__('SpectralFlatness', {'low_cutoff': low_cutoff,
@@ -129,6 +185,30 @@ class SpectralFlatness(Feature):
 
         self.low_cut = low_cutoff
         self.high_cut = high_cutoff
+
+    def compute(self, *args, **kwargs):
+        """
+        compute(signal, fs, *, columns=None, windowed=False)
+
+        Compute the spectral flatness
+
+        Parameters
+        ----------
+        signal : {numpy.ndarray, pandas.DataFrame}
+            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
+        fs : float, optional
+            Sampling frequency in Hz
+        columns : array_like, optional
+            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
+        windowed : bool, optional
+            If the signal has already been windowed. Default is False.
+
+        Returns
+        -------
+        spec_flat : {numpy.ndarray, pandas.DataFrame}
+            Computed spectral flatness, returned as the same type as the input signal
+        """
+        return super().compute(*args, **kwargs)
 
     def _compute(self, x, fs):
         super(SpectralFlatness, self)._compute(x, fs)
@@ -149,10 +229,6 @@ class SpectralEntropy(Feature):
         Low value of the frequency range to look in. Default is 0.0 Hz
     high_cutoff : float, optional
         High value of the frequency range to look in. Default is 5.0 Hz
-
-    Methods
-    -------
-    compute(signal, fs[, columns=None, windowed=False])
     """
     def __init__(self, low_cutoff=0.0, high_cutoff=5.0):
         super(SpectralEntropy, self).__init__('SpectralEntropy', {'low_cutoff': low_cutoff,
@@ -160,6 +236,30 @@ class SpectralEntropy(Feature):
 
         self.low_cut = low_cutoff
         self.high_cut = high_cutoff
+
+    def compute(self, *args, **kwargs):
+        """
+        compute(signal, fs, *, columns=None, windowed=False)
+
+        Compute the spectral entropy
+
+        Parameters
+        ----------
+        signal : {numpy.ndarray, pandas.DataFrame}
+            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
+        fs : float, optional
+            Sampling frequency in Hz
+        columns : array_like, optional
+            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
+        windowed : bool, optional
+            If the signal has already been windowed. Default is False.
+
+        Returns
+        -------
+        spec_ent : {numpy.ndarray, pandas.DataFrame}
+            Computed spectral entropy, returned as the same type as the input signal
+        """
+        return super().compute(*args, **kwargs)
 
     def _compute(self, x, fs):
         super(SpectralEntropy, self)._compute(x, fs)

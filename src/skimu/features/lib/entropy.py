@@ -17,13 +17,31 @@ class SignalEntropy(Feature):
     """
     A Measure of the information contained in a signal. Also described as a measure of how
     surprising the outcome of a variable is.
-
-    Methods
-    -------
-    compute(signal[, columns=None, windowed=False])
     """
     def __init__(self):
         super(SignalEntropy, self).__init__('SignalEntropy', {})
+
+    def compute(self, *args, **kwargs):
+        """
+        compute(signal, *, columns=None, windowed=False)
+
+        Compute the signal entropy
+
+        Parameters
+        ----------
+        signal : {numpy.ndarray, pandas.DataFrame}
+            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
+        columns : array_like, optional
+            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
+        windowed : bool, optional
+            If the signal has already been windowed. Default is False.
+
+        Returns
+        -------
+        sig_en : {numpy.ndarray, pandas.DataFrame}
+            Computed signal entropy, returned as the same type as the input signal
+        """
+        return super().compute(*args, **kwargs)
 
     def _compute(self, x, fs):
         super(SignalEntropy, self)._compute(x, fs)
@@ -44,10 +62,6 @@ class SampleEntropy(Feature):
         Set length for comparison (aka embedding dimension). Default is 4
     r : float, optional
         Maximum distance between sets. Default is 1.0
-
-    Methods
-    -------
-    compute(signal[, columns=None, windowed=False])
 
     Notes
     -----
@@ -74,6 +88,28 @@ class SampleEntropy(Feature):
         self.m = m
         self.r = r
 
+    def compute(self, *args, **kwargs):
+        """
+        compute(signal, *, columns=None, windowed=False)
+
+        Compute the detail power ratio
+
+        Parameters
+        ----------
+        signal : {numpy.ndarray, pandas.DataFrame}
+            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
+        columns : array_like, optional
+            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
+        windowed : bool, optional
+            If the signal has already been windowed. Default is False.
+
+        Returns
+        -------
+        samp_en : {numpy.ndarray, pandas.DataFrame}
+            Computed sample entropy, returned as the same type as the input signal
+        """
+        return super().compute(*args, **kwargs)
+
     def _compute(self, x, fs):
         super(SampleEntropy, self)._compute(x, fs)
 
@@ -96,10 +132,6 @@ class PermutationEntropy(Feature):
         Time-delay to use in computing the sub-signals. Default is 1 sample.
     normalize : bool, optional
         Normalize the output between 0 and 1. Default is False.
-
-    Methods
-    -------
-    compute(signal, fs[, columns=None, windowed=False])
     """
     def __init__(self, order=3, delay=1, normalize=False):
         super(PermutationEntropy, self).__init__(
@@ -108,6 +140,28 @@ class PermutationEntropy(Feature):
         self.order = order
         self.delay = delay
         self.normalize = normalize
+
+    def compute(self, *args, **kwargs):
+        """
+        compute(signal, *, columns=None, windowed=False)
+
+        Compute the permutation entropy
+
+        Parameters
+        ----------
+        signal : {numpy.ndarray, pandas.DataFrame}
+            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
+        columns : array_like, optional
+            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
+        windowed : bool, optional
+            If the signal has already been windowed. Default is False.
+
+        Returns
+        -------
+        perm_en : {numpy.ndarray, pandas.DataFrame}
+            Computed permutation entropy, returned as the same type as the input signal
+        """
+        return super().compute(*args, **kwargs)
 
     def _compute(self, x, fs):
         super(PermutationEntropy, self)._compute(x, fs)

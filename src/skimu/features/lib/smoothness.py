@@ -35,8 +35,32 @@ class JerkMetric(Feature):
     .. math:: J = \frac{\hat{J}}{2s}
     """
     def __init__(self, normalize=True):
-        super(JerkMetric, self).__init__('JerkMetric', {})
+        super(JerkMetric, self).__init__('JerkMetric', {'normalize': normalize})
         self.normalize = normalize
+
+    def compute(self, *args, **kwargs):
+        """
+        compute(signal, fs, *, columns=None, windowed=False)
+
+        Compute the jerk metric
+
+        Parameters
+        ----------
+        signal : {numpy.ndarray, pandas.DataFrame}
+            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
+        fs : float, optional
+            Sampling frequency in Hz
+        columns : array_like, optional
+            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
+        windowed : bool, optional
+            If the signal has already been windowed. Default is False.
+
+        Returns
+        -------
+        jerk_metric : {numpy.ndarray, pandas.DataFrame}
+            Computed jerk metric, returned as the same type as the input signal
+        """
+        return super().compute(*args, **kwargs)
 
     def _compute(self, x, fs):
         super(JerkMetric, self)._compute(x, fs)
@@ -92,6 +116,8 @@ class DimensionlessJerk(Feature):
         DJ = \frac{-\hat{J}_{type}}{s_{type}} \\
         DJ_{log} = -ln\left(\frac{\hat{J}_{type}}{s_{type}}\right)
     """
+    _signal_type_options = ['velocity', 'acceleration', 'jerk']
+
     def __init__(self, log=False, signal_type='acceleration'):
         super(DimensionlessJerk, self).__init__(
             'DimensionlessJerk', {'log': log, 'signal_type': signal_type}
@@ -105,13 +131,35 @@ class DimensionlessJerk(Feature):
         except KeyError:
             raise ValueError(f"'signal_type' ({signal_type}) unrecognized.")
 
+    def compute(self, *args, **kwargs):
+        """
+        compute(signal, *, columns=None, windowed=False)
+
+        Compute the dimensionless jerk metric
+
+        Parameters
+        ----------
+        signal : {numpy.ndarray, pandas.DataFrame}
+            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
+        columns : array_like, optional
+            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
+        windowed : bool, optional
+            If the signal has already been windowed. Default is False.
+
+        Returns
+        -------
+        dimless_jerk_metric : {numpy.ndarray, pandas.DataFrame}
+            Computed [log] dimensionless jerk metric, returned as the same type as the input signal
+        """
+        return super().compute(*args, **kwargs)
+
     def _compute(self, x, fs):
         super(DimensionlessJerk, self)._compute(x, fs)
 
+        self._result = _cython.DimensionlessJerk(x, self.i_type)
+
         if self.log:
-            self._result = -log(abs(_cython.DimensionlessJerk(x, self.i_type)))
-        else:
-            self._result = _cython.DimensionlessJerk(x, self.i_type)
+            self._result = -log(abs(self._result))
 
 
 class SPARC(Feature):
@@ -149,6 +197,30 @@ class SPARC(Feature):
         self.padlevel = padlevel
         self.fc = fc
         self.amp_thresh = amplitude_threshold
+
+    def compute(self, *args, **kwargs):
+        """
+        compute(signal, fs, *, columns=None, windowed=False)
+
+        Compute the SPARC
+
+        Parameters
+        ----------
+        signal : {numpy.ndarray, pandas.DataFrame}
+            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
+        fs : float, optional
+            Sampling frequency in Hz
+        columns : array_like, optional
+            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
+        windowed : bool, optional
+            If the signal has already been windowed. Default is False.
+
+        Returns
+        -------
+        sparc : {numpy.ndarray, pandas.DataFrame}
+            Computed SPARC, returned as the same type as the input signal
+        """
+        return super().compute(*args, **kwargs)
 
     def _compute(self, x, fs):
         super(SPARC, self)._compute(x, fs)

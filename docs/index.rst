@@ -4,12 +4,12 @@
    contain the root `toctree` directive.
 
 Welcome to SciKit-IMU's documentation!
-=================================
+======================================
 
-.. image:: https://github.com/PfizerRD/scikit-imu/workflows/skimu/badge.svg)
+.. image:: https://github.com/PfizerRD/scikit-imu/workflows/skimu/badge.svg
    :alt: GitHub Actions Badge
 
-`Scikit-IMU` is a Python package with methods for reading, pre-processing, manipulating, and analyzing Inertial Meausurement Unit data. `SciKit-IMU` contains the following sub-modules:
+`SciKit-IMU` is a Python package with methods for reading, pre-processing, manipulating, and analyzing Inertial Meausurement Unit data. `scikit-imu` contains the following sub-modules:
 
 sit2stand
 ---------

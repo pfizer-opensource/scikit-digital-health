@@ -10,7 +10,7 @@ from scipy.integrate import cumtrapz
 from pywt import cwt
 
 
-def get_gait_events(vert_accel, dt, va_sign, o_scale, filter_order, filter_cutoff,
+def get_gait_events(vert_accel, dt, timestamps, va_sign, o_scale, filter_order, filter_cutoff,
                     use_optimal_scale):
     """
     Get the bouts of gait from the acceleration during a gait bout
@@ -21,6 +21,8 @@ def get_gait_events(vert_accel, dt, va_sign, o_scale, filter_order, filter_cutof
         (N, ) array of vertical acceleration during the gait bout
     dt : float
         Sampling period for the acceleration
+    timestamps : numpy.ndarray
+        Array of timestmaps (in seconds) corresponding to acceleration sampling times.
     va_sign : int
         Sign of the vertical acceleration
     o_scale : int
@@ -40,21 +42,20 @@ def get_gait_events(vert_accel, dt, va_sign, o_scale, filter_order, filter_cutof
         Indices of final contacts
     vert_accel : numpy.ndarray
         Filtered vertical acceleration
-    vert_velocity : numpy.ndarray
-        Vertical velocity
-    vert_position : numpy.ndarray
-        Vertical position
     """
+    assert vert_accel.size == timestamps.size, "`vert_accel` and `timestamps` size must match"
+
     vert_accel = detrend(vert_accel)  # detrend data just in case
 
     # low-pass filter
-    sos = butter(filter_order, 2 * filter_cutoff * dt, btype='low', output='sos')
-    filt_vert_accel = sosfiltfilt(sos, vert_accel)
+    if (1/dt) > 2 * filter_cutoff:
+        sos = butter(filter_order, 2 * filter_cutoff * dt, btype='low', output='sos')
+        filt_vert_accel = sosfiltfilt(sos, vert_accel)
+    else:
+        filt_vert_accel = vert_accel * 1.0  # make sure its a copy not a view
 
     # first integrate the vertical acceleration to get vertical velocity
-    vert_velocity = cumtrapz(filt_vert_accel, dx=dt, initial=0)
-    # integrate again for future use, after detrending
-    vert_position = cumtrapz(detrend(vert_velocity), dx=dt, initial=0)
+    vert_velocity = cumtrapz(filt_vert_accel, x=timestamps - timestamps[0], initial=0)
 
     # if using the optimal scale relationship, get the optimal scale
     if use_optimal_scale:
@@ -89,4 +90,4 @@ def get_gait_events(vert_accel, dt, va_sign, o_scale, filter_order, filter_cutof
     """
     final_contact, *_ = find_peaks(-va_sign * coef2[0], height=0.5 * std(coef2[0]))
 
-    return init_contact, final_contact, filt_vert_accel, vert_velocity, vert_position
+    return init_contact, final_contact, filt_vert_accel

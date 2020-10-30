@@ -5,7 +5,7 @@ Lukas Adamowicz
 Pfizer DMTI 2020
 """
 from warnings import warn
-from collections import Iterable
+from collections.abc import Iterable
 
 from numpy import mean, diff, abs, argmax, sign, round, array
 
@@ -16,7 +16,10 @@ from skimu.gait.get_gait_events import get_gait_events
 from skimu.gait.get_strides import get_strides
 from skimu.gait import gait_metrics
 from skimu.gait.gait_metrics import EventMetric, BoutMetric
-from skimu.gait.get_bout_metrics_delta_h import get_bout_metrics_delta_h
+
+
+class LowFrequencyError(Exception):
+    pass
 
 
 class Gait(_BaseProcess):
@@ -33,7 +36,8 @@ class Gait(_BaseProcess):
         continuous wavelet transform. Default is True. See Notes for a caveat of the
         relationship
     min_bout_time : float, optional
-        Minimum time in seconds for a gait bout. Default is 5s
+        Minimum time in seconds for a gait bout. Default is 8s (making a minimum of 3 3-second
+        windows)
     max_bout_separation_time : float, optional
         Maximum time in seconds between two bouts of gait for them to be merged into 1 gait
         bout. Default is 0.5s
@@ -46,7 +50,7 @@ class Gait(_BaseProcess):
     height_factor : float, optional
         The factor multiplied by height to obtain an estimate of leg length.
         Default is 0.53 [4]_. Ignored if `leg_length` is `True`
-    leg_length : bool, optional
+    prov_leg_length : bool, optional
         If the actual leg length will be provided. Setting to true would have the same effect
         as setting height_factor to 1.0 while providing leg length. Default is False
     filter_order : int, optional
@@ -114,31 +118,32 @@ class Gait(_BaseProcess):
         gait_metrics.IntraStepCovarianceV,
         gait_metrics.IntraStrideCovarianceV,
         gait_metrics.HarmonicRatioV,
+        gait_metrics.StrideSPARC,
         # bout level metrics
         gait_metrics.PhaseCoordinationIndex,
         gait_metrics.GaitSymmetryIndex,
         gait_metrics.StepRegularityV,
         gait_metrics.StrideRegularityV,
-        gait_metrics.AutocovarianceSymmetryV
+        gait_metrics.AutocovarianceSymmetryV,
+        gait_metrics.RegularityIndexV
     ]
 
-    def __repr__(self):
-        ret = "Gait("
-        ret += f"use_cwt_scale_relation={self.use_opt_scale!r}, "
-        ret += f"min_bout_time={self.min_bout!r}, "
-        ret += f"max_bout_separation_time={self.max_bout_sep!r}, "
-        ret += f"max_stride_time={self.max_stride_time!r}, "
-        ret += f"loading_factor={self.loading_factor!r}, "
-        ret += f"height_factor={self.height_factor!r}, "
-        ret += f"leg_length={self.leg_length!r}, "
-        ret += f"filter_order={self.filt_ord!r}, "
-        ret += f"filter_cutoff={self.filt_cut!r})"
-        return ret
-
-    def __init__(self, use_cwt_scale_relation=True, min_bout_time=5.0,
+    def __init__(self, use_cwt_scale_relation=True, min_bout_time=8.0,
                  max_bout_separation_time=0.5, max_stride_time=2.25, loading_factor=0.2,
-                 height_factor=0.53, leg_length=False, filter_order=4, filter_cutoff=20.0):
-        super().__init__('Gait Process', True)
+                 height_factor=0.53, prov_leg_length=False, filter_order=4, filter_cutoff=20.0):
+        super().__init__(
+            True,
+            # key-word arguments for storage
+            use_cwt_scale_relation=use_cwt_scale_relation,
+            min_bout_time=min_bout_time,
+            max_bout_separation_time=max_bout_separation_time,
+            max_stride_time=max_stride_time,
+            loading_factor=loading_factor,
+            height_factor=height_factor,
+            prov_leg_length=prov_leg_length,
+            filter_order=filter_order,
+            filter_cutoff=filter_cutoff
+        )
 
         self.use_opt_scale = use_cwt_scale_relation
         self.min_bout = min_bout_time
@@ -147,8 +152,10 @@ class Gait(_BaseProcess):
         self.max_stride_time = max_stride_time
         self.loading_factor = loading_factor
 
-        self.height_factor = height_factor
-        self.leg_length = leg_length
+        if prov_leg_length:
+            self.height_factor = 1.0
+        else:
+            self.height_factor = height_factor
 
         self.filt_ord = filter_order
         self.filt_cut = filter_cutoff
@@ -183,13 +190,17 @@ class Gait(_BaseProcess):
             if all(isinstance(i(), (EventMetric, BoutMetric)) for i in metrics):
                 self._params.extend(metrics)
             else:
-                raise ValueError('Must provide either a GaitMetric or iterable of GaitMetrics')
+                raise ValueError("Not all objects are EventMetric or BoutMetric")
         else:
-            if isinstance(metrics(), gait_metrics.EventMetric):
+            if isinstance(metrics(), (EventMetric, BoutMetric)):
                 self._params.append(metrics)
+            else:
+                raise ValueError(f'Metric {metrics!r} is not a EventMetric or BoutMetric')
 
     def predict(self, *args, **kwargs):
         """
+        predict(time, accel, *, gyro=None, height=None, gait_pred=None)
+
         Get the gait events and metrics from a time series signal
 
         Parameters
@@ -207,13 +218,21 @@ class Gait(_BaseProcess):
             Either height (False) or leg length (True) of the subject who wore the inertial
             measurement device, in meters, depending on `leg_length`. If not provided,
             spatial metrics will not be computed
-        gait_pred : numpy.ndarray, optional
-            (N, ) array of boolean predictions of gait. If not provided, gait classification
-            will be performed on the acceleration data
+        gait_pred : {any, numpy.ndarray}, optional
+            (N, ) array of boolean predictions of gait, or any value that is not None. If not an
+            ndarray but not None, the entire recording will be taken as gait. If not provided
+            (or None), gait classification will be performed on the acceleration data.
 
         Returns
         -------
         gait_results : dict
+            The computed gait metrics. For a list of metrics and their definitions, see
+            :ref:`event-level-gait-metrics` and :ref:`bout-level-gait-metrics`.
+
+        Raises
+        ------
+        LowFrequencyError
+            If the sampling frequency is less than 20Hz
         """
         return super().predict(*args, **kwargs)
 
@@ -221,6 +240,7 @@ class Gait(_BaseProcess):
                  **kwargs):
         """
         predict(time=None, accel=None, *, gyro=None, height=None, gait_pred=None)
+
         Get the gait events and metrics from a time series signal
 
         Parameters
@@ -250,27 +270,13 @@ class Gait(_BaseProcess):
             warn('height not provided, not computing spatial metrics', UserWarning)
             leg_length = None
         else:
-            # if not providing leg length (default), multiply height by the height factor
-            if not self.leg_length:
-                leg_length = self.height_factor * height
-            else:
-                leg_length = height
+            # height factor is set to 1 if providing leg length
+            leg_length = self.height_factor * height
 
         # compute fs/delta t
         dt = mean(diff(time[:500]))
-
-        # check if windows exist for days
-        if self._days in kwargs:
-            days = kwargs[self._days]
-        else:
-            days = [(0, accel.shape[0])]
-
-        # get the gait classifications if necessary
-        if gait_pred is None:
-            gait_pred = get_gait_classification_lgbm(accel, 1 / dt)
-        else:
-            if gait_pred.size != accel.shape[0]:
-                raise ValueError('Number of gait predictions must much number of accel samples')
+        if (1 / dt) < 20.0:
+            raise LowFrequencyError(f"Frequency ({1/dt:.2f}Hz) is too low (<20Hz)")
 
         # figure out vertical axis
         acc_mean = mean(accel, axis=0)
@@ -280,6 +286,9 @@ class Gait(_BaseProcess):
         # 1.25 comes from original paper, corresponds to desired frequency
         # 0.4 comes from using the 'gaus1' wavelet
         scale_original = round(0.4 / (2 * 1.25 * dt)) - 1
+
+        # get days if it exists, otherwise use the start and end of the data
+        days = kwargs.get(self._days, [(0, accel.shape[0])])
 
         gait = {
             'Day N': [],
@@ -296,7 +305,10 @@ class Gait(_BaseProcess):
             'inertial data i': []
         }
 
-        ig = 0  # keep track of where everything is in the cycle
+        # get the gait classifications if necessary (delegated to subfunction)
+        gait_pred = get_gait_classification_lgbm(gait_pred, accel, dt, time)
+
+        gait_i = 0  # keep track of where everything is in the cycle
 
         for iday, day_idx in enumerate(days):
             start, stop = day_idx
@@ -304,43 +316,36 @@ class Gait(_BaseProcess):
             # GET GAIT BOUTS
             # ======================================
             gait_bouts = get_gait_bouts(
-                gait_pred[start:stop], dt, self.max_bout_sep, self.min_bout
+                gait_pred[start:stop], time[start:stop], self.max_bout_sep, self.min_bout
             )
 
             for ibout, bout in enumerate(gait_bouts):
                 bstart = start + bout[0]
 
-                ic, fc, vert_acc, vert_vel, vert_pos = get_gait_events(
-                    accel[bstart:start + bout[1], v_axis],
-                    dt,
-                    sign(acc_mean[v_axis]),
-                    scale_original,
-                    self.filt_ord,
-                    self.filt_cut,
-                    self.use_opt_scale
+                ic, fc, vert_acc = get_gait_events(
+                    accel[bstart:start + bout[1], v_axis], dt, time[bstart:start + bout[1]],
+                    sign(acc_mean[v_axis]), scale_original,
+                    self.filt_ord, self.filt_cut, self.use_opt_scale
+                )
+
+                # get strides
+                sib = get_strides(
+                    gait, vert_acc, gait_i, ic, fc, time[bstart:start + bout[1]],
+                    self.max_stride_time, self.loading_factor
                 )
 
                 # add inertial data to the aux dict for use in gait metric calculation
-                gait_aux['accel'].append(accel[bstart:start+bout[1], :])
-                gait_aux['vert velocity'].append(vert_vel)
-                gait_aux['vert position'].append(vert_pos)
-
-                # add start index to gait event indices to get absolute indices
-                # ic += bstart
-                # fc += bstart
-
-                # get strides
-                sib = get_strides(gait, ig, ic, fc, dt, self.max_stride_time, self.loading_factor)
-
+                gait_aux['accel'].append(accel[bstart:start + bout[1], :])
                 # add the index for the corresponding accel/velocity/position
                 gait_aux['inertial data i'].extend([len(gait_aux['accel']) - 1] * sib)
 
-                # get the initial gait metrics
-                get_bout_metrics_delta_h(
-                    gait, ig, ibout, dt, time, vert_pos, sib, bout, bstart
-                )
+                # save some default per bout metrics
+                gait['Bout N'].extend([ibout + 1] * sib)
+                gait['Bout Start'].extend([time[bstart]] * sib)
+                gait['Bout Duration'].extend([(bout[1] - bout[0]) * dt] * sib)
+                gait['Bout Steps'].extend([sum(gait['b valid cycle'][gait_i:])] * sib)
 
-                ig += sib
+                gait_i += sib
 
             # add the day number
             gait['Day N'].extend([iday + 1] * (len(gait['Bout N']) - len(gait['Day N'])))

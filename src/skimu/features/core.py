@@ -7,7 +7,8 @@ from numpy import ndarray, array, zeros, sum
 from pandas import DataFrame
 import json
 
-from skimu.features.utility import standardize_signal, compute_window_samples
+from skimu.utility import compute_window_samples
+from skimu.features.utility import standardize_signal
 
 
 __all__ = ['Bank']
@@ -35,9 +36,9 @@ class Bank:
 
     Parameters
     ----------
-    window_length : float
+    window_length : {None, float}, optional
         Window length in seconds. If not provided (None), will do no windowing. Default is None
-    window_step : {float, int}
+    window_step : {None, float, int}, optional
         Window step - the spacing between the start of windows. This can be specified several
         different ways (see Notes). Default is 1.0
 
@@ -126,10 +127,7 @@ class Bank:
         self._n_feats = []
 
         # compute windowing # of samples if necessary
-        if self.wlen_s is not None and self.wstep is not None:
-            window_length, window_step = compute_window_samples(fs, self.wlen_s, self.wstep)
-        else:
-            window_length, window_step = None, None
+        window_length, window_step = compute_window_samples(fs, self.wlen_s, self.wstep)
 
         # standardize the input signal, and perform windowing if desired
         x, columns = standardize_signal(signal, windowed=windowed, window_length=window_length,
@@ -362,11 +360,11 @@ class Feature:
             elif key[0] in self._xyz_map:
                 index = [self._xyz_map[i] for i in key]
             else:
-                index = key
+                index = key if all(isinstance(i, int) for i in key) else None
 
         if index is None:
-            raise IndexError("Index must be a int, in ['x', 'y', 'z', 'xy', 'xz', 'yz'] or an "
-                             "array-like of those")
+            raise IndexError("Index must be an int, in ['x', 'y', 'z', 'xy', 'xz', 'yz'], an "
+                             "array-like of those, or an Ellipsis (...)")
 
         return DeferredFeature(self, index)
 

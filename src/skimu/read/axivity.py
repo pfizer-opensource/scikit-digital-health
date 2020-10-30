@@ -13,33 +13,48 @@ from skimu.read.get_window_start_stop import get_window_start_stop
 from skimu.read._extensions import read_cwa
 
 
+class UnexpectedAxesError(Exception):
+    pass
+
+
 class ReadCWA(_BaseProcess):
-    def __repr__(self):
-        return f"ReadCWA(base={self.base!r}, period={self.period!r})"
+    """
+    Read a binary CWA file from an axivity sensor into memory. Acceleration is return in units of
+    'g' while angular velocity (if available) is returned in units of `deg/s`. If providing a base
+    and period value, included in the output will be the indices to create windows starting at
+    the `base` time, with a length of `period`.
+
+    Parameters
+    ----------
+    base : {None, int}, optional
+        Base hour [0, 23] in which to start a window of time. Default is None, which will not
+        do any windowing. Both `base` and `period` must be defined in order to window.
+    period : {None, int}, optional
+        Period for each window, in [1, 24]. Defines the number of hours per window. Default is
+        None, which will do no windowing. Both `period` and `base` must be defined to window
+
+    Examples
+    --------
+    Setup a reader with no windowing:
+
+    >>> reader = ReadCWA()
+    >>> reader.predict('example.cwa')
+    {'accel': ..., 'time': ..., ...}
+
+    Setup a reader that does windowing between 8:00 AM and 8:00 PM (20:00):
+
+    >>> reader = ReadCWA(base=8, period=12)  # 8 + 12 = 20
+    >>> reader.predict('example.cwa')
+    {'accel': ..., 'time': ..., 'day_ends': [130, 13951, ...], ...}
+    """
 
     def __init__(self, base=None, period=None):
-        """
-        Read a binary CWA file from an axivity sensor into memory. The units for acceleration data
-        will be `g`, and the units for angular velocity data will be `deg/s`. If providing a base
-        and period value, included in the output will be the indices to create windows starting at
-        the `base` time, with a length of `period`.
-
-        Parameters
-        ----------
-        base : {None, int}, optional
-            Base hour [0, 23] in which to start a window of time. Default is None, which will not
-            do any windowing. Both `base` and `period` must be defined in order to window.
-        period : {None, int}, optional
-            Period for each window, in [1, 24]. Defines the number of hours per window. Default is
-            None, which will do no windowing. Both `period` and `base` must be defined to window
-
-        Examples
-        ========
-        >>> # setup a reader to read, with windows from 08:00 to 20:00 (8AM to 8PM)
-        >>> reader = ReadCWA(base=8, period=12)
-        >>> reader.predict('example.cwa')
-        """
-        super().__init__('Read CWA', False)
+        super().__init__(
+            False,
+            # kwargs
+            base=base,
+            period=None
+        )
 
         if (base is None) and (period is None):
             self.window = False
@@ -60,6 +75,8 @@ class ReadCWA(_BaseProcess):
 
     def predict(self, *args, **kwargs):
         """
+        predict(file)
+
         Read the data from the axivity file
 
         Parameters
@@ -67,6 +84,28 @@ class ReadCWA(_BaseProcess):
         file : {str, Path}
             Path to the file to read. Must either be a string, or be able to be converted by
             `str(file)`
+
+        Returns
+        -------
+        data : dict
+            Dictionary of the data contained in the file.
+
+        Raises
+        ------
+        ValueError
+            If the file name is not provided
+        UnexpectedAxesError
+            If the number of axes returned is not 3, 6 or 9
+
+        Notes
+        -----
+        The keys in `data` depend on which data the file contained. Potential keys are:
+
+        - `accel`: acceleration [g]
+        - `gyro`: angular velocity [deg/s]
+        - `magnet`: magnetic field readings [uT]
+        - `time`: timestamps [s]
+        - `day_ends`: window indices
         """
         return super().predict(*args, **kwargs)
 
@@ -98,12 +137,12 @@ class ReadCWA(_BaseProcess):
         elif num_axes == 6:
             gyr_axes = slice(3)
             acc_axes = slice(3, 6)
-        elif num_axes == 9:
+        elif num_axes == 9:  # pragma: no cover :: don't have data to test this
             gyr_axes = slice(3)
             acc_axes = slice(3, 6)
             mag_axes = slice(6, 9)
-        else:
-            raise ValueError("Unexpected number of axes in the IMU data")
+        else:  # pragma: no cover :: not expected to reach here only if file is corrupt
+            raise UnexpectedAxesError("Unexpected number of axes in the IMU data")
 
         results = {
             self._time: ts
@@ -112,7 +151,7 @@ class ReadCWA(_BaseProcess):
             results[self._acc] = imudata[:, acc_axes]
         if gyr_axes is not None:
             results[self._gyro] = imudata[:, gyr_axes]
-        if mag_axes is not None:
+        if mag_axes is not None:  # pragma: no cover :: don't have data to test this
             results[self._mag] = imudata[:, mag_axes]
 
         if self.window:

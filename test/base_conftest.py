@@ -43,12 +43,9 @@ class BaseProcessTester:
             self.truth_suffix
         )
 
-        inp, res = self.process._predict(**data)
+        res = self.process.predict(**data)
 
-        if self.test_results:
-            self.dict_allclose(res, truth_data, self.truth_data_keys)
-        else:
-            self.dict_allclose(inp, truth_data, self.truth_data_keys)
+        self.dict_allclose(res, truth_data, self.truth_data_keys)
 
     def dict_allclose(self, pred, truth, keys):
         for key in keys:
@@ -56,10 +53,10 @@ class BaseProcessTester:
                 ptime = pred[key] - truth[key][0]
                 ttime = truth[key] - truth[key][0]
                 assert allclose(ptime, ttime, atol=self.atol_time), \
-                    f"{self.process._proc_name} test for value ({key}) not close to truth"
+                    f"{self.process._name} test for value ({key}) not close to truth"
             else:
-                assert allclose(pred[key], truth[key], atol=self.atol), \
-                    f"{self.process._proc_name} test for value ({key}) not close to truth"
+                assert allclose(pred[key], truth[key], atol=self.atol, equal_nan=True), \
+                    f"{self.process._name} test for value ({key}) not close to truth"
 
 
 @fixture(scope='module')
@@ -99,6 +96,10 @@ class TestRunLocationError(Exception):
 
 
 def resolve_data_path(file, module=None):
+
+    if isinstance(file, bytes):
+        file = file.decode('utf-8')
+
     if Path.cwd().name == 'scikit-imu':
         path = Path(f'test/data/{file}')
     elif Path.cwd().name == 'test':
