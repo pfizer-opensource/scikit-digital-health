@@ -12,6 +12,11 @@ class NotAProcessError(Exception):
 
 
 class Pipeline:
+    """
+    Pipeline class that can have multiple steps that are processed sequentially. Some of the output
+    is passed between steps. Has the ability to save results from processing steps as local files,
+    as well as return the results in a dictionary following the processing.
+    """
     def __str__(self):
         return "IMUAnalysisPipeline"
 
@@ -23,9 +28,6 @@ class Pipeline:
         return ret
 
     def __init__(self):
-        """
-        Pipeline class that can have multiple steps that are processed sequentially
-        """
         self._steps = []
         self._save = []
         self._current = -1  # iteration tracking
@@ -74,7 +76,7 @@ class Pipeline:
         ----------
         kwargs
             Any key-word arguments. Will get passed to the first step of the pipeline, and
-            therefore they must contain at least what the first pipeline is expecting.
+            therefore they must contain at least what the first process is expecting.
 
         Returns
         -------
