@@ -67,8 +67,8 @@ def get_gait_events(vert_accel, dt, timestamps, va_sign, o_scale, filter_order, 
         ic_opt_freq = 0.69 * step_freq + 0.34
         fc_opt_freq = 3.6 * step_freq - 4.5
 
-        scale1 = round(0.4 / (2 * ic_opt_freq * dt)) - 1
-        scale2 = round(0.4 / (2 * fc_opt_freq * dt)) - 1
+        scale1 = max(round(0.4 / (2 * ic_opt_freq * dt)) - 1, 1)
+        scale2 = max(round(0.4 / (2 * fc_opt_freq * dt)) - 1, 1)
     else:
         scale1 = scale2 = o_scale
 
