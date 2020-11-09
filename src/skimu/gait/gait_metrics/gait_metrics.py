@@ -32,7 +32,7 @@ gait speed: stride_length / stride time
 from warnings import warn
 
 from numpy import zeros, nanmean, mean, nanstd, std, sum, sqrt, nan, nonzero, argmin, abs, round, \
-    float_, int_, fft, arange
+    float_, int_, fft, arange, isnan
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt, find_peaks
 
@@ -607,9 +607,11 @@ class GaitSymmetryIndex(BoutMetric):
         # setup acceleration filter
         sos = butter(4, 2 * 10 * dt, btype='low', output='sos')
         for i, acc in enumerate(gait_aux['accel']):
-            lag = int(
-                round(nanmean(gait['PARAM:stride time'][gait_aux['inertial data i'] == i]) / dt)
-            )
+            lag_ = nanmean(gait['PARAM:stride time'][gait_aux['inertial data i'] == i]) / dt
+            if isnan(lag_):  # if only nan values in the bout
+                gsi[i] = nan
+                continue
+            lag = int(round(lag_))
             # GSI uses biased autocovariance
             ac = _autocovariancefunction(sosfiltfilt(sos, acc, axis=0), int(4.5 / dt), biased=True)
 
@@ -662,9 +664,11 @@ class StepRegularityV(BoutMetric):
 
         for i, acc in enumerate(gait_aux['accel']):
             va = gait_aux['vert axis'][[gait_aux['inertial data i'] == i]][0]
-            lag = int(
-                round(nanmean(gait['PARAM:step time'][gait_aux['inertial data i'] == i]) / dt)
-            )
+            lag_ = nanmean(gait['PARAM:step time'][gait_aux['inertial data i'] == i]) / dt
+            if isnan(lag_):  # if only nan values in the bout
+                stepreg[i] = nan
+                continue
+            lag = int(round(lag_))
             acf = _autocovariancefunction(acc[:, va], int(4.5 / dt))
             pks, _ = find_peaks(acf)
             idx = argmin(abs(pks - lag))
@@ -713,13 +717,12 @@ class StrideRegularityV(BoutMetric):
         stridereg = zeros(len(gait_aux['accel']), dtype=float_)
 
         for i, acc in enumerate(gait_aux['accel']):
-            # acf = _autocovariancefunction(acc[:, gait_aux['vert axis']], int(4.5 / dt))
-            # compute the average number of samples per stride, this *should* be the
-            # lag over the bout for sequential strides
             va = gait_aux['vert axis'][[gait_aux['inertial data i'] == i]][0]
-            lag = int(
-                round(nanmean(gait['PARAM:stride time'][gait_aux['inertial data i'] == i]) / dt)
-            )
+            lag_ = nanmean(gait['PARAM:stride time'][gait_aux['inertial data i'] == i]) / dt
+            if isnan(lag_):  # if only nan values in the bout
+                stridereg[i] = nan
+                continue
+            lag = int(round(lag_))
             acf = _autocovariancefunction(acc[:, va], int(4.5 / dt))
             pks, _ = find_peaks(acf)
             idx = argmin(abs(pks - lag))
