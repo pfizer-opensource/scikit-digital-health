@@ -425,10 +425,18 @@ class HarmonicRatioV(EventMetric):
             stridef = 1 / gait['PARAM:stride time'][idx]  # current stride frequency
             # get the indices for the first 20 harmonics
             ix_stridef = argmin(abs(self._freq / dt - stridef)) * self._harmonics
-            if (ix_stridef < F.size).sum() != ix_stridef.size:
+            if (ix_stridef < F.size).sum() < 10:
                 warn(
-                    f"Not enough frequency range to compute all 20 harmonics, using "
-                    f"first {(ix_stridef < F.size).sum()}. Stride frequency {stridef:.2f}Hz",
+                    f"High stride frequency [{stridef:.2f}] results too few harmonics in "
+                    f"frequency range. Setting to nan",
+                    UserWarning
+                )
+                gait[self.k_][idx] = nan
+                continue
+            elif (ix_stridef < F.size).sum() < 20:
+                warn(
+                    f"High stride frequency [{stridef:.2f}] results in use of less than 20 "
+                    f"harmonics [{(ix_stridef < F.size).sum()}].",
                     UserWarning
                 )
             ix_stridef = ix_stridef[ix_stridef < F.size]  # make sure not taking more than possible
