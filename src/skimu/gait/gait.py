@@ -321,7 +321,6 @@ class Gait(_BaseProcess):
                 # figure out vertical axis on a per-bout basis
                 acc_mean = mean(accel[bstart:start + bout[1]], axis=0)
                 v_axis = argmax(abs(acc_mean))
-                gait_aux['vert axis'].extend(v_axis)
 
                 ic, fc, vert_acc = get_gait_events(
                     accel[bstart:start + bout[1], v_axis], dt, time[bstart:start + bout[1]],
@@ -339,6 +338,7 @@ class Gait(_BaseProcess):
                 gait_aux['accel'].append(accel[bstart:start + bout[1], :])
                 # add the index for the corresponding accel/velocity/position
                 gait_aux['inertial data i'].extend([len(gait_aux['accel']) - 1] * sib)
+                gait_aux['vert axis'].extend([v_axis] * sib)
 
                 # save some default per bout metrics
                 gait['Bout N'].extend([ibout + 1] * sib)

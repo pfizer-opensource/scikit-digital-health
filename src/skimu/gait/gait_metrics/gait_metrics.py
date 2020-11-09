@@ -336,7 +336,7 @@ class IntraStrideCovarianceV(EventMetric):
         for i, idx in enumerate(nonzero(mask)[0]):
             gait[self.k_][idx] = _autocovariance(
                 # index the accel, then the list of views, then the vertical axis
-                gait_aux['accel'][gait_aux['inertial data i'][idx]][:, gait_aux['vert axis']],
+                gait_aux['accel'][gait_aux['inertial data i'][idx]][:, gait_aux['vert axis'][idx]],
                 i1[i], i2[i], i3[i], biased=False
             )
 
@@ -369,7 +369,7 @@ class IntraStepCovarianceV(EventMetric):
 
         for i, idx in enumerate(nonzero(mask)[0]):
             gait[self.k_][idx] = _autocovariance(
-                gait_aux['accel'][gait_aux['inertial data i'][idx]][:, gait_aux['vert axis']],
+                gait_aux['accel'][gait_aux['inertial data i'][idx]][:, gait_aux['vert axis'][idx]],
                 i1[i], i2[i], i3[i], biased=False
             )
 
@@ -414,9 +414,8 @@ class HarmonicRatioV(EventMetric):
         i1 = gait['IC'][mask]
         i2 = gait['IC'][mask_ofst]
 
-        va = gait_aux['vert axis']  # shorthand
-
         for i, idx in enumerate(nonzero(mask)[0]):
+            va = gait_aux['vert axis'][idx]  # shorthand
             F = abs(fft.rfft(
                 gait_aux['accel'][gait_aux['inertial data i'][idx]][i1[i]:i2[i], va],
                 n=1024
@@ -645,10 +644,11 @@ class StepRegularityV(BoutMetric):
         stepreg = zeros(len(gait_aux['accel']), dtype=float_)
 
         for i, acc in enumerate(gait_aux['accel']):
+            va = gait_aux['vert axis'][[gait_aux['inertial data i'] == i]][0]
             lag = int(
                 round(nanmean(gait['PARAM:step time'][gait_aux['inertial data i'] == i]) / dt)
             )
-            acf = _autocovariancefunction(acc[:, gait_aux['vert axis']], int(4.5 / dt))
+            acf = _autocovariancefunction(acc[:, va], int(4.5 / dt))
             pks, _ = find_peaks(acf)
             idx = argmin(abs(pks - lag))
 
@@ -699,10 +699,11 @@ class StrideRegularityV(BoutMetric):
             # acf = _autocovariancefunction(acc[:, gait_aux['vert axis']], int(4.5 / dt))
             # compute the average number of samples per stride, this *should* be the
             # lag over the bout for sequential strides
+            va = gait_aux['vert axis'][[gait_aux['inertial data i'] == i]][0]
             lag = int(
                 round(nanmean(gait['PARAM:stride time'][gait_aux['inertial data i'] == i]) / dt)
             )
-            acf = _autocovariancefunction(acc[:, gait_aux['vert axis']], int(4.5 / dt))
+            acf = _autocovariancefunction(acc[:, va], int(4.5 / dt))
             pks, _ = find_peaks(acf)
             idx = argmin(abs(pks - lag))
 
