@@ -431,7 +431,7 @@ class HarmonicRatioV(EventMetric):
                     f"first {(ix_stridef < F.size).sum()}. Stride frequency {stridef:.2f}Hz",
                     UserWarning
                 )
-            ix_stridef[ix_stridef < F.size]  # make sure not taking more than possible
+            ix_stridef = ix_stridef[ix_stridef < F.size]  # make sure not taking more than possible
 
             # index 1 is harmonic 2 -> even harmonics / odd harmonics
             gait[self.k_][idx] = sum(F[ix_stridef[1::2]]) / sum(F[ix_stridef[::2]])
