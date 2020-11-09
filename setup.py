@@ -150,7 +150,8 @@ REQUIREMENTS = [
     'pandas>=0.23.4',
     'lightgbm>=2.3.0',
     'pywavelets',
-    'scikit-learn'  # needed for lightgbm
+    'scikit-learn',  # needed for lightgbm
+    'h5py'  # currently for gait classifier dataset loading
 ]
 
 if sys.version_info < (3, 7):
