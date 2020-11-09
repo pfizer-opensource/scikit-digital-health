@@ -29,6 +29,8 @@ stride length: step_length_i + step_length_i+1
 
 gait speed: stride_length / stride time
 """
+from warnings import warn
+
 from numpy import zeros, nanmean, mean, nanstd, std, sum, sqrt, nan, nonzero, argmin, abs, round, \
     float_, int_, fft, arange
 from numpy.linalg import norm
@@ -423,6 +425,13 @@ class HarmonicRatioV(EventMetric):
             stridef = 1 / gait['PARAM:stride time'][idx]  # current stride frequency
             # get the indices for the first 20 harmonics
             ix_stridef = argmin(abs(self._freq / dt - stridef)) * self._harmonics
+            if (ix_stridef < F.size).sum() != ix_stridef.size:
+                warn(
+                    f"Not enough frequency range to compute all 20 harmonics, using "
+                    f"first {(ix_stridef < F.size).sum()}. Stride frequency {stridef:.2f}Hz",
+                    UserWarning
+                )
+            ix_stridef[ix_stridef < F.size]  # make sure not taking more than possible
 
             # index 1 is harmonic 2 -> even harmonics / odd harmonics
             gait[self.k_][idx] = sum(F[ix_stridef[1::2]]) / sum(F[ix_stridef[::2]])
