@@ -278,10 +278,6 @@ class Gait(_BaseProcess):
         if (1 / dt) < 20.0:
             raise LowFrequencyError(f"Frequency ({1/dt:.2f}Hz) is too low (<20Hz)")
 
-        # figure out vertical axis
-        acc_mean = mean(accel, axis=0)
-        v_axis = argmax(abs(acc_mean))
-
         # original scale. compute outside loop.
         # 1.25 comes from original paper, corresponds to desired frequency
         # 0.4 comes from using the 'gaus1' wavelet
@@ -298,7 +294,7 @@ class Gait(_BaseProcess):
         }
         # auxiliary dictionary for storing values for computing gait metrics
         gait_aux = {
-            'vert axis': v_axis,
+            'vert axis': [],
             'accel': [],
             'vert velocity': [],
             'vert position': [],
@@ -321,6 +317,11 @@ class Gait(_BaseProcess):
 
             for ibout, bout in enumerate(gait_bouts):
                 bstart = start + bout[0]
+
+                # figure out vertical axis on a per-bout basis
+                acc_mean = mean(accel[bstart:start + bout[1]], axis=0)
+                v_axis = argmax(abs(acc_mean))
+                gait_aux['vert axis'].extend(v_axis)
 
                 ic, fc, vert_acc = get_gait_events(
                     accel[bstart:start + bout[1], v_axis], dt, time[bstart:start + bout[1]],
@@ -354,6 +355,7 @@ class Gait(_BaseProcess):
         for key in gait:
             gait[key] = array(gait[key])
         # convert inertial data index to an array
+        gait_aux['vert axis'] = array(gait_aux['vert axis'])
         gait_aux['inertial data i'] = array(gait_aux['inertial data i'])
 
         # loop over metrics and compute
