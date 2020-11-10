@@ -93,6 +93,6 @@ def get_strides(gait, vert_accel, gait_index, ic, fc, timestamps, max_stride_tim
             gait['delta h'].append(nan)
 
     # make sure parameters here math the number of steps in gait
-    gait['delta h'].append(nan)
+    gait['delta h'].extend([nan] * min(1, bout_n_steps))
 
     return bout_n_steps

@@ -4,8 +4,8 @@ Gait detection, processing, and analysis from wearable inertial sensor data
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
-from warnings import warn
 from collections.abc import Iterable
+from warnings import warn
 
 from numpy import mean, diff, abs, argmax, sign, round, array
 
@@ -132,7 +132,6 @@ class Gait(_BaseProcess):
                  max_bout_separation_time=0.5, max_stride_time=2.25, loading_factor=0.2,
                  height_factor=0.53, prov_leg_length=False, filter_order=4, filter_cutoff=20.0):
         super().__init__(
-            True,
             # key-word arguments for storage
             use_cwt_scale_relation=use_cwt_scale_relation,
             min_bout_time=min_bout_time,
@@ -197,7 +196,7 @@ class Gait(_BaseProcess):
             else:
                 raise ValueError(f'Metric {metrics!r} is not a EventMetric or BoutMetric')
 
-    def predict(self, *args, **kwargs):
+    def predict(self, time=None, accel=None, *, gyro=None, height=None, gait_pred=None, **kwargs):
         """
         predict(time, accel, *, gyro=None, height=None, gait_pred=None)
 
@@ -234,38 +233,10 @@ class Gait(_BaseProcess):
         LowFrequencyError
             If the sampling frequency is less than 20Hz
         """
-        return super().predict(*args, **kwargs)
+        super().predict(
+            time=time, accel=accel, gyro=gyro, height=height, gait_pred=gait_pred, **kwargs
+        )
 
-    def _predict(self, time=None, accel=None, *, gyro=None, height=None, gait_pred=None,
-                 **kwargs):
-        """
-        predict(time=None, accel=None, *, gyro=None, height=None, gait_pred=None)
-
-        Get the gait events and metrics from a time series signal
-
-        Parameters
-        ----------
-        time : numpy.ndarray
-            (N, ) array of unix timestamps, in seconds
-        accel : numpy.ndarray
-            (N, 3) array of accelerations measured by centrally mounted lumbar device, in
-            units of 'g'
-        gyro : numpy.ndarray, optional
-            (N, 3) array of angular velocities measured by the same centrally mounted lumbar
-            device, in units of 'deg/s'. Only optionally used if provided. Main functionality
-            is to allow distinguishing step sides.
-        height : float, optional
-            Either height (False) or leg length (True) of the subject who wore the inertial
-            measurement device, in meters, depending on `leg_length`. If not provided,
-            spatial metrics will not be computed
-        gait_pred : numpy.ndarray, optional
-            (N, ) array of boolean predictions of gait. If not provided, gait classification
-            will be performed on the acceleration data
-
-        Returns
-        -------
-        gait_results : dict
-        """
         if height is None:
             warn('height not provided, not computing spatial metrics', UserWarning)
             leg_length = None
@@ -277,10 +248,6 @@ class Gait(_BaseProcess):
         dt = mean(diff(time[:500]))
         if (1 / dt) < 20.0:
             raise LowFrequencyError(f"Frequency ({1/dt:.2f}Hz) is too low (<20Hz)")
-
-        # figure out vertical axis
-        acc_mean = mean(accel, axis=0)
-        v_axis = argmax(abs(acc_mean))
 
         # original scale. compute outside loop.
         # 1.25 comes from original paper, corresponds to desired frequency
@@ -298,7 +265,7 @@ class Gait(_BaseProcess):
         }
         # auxiliary dictionary for storing values for computing gait metrics
         gait_aux = {
-            'vert axis': v_axis,
+            'vert axis': [],
             'accel': [],
             'vert velocity': [],
             'vert position': [],
@@ -322,6 +289,10 @@ class Gait(_BaseProcess):
             for ibout, bout in enumerate(gait_bouts):
                 bstart = start + bout[0]
 
+                # figure out vertical axis on a per-bout basis
+                acc_mean = mean(accel[bstart:start + bout[1]], axis=0)
+                v_axis = argmax(abs(acc_mean))
+
                 ic, fc, vert_acc = get_gait_events(
                     accel[bstart:start + bout[1], v_axis], dt, time[bstart:start + bout[1]],
                     sign(acc_mean[v_axis]), scale_original,
@@ -338,6 +309,7 @@ class Gait(_BaseProcess):
                 gait_aux['accel'].append(accel[bstart:start + bout[1], :])
                 # add the index for the corresponding accel/velocity/position
                 gait_aux['inertial data i'].extend([len(gait_aux['accel']) - 1] * sib)
+                gait_aux['vert axis'].extend([v_axis] * sib)
 
                 # save some default per bout metrics
                 gait['Bout N'].extend([ibout + 1] * sib)
@@ -354,11 +326,26 @@ class Gait(_BaseProcess):
         for key in gait:
             gait[key] = array(gait[key])
         # convert inertial data index to an array
+        gait_aux['vert axis'] = array(gait_aux['vert axis'])
         gait_aux['inertial data i'] = array(gait_aux['inertial data i'])
 
         # loop over metrics and compute
         for param in self._params:
-            param().predict(dt, leg_length, gait, gait_aux)
+            param(self.logger).predict(dt, leg_length, gait, gait_aux)
+
+        # remove unnecessary stuff from gait dict
+        gait.pop('IC', None)
+        gait.pop('FC', None)
+        gait.pop('FC opp foot', None)
+
+        # remove in-valid gait cycles
+        for k in [i for i in gait if i != 'b valid cycle']:
+            gait[k] = gait[k][gait['b valid cycle']]
+
+        gait.pop('b valid cycle')
 
         kwargs.update({self._acc: accel, self._time: time, self._gyro: gyro, 'height': height})
-        return kwargs, gait
+        if self._in_pipeline:
+            return kwargs, gait
+        else:
+            return gait

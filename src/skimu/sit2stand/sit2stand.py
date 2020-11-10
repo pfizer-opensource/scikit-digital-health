@@ -108,7 +108,6 @@ class Sit2Stand(_BaseProcess):
             reconstruction_window=0.25
     ):
         super().__init__(
-            True,
             # kwarg saving
             stillness_constraint=stillness_constraint,
             gravity=gravity,
@@ -162,7 +161,7 @@ class Sit2Stand(_BaseProcess):
             still_window=still_window
         )
 
-    def predict(self, *args, **kwargs):
+    def predict(self, time=None, accel=None, **kwargs):
         """
         predict(time, accel)
 
@@ -175,9 +174,8 @@ class Sit2Stand(_BaseProcess):
         accel : ndarray
             (N, 3) array of acceleration, with units of 'g'.
         """
-        return super().predict(*args, **kwargs)
+        super().predict(time=time, accel=accel, **kwargs)
 
-    def _predict(self, time=None, accel=None, **kwargs):
         # FILTERING
         # ======================================================
         # compute the sampling period
@@ -254,4 +252,7 @@ class Sit2Stand(_BaseProcess):
         sts.pop('Partial')
 
         kwargs.update({self._time: time, self._acc: accel})
-        return kwargs, sts
+        if self._in_pipeline:
+            return kwargs, sts
+        else:
+            return sts

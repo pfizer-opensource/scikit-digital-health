@@ -13,10 +13,7 @@ from skimu.read import ReadCWA
 
 class TestPipeline:
     gait_keys = [
-        'IC',
-        'FC',
         'delta h',
-        'b valid cycle',
         'PARAM:stride time',
         'PARAM:stance time',
         'PARAM:swing time',

@@ -50,7 +50,6 @@ class ReadCWA(_BaseProcess):
 
     def __init__(self, base=None, period=None):
         super().__init__(
-            False,
             # kwargs
             base=base,
             period=None
@@ -73,7 +72,7 @@ class ReadCWA(_BaseProcess):
             else:
                 raise ValueError("Base must be in [0, 23] and period must be in [1, 23]")
 
-    def predict(self, *args, **kwargs):
+    def predict(self, file=None, **kwargs):
         """
         predict(file)
 
@@ -107,25 +106,14 @@ class ReadCWA(_BaseProcess):
         - `time`: timestamps [s]
         - `day_ends`: window indices
         """
-        return super().predict(*args, **kwargs)
-
-    def _predict(self, file=None, **kwargs):
-        """
-        Read the data from the axivity file
-
-        Parameters
-        ----------
-        file : {str, Path}
-            Path to the file to read. Must either be a string, or be able to be converted by
-            `str(file)`
-        """
+        super().predict(file=file, **kwargs)
 
         if file is None:
             raise ValueError("file must not be None")
         if not isinstance(file, str):
             file = str(file)
         if file[-3:] != "cwa":
-            warn("File extension is not '.cwa'", UserWarning)
+            warn("File extension is not expected '.cwa'", UserWarning)
 
         # read the file
         meta, imudata, ts, idx, light = read_cwa(file, self.base, self.period)
@@ -159,4 +147,7 @@ class ReadCWA(_BaseProcess):
             results[self._days] = vstack((day_starts, day_stops)).T
 
         kwargs.update(results)
-        return kwargs, None
+        if self._in_pipeline:
+            return kwargs, None
+        else:
+            return kwargs

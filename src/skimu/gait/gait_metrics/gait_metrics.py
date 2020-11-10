@@ -30,7 +30,7 @@ stride length: step_length_i + step_length_i+1
 gait speed: stride_length / stride time
 """
 from numpy import zeros, nanmean, mean, nanstd, std, sum, sqrt, nan, nonzero, argmin, abs, round, \
-    float_, int_, fft, arange
+    float_, int_, fft, arange, isnan
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt, find_peaks
 
@@ -97,7 +97,8 @@ class StrideTime(EventMetric):
     heel-strike for the same foot. A basic asymmetry measure is also computed as the difference
     between sequential stride times of opposite feet.
     """
-    def __init__(self):
+    def __init__(self, logger=None):
+        self.logger = logger
         super().__init__('stride time')
 
     @basic_asymmetry
@@ -112,7 +113,8 @@ class StanceTime(EventMetric):
     (initial contact) to toe-off (final contact) for a foot. A basic asymmetry measure is also
     computed as the difference between sequential stance times of opposite feet.
     """
-    def __init__(self):
+    def __init__(self, logger=None):
+        self.logger = logger
         super().__init__('stance time')
 
     @basic_asymmetry
@@ -126,7 +128,8 @@ class SwingTime(EventMetric):
     heel-strike (initial contact) of the same foot. A basic asymmetry measure is also computed as
     the difference between sequential swing times of opposite feet.
     """
-    def __init__(self):
+    def __init__(self, logger=None):
+        self.logger = logger
         super().__init__('swing time')
 
     @basic_asymmetry
@@ -141,7 +144,8 @@ class StepTime(EventMetric):
     asymmetry measure is also computed as the difference between sequential step times of opposite
     feet.
     """
-    def __init__(self):
+    def __init__(self, logger=None):
+        self.logger = logger
         super().__init__('step time')
 
     @basic_asymmetry
@@ -157,7 +161,8 @@ class InitialDoubleSupport(EventMetric):
     foot. A basic asymmetry measure is also computed as the difference between sequential initial
     double support times of opposite feet.
     """
-    def __init__(self):
+    def __init__(self, logger=None):
+        self.logger = logger
         super().__init__('initial double support')
 
     @basic_asymmetry
@@ -172,7 +177,8 @@ class TerminalDoubleSupport(EventMetric):
     current foot. A basic asymmetry measure is also computed as the difference between sequential
     terminal double support times of opposite feet.
     """
-    def __init__(self):
+    def __init__(self, logger=None):
+        self.logger = logger
         super().__init__('terminal double support')
 
     @basic_asymmetry
@@ -187,7 +193,8 @@ class DoubleSupport(EventMetric):
     that the current and opposite foot are in contact with the ground. A basic asymmetry measure
     is also computed as the difference between sequential double support times of opposite feet.
     """
-    def __init__(self):
+    def __init__(self, logger=None):
+        self.logger = logger
         super().__init__('double support', depends=[InitialDoubleSupport, TerminalDoubleSupport])
 
     @basic_asymmetry
@@ -203,7 +210,8 @@ class SingleSupport(EventMetric):
     asymmetry measure is also computed as the difference between sequential single support times
     of opposite feet.
     """
-    def __init__(self):
+    def __init__(self, logger=None):
+        self.logger = logger
         super().__init__('single support')
 
     @basic_asymmetry
@@ -234,7 +242,8 @@ class StepLength(EventMetric):
         trunk accelerations during human walking,” Gait & Posture, vol. 18, no. 2, pp. 1–10,
         Oct. 2003, doi: 10.1016/S0966-6362(02)00190-X.
     """
-    def __init__(self):
+    def __init__(self, logger=None):
+        self.logger = logger
         super().__init__('step length')
 
     @basic_asymmetry
@@ -268,7 +277,8 @@ class StrideLength(EventMetric):
         trunk accelerations during human walking,” Gait & Posture, vol. 18, no. 2, pp. 1–10,
         Oct. 2003, doi: 10.1016/S0966-6362(02)00190-X.
     """
-    def __init__(self):
+    def __init__(self, logger=None):
+        self.logger = logger
         super().__init__('stride length', depends=[StepLength])
 
     @basic_asymmetry
@@ -285,7 +295,8 @@ class GaitSpeed(EventMetric):
     stride duration, in m/s. A basic asymmetry measure is also computed as the difference between
     sequential gait speeds of opposite feet.
     """
-    def __init__(self):
+    def __init__(self, logger=None):
+        self.logger = logger
         super().__init__('gait speed', depends=[StrideLength, StrideTime])
 
     @basic_asymmetry
@@ -300,7 +311,8 @@ class Cadence(EventMetric):
     """
     The number of steps taken in 1 minute. Computed per step as 60.0s divided by the step time.
     """
-    def __init__(self):
+    def __init__(self, logger=None):
+        self.logger = logger
         super().__init__('cadence', depends=[StepTime])
 
     def _predict(self, dt, leg_length, gait, gait_aux):
@@ -323,7 +335,8 @@ class IntraStrideCovarianceV(EventMetric):
         Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
         Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
     """
-    def __init__(self):
+    def __init__(self, logger=None):
+        self.logger = logger
         super().__init__('intra-stride covariance - V')
 
     def _predict(self, dt, leg_length, gait, gait_aux):
@@ -336,7 +349,7 @@ class IntraStrideCovarianceV(EventMetric):
         for i, idx in enumerate(nonzero(mask)[0]):
             gait[self.k_][idx] = _autocovariance(
                 # index the accel, then the list of views, then the vertical axis
-                gait_aux['accel'][gait_aux['inertial data i'][idx]][:, gait_aux['vert axis']],
+                gait_aux['accel'][gait_aux['inertial data i'][idx]][:, gait_aux['vert axis'][idx]],
                 i1[i], i2[i], i3[i], biased=False
             )
 
@@ -357,7 +370,8 @@ class IntraStepCovarianceV(EventMetric):
         Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
         Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
     """
-    def __init__(self):
+    def __init__(self, logger=None):
+        self.logger = logger
         super().__init__('intra-step covariance - V')
 
     def _predict(self, dt, leg_length, gait, gait_aux):
@@ -369,7 +383,7 @@ class IntraStepCovarianceV(EventMetric):
 
         for i, idx in enumerate(nonzero(mask)[0]):
             gait[self.k_][idx] = _autocovariance(
-                gait_aux['accel'][gait_aux['inertial data i'][idx]][:, gait_aux['vert axis']],
+                gait_aux['accel'][gait_aux['inertial data i'][idx]][:, gait_aux['vert axis'][idx]],
                 i1[i], i2[i], i3[i], biased=False
             )
 
@@ -402,7 +416,8 @@ class HarmonicRatioV(EventMetric):
         Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
     """
 
-    def __init__(self):
+    def __init__(self, logger=None):
+        self.logger = logger
         super().__init__('harmonic ratio - V', depends=[StrideTime])
         self._freq = fft.rfftfreq(1024)  # precompute the frequencies (still need to be scaled)
         # TODO add check for stride frequency, if too low, bump this up higher?
@@ -414,9 +429,8 @@ class HarmonicRatioV(EventMetric):
         i1 = gait['IC'][mask]
         i2 = gait['IC'][mask_ofst]
 
-        va = gait_aux['vert axis']  # shorthand
-
         for i, idx in enumerate(nonzero(mask)[0]):
+            va = gait_aux['vert axis'][idx]  # shorthand
             F = abs(fft.rfft(
                 gait_aux['accel'][gait_aux['inertial data i'][idx]][i1[i]:i2[i], va],
                 n=1024
@@ -424,6 +438,21 @@ class HarmonicRatioV(EventMetric):
             stridef = 1 / gait['PARAM:stride time'][idx]  # current stride frequency
             # get the indices for the first 20 harmonics
             ix_stridef = argmin(abs(self._freq / dt - stridef)) * self._harmonics
+            if (ix_stridef < F.size).sum() < 10:
+                if self.logger is not None:
+                    self.logger.warning(
+                        f"High stride frequency [{stridef:.2f}] results too few harmonics in "
+                        f"frequency range. Setting to nan"
+                    )
+                gait[self.k_][idx] = nan
+                continue
+            elif (ix_stridef < F.size).sum() < 20:
+                if self.logger is not None:
+                    self.logger.warning(
+                        f"High stride frequency [{stridef:.2f}] results in use of less than 20 "
+                        f"harmonics [{(ix_stridef < F.size).sum()}]."
+                    )
+            ix_stridef = ix_stridef[ix_stridef < F.size]  # make sure not taking more than possible
 
             # index 1 is harmonic 2 -> even harmonics / odd harmonics
             gait[self.k_][idx] = sum(F[ix_stridef[1::2]]) / sum(F[ix_stridef[::2]])
@@ -446,7 +475,8 @@ class StrideSPARC(EventMetric):
         analysis of movement smoothness,” J NeuroEngineering Rehabil, vol. 12, no. 1, p. 112,
         Dec. 2015, doi: 10.1186/s12984-015-0090-9.
     """
-    def __init__(self):
+    def __init__(self, logger=None):
+        self.logger = logger
         super().__init__('stride SPARC')
 
     def _predict(self, dt, leg_length, gait, gait_aux):
@@ -510,7 +540,8 @@ class PhaseCoordinationIndex(BoutMetric):
         Further Insights into Motor-Cognitive Links,” Parkinsons Dis, vol. 2015, 2015,
         doi: 10.1155/2015/547065.
     """
-    def __init__(self):
+    def __init__(self, logger=None):
+        self.logger = logger
         super().__init__('phase coordination index', depends=[StrideTime, StepTime])
 
     def _predict(self, dt, leg_length, gait, gait_aux):
@@ -582,7 +613,8 @@ class GaitSymmetryIndex(BoutMetric):
         parameters following stroke: a practical assessment,” Journal of Rehabilitation Research
         and Development, vol. 32, no. 1, pp. 25–31, Feb. 1995.
     """
-    def __init__(self):
+    def __init__(self, logger=None):
+        self.logger = logger
         super().__init__('gait symmetry index', depends=[StrideTime])
 
     def _predict(self, dt, leg_length, gait, gait_aux):
@@ -591,9 +623,11 @@ class GaitSymmetryIndex(BoutMetric):
         # setup acceleration filter
         sos = butter(4, 2 * 10 * dt, btype='low', output='sos')
         for i, acc in enumerate(gait_aux['accel']):
-            lag = int(
-                round(nanmean(gait['PARAM:stride time'][gait_aux['inertial data i'] == i]) / dt)
-            )
+            lag_ = nanmean(gait['PARAM:stride time'][gait_aux['inertial data i'] == i]) / dt
+            if isnan(lag_):  # if only nan values in the bout
+                gsi[i] = nan
+                continue
+            lag = int(round(lag_))
             # GSI uses biased autocovariance
             ac = _autocovariancefunction(sosfiltfilt(sos, acc, axis=0), int(4.5 / dt), biased=True)
 
@@ -638,17 +672,25 @@ class StepRegularityV(BoutMetric):
         Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
         Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
     """
-    def __init__(self):
+    def __init__(self, logger=None):
+        self.logger = logger
         super().__init__('step regularity - V', depends=[StepTime])
 
     def _predict(self, dt, leg_length, gait, gait_aux):
         stepreg = zeros(len(gait_aux['accel']), dtype=float_)
 
         for i, acc in enumerate(gait_aux['accel']):
-            lag = int(
-                round(nanmean(gait['PARAM:step time'][gait_aux['inertial data i'] == i]) / dt)
-            )
-            acf = _autocovariancefunction(acc[:, gait_aux['vert axis']], int(4.5 / dt))
+            mask = gait_aux['inertial data i'] == i
+            if mask.sum() == 0:
+                stepreg[i] = nan
+                continue
+            va = gait_aux['vert axis'][mask][0]
+            lag_ = nanmean(gait['PARAM:step time'][mask]) / dt
+            if isnan(lag_):  # if only nan values in the bout
+                stepreg[i] = nan
+                continue
+            lag = int(round(lag_))
+            acf = _autocovariancefunction(acc[:, va], int(4.5 / dt))
             pks, _ = find_peaks(acf)
             idx = argmin(abs(pks - lag))
 
@@ -689,20 +731,25 @@ class StrideRegularityV(BoutMetric):
         Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
         Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
     """
-    def __init__(self):
+    def __init__(self, logger=None):
+        self.logger = logger
         super().__init__('stride regularity - V', depends=[StrideTime])
 
     def _predict(self, dt, leg_length, gait, gait_aux):
         stridereg = zeros(len(gait_aux['accel']), dtype=float_)
 
         for i, acc in enumerate(gait_aux['accel']):
-            # acf = _autocovariancefunction(acc[:, gait_aux['vert axis']], int(4.5 / dt))
-            # compute the average number of samples per stride, this *should* be the
-            # lag over the bout for sequential strides
-            lag = int(
-                round(nanmean(gait['PARAM:stride time'][gait_aux['inertial data i'] == i]) / dt)
-            )
-            acf = _autocovariancefunction(acc[:, gait_aux['vert axis']], int(4.5 / dt))
+            mask = gait_aux['inertial data i'] == i
+            if mask.sum() == 0:
+                stridereg[i] = nan
+                continue
+            va = gait_aux['vert axis'][mask][0]
+            lag_ = nanmean(gait['PARAM:stride time'][mask]) / dt
+            if isnan(lag_):  # if only nan values in the bout
+                stridereg[i] = nan
+                continue
+            lag = int(round(lag_))
+            acf = _autocovariancefunction(acc[:, va], int(4.5 / dt))
             pks, _ = find_peaks(acf)
             idx = argmin(abs(pks - lag))
 
@@ -730,7 +777,8 @@ class AutocovarianceSymmetryV(BoutMetric):
         Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
         Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
     """
-    def __init__(self):
+    def __init__(self, logger=None):
+        self.logger = logger
         super().__init__(
             'autocovariance symmetry - V', depends=[StepRegularityV, StrideRegularityV]
         )
@@ -774,7 +822,8 @@ class RegularityIndexV(BoutMetric):
 
 
     """
-    def __init__(self):
+    def __init__(self, logger=None):
+        self.logger = logger
         super().__init__(
             'regularity index - V', depends=[StepRegularityV, StrideRegularityV]
         )

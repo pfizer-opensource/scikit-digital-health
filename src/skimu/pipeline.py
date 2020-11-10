@@ -7,6 +7,7 @@ Pfizer DMTI 2020
 import json
 from operator import attrgetter
 from warnings import warn
+import logging
 
 from skimu.base import _BaseProcess as Process
 
@@ -39,6 +40,8 @@ class Pipeline:
         self._steps = []
         self._save = []
         self._current = -1  # iteration tracking
+
+        self.logger = logging.getLogger(__name__)
 
     def save(self, file):
         """
@@ -122,8 +125,12 @@ class Pipeline:
 
         self._steps += [process]
         # attach the save bool and save_name to the process
+        self._steps[-1]._in_pipeline = True
         self._steps[-1].pipe_save = save_results
         self._steps[-1].pipe_fname = save_name
+
+        # point the step logging disabled to the pipeline disabled
+        self._steps[-1].logger.disabled = self.logger.disabled
 
     def __iter__(self):
         return self
@@ -157,10 +164,13 @@ class Pipeline:
         results = {}
 
         for proc in self:
-            kwargs, step_result = proc._predict(**kwargs)
+            kwargs, step_result = proc.predict(**kwargs)
             if proc.pipe_save:
-                proc.save_results(step_result if proc._return_result else kwargs, proc.pipe_fname)
-            if proc._return_result:
+                proc.save_results(
+                    step_result if step_result is not None else kwargs,
+                    proc.pipe_fname
+                )
+            if step_result is not None:
                 results[proc._name] = step_result
 
         return results

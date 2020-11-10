@@ -122,7 +122,7 @@ class EventMetric:
         self._predict(dt, leg_length, gait, gait_aux)
 
     def _predict_asymmetry(self, dt, leg_length, gait, gait_aux):
-        asy_name = f'{self.name} asymmetry'
+        asy_name = f'{self.k_} asymmetry'
         gait[asy_name] = full(gait['IC'].size, nan, dtype=float_)
 
         mask = self._get_mask(gait, 1)

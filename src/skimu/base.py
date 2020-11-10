@@ -5,6 +5,8 @@ Lukas Adamowicz
 Pfizer DMTI 2020
 """
 from datetime import date as dt_date
+import logging
+
 from pandas import DataFrame
 
 
@@ -30,7 +32,7 @@ class _BaseProcess:
 
         return ret
 
-    def __init__(self, return_result=True, **kwargs):
+    def __init__(self, **kwargs):
         """
         Intended to be subclassed
 
@@ -42,17 +44,17 @@ class _BaseProcess:
             Key-word arguments which are passed to the sub-class
         """
         self._name = self.__class__.__name__
-        self._return_result = return_result
+        self._in_pipeline = False  # initialize to false.  Will be set by the pipeline
 
         self._kw = kwargs
 
-    def predict(self, *args, **kwargs):
-        result = self._predict(*args, **kwargs)
+        self.logger = logging.getLogger(__name__)
 
-        if self._return_result:
-            return result[1]
-        else:
-            return result[0]
+    def predict(self, *args, **kwargs):
+        """
+        Intended to be overwritten in the subclass. Should still be called with super though
+        """
+        self.logger.info(f"Entering {self._name} processing with call {self!r}")
 
     def save_results(self, results, file_name):
         """
