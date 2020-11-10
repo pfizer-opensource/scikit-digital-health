@@ -4,7 +4,6 @@ Gait detection, processing, and analysis from wearable inertial sensor data
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
-from warnings import warn
 from collections.abc import Iterable
 
 from numpy import mean, diff, abs, argmax, sign, round, array
@@ -197,7 +196,7 @@ class Gait(_BaseProcess):
             else:
                 raise ValueError(f'Metric {metrics!r} is not a EventMetric or BoutMetric')
 
-    def predict(self, *args, **kwargs):
+    def predict(self, time=None, accel=None, *, gyro=None, height=None, gait_pred=None, **kwargs):
         """
         predict(time, accel, *, gyro=None, height=None, gait_pred=None)
 
@@ -234,40 +233,12 @@ class Gait(_BaseProcess):
         LowFrequencyError
             If the sampling frequency is less than 20Hz
         """
-        return super().predict(*args, **kwargs)
+        super().predict(
+            time=time, accel=accel, gyro=gyro, height=height, gait_pred=gait_pred, **kwargs
+        )
 
-    def _predict(self, time=None, accel=None, *, gyro=None, height=None, gait_pred=None,
-                 **kwargs):
-        """
-        predict(time=None, accel=None, *, gyro=None, height=None, gait_pred=None)
-
-        Get the gait events and metrics from a time series signal
-
-        Parameters
-        ----------
-        time : numpy.ndarray
-            (N, ) array of unix timestamps, in seconds
-        accel : numpy.ndarray
-            (N, 3) array of accelerations measured by centrally mounted lumbar device, in
-            units of 'g'
-        gyro : numpy.ndarray, optional
-            (N, 3) array of angular velocities measured by the same centrally mounted lumbar
-            device, in units of 'deg/s'. Only optionally used if provided. Main functionality
-            is to allow distinguishing step sides.
-        height : float, optional
-            Either height (False) or leg length (True) of the subject who wore the inertial
-            measurement device, in meters, depending on `leg_length`. If not provided,
-            spatial metrics will not be computed
-        gait_pred : numpy.ndarray, optional
-            (N, ) array of boolean predictions of gait. If not provided, gait classification
-            will be performed on the acceleration data
-
-        Returns
-        -------
-        gait_results : dict
-        """
         if height is None:
-            warn('height not provided, not computing spatial metrics', UserWarning)
+            self.logger.warning('height not provided, not computing spatial metrics')
             leg_length = None
         else:
             # height factor is set to 1 if providing leg length
@@ -360,7 +331,7 @@ class Gait(_BaseProcess):
 
         # loop over metrics and compute
         for param in self._params:
-            param().predict(dt, leg_length, gait, gait_aux)
+            param(self.logger).predict(dt, leg_length, gait, gait_aux)
 
         # remove unnecessary stuff from gait dict
         gait.pop('IC', None)
@@ -373,5 +344,8 @@ class Gait(_BaseProcess):
 
         gait.pop('b valid cycle')
 
-        kwargs.update({self._acc: accel, self._time: time, self._gyro: gyro, 'height': height})
-        return kwargs, gait
+        if self._in_pipeline:
+            kwargs.update({self._acc: accel, self._time: time, self._gyro: gyro, 'height': height})
+            return kwargs, gait
+        else:
+            return gait
