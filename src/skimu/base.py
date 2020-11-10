@@ -57,8 +57,7 @@ class _BaseProcess:
         """
         Intended to be overwritten in the subclass. Should still be called with super though
         """
-        if self.logger is not None:
-            self.logger.info(f"Entering {self._name} processing with call {self!r}")
+        self.logger.info(f"Entering {self._name} processing with call {self!r}")
 
     def disable_logging(self):
         """
