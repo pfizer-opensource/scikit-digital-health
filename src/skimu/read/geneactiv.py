@@ -106,7 +106,7 @@ class ReadBin(_BaseProcess):
         if not isinstance(file, str):
             file = str(file)
         if file[-3:] != "bin":
-            self.logger.warning("File extension is not '.bin'", UserWarning)
+            self.logger.warning("File extension is not '.bin'")
 
         # read the file
         nmax, hdr, acc, time, light, temp, idx, dtime = bin_convert(file, self.base, self.period)

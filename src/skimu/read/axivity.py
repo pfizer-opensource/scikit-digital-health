@@ -113,7 +113,7 @@ class ReadCWA(_BaseProcess):
         if not isinstance(file, str):
             file = str(file)
         if file[-3:] != "cwa":
-            self.logger.warning("File extension is not '.cwa'", UserWarning)
+            self.logger.warning("File extension is not '.cwa'")
 
         # read the file
         meta, imudata, ts, idx, light = read_cwa(file, self.base, self.period)
