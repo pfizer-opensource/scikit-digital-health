@@ -221,9 +221,8 @@ class TestGait(BaseProcessTester):
         )
         data['height'] = None
 
-        self.process.predict(**data)
-        assert caplog.records[0].levelname == 'WARNING'
-        assert 'height not provided' in caplog.records[0].message
+        with pytest.warns(UserWarning):
+            self.process.predict(**data)
 
     def test_sample_rate_error(self, get_sample_data):
         data = get_sample_data(
