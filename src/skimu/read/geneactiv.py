@@ -45,7 +45,6 @@ class ReadBin(_BaseProcess):
 
     def __init__(self, base=None, period=None):
         super().__init__(
-            False,
             # kwargs
             base=base,
             period=period
@@ -68,7 +67,7 @@ class ReadBin(_BaseProcess):
             else:
                 raise ValueError("Base must be in [0, 23] and period must be in [1, 23]")
 
-    def predict(self, *args, **kwargs):
+    def _predict(self, file=None, **kwargs):
         """
         predict(file)
 
@@ -100,15 +99,14 @@ class ReadBin(_BaseProcess):
         - `temperature`: temperature [deg C]
         - `day_ends`: window indices
         """
-        return super().predict(*args, **kwargs)
+        super().predict(file=file, **kwargs)
 
-    def _predict(self, file=None, **kwargs):
         if file is None:
             raise ValueError("file must not be None")
         if not isinstance(file, str):
             file = str(file)
         if file[-3:] != "bin":
-            warn("File extension is not '.bin'", UserWarning)
+            self.logger.warning("File extension is not '.bin'", UserWarning)
 
         # read the file
         nmax, hdr, acc, time, light, temp, idx, dtime = bin_convert(file, self.base, self.period)
@@ -125,4 +123,7 @@ class ReadBin(_BaseProcess):
             results[self._days] = vstack((day_starts, day_stops)).T
 
         kwargs.update(results)
-        return kwargs, None
+        if self._in_pipeline:
+            return kwargs, None
+        else:
+            return kwargs
