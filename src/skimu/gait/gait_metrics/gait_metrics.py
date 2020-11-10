@@ -663,8 +663,12 @@ class StepRegularityV(BoutMetric):
         stepreg = zeros(len(gait_aux['accel']), dtype=float_)
 
         for i, acc in enumerate(gait_aux['accel']):
-            va = gait_aux['vert axis'][[gait_aux['inertial data i'] == i]][0]
-            lag_ = nanmean(gait['PARAM:step time'][gait_aux['inertial data i'] == i]) / dt
+            mask = gait_aux['inertial data i'] == i
+            if mask.sum() == 0:
+                stepreg[i] = nan
+                continue
+            va = gait_aux['vert axis'][mask][0]
+            lag_ = nanmean(gait['PARAM:step time'][mask]) / dt
             if isnan(lag_):  # if only nan values in the bout
                 stepreg[i] = nan
                 continue
@@ -717,8 +721,12 @@ class StrideRegularityV(BoutMetric):
         stridereg = zeros(len(gait_aux['accel']), dtype=float_)
 
         for i, acc in enumerate(gait_aux['accel']):
-            va = gait_aux['vert axis'][[gait_aux['inertial data i'] == i]][0]
-            lag_ = nanmean(gait['PARAM:stride time'][gait_aux['inertial data i'] == i]) / dt
+            mask = gait_aux['inertial data i'] == i
+            if mask.sum() == 0:
+                stridereg[i] = nan
+                continue
+            va = gait_aux['vert axis'][mask][0]
+            lag_ = nanmean(gait['PARAM:stride time'][mask]) / dt
             if isnan(lag_):  # if only nan values in the bout
                 stridereg[i] = nan
                 continue
