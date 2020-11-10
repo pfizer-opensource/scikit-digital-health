@@ -5,6 +5,7 @@ Lukas Adamowicz
 Pfizer DMTI 2020
 """
 from collections.abc import Iterable
+from warnings import warn
 
 from numpy import mean, diff, abs, argmax, sign, round, array
 
@@ -237,7 +238,7 @@ class Gait(_BaseProcess):
         )
 
         if height is None:
-            self.logger.warning('height not provided, not computing spatial metrics')
+            warn('height not provided, not computing spatial metrics', UserWarning)
             leg_length = None
         else:
             # height factor is set to 1 if providing leg length
