@@ -49,8 +49,10 @@ class _BaseProcess:
         self._kw = kwargs
 
         self.logger = logging.getLogger(__name__)
-        self.logger.setLevel('INFO')  # set the level for the logger
-        self.logger.addHandler(logging.StreamHandler())
+        self.logger.setLevel(logging.INFO)  # set the level for the logger
+        self._sh = logging.StreamHandler()
+        self._sh.setLevel(logging.INFO)
+        self.logger.addHandler(self._sh)
         self.logger.disabled = True
 
     def predict(self, *args, **kwargs):
@@ -82,7 +84,9 @@ class _BaseProcess:
         """
         if filename is None:
             filename = f"{self._name}_logs.log"
-        self.logger.addHandler(logging.FileHandler(filename=filename))
+        fh = logging.FileHandler(filename=filename)
+        fh.setLevel(logging.INFO)
+        self.logger.addHandler(fh)
 
     def save_results(self, results, file_name):
         """
