@@ -169,10 +169,7 @@ class TestGait(BaseProcessTester):
         cls.truth_data_file = resolve_data_path('gait_data.h5', 'gait')
         cls.truth_suffix = None
         cls.truth_data_keys = [
-            'IC',
-            'FC',
             'delta h',
-            'b valid cycle',
             'PARAM:stride time',
             'PARAM:stance time',
             'PARAM:swing time',
@@ -217,15 +214,16 @@ class TestGait(BaseProcessTester):
 
         assert g.height_factor == 1.0
 
-    def test_leg_length_warning(self, get_sample_data):
+    def test_leg_length_warning(self, get_sample_data, caplog):
         data = get_sample_data(
             self.sample_data_file,
             self.sample_data_keys
         )
         data['height'] = None
 
-        with pytest.warns(UserWarning):
-            self.process._predict(**data)
+        self.process.predict(**data)
+        assert caplog.records[0].levelname == 'WARNING'
+        assert 'height not provided' in caplog.records[0].message
 
     def test_sample_rate_error(self, get_sample_data):
         data = get_sample_data(
@@ -235,7 +233,7 @@ class TestGait(BaseProcessTester):
         data['time'] = arange(0, 300, 0.5)
 
         with pytest.raises(LowFrequencyError):
-            self.process._predict(**data)
+            self.process.predict(**data)
 
     def test_gait_predictions_error(self, get_sample_data):
         data = get_sample_data(
@@ -245,7 +243,7 @@ class TestGait(BaseProcessTester):
         data['gait_pred'] = arange(0, 1, 0.1)
 
         with pytest.raises(ValueError):
-            self.process._predict(**data)
+            self.process.predict(**data)
 
     def test_add_metrics(self):
         g = Gait()
