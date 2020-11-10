@@ -7,6 +7,7 @@ Pfizer DMTI 2020
 import json
 from operator import attrgetter
 from warnings import warn
+import logging
 
 from skimu.base import _BaseProcess as Process
 
@@ -39,6 +40,44 @@ class Pipeline:
         self._steps = []
         self._save = []
         self._current = -1  # iteration tracking
+
+        self.logger = None
+        self.log_filename = None
+
+    def enable_logging(self, logger=None, filename='pipeline_log.log', name=None):
+        """
+        Enable logging during the execution of the pipeline. This will initialize loggers
+        for steps already added, and any new steps that are added to the pipeline.
+
+        Parameters
+        ----------
+        logger : logging.Logger, optional
+            Custom logger for logging. If None (default), a logger will be created. See Notes for
+            a more detailed description of the logger that will be created.
+        filename : str, optional
+            Filename/path for the logger. Default is 'pipeline_log.log'.
+        name : str, optional
+            Name for the logger. Default is None, which will use __name__ (skimu.pipeline)
+
+        Notes
+        -----
+        If a logger is being created, it is created with the following attributes/parameters:
+
+        - Name is set to __name__ (`name=None`) or `name`
+        - Level is set to `INFO`
+        - Handler is a `logging.FileHandler` with `filename` for the file
+        """
+        if logger is None:
+            self.log_filename = filename  # save the file name
+            self.logger = logging.getLogger(name if name is not None else __name__)
+            self.logger.setLevel('INFO')  # set the level for the logger
+            self.logger.addHandler(logging.FileHandler(filename=filename))
+        else:
+            if isinstance(logger, logging.Logger):
+                self.logger = logger
+
+        for step in self._steps:
+            step.enable_logging(filename=filename)
 
     def save(self, file):
         """
@@ -101,7 +140,8 @@ class Pipeline:
                 save_name=save_name
             )
 
-    def add(self, process, save_results=False, save_name="{date}_{name}_results.cv"):
+    def add(self, process, save_results=False, save_name="{date}_{name}_results.cv",
+            logging_name=None):
         """
         Add a processing step to the pipeline
 
@@ -115,6 +155,9 @@ class Pipeline:
             Optionally formattable path for the save file. Ignored if `save_results` is False.
             For options for the formatting, see any of the processes (e.g. :class:`Gait`,
             :class:`Sit2Stand`). Default is "{date}_{name}_results.csv
+        logging_name : str, optional
+            Name for the logger for the process, if `enable_logging` has been called. Default is
+            None, which will use the __name__ attribute for the process.
         """
         if not isinstance(process, Process):
             raise NotAProcessError("process is not a subclass of _BaseProcess, "
@@ -124,6 +167,9 @@ class Pipeline:
         # attach the save bool and save_name to the process
         self._steps[-1].pipe_save = save_results
         self._steps[-1].pipe_fname = save_name
+
+        if self.logger is not None:
+            self._steps[-1].enable_logging(name=logging_name, filename=self.log_filename)
 
     def __iter__(self):
         return self
