@@ -68,7 +68,7 @@ class Pipeline:
             Filename for the logger. Default is None, which will use "pipeline_logs.log"
         """
         if filename is None:
-            filename = f"pipeline_logs.log"
+            filename = "pipeline_logs.log"
         self.logger.addHandler(logging.FileHandler(filename=filename))
 
     def save(self, file):
@@ -132,8 +132,7 @@ class Pipeline:
                 save_name=save_name
             )
 
-    def add(self, process, save_results=False, save_name="{date}_{name}_results.cv",
-            logging_name=None):
+    def add(self, process, save_results=False, save_name="{date}_{name}_results.cv"):
         """
         Add a processing step to the pipeline
 
@@ -147,9 +146,6 @@ class Pipeline:
             Optionally formattable path for the save file. Ignored if `save_results` is False.
             For options for the formatting, see any of the processes (e.g. :class:`Gait`,
             :class:`Sit2Stand`). Default is "{date}_{name}_results.csv
-        logging_name : str, optional
-            Name for the logger for the process, if `enable_logging` has been called. Default is
-            None, which will use the __name__ attribute for the process.
         """
         if not isinstance(process, Process):
             raise NotAProcessError("process is not a subclass of _BaseProcess, "
