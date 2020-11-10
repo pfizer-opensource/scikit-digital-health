@@ -362,5 +362,16 @@ class Gait(_BaseProcess):
         for param in self._params:
             param().predict(dt, leg_length, gait, gait_aux)
 
+        # remove unnecessary stuff from gait dict
+        gait.pop('IC', None)
+        gait.pop('FC', None)
+        gait.pop('FC opp foot', None)
+
+        # remove in-valid gait cycles
+        for k in [i for i in gait if i != 'b valid cycle']:
+            gait[k] = gait[k][gait['b valid cycle']]
+
+        gait.pop('b valid cycle')
+
         kwargs.update({self._acc: accel, self._time: time, self._gyro: gyro, 'height': height})
         return kwargs, gait
