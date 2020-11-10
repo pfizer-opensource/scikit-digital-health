@@ -48,8 +48,10 @@ class _BaseProcess:
 
         self._kw = kwargs
 
-        self.logger = None
-        self.log_filename = None
+        self.logger = logging.getLogger(__name__)
+        self.logger.setLevel('INFO')  # set the level for the logger
+        self.logger.addHandler(logging.StreamHandler())
+        self.logger.disabled = True
 
     def predict(self, *args, **kwargs):
         """
@@ -58,37 +60,30 @@ class _BaseProcess:
         if self.logger is not None:
             self.logger.info(f"Entering {self._name} processing with call {self!r}")
 
-    def enable_logging(self, logger=None, filename='pipeline_log.log', name=None):
+    def disable_logging(self):
         """
-        Enable logging during the execution of the pipeline. This will initialize loggers
-        for steps already added, and any new steps that are added to the pipeline.
+        Disable all logging for the process.
+        """
+        self.logger.disabled = True
+
+    def enable_logging(self):
+        """
+        Enable all logging for the process.
+        """
+        self.logger.disabled = False
+
+    def add_logging_file_handler(self, filename=None):
+        """
+        Add a file handler for logging, which will output the logs to the specified file.
 
         Parameters
         ----------
-        logger : logging.Logger, optional
-            Custom logger for logging. If None (default), a logger will be created. See Notes for
-            a more detailed description of the logger that will be created.
-        filename : str, optional
-            Filename/path for the logger. Default is 'pipeline_log.log'.
-        name : str, optional
-            Name for the logger. Default is None, which will use __name__ (skimu.pipeline)
-
-        Notes
-        -----
-        If a logger is being created, it is created with the following attributes/parameters:
-
-        - Name is set to __name__ (`name=None`) or `name`
-        - Level is set to `INFO`
-        - Handler is a `logging.FileHandler` with `filename` for the file
+        filename : {None, str}, optional
+            Filename for the logger. Default is None, which will use "{name}_logs.log"
         """
-        if logger is None:
-            self.log_filename = filename  # save the file name
-            self.logger = logging.getLogger(name if name is not None else __name__)
-            self.logger.setLevel('INFO')  # set the level for the logger
-            self.logger.addHandler(logging.FileHandler(filename=filename))
-        else:
-            if isinstance(logger, logging.Logger):
-                self.logger = logger
+        if filename is None:
+            filename = f"{self._name}_logs.log"
+        self.logger.addHandler(logging.FileHandler(filename=filename))
 
     def save_results(self, results, file_name):
         """
