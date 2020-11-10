@@ -67,7 +67,7 @@ class ReadBin(_BaseProcess):
             else:
                 raise ValueError("Base must be in [0, 23] and period must be in [1, 23]")
 
-    def _predict(self, file=None, **kwargs):
+    def predict(self, file=None, **kwargs):
         """
         predict(file)
 
