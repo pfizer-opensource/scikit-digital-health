@@ -42,38 +42,6 @@ class Pipeline:
         self._current = -1  # iteration tracking
 
         self.logger = logging.getLogger(__name__)
-        self.logger.setLevel(logging.INFO)  # set the level for the logger
-        self._sh = logging.StreamHandler()
-        self._sh.setLevel(logging.INFO)
-        self.logger.addHandler(self._sh)
-        self.logger.disabled = True
-
-    def disable_logging(self):
-        """
-        Disable all logging for the pipeline
-        """
-        self.logger.disabled = True
-
-    def enable_logging(self):
-        """
-        Enable all logging for the pipeline
-        """
-        self.logger.disabled = False
-
-    def add_logging_file_handler(self, filename=None):
-        """
-        Add a file handler for logging, which will output the logs to the specified file.
-
-        Parameters
-        ----------
-        filename : {None, str}, optional
-            Filename for the logger. Default is None, which will use "pipeline_logs.log"
-        """
-        if filename is None:
-            filename = "pipeline_logs.log"
-        _fh = logging.FileHandler(filename=filename)
-        _fh.setLevel(logging.INFO)
-        self.logger.addHandler(_fh)
 
     def save(self, file):
         """

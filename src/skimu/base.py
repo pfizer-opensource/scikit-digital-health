@@ -49,44 +49,12 @@ class _BaseProcess:
         self._kw = kwargs
 
         self.logger = logging.getLogger(__name__)
-        self.logger.setLevel(logging.INFO)  # set the level for the logger
-        self._sh = logging.StreamHandler()
-        self._sh.setLevel(logging.INFO)
-        self.logger.addHandler(self._sh)
-        self.logger.disabled = True
 
     def predict(self, *args, **kwargs):
         """
         Intended to be overwritten in the subclass. Should still be called with super though
         """
         self.logger.info(f"Entering {self._name} processing with call {self!r}")
-
-    def disable_logging(self):
-        """
-        Disable all logging for the process.
-        """
-        self.logger.disabled = True
-
-    def enable_logging(self):
-        """
-        Enable all logging for the process.
-        """
-        self.logger.disabled = False
-
-    def add_logging_file_handler(self, filename=None):
-        """
-        Add a file handler for logging, which will output the logs to the specified file.
-
-        Parameters
-        ----------
-        filename : {None, str}, optional
-            Filename for the logger. Default is None, which will use "{name}_logs.log"
-        """
-        if filename is None:
-            filename = f"{self._name}_logs.log"
-        fh = logging.FileHandler(filename=filename)
-        fh.setLevel(logging.INFO)
-        self.logger.addHandler(fh)
 
     def save_results(self, results, file_name):
         """
