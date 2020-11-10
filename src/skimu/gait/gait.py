@@ -343,8 +343,8 @@ class Gait(_BaseProcess):
 
         gait.pop('b valid cycle')
 
+        kwargs.update({self._acc: accel, self._time: time, self._gyro: gyro, 'height': height})
         if self._in_pipeline:
-            kwargs.update({self._acc: accel, self._time: time, self._gyro: gyro, 'height': height})
             return kwargs, gait
         else:
             return gait
