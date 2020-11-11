@@ -229,8 +229,8 @@ def sample_gait_aux():
         'accel': [
             a, a, a
         ],
-        'inertial data i': np.array([0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2]),
-        'vert axis': np.array([0] * 12)
+        'inertial data i': np.array([0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2]),
+        'vert axis': np.array([0] * 13)
     }
 
     return gait_aux
