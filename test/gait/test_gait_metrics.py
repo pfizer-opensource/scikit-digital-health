@@ -299,6 +299,26 @@ class TestHarmonicRatioV(BaseTestMetric):
         cls.metric = HarmonicRatioV()
         cls.num_nan = 2
 
+    def test(self, sample_gait, sample_gait_aux, caplog):
+        self.metric.predict(1/50, 1.0, sample_gait, sample_gait_aux)
+
+        assert np.isnan(sample_gait[self.metric.k_][:10]).sum() == 2 * self.num_nan
+
+        assert len(caplog.records) == 2  # should be 2 loggings
+        assert any(['use of less than 20 harmonics' in i.message for i in caplog.records])
+        assert any(['too few harmonics in frequency range' in i.message for i in caplog.records])
+
+        if self.event_metric:
+            assert np.allclose(
+                sample_gait[self.metric.k_][:5], sample_gait[self.metric.k_][5:10],
+                equal_nan=True
+            )
+        else:
+            assert all(sample_gait[self.metric.k_][:10] == sample_gait[self.metric.k_][0])
+
+        if self.res_bout1 is not None:
+            assert np.allclose(sample_gait[self.metric.k_][:5], self.res_bout1, equal_nan=True)
+
 
 # TODO should probably check actual values here not just through running Gait
 class TestStrideSPARC(BaseTestMetric):
