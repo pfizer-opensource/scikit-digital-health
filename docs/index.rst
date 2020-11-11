@@ -43,8 +43,8 @@ Contents
    :maxdepth: 3
 
    src/installation
-   src/testing
    src/usage
+   src/dev/contributing
    ref/index
 
 
