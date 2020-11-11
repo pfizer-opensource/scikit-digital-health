@@ -4,7 +4,7 @@
 Adding modules
 ##############
 
-The goal of ``scikit-imu`` is to have one package with a defined structure that allows for easy pipeline generaton with multiple stages that may or may not depends on previous stages. 
+The goal of ``scikit-imu`` is to have one package with a defined structure that allows for easy pipeline generaton with multiple stages that may or may not depend on previous stages. 
 To that end, there are several pre-defined base classes intended to be sub-classeed that will help setting up modules that are intended to directly interface with the pipeline infrastructure.
 
 Add a new module
