@@ -331,7 +331,7 @@ class Gait(_BaseProcess):
 
         # loop over metrics and compute
         for param in self._params:
-            param(self.logger).predict(dt, leg_length, gait, gait_aux)
+            param().predict(dt, leg_length, gait, gait_aux)
 
         # remove unnecessary stuff from gait dict
         gait.pop('IC', None)
