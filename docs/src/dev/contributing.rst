@@ -62,7 +62,7 @@ This is the short summary, complete descriptions are below:
 
     * Reviewers might write comments regarding your PR in order to improve it and make sure the standards are met.
 
-    * To update your PR, make changes on your local repository, and commit. **Run tests again, and only if they succed** push to your fork. As seeon as the changes are pushed up (to the same branch as before) the PR will update automatically.
+    * To update your PR, make changes on your local repository, and commit. **Run tests again, and only if they succed** push to your fork. As the changes are pushed up (to the same branch as before) the PR will update automatically.
 
     * If tests are failing, but you are not sure how to fix these, you can push the changes and ask for help in a PR comment.
 
