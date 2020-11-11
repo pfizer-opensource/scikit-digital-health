@@ -193,13 +193,15 @@ def get_strides_truth():
 @fixture
 def sample_gait():
     gait = {
-        'IC': np.array([10, 35, 62, 86, 111, 10, 35, 62, 86, 111, 5, 20, 35]),
-        'FC opp foot': np.array([15, 41, 68, 90, 116, 15, 41, 68, 90, 116, 10, 25, 40]),
-        'FC': np.array([40, 65, 90, 115, 140, 40, 65, 90, 115, 140, 35, 50, 65]),
-        'delta h': np.array(
-            [0.05, 0.055, 0.05, 0.045, np.nan, 0.05, 0.055, 0.05, 0.045, np.nan, 0.05, 0.05, np.nan]
-        ),
-        'Bout N': np.array([1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3])
+        'IC': np.array([10, 35, 62, 86, 111, 10, 35, 62, 86, 111, 5, 20, 25, 55, 80]),
+        'FC opp foot': np.array([15, 41, 68, 90, 116, 15, 41, 68, 90, 116, 10, 25, 28, 65, 90]),
+        'FC': np.array([40, 65, 90, 115, 140, 40, 65, 90, 115, 140, 35, 50, 55, 85, 110]),
+        'delta h': np.array([
+            0.05, 0.055, 0.05, 0.045, np.nan,
+            0.05, 0.055, 0.05, 0.045, np.nan,
+            0.05, 0.05, 0.05, 0.05, np.nan
+        ]),
+        'Bout N': np.array([1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3])
     }
     return gait
 
@@ -229,8 +231,8 @@ def sample_gait_aux():
         'accel': [
             a, a, a
         ],
-        'inertial data i': np.array([0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2]),
-        'vert axis': np.array([0] * 13)
+        'inertial data i': np.array([0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2]),
+        'vert axis': np.array([0] * 15)
     }
 
     return gait_aux
