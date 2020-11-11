@@ -61,15 +61,15 @@ class BaseTestMetric:
     def test(self, sample_gait, sample_gait_aux):
         self.metric.predict(1/50, 1.0, sample_gait, sample_gait_aux)
 
-        assert np.isnan(sample_gait[self.metric.k_]).sum() == 2 * self.num_nan
+        assert np.isnan(sample_gait[self.metric.k_][:10]).sum() == 2 * self.num_nan
 
         if self.event_metric:
             assert np.allclose(
-                sample_gait[self.metric.k_][:5], sample_gait[self.metric.k_][5:],
+                sample_gait[self.metric.k_][:5], sample_gait[self.metric.k_][5:10],
                 equal_nan=True
             )
         else:
-            assert all(sample_gait[self.metric.k_] == sample_gait[self.metric.k_][0])
+            assert all(sample_gait[self.metric.k_][:10] == sample_gait[self.metric.k_][0])
 
         if self.res_bout1 is not None:
             assert np.allclose(sample_gait[self.metric.k_][:5], self.res_bout1, equal_nan=True)
@@ -208,7 +208,7 @@ class TestStepLength(BaseTestMetric):
     def test_no_leg_length(self, sample_gait):
         self.metric.predict(1/50, None, sample_gait, None)
 
-        assert np.isnan(sample_gait[self.metric.k_]).sum() == 10
+        assert np.isnan(sample_gait[self.metric.k_][:10]).sum() == 10
 
 
 class TestStrideLength(BaseTestMetric):
@@ -230,7 +230,7 @@ class TestStrideLength(BaseTestMetric):
     def test_no_leg_length(self, sample_gait):
         self.metric.predict(1/50, None, sample_gait, None)
 
-        assert np.isnan(sample_gait[self.metric.k_]).sum() == 10
+        assert np.isnan(sample_gait[self.metric.k_][:10]).sum() == 10
 
 
 class TestGaitSpeed(BaseTestMetric):
@@ -255,7 +255,7 @@ class TestGaitSpeed(BaseTestMetric):
     def test_no_leg_length(self, sample_gait):
         self.metric.predict(1/50, None, sample_gait, None)
 
-        assert np.isnan(sample_gait[self.metric.k_]).sum() == 10
+        assert np.isnan(sample_gait[self.metric.k_][:10]).sum() == 10
 
 
 class TestCadence(BaseTestMetric):
