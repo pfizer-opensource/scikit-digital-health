@@ -439,19 +439,17 @@ class HarmonicRatioV(EventMetric):
             # get the indices for the first 20 harmonics
             ix_stridef = argmin(abs(self._freq / dt - stridef)) * self._harmonics
             if (ix_stridef < F.size).sum() < 10:
-                if self.logger is not None:
-                    self.logger.warning(
-                        f"High stride frequency [{stridef:.2f}] results too few harmonics in "
-                        f"frequency range. Setting to nan"
-                    )
+                self.logger.warning(
+                    f"High stride frequency [{stridef:.2f}] results too few harmonics in "
+                    f"frequency range. Setting to nan"
+                )
                 gait[self.k_][idx] = nan
                 continue
             elif (ix_stridef < F.size).sum() < 20:
-                if self.logger is not None:
-                    self.logger.warning(
-                        f"High stride frequency [{stridef:.2f}] results in use of less than 20 "
-                        f"harmonics [{(ix_stridef < F.size).sum()}]."
-                    )
+                self.logger.warning(
+                    f"High stride frequency [{stridef:.2f}] results in use of less than 20 "
+                    f"harmonics [{(ix_stridef < F.size).sum()}]."
+                )
             ix_stridef = ix_stridef[ix_stridef < F.size]  # make sure not taking more than possible
 
             # index 1 is harmonic 2 -> even harmonics / odd harmonics
