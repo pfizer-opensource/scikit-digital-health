@@ -111,7 +111,7 @@ Tests should provide 100% coverage in an ideal case. Coverage can be measured by
 
 .. code:: sh
 
-    coverage -run --pyargs pytest && coverage html
+    coverage run -m pytest && coverage html
 
 from the top-level ``scikit-imu`` folder. This will generate html documents in ``coverage/`` which can easily be explored to find statements that are not covered:
 
