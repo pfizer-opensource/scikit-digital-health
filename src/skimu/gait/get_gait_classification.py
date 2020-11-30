@@ -49,7 +49,7 @@ def get_gait_classification_lgbm(gait_pred, accel, dt, timestamps):
     """
     assert accel.shape[0] == timestamps.size, "`vert_accel` and `timestamps` # samples must match"
 
-    rel_time = timestamps - timestamps[0]
+    # rel_time = timestamps - timestamps[0]
     if gait_pred is None:
         if 1 / dt >= 50.0:
             goal_fs = 50.0  # goal fs for classifier
@@ -65,19 +65,20 @@ def get_gait_classification_lgbm(gait_pred, accel, dt, timestamps):
         # down-sample if necessary
         if 1 / dt != goal_fs:
             f_rs = interp1d(
-                rel_time, accel, kind='cubic', axis=0, bounds_error=False,
+                timestamps, accel, kind='cubic', axis=0, bounds_error=False,
                 fill_value='extrapolate'
             )
-            accel_rs = f_rs(arange(0, rel_time[-1], 1 / goal_fs))
+            accel_rs = f_rs(arange(timestamps[0], timestamps[-1], 1 / goal_fs))
+            del f_rs  # won't free immediately, but might reduce memory a bit
         else:
             accel_rs = accel
 
         # band-pass filter
         sos = butter(1, [2 * 0.25 / goal_fs, 2 * 5 / goal_fs], btype='band', output='sos')
-        accel_rs_f = sosfiltfilt(sos, norm(accel_rs, axis=1))
+        accel_rs = sosfiltfilt(sos, norm(accel_rs, axis=1))
 
         # window
-        accel_w = get_windowed_view(accel_rs_f, wlen, wstep, ensure_c_contiguity=True)
+        accel_w = get_windowed_view(accel_rs, wlen, wstep, ensure_c_contiguity=True)
 
         # get the feature bank
         feat_bank = Bank(window_length=None, window_step=None)  # make sure no windowing
@@ -114,11 +115,15 @@ def get_gait_classification_lgbm(gait_pred, accel, dt, timestamps):
 
         # upsample the gait predictions
         f = interp1d(
-            arange(0, rel_time[-1] + 1 / goal_fs, 1 / goal_fs)[:gait_pred_sample_rs.size],
+            arange(
+                timestamps[0],
+                timestamps[-1] + 1 / goal_fs,
+                1 / goal_fs
+            )[:gait_pred_sample_rs.size],
             gait_pred_sample_rs,
             kind='previous', bounds_error=False, fill_value=0
         )
-        gait_pred_sample = f(rel_time)
+        gait_pred_sample = f(timestamps)
     else:
         if isinstance(gait_pred, ndarray):
             if gait_pred.size != accel.shape[0]:
