@@ -15,7 +15,7 @@ PyObject * read_gt3x(PyObject *NPY_UNUSED(self), PyObject *args){
     GT3XInfo_t file_info;  // for storing information from the "info.txt" file
 
     // explicitly set debug
-    info.debug = 1;
+    info.debug = 0;
 
     if (!PyArg_ParseTuple(args, "O&ll:read_cwa", PyUnicode_FSConverter, &bytes, &(info.base), &(info.period))) return NULL;
     PyBytes_AsStringAndSize(bytes, &filename, &flen);
@@ -56,6 +56,11 @@ PyObject * read_gt3x(PyObject *NPY_UNUSED(self), PyObject *args){
            *time_ptr  = (double *)PyArray_DATA(time),
            *lux_ptr   = (double *)PyArray_DATA(lux);
     int *index_ptr = (int *)PyArray_DATA(index);
+
+    // set the index values to outside possible range
+    for (int i = 0; i < info.n_days * 2 + 4; ++i){
+        index_ptr[i] = - 2 * info.samples;
+    }
 
     // read the data into the arrays
     if (!parse_activity(gt3x, &info, &file_info, &accel_ptr, &time_ptr, &lux_ptr, &index_ptr, &read_err)){
