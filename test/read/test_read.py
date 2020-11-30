@@ -136,6 +136,7 @@ class TestReadBin(BaseProcessTester):
                 ReadBin().predict('test.random')
 
 
+# TODO: find an old version file to test on
 class TestReadGT3X(BaseProcessTester):
     @classmethod
     def setup_class(cls):
