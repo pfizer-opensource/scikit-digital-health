@@ -3,7 +3,7 @@ from numpy import allclose
 
 from ..base_conftest import *
 
-from skimu.read import ReadCWA, ReadBin
+from skimu.read import ReadCWA, ReadBin, ReadGT3X
 from skimu.read.get_window_start_stop import get_window_start_stop
 
 
@@ -107,6 +107,51 @@ class TestReadBin(BaseProcessTester):
         cls.process = ReadBin(base=8, period=12)
 
         cls.atol = 5e-5  # this is for accel, because GeneActiv csv file values are truncated
+
+    def test_none_file(self):
+        with pytest.raises(ValueError):
+            self.process.predict(file=None)
+
+    def test_window(self):
+        r = ReadBin(base=8, period=12)
+
+        assert r.window
+        assert r.base == 8
+        assert r.period == 12
+
+    def test_window_warning(self):
+        with pytest.warns(UserWarning):
+            ReadBin(base=None, period=12)
+        with pytest.warns(UserWarning):
+            ReadBin(base=8, period=None)
+
+    @pytest.mark.parametrize(('base', 'period'), ((-1, 12), (0, 25), (8, 30), (24, 12), (8, -12)))
+    def test_window_bounds_error(self, base, period):
+        with pytest.raises(ValueError):
+            ReadBin(base=base, period=period)
+
+    def test_extension_warning(self):
+        with pytest.warns(UserWarning):
+            with pytest.raises(OSError):
+                ReadBin().predict('test.random')
+
+
+class TestReadGT3X(BaseProcessTester):
+    @classmethod
+    def setup_class(cls):
+        super().setup_class()
+
+        # override specific necessary attributes
+        cls.sample_data_file = resolve_data_path('gt3x_data.h5', 'read')
+        cls.truth_data_file = resolve_data_path('gt3x_data.h5', 'read')
+        cls.truth_data_keys = [
+            'time',
+            'accel',
+            'day_ends'
+        ]
+
+        cls.test_results = False
+        cls.process = ReadGT3X(base=9, period=2)
 
     def test_none_file(self):
         with pytest.raises(ValueError):
