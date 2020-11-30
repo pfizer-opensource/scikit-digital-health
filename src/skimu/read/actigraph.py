@@ -116,7 +116,7 @@ class ReadGT3X(_BaseProcess):
         }
 
         if not all(lux == 0.0):
-            results['light'] = lux
+            results['light'] = lux[:N]
 
         if self.window:
             day_starts, day_stops = get_window_start_stop(index, N)
