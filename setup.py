@@ -195,6 +195,7 @@ def configuration(parent_package='', top_path=None):
         libraries=['gt3x', 'zip']
     )
 
+    # cython feature extensions
     if os.environ.get('CYTHONIZE', 'False') == 'True':
         from Cython.Build import cythonize
 
