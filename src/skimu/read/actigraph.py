@@ -115,6 +115,9 @@ class ReadGT3X(_BaseProcess):
             self._acc: accel[:N]
         }
 
+        if not all(lux == 0.0):
+            results['light'] = lux
+
         if self.window:
             day_starts, day_stops = get_window_start_stop(index, N)
             results[self._days] = vstack((day_starts, day_stops)).T
