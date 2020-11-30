@@ -191,7 +191,7 @@ def configuration(parent_package='', top_path=None):
     config.add_library('gt3x', sources='src/skimu/read/_extensions/gt3x.c')
     config.add_extension(
         'skimu/read/_extensions/read_gt3x',
-        sources=['scr/skimu/read/_extensions/read_gt3x.c'],
+        sources=['src/skimu/read/_extensions/read_gt3x.c'],
         libraries=['gt3x', 'zip']
     )
 
