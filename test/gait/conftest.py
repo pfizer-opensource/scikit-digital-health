@@ -193,11 +193,15 @@ def get_strides_truth():
 @fixture
 def sample_gait():
     gait = {
-        'IC': np.tile(np.array([10, 35, 62, 86, 111]), 2),
-        'FC opp foot': np.tile(np.array([15, 41, 68, 90, 116]), 2),
-        'FC': np.tile(np.array([40, 65, 90, 115, 140]), 2),
-        'delta h': np.tile(np.array([0.05, 0.055, 0.05, 0.045, np.nan]), 2),
-        'Bout N': np.repeat([1, 2], 5)
+        'IC': np.array([10, 35, 62, 86, 111, 10, 35, 62, 86, 111, 5, 20, 25, 55, 80]),
+        'FC opp foot': np.array([15, 41, 68, 90, 116, 15, 41, 68, 90, 116, 10, 25, 28, 65, 90]),
+        'FC': np.array([40, 65, 90, 115, 140, 40, 65, 90, 115, 140, 35, 50, 55, 85, 110]),
+        'delta h': np.array([
+            0.05, 0.055, 0.05, 0.045, np.nan,
+            0.05, 0.055, 0.05, 0.045, np.nan,
+            0.05, 0.05, 0.05, 0.05, np.nan
+        ]),
+        'Bout N': np.array([1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3])
     }
     return gait
 
@@ -225,10 +229,98 @@ def sample_gait_aux():
 
     gait_aux = {
         'accel': [
+            a, a, a
+        ],
+        'inertial data i': np.array([0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2]),
+        'vert axis': np.array([0] * 15)
+    }
+
+    return gait_aux
+
+
+@fixture
+def sample_gait_nan_bout():
+    gait = {
+        'IC': np.array([10, 35, 62, 86, 111, 11, 35]),
+        'FC opp foot': np.array([15, 41, 68, 90, 116, 15, 41]),
+        'FC': np.array([40, 65, 90, 115, 140, 41, 65]),
+        'delta h': np.array([0.05, 0.055, 0.05, 0.045, np.nan, np.nan, np.nan]),
+        'Bout N': np.array([1, 1, 1, 1, 1, 2, 2])
+    }
+    return gait
+
+
+@fixture(scope='module')
+def sample_gait_aux_nan_bout():
+    def y(x):
+        return np.sin(np.pi * x / x.max()) + np.sin(5 * np.pi * x/x.max()) / (x+1)
+
+    a = np.concatenate(
+        (
+            y(np.arange(25)),
+            y(np.arange(27)),
+            y(np.arange(24)),
+            y(np.arange(25)),
+            y(np.arange(25)),
+            y(np.arange(24)),
+            y(np.arange(24)),
+            y(np.arange(24)),
+            y(np.arange(24)),
+            y(np.arange(25)),
+            y(np.arange(27))
+        )
+    ).reshape((-1, 1))
+
+    gait_aux = {
+        'accel': [
             a, a
         ],
-        'inertial data i': np.repeat([0, 1], 5),
-        'vert axis': np.array([0] * 10)
+        'inertial data i': np.array([0, 0, 0, 0, 0, 1, 1]),
+        'vert axis': np.array([0] * 7)
+    }
+
+    return gait_aux
+
+
+@fixture
+def sample_gait_no_bout():
+    gait = {
+        'IC': np.array([10, 35, 62, 86, 111, 11, 35]),
+        'FC opp foot': np.array([15, 41, 68, 90, 116, 15, 41]),
+        'FC': np.array([40, 65, 90, 115, 140, 41, 65]),
+        'delta h': np.array([0.05, 0.055, 0.05, 0.045, np.nan, np.nan, np.nan]),
+        'Bout N': np.array([1, 1, 1, 1, 1, 3, 3])
+    }
+    return gait
+
+
+@fixture(scope='module')
+def sample_gait_aux_no_bout():
+    def y(x):
+        return np.sin(np.pi * x / x.max()) + np.sin(5 * np.pi * x/x.max()) / (x+1)
+
+    a = np.concatenate(
+        (
+            y(np.arange(25)),
+            y(np.arange(27)),
+            y(np.arange(24)),
+            y(np.arange(25)),
+            y(np.arange(25)),
+            y(np.arange(24)),
+            y(np.arange(24)),
+            y(np.arange(24)),
+            y(np.arange(24)),
+            y(np.arange(25)),
+            y(np.arange(27))
+        )
+    ).reshape((-1, 1))
+
+    gait_aux = {
+        'accel': [
+            a, a, a
+        ],
+        'inertial data i': np.array([0, 0, 0, 0, 0, 2, 2]),
+        'vert axis': np.array([0] * 7)
     }
 
     return gait_aux

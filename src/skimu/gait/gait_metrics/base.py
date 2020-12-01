@@ -5,6 +5,7 @@ Lukas Adamowicz
 2020, Pfizer DMTI
 """
 import functools
+import logging
 
 from numpy import zeros, roll, full, nan, bool_, float_
 
@@ -24,7 +25,7 @@ class BoutMetric:
     def __repr__(self):
         return self.name
 
-    def __init__(self, name, depends=None):
+    def __init__(self, name, logname, depends=None):
         """
         Bout level metric base class
 
@@ -36,6 +37,7 @@ class BoutMetric:
             Any other metrics that are required to be computed beforehand
         """
         self.name = name
+        self.logger = logging.getLogger(logname)
         self.k_ = f'BOUTPARAM:{self.name}'
 
         self._depends = depends
@@ -73,7 +75,7 @@ class EventMetric:
     def __repr__(self):
         return self.name
 
-    def __init__(self, name, depends=None):
+    def __init__(self, name, logname, depends=None):
         """
         Gait metric base class
 
@@ -83,6 +85,7 @@ class EventMetric:
             Name of the metric
         """
         self.name = name
+        self.logger = logging.getLogger(logname)
         self.k_ = f'PARAM:{self.name}'
 
         self._depends = depends

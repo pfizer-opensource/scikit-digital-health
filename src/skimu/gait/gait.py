@@ -245,7 +245,7 @@ class Gait(_BaseProcess):
             leg_length = self.height_factor * height
 
         # compute fs/delta t
-        dt = mean(diff(time[:500]))
+        dt = mean(diff(time))
         if (1 / dt) < 20.0:
             raise LowFrequencyError(f"Frequency ({1/dt:.2f}Hz) is too low (<20Hz)")
 
@@ -331,7 +331,7 @@ class Gait(_BaseProcess):
 
         # loop over metrics and compute
         for param in self._params:
-            param(self.logger).predict(dt, leg_length, gait, gait_aux)
+            param().predict(dt, leg_length, gait, gait_aux)
 
         # remove unnecessary stuff from gait dict
         gait.pop('IC', None)

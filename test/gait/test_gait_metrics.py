@@ -61,15 +61,15 @@ class BaseTestMetric:
     def test(self, sample_gait, sample_gait_aux):
         self.metric.predict(1/50, 1.0, sample_gait, sample_gait_aux)
 
-        assert np.isnan(sample_gait[self.metric.k_]).sum() == 2 * self.num_nan
+        assert np.isnan(sample_gait[self.metric.k_][:10]).sum() == 2 * self.num_nan
 
         if self.event_metric:
             assert np.allclose(
-                sample_gait[self.metric.k_][:5], sample_gait[self.metric.k_][5:],
+                sample_gait[self.metric.k_][:5], sample_gait[self.metric.k_][5:10],
                 equal_nan=True
             )
         else:
-            assert all(sample_gait[self.metric.k_] == sample_gait[self.metric.k_][0])
+            assert all(sample_gait[self.metric.k_][:10] == sample_gait[self.metric.k_][0])
 
         if self.res_bout1 is not None:
             assert np.allclose(sample_gait[self.metric.k_][:5], self.res_bout1, equal_nan=True)
@@ -208,7 +208,7 @@ class TestStepLength(BaseTestMetric):
     def test_no_leg_length(self, sample_gait):
         self.metric.predict(1/50, None, sample_gait, None)
 
-        assert np.isnan(sample_gait[self.metric.k_]).sum() == 10
+        assert np.isnan(sample_gait[self.metric.k_][:10]).sum() == 10
 
 
 class TestStrideLength(BaseTestMetric):
@@ -230,7 +230,7 @@ class TestStrideLength(BaseTestMetric):
     def test_no_leg_length(self, sample_gait):
         self.metric.predict(1/50, None, sample_gait, None)
 
-        assert np.isnan(sample_gait[self.metric.k_]).sum() == 10
+        assert np.isnan(sample_gait[self.metric.k_][:10]).sum() == 10
 
 
 class TestGaitSpeed(BaseTestMetric):
@@ -255,7 +255,7 @@ class TestGaitSpeed(BaseTestMetric):
     def test_no_leg_length(self, sample_gait):
         self.metric.predict(1/50, None, sample_gait, None)
 
-        assert np.isnan(sample_gait[self.metric.k_]).sum() == 10
+        assert np.isnan(sample_gait[self.metric.k_][:10]).sum() == 10
 
 
 class TestCadence(BaseTestMetric):
@@ -299,6 +299,26 @@ class TestHarmonicRatioV(BaseTestMetric):
         cls.metric = HarmonicRatioV()
         cls.num_nan = 2
 
+    def test(self, sample_gait, sample_gait_aux, caplog):
+        self.metric.predict(1/50, 1.0, sample_gait, sample_gait_aux)
+
+        assert np.isnan(sample_gait[self.metric.k_][:10]).sum() == 2 * self.num_nan
+
+        assert len(caplog.records) == 2  # should be 2 loggings
+        assert any(['use of less than 20 harmonics' in i.message for i in caplog.records])
+        assert any(['too few harmonics in frequency range' in i.message for i in caplog.records])
+
+        if self.event_metric:
+            assert np.allclose(
+                sample_gait[self.metric.k_][:5], sample_gait[self.metric.k_][5:10],
+                equal_nan=True
+            )
+        else:
+            assert all(sample_gait[self.metric.k_][:10] == sample_gait[self.metric.k_][0])
+
+        if self.res_bout1 is not None:
+            assert np.allclose(sample_gait[self.metric.k_][:5], self.res_bout1, equal_nan=True)
+
 
 # TODO should probably check actual values here not just through running Gait
 class TestStrideSPARC(BaseTestMetric):
@@ -333,6 +353,12 @@ class TestGaitSymmetryIndex(BaseTestMetric):
 
         cls.event_metric = False
 
+    def test_nan_bout(self, sample_gait_nan_bout, sample_gait_aux_nan_bout):
+        self.metric.predict(1 / 50, 1.0, sample_gait_nan_bout, sample_gait_aux_nan_bout)
+
+        # last 2 values (2 values in the last bout) should be nan
+        assert np.isnan(sample_gait_nan_bout[self.metric.k_]).sum() == 2
+
 
 # TODO should probably check actual values here not just through running Gait
 class TestStrideRegularityV(BaseTestMetric):
@@ -345,6 +371,18 @@ class TestStrideRegularityV(BaseTestMetric):
 
         cls.event_metric = False
 
+    def test_nan_bout(self, sample_gait_nan_bout, sample_gait_aux_nan_bout, caplog):
+        self.metric.predict(1 / 50, 1.0, sample_gait_nan_bout, sample_gait_aux_nan_bout)
+
+        # last 2 values (2 values in the last bout) should be nan
+        assert np.isnan(sample_gait_nan_bout[self.metric.k_]).sum() == 2
+
+    def test_missing_bout(self, sample_gait_no_bout, sample_gait_aux_no_bout, caplog):
+        self.metric.predict(1 / 50, 1.0, sample_gait_no_bout, sample_gait_aux_no_bout)
+
+        # last 2 values (2 values in the last bout) should be nan
+        assert np.isnan(sample_gait_no_bout[self.metric.k_]).sum() == 2
+
 
 # TODO should probably check actual values here not just through running Gait
 class TestStepRegularityV(BaseTestMetric):
@@ -356,6 +394,23 @@ class TestStepRegularityV(BaseTestMetric):
         cls.num_nan = 0
 
         cls.event_metric = False
+
+    def test_nan_bout(self, sample_gait_nan_bout, sample_gait_aux_nan_bout, caplog):
+        for k in sample_gait_nan_bout:
+            sample_gait_nan_bout[k] = sample_gait_nan_bout[k][:-1]
+        for k in [i for i in sample_gait_aux_nan_bout if 'acc' not in i]:
+            sample_gait_aux_nan_bout[k] = sample_gait_aux_nan_bout[k][:-1]
+
+        self.metric.predict(1 / 50, 1.0, sample_gait_nan_bout, sample_gait_aux_nan_bout)
+
+        # last 1 values (1 values in the last bout) should be nan
+        assert np.isnan(sample_gait_nan_bout[self.metric.k_]).sum() == 1
+
+    def test_missing_bout(self, sample_gait_no_bout, sample_gait_aux_no_bout, caplog):
+        self.metric.predict(1 / 50, 1.0, sample_gait_no_bout, sample_gait_aux_no_bout)
+
+        # last 2 values (2 values in the last bout) should be nan
+        assert np.isnan(sample_gait_no_bout[self.metric.k_]).sum() == 0
 
 
 # TODO should probably check actual values here not just through running Gait

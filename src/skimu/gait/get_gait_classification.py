@@ -6,7 +6,7 @@ Pfizer DMTI 2020
 """
 from sys import version_info
 
-from numpy import arange, zeros, ndarray, full, bool_
+from numpy import arange, zeros, ndarray, full, bool_, interp
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt
 from scipy.interpolate import interp1d
@@ -49,9 +49,9 @@ def get_gait_classification_lgbm(gait_pred, accel, dt, timestamps):
     """
     assert accel.shape[0] == timestamps.size, "`vert_accel` and `timestamps` # samples must match"
 
-    rel_time = timestamps - timestamps[0]
+    # rel_time = timestamps - timestamps[0]
     if gait_pred is None:
-        if 1 / dt >= 50.0:
+        if 1 / dt >= (50.0 * 0.985):  # allow for 1.5% margin on the frequency
             goal_fs = 50.0  # goal fs for classifier
             suffix = '50hz'
         else:
@@ -62,22 +62,32 @@ def get_gait_classification_lgbm(gait_pred, accel, dt, timestamps):
         wstep = wlen
         thresh = 0.7  # mean + 1 standard deviation of best threshold for maximizing F1 score
 
-        # down-sample if necessary
-        if 1 / dt != goal_fs:
-            f_rs = interp1d(
-                rel_time, accel, kind='cubic', axis=0, bounds_error=False,
-                fill_value='extrapolate'
-            )
-            accel_rs = f_rs(arange(0, rel_time[-1], 1 / goal_fs))
+        # down-sample if necessary. Use +- 1.5% goal fs to account for slight sampling irregularities
+        if not ((0.985 * goal_fs) < (1 / dt) < (1.015 * goal_fs)):
+            """
+            Using numpy's interp function here because it is a lot more memory efficient, while
+            achieving the same results as interp1d(kind='linear'). Cubic interpolation using 
+            scipy is a massive memory hog (goes from 1.5k Mb to 7k Mb for a 7-14 day file)
+            """
+            _t = arange(timestamps[0], timestamps[-1], 1 / goal_fs)
+            accel_rs = zeros((_t.size, 3))
+            for i in range(3):
+                accel_rs[:, i] = interp(_t, timestamps, accel[:, i])
+            # f_rs = interp1d(
+            #     timestamps, accel, kind='cubic', axis=0, bounds_error=False,
+            #     fill_value='extrapolate'
+            # )
+            # accel_rs = f_rs(arange(timestamps[0], timestamps[-1], 1 / goal_fs))
+            # del f_rs  # won't free immediately, but might reduce memory a bit
         else:
             accel_rs = accel
 
         # band-pass filter
         sos = butter(1, [2 * 0.25 / goal_fs, 2 * 5 / goal_fs], btype='band', output='sos')
-        accel_rs_f = sosfiltfilt(sos, norm(accel_rs, axis=1))
+        accel_rs = sosfiltfilt(sos, norm(accel_rs, axis=1))
 
         # window
-        accel_w = get_windowed_view(accel_rs_f, wlen, wstep, ensure_c_contiguity=True)
+        accel_w = get_windowed_view(accel_rs, wlen, wstep, ensure_c_contiguity=True)
 
         # get the feature bank
         feat_bank = Bank(window_length=None, window_step=None)  # make sure no windowing
@@ -114,11 +124,15 @@ def get_gait_classification_lgbm(gait_pred, accel, dt, timestamps):
 
         # upsample the gait predictions
         f = interp1d(
-            arange(0, rel_time[-1] + 1 / goal_fs, 1 / goal_fs)[:gait_pred_sample_rs.size],
+            arange(
+                timestamps[0],
+                timestamps[-1] + 1 / goal_fs,
+                1 / goal_fs
+            )[:gait_pred_sample_rs.size],
             gait_pred_sample_rs,
             kind='previous', bounds_error=False, fill_value=0
         )
-        gait_pred_sample = f(rel_time)
+        gait_pred_sample = f(timestamps)
     else:
         if isinstance(gait_pred, ndarray):
             if gait_pred.size != accel.shape[0]:

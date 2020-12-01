@@ -16,6 +16,14 @@ def configuration(parent_package='', top_path=None):
     # BIN (GeneActiv) converter
     config.add_extension('bin_convert', sources='bin_convert.c')
 
+    # GT3X (Actigraph) converter
+    config.add_library('gt3x', sources=['gt3x.c'])
+    config.add_extension(
+        'read_gt3x',
+        sources=['read_gt3x.c'],
+        libraries=['gt3x', 'zip']
+    )
+
     return config
 
 

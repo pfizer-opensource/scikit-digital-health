@@ -5,3 +5,4 @@ lightgbm>=2.3.0
 pywavelets
 scikit-learn
 h5py
+libzip

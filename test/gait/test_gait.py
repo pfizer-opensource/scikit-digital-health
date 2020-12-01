@@ -24,7 +24,7 @@ class TestGetGaitClassificationLGBM:
         b_gait = get_gait_classification_lgbm(None, sample_accel, sample_dt, sample_time)
         b_gait_truth = get_gait_classification_truth(1 / sample_dt)
 
-        assert b_gait.sum() == 20707
+        assert b_gait.sum() == 20115
         assert allclose(b_gait, b_gait_truth)
 
     def test_20hz(self, sample_accel, sample_dt, sample_time, get_gait_classification_truth):
@@ -124,7 +124,7 @@ class TestGetGaitStrides:
         gait = {i: [] for i in keys}
         bout_steps = get_strides(gait, accel[:, axis], 0, ic, fc, time, 2.25, 0.2)
 
-        assert bout_steps == 45
+        assert bout_steps == 39
         for k in keys:
             assert allclose(gait[k], gait_truth[k], equal_nan=True)
 

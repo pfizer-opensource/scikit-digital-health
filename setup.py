@@ -172,6 +172,7 @@ def configuration(parent_package='', top_path=None):
 
     # EXTENSIONS
     # ========================
+    # cwa (axivity)
     config.add_library(
         'fcwa_convert',
         sources='src/skimu/read/_extensions/cwa_convert.f95'
@@ -181,11 +182,20 @@ def configuration(parent_package='', top_path=None):
         sources='src/skimu/read/_extensions/cwa_convert.c',
         libraries=['fcwa_convert']
     )
+    # bin (geneactiv)
     config.add_extension(
         'skimu/read/_extensions/bin_convert',
         sources='src/skimu/read/_extensions/bin_convert.c'
     )
+    # gt3x (actigraph)
+    config.add_library('gt3x', sources='src/skimu/read/_extensions/gt3x.c')
+    config.add_extension(
+        'skimu/read/_extensions/read_gt3x',
+        sources=['src/skimu/read/_extensions/read_gt3x.c'],
+        libraries=['gt3x', 'zip']
+    )
 
+    # cython feature extensions
     if os.environ.get('CYTHONIZE', 'False') == 'True':
         from Cython.Build import cythonize
 
