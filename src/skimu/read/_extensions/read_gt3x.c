@@ -21,10 +21,8 @@ PyObject * read_gt3x(PyObject *NPY_UNUSED(self), PyObject *args){
     PyBytes_AsStringAndSize(bytes, &filename, &flen);
 
     // convert base and period to seconds
-    fprintf(stdout, "base: %li  period: %li   end: %li\n", info.base, info.period, (info.base + info.period) % 24);
     info.period = ((info.base + info.period) % 24) * 3600;
     info.base *= 3600;
-    fprintf(stdout, "base: %li  period: %li\n", info.base, info.period);
 
     int archive_err = 0;
     zip_t *gt3x = zip_open(filename, ZIP_RDONLY, &archive_err);
