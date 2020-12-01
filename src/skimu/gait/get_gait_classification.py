@@ -64,6 +64,11 @@ def get_gait_classification_lgbm(gait_pred, accel, dt, timestamps):
 
         # down-sample if necessary. Use +- 1.5% goal fs to account for slight sampling irregularities
         if (0.985 * goal_fs) < (1 / dt) < (1.015 * goal_fs):
+            """
+            Using numpy's interp function here because it is a lot more memory efficient, while
+            achieving the same results as interp1d(kind='linear'). Cubic interpolation using 
+            scipy is a massive memory hog (goes from 1.5k Mb to 7k Mb for a 7-14 day file)
+            """
             _t = arange(timestamps[0], timestamps[-1], 1 / goal_fs)
             accel_rs = zeros((_t.size, 3))
             for i in range(3):
