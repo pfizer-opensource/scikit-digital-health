@@ -6,7 +6,7 @@ Pfizer DMTI 2020
 """
 from sys import version_info
 
-from numpy import arange, zeros, ndarray, full, bool_
+from numpy import arange, zeros, ndarray, full, bool_, interp
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt
 from scipy.interpolate import interp1d
@@ -62,14 +62,18 @@ def get_gait_classification_lgbm(gait_pred, accel, dt, timestamps):
         wstep = wlen
         thresh = 0.7  # mean + 1 standard deviation of best threshold for maximizing F1 score
 
-        # down-sample if necessary. Use +- 1% goal fs to account for slight sampling irregularities
-        if (0.99 * goal_fs) < (1 / dt) < (1.01 * goal_fs):
-            f_rs = interp1d(
-                timestamps, accel, kind='cubic', axis=0, bounds_error=False,
-                fill_value='extrapolate'
-            )
-            accel_rs = f_rs(arange(timestamps[0], timestamps[-1], 1 / goal_fs))
-            del f_rs  # won't free immediately, but might reduce memory a bit
+        # down-sample if necessary. Use +- 1.5% goal fs to account for slight sampling irregularities
+        if (0.985 * goal_fs) < (1 / dt) < (1.015 * goal_fs):
+            _t = arange(timestamps[0], timestamps[-1], 1 / goal_fs)
+            accel_rs = zeros((_t.size, 3))
+            for i in range(3):
+                accel_rs[:, i] = interp(_t, timestamps, accel[:, i])
+            # f_rs = interp1d(
+            #     timestamps, accel, kind='cubic', axis=0, bounds_error=False,
+            #     fill_value='extrapolate'
+            # )
+            # accel_rs = f_rs(arange(timestamps[0], timestamps[-1], 1 / goal_fs))
+            # del f_rs  # won't free immediately, but might reduce memory a bit
         else:
             accel_rs = accel
 
