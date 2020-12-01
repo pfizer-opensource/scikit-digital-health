@@ -245,7 +245,7 @@ class Gait(_BaseProcess):
             leg_length = self.height_factor * height
 
         # compute fs/delta t
-        dt = mean(diff(time[:500]))
+        dt = mean(diff(time[:10000]))
         if (1 / dt) < 20.0:
             raise LowFrequencyError(f"Frequency ({1/dt:.2f}Hz) is too low (<20Hz)")
 
