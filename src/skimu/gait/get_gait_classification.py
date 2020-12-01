@@ -62,8 +62,8 @@ def get_gait_classification_lgbm(gait_pred, accel, dt, timestamps):
         wstep = wlen
         thresh = 0.7  # mean + 1 standard deviation of best threshold for maximizing F1 score
 
-        # down-sample if necessary
-        if 1 / dt != goal_fs:
+        # down-sample if necessary. Use +- 1% goal fs to account for slight sampling irregularities
+        if (0.99 * goal_fs) < (1 / dt) < (1.01 * goal_fs):
             f_rs = interp1d(
                 timestamps, accel, kind='cubic', axis=0, bounds_error=False,
                 fill_value='extrapolate'
