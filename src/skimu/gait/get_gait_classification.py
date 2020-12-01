@@ -51,7 +51,7 @@ def get_gait_classification_lgbm(gait_pred, accel, dt, timestamps):
 
     # rel_time = timestamps - timestamps[0]
     if gait_pred is None:
-        if 1 / dt >= 50.0:
+        if 1 / dt >= (50.0 * 0.985):  # allow for 1.5% margin on the frequency
             goal_fs = 50.0  # goal fs for classifier
             suffix = '50hz'
         else:
