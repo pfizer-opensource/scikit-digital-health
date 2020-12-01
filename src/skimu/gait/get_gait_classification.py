@@ -63,7 +63,7 @@ def get_gait_classification_lgbm(gait_pred, accel, dt, timestamps):
         thresh = 0.7  # mean + 1 standard deviation of best threshold for maximizing F1 score
 
         # down-sample if necessary. Use +- 1.5% goal fs to account for slight sampling irregularities
-        if (0.985 * goal_fs) < (1 / dt) < (1.015 * goal_fs):
+        if not ((0.985 * goal_fs) < (1 / dt) < (1.015 * goal_fs)):
             """
             Using numpy's interp function here because it is a lot more memory efficient, while
             achieving the same results as interp1d(kind='linear'). Cubic interpolation using 
