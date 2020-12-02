@@ -38,11 +38,7 @@ jobs:
         fi
       shell: bash
     - name: Install libzip
-      run: |
-        if ["$RUNNER_OS" == "Linux"]; then
-          sudo apt-get install libzip-dev -y
-        fi
-      shell: bash
+      run: sudo apt-get install libzip-dev -y
     - name: Install skimu
       run: |
         # if macOS, make sure to set the environment variables so that it can find gfortran-9
