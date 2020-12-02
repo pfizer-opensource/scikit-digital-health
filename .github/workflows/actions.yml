@@ -17,10 +17,21 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        # this path is specific to ubuntu
+        path: ~/.cache/pip
+        # look to see if there is a cache hit for the corresponding requirements file
+        key: ${{ runner.os }}-pip-${{ hashFiles('gh_actions_requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+          ${{ runner.os }}-
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8 pytest h5py wheel
+        # install the listed requirements
+        pip install -r gh_actions_requirements.txt
         # if macOS install libomp
         if [ "$RUNNER_OS" == "macOS" ]; then
           HOMEBREW_NO_AUTO_UPDATE=1 brew install libomp

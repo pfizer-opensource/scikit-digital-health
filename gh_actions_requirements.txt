@@ -1,0 +1,12 @@
+numpy>=1.17.2
+scipy>=1.3.1
+pandas>=0.23.4
+lightgbm>=2.3.0
+pywavelets
+scikit-learn
+h5py
+libzip
+flake8
+pytest
+h5py
+wheel
