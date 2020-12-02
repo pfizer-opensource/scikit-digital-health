@@ -295,7 +295,7 @@ class Gait(_BaseProcess):
             # GET GAIT BOUTS
             # ======================================
             gait_bouts = get_gait_bouts(
-                gbout_starts, gbout_stops, start, stop, self.max_bout_sep, self.min_bout
+                gbout_starts, gbout_stops, start, stop, time, self.max_bout_sep, self.min_bout
             )
 
             for ibout, bout in enumerate(gait_bouts):
