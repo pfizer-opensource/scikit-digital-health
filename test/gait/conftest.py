@@ -109,20 +109,8 @@ def get_gait_classification_truth():
 @fixture(scope='module')
 def get_bgait_samples_truth():  # boolean gait classification
     def get_stuff(case):
-        bgait = np.zeros(1000, dtype=np.bool_)
-
-        bouts_ = [
-            (0, 90),
-            (150, 160),
-            (165, 180),
-            (200, 210),
-            (225, 240),
-            (400, 760),
-            (770, 780),
-            (990, 1000)
-        ]
-        for bout in bouts_:
-            bgait[bout[0]:bout[1]] = True
+        starts = np.array([0, 150, 165, 200, 225, 400, 770, 990])
+        stops = np.array([90, 160, 180, 210, 240, 760, 780, 1000])
 
         if case == 1:
             dt = 1 / 50
@@ -171,7 +159,7 @@ def get_bgait_samples_truth():  # boolean gait classification
                 (770, 780),
                 (990, 1000)
             ]
-        return bgait, time, n_max_sep * dt, n_min_time * dt, bouts
+        return starts, stops, time, n_max_sep * dt, n_min_time * dt, bouts
     return get_stuff
 
 

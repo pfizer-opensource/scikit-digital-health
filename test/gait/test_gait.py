@@ -77,9 +77,9 @@ class TestGetGaitClassificationLGBM:
 class TestGetGaitBouts:
     @pytest.mark.parametrize('case', (1, 2, 3, 4))
     def test(self, get_bgait_samples_truth, case):
-        bgait, time, max_sep, min_time, bouts = get_bgait_samples_truth(case)
+        starts, stops, time, max_sep, min_time, bouts = get_bgait_samples_truth(case)
 
-        pred_bouts = get_gait_bouts(bgait, time, max_sep, min_time)
+        pred_bouts = get_gait_bouts(starts, stops, 0, 1500, time, max_sep, min_time)
 
         assert allclose(pred_bouts, bouts)
 
