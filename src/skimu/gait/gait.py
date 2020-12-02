@@ -8,6 +8,7 @@ from collections.abc import Iterable
 from warnings import warn
 
 from numpy import mean, diff, abs, argmax, sign, round, array
+import h5py
 
 from skimu.base import _BaseProcess
 from skimu.gait.get_gait_classification import get_gait_classification_lgbm
@@ -159,6 +160,16 @@ class Gait(_BaseProcess):
         self.filt_ord = filter_order
         self.filt_cut = filter_cutoff
 
+        # for saving gait predictions
+        self._save_classifier_fn = lambda time, pred: None
+
+    def _save_classifier_predictions(self, fname):
+        def fn(time, pred):
+            with h5py.File(fname, 'w') as f:
+                f['time'] = time
+                f['predictions'] = pred
+        self._save_classifier_fn = fn
+
     def add_metrics(self, metrics):
         """
         Add metrics to be computed
@@ -274,6 +285,7 @@ class Gait(_BaseProcess):
 
         # get the gait classifications if necessary (delegated to subfunction)
         gait_pred = get_gait_classification_lgbm(gait_pred, accel, dt, time)
+        self._save_classifier_fn(time, gait_pred)  # save the classifier outputs if desired
 
         gait_i = 0  # keep track of where everything is in the cycle
 
