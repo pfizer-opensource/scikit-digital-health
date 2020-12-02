@@ -284,7 +284,7 @@ class Gait(_BaseProcess):
         }
 
         # get the gait classifications if necessary (delegated to subfunction)
-        gait_pred = get_gait_classification_lgbm(gait_pred, accel, dt, time)
+        gbout_starts, gbout_stops = get_gait_classification_lgbm(gait_pred, accel, dt, time)
         self._save_classifier_fn(time, gait_pred)  # save the classifier outputs if desired
 
         gait_i = 0  # keep track of where everything is in the cycle
@@ -295,7 +295,7 @@ class Gait(_BaseProcess):
             # GET GAIT BOUTS
             # ======================================
             gait_bouts = get_gait_bouts(
-                gait_pred[start:stop], time[start:stop], self.max_bout_sep, self.min_bout
+                gbout_starts, gbout_stops, start, stop, self.max_bout_sep, self.min_bout
             )
 
             for ibout, bout in enumerate(gait_bouts):

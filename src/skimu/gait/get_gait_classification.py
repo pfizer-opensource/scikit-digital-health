@@ -6,10 +6,9 @@ Pfizer DMTI 2020
 """
 from sys import version_info
 
-from numpy import arange, zeros, ndarray, full, bool_, interp
+from numpy import arange, zeros, ndarray, array, interp, where, diff, insert, append, around, int_
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt
-from scipy.interpolate import interp1d
 import lightgbm as lgb
 
 from skimu.utility import get_windowed_view
@@ -73,12 +72,6 @@ def get_gait_classification_lgbm(gait_pred, accel, dt, timestamps):
             accel_rs = zeros((_t.size, 3))
             for i in range(3):
                 accel_rs[:, i] = interp(_t, timestamps, accel[:, i])
-            # f_rs = interp1d(
-            #     timestamps, accel, kind='cubic', axis=0, bounds_error=False,
-            #     fill_value='extrapolate'
-            # )
-            # accel_rs = f_rs(arange(timestamps[0], timestamps[-1], 1 / goal_fs))
-            # del f_rs  # won't free immediately, but might reduce memory a bit
         else:
             accel_rs = accel
 
@@ -103,42 +96,46 @@ def get_gait_classification_lgbm(gait_pred, accel, dt, timestamps):
         bst = lgb.Booster(model_file=lgb_file)
 
         # predict
-        gait_predictions = bst.predict(accel_feats, raw_score=False) > thresh
+        gait_predictions = (bst.predict(accel_feats, raw_score=False) > thresh).astype(int_)
 
-        # expand the predictions to be per sample, for the downsampled data
-        tmp = zeros(accel_rs.shape[0])
+        """
+        Re-doing gait prediction upsampling/return, should be able to fully remove the 
+        get_gait_bouts_function
+        """
+        bout_starts = where(diff(gait_predictions) == 1)[0] + 1  # account for n-1 samples
+        bout_stops = where(diff(gait_predictions) == -1)[0] + 1
 
-        c = zeros(accel_rs.shape[0], dtype='int')  # keep track of overlap
-        for i, p in enumerate(gait_predictions):
-            i1 = i * wstep
-            i2 = i1 + wlen
-            # add prediction and keep track of counts effecting that cell to deal with
-            # overlapping windows and therefore overlapping predictions
-            tmp[i1:i2] += p
-            c[i1:i2] += 1
-        # make sure no divide by 0
-        c[i2:] = 1
+        if gait_predictions[0]:
+            bout_starts = insert(bout_starts, 0, 0)
+        if gait_predictions[-1]:
+            bout_stops = append(bout_stops, gait_predictions.size)
 
-        tmp /= c
-        gait_pred_sample_rs = tmp >= 0.5  # final gait predictions, ps = per sample
+        assert bout_starts.size == bout_stops.size, "Starts and stops of bouts do not match"
 
-        # upsample the gait predictions
-        f = interp1d(
-            arange(
-                timestamps[0],
-                timestamps[-1] + 1 / goal_fs,
-                1 / goal_fs
-            )[:gait_pred_sample_rs.size],
-            gait_pred_sample_rs,
-            kind='previous', bounds_error=False, fill_value=0
-        )
-        gait_pred_sample = f(timestamps)
+        # convert to per sample values, and upsample to original frequency
+        bout_starts *= wstep
+        bout_stops = bout_stops * wstep + (wlen - wstep)  # accounts for edges, or if windows overlap
+
+        bout_starts = around(bout_starts / (dt * goal_fs), decimals=0).astype(int_)
+        bout_stops = around(bout_stops / (dt * goal_fs), decimals=0).astype(int_)
+
+        if gait_predictions[0]:
+            bout_starts = insert(bout_starts, 0, 0)
+        if gait_predictions[-1]:
+            bout_stops = append(bout_stops, accel.shape[0])
     else:
         if isinstance(gait_pred, ndarray):
             if gait_pred.size != accel.shape[0]:
                 raise ValueError('Number of gait predictions must much number of accel samples')
-            gait_pred_sample = gait_pred
-        else:
-            gait_pred_sample = full(accel.shape[0], True, dtype=bool_)
+            bout_starts = where(diff(gait_pred.astype(int_)) == 1)[0] + 1
+            bout_stops = where(diff(gait_pred.astype(int_)) == -1)[0] + 1
 
-    return gait_pred_sample
+            if gait_pred[0]:
+                bout_starts = insert(bout_starts, 0, 0)
+            if gait_pred[-1]:
+                bout_stops = append(bout_stops, accel.shape[0])
+        else:
+            bout_starts = array([0])
+            bout_stops = array([accel.shape[0]])
+
+    return bout_starts, bout_stops
