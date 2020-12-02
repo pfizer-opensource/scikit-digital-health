@@ -37,6 +37,12 @@ jobs:
           HOMEBREW_NO_AUTO_UPDATE=1 brew install libomp
         fi
       shell: bash
+    - name: Install libzip
+      run: |
+        if ["$RUNNER_OS" == "ubuntu"]; then
+          sudo apt install libzip-dev -y
+        fi
+      shell: bash
     - name: Install skimu
       run: |
         # if macOS, make sure to set the environment variables so that it can find gfortran-9
