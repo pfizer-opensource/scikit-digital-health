@@ -189,22 +189,16 @@ def configuration(parent_package='', top_path=None):
         sources='src/skimu/read/_extensions/bin_convert.c'
     )
     # gt3x (actigraph)
-    # config.add_library(
-    #     'gt3x',
-    #     sources='src/skimu/read/_extensions/gt3x.c',
-    #     build_info={
-    #         'include_dirs': [
-    #             os.sep.join(sysconfig.get_path('include').split(os.sep)[:-1])
-    #         ]
-    #     }
-    # )
+    config.add_library(
+        'gt3x',
+        sources='src/skimu/read/_extensions/gt3x.c',
+        include_dirs=[os.sep.join(sysconfig.get_path('include').split(os.sep)[:-1])]
+    )
     config.add_extension(
         'skimu/read/_extensions/read_gt3x',
-        sources=[
-            'src/skimu/read/_extensions/read_gt3x.c',
-            'src/skimu/read/_extensions/gt3x.c'
-        ],
-        libraries=['zip']
+        sources=['src/skimu/read/_extensions/read_gt3x.c'],
+        libraries=['gt3x', 'zip'],
+        include_dirs=[os.sep.join(sysconfig.get_path('include').split(os.sep)[:-1])]
     )
 
     # cython feature extensions
