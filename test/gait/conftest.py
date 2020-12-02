@@ -95,12 +95,14 @@ def get_gait_classification_truth():
     def get_stuff(freq):
         if freq >= 50.0:
             with h5py.File(resolve_data_path('gait_data.h5', 'gait'), 'r') as f:
-                truth = f['Truth']['Gait Classification']['gait_classification_50'][()]
+                starts = f['Truth']['Gait Classification']['gait_starts_50'][()]
+                stops = f['Truth']['Gait Classification']['gait_stops_50'][()]
         else:
             with h5py.File(resolve_data_path('gait_data.h5', 'gait'), 'r') as f:
-                truth = f['Truth']['Gait Classification']['gait_classification_20'][()]
+                starts = f['Truth']['Gait Classification']['gait_starts_20'][()]
+                stops = f['Truth']['Gait Classification']['gait_stops_20'][()]
 
-        return truth
+        return starts, stops
     return get_stuff
 
 
