@@ -45,13 +45,16 @@ def get_sample_bout_accel():
 
         if freq >= 50.0:
             with h5py.File(resolve_data_path('gait_data.h5', 'gait'), 'r') as f:
-                bout = f['Truth']['Gait Classification']['gait_classification_50'].attrs.get('bout')
+                starts = f['Truth']['Gait Classification']['gait_starts_50'][()]
+                stops = f['Truth']['Gait Classification']['gait_stops_50'][()]
 
-            bout_acc = accel[bout[0]:bout[1], :]
-            bout_time = time[bout[0]:bout[1]]
+            idx = np.argmax(stops - starts)
+            bout_acc = accel[starts[idx]:stops[idx], :]
+            bout_time = time[starts[idx]:stops[idx]]
         else:
             with h5py.File(resolve_data_path('gait_data.h5', 'gait'), 'r') as f:
-                bout = f['Truth']['Gait Classification']['gait_classification_20'].attrs.get('bout')
+                starts = f['Truth']['Gait Classification']['gait_starts_20'][()]
+                stops = f['Truth']['Gait Classification']['gait_stops_20'][()]
 
             f = interp1d(
                 time - time[0],
@@ -65,8 +68,9 @@ def get_sample_bout_accel():
             time_ds = np.arange(0, time[-1] - time[0], 1 / 20.0)
             acc_ds = f(time_ds)
 
-            bout_acc = acc_ds[bout[0]:bout[1], :]
-            bout_time = time_ds[bout[0]:bout[1]]
+            idx = np.argmax(stops - starts)
+            bout_acc = acc_ds[starts[idx]:stops[idx], :]
+            bout_time = time_ds[starts[idx]:stops[idx]]
 
         vaxis = np.argmax(np.mean(bout_acc, axis=0))
         return bout_acc, bout_time, vaxis, np.sign(np.mean(bout_acc, axis=0)[vaxis])
