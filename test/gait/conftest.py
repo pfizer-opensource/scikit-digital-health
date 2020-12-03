@@ -123,9 +123,9 @@ def get_bgait_samples_truth():  # boolean gait classification
             n_min_time = 75  # 1.5 seconds
 
             bouts = [
-                (0, 90),
-                (150, 240),
-                (400, 780)
+                slice(0, 90),
+                slice(150, 240),
+                slice(400, 780)
             ]
         elif case == 2:
             dt = 1 / 100
@@ -134,7 +134,7 @@ def get_bgait_samples_truth():  # boolean gait classification
             n_min_time = 200  # 2 seconds
 
             bouts = [
-                (400, 780)
+                slice(400, 780)
             ]
 
         elif case == 3:
@@ -144,9 +144,9 @@ def get_bgait_samples_truth():  # boolean gait classification
             n_min_time = 5  # 0.1 seconds
 
             bouts = [
-                (0, 240),
-                (400, 780),
-                (990, 1000)
+                slice(0, 240),
+                slice(400, 780),
+                slice(990, 1000)
             ]
         else:
             dt = 1 / 50
@@ -155,13 +155,13 @@ def get_bgait_samples_truth():  # boolean gait classification
             n_min_time = 5  # 0.1 seconds
 
             bouts = [
-                (0, 90),
-                (150, 180),
-                (200, 210),
-                (225, 240),
-                (400, 760),
-                (770, 780),
-                (990, 1000)
+                slice(0, 90),
+                slice(150, 180),
+                slice(200, 210),
+                slice(225, 240),
+                slice(400, 760),
+                slice(770, 780),
+                slice(990, 1000)
             ]
         return starts, stops, time, n_max_sep * dt, n_min_time * dt, bouts
     return get_stuff

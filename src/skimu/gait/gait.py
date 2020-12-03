@@ -300,34 +300,32 @@ class Gait(_BaseProcess):
             )
 
             for ibout, bout in enumerate(gait_bouts):
-                bstart = start + bout[0]
-
                 # figure out vertical axis on a per-bout basis
-                acc_mean = mean(accel[bstart:start + bout[1]], axis=0)
+                acc_mean = mean(accel[bout], axis=0)
                 v_axis = argmax(abs(acc_mean))
 
                 ic, fc, vert_acc = get_gait_events(
-                    accel[bstart:start + bout[1], v_axis], dt, time[bstart:start + bout[1]],
+                    accel[bout, v_axis], dt, time[bout],
                     sign(acc_mean[v_axis]), scale_original,
                     self.filt_ord, self.filt_cut, self.use_opt_scale
                 )
 
                 # get strides
                 sib = get_strides(
-                    gait, vert_acc, gait_i, ic, fc, time[bstart:start + bout[1]],
+                    gait, vert_acc, gait_i, ic, fc, time[bout],
                     self.max_stride_time, self.loading_factor
                 )
 
                 # add inertial data to the aux dict for use in gait metric calculation
-                gait_aux['accel'].append(accel[bstart:start + bout[1], :])
+                gait_aux['accel'].append(accel[bout, :])
                 # add the index for the corresponding accel/velocity/position
                 gait_aux['inertial data i'].extend([len(gait_aux['accel']) - 1] * sib)
                 gait_aux['vert axis'].extend([v_axis] * sib)
 
                 # save some default per bout metrics
                 gait['Bout N'].extend([ibout + 1] * sib)
-                gait['Bout Start'].extend([time[bstart]] * sib)
-                gait['Bout Duration'].extend([(bout[1] - bout[0]) * dt] * sib)
+                gait['Bout Start'].extend([time[bout.start]] * sib)
+                gait['Bout Duration'].extend([(bout.stop - bout.start) * dt] * sib)
                 gait['Bout Steps'].extend([sum(gait['b valid cycle'][gait_i:])] * sib)
 
                 gait_i += sib

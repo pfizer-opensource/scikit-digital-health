@@ -59,7 +59,7 @@ def get_gait_bouts(starts, stops, day_start, day_stop, timestamps, max_bout_sepa
                 tdiff = timestamps[starts_subset[nb + ncb + 1]] - timestamps[stops_subset[nb + ncb]]
 
         if (timestamps[stops_subset[nb + ncb]-1] - timestamps[starts_subset[nb]]) > min_bout_time:
-            bouts.append((starts_subset[nb], stops_subset[nb + ncb]))
+            bouts.append(slice(starts_subset[nb], stops_subset[nb + ncb]))
 
         nb += ncb + 1
 

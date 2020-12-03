@@ -81,7 +81,9 @@ class TestGetGaitBouts:
 
         pred_bouts = get_gait_bouts(starts, stops, 0, 1500, time, max_sep, min_time)
 
-        assert allclose(pred_bouts, bouts)
+        # assert allclose(pred_bouts, bouts)
+        assert len(pred_bouts) == len(bouts)
+        assert all([b == bouts[i] for i, b in enumerate(pred_bouts)])
 
 
 class TestGetGaitEvents:
