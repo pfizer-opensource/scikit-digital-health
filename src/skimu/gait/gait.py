@@ -161,13 +161,14 @@ class Gait(_BaseProcess):
         self.filt_cut = filter_cutoff
 
         # for saving gait predictions
-        self._save_classifier_fn = lambda time, pred: None
+        self._save_classifier_fn = lambda time, starts, stops: None
 
     def _save_classifier_predictions(self, fname):
-        def fn(time, pred):
+        def fn(time, starts, stops):
             with h5py.File(fname, 'w') as f:
                 f['time'] = time
-                f['predictions'] = pred
+                f['bout starts'] = starts
+                f['bout stops'] = stops
         self._save_classifier_fn = fn
 
     def add_metrics(self, metrics):
@@ -285,7 +286,7 @@ class Gait(_BaseProcess):
 
         # get the gait classifications if necessary (delegated to subfunction)
         gbout_starts, gbout_stops = get_gait_classification_lgbm(gait_pred, accel, dt, time)
-        self._save_classifier_fn(time, gait_pred)  # save the classifier outputs if desired
+        self._save_classifier_fn(time, gbout_starts, gbout_stops)  # save the classifier outputs
 
         gait_i = 0  # keep track of where everything is in the cycle
 
