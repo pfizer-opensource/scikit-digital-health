@@ -5,7 +5,7 @@ Lukas Adamowicz
 2020, Pfizer DMTI
 """
 import pytest
-from numpy import allclose, arange, random, array, isnan
+from numpy import allclose, arange, random, array, isnan, zeros
 from scipy.interpolate import interp1d
 
 from ..base_conftest import *
@@ -21,11 +21,11 @@ from skimu.gait import gait_metrics
 
 class TestGetGaitClassificationLGBM:
     def test(self, sample_accel, sample_dt, sample_time, get_gait_classification_truth):
-        b_gait = get_gait_classification_lgbm(None, sample_accel, sample_dt, sample_time)
-        b_gait_truth = get_gait_classification_truth(1 / sample_dt)
+        starts, stops = get_gait_classification_lgbm(None, sample_accel, sample_dt, sample_time)
+        starts_truth, stops_truth = get_gait_classification_truth(1 / sample_dt)
 
-        assert b_gait.sum() == 20115
-        assert allclose(b_gait, b_gait_truth)
+        assert allclose(starts, starts_truth)
+        assert allclose(stops, stops_truth)
 
     def test_20hz(self, sample_accel, sample_dt, sample_time, get_gait_classification_truth):
         # downsample to 20hz
@@ -41,11 +41,11 @@ class TestGetGaitClassificationLGBM:
         time_ds = arange(0, sample_time[-1] - sample_time[0], 1 / 20.0)
         acc_ds = f(time_ds)
 
-        b_gait = get_gait_classification_lgbm(None, acc_ds, 1 / 20.0, time_ds)
-        b_gait_truth = get_gait_classification_truth(20.0)
+        starts, stops = get_gait_classification_lgbm(None, acc_ds, 1 / 20.0, time_ds)
+        starts_truth, stops_truth = get_gait_classification_truth(20.0)
 
-        assert b_gait.sum() == 1920
-        assert allclose(b_gait, b_gait_truth)
+        assert allclose(starts, starts_truth)
+        assert allclose(stops, stops_truth)
 
     def test_pred_size_error(self, sample_accel, sample_time):
         with pytest.raises(ValueError):
@@ -53,26 +53,37 @@ class TestGetGaitClassificationLGBM:
 
     @pytest.mark.parametrize('pred', (True, False, 1, -135098135, 1.513e-600))
     def test_pred_single_input(self, pred, sample_accel, sample_time):
-        b_gait = get_gait_classification_lgbm(pred, sample_accel, 1 / 32.125, sample_time)
+        starts, stops = get_gait_classification_lgbm(pred, sample_accel, 1 / 32.125, sample_time)
 
-        assert all(b_gait)
+        assert starts.size == 1
+        assert starts[0] == 0
+        assert stops.size == 1
+        assert stops[0] == sample_accel.shape[0]
 
     def test_pred_array_input(self, sample_accel, sample_time):
-        pred = random.rand(sample_accel.shape[0]) < 0.5
-        b_gait = get_gait_classification_lgbm(pred, sample_accel, 1 / 55.0, sample_time)
+        pred = zeros(sample_accel.shape[0], dtype="bool")
 
-        assert b_gait is pred
-        assert allclose(b_gait, pred)
+        starts_truth = array([0, 500, 750, 950])
+        stops_truth = array([150, 575, 850, 1200])
+        for s, f in zip(starts_truth, stops_truth):
+            pred[s:f] = True
+
+        starts, stops = get_gait_classification_lgbm(pred, sample_accel, 1 / 55.0, sample_time)
+
+        assert allclose(starts, starts_truth)
+        assert allclose(stops, stops_truth)
 
 
 class TestGetGaitBouts:
     @pytest.mark.parametrize('case', (1, 2, 3, 4))
     def test(self, get_bgait_samples_truth, case):
-        bgait, time, max_sep, min_time, bouts = get_bgait_samples_truth(case)
+        starts, stops, time, max_sep, min_time, bouts = get_bgait_samples_truth(case)
 
-        pred_bouts = get_gait_bouts(bgait, time, max_sep, min_time)
+        pred_bouts = get_gait_bouts(starts, stops, 0, 1500, time, max_sep, min_time)
 
-        assert allclose(pred_bouts, bouts)
+        # assert allclose(pred_bouts, bouts)
+        assert len(pred_bouts) == len(bouts)
+        assert all([b == bouts[i] for i, b in enumerate(pred_bouts)])
 
 
 class TestGetGaitEvents:
@@ -124,7 +135,7 @@ class TestGetGaitStrides:
         gait = {i: [] for i in keys}
         bout_steps = get_strides(gait, accel[:, axis], 0, ic, fc, time, 2.25, 0.2)
 
-        assert bout_steps == 39
+        assert bout_steps == 42
         for k in keys:
             assert allclose(gait[k], gait_truth[k], equal_nan=True)
 
@@ -138,7 +149,7 @@ class TestGetGaitStrides:
         gait = {i: [] for i in keys}
         bout_steps = get_strides(gait, accel[:, axis], 0, ic, fc, time, 2.25, 0.2)
 
-        assert bout_steps == 31
+        assert bout_steps == 37
         for k in keys:
             assert allclose(gait[k], gait_truth[k], equal_nan=True)
 

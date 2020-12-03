@@ -8,6 +8,7 @@ from collections.abc import Iterable
 from warnings import warn
 
 from numpy import mean, diff, abs, argmax, sign, round, array
+import h5py
 
 from skimu.base import _BaseProcess
 from skimu.gait.get_gait_classification import get_gait_classification_lgbm
@@ -159,6 +160,17 @@ class Gait(_BaseProcess):
         self.filt_ord = filter_order
         self.filt_cut = filter_cutoff
 
+        # for saving gait predictions
+        self._save_classifier_fn = lambda time, starts, stops: None
+
+    def _save_classifier_predictions(self, fname):
+        def fn(time, starts, stops):
+            with h5py.File(fname, 'w') as f:
+                f['time'] = time
+                f['bout starts'] = starts
+                f['bout stops'] = stops
+        self._save_classifier_fn = fn
+
     def add_metrics(self, metrics):
         """
         Add metrics to be computed
@@ -273,7 +285,8 @@ class Gait(_BaseProcess):
         }
 
         # get the gait classifications if necessary (delegated to subfunction)
-        gait_pred = get_gait_classification_lgbm(gait_pred, accel, dt, time)
+        gbout_starts, gbout_stops = get_gait_classification_lgbm(gait_pred, accel, dt, time)
+        self._save_classifier_fn(time, gbout_starts, gbout_stops)  # save the classifier outputs
 
         gait_i = 0  # keep track of where everything is in the cycle
 
@@ -283,38 +296,36 @@ class Gait(_BaseProcess):
             # GET GAIT BOUTS
             # ======================================
             gait_bouts = get_gait_bouts(
-                gait_pred[start:stop], time[start:stop], self.max_bout_sep, self.min_bout
+                gbout_starts, gbout_stops, start, stop, time, self.max_bout_sep, self.min_bout
             )
 
             for ibout, bout in enumerate(gait_bouts):
-                bstart = start + bout[0]
-
                 # figure out vertical axis on a per-bout basis
-                acc_mean = mean(accel[bstart:start + bout[1]], axis=0)
+                acc_mean = mean(accel[bout], axis=0)
                 v_axis = argmax(abs(acc_mean))
 
                 ic, fc, vert_acc = get_gait_events(
-                    accel[bstart:start + bout[1], v_axis], dt, time[bstart:start + bout[1]],
+                    accel[bout, v_axis], dt, time[bout],
                     sign(acc_mean[v_axis]), scale_original,
                     self.filt_ord, self.filt_cut, self.use_opt_scale
                 )
 
                 # get strides
                 sib = get_strides(
-                    gait, vert_acc, gait_i, ic, fc, time[bstart:start + bout[1]],
+                    gait, vert_acc, gait_i, ic, fc, time[bout],
                     self.max_stride_time, self.loading_factor
                 )
 
                 # add inertial data to the aux dict for use in gait metric calculation
-                gait_aux['accel'].append(accel[bstart:start + bout[1], :])
+                gait_aux['accel'].append(accel[bout, :])
                 # add the index for the corresponding accel/velocity/position
                 gait_aux['inertial data i'].extend([len(gait_aux['accel']) - 1] * sib)
                 gait_aux['vert axis'].extend([v_axis] * sib)
 
                 # save some default per bout metrics
                 gait['Bout N'].extend([ibout + 1] * sib)
-                gait['Bout Start'].extend([time[bstart]] * sib)
-                gait['Bout Duration'].extend([(bout[1] - bout[0]) * dt] * sib)
+                gait['Bout Start'].extend([time[bout.start]] * sib)
+                gait['Bout Duration'].extend([(bout.stop - bout.start) * dt] * sib)
                 gait['Bout Steps'].extend([sum(gait['b valid cycle'][gait_i:])] * sib)
 
                 gait_i += sib

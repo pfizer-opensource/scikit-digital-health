@@ -45,13 +45,16 @@ def get_sample_bout_accel():
 
         if freq >= 50.0:
             with h5py.File(resolve_data_path('gait_data.h5', 'gait'), 'r') as f:
-                bout = f['Truth']['Gait Classification']['gait_classification_50'].attrs.get('bout')
+                starts = f['Truth']['Gait Classification']['gait_starts_50'][()]
+                stops = f['Truth']['Gait Classification']['gait_stops_50'][()]
 
-            bout_acc = accel[bout[0]:bout[1], :]
-            bout_time = time[bout[0]:bout[1]]
+            idx = np.argmax(stops - starts)
+            bout_acc = accel[starts[idx]:stops[idx], :]
+            bout_time = time[starts[idx]:stops[idx]]
         else:
             with h5py.File(resolve_data_path('gait_data.h5', 'gait'), 'r') as f:
-                bout = f['Truth']['Gait Classification']['gait_classification_20'].attrs.get('bout')
+                starts = f['Truth']['Gait Classification']['gait_starts_20'][()]
+                stops = f['Truth']['Gait Classification']['gait_stops_20'][()]
 
             f = interp1d(
                 time - time[0],
@@ -65,8 +68,9 @@ def get_sample_bout_accel():
             time_ds = np.arange(0, time[-1] - time[0], 1 / 20.0)
             acc_ds = f(time_ds)
 
-            bout_acc = acc_ds[bout[0]:bout[1], :]
-            bout_time = time_ds[bout[0]:bout[1]]
+            idx = np.argmax(stops - starts)
+            bout_acc = acc_ds[starts[idx]:stops[idx], :]
+            bout_time = time_ds[starts[idx]:stops[idx]]
 
         vaxis = np.argmax(np.mean(bout_acc, axis=0))
         return bout_acc, bout_time, vaxis, np.sign(np.mean(bout_acc, axis=0)[vaxis])
@@ -95,32 +99,22 @@ def get_gait_classification_truth():
     def get_stuff(freq):
         if freq >= 50.0:
             with h5py.File(resolve_data_path('gait_data.h5', 'gait'), 'r') as f:
-                truth = f['Truth']['Gait Classification']['gait_classification_50'][()]
+                starts = f['Truth']['Gait Classification']['gait_starts_50'][()]
+                stops = f['Truth']['Gait Classification']['gait_stops_50'][()]
         else:
             with h5py.File(resolve_data_path('gait_data.h5', 'gait'), 'r') as f:
-                truth = f['Truth']['Gait Classification']['gait_classification_20'][()]
+                starts = f['Truth']['Gait Classification']['gait_starts_20'][()]
+                stops = f['Truth']['Gait Classification']['gait_stops_20'][()]
 
-        return truth
+        return starts, stops
     return get_stuff
 
 
 @fixture(scope='module')
 def get_bgait_samples_truth():  # boolean gait classification
     def get_stuff(case):
-        bgait = np.zeros(1000, dtype=np.bool_)
-
-        bouts_ = [
-            (0, 90),
-            (150, 160),
-            (165, 180),
-            (200, 210),
-            (225, 240),
-            (400, 760),
-            (770, 780),
-            (990, 1000)
-        ]
-        for bout in bouts_:
-            bgait[bout[0]:bout[1]] = True
+        starts = np.array([0, 150, 165, 200, 225, 400, 770, 990])
+        stops = np.array([90, 160, 180, 210, 240, 760, 780, 1000])
 
         if case == 1:
             dt = 1 / 50
@@ -129,9 +123,9 @@ def get_bgait_samples_truth():  # boolean gait classification
             n_min_time = 75  # 1.5 seconds
 
             bouts = [
-                (0, 90),
-                (150, 240),
-                (400, 780)
+                slice(0, 90),
+                slice(150, 240),
+                slice(400, 780)
             ]
         elif case == 2:
             dt = 1 / 100
@@ -140,7 +134,7 @@ def get_bgait_samples_truth():  # boolean gait classification
             n_min_time = 200  # 2 seconds
 
             bouts = [
-                (400, 780)
+                slice(400, 780)
             ]
 
         elif case == 3:
@@ -150,9 +144,9 @@ def get_bgait_samples_truth():  # boolean gait classification
             n_min_time = 5  # 0.1 seconds
 
             bouts = [
-                (0, 240),
-                (400, 780),
-                (990, 1000)
+                slice(0, 240),
+                slice(400, 780),
+                slice(990, 1000)
             ]
         else:
             dt = 1 / 50
@@ -161,15 +155,15 @@ def get_bgait_samples_truth():  # boolean gait classification
             n_min_time = 5  # 0.1 seconds
 
             bouts = [
-                (0, 90),
-                (150, 180),
-                (200, 210),
-                (225, 240),
-                (400, 760),
-                (770, 780),
-                (990, 1000)
+                slice(0, 90),
+                slice(150, 180),
+                slice(200, 210),
+                slice(225, 240),
+                slice(400, 760),
+                slice(770, 780),
+                slice(990, 1000)
             ]
-        return bgait, time, n_max_sep * dt, n_min_time * dt, bouts
+        return starts, stops, time, n_max_sep * dt, n_min_time * dt, bouts
     return get_stuff
 
 
