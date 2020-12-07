@@ -326,6 +326,9 @@ class Gait(_BaseProcess):
                 gait['Bout N'].extend([ibout + 1] * sib)
                 gait['Bout Start'].extend([time[bout.start]] * sib)
                 gait['Bout Duration'].extend([(bout.stop - bout.start) * dt] * sib)
+
+                # TODO add back in gait cycles in the bout
+                # NOTE gait cycles is full cycles with parameters, # steps is number of actual steps detected
                 gait['Bout Steps'].extend([sum(gait['b valid cycle'][gait_i:])] * sib)
 
                 gait_i += sib
