@@ -35,8 +35,8 @@ def get_gait_bouts(starts, stops, day_start, day_stop, timestamps, max_bout_sepa
         (M, 2) array of starts and stops of gait bouts
     """
     # get the portion of bouts for the specified day
-    starts_subset = starts[(starts > day_start) & (starts < day_stop)]
-    stops_subset = stops[(stops > day_start) & (stops < day_stop)]
+    starts_subset = starts[(starts >= day_start) & (starts < day_stop)]
+    stops_subset = stops[(stops > day_start) & (stops <= day_stop)]
 
     if starts_subset[0] > stops_subset[0]:
         starts_subset = insert(starts_subset, 0, day_start)
