@@ -217,7 +217,7 @@ class TestGait(BaseProcessTester):
 
         assert g.height_factor == 1.0
 
-    def test_leg_length_warning(self, get_sample_data, caplog):
+    def test_leg_length_warning(self, get_sample_data):
         data = get_sample_data(
             self.sample_data_file,
             self.sample_data_keys
@@ -244,7 +244,7 @@ class TestGait(BaseProcessTester):
         )
         data['gait_pred'] = arange(0, 1, 0.1)
 
-        with pytest.raises(ValueError):
+        with pytest.raises(DimensionMismatchError):
             self.process.predict(**data)
 
     def test_add_metrics(self):
