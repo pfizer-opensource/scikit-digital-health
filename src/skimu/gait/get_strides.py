@@ -88,7 +88,11 @@ def get_strides(gait, vert_accel, gait_index, ic, fc, ts, fs, max_stride_time, l
         if gait['valid cycle'][i]:
             vacc = detrend(vert_accel[i1:i2])
             vvel = cumtrapz(vacc, x=ts[i1:i2], initial=0)
-            vpos = sosfiltfilt(sos, cumtrapz(vvel, x=ts[i1:i2], initial=0))
+            vpos = cumtrapz(vvel, x=ts[i1:i2], initial=0)
+            try:
+                vpos = sosfiltfilt(sos, vpos)
+            except ValueError:  # not enough points for padding
+                pass
 
             gait['delta h'].append((vpos.max() - vpos.min()) * 9.81)  # convert to meters
         else:

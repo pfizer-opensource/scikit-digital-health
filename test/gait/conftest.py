@@ -71,15 +71,16 @@ def get_sample_bout_accel():
 @fixture(scope='module')
 def get_contact_truth():
     def get_stuff(fs):
-        if fs > 50.0:
+        if fs == 50.0:
             with h5py.File(resolve_data_path('gait_data.h5', 'gait'), 'r') as f:
                 ic = f['Truth']['Gait Events']['ic_50'][()]
                 fc = f['Truth']['Gait Events']['fc_50'][()]
-        else:
+        elif fs == 20.0:
             with h5py.File(resolve_data_path('gait_data.h5', 'gait'), 'r') as f:
                 ic = f['Truth']['Gait Events']['ic_20'][()]
                 fc = f['Truth']['Gait Events']['fc_20'][()]
-
+        else:
+            assert False, "Invalid frequency for gait event testing"
         return ic, fc
     return get_stuff
 

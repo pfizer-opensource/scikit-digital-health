@@ -106,7 +106,7 @@ class TestGetGaitEvents:
 
         ic, fc, _ = get_gait_events(
             sign * accel[:, axis],
-            1 / 20.0,
+            20.0,
             time,
             sign * acc_sign,
             o_scale, 4, 20.0, False  # also test original scale
@@ -117,31 +117,31 @@ class TestGetGaitEvents:
 
 
 class TestGetGaitStrides:
-    def test(self, sample_dt, get_sample_bout_accel, get_contact_truth, get_strides_truth):
-        accel, time, axis, acc_sign = get_sample_bout_accel(1 / sample_dt)
-        ic, fc = get_contact_truth(1 / sample_dt)
+    def test_50hz(self, get_sample_bout_accel, get_contact_truth, get_strides_truth):
+        accel, time, axis, acc_sign = get_sample_bout_accel(50.0)
+        ic, fc = get_contact_truth(50.0)
 
-        keys = ['IC', 'FC', 'FC opp foot', 'b valid cycle', 'delta h']
-        gait_truth = get_strides_truth(1 / sample_dt, keys)
+        keys = ['IC', 'FC', 'FC opp foot', 'valid cycle', 'delta h']
+        gait_truth = get_strides_truth(50.0, keys)
 
         gait = {i: [] for i in keys}
-        bout_steps = get_strides(gait, accel[:, axis], 0, ic, fc, time, 2.25, 0.2)
+        bout_steps = get_strides(gait, accel[:, axis], 0, ic, fc, time, 50.0, 2.25, 0.2)
 
-        assert bout_steps == 42
+        assert bout_steps == 45
         for k in keys:
             assert allclose(gait[k], gait_truth[k], equal_nan=True)
 
-    def test_20(self, sample_dt, get_sample_bout_accel, get_contact_truth, get_strides_truth):
-        accel, time, axis, acc_sign = get_sample_bout_accel(20)
-        ic, fc = get_contact_truth(20)
+    def test_20hz(self, get_sample_bout_accel, get_contact_truth, get_strides_truth):
+        accel, time, axis, acc_sign = get_sample_bout_accel(20.0)
+        ic, fc = get_contact_truth(20.0)
 
-        keys = ['IC', 'FC', 'FC opp foot', 'b valid cycle', 'delta h']
-        gait_truth = get_strides_truth(20, keys)
+        keys = ['IC', 'FC', 'FC opp foot', 'valid cycle', 'delta h']
+        gait_truth = get_strides_truth(20.0, keys)
 
         gait = {i: [] for i in keys}
-        bout_steps = get_strides(gait, accel[:, axis], 0, ic, fc, time, 2.25, 0.2)
+        bout_steps = get_strides(gait, accel[:, axis], 0, ic, fc, time, 20.0, 2.25, 0.2)
 
-        assert bout_steps == 37
+        assert bout_steps == 46
         for k in keys:
             assert allclose(gait[k], gait_truth[k], equal_nan=True)
 
@@ -150,15 +150,15 @@ class TestGetGaitStrides:
         ic = array([10, 23])
         fc = array([12, 25, 37])
 
-        gait = {i: [] for i in ['IC', 'FC', 'FC opp foot', 'b valid cycle', 'delta h']}
+        gait = {i: [] for i in ['IC', 'FC', 'FC opp foot', 'valid cycle', 'delta h']}
 
-        bsteps = get_strides(gait, random.rand(time.size), 0, ic, fc, time, 2.25, 0.2)
+        bsteps = get_strides(gait, random.rand(time.size), 0, ic, fc, time, 25.0, 2.25, 0.2)
 
         assert bsteps == 2
         assert allclose(gait['IC'], ic)
         assert allclose(gait['FC'], fc[1:])
         assert allclose(gait['FC opp foot'], fc[:-1])
-        assert all([not i for i in gait['b valid cycle']])
+        assert all([not i for i in gait['valid cycle']])
         assert all([isnan(i) for i in gait['delta h']])
 
 
