@@ -296,7 +296,7 @@ class Gait(_BaseProcess):
         # setup the storage for the gait parameters
         gait = {
             i: [] for i in [
-                'Day N', 'Bout N', 'Bout Start', 'Bout Duration', 'Bout Steps', 'Gait Cycles',
+                'Day N', 'Bout N', 'Bout Starts', 'Bout Duration', 'Bout Steps', 'Gait Cycles',
                 'IC', 'FC', 'FC opp foot', 'valid cycle', 'delta h'
             ]
         }
@@ -354,7 +354,7 @@ class Gait(_BaseProcess):
                 gait['Bout Duration'].extend([(bout.stop - bout.start) / goal_fs] * strides_in_bout)
 
                 gait['Bout Steps'].extend([strides_in_bout] * strides_in_bout)
-                gait['Gait Cycles'].extend([sum(gait['valid cycles'])] * strides_in_bout)
+                gait['Gait Cycles'].extend([sum(gait['valid cycle'])] * strides_in_bout)
 
                 gait_i += strides_in_bout
 
