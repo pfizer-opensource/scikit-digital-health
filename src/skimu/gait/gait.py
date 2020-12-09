@@ -7,15 +7,16 @@ Pfizer DMTI 2020
 from collections.abc import Iterable
 from warnings import warn
 
-from numpy import mean, diff, abs, argmax, sign, round, array
 import h5py
+from numpy import mean, diff, arange, zeros, interp, float_, abs, max, around, argmax, sign, \
+    array, sum
 
 from skimu.base import _BaseProcess
 from skimu.gait.get_gait_classification import get_gait_classification_lgbm
 from skimu.gait.get_gait_bouts import get_gait_bouts
 from skimu.gait.get_gait_events import get_gait_events
 from skimu.gait.get_strides import get_strides
-from skimu.gait import gait_metrics
+from skimu.gait.gait_metrics import gait_metrics
 from skimu.gait.gait_metrics import EventMetric, BoutMetric
 
 
@@ -100,7 +101,6 @@ class Gait(_BaseProcess):
         Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
         Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
     """
-
     # gait parameters
     _params = [
         # event level metrics
@@ -129,9 +129,18 @@ class Gait(_BaseProcess):
         gait_metrics.RegularityIndexV
     ]
 
-    def __init__(self, use_cwt_scale_relation=True, min_bout_time=8.0,
-                 max_bout_separation_time=0.5, max_stride_time=2.25, loading_factor=0.2,
-                 height_factor=0.53, prov_leg_length=False, filter_order=4, filter_cutoff=20.0):
+    def __init__(
+            self,
+            use_cwt_scale_relation=True,
+            min_bout_time=8.0,
+            max_bout_separation_time=0.5,
+            max_stride_time=2.25,
+            loading_factor=0.2,
+            height_factor=0.53,
+            prov_leg_length=False,
+            filter_order=4,
+            filter_cutoff=20.0
+    ):
         super().__init__(
             # key-word arguments for storage
             use_cwt_scale_relation=use_cwt_scale_relation,
@@ -250,88 +259,105 @@ class Gait(_BaseProcess):
         )
 
         if height is None:
-            warn('height not provided, not computing spatial metrics', UserWarning)
+            warn("height not provided, not computing spatial metrics", UserWarning)
             leg_length = None
         else:
             # height factor is set to 1 if providing leg length
             leg_length = self.height_factor * height
 
         # compute fs/delta t
-        dt = mean(diff(time))
-        if (1 / dt) < 20.0:
-            raise LowFrequencyError(f"Frequency ({1/dt:.2f}Hz) is too low (<20Hz)")
+        fs = 1 / mean(diff(time))
+        if fs < 20.0:
+            raise LowFrequencyError(f"Frequency ({fs:.2f}Hz) is too low (<20Hz).")
+        if fs < (50.0 * 0.985):  # 1.5% margin
+            warn("Frequency is less than 50Hz. Downsampling to 20Hz. Note that this may effect "
+                 "gait metric results values", UserWarning)
 
-        # original scale. compute outside loop.
+        # downsample acceleration
+        goal_fs = 50 if fs > (50 * 0.985) else 20
+        downsample = False if ((0.985 * goal_fs) < fs < (1.015 * goal_fs)) else True
+
+        if downsample:
+            time_ds = arange(time[0], time[-1], 1 / goal_fs)
+            accel_ds = zeros((time_ds.size, 3), dtype=float_)
+            for i in range(3):
+                accel_ds[:, i] = interp(time_ds, time, accel[:, i])
+        else:
+            time_ds = time
+            accel_ds = accel
+
+        # original scale. Compute outside loop since stays the same
         # 1.25 comes from original paper, corresponds to desired frequency
         # 0.4 comes from using the 'gaus1' wavelet
-        scale_original = round(0.4 / (2 * 1.25 * dt)) - 1
+        original_scale = max(around(0.4 * goal_fs / (2 * 1.25)) - 1, 1)
 
-        # get days if it exists, otherwise use the start and end of the data
-        days = kwargs.get(self._days, [(0, accel.shape[0])])
+        # get days if it exists, otherwise use the starts and end of the data
+        days = kwargs.get(self._days, [(0, accel_ds.shape[0])])
 
+        # setup the storage for the gait parameters
         gait = {
-            'Day N': [],
-            'Bout N': [], 'Bout Start': [], 'Bout Duration': [], 'Bout Steps': [],
-            'IC': [], 'FC': [], 'FC opp foot': [],
-            'b valid cycle': [], 'delta h': []
+            i: [] for i in [
+                'Day N', 'Bout N', 'Bout Start', 'Bout Duration', 'Bout Steps', 'Gait Cycles',
+                'IC', 'FC', 'FC opp foot', 'valid cycle', 'delta h'
+            ]
         }
-        # auxiliary dictionary for storing values for computing gait metrics
+        # aux dictionary for storing values for computing gait metrics
         gait_aux = {
-            'vert axis': [],
-            'accel': [],
-            'vert velocity': [],
-            'vert position': [],
-            'inertial data i': []
+            i: [] for i in ['vert axis', 'accel', 'vert velocity', 'vert position', 'inertial data i']
         }
 
-        # get the gait classifications if necessary (delegated to subfunction)
-        gbout_starts, gbout_stops = get_gait_classification_lgbm(gait_pred, accel, dt, time)
-        self._save_classifier_fn(time, gbout_starts, gbout_stops)  # save the classifier outputs
+        # get the gait classification if necessary
+        gbout_starts, gbout_stops = get_gait_classification_lgbm(gait_pred, accel_ds, goal_fs)
+        self._save_classifier_fn(time_ds, gbout_starts, gbout_stops)
 
-        gait_i = 0  # keep track of where everything is in the cycle
+        gait_i = 0  # keep track of where everything is in the loops
 
         for iday, day_idx in enumerate(days):
             start, stop = day_idx
 
             # GET GAIT BOUTS
-            # ======================================
+            # ==============
             gait_bouts = get_gait_bouts(
-                gbout_starts, gbout_stops, start, stop, time, self.max_bout_sep, self.min_bout
+                gbout_starts, gbout_stops, start, stop, time_ds, self.max_bout_sep, self.min_bout
             )
 
             for ibout, bout in enumerate(gait_bouts):
                 # figure out vertical axis on a per-bout basis
-                acc_mean = mean(accel[bout], axis=0)
+                acc_mean = mean(accel_ds[bout], axis=0)
                 v_axis = argmax(abs(acc_mean))
 
                 ic, fc, vert_acc = get_gait_events(
-                    accel[bout, v_axis], dt, time[bout],
-                    sign(acc_mean[v_axis]), scale_original,
-                    self.filt_ord, self.filt_cut, self.use_opt_scale
+                    accel_ds[bout, v_axis],
+                    goal_fs,
+                    time_ds[bout],
+                    sign(acc_mean[v_axis]),
+                    original_scale,
+                    self.filt_ord,
+                    self.filt_cut,
+                    self.use_opt_scale
                 )
 
-                # get strides
-                sib = get_strides(
-                    gait, vert_acc, gait_i, ic, fc, time[bout],
-                    self.max_stride_time, self.loading_factor
+                # get the strides
+                strides_in_bout = get_strides(
+                    gait, vert_acc, gait_i, ic, fc, time_ds[bout], goal_fs, self.max_stride_time,
+                    self.loading_factor
                 )
 
                 # add inertial data to the aux dict for use in gait metric calculation
-                gait_aux['accel'].append(accel[bout, :])
+                gait_aux['accel'].append(accel_ds[bout, :])
                 # add the index for the corresponding accel/velocity/position
-                gait_aux['inertial data i'].extend([len(gait_aux['accel']) - 1] * sib)
-                gait_aux['vert axis'].extend([v_axis] * sib)
+                gait_aux['inertial data i'].extend([len(gait_aux['accel']) - 1] * strides_in_bout)
+                gait_aux['vert axis'].extend([v_axis] * strides_in_bout)
 
                 # save some default per bout metrics
-                gait['Bout N'].extend([ibout + 1] * sib)
-                gait['Bout Start'].extend([time[bout.start]] * sib)
-                gait['Bout Duration'].extend([(bout.stop - bout.start) * dt] * sib)
+                gait['Bout N'].extend([ibout + 1] * strides_in_bout)
+                gait['Bout Starts'].extend([time_ds[bout.start]] * strides_in_bout)
+                gait['Bout Duration'].extend([(bout.stop - bout.start) / fs] * strides_in_bout)
 
-                # TODO add back in gait cycles in the bout
-                # NOTE gait cycles is full cycles with parameters, # steps is number of actual steps detected
-                gait['Bout Steps'].extend([sum(gait['b valid cycle'][gait_i:])] * sib)
+                gait['Bout Steps'].extend([strides_in_bout] * strides_in_bout)
+                gait['Gait Cycles'].extend([sum(gait['valid cycles'])] * strides_in_bout)
 
-                gait_i += sib
+                gait_i += strides_in_bout
 
             # add the day number
             gait['Day N'].extend([iday + 1] * (len(gait['Bout N']) - len(gait['Day N'])))
@@ -340,23 +366,22 @@ class Gait(_BaseProcess):
         for key in gait:
             gait[key] = array(gait[key])
         # convert inertial data index to an array
-        gait_aux['vert axis'] = array(gait_aux['vert axis'])
         gait_aux['inertial data i'] = array(gait_aux['inertial data i'])
+        gait_aux['vert axis'] = array(gait_aux['vert axis'])
 
         # loop over metrics and compute
         for param in self._params:
-            param().predict(dt, leg_length, gait, gait_aux)
+            param().predict(fs, leg_length, gait, gait_aux)
+
+        # remove invalid gait cycles
+        for k in [i for i in gait if i != 'valid cycle']:
+            gait[k] = gait[k][gait['valid cycle']]
 
         # remove unnecessary stuff from gait dict
         gait.pop('IC', None)
         gait.pop('FC', None)
         gait.pop('FC opp foot', None)
-
-        # remove in-valid gait cycles
-        for k in [i for i in gait if i != 'b valid cycle']:
-            gait[k] = gait[k][gait['b valid cycle']]
-
-        gait.pop('b valid cycle')
+        gait.pop('valid cycle', None)
 
         kwargs.update({self._acc: accel, self._time: time, self._gyro: gyro, 'height': height})
         if self._in_pipeline:
