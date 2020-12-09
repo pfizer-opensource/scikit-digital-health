@@ -42,14 +42,14 @@ class BoutMetric:
 
         self._depends = depends
 
-    def predict(self, dt, leg_length, gait, gait_aux):
+    def predict(self, fs, leg_length, gait, gait_aux):
         """
         Predict the bout level gait metric
 
         Parameters
         ----------
-        dt : float
-            Sampling period in seconds
+        fs : float
+            Sampling frequency in Hz
         leg_length : {None, float}
             Leg length in meters
         gait : dict
@@ -63,9 +63,9 @@ class BoutMetric:
             return
         if self._depends is not None:
             for param in self._depends:
-                param().predict(dt, leg_length, gait, gait_aux)
+                param().predict(fs, leg_length, gait, gait_aux)
 
-        self._predict(dt, leg_length, gait, gait_aux)
+        self._predict(fs, leg_length, gait, gait_aux)
 
 
 class EventMetric:
@@ -99,14 +99,14 @@ class EventMetric:
 
         return mask
 
-    def predict(self, dt, leg_length, gait, gait_aux):
+    def predict(self, fs, leg_length, gait, gait_aux):
         """
         Predict the gait event-level metric
 
         Parameters
         ----------
-        dt : float
-            Sampling period in seconds
+        fs : float
+            Sampling frequency in Hz
         leg_length : {None, float}
             Leg length in meters
         gait : dict
@@ -120,9 +120,9 @@ class EventMetric:
             return
         if self._depends is not None:
             for param in self._depends:
-                param().predict(dt, leg_length, gait, gait_aux)
+                param().predict(fs, leg_length, gait, gait_aux)
 
-        self._predict(dt, leg_length, gait, gait_aux)
+        self._predict(fs, leg_length, gait, gait_aux)
 
     def _predict_asymmetry(self, dt, leg_length, gait, gait_aux):
         asy_name = f'{self.k_} asymmetry'

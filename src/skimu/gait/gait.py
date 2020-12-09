@@ -352,7 +352,7 @@ class Gait(_BaseProcess):
                 # save some default per bout metrics
                 gait['Bout N'].extend([ibout + 1] * strides_in_bout)
                 gait['Bout Starts'].extend([time_ds[bout.start]] * strides_in_bout)
-                gait['Bout Duration'].extend([(bout.stop - bout.start) / fs] * strides_in_bout)
+                gait['Bout Duration'].extend([(bout.stop - bout.start) / goal_fs] * strides_in_bout)
 
                 gait['Bout Steps'].extend([strides_in_bout] * strides_in_bout)
                 gait['Gait Cycles'].extend([sum(gait['valid cycles'])] * strides_in_bout)
@@ -371,7 +371,7 @@ class Gait(_BaseProcess):
 
         # loop over metrics and compute
         for param in self._params:
-            param().predict(fs, leg_length, gait, gait_aux)
+            param().predict(goal_fs, leg_length, gait, gait_aux)
 
         # remove invalid gait cycles
         for k in [i for i in gait if i != 'valid cycle']:
