@@ -8,8 +8,7 @@ from collections.abc import Iterable
 from warnings import warn
 
 import h5py
-from numpy import mean, diff, arange, zeros, interp, float_, abs, max, around, argmax, sign, \
-    array, sum
+from numpy import mean, diff, arange, zeros, interp, float_, abs, around, argmax, sign, array, sum
 
 from skimu.base import _BaseProcess
 from skimu.gait.get_gait_classification import get_gait_classification_lgbm
