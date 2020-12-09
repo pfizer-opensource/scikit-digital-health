@@ -51,7 +51,7 @@ def get_gait_events(
     # low-pass filter
     if fs > (2 * filter_cutoff):
         sos = butter(filter_order, 2 * filter_cutoff / fs, btype='low', output='sos')
-        filter_vert_accel = sosfiltfilt(sos, vert_accel)
+        filt_vert_accel = sosfiltfilt(sos, vert_accel)
     else:
         filt_vert_accel = vert_accel * 1  # make sure a copy and not a view
 
