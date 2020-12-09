@@ -9,68 +9,58 @@ from scipy.interpolate import interp1d
 from ..base_conftest import *
 
 
-@fixture(scope='module')
-def sample_accel():
+def _get_sample_accel(goal_fs):
     path = resolve_data_path('gait_data.h5', 'gait')
     with h5py.File(path, 'r') as f:
         accel = f['accel'][()]
+        time = f['time'][()]
 
-    return accel
+    fs = 1 / np.mean(np.diff(time))
+
+    if fs > (1.015 * goal_fs):
+        t_ = np.arange(time[0], time[-1], 1 / goal_fs)
+        a_ = np.zeros((t_.size, 3))
+        for i in range(3):
+            a_[:, i] = np.interp(t_, time, accel[:, i])
+        fs_ = goal_fs
+    elif fs < (0.985 * goal_fs):
+        assert False, "Original FS too low for goal_fs, failing test"
+    else:
+        t_ = time
+        a_ = accel
+        fs_ = goal_fs
+
+    return t_, fs_, a_
 
 
 @fixture(scope='module')
-def sample_dt():
-    path = resolve_data_path('gait_data.h5', 'gait')
-    with h5py.File(path, 'r') as f:
-        dt = np.mean(np.diff(f['time'][:500]))
-
-    return dt
-
-
-@fixture(scope='module')
-def sample_time():
-    path = resolve_data_path('gait_data.h5', 'gait')
-    with h5py.File(path, 'r') as f:
-        accel = f['time'][()]
-
-    return accel
+def get_sample_accel():
+    return _get_sample_accel
 
 
 @fixture(scope='module')
 def get_sample_bout_accel():
     def get_stuff(freq):
-        with h5py.File(resolve_data_path('gait_data.h5', 'gait'), 'r') as f:
-            accel = f['accel'][()]
-            time = f['time'][()]
+        t, fs, accel = _get_sample_accel(freq)
 
-        if freq >= 50.0:
+        if freq == 50.0:
             with h5py.File(resolve_data_path('gait_data.h5', 'gait'), 'r') as f:
                 starts = f['Truth']['Gait Classification']['gait_starts_50'][()]
                 stops = f['Truth']['Gait Classification']['gait_stops_50'][()]
 
             idx = np.argmax(stops - starts)
             bout_acc = accel[starts[idx]:stops[idx], :]
-            bout_time = time[starts[idx]:stops[idx]]
-        else:
+            bout_time = t[starts[idx]:stops[idx]]
+        elif freq == 20.0:
             with h5py.File(resolve_data_path('gait_data.h5', 'gait'), 'r') as f:
                 starts = f['Truth']['Gait Classification']['gait_starts_20'][()]
                 stops = f['Truth']['Gait Classification']['gait_stops_20'][()]
 
-            f = interp1d(
-                time - time[0],
-                accel,
-                kind='cubic',
-                bounds_error=False,
-                fill_value='extrapolate',
-                axis=0
-            )
-
-            time_ds = np.arange(0, time[-1] - time[0], 1 / 20.0)
-            acc_ds = f(time_ds)
-
             idx = np.argmax(stops - starts)
-            bout_acc = acc_ds[starts[idx]:stops[idx], :]
-            bout_time = time_ds[starts[idx]:stops[idx]]
+            bout_acc = accel[starts[idx]:stops[idx], :]
+            bout_time = t[starts[idx]:stops[idx]]
+        else:
+            assert False, "Invalid frequency"
 
         vaxis = np.argmax(np.mean(bout_acc, axis=0))
         return bout_acc, bout_time, vaxis, np.sign(np.mean(bout_acc, axis=0)[vaxis])
