@@ -6,13 +6,12 @@ Lukas Adamowicz
 """
 import pytest
 from numpy import allclose, arange, random, array, isnan, zeros
-from scipy.interpolate import interp1d
 
 from ..base_conftest import *
 
 from skimu.gait import Gait
 from skimu.gait.gait import LowFrequencyError
-from skimu.gait.get_gait_classification import get_gait_classification_lgbm
+from skimu.gait.get_gait_classification import get_gait_classification_lgbm, DimensionMismatchError
 from skimu.gait.get_gait_bouts import get_gait_bouts
 from skimu.gait.get_gait_events import get_gait_events
 from skimu.gait.get_strides import get_strides
@@ -20,55 +19,48 @@ from skimu.gait import gait_metrics
 
 
 class TestGetGaitClassificationLGBM:
-    def test(self, sample_accel, sample_dt, sample_time, get_gait_classification_truth):
-        starts, stops = get_gait_classification_lgbm(None, sample_accel, sample_dt, sample_time)
-        starts_truth, stops_truth = get_gait_classification_truth(1 / sample_dt)
+    def test_50hz(self, get_sample_accel, get_gait_classification_truth):
+        time, fs, accel = get_sample_accel(50.0)
+
+        starts, stops = get_gait_classification_lgbm(None, accel, fs)
+        starts_truth, stops_truth = get_gait_classification_truth(50)
 
         assert allclose(starts, starts_truth)
         assert allclose(stops, stops_truth)
 
-    def test_20hz(self, sample_accel, sample_dt, sample_time, get_gait_classification_truth):
-        # downsample to 20hz
-        f = interp1d(
-            sample_time - sample_time[0],
-            sample_accel,
-            kind='cubic',
-            bounds_error=False,
-            fill_value='extrapolate',
-            axis=0
-        )
+    def test_20hz(self, get_sample_accel, get_gait_classification_truth):
+        time, fs, accel = get_sample_accel(20.0)
 
-        time_ds = arange(0, sample_time[-1] - sample_time[0], 1 / 20.0)
-        acc_ds = f(time_ds)
-
-        starts, stops = get_gait_classification_lgbm(None, acc_ds, 1 / 20.0, time_ds)
+        starts, stops = get_gait_classification_lgbm(None, accel, fs)
         starts_truth, stops_truth = get_gait_classification_truth(20.0)
 
         assert allclose(starts, starts_truth)
         assert allclose(stops, stops_truth)
 
-    def test_pred_size_error(self, sample_accel, sample_time):
-        with pytest.raises(ValueError):
-            get_gait_classification_lgbm(random.rand(50) > 0.5, sample_accel, 1 / 50.0, sample_time)
+    def test_pred_size_error(self, get_sample_accel):
+        _, fs, accel = get_sample_accel(50.0)
+        with pytest.raises(DimensionMismatchError):
+            get_gait_classification_lgbm(random.rand(50) > 0.5, accel, fs)
 
     @pytest.mark.parametrize('pred', (True, False, 1, -135098135, 1.513e-600))
-    def test_pred_single_input(self, pred, sample_accel, sample_time):
-        starts, stops = get_gait_classification_lgbm(pred, sample_accel, 1 / 32.125, sample_time)
+    def test_pred_single_input(self, pred, get_sample_accel):
+        starts, stops = get_gait_classification_lgbm(pred, random.rand(500), 32.125)
 
         assert starts.size == 1
         assert starts[0] == 0
         assert stops.size == 1
-        assert stops[0] == sample_accel.shape[0]
+        assert stops[0] == 500
 
-    def test_pred_array_input(self, sample_accel, sample_time):
-        pred = zeros(sample_accel.shape[0], dtype="bool")
+    def test_pred_array_input(self, get_sample_accel):
+        t, fs, accel = get_sample_accel(50.0)
+        pred = zeros(accel.shape[0], dtype="bool")
 
         starts_truth = array([0, 500, 750, 950])
         stops_truth = array([150, 575, 850, 1200])
         for s, f in zip(starts_truth, stops_truth):
             pred[s:f] = True
 
-        starts, stops = get_gait_classification_lgbm(pred, sample_accel, 1 / 55.0, sample_time)
+        starts, stops = get_gait_classification_lgbm(pred, accel, fs)
 
         assert allclose(starts, starts_truth)
         assert allclose(stops, stops_truth)
@@ -88,15 +80,15 @@ class TestGetGaitBouts:
 
 class TestGetGaitEvents:
     @pytest.mark.parametrize('sign', (1, -1))
-    def test(self, sign, sample_dt, get_sample_bout_accel, get_contact_truth):
-        accel, time, axis, acc_sign = get_sample_bout_accel(1 / sample_dt)
-        ic_truth, fc_truth = get_contact_truth(1 / sample_dt)  # index starts at 1 for this
+    def test_50hz(self, sign, get_sample_bout_accel, get_contact_truth):
+        accel, time, axis, acc_sign = get_sample_bout_accel(50.0)
+        ic_truth, fc_truth = get_contact_truth(50.0)  # index starts at 1 for this
 
-        o_scale = round(0.4 / (2 * 1.25 * sample_dt)) - 1
+        o_scale = round(0.4 / (2 * 1.25 / 50.0)) - 1
 
         ic, fc, _ = get_gait_events(
             sign * accel[:, axis],
-            sample_dt,
+            50.0,
             time,
             sign * acc_sign,
             o_scale, 4, 20.0, True
@@ -114,7 +106,7 @@ class TestGetGaitEvents:
 
         ic, fc, _ = get_gait_events(
             sign * accel[:, axis],
-            1 / 20.0,
+            20.0,
             time,
             sign * acc_sign,
             o_scale, 4, 20.0, False  # also test original scale
@@ -125,31 +117,31 @@ class TestGetGaitEvents:
 
 
 class TestGetGaitStrides:
-    def test(self, sample_dt, get_sample_bout_accel, get_contact_truth, get_strides_truth):
-        accel, time, axis, acc_sign = get_sample_bout_accel(1 / sample_dt)
-        ic, fc = get_contact_truth(1 / sample_dt)
+    def test_50hz(self, get_sample_bout_accel, get_contact_truth, get_strides_truth):
+        accel, time, axis, acc_sign = get_sample_bout_accel(50.0)
+        ic, fc = get_contact_truth(50.0)
 
-        keys = ['IC', 'FC', 'FC opp foot', 'b valid cycle', 'delta h']
-        gait_truth = get_strides_truth(1 / sample_dt, keys)
+        keys = ['IC', 'FC', 'FC opp foot', 'valid cycle', 'delta h']
+        gait_truth = get_strides_truth(50.0, keys)
 
         gait = {i: [] for i in keys}
-        bout_steps = get_strides(gait, accel[:, axis], 0, ic, fc, time, 2.25, 0.2)
+        bout_steps = get_strides(gait, accel[:, axis], 0, ic, fc, time, 50.0, 2.25, 0.2)
 
-        assert bout_steps == 42
+        assert bout_steps == 45
         for k in keys:
             assert allclose(gait[k], gait_truth[k], equal_nan=True)
 
-    def test_20(self, sample_dt, get_sample_bout_accel, get_contact_truth, get_strides_truth):
-        accel, time, axis, acc_sign = get_sample_bout_accel(20)
-        ic, fc = get_contact_truth(20)
+    def test_20hz(self, get_sample_bout_accel, get_contact_truth, get_strides_truth):
+        accel, time, axis, acc_sign = get_sample_bout_accel(20.0)
+        ic, fc = get_contact_truth(20.0)
 
-        keys = ['IC', 'FC', 'FC opp foot', 'b valid cycle', 'delta h']
-        gait_truth = get_strides_truth(20, keys)
+        keys = ['IC', 'FC', 'FC opp foot', 'valid cycle', 'delta h']
+        gait_truth = get_strides_truth(20.0, keys)
 
         gait = {i: [] for i in keys}
-        bout_steps = get_strides(gait, accel[:, axis], 0, ic, fc, time, 2.25, 0.2)
+        bout_steps = get_strides(gait, accel[:, axis], 0, ic, fc, time, 20.0, 2.25, 0.2)
 
-        assert bout_steps == 37
+        assert bout_steps == 46
         for k in keys:
             assert allclose(gait[k], gait_truth[k], equal_nan=True)
 
@@ -158,15 +150,15 @@ class TestGetGaitStrides:
         ic = array([10, 23])
         fc = array([12, 25, 37])
 
-        gait = {i: [] for i in ['IC', 'FC', 'FC opp foot', 'b valid cycle', 'delta h']}
+        gait = {i: [] for i in ['IC', 'FC', 'FC opp foot', 'valid cycle', 'delta h']}
 
-        bsteps = get_strides(gait, random.rand(time.size), 0, ic, fc, time, 2.25, 0.2)
+        bsteps = get_strides(gait, random.rand(time.size), 0, ic, fc, time, 25.0, 2.25, 0.2)
 
         assert bsteps == 2
         assert allclose(gait['IC'], ic)
         assert allclose(gait['FC'], fc[1:])
         assert allclose(gait['FC opp foot'], fc[:-1])
-        assert all([not i for i in gait['b valid cycle']])
+        assert all([not i for i in gait['valid cycle']])
         assert all([isnan(i) for i in gait['delta h']])
 
 
@@ -225,7 +217,7 @@ class TestGait(BaseProcessTester):
 
         assert g.height_factor == 1.0
 
-    def test_leg_length_warning(self, get_sample_data, caplog):
+    def test_leg_length_warning(self, get_sample_data):
         data = get_sample_data(
             self.sample_data_file,
             self.sample_data_keys
@@ -252,7 +244,7 @@ class TestGait(BaseProcessTester):
         )
         data['gait_pred'] = arange(0, 1, 0.1)
 
-        with pytest.raises(ValueError):
+        with pytest.raises(DimensionMismatchError):
             self.process.predict(**data)
 
     def test_add_metrics(self):

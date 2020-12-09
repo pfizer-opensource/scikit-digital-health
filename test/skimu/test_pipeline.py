@@ -41,17 +41,23 @@ class TestPipeline:
     # some parameters need higher tolerances due to slightly different accelerations
     # some timestamp rounding causes slight changes in the filter cutoffs, effecting the
     # acceleration values
-    atol = {
-        'delta h': 1e-3,
-        'PARAM:step length': 1e-3,
-        'PARAM:stride length': 1e-3,
-        'PARAM:gait speed': 1e-3,
-        'BOUTPARAM:gait symmetry index': 5e-5,
-        'BOUTPARAM:autocovariance symmetry - V': 5e-5
+    rtol = {
+        'delta h': 7e-4,
+        'PARAM:step length': 3e-4,
+        'PARAM:stride length': 3e-4,
+        'PARAM:gait speed': 3e-4,
+        'PARAM:intra-step covariance - V': 2e-3,
+        'PARAM:intra-stride covariance - V': 3e-3,
+        'PARAM:harmonic ratio - V': 3e-3,
+        'PARAM:stride SPARC': 9e-4,
+        'BOUTPARAM:gait symmetry index': 3e-5,
+        'BOUTPARAM:stride regularity - V': 5e-5,
+        'BOUTPARAM:autocovariance symmetry - V': 3e-4,
+        'BOUTPARAM:regularity index - V': 5e-5
     }
 
     @staticmethod
-    def run_pipeline(get_truth_data, pipe, gait_keys, abs_tol, gait_results_file):
+    def run_pipeline(get_truth_data, pipe, gait_keys, rel_tol, gait_results_file):
         file = resolve_data_path('ax3_sample.cwa', 'skimu')
 
         res = pipe.run(file=file, height=1.88)
@@ -67,7 +73,7 @@ class TestPipeline:
                 res['Gait'][key],
                 gait_res[key],
                 equal_nan=True,
-                atol=abs_tol.get(key, 1e-8)
+                rtol=rel_tol.get(key, 1e-8)
             ), f'{key} does not match truth'
 
         # get the data from the saved file
@@ -78,7 +84,7 @@ class TestPipeline:
                 data[key].values,
                 gait_res[key],
                 equal_nan=True,
-                atol=abs_tol.get(key, 1e-8)
+                rtol=rel_tol.get(key, 1e-8)
             ), f'{key} from saved data does not match truth'
 
     def test(self, get_truth_data, gait_res_file, pipeline_file):
@@ -104,13 +110,13 @@ class TestPipeline:
         # test saving the pipeline
         p.save(pipeline_file)
 
-        self.run_pipeline(get_truth_data, p, self.gait_keys, self.atol, gait_res_file)
+        self.run_pipeline(get_truth_data, p, self.gait_keys, self.rtol, gait_res_file)
 
     def test_load_and_process(self, get_truth_data, gait_res_file, pipeline_file):
         p = Pipeline()
         p.load(pipeline_file)
 
-        self.run_pipeline(get_truth_data, p, self.gait_keys, self.atol, gait_res_file)
+        self.run_pipeline(get_truth_data, p, self.gait_keys, self.rtol, gait_res_file)
 
     def test_save_load_not_process_error(self, pipe_file2):
         p = Pipeline()
