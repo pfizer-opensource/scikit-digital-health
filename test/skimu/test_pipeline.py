@@ -43,7 +43,7 @@ class TestPipeline:
     # acceleration values
     rtol = {
         'delta h': 7e-4,
-        'PARAM:step length': 3e-4,
+        'PARAM:step length': 4e-4,
         'PARAM:stride length': 3e-4,
         'PARAM:gait speed': 3e-4,
         'PARAM:intra-step covariance - V': 2e-3,
