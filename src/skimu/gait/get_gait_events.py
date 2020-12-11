@@ -65,11 +65,12 @@ def get_gait_events(
         # compute an estimate of step frequency
         step_freq = argmax(F) / vert_velocity.size * fs
 
-        ic_opt_freq = 0.69 * step_freq + 0.34
-        fc_opt_freq = 3.6 * step_freq - 4.5
-
-        scale1 = max(around(0.4 / (2 * ic_opt_freq / fs)) - 1, 1)
-        scale2 = max(around(0.4 / (2 * fc_opt_freq / fs)) - 1, 1)
+        # IC scale: -10 * sf + 56
+        # FC scale: -52 * sf + 131
+        # TODO verify the FC scale equation. This is not in the paper but is a guess from the graph
+        scale1 = min(max(round((-10 * step_freq + 56) * (fs / 250)), 1), 90)  # 250Hz was original fs
+        scale2 = min(max(round((-52 * step_freq + 131) * (fs / 250)), 1), 90)
+        # range is set to 1 <-> 90
     else:
         scale1 = scale2 = orig_scale
 

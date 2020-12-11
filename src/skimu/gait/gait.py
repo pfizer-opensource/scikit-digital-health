@@ -8,7 +8,7 @@ from collections.abc import Iterable
 from warnings import warn
 
 import h5py
-from numpy import mean, diff, arange, zeros, interp, float_, abs, around, argmax, sign, array, sum
+from numpy import mean, diff, arange, zeros, interp, float_, abs, argmax, sign, array, sum
 
 from skimu.base import _BaseProcess
 from skimu.gait.get_gait_classification import get_gait_classification_lgbm
@@ -287,8 +287,8 @@ class Gait(_BaseProcess):
 
         # original scale. Compute outside loop since stays the same
         # 1.25 comes from original paper, corresponds to desired frequency
-        # 0.4 comes from using the 'gaus1' wavelet
-        original_scale = max(around(0.4 * goal_fs / (2 * 1.25)) - 1, 1)
+        # 0.2 is the central frequency of the 'gaus1' wavelet (normalized to 1)
+        original_scale = max(round(0.2 / (1.25 / goal_fs)), 1)
 
         # get days if it exists, otherwise use the starts and end of the data
         days = kwargs.get(self._days, [(0, accel_ds.shape[0])])
