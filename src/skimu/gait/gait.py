@@ -354,7 +354,7 @@ class Gait(_BaseProcess):
                 gait['Bout Duration'].extend([(bout.stop - bout.start) / goal_fs] * strides_in_bout)
 
                 gait['Bout Steps'].extend([strides_in_bout] * strides_in_bout)
-                gait['Gait Cycles'].extend([sum(gait['valid cycle'])] * strides_in_bout)
+                gait['Gait Cycles'].extend([sum(gait['valid cycle'][gait_i:])] * strides_in_bout)
 
                 gait_i += strides_in_bout
 
