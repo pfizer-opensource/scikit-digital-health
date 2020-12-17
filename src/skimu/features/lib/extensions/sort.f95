@@ -60,7 +60,7 @@ contains
     end subroutine
 
     ! --------------------------------------------------------------------
-    ! SUBROUTINE  dpqsort
+    ! SUBROUTINE  quick_argsort_
     !     Perform a double pivot quicksort, inplace, on a 1d array and its indices
     !
     !     adapted from https://www.mjr19.org.uk/IT/sorts/
@@ -72,7 +72,7 @@ contains
     !     x(n)    : real(8), array of values to sort (inplace)
     !     idx(n)  : integer(8), index of values to be rearranged (inplace) to match the sorting of x
     ! --------------------------------------------------------------------
-    recursive subroutine quick_argsort_(n, x, idx) bind(C, name="_quick_argsort")
+    recursive subroutine quick_argsort_(n, x, idx) bind(C, name="quick_argsort_")
         integer(c_long), intent(in) :: n
         real(c_double), intent(inout) :: x(n)
         integer(c_long), intent(inout) :: idx(n)
@@ -189,7 +189,7 @@ contains
 
 
     ! --------------------------------------------------------------------
-    ! SUBROUTINE  dpqsort
+    ! SUBROUTINE  quick_sort_
     !     Perform a double pivot quicksort, inplace, on a 1d array without indices
     !
     !     adapted from https://www.mjr19.org.uk/IT/sorts/
@@ -200,7 +200,7 @@ contains
     !     Inout
     !     x(n)  : real(8), array of values to sort (inplace)
     ! --------------------------------------------------------------------
-    recursive subroutine quick_sort_(n, x) bind(C, name="_quick_sort")
+    recursive subroutine quick_sort_(n, x) bind(C, name="quick_sort_")
         integer(c_long), intent(in) :: n
         real(c_double), intent(inout) :: x(n)
     !f2py intent(hide) :: n
