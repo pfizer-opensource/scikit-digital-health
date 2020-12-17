@@ -14,7 +14,7 @@ PyObject * signal_entropy(PyObject *NPY_UNUSED(self), PyObject *args){
     PyObject *x_;
     int fail = 0;
 
-    if (!PyArg_ParseTuple(args, "O:permutation_entropy", &x_)) return NULL;
+    if (!PyArg_ParseTuple(args, "O:signal_entropy", &x_)) return NULL;
 
     PyArrayObject *data = (PyArrayObject *)PyArray_FromAny(
         x_, PyArray_DescrFromType(NPY_DOUBLE), 1, 0,
@@ -67,7 +67,7 @@ PyObject * sample_entropy(PyObject *NPY_UNUSED(self), PyObject *args){
     double r;
     int fail = 0;
 
-    if (!PyArg_ParseTuple(args, "Old:permutation_entropy", &x_, &L, &r)) return NULL;
+    if (!PyArg_ParseTuple(args, "Old:sample_entropy", &x_, &L, &r)) return NULL;
 
     PyArrayObject *data = (PyArrayObject *)PyArray_FromAny(
         x_, PyArray_DescrFromType(NPY_DOUBLE), 1, 0,
