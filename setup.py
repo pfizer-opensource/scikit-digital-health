@@ -190,7 +190,7 @@ def configuration(parent_package='', top_path=None):
     )
     # gt3x (actigraph)
     config.add_library(
-        'skimu/read/_extensions/gt3x',
+        'gt3x',
         sources='src/skimu/read/_extensions/gt3x.c',
         include_dirs=[os.sep.join(sysconfig.get_path('include').split(os.sep)[:-1])]
     )
