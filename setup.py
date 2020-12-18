@@ -190,7 +190,7 @@ def configuration(parent_package='', top_path=None):
     )
     # gt3x (actigraph)
     config.add_library(
-        'gt3x',
+        'skimu/read/_extensions/gt3x',
         sources='src/skimu/read/_extensions/gt3x.c',
         include_dirs=[os.sep.join(sysconfig.get_path('include').split(os.sep)[:-1])]
     )
@@ -200,6 +200,23 @@ def configuration(parent_package='', top_path=None):
         libraries=['gt3x', 'zip'],
         include_dirs=[os.sep.join(sysconfig.get_path('include').split(os.sep)[:-1])]
     )
+
+    # Fortran/C feature extensions
+    config.add_library(
+        "ffeatures",
+        sources=[
+            "src/skimu/features/lib/extensions/ffeatures.f95",
+            "src/skimu/features/lib/extensions/real_fft.f95",
+            "src/skimu/features/lib/extensions/sort.f95",
+            "src/skimu/features/lib/extensions/utility.f95"
+        ]
+    )
+    for ext in ["entropy", "frequency", "misc_features", "smoothness", "statistics", "_utility"]:
+        config.add_extension(
+            f"skimu/features/lib/extensions/{ext}",
+            sources=[f"src/skimu/features/lib/extensions/{ext}.c"],
+            libraries=["ffeatures"]
+        )
 
     # cython feature extensions
     if os.environ.get('CYTHONIZE', 'False') == 'True':
