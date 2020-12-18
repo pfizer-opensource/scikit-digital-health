@@ -123,7 +123,7 @@ PyObject * ratio_beyond_r_sigma(PyObject *NPY_UNUSED(self), PyObject *args){
     double r;
     int fail = 0;
 
-    if (!PyArg_ParseTuple(args, "Od:jerk_metric", &x_, &r)) return NULL;
+    if (!PyArg_ParseTuple(args, "Od:ratio_beyond_r_sigma", &x_, &r)) return NULL;
 
     PyArrayObject *data = (PyArrayObject *)PyArray_FromAny(
         x_, PyArray_DescrFromType(NPY_DOUBLE), 1, 0,

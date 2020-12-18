@@ -68,7 +68,7 @@ PyObject * dimensionless_jerk_metric(PyObject *NPY_UNUSED(self), PyObject *args)
     long stype;
     int fail = 0;
 
-    if (!PyArg_ParseTuple(args, "Ol:jerk_metric", &x_, &stype)) return NULL;
+    if (!PyArg_ParseTuple(args, "Ol:dimensionless_jerk_metric", &x_, &stype)) return NULL;
 
     PyArrayObject *data = (PyArrayObject *)PyArray_FromAny(
         x_, PyArray_DescrFromType(NPY_DOUBLE), 1, 0,
