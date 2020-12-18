@@ -9,7 +9,7 @@
 extern void jerk_1d(long *, double *, double *, double *);
 extern void dimensionless_jerk_1d(long *, double *, long *, double *);
 extern void sparc_1d(long *, double *, double *, long *, double *, double *, double *);
-extern void destroy_plan();
+extern void destroy_plan(void);
 
 PyObject * jerk_metric(PyObject *NPY_UNUSED(self), PyObject *args){
     PyObject *x_;

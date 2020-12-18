@@ -9,7 +9,8 @@ extern void dominant_freq_1d(long *, double *, long *, double *, double *, doubl
 extern void dominant_freq_value_1d(long *, double *, long *, double *, double *, double *, double *);
 extern void power_spectral_sum_1d(long *, double *, long *, double *, double *, double *, double *);
 extern void spectral_entropy_1d(long *, double *, long *, double *, double *, double *, double *);
-extern void destroy_plan();
+extern void spectral_flatness_1d(long *, double *, long *, double *, double *, double *, double *);
+extern void destroy_plan(void);
 
 
 PyObject * dominant_frequency(PyObject *NPY_UNUSED(self), PyObject *args){
