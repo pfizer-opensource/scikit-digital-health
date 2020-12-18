@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 extern void mean_sd_1d(long *, double *, double *, double *);
 extern void unique(long *, real *, real *, long *, long *);
@@ -46,7 +47,7 @@ PyObject * cf_mean_sd_1d(PyObject *NPY_UNUSED(self), PyObject *args){
     Py_XDECREF(data);
 
     return Py_BuildValue(
-        "OO",
+        "dd",
         PyFloat_FromDouble(mean),
         PyFloat_FromDouble(stdev)
     )
@@ -86,7 +87,7 @@ PyObject * cf_unique(PyObject *NPY_UNUSED(self), PyObject *args){
     Py_XDECREF(data);
 
     return Py_BuildValue(
-        "OOl",
+        "ddd",
         PyFloat_FromDouble(unq),
         PyFloat_FromDouble(cnt),
         PyFloat_FromDouble(n_unique)
@@ -199,6 +200,49 @@ PyObject * cf_hist(PyObject *NPY_UNUSED(self), PyObject *args){
     Py_XDECREF(data);
 
     return (PyObject *)res;
+}
+
+
+PyObject * cf_histogram(PyObject *NPY_UNUSED(self), PyObject *args){
+    PyObject *x_;
+    int fail;
+
+    if (!PyArg_ParseTuple(args, "O:cf_histogram", &x_)) return NULL;
+
+    PyArrayObject *data = (PyArrayObject *)PyArray_FromAny(
+        x_, PyArray_DescrFromType(NPY_DOUBLE), 1, 0,
+        NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_CARRAY_RO, NULL
+    );
+    if (!data) return NULL;
+
+    int ndim = PyArray_NDIM(data);
+
+    if (ndim != 1){
+        PyExc_ValueError("Number of dimensions cannot be other than 1.")
+        Py_XDECREF(data);
+        return NULL;
+    }
+
+    npy_intp *ddims = PyArray_DIMS(data);
+
+    long ncells = (long)ceil(sqrt(ddims[0]));
+
+    PyArrayObject *d = (PyArrayObject *)PyArray_EMPTY(1, 3, NPY_DOUBLE, 0);
+    PyArrayObject *counts = (PyArrayObject *)PyArray_ZEROS(1, ncells, NPY_LONG, 0);
+
+    double *data_ptr = (double *)PyArray_DATA(data);
+    double *d_ptr = (double *)PyArray_DATA(d);
+    long *counts_ptr = (long *)PyArray_DATA(counts);
+
+    histogram(&ddims[0], &ncells, data_ptr, d_ptr, counts_ptr);
+
+    Py_XDECREF(data);
+
+    return Py_BuildValue(
+        "OO",
+        (PyObject *)d,
+        (PyObject *)counts
+    )
 }
 
 
