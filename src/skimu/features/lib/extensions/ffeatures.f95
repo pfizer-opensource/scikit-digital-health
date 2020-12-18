@@ -648,7 +648,7 @@ end subroutine
 !     Output
 !     rbrs : real(double)
 ! --------------------------------------------------------------------
-subroutine ratio_beyond_r_sigma_1d(n, x, r, rbrs) bind(C, name="ratio_beyond_r_sigma")
+subroutine ratio_beyond_r_sigma_1d(n, x, r, rbrs) bind(C, name="ratio_beyond_r_sigma_1d")
     use, intrinsic :: iso_c_binding
     use utility, only : mean_sd_1d
     implicit none
