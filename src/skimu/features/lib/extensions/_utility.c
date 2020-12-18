@@ -7,7 +7,7 @@
 #include <math.h>
 
 extern void mean_sd_1d(long *, double *, double *, double *);
-extern void unique(long *, real *, real *, long *, long *);
+extern void unique(long *, double *, double *, long *, long *);
 extern void gmean(long *, double *, double *);
 extern void embed_sort(long *, long *, double *, long *, long *, long *);
 extern void hist(long *, double *, long *, double *, double *, long *);
@@ -20,7 +20,6 @@ extern void quick_sort_(long *, double *);
 
 PyObject * cf_mean_sd_1d(PyObject *NPY_UNUSED(self), PyObject *args){
     PyObject *x_;
-    int fail;
 
     if (!PyArg_ParseTuple(args, "O:cf_mean_sd_1d", &x_)) return NULL;
 
@@ -33,16 +32,16 @@ PyObject * cf_mean_sd_1d(PyObject *NPY_UNUSED(self), PyObject *args){
     int ndim = PyArray_NDIM(data);
 
     if (ndim != 1){
-        PyExc_ValueError("Number of dimensions cannot be other than 1.")
+        PyErr_SetString(PyExc_ValueError, "Number of dimensions cannot be other than 1.");
         Py_XDECREF(data);
         return NULL;
     }
 
     double mean = 0., stdev = 0.;
     double *dptr = (double *)PyArray_DATA(data);
-    npy_intp *ddims = PyArray_DIMS(data);
+    npy_intp n_elem = PyArray_SIZE(data);
 
-    mean_sd_1d(&ddims[0], dptr, &mean, &stdev);
+    mean_sd_1d(&n_elem, dptr, &mean, &stdev);
 
     Py_XDECREF(data);
 
@@ -50,12 +49,11 @@ PyObject * cf_mean_sd_1d(PyObject *NPY_UNUSED(self), PyObject *args){
         "dd",
         PyFloat_FromDouble(mean),
         PyFloat_FromDouble(stdev)
-    )
+    );
 }
 
 PyObject * cf_unique(PyObject *NPY_UNUSED(self), PyObject *args){
     PyObject *x_;
-    int fail;
 
     if (!PyArg_ParseTuple(args, "O:cf_unique", &x_)) return NULL;
 
@@ -68,36 +66,35 @@ PyObject * cf_unique(PyObject *NPY_UNUSED(self), PyObject *args){
     int ndim = PyArray_NDIM(data);
 
     if (ndim != 1){
-        PyExc_ValueError("Number of dimensions cannot be other than 1.")
+        PyErr_SetString(PyExc_ValueError, "Number of dimensions cannot be other than 1.");
         Py_XDECREF(data);
         return NULL;
     }
-    npy_intp *ddims = PyArray_DIMS(data);
+    npy_intp n_elem = PyArray_SIZE(data);
 
-    PyArrayObject *unq = (PyArrayObject *)PyArray_ZEROS(1, ddims, NPY_DOUBLE, 0);
-    PyArrayObject *cnt = (PyArrayObject *)PyArray_ZEROS(1, ddims, NPY_LONG, 0);
+    PyArrayObject *unq = (PyArrayObject *)PyArray_ZEROS(1, &n_elem, NPY_DOUBLE, 0);
+    PyArrayObject *cnt = (PyArrayObject *)PyArray_ZEROS(1, &n_elem, NPY_LONG, 0);
 
     double *dptr = (double *)PyArray_DATA(data);
     double *uptr = (double *)PyArray_DATA(unq);
-    double *cptr = (double *)PyArray_DATA(cnt);
+    long *cptr = (long *)PyArray_DATA(cnt);
     long n_unique = 0;
 
-    unique(&ddims[0], dptr, uptr, cptr, &n_unique);
+    unique(&n_elem, dptr, uptr, cptr, &n_unique);
 
     Py_XDECREF(data);
 
     return Py_BuildValue(
-        "ddd",
-        PyFloat_FromDouble(unq),
-        PyFloat_FromDouble(cnt),
-        PyFloat_FromDouble(n_unique)
-    )
+        "OOl",
+        (PyObject *)unq,
+        (PyObject *)cnt,
+        PyLong_FromLong(n_unique)
+    );
 }
 
 
 PyObject * cf_gmean(PyObject *NPY_UNUSED(self), PyObject *args){
     PyObject *x_;
-    int fail;
 
     if (!PyArg_ParseTuple(args, "O:cf_gmean", &x_)) return NULL;
 
@@ -110,15 +107,17 @@ PyObject * cf_gmean(PyObject *NPY_UNUSED(self), PyObject *args){
     int ndim = PyArray_NDIM(data);
 
     if (ndim != 1){
-        PyExc_ValueError("Number of dimensions cannot be other than 1.")
+        PyErr_SetString(PyExc_ValueError, "Number of dimensions cannot be other than 1.");
         Py_XDECREF(data);
         return NULL;
     }
 
+    npy_intp n_elem = PyArray_SIZE(data);
+
     double geo_mean = 0.;
     double *dptr = (double *)PyArray_DATA(data);
 
-    unique(&ddims[0], dptr, &geo_mean);
+    gmean(&n_elem, dptr, &geo_mean);
 
     Py_XDECREF(data);
 
@@ -128,7 +127,6 @@ PyObject * cf_gmean(PyObject *NPY_UNUSED(self), PyObject *args){
 
 PyObject * cf_embed_sort(PyObject *NPY_UNUSED(self), PyObject *args){
     PyObject *x_;
-    int fail;
     long order = 3, delay = 1;
 
     if (!PyArg_ParseTuple(args, "Oll:cf_embed_sort", &x_, &order, &delay)) return NULL;
@@ -142,23 +140,23 @@ PyObject * cf_embed_sort(PyObject *NPY_UNUSED(self), PyObject *args){
     int ndim = PyArray_NDIM(data);
 
     if (ndim != 1){
-        PyExc_ValueError("Number of dimensions cannot be other than 1.")
+        PyErr_SetString(PyExc_ValueError, "Number of dimensions cannot be other than 1.");
         Py_XDECREF(data);
         return NULL;
     }
 
-    npy_intp *ddims = PyArray_DIMS(data);
+    npy_intp n_elem = PyArray_SIZE(data);
 
-    long nsi = ddims[0] - (order - 1) * delay;
+    long nsi = n_elem - (order - 1) * delay;
 
     npy_intp rdims[2] = {nsi, order};
 
     PyArrayObject *res = (PyArrayObject *)PyArray_EMPTY(2, rdims, NPY_LONG, 0);
 
     double *dptr = (double *)PyArray_DATA(data);
-    double *rptr = (double *)PyArray_DATA(res);
+    long *rptr = (long *)PyArray_DATA(res);
 
-    embed_sort(&ddims[0], &nsi, dptr, &order, &delay, rptr);
+    embed_sort(&n_elem, &nsi, dptr, &order, &delay, rptr);
 
     Py_XDECREF(data);
 
@@ -168,7 +166,6 @@ PyObject * cf_embed_sort(PyObject *NPY_UNUSED(self), PyObject *args){
 
 PyObject * cf_hist(PyObject *NPY_UNUSED(self), PyObject *args){
     PyObject *x_;
-    int fail;
     long ncells = 1;
     double min_val = 0., max_val = 100.;
 
@@ -183,19 +180,19 @@ PyObject * cf_hist(PyObject *NPY_UNUSED(self), PyObject *args){
     int ndim = PyArray_NDIM(data);
 
     if (ndim != 1){
-        PyExc_ValueError("Number of dimensions cannot be other than 1.")
+        PyErr_SetString(PyExc_ValueError, "Number of dimensions cannot be other than 1.");
         Py_XDECREF(data);
         return NULL;
     }
 
-    npy_intp *ddims = PyArray_DIMS(data);
+    npy_intp n_elem = PyArray_SIZE(data);
 
-    PyArrayObject *res = (PyArrayObject *)PyArray_ZEROS(1, ncells, NPY_LONG, 0);
+    PyArrayObject *res = (PyArrayObject *)PyArray_ZEROS(1, &ncells, NPY_LONG, 0);
 
     double *dptr = (double *)PyArray_DATA(data);
     long *rptr = (long *)PyArray_DATA(res);
 
-    hist(&ddims[0], dptr, &ncells, &min_val, &max_val, rptr);
+    hist(&n_elem, dptr, &ncells, &min_val, &max_val, rptr);
 
     Py_XDECREF(data);
 
@@ -205,7 +202,6 @@ PyObject * cf_hist(PyObject *NPY_UNUSED(self), PyObject *args){
 
 PyObject * cf_histogram(PyObject *NPY_UNUSED(self), PyObject *args){
     PyObject *x_;
-    int fail;
 
     if (!PyArg_ParseTuple(args, "O:cf_histogram", &x_)) return NULL;
 
@@ -218,23 +214,24 @@ PyObject * cf_histogram(PyObject *NPY_UNUSED(self), PyObject *args){
     int ndim = PyArray_NDIM(data);
 
     if (ndim != 1){
-        PyExc_ValueError("Number of dimensions cannot be other than 1.")
+        PyErr_SetString(PyExc_ValueError, "Number of dimensions cannot be other than 1.");
         Py_XDECREF(data);
         return NULL;
     }
 
-    npy_intp *ddims = PyArray_DIMS(data);
+    npy_intp n_elem = PyArray_SIZE(data);
 
-    long ncells = (long)ceil(sqrt(ddims[0]));
+    long n3 = 3;
+    long ncells = (long)ceil(sqrt(n_elem));
 
-    PyArrayObject *d = (PyArrayObject *)PyArray_EMPTY(1, 3, NPY_DOUBLE, 0);
-    PyArrayObject *counts = (PyArrayObject *)PyArray_ZEROS(1, ncells, NPY_LONG, 0);
+    PyArrayObject *d = (PyArrayObject *)PyArray_EMPTY(1, &n3, NPY_DOUBLE, 0);
+    PyArrayObject *counts = (PyArrayObject *)PyArray_ZEROS(1, &ncells, NPY_LONG, 0);
 
     double *data_ptr = (double *)PyArray_DATA(data);
     double *d_ptr = (double *)PyArray_DATA(d);
     long *counts_ptr = (long *)PyArray_DATA(counts);
 
-    histogram(&ddims[0], &ncells, data_ptr, d_ptr, counts_ptr);
+    histogram(&n_elem, &ncells, data_ptr, d_ptr, counts_ptr);
 
     Py_XDECREF(data);
 
@@ -242,12 +239,12 @@ PyObject * cf_histogram(PyObject *NPY_UNUSED(self), PyObject *args){
         "OO",
         (PyObject *)d,
         (PyObject *)counts
-    )
+    );
 }
 
 
 static struct PyMethodDef methods[] = {
-    {"cf_mean_sd_1d",   permutation_entropy,   1, NULL},  // last is test__doc__
+    {"cf_mean_sd_1d",   cf_mean_sd_1d,   1, NULL},  // last is test__doc__
     {"cf_unique",   cf_unique,   1, NULL},
     {"cf_gmean",   cf_gmean,   1, NULL},
     {"cf_embed_sort",   cf_embed_sort,   1, NULL},
