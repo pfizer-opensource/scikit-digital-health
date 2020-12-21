@@ -249,6 +249,7 @@ static struct PyMethodDef methods[] = {
     {"cf_gmean",   cf_gmean,   1, NULL},
     {"cf_embed_sort",   cf_embed_sort,   1, NULL},
     {"cf_hist",   cf_hist,   1, NULL},
+    {"cf_histogram",   cf_histogram,   1, NULL},
     {NULL, NULL, 0, NULL}          /* sentinel */
 };
 
