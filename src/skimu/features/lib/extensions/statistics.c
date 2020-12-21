@@ -6,7 +6,7 @@
 #include <stdlib.h>
 
 
-extern void autocorr(long *, double *, long *, int *, double *);
+extern void autocorr_1d(long *, double *, long *, int *, double *);
 extern void linear_regression_1d(long *, double *, double *, double *);
 
 
@@ -52,7 +52,7 @@ PyObject * autocorrelation(PyObject *NPY_UNUSED(self), PyObject *args){
         int nrepeats = PyArray_SIZE(data) / stride;
 
         for (int i = 0; i < nrepeats; ++i){
-            autocorr(&stride, dptr, &lag, &norm, rptr);
+            autocorr_1d(&stride, dptr, &lag, &norm, rptr);
             dptr += stride;
             rptr ++;
         }
