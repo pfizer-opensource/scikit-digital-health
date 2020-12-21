@@ -255,7 +255,7 @@ static struct PyMethodDef methods[] = {
 
 static struct PyModuleDef moduledef = {
         PyModuleDef_HEAD_INIT,
-        "_utility_extensions",
+        "_utility",
         NULL,
         -1,
         methods,
@@ -266,7 +266,7 @@ static struct PyModuleDef moduledef = {
 };
 
 /* Initialization function for the module */
-PyMODINIT_FUNC PyInit__utility_extensions(void)
+PyMODINIT_FUNC PyInit__utility(void)
 {
     PyObject *m;
     m = PyModule_Create(&moduledef);
