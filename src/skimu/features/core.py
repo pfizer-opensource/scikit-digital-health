@@ -3,9 +3,10 @@ Core functionality for feature computation
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
+import json
+
 from numpy import ndarray, array, zeros, sum
 from pandas import DataFrame
-import json
 
 from skimu.utility import compute_window_samples
 from skimu.features.utility import standardize_signal
@@ -330,6 +331,13 @@ class Feature:
 
     # PRIVATE METHODS
     def _compute(self, x, fs):
+        # if the result is already defined, don't need to compute again. Note that if calling from
+        # the public Feature.compute() method, _result is automatically set to None for
+        # re-computation each time it is called
+        if self._result is not None:
+            return
+
+    def _compute2(self, x, fs):
         # if the result is already defined, don't need to compute again. Note that if calling from
         # the public Feature.compute() method, _result is automatically set to None for
         # re-computation each time it is called
