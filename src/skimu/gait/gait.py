@@ -8,7 +8,7 @@ from collections.abc import Iterable
 from warnings import warn
 
 import h5py
-from numpy import mean, diff, arange, zeros, interp, float_, abs, argmax, sign, array, sum
+from numpy import mean, diff, arange, zeros, interp, float_, abs, argmax, sign, asarray, sum, argmin
 
 from skimu.base import _BaseProcess
 from skimu.gait.get_gait_classification import get_gait_classification_lgbm
@@ -281,17 +281,26 @@ class Gait(_BaseProcess):
             accel_ds = zeros((time_ds.size, 3), dtype=float_)
             for i in range(3):
                 accel_ds[:, i] = interp(time_ds, time, accel[:, i])
+
+            # get days if it exists, otherwise use the starts and end of the data
+            _days = asarray(kwargs.get(self._days, [[0, accel_ds.shape[0]]]))
+
+            days = zeros(asarray(_days).shape)
+            for i, day_idx in enumerate(days):
+                i_guess = (day_idx * goal_fs / fs).astype(int) - 1000
+                days[i, 0] = argmin(abs(time_ds[i_guess[0]:i_guess[0] + 2000] - time[day_idx[0]]))
+                days[i, 1] = argmin(abs(time_ds[i_guess[1]:i_guess[1] + 2000] - time[day_idx[1]]))
         else:
             time_ds = time
             accel_ds = accel
+
+            # get days if it exists, otherwise use the starts and end of the data
+            days = kwargs.get(self._days, [(0, accel_ds.shape[0])])
 
         # original scale. Compute outside loop since stays the same
         # 1.25 comes from original paper, corresponds to desired frequency
         # 0.2 is the central frequency of the 'gaus1' wavelet (normalized to 1)
         original_scale = max(round(0.2 / (1.25 / goal_fs)), 1)
-
-        # get days if it exists, otherwise use the starts and end of the data
-        days = kwargs.get(self._days, [(0, accel_ds.shape[0])])
 
         # setup the storage for the gait parameters
         gait = {
@@ -363,10 +372,10 @@ class Gait(_BaseProcess):
 
         # convert to arrays
         for key in gait:
-            gait[key] = array(gait[key])
+            gait[key] = asarray(gait[key])
         # convert inertial data index to an array
-        gait_aux['inertial data i'] = array(gait_aux['inertial data i'])
-        gait_aux['vert axis'] = array(gait_aux['vert axis'])
+        gait_aux['inertial data i'] = asarray(gait_aux['inertial data i'])
+        gait_aux['vert axis'] = asarray(gait_aux['vert axis'])
 
         # loop over metrics and compute
         for param in self._params:
