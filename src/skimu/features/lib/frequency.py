@@ -119,7 +119,7 @@ class DominantFrequencyValue(Feature):
         Parameters
         ----------
         signal : array-like
-            Array-like containing values to compute the dominant frequency for.
+            Array-like containing values to compute the dominant frequency value for.
         fs : float
             Sampling frequency in Hz.
         axis : int, optional
@@ -184,7 +184,7 @@ class PowerSpectralSum(Feature):
         Parameters
         ----------
         signal : array-like
-            Array-like containing values to compute the dominant frequency for.
+            Array-like containing values to compute the power spectral sum for.
         fs : float
             Sampling frequency in Hz.
         axis : int, optional
@@ -251,7 +251,7 @@ class SpectralFlatness(Feature):
         Parameters
         ----------
         signal : array-like
-            Array-like containing values to compute the dominant frequency for.
+            Array-like containing values to compute the spectral flatness for.
         fs : float
             Sampling frequency in Hz.
         axis : int, optional
@@ -293,7 +293,7 @@ class SpectralEntropy(Feature):
     While the `nfft` parameter allows specification of arbitrary points to be used in the FFT,
     fastest results will be for powers of 2. Additionally, there is a minimum `nfft` defined as
 
-    .. math:: NFFT_{min} = 2^{log_2(N)}
+    .. math:: nfft_{min} = 2^{log_2(N)}
 
     where `N` is the number of points in the computation axis. If `nfft` is set below this, it
     will be automatically bumped up, without warning.
@@ -316,7 +316,7 @@ class SpectralEntropy(Feature):
         Parameters
         ----------
         signal : array-like
-            Array-like containing values to compute the dominant frequency for.
+            Array-like containing values to compute the spectral entropy for.
         fs : float
             Sampling frequency in Hz.
         axis : int, optional
