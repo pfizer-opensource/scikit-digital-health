@@ -32,7 +32,7 @@ class DetailPower(Feature):
     _wavelet_options = pywt.wavelist(kind='discrete')
 
     def __init__(self, wavelet='coif4', freq_band=None):
-        super().__init__('DetailPower', {'wavelet': wavelet, 'freq_band': freq_band})
+        super().__init__(wavelet=wavelet, freq_band=freq_band)
 
         self.wave = wavelet
 
@@ -41,33 +41,33 @@ class DetailPower(Feature):
         else:
             self.f_band = [1.0, 3.0]
 
-    def compute(self, *args, **kwargs):
+    def compute(self, signal, fs, *, axis=-1, col_axis=-2, columns=None):
         """
-        compute(signal, fs, *, columns=None, windowed=False)
-
         Compute the detail power
 
         Parameters
         ----------
-        signal : {numpy.ndarray, pandas.DataFrame}
-            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
-        fs : float, optional
-            Sampling frequency in Hz
+        signal : array-like
+            Array-like containing values to compute the detail power for.
+        fs : float
+            Sampling frequency in Hz.
+        axis : int, optional
+            Axis along which the signal entropy will be computed. Ignored if `signal` is a
+            pandas.DataFrame. Default is last (-1).
+        col_axis : int, optional
+            Axis along which column indexing will be done. Ignored if `signal` is a pandas.DataFrame
+            or if `signal` is 2D.
         columns : array_like, optional
             Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
-        windowed : bool, optional
-            If the signal has already been windowed. Default is False.
 
         Returns
         -------
-        power : {numpy.ndarray, pandas.DataFrame}
-            Computed detail power, returned as the same type as the input signal
+        power : numpy.ndarray
+            Computed detail power.
         """
-        return super().compute(*args, **kwargs)
+        return super().compute(signal, fs, axis=axis, col_axis=col_axis, columns=columns)
 
     def _compute(self, x, fs):
-        super()._compute(x, fs)
-
         # computation
         lvls = [
             int(ceil(log2(fs / self.f_band[0]))),  # maximum level needed
@@ -75,23 +75,23 @@ class DetailPower(Feature):
         ]
 
         # TODO test effect of mode on result
-        cA, *cD = pywt.wavedec(x, self.wave, mode='symmetric', level=lvls[0], axis=1)
+        cA, *cD = pywt.wavedec(x, self.wave, mode='symmetric', level=lvls[0], axis=-1)
 
         # set non necessary levels to 0
         for i in range(lvls[0] - lvls[1] + 1, lvls[0]):
             cD[i][:] = 0.
 
         # reconstruct and get negative->positive zero crossings
-        xr = pywt.waverec((cA,) + tuple(cD), self.wave, mode='symmetric', axis=1)
+        xr = pywt.waverec((cA,) + tuple(cD), self.wave, mode='symmetric', axis=-1)
 
-        N = sum(diff(sign(xr), axis=1) > 0, axis=1).astype(float)
+        N = sum(diff(sign(xr), axis=-1) > 0, axis=-1).astype(float)
         # ensure no 0 values to prevent divide by 0
         N[N == 0] = 1e-4
 
-        self._result = zeros((x.shape[0], x.shape[2]))
+        result = zeros((x.shape[0], x.shape[2]))
         for i in range(lvls[0] - lvls[1] + 1):
-            self._result += sum(cD[i]**2, axis=1)
-        self._result /= N
+            result += sum(cD[i]**2, axis=-1)
+        return result / N
 
 
 class DetailPowerRatio(Feature):
@@ -121,7 +121,7 @@ class DetailPowerRatio(Feature):
     _wavelet_options = pywt.wavelist(kind='discrete')
 
     def __init__(self, wavelet='coif4', freq_band=None):
-        super().__init__('DetailPowerRatio', {'wavelet': wavelet, 'freq_band': freq_band})
+        super().__init__(wavelet=wavelet, freq_band=freq_band)
 
         self.wave = wavelet
 
@@ -130,33 +130,33 @@ class DetailPowerRatio(Feature):
         else:
             self.f_band = [1.0, 10.0]
 
-    def compute(self, *args, **kwargs):
+    def compute(self, signal, fs, *, axis=-1, col_axis=-2, columns=None):
         """
-        compute(signal, fs, *, columns=None, windowed=False)
-
         Compute the detail power ratio
 
         Parameters
         ----------
-        signal : {numpy.ndarray, pandas.DataFrame}
-            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
-        fs : float, optional
-            Sampling frequency in Hz
+        signal : array-like
+            Array-like containing values to compute the detail power ratio for.
+        fs : float
+            Sampling frequency in Hz.
+        axis : int, optional
+            Axis along which the signal entropy will be computed. Ignored if `signal` is a
+            pandas.DataFrame. Default is last (-1).
+        col_axis : int, optional
+            Axis along which column indexing will be done. Ignored if `signal` is a pandas.DataFrame
+            or if `signal` is 2D.
         columns : array_like, optional
             Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
-        windowed : bool, optional
-            If the signal has already been windowed. Default is False.
 
         Returns
         -------
-        power_ratio : {numpy.ndarray, pandas.DataFrame}
-            Computed detail power ratio, returned as the same type as the input signal
+        power_ratio : numpy.ndarray
+            Computed detail power ratio.
         """
-        return super().compute(*args, **kwargs)
+        return super().compute(signal, fs, axis=axis, col_axis=col_axis, columns=columns)
 
     def _compute(self, x, fs):
-        super()._compute(x, fs)
-
         # compute the required levels
         lvls = [
             int(ceil(log2(fs / self.f_band[0]))),  # maximum level needed
@@ -164,10 +164,10 @@ class DetailPowerRatio(Feature):
         ]
 
         # TODO test effect of mode on result
-        cA, *cD = pywt.wavedec(x, self.wave, mode='symmetric', level=lvls[0], axis=1)
+        cA, *cD = pywt.wavedec(x, self.wave, mode='symmetric', level=lvls[0], axis=-1)
 
-        self._result = zeros((x.shape[0], x.shape[2]))
+        result = zeros((x.shape[0], x.shape[2]))
         for i in range(lvls[0] - lvls[1] + 1):
-            self._result += sum(cD[i]**2, axis=1)
+            result += sum(cD[i]**2, axis=-1)
 
-        self._result /= sum(x**2, axis=1)
+        return result / sum(x**2, axis=-1)
