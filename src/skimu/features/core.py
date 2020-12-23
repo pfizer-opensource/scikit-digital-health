@@ -11,9 +11,6 @@ import json
 from numpy import asarray, zeros, atleast_2d, sum, float_
 from pandas import DataFrame
 
-from skimu.utility import compute_window_samples
-
-
 __all__ = ["Bank"]
 
 
