@@ -347,28 +347,26 @@ class Feature(ABC):
         feature : array-like
             Computed feature.
         """
-        if not isinstance(fs, (float, int)):
-            raise ValueError("fs must be a float or int.")
-        fs = float(fs)  # make sure its a float
+        fs = float(fs)
 
         # make sure it is an array
         if isinstance(signal, DataFrame) and columns is not None:
-            x = signal[columns].values
+            x = signal[columns].values.astype(float_)
+            axis = 0
+            col_axis = 1
         else:
-            if col_axis is None:
-                x = asarray(signal)[self.index]
-            else:
-                x = asarray(signal)
-                odims = x.ndim
-                x.swapaxes(col_axis, -1)
-                x = x[..., self.index]
-                if x.ndim == odims:
-                    x.swapaxes(col_axis, -1)
+            x = asarray(signal, dtype=float_)
+            # standardize the axis and column axis arguments
+            axis = axis if axis >= 0 else x.ndim - axis
+            col_axis = col_axis if col_axis >= 0 else x.ndim - col_axis
+            # if 2d, get the col_axis based on axis
+            col_axis = col_axis if x.ndim > 2 else 1 - axis
 
-        x.swapaxes(axis, -1)
-        res = self._compute(x, fs)
-        if res.ndim == x.ndim:  # only swap axes back if dimensionality has not been reduced
-            res.swapaxes(axis, -1)
+        x.swapaxes((col_axis, axis), (0, -1))
+        res = self._compute(x[self.index], fs)
+        if res.ndim == x.ndim - 1:
+            res.swap(col_axis, 0)
+
         return res
 
     # PRIVATE METHODS
