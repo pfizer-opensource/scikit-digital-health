@@ -47,7 +47,12 @@ class Bank:
     >>> # add features to the bank
     >>> fb.add([Mean(), Range()])
     >>> # add specific axes to the bank
-    >>>
+    >>> fb.add([
+    >>>     SignalEntropy()[0],
+    >>>     IQR(),
+    >>>     SignalEntropy()[1:]
+    >>> ])
+    >>> features = fb.compute(signal, axis=1, col_axis=0)
     """
     __slots__ = "_feat_list", "_n_feats", "_eq_idx"
 
