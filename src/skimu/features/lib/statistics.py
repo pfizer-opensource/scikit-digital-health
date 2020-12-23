@@ -87,7 +87,7 @@ class RMS(Feature):
     The root mean square value of the signal
     """
     def __init__(self):
-        super(RMS, self).__init__('RMS', {})
+        super(RMS, self).__init__()
 
     def compute(self, signal, *, axis=-1, col_axis=-2, columns=None):
         """
