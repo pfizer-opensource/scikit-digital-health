@@ -79,7 +79,7 @@ class TestRatioBeyondRSigma(BaseTestFeature):
 
 # SMOOTHNESS FEATURES
 class TestJerkMetric(BaseTestFeature):
-    feature = JerkMetric(normalize=True)
+    feature = JerkMetric()
 
 
 class TestDimensionlessJerk(BaseTestFeature):
