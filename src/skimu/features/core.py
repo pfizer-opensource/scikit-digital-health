@@ -367,6 +367,10 @@ class Feature(ABC):
             # if 2d, get the col_axis based on axis
             col_axis = col_axis if x.ndim > 2 else 1 - axis
 
+        if x.ndim == 1:
+            res = self._compute(x, fs)
+            return res
+
         x = x.swapaxes(axis, -1)
         x = x.swapaxes(col_axis, 0)
         res = self._compute(x[self.index], fs)
