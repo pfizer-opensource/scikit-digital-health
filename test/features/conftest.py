@@ -32,7 +32,7 @@ class BaseTestFeature:
         truth = get_2d_truth(self.feature.__class__.__name__)
 
         try:
-            pred = self.feature.compute(acc, fs)
+            pred = self.feature.compute(acc, fs, axis=0)
         except TypeError:
             pred = self.feature.compute(acc, axis=0)
 
@@ -41,16 +41,22 @@ class BaseTestFeature:
     def test_3d_ndarray(self, fs, win_acc, get_3d_truth):
         truth = get_3d_truth(self.feature.__class__.__name__)
 
-        pred = self.feature.compute(win_acc, fs)
+        try:
+            pred = self.feature.compute(win_acc, fs, axis=1)
+        except TypeError:
+            pred = self.feature.compute(win_acc, axis=1)
 
         assert allclose(pred, truth)
 
     def test_dataframe(self, fs, df_acc, get_dataframe_truth):
-        df_truth = get_dataframe_truth(self.feature.__class__.__name__)
+        df_truth, cols = get_dataframe_truth(self.feature.__class__.__name__)
 
-        df_pred = self.feature.compute(df_acc, fs)
+        try:
+            df_pred = self.feature.compute(df_acc, fs)
+        except TypeError:
+            df_pred = self.feature.compute(df_acc)
 
-        assert_frame_equal(df_pred, df_truth)
+        assert allclose(df_pred, df_truth)
 
 
 @fixture(scope='package')
@@ -163,7 +169,7 @@ def get_dataframe_truth():
         with h5py.File(path, 'r') as f:
             truth = f[name][()]
 
-        return DataFrame(data=truth, columns=[f'{name}_x', f'{name}_y', f'{name}_z'])
+        return truth, [f'{name}_x', f'{name}_y', f'{name}_z']
     return get_df
 
 
