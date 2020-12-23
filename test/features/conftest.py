@@ -6,6 +6,34 @@ import h5py
 
 from ..base_conftest import resolve_data_path
 
+from skimu.features.core2 import Feature
+
+
+class F1(Feature):
+    def __init__(self, p1=5, p2=10):
+        super().__init__(p1=p1, p2=p2)
+
+    def _compute(self):
+        pass
+
+
+class F2(Feature):
+    def __init__(self, p1=5, p2=10):
+        super().__init__(p1=p1, p2=p2)
+
+    def _compute(self):
+        pass
+
+
+class F3(Feature):
+    def __init__(self, p3=-135., p4='test'):
+        super().__init__(p3=p3, p4=p4)
+
+    def _compute(self):
+        pass
+
+
+
 
 SAMPLE_DATA_PATH = resolve_data_path('sample_accelerometer.h5', 'features')
 FEATURES_TRUTH_PATH = resolve_data_path('features_truth.h5', 'features')
