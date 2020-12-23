@@ -43,6 +43,11 @@ class Bank:
 
     Examples
     --------
+    >>> fb = Bank()
+    >>> # add features to the bank
+    >>> fb.add([Mean(), Range()])
+    >>> # add specific axes to the bank
+    >>>
     """
     __slots__ = "_feat_list", "_n_feats", "_eq_idx"
 
@@ -230,9 +235,9 @@ class Bank:
             else:
                 n_feats.append(ft.n)
 
-        x.swapaxes((col_axis, axis), (-2, -1))
+        x.swapaxes((col_axis, axis), (0, -1))  # want the column axis to be first
         shape = x.shape
-        shape[-2] = sum(n_feats)
+        shape[0] = sum(n_feats)
 
         feats = zeros(shape[:-1])
         feat_cols = [] if columns is not None else None
@@ -240,14 +245,14 @@ class Bank:
         idx = 0  # keep track of where the features are being inserted
 
         for i, ft in enumerate(self._feat_list):
-            feats[..., idx:idx + n_feats[i]] = ft._compute(x, fs)
+            feats[idx:idx + n_feats[i]] = ft._compute(x[ft.index], fs)
 
             if feat_cols is not None:
                 feat_cols.extend(ft._get_cols(columns))
 
             idx += n_feats[i]
         # swap back
-        x.swapaxes(col_axis, -1)  # last index is currently the column index
+        x.swapaxes(col_axis, 0)  # last index is currently the column index
 
         if feat_cols is not None:
             return feats, feat_cols
