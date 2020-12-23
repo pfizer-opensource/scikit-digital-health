@@ -365,7 +365,7 @@ class Feature(ABC):
             axis = axis if axis >= 0 else x.ndim + axis
             col_axis = col_axis if col_axis >= 0 else x.ndim + col_axis
             # if 2d, get the col_axis based on axis
-            col_axis = col_axis if x.ndim > 2 else 1 - axis
+            col_axis = col_axis if x.ndim > 2 else 0
 
         if x.ndim == 1:
             res = self._compute(x, fs)
