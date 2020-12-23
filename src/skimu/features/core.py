@@ -337,13 +337,6 @@ class Feature:
         if self._result is not None:
             return
 
-    def _compute2(self, x, fs):
-        # if the result is already defined, don't need to compute again. Note that if calling from
-        # the public Feature.compute() method, _result is automatically set to None for
-        # re-computation each time it is called
-        if self._result is not None:
-            return
-
     # FUNCTIONALITY METHODS
     def __eq__(self, other):
         if isinstance(other, type(self)):
