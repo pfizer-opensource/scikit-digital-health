@@ -237,7 +237,9 @@ class Bank:
             else:
                 n_feats.append(ft.n)
 
-        x.swapaxes((col_axis, axis), (0, -1))  # want the column axis to be first
+        # move the axis array to the end (for C-storage when copied in extensions)
+        x = x.swapaxes(axis, -1)
+        x = x.swapaxes(col_axis, 0)  # move column axis first for easy indexing
         shape = x.shape
         shape[0] = sum(n_feats)
 
@@ -253,8 +255,8 @@ class Bank:
                 feat_cols.extend(ft._get_cols(columns))
 
             idx += n_feats[i]
-        # swap back
-        x.swapaxes(col_axis, 0)  # last index is currently the column index
+        # swap back the features
+        feats = feats.swapaxes(col_axis, 0)
 
         if feat_cols is not None:
             return feats, feat_cols
@@ -365,10 +367,32 @@ class Feature(ABC):
             # if 2d, get the col_axis based on axis
             col_axis = col_axis if x.ndim > 2 else 1 - axis
 
-        x.swapaxes((col_axis, axis), (0, -1))
+        x = x.swapaxes(axis, -1)
+        x = x.swapaxes(col_axis, 0)
         res = self._compute(x[self.index], fs)
+        """
+        If only 1 dimension was lost, swap the column axis
+        If more than 1 dimension was lost, then the indexing operation was what got rid of an axis
+        so we don't need to swap anything
+        
+        signal.shape -> (100, 300, 3)
+        axis -> 1
+        col_axis -> 2
+        x.shape -> (3, 100, 300)
+        
+        EX
+        index -> 0
+        x[index].shape -> (100, 300)
+        res.shape -> (100,)
+        
+        EX2
+        index -> ...
+        x[index].shape -> (3, 100, 300)
+        res.shape -> (3, 100)
+        res.swapaxes -> (100, 3) :: matches signal shape order
+        """
         if res.ndim == x.ndim - 1:
-            res.swap(col_axis, 0)
+            res = res.swapaxes(col_axis, 0)
 
         return res
 
