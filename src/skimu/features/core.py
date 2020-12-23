@@ -215,8 +215,8 @@ class Bank:
                     f"signal ({type(signal)}) cannot be converted to an array") from e
 
             # standardize the axis and column axis arguments
-            axis = axis if axis >= 0 else x.ndim - axis
-            col_axis = col_axis if col_axis >= 0 else x.ndim - col_axis
+            axis = axis if axis >= 0 else x.ndim + axis
+            col_axis = col_axis if col_axis >= 0 else x.ndim + col_axis
             # if 2d, get the col_axis based on axis
             col_axis = col_axis if x.ndim > 2 else 1 - axis
 
@@ -362,8 +362,8 @@ class Feature(ABC):
         else:
             x = asarray(signal, dtype=float_)
             # standardize the axis and column axis arguments
-            axis = axis if axis >= 0 else x.ndim - axis
-            col_axis = col_axis if col_axis >= 0 else x.ndim - col_axis
+            axis = axis if axis >= 0 else x.ndim + axis
+            col_axis = col_axis if col_axis >= 0 else x.ndim + col_axis
             # if 2d, get the col_axis based on axis
             col_axis = col_axis if x.ndim > 2 else 1 - axis
 
