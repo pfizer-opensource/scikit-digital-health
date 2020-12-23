@@ -2,56 +2,20 @@ import inspect
 
 import pytest
 from numpy import random
-import pandas as pd
 
 from skimu.features import *
 from skimu.features import lib
-from skimu.features.core import NotAFeatureError
-from skimu.features.utility import standardize_signal, InputTypeError
-from skimu.utility import DimensionError
 
 
-class TestStandardizeSignal:
-    def test_dataframe(self):
-        df = pd.DataFrame(data=random.rand(500, 3), columns=['x', 'y', 'z'])
-
-        # test with windowing
-        res, cols = standardize_signal(df, windowed=False, window_length=50, step=50, columns=None)
-        assert res.shape == (10, 50, 3)
-
-        # test with windowing and columns
-        c = ['x', 'z']
-        res, cols = standardize_signal(df, windowed=False, window_length=50, step=50, columns=c)
-        assert res.shape == (10, 50, 2)
-        assert cols == c
-
-        # test without windowing
-        res, cols = standardize_signal(df, windowed=True, columns=None)
-        assert res.shape == (500, 3, 1)
-
-        # test without windowing with columns
-        res, cols = standardize_signal(df, windowed=True, columns=c)
-        assert res.shape == (500, 2, 1)
-        assert cols == c
-
-    def test_dim_error(self):
-        with pytest.raises(DimensionError):
-            standardize_signal(random.rand(5, 3, 3, 10), True, None, None, None)
-
-    def test_input_error(self):
-        with pytest.raises(InputTypeError):
-            standardize_signal([1, 2, 3], False, None, None, None)
-
-
-class TestFeatureEquivalence:
+class _TestFeatureEquivalence:
     @pytest.mark.parametrize(
         ('f1', 'f2'),
         (
                 (Mean(), Mean()),
                 (DominantFrequency(low_cutoff=0.0, high_cutoff=12.0),
                  DominantFrequency(low_cutoff=0.0, high_cutoff=12.0)),
-                (JerkMetric(normalize=True), JerkMetric(normalize=True)),
-                (Kurtosis()['x', 'y'], Kurtosis()['z'])
+                (JerkMetric(), JerkMetric()),
+                (Kurtosis()[[0, 1]], Kurtosis()[0, 1])
         )
     )
     def test(self, f1, f2):
@@ -91,7 +55,7 @@ class TestFeatureEquivalence:
         kw = {}
 
         for i, arg in enumerate(spec.args[1:]):
-            kw[arg] = TestFeatureEquivalence.rand(
+            kw[arg] = _TestFeatureEquivalence.rand(
                 spec.defaults[i],
                 arg,
                 feat
@@ -99,8 +63,7 @@ class TestFeatureEquivalence:
 
         return kw
 
-    @staticmethod
-    def rand(like_type, arg, feat):
+    def rand(self, like_type, arg, feat):
         if isinstance(like_type, int):
             return random.randint(0, 10)
         elif isinstance(like_type, float):
@@ -115,64 +78,13 @@ class TestFeatureEquivalence:
         else:
             raise ValueError(f"can't deal with type {type(like_type)} for {feat!r}")
 
-    @staticmethod
-    def change_kwarg(kw, key, feat):
+    def change_kwarg(self, kw, key, feat):
         kwargs = kw.copy()
 
         new = kwargs[key]
         while new == kwargs[key] and new is not None:
-            new = TestFeatureEquivalence.rand(kwargs[key], key, feat)
+            new = self.rand(kwargs[key], key, feat)
 
         kwargs[key] = new
 
         return kwargs
-
-
-class TestDeferredFeature:
-    @pytest.mark.parametrize('f', lib.__all__)
-    def test_equivalence(self, f):
-        feature = getattr(lib, f)
-
-        df1 = DeferredFeature(feature(), ...)
-        df2 = DeferredFeature(feature(), ...)
-        f1 = feature()
-
-        assert df1 == df2
-        assert df1 == f1
-
-    @pytest.mark.parametrize(
-        ('f1', 'f2'),
-        (
-                (Mean(), JerkMetric()),
-                (DominantFrequency(), DetailPower())
-        )
-    )
-    def test_not_equal(self, f1, f2):
-        df1 = DeferredFeature(f1, ...)
-        df2 = DeferredFeature(f2, ...)
-
-        assert df1 != df2
-        assert df1 != f2
-        assert f1 != df2
-        # misc other testing
-        assert df1 != list()
-        assert df1 != dict()
-        assert df2 != list()
-        assert df2 != float()
-
-    def test_comp_index(self):
-        m = Mean()['xy', 'yz']
-
-        assert m.index == [0, 2]
-
-    def test_get_columns(self):
-        feat = DeferredFeature(Mean(), ...)
-
-        columns = feat.get_columns(['x', 'y'])
-
-        assert columns[0] == 'x_Mean()'
-        assert columns[1] == 'y_Mean()'
-
-    def test_parent_error(self):
-        with pytest.raises(NotAFeatureError):
-            DeferredFeature(list(), ...)
