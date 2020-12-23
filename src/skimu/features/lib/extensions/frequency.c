@@ -20,7 +20,7 @@ PyObject * dominant_frequency(PyObject *NPY_UNUSED(self), PyObject *args){
     double fs = 0., low_cut=0., hi_cut=12.;
     int fail = 0;
 
-    if (!PyArg_ParseTuple(args, "Olddd:dominant_frequency", &x_, &fs, &nfft, &low_cut, &hi_cut)) return NULL;
+    if (!PyArg_ParseTuple(args, "Odldd:dominant_frequency", &x_, &fs, &nfft, &low_cut, &hi_cut)) return NULL;
 
     if (fs <= 0.){
         PyErr_SetString(PyExc_ValueError, "Sampling frequency cannot be negative");
@@ -88,7 +88,7 @@ PyObject * dominant_frequency_value(PyObject *NPY_UNUSED(self), PyObject *args){
     double fs = 0., low_cut=0., hi_cut=12.;
     int fail = 0;
 
-    if (!PyArg_ParseTuple(args, "Olddd:dominant_frequency_value", &x_, &fs, &nfft, &low_cut, &hi_cut)) return NULL;
+    if (!PyArg_ParseTuple(args, "Odldd:dominant_frequency_value", &x_, &fs, &nfft, &low_cut, &hi_cut)) return NULL;
 
     if (fs <= 0.){
         PyErr_SetString(PyExc_ValueError, "Sampling frequency cannot be negative");
@@ -157,7 +157,7 @@ PyObject * power_spectral_sum(PyObject *NPY_UNUSED(self), PyObject *args){
     double fs = 0., low_cut=0., hi_cut=12.;
     int fail = 0;
 
-    if (!PyArg_ParseTuple(args, "Olddd:power_spectral_sum", &x_, &fs, &nfft, &low_cut, &hi_cut)) return NULL;
+    if (!PyArg_ParseTuple(args, "Odldd:power_spectral_sum", &x_, &fs, &nfft, &low_cut, &hi_cut)) return NULL;
 
     if (fs <= 0.){
         PyErr_SetString(PyExc_ValueError, "Sampling frequency cannot be negative");
@@ -226,7 +226,7 @@ PyObject * spectral_entropy(PyObject *NPY_UNUSED(self), PyObject *args){
     double fs = 0., low_cut=0., hi_cut=12.;
     int fail = 0;
 
-    if (!PyArg_ParseTuple(args, "Olddd:spectral_entropy", &x_, &fs, &nfft, &low_cut, &hi_cut)) return NULL;
+    if (!PyArg_ParseTuple(args, "Odldd:spectral_entropy", &x_, &fs, &nfft, &low_cut, &hi_cut)) return NULL;
 
     if (fs <= 0.){
         PyErr_SetString(PyExc_ValueError, "Sampling frequency cannot be negative");
@@ -295,7 +295,7 @@ PyObject * spectral_flatness(PyObject *NPY_UNUSED(self), PyObject *args){
     double fs = 0., low_cut=0., hi_cut=12.;
     int fail = 0;
 
-    if (!PyArg_ParseTuple(args, "Olddd:spectral_flatness", &x_, &fs, &nfft, &low_cut, &hi_cut)) return NULL;
+    if (!PyArg_ParseTuple(args, "Odldd:spectral_flatness", &x_, &fs, &nfft, &low_cut, &hi_cut)) return NULL;
 
     if (fs <= 0.){
         PyErr_SetString(PyExc_ValueError, "Sampling frequency cannot be negative");
