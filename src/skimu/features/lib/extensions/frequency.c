@@ -52,7 +52,7 @@ PyObject * dominant_frequency(PyObject *NPY_UNUSED(self), PyObject *args){
     free(rdims);
 
     // make sure that NFFT is large enough
-    long nfft_min = (long)pow(2, log((double)ddims[ndim-1]) / log(2.))
+    long nfft_min = (long)pow(2, log((double)ddims[ndim-1]) / log(2.));
     if (nfft < nfft_min) nfft = nfft_min;
 
     if (!res) fail = 1;
@@ -120,7 +120,7 @@ PyObject * dominant_frequency_value(PyObject *NPY_UNUSED(self), PyObject *args){
     free(rdims);
 
     // make sure that NFFT is large enough
-    long nfft_min = (long)pow(2, log((double)ddims[ndim-1]) / log(2.))
+    long nfft_min = (long)pow(2, log((double)ddims[ndim-1]) / log(2.));
     if (nfft < nfft_min) nfft = nfft_min;
 
     if (!res) fail = 1;
@@ -189,7 +189,7 @@ PyObject * power_spectral_sum(PyObject *NPY_UNUSED(self), PyObject *args){
     free(rdims);
 
     // make sure that NFFT is large enough
-    long nfft_min = (long)pow(2, log((double)ddims[ndim-1]) / log(2.))
+    long nfft_min = (long)pow(2, log((double)ddims[ndim-1]) / log(2.));
     if (nfft < nfft_min) nfft = nfft_min;
 
     if (!res) fail = 1;
@@ -258,7 +258,7 @@ PyObject * spectral_entropy(PyObject *NPY_UNUSED(self), PyObject *args){
     free(rdims);
 
     // make sure that NFFT is large enough
-    long nfft_min = (long)pow(2, log((double)ddims[ndim-1]) / log(2.))
+    long nfft_min = (long)pow(2, log((double)ddims[ndim-1]) / log(2.));
     if (nfft < nfft_min) nfft = nfft_min;
 
     if (!res) fail = 1;
@@ -327,7 +327,7 @@ PyObject * spectral_flatness(PyObject *NPY_UNUSED(self), PyObject *args){
     free(rdims);
 
     // make sure that NFFT is large enough
-    long nfft_min = (long)pow(2, log((double)ddims[ndim-1]) / log(2.))
+    long nfft_min = (long)pow(2, log((double)ddims[ndim-1]) / log(2.));
     if (nfft < nfft_min) nfft = nfft_min;
 
     if (!res) fail = 1;
