@@ -12,10 +12,12 @@ class TestBank:
     def set_up(self):
         bank = Bank(window_length=None, window_step=None)
 
-        bank + Mean()
-        bank + Range()[['x', 'z']]
-        bank + JerkMetric(normalize=True)
-        bank + Range()['y']
+        bank.add([
+            Mean(),
+            Range()[[0, 2]],
+            JerkMetric(),
+            Range()[1]
+        ])
 
         return bank
 
