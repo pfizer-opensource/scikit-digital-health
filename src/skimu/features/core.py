@@ -395,7 +395,7 @@ class Feature(ABC):
         res.shape -> (3, 100)
         res.swapaxes -> (100, 3) :: matches signal shape order
         """
-        if res.ndim == x.ndim - 1:
+        if res.ndim == x.ndim - 1 and res.ndim > 1:
             res = res.swapaxes(col_axis, 0)
 
         return res

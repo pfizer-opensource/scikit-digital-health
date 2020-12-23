@@ -6,34 +6,6 @@ import h5py
 
 from ..base_conftest import resolve_data_path
 
-from skimu.features.core import Feature
-
-
-class F1(Feature):
-    def __init__(self, p1=5, p2=10):
-        super().__init__(p1=p1, p2=p2)
-
-    def _compute(self):
-        pass
-
-
-class F2(Feature):
-    def __init__(self, p1=5, p2=10):
-        super().__init__(p1=p1, p2=p2)
-
-    def _compute(self):
-        pass
-
-
-class F3(Feature):
-    def __init__(self, p3=-135., p4='test'):
-        super().__init__(p3=p3, p4=p4)
-
-    def _compute(self):
-        pass
-
-
-
 
 SAMPLE_DATA_PATH = resolve_data_path('sample_accelerometer.h5', 'features')
 FEATURES_TRUTH_PATH = resolve_data_path('features_truth.h5', 'features')
@@ -41,32 +13,40 @@ FEATURES_TRUTH_PATH = resolve_data_path('features_truth.h5', 'features')
 
 class BaseTestFeature:
     def test_1d_ndarray(self, fs, x, y, z, get_1d_truth):
-        x_truth, y_truth, z_truth = get_1d_truth(self.feature._name)
+        x_truth, y_truth, z_truth = get_1d_truth(self.feature.__class__.__name__)
 
-        x_pred = self.feature.compute(x, fs)
-        y_pred = self.feature.compute(y, fs)
-        z_pred = self.feature.compute(z, fs)
+        try:
+            x_pred = self.feature.compute(x, fs)
+            y_pred = self.feature.compute(y, fs)
+            z_pred = self.feature.compute(z, fs)
+        except TypeError:
+            x_pred = self.feature.compute(x)
+            y_pred = self.feature.compute(y)
+            z_pred = self.feature.compute(z)
 
         assert allclose(x_pred, x_truth)
         assert allclose(y_pred, y_truth)
         assert allclose(z_pred, z_truth)
 
     def test_2d_ndarray(self, fs, acc, get_2d_truth):
-        truth = get_2d_truth(self.feature._name)
+        truth = get_2d_truth(self.feature.__class__.__name__)
 
-        pred = self.feature.compute(acc, fs)
+        try:
+            pred = self.feature.compute(acc, fs)
+        except TypeError:
+            pred = self.feature.compute(acc, axis=0)
 
         assert allclose(pred, truth)
 
     def test_3d_ndarray(self, fs, win_acc, get_3d_truth):
-        truth = get_3d_truth(self.feature._name)
+        truth = get_3d_truth(self.feature.__class__.__name__)
 
         pred = self.feature.compute(win_acc, fs)
 
         assert allclose(pred, truth)
 
     def test_dataframe(self, fs, df_acc, get_dataframe_truth):
-        df_truth = get_dataframe_truth(self.feature._name)
+        df_truth = get_dataframe_truth(self.feature.__class__.__name__)
 
         df_pred = self.feature.compute(df_acc, fs)
 
