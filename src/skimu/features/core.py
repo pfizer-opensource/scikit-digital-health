@@ -355,10 +355,13 @@ class Feature(ABC):
         fs = float(fs)
 
         # make sure it is an array
-        if isinstance(signal, DataFrame) and columns is not None:
-            x = signal[columns].values.astype(float_)
+        if isinstance(signal, DataFrame):
+            if columns is not None:
+                x = signal[columns].values.astype(float_)
+            else:
+                x = signal.values.astype(float_)
             axis = 0
-            col_axis = 1
+            col_axis = 0  # needs to be the same to avoid swapping and undoing a previous swap
         else:
             x = asarray(signal, dtype=float_)
             # standardize the axis and column axis arguments
