@@ -6,7 +6,7 @@ import h5py
 
 from ..base_conftest import resolve_data_path
 
-from skimu.features.core2 import Feature
+from skimu.features.core import Feature
 
 
 class F1(Feature):

@@ -1,6 +1,6 @@
 import pytest
 
-from skimu.features.core2 import Feature
+from skimu.features.core import Feature
 
 from .conftest import F1, F2, F3
 
