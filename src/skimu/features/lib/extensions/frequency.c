@@ -4,12 +4,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
-extern void dominant_freq_1d(long *, double *, long *, double *, double *, double *, double *);
-extern void dominant_freq_value_1d(long *, double *, long *, double *, double *, double *, double *);
-extern void power_spectral_sum_1d(long *, double *, long *, double *, double *, double *, double *);
-extern void spectral_entropy_1d(long *, double *, long *, double *, double *, double *, double *);
-extern void spectral_flatness_1d(long *, double *, long *, double *, double *, double *, double *);
+extern void dominant_freq_1d(long *, double *, double *, long *, double *, double *, double *);
+extern void dominant_freq_value_1d(long *, double *, double *, long *, double *, double *, double *);
+extern void power_spectral_sum_1d(long *, double *, double *, long *, double *, double *, double *);
+extern void spectral_entropy_1d(long *, double *, double *, long *, double *, double *, double *);
+extern void spectral_flatness_1d(long *, double *, double *, long *, double *, double *, double *);
 extern void destroy_plan(void);
 
 
@@ -19,7 +20,7 @@ PyObject * dominant_frequency(PyObject *NPY_UNUSED(self), PyObject *args){
     double fs = 0., low_cut=0., hi_cut=12.;
     int fail = 0;
 
-    if (!PyArg_ParseTuple(args, "Olddd:dominant_frequency", &x_, &nfft, &fs, &low_cut, &hi_cut)) return NULL;
+    if (!PyArg_ParseTuple(args, "Olddd:dominant_frequency", &x_, &fs, &nfft, &low_cut, &hi_cut)) return NULL;
 
     if (fs <= 0.){
         PyErr_SetString(PyExc_ValueError, "Sampling frequency cannot be negative");
@@ -50,6 +51,10 @@ PyObject * dominant_frequency(PyObject *NPY_UNUSED(self), PyObject *args){
     PyArrayObject *res = (PyArrayObject *)PyArray_Empty(ndim-1, rdims, PyArray_DescrFromType(NPY_DOUBLE), 0);
     free(rdims);
 
+    // make sure that NFFT is large enough
+    long nfft_min = (long)pow(2, log((double)ddims[ndim-1]) / log(2.))
+    if (nfft < nfft_min) nfft = nfft_min;
+
     if (!res) fail = 1;
     if (!fail){
         double *dptr = (double *)PyArray_DATA(data);
@@ -59,7 +64,7 @@ PyObject * dominant_frequency(PyObject *NPY_UNUSED(self), PyObject *args){
         int nrepeats = PyArray_SIZE(data) / stride;
 
         for (int i = 0; i < nrepeats; ++i){
-            dominant_freq_1d(&stride, dptr, &nfft, &fs, &low_cut, &hi_cut, rptr);
+            dominant_freq_1d(&stride, dptr, &fs, &nfft, &low_cut, &hi_cut, rptr);
             dptr += stride;
             rptr ++;
         }
@@ -83,7 +88,7 @@ PyObject * dominant_frequency_value(PyObject *NPY_UNUSED(self), PyObject *args){
     double fs = 0., low_cut=0., hi_cut=12.;
     int fail = 0;
 
-    if (!PyArg_ParseTuple(args, "Olddd:dominant_frequency_value", &x_, &nfft, &fs, &low_cut, &hi_cut)) return NULL;
+    if (!PyArg_ParseTuple(args, "Olddd:dominant_frequency_value", &x_, &fs, &nfft, &low_cut, &hi_cut)) return NULL;
 
     if (fs <= 0.){
         PyErr_SetString(PyExc_ValueError, "Sampling frequency cannot be negative");
@@ -114,6 +119,10 @@ PyObject * dominant_frequency_value(PyObject *NPY_UNUSED(self), PyObject *args){
     PyArrayObject *res = (PyArrayObject *)PyArray_Empty(ndim-1, rdims, PyArray_DescrFromType(NPY_DOUBLE), 0);
     free(rdims);
 
+    // make sure that NFFT is large enough
+    long nfft_min = (long)pow(2, log((double)ddims[ndim-1]) / log(2.))
+    if (nfft < nfft_min) nfft = nfft_min;
+
     if (!res) fail = 1;
     if (!fail){
         double *dptr = (double *)PyArray_DATA(data);
@@ -123,7 +132,7 @@ PyObject * dominant_frequency_value(PyObject *NPY_UNUSED(self), PyObject *args){
         int nrepeats = PyArray_SIZE(data) / stride;
 
         for (int i = 0; i < nrepeats; ++i){
-            dominant_freq_value_1d(&stride, dptr, &nfft, &fs, &low_cut, &hi_cut, rptr);
+            dominant_freq_value_1d(&stride, dptr, &fs, &nfft, &low_cut, &hi_cut, rptr);
             dptr += stride;
             rptr ++;
         }
@@ -148,7 +157,7 @@ PyObject * power_spectral_sum(PyObject *NPY_UNUSED(self), PyObject *args){
     double fs = 0., low_cut=0., hi_cut=12.;
     int fail = 0;
 
-    if (!PyArg_ParseTuple(args, "Olddd:power_spectral_sum", &x_, &nfft, &fs, &low_cut, &hi_cut)) return NULL;
+    if (!PyArg_ParseTuple(args, "Olddd:power_spectral_sum", &x_, &fs, &nfft, &low_cut, &hi_cut)) return NULL;
 
     if (fs <= 0.){
         PyErr_SetString(PyExc_ValueError, "Sampling frequency cannot be negative");
@@ -179,6 +188,10 @@ PyObject * power_spectral_sum(PyObject *NPY_UNUSED(self), PyObject *args){
     PyArrayObject *res = (PyArrayObject *)PyArray_Empty(ndim-1, rdims, PyArray_DescrFromType(NPY_DOUBLE), 0);
     free(rdims);
 
+    // make sure that NFFT is large enough
+    long nfft_min = (long)pow(2, log((double)ddims[ndim-1]) / log(2.))
+    if (nfft < nfft_min) nfft = nfft_min;
+
     if (!res) fail = 1;
     if (!fail){
         double *dptr = (double *)PyArray_DATA(data);
@@ -188,7 +201,7 @@ PyObject * power_spectral_sum(PyObject *NPY_UNUSED(self), PyObject *args){
         int nrepeats = PyArray_SIZE(data) / stride;
 
         for (int i = 0; i < nrepeats; ++i){
-            power_spectral_sum_1d(&stride, dptr, &nfft, &fs, &low_cut, &hi_cut, rptr);
+            power_spectral_sum_1d(&stride, dptr, &fs, &nfft, &low_cut, &hi_cut, rptr);
             dptr += stride;
             rptr ++;
         }
@@ -213,7 +226,7 @@ PyObject * spectral_entropy(PyObject *NPY_UNUSED(self), PyObject *args){
     double fs = 0., low_cut=0., hi_cut=12.;
     int fail = 0;
 
-    if (!PyArg_ParseTuple(args, "Olddd:spectral_entropy", &x_, &nfft, &fs, &low_cut, &hi_cut)) return NULL;
+    if (!PyArg_ParseTuple(args, "Olddd:spectral_entropy", &x_, &fs, &nfft, &low_cut, &hi_cut)) return NULL;
 
     if (fs <= 0.){
         PyErr_SetString(PyExc_ValueError, "Sampling frequency cannot be negative");
@@ -244,6 +257,10 @@ PyObject * spectral_entropy(PyObject *NPY_UNUSED(self), PyObject *args){
     PyArrayObject *res = (PyArrayObject *)PyArray_Empty(ndim-1, rdims, PyArray_DescrFromType(NPY_DOUBLE), 0);
     free(rdims);
 
+    // make sure that NFFT is large enough
+    long nfft_min = (long)pow(2, log((double)ddims[ndim-1]) / log(2.))
+    if (nfft < nfft_min) nfft = nfft_min;
+
     if (!res) fail = 1;
     if (!fail){
         double *dptr = (double *)PyArray_DATA(data);
@@ -253,7 +270,7 @@ PyObject * spectral_entropy(PyObject *NPY_UNUSED(self), PyObject *args){
         int nrepeats = PyArray_SIZE(data) / stride;
 
         for (int i = 0; i < nrepeats; ++i){
-            spectral_entropy_1d(&stride, dptr, &nfft, &fs, &low_cut, &hi_cut, rptr);
+            spectral_entropy_1d(&stride, dptr, &fs, &nfft, &low_cut, &hi_cut, rptr);
             dptr += stride;
             rptr ++;
         }
@@ -278,7 +295,7 @@ PyObject * spectral_flatness(PyObject *NPY_UNUSED(self), PyObject *args){
     double fs = 0., low_cut=0., hi_cut=12.;
     int fail = 0;
 
-    if (!PyArg_ParseTuple(args, "Olddd:spectral_flatness", &x_, &nfft, &fs, &low_cut, &hi_cut)) return NULL;
+    if (!PyArg_ParseTuple(args, "Olddd:spectral_flatness", &x_, &fs, &nfft, &low_cut, &hi_cut)) return NULL;
 
     if (fs <= 0.){
         PyErr_SetString(PyExc_ValueError, "Sampling frequency cannot be negative");
@@ -309,6 +326,10 @@ PyObject * spectral_flatness(PyObject *NPY_UNUSED(self), PyObject *args){
     PyArrayObject *res = (PyArrayObject *)PyArray_Empty(ndim-1, rdims, PyArray_DescrFromType(NPY_DOUBLE), 0);
     free(rdims);
 
+    // make sure that NFFT is large enough
+    long nfft_min = (long)pow(2, log((double)ddims[ndim-1]) / log(2.))
+    if (nfft < nfft_min) nfft = nfft_min;
+
     if (!res) fail = 1;
     if (!fail){
         double *dptr = (double *)PyArray_DATA(data);
@@ -318,7 +339,7 @@ PyObject * spectral_flatness(PyObject *NPY_UNUSED(self), PyObject *args){
         int nrepeats = PyArray_SIZE(data) / stride;
 
         for (int i = 0; i < nrepeats; ++i){
-            spectral_flatness_1d(&stride, dptr, &nfft, &fs, &low_cut, &hi_cut, rptr);
+            spectral_flatness_1d(&stride, dptr, &fs, &nfft, &low_cut, &hi_cut, rptr);
             dptr += stride;
             rptr ++;
         }

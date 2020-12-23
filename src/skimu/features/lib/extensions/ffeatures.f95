@@ -268,7 +268,7 @@ end subroutine
 !     Output
 !     df : real(double)
 ! --------------------------------------------------------------------
-subroutine dominant_freq_1d(n, x, nfft, fs, low_cut, hi_cut, df) bind(C, name="dominant_freq_1d")
+subroutine dominant_freq_1d(n, x, fs, nfft, low_cut, hi_cut, df) bind(C, name="dominant_freq_1d")
     use, intrinsic :: iso_c_binding
     use real_fft, only : execute_real_forward
     implicit none
@@ -320,7 +320,7 @@ end subroutine
 !     Output
 !     dfval : real(double)
 ! --------------------------------------------------------------------
-subroutine dominant_freq_value_1d(n, x, nfft, fs, low_cut, hi_cut, dfval) bind(C, name="dominant_freq_value_1d")
+subroutine dominant_freq_value_1d(n, x, fs, nfft, low_cut, hi_cut, dfval) bind(C, name="dominant_freq_value_1d")
     use, intrinsic :: iso_c_binding
     use real_fft, only : execute_real_forward
     implicit none
@@ -370,7 +370,7 @@ end subroutine
 !     Output
 !     pss : real(double)
 ! --------------------------------------------------------------------
-subroutine power_spectral_sum_1d(n, x, nfft, fs, low_cut, hi_cut, pss) bind(C, name="power_spectral_sum_1d")
+subroutine power_spectral_sum_1d(n, x, fs, nfft, low_cut, hi_cut, pss) bind(C, name="power_spectral_sum_1d")
     use, intrinsic :: iso_c_binding
     use real_fft, only : execute_real_forward
     implicit none
@@ -430,7 +430,7 @@ end subroutine
 !     Output
 !     sEnt : real(double)
 ! --------------------------------------------------------------------
-subroutine spectral_entropy_1d(n, x, nfft, fs, low_cut, hi_cut, sEnt) bind(C, name="spectral_entropy_1d")
+subroutine spectral_entropy_1d(n, x, fs, nfft, low_cut, hi_cut, sEnt) bind(C, name="spectral_entropy_1d")
     use, intrinsic :: iso_c_binding
     use real_fft, only : execute_real_forward
     implicit none
@@ -483,7 +483,7 @@ end subroutine
 !     Output
 !     df : real(double)
 ! --------------------------------------------------------------------
-subroutine spectral_flatness_1d(n, x, nfft, fs, low_cut, hi_cut, sFlat) bind(C, name="spectral_flatness_1d")
+subroutine spectral_flatness_1d(n, x, fs, nfft, low_cut, hi_cut, sFlat) bind(C, name="spectral_flatness_1d")
     use, intrinsic :: iso_c_binding
     use real_fft, only : execute_real_forward
     use utility, only : gmean
