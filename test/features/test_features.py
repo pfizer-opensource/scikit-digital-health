@@ -40,16 +40,16 @@ class TestPermutationEntropy(BaseTestFeature):
 
 # FREQUENCY FEATURES
 class TestDominantFrequency(BaseTestFeature):
-    feature = DominantFrequency(low_cutoff=0.0, high_cutoff=12.0)
+    feature = DominantFrequency(nfft=128, low_cutoff=0.0, high_cutoff=12.0)
 
     @pytest.mark.parametrize('fs_', ([5], 'a', (10,)))
     def test_fs_error(self, fs_):
-        with pytest.raises(ValueError):
+        with pytest.raises((TypeError, ValueError)):
             self.feature.compute(None, fs_)
 
 
 class TestDominantFrequencyValue(BaseTestFeature):
-    feature = DominantFrequencyValue(low_cutoff=0.0, high_cutoff=12.0)
+    feature = DominantFrequencyValue(nfft=128, low_cutoff=0.0, high_cutoff=12.0)
 
 
 class TestPowerSpectralSum(BaseTestFeature):
