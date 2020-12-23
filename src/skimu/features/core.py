@@ -330,6 +330,7 @@ class Feature(ABC):
             raise ValueError("Index not understood")
 
     # PUBLIC METHODS
+    @abstractmethod
     def compute(self, signal, fs=1., *, axis=-1, col_axis=None, columns=None):
         """
         Compute the feature
