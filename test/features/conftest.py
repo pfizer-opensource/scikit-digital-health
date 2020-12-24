@@ -1,6 +1,5 @@
 from pytest import fixture
-from numpy import allclose, broadcast_to, zeros
-from pandas.testing import assert_frame_equal
+import numpy as np
 from pandas import DataFrame
 import h5py
 
@@ -24,9 +23,9 @@ class BaseTestFeature:
             y_pred = self.feature.compute(y)
             z_pred = self.feature.compute(z)
 
-        assert allclose(x_pred, x_truth)
-        assert allclose(y_pred, y_truth)
-        assert allclose(z_pred, z_truth)
+        assert np.allclose(x_pred, x_truth)
+        assert np.allclose(y_pred, y_truth)
+        assert np.allclose(z_pred, z_truth)
 
     def test_2d_ndarray(self, fs, acc, get_2d_truth):
         truth = get_2d_truth(self.feature.__class__.__name__)
@@ -36,7 +35,7 @@ class BaseTestFeature:
         except TypeError:
             pred = self.feature.compute(acc, axis=0)
 
-        assert allclose(pred, truth)
+        assert np.allclose(pred, truth)
 
     def test_3d_ndarray(self, fs, win_acc, get_3d_truth):
         truth = get_3d_truth(self.feature.__class__.__name__)
@@ -46,7 +45,7 @@ class BaseTestFeature:
         except TypeError:
             pred = self.feature.compute(win_acc, axis=1)
 
-        assert allclose(pred, truth)
+        assert np.allclose(pred, truth)
 
     def test_dataframe(self, fs, df_acc, get_dataframe_truth):
         df_truth, cols = get_dataframe_truth(self.feature.__class__.__name__)
@@ -56,7 +55,7 @@ class BaseTestFeature:
         except TypeError:
             df_pred = self.feature.compute(df_acc)
 
-        assert allclose(df_pred, df_truth)
+        assert np.allclose(df_pred, df_truth)
 
 
 @fixture(scope='package')
@@ -68,6 +67,62 @@ def fs():
     return ret
 
 
+@fixture(scope="package")
+def random_wave():
+    class RandomWave:
+        __slots__ = ("x", "y", "fs", "freq1", "freq2", "amp1", "amp2", "slope", "itcpt",
+                     "noise_amp", "axis")
+
+        def __init__(self, fs, ndim):
+            shape = (ndim,) * (ndim - 1)
+
+            self.fs = fs
+
+            self.freq1 = np.around(np.random.rand(*shape) * 5, 2)
+            self.freq2 = 5 + np.around(np.random.rand(*shape) * 5, 2)
+            self.amp1 = np.around(np.random.rand(*shape), 2)
+            self.amp2 = np.around(np.random.rand(*shape) * 0.5, 2)
+            self.slope = np.around(np.random.rand(*shape) * 0.15, 3)
+            self.itcpt = np.sign(np.random.rand(*shape) - 0.5) * np.around(np.random.rand(*shape), 3)
+
+            self.x = np.arange(0, 10 + 0.5 / fs, 1 / fs)[np.newaxis]
+
+            self.y = None
+            self.get_y()
+
+            self.axis = -1
+
+        def get_y(self):
+            nax = np.newaxis
+            p2 = 2 * np.pi
+
+            self.y = (self.amp1[..., nax] * np.sin(p2 * self.freq1[..., nax] * self.x)
+                      + self.amp2[..., nax] * np.sin(p2 * self.freq2[..., nax] * self.x)
+                      + self.slope[..., nax] * self.x + self.itcpt[..., nax])
+    return RandomWave
+
+
+@fixture
+def random_linear():
+    class Linear:
+        __slots__ = ("x", "y", "fs", "slope", "itcpt", "axis")
+
+        def __init__(self, fs, ndim):
+            shape = (ndim,) * (ndim - 1)
+
+            self.fs = fs
+            self.slope = np.around(np.random.rand(*shape) * 0.15, 3)
+            self.itcpt = np.sign(np.random.rand(*shape) - 0.5) * np.around(np.random.rand(*shape), 3)
+
+            self.x = np.arange(0, 10, 1 / fs)
+
+            self.y = self.slope[..., np.newaxis] * self.x + self.itcpt[..., np.newaxis]
+
+            self.axis = -1
+
+    return Linear
+
+    
 @fixture(scope='package')
 def x():
     path = SAMPLE_DATA_PATH
@@ -111,7 +166,7 @@ def win_acc():
         acc = f['Accelerometer'][()]
 
     # broadcast the acceleration into windows (with the same samples)
-    ret = broadcast_to(acc, (4, ) + acc.shape)
+    ret = np.broadcast_to(acc, (4, ) + acc.shape)
     return ret
 
 
@@ -157,7 +212,7 @@ def get_3d_truth():
         path = FEATURES_TRUTH_PATH
         with h5py.File(path, 'r') as f:
             truth = f[name][()].reshape((1, 3))
-        return broadcast_to(truth, (4, 3))
+        return np.broadcast_to(truth, (4, 3))
 
     return get_3d
 
@@ -181,7 +236,7 @@ def bank_2d_truth():
     bank + JerkMetric(normalize=True)
     bank + Range()['y']
     """
-    truth = zeros((1, 9))
+    truth = np.zeros((1, 9))
 
     path = FEATURES_TRUTH_PATH
     with h5py.File(path, 'r') as f:
