@@ -4,9 +4,6 @@ Different entropy measures
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
-from numpy import empty, arange, multiply, zeros, power, unique, log2
-from math import factorial
-
 from skimu.features.core import Feature
 from skimu.features.lib import extensions
 
@@ -14,9 +11,42 @@ __all__ = ['SignalEntropy', 'SampleEntropy', 'PermutationEntropy']
 
 
 class SignalEntropy(Feature):
-    """
+    r"""
     A Measure of the information contained in a signal. Also described as a measure of how
     surprising the outcome of a variable is.
+
+    Notes
+    -----
+    The entropy is estimated using the histogram of the input signal. Bin limits for the
+    histogram are defined per
+
+    .. math::
+
+        n_{bins} = ceil(\sqrt{N})
+        \delta = \frac{x_{max} - x_{min}}{N - 1}
+        bin_{min} = x_{min} - \frac{\delta}{2}
+        bin_{max} = x_{max} + \frac{\delta}{2}
+
+    where :math:`N` is the number of samples in the signal. Note that the data is standardized
+    before computing (using mean and standard deviation).
+
+    With the histogram, then the estimate of the entropy is computed per
+
+    .. math::
+
+        H_{est} = -\sum_{i=1}^kf(x_i)ln(f(x_i)) + ln(w) - bias
+        w = \frac{bin_{max} - bin_{min}}{n_{bins}}
+        bias = -\frac{n_{bins} - 1}{2N}
+
+    Because of the standardization before the histogram computation, the entropy
+    estimate is scaled again per
+
+    .. math:: H_{est} = exp(H_{est}**2) - 2
+
+    References
+    ----------
+    .. [1] Wallis, Kenneth. "A note on the calculation of entropy from histograms". 2006.
+    https://warwick.ac.uk/fac/soc/economics/staff/academic/wallis/publications/entropy.pdf
     """
     def __init__(self):
         super(SignalEntropy, self).__init__()
@@ -80,7 +110,7 @@ class SampleEntropy(Feature):
 
     References
     ----------
-    https://archive.physionet.org/physiotools/sampen/c/sampen.c
+    .. [1] https://archive.physionet.org/physiotools/sampen/c/sampen.c
     """
     def __init__(self, m=4, r=1.0):
         super(SampleEntropy, self).__init__(m=m, r=r)
