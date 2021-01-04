@@ -4,7 +4,7 @@ Features using wavelet transforms
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
-from numpy import zeros, ceil, log2, sort, sum, diff, sign
+from numpy import ndarray, zeros, ceil, log2, sort, sum, diff, sign
 import pywt
 
 from skimu.features.core import Feature
@@ -86,9 +86,14 @@ class DetailPower(Feature):
 
         N = sum(diff(sign(xr), axis=-1) > 0, axis=-1).astype(float)
         # ensure no 0 values to prevent divide by 0
-        N[N == 0] = 1e-4
+        if isinstance(N, ndarray):
+            N[N == 0] = 1e-4
+        else:
+            N = N if N != 0 else 1e-4
 
-        result = zeros((x.shape[0], x.shape[2]))
+        rshape = x.shape[:-1]
+
+        result = zeros(rshape)
         for i in range(lvls[0] - lvls[1] + 1):
             result += sum(cD[i]**2, axis=-1)
         return result / N
@@ -166,7 +171,7 @@ class DetailPowerRatio(Feature):
         # TODO test effect of mode on result
         cA, *cD = pywt.wavedec(x, self.wave, mode='symmetric', level=lvls[0], axis=-1)
 
-        result = zeros((x.shape[0], x.shape[2]))
+        result = zeros(x.shape[:-1])
         for i in range(lvls[0] - lvls[1] + 1):
             result += sum(cD[i]**2, axis=-1)
 
