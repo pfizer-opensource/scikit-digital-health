@@ -413,6 +413,9 @@ class Feature(ABC):
     def _compute(self, x, fs):
         pass
 
+    def _get_cols(self, columns):
+        return [f"{i}_{self!r}" if i != "" else f"{self!r}" for i in asarray(columns)[self.index]]
+
     def _get_columns(self, cols):
         cols = asarray(cols)[self.index]
 
