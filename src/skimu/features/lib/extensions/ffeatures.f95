@@ -630,8 +630,16 @@ subroutine range_count_1d(n, x, xmin, xmax, rcp) bind(C, name="range_count_1d")
     integer(c_long), intent(in) :: n
     real(c_double), intent(in) :: x(n), xmin, xmax
     real(c_double), intent(out) :: rcp
+    ! local
+    integer(c_long) :: i
 
-    rcp = count((x > xmin) .AND. (x < xmax)) / n
+    rcp = 0._c_double
+    do i=1, n
+        if ((x(i) >= xmin) .AND. (x(i) < xmax)) then
+            rcp = rcp + 1._c_double
+        end if
+    end do
+    rcp = rcp / n
 
 end subroutine
 
