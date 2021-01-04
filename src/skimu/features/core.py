@@ -330,6 +330,8 @@ class Feature(ABC):
             self.n = 1
         elif isinstance(item, slice):
             self.n = -1
+        elif isinstance(item, type(Ellipsis)):
+            self.n = -1
         else:
             raise ValueError("Index not understood")
 
