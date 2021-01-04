@@ -76,13 +76,15 @@ def get_gait_classification_lgbm(gait_pred, accel, fs):
 
         # window, data will already be in c-contiguous layout
         accel_w = get_windowed_view(accel_filt, wlen, wstep, ensure_c_contiguity=False)
+        # make sure its a size that works with the feature computation
+        accel_w = accel_w.reshape(accel_w.shape + (1,))
 
         # get the feature bank
         feat_bank = Bank()  # data is already windowed
         feat_bank.load(_resolve_path('skimu.gait.model', 'final_features.json'))
 
         # compute the features
-        accel_feats = feat_bank.compute(accel_w, fs=fs)
+        accel_feats = feat_bank.compute(accel_w, fs=fs, axis=1, col_axis=2)
 
         # load the classification model
         lgb_file = str(
