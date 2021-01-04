@@ -220,6 +220,10 @@ class Bank:
             # if 2d, get the col_axis based on axis
             col_axis = col_axis if x.ndim > 2 else 0
 
+        # move the axis array to the end (for C-storage when copied in extensions)
+        x = x.swapaxes(axis, -1)
+        x = x.swapaxes(col_axis, 0)  # move column axis first for easy indexing
+
         # get the number of features expected so the space can be allocated
         n_feats = []
         for ft in self._feat_list:
@@ -232,9 +236,6 @@ class Bank:
             else:
                 n_feats.append(ft.n)
 
-        # move the axis array to the end (for C-storage when copied in extensions)
-        x = x.swapaxes(axis, -1)
-        x = x.swapaxes(col_axis, 0)  # move column axis first for easy indexing
         shape = list(x.shape)  # change to allow for item assignment
         shape[0] = sum(n_feats)
         shape = tuple(shape)
