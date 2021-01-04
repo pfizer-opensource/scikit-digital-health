@@ -123,7 +123,7 @@ class Bank:
                 {
                     ft.__class__.__name__: {
                         "Parameters": ft._params,
-                        "index": idx
+                        "Index": idx
                     }
                 }
             )
