@@ -280,7 +280,8 @@ class Feature(ABC):
         s = self.__class__.__name__ + "("
         for key in self._params:
             s += f"{key}={self._params[key]!r}, "
-        s = s[:-2] + ")"
+        if len(self._params) > 0:
+            s = s[:-2] + ")"
         return s
 
     __slots__ = "_params", "index", "n"
@@ -327,6 +328,8 @@ class Feature(ABC):
             self.n = -1
         else:
             raise ValueError("Index not understood")
+
+        return self
 
     # PUBLIC METHODS
     @abstractmethod
