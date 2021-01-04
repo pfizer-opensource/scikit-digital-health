@@ -284,6 +284,8 @@ class Feature(ABC):
             s += f"{key}={self._params[key]!r}, "
         if len(self._params) > 0:
             s = s[:-2] + ")"
+        else:
+            s += ")"
         return s
 
     __slots__ = "_params", "index", "n"
