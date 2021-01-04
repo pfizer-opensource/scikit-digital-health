@@ -206,7 +206,7 @@ class Bank:
                 columns = signal.columns
             # set axis/col_axis
             axis = 0
-            col_axis = 1
+            col_axis = 0  # needs to be the same to avoid swapping and undoing a previous swap
         else:
             try:
                 x = atleast_2d(asarray(signal, dtype=float_))
@@ -218,7 +218,7 @@ class Bank:
             axis = axis if axis >= 0 else x.ndim + axis
             col_axis = col_axis if col_axis >= 0 else x.ndim + col_axis
             # if 2d, get the col_axis based on axis
-            col_axis = col_axis if x.ndim > 2 else 1 - axis
+            col_axis = col_axis if x.ndim > 2 else 0
 
         # make sure columns matches the shape
         if columns is not None:
