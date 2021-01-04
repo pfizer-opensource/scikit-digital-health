@@ -99,8 +99,6 @@ class TestMeanCrossRate:
         assert np.allclose(pred, truth)
 
 
-
-
 class TestStdDev(_BaseTestFeature):
     feature = StdDev()
 
@@ -120,6 +118,23 @@ class TestKurtosis(_BaseTestFeature):
 
     def get_truth(self, sig):
         return kurtosis(sig.y, axis=sig.axis, bias=False)
+
+
+# =========================
+#   Entropy Features
+# =========================
+class TestSignalEntropy:
+    feature = SignalEntropy()
+
+    @pytest.mark.parametrize("ndim", (1, 2, 3, 4, 5))
+    def test_nd(self, ndim):
+        shape = (ndim,) * (ndim - 1) + (500,)
+
+        x = (np.random.rand(*shape) < 0.5).astype(np.float_)
+
+        res = self.feature.compute(x)
+
+        assert True
 
 """
 import pytest
