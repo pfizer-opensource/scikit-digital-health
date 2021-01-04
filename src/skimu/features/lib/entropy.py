@@ -41,7 +41,7 @@ class SignalEntropy(Feature):
     Because of the standardization before the histogram computation, the entropy
     estimate is scaled again per
 
-    .. math:: H_{est} = exp(H_{est}**2) - 2
+    .. math:: H_{est} = exp(H_{est}^2) - 2
 
     References
     ----------
