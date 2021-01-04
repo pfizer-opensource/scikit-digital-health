@@ -34,6 +34,31 @@ class ArrayConversionError(Exception):
     pass
 
 
+def _normalize_axes(ndim, is_df, axis, col_axis):
+    """
+    Normalize the input axes.  This accounts for the col_axis not undoing the previous swap
+    """
+    if ndim == 2:
+        if is_df:
+            return 0, 0
+
+        ret_axis = axis if axis >= 0 else ndim + axis
+        return ret_axis, 0
+    else:
+        ret_axis = axis if axis >= 0 else ndim + axis
+        ret_caxis = col_axis if col_axis >= 0 else ndim + col_axis
+
+        """
+        If col_axis is equivalent to -1, the swap will be messed up because -1 is the axis dimension
+        after the first swap. Therefore, the actual column_axis we want to swap will be the 
+        axis that was swapped first.
+        """
+        if ret_caxis == ndim - 1:
+            ret_caxis = ret_axis
+
+        return ret_axis, ret_caxis
+
+
 class Bank:
     """
     A feature bank for ease in creating a table or pipeline of features to be computed.
@@ -204,9 +229,6 @@ class Bank:
             else:
                 x = atleast_2d(signal.values.astype(float_))
                 columns = signal.columns
-            # set axis/col_axis
-            axis = 0
-            col_axis = 0  # needs to be the same to avoid swapping and undoing a previous swap
         else:
             try:
                 x = atleast_2d(asarray(signal, dtype=float_))
@@ -214,11 +236,7 @@ class Bank:
                 raise ArrayConversionError(
                     f"signal ({type(signal)}) cannot be converted to an array") from e
 
-            # standardize the axis and column axis arguments
-            axis = axis if axis >= 0 else x.ndim + axis
-            col_axis = col_axis if col_axis >= 0 else x.ndim + col_axis
-            # if 2d, get the col_axis based on axis
-            col_axis = col_axis if x.ndim > 2 else 0
+        axis, col_axis = _normalize_axes(x.ndim, isinstance(signal, DataFrame), axis, col_axis)
 
         # move the axis array to the end (for C-storage when copied in extensions)
         x = x.swapaxes(axis, -1)
@@ -369,19 +387,14 @@ class Feature(ABC):
                 x = signal[columns].values.astype(float_)
             else:
                 x = signal.values.astype(float_)
-            axis = 0
-            col_axis = 0  # needs to be the same to avoid swapping and undoing a previous swap
         else:
             x = asarray(signal, dtype=float_)
-            # standardize the axis and column axis arguments
-            axis = axis if axis >= 0 else x.ndim + axis
-            col_axis = col_axis if col_axis >= 0 else x.ndim + col_axis
-            # if 2d, get the col_axis based on axis
-            col_axis = col_axis if x.ndim > 2 else 0
 
         if x.ndim == 1:
             res = self._compute(x, fs)
             return res
+
+        axis, col_axis = _normalize_axes(x.ndim, isinstance(signal, DataFrame), axis, col_axis)
 
         x = x.swapaxes(axis, -1)
         x = x.swapaxes(col_axis, 0)
