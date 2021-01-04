@@ -235,8 +235,9 @@ class Bank:
         # move the axis array to the end (for C-storage when copied in extensions)
         x = x.swapaxes(axis, -1)
         x = x.swapaxes(col_axis, 0)  # move column axis first for easy indexing
-        shape = x.shape
+        shape = list(x.shape)  # change to allow for item assignment
         shape[0] = sum(n_feats)
+        shape = tuple(shape)
 
         # make sure columns matches the shape
         if columns is not None:
