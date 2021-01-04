@@ -282,8 +282,8 @@ subroutine dominant_freq_1d(n, x, fs, nfft, low_cut, hi_cut, df) bind(C, name="d
     real(c_double) :: sp_hat(2 * nfft + 2), y(2 * nfft)
 
     ! find the cutoff indices for the high and low cutoffs
-    ihcut = floor(hi_cut / (fs / 2) * (nfft - 1) + 1, 8)
-    ilcut = ceiling(low_cut / (fs / 2) * (nfft - 1) + 1, 8)
+    ihcut = floor(hi_cut / (fs / 2) * (nfft - 1) + 1, c_long)
+    ilcut = ceiling(low_cut / (fs / 2) * (nfft - 1) + 1, c_long)
 
     if (ihcut > nfft) then
         ihcut = nfft
