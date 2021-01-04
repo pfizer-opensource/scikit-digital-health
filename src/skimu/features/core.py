@@ -220,11 +220,6 @@ class Bank:
             # if 2d, get the col_axis based on axis
             col_axis = col_axis if x.ndim > 2 else 0
 
-        # make sure columns matches the shape
-        if columns is not None:
-            if len(columns) != x.shape[col_axis]:
-                raise ValueError("Provided columns does not match signal col_axis shape.")
-
         # get the number of features expected so the space can be allocated
         n_feats = []
         for ft in self._feat_list:
@@ -242,6 +237,11 @@ class Bank:
         x = x.swapaxes(col_axis, 0)  # move column axis first for easy indexing
         shape = x.shape
         shape[0] = sum(n_feats)
+
+        # make sure columns matches the shape
+        if columns is not None:
+            if len(columns) != x.shape[col_axis]:
+                raise ValueError("Provided columns does not match signal col_axis shape.")
 
         feats = zeros(shape[:-1])
         feat_cols = [] if columns is not None else None
