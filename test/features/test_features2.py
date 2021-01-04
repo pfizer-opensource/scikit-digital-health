@@ -16,20 +16,10 @@ class _BaseTestFeature(ABC):
         pass
 
     @pytest.mark.parametrize("ndim", (1, 2, 3, 4, 5))
-    def test_nd(self, signal_nd, ndim):
-        shape = (ndim,) * (ndim - 1)
-        np.random.seed(5)
-
+    def test_nd(self, random_wave, ndim):
         fs = 100.
-        amp1 = np.around(np.random.rand(*shape), 2)
-        amp2 = np.around(np.random.rand(*shape) * 0.5, 2)
-        freq1 = np.around(np.random.rand(*shape) * 5, 2)
-        freq2 = 5 + np.around(np.random.rand(*shape) * 5, 2)
-        slope = np.around(np.random.rand(*shape) * 0.15, 3)
-        itcpt = -np.around(np.random.rand(*shape), 3)
-        noise_amp = np.zeros(shape)
 
-        signal = signal_nd(fs, freq1, freq2, amp1, amp2, slope, itcpt, noise_amp)
+        signal = random_wave(fs, ndim)
 
         truth = self.get_truth(signal)
 
