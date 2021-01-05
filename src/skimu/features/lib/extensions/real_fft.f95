@@ -78,16 +78,16 @@ contains
         ier = 0_c_long
         
         ! ensure proper power of 2 size
-        if (iand(n, n-1) .NE. 0) then
+        if (iand(n, n-1) /= 0_c_long) then
             print *, "N is not a power of 2"
             ier = -1_c_long
             return
         end if
         
-        if ((plan%length .NE. n) .OR. (plan%length == -1_c_long)) then
+        if ((plan%length /= n) .OR. (plan%length == -1_c_long)) then
             call make_rfftp_plan(n, ier)
         end if
-        if (ier .NE. 0) then
+        if (ier /= 0_c_long) then
             print *, "Error making plan"
             return
         end if
@@ -97,7 +97,7 @@ contains
         ret = 0._c_double
         ret(2:n+1) = x
         call rfftp_forward(n, ret(2:), fct, ier)
-        if (ier .NE. 0) then
+        if (ier /= 0_c_long) then
             print *, "Error calling rfftp_forward"
             return
         end if
@@ -150,24 +150,24 @@ contains
         p2 => ch
         
         do k1=1, nf
-            k = nf - k1 + 1
+            k = nf - k1 + 1_c_long
             ip = plan%fct(k)%fct
             ido = n / l1
             l1 = l1 / ip
             
-            if (ip .EQ. 4) then
+            if (ip == 4_c_long) then
                 call radf4(ido, l1, p1, p2, plan%fct(k)%tw)
-            else if (ip .EQ. 2) then
+            else if (ip == 2_c_long) then
                 call radf2(ido, l1, p1, p2, plan%fct(k)%tw)
             else
-                ier = -1
+                ier = -1_c_long
                 return
             end if
             
             ! swap which arrays the pointers point to
             nullify(p1)
             nullify(p2)
-            if (iand(iswap, 1_c_long) .NE. 0) then
+            if (iand(iswap, 1_c_long) /= 0) then
                 p1 => ch
                 p2 => x
             else
@@ -181,13 +181,13 @@ contains
         ! normalize
         !call copy_and_norm(x, p1, n, fct)
         if (.NOT. associated(p1, x)) then
-            if (fct .NE. 1._c_double) then
+            if (fct /= 1._c_double) then
                 x = fct * p1
             else
                 x = p1
             end if
         else
-            if (fct .NE. 1._c_double) then
+            if (fct /= 1._c_double) then
                 x = x * fct
             end if
         end if
@@ -351,7 +351,7 @@ contains
         end do
         
         call rfftp_factorize(ier)
-        if (ier .NE. 0) then
+        if (ier /= 0_c_long) then
             print *, "Error calling rfftp_factorize"
             return
         end if
@@ -366,7 +366,7 @@ contains
         plan%mem = 0._c_double
         
         call rfftp_comp_twiddle( length, ier)
-        if (ier .NE. 0) then
+        if (ier /= 0_c_long) then
             print *, "Error calling rfftp_comp_twiddle"
             return
         end if
@@ -432,7 +432,7 @@ contains
         real(c_double) :: p(0:2*n-1)
         integer(c_long) :: ndone, i, idx1, idx2
         
-        p = res + real(n, 8)
+        p = res + real(n, c_double)
         
         call calc_first_octant(ishft(n, 1), p)
         
@@ -449,7 +449,7 @@ contains
             idx2 = idx2 - 2
         end do
         
-        if (i .NE. ndone) then
+        if (i /= ndone) then
             res(idx1) = p(2 * i)
             res(idx1+1) = p(2 * i + 1)
         end if
@@ -475,24 +475,24 @@ contains
             res(2*i) = p(2*i4)
             res(2*i+1) = p(2*i4+1)
             
-            i = i + 1
-            i4 = i4 + 4
+            i = i + 1_c_long
+            i4 = i4 + 4_c_long
         end do
         do while (i4-in <= 0)  ! octant 1
             xm = in - i4
             res(2*i) = p(2*xm+1)
             res(2*i+1) = p(2*xm)
             
-            i = i + 1
-            i4 = i4 + 4
+            i = i + 1_c_long
+            i4 = i4 + 4_c_long
         end do
         do while (i4 <= 3 * in-i4)  ! octant 2
             xm = i4 - in
             res(2*i) = -p(2*xm+1)
             res(2*i+1) = p(2*xm)
             
-            i = i + 1
-            i4 = i4 + 4
+            i = i + 1_c_long
+            i4 = i4 + 4_c_long
         end do
         do while (i < ndone)
             xm = 2 * in - i4
@@ -562,7 +562,7 @@ contains
         res(1) = 0._c_double
         if (n == 1) return
         
-        l1 = int(sqrt(real(n, 8)))
+        l1 = int(sqrt(real(n, c_double)))
         
         do i=1, l1-1
             call my_sincosm1pi((2._c_double * i) / den, res(2 * i:2*i+1))
