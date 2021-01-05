@@ -4,8 +4,6 @@ Frequency based features
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
-from numpy import array
-
 from skimu.features.core import Feature
 from skimu.features.lib import extensions
 
@@ -20,8 +18,8 @@ class DominantFrequency(Feature):
 
     Parameters
     ----------
-    nfft : int, optional
-        Number of points in the FFT to use. Default is 1024.
+    padlevel : int, optional
+        Padding (factors of 2) to use in the FFT computation. Default is 2.
     low_cutoff : float, optional
         Low value of the frequency range to look in. Default is 0.0 Hz
     high_cutoff : float, optional
@@ -29,22 +27,22 @@ class DominantFrequency(Feature):
 
     Notes
     -----
-    While the `nfft` parameter allows specification of arbitrary points to be used in the FFT,
-    fastest results will be for powers of 2. Additionally, there is a minimum `nfft` defined as
+    The `padlevel` parameter effects the number of points to be used in the FFT computation by
+    factors of 2. The computation of number of points is per
 
-    .. math:: NFFT_{min} = 2^{log_2(N)}
+    .. math:: nfft = 2^{ceil(log_2(N)) + padlevel}
 
-    where `N` is the number of points in the computation axis. If `nfft` is set below this, it
-    will be automatically bumped up, without warning.
+    So `padlevel=2` would mean that for a signal with length 150, the number of points used
+    in the FFT would go from 256 to 1024.
     """
-    def __init__(self, nfft=1024, low_cutoff=0.0, high_cutoff=5.0):
+    def __init__(self, padlevel=2, low_cutoff=0.0, high_cutoff=5.0):
         super(DominantFrequency, self).__init__(
-            nfft=nfft,
+            padlevel=padlevel,
             low_cutoff=low_cutoff,
             high_cutoff=high_cutoff
         )
 
-        self.nfft = nfft
+        self.padlevel = padlevel
         self.low_cut = low_cutoff
         self.high_cut = high_cutoff
 
@@ -75,7 +73,7 @@ class DominantFrequency(Feature):
         return super().compute(signal, fs, axis=axis, col_axis=col_axis, columns=columns)
 
     def _compute(self, x, fs):
-        return extensions.dominant_frequency(x, fs, self.nfft, self.low_cut, self.high_cut)
+        return extensions.dominant_frequency(x, fs, self.padlevel, self.low_cut, self.high_cut)
 
 
 class DominantFrequencyValue(Feature):
@@ -84,8 +82,8 @@ class DominantFrequencyValue(Feature):
 
     Parameters
     ----------
-    nfft : int, optional
-        Number of points in the FFT to use. Default is 1024.
+    padlevel : int, optional
+        Padding (factors of 2) to use in the FFT computation. Default is 2.
     low_cutoff : float, optional
         Low value of the frequency range to look in. Default is 0.0 Hz
     high_cutoff : float, optional
@@ -93,22 +91,22 @@ class DominantFrequencyValue(Feature):
 
     Notes
     -----
-    While the `nfft` parameter allows specification of arbitrary points to be used in the FFT,
-    fastest results will be for powers of 2. Additionally, there is a minimum `nfft` defined as
+    The `padlevel` parameter effects the number of points to be used in the FFT computation by
+    factors of 2. The computation of number of points is per
 
-    .. math:: NFFT_{min} = 2^{log_2(N)}
+    .. math:: nfft = 2^{ceil(log_2(N)) + padlevel}
 
-    where `N` is the number of points in the computation axis. If `nfft` is set below this, it
-    will be automatically bumped up, without warning.
+    So `padlevel=2` would mean that for a signal with length 150, the number of points used
+    in the FFT would go from 256 to 1024.
     """
-    def __init__(self, nfft=1024, low_cutoff=0.0, high_cutoff=5.0):
+    def __init__(self, padlevel=2, low_cutoff=0.0, high_cutoff=5.0):
         super(DominantFrequencyValue, self).__init__(
-            nfft=nfft,
+            padlevel=padlevel,
             low_cutoff=low_cutoff,
             high_cutoff=high_cutoff
         )
 
-        self.nfft = nfft
+        self.padlevel = padlevel
         self.low_cut = low_cutoff
         self.high_cut = high_cutoff
 
@@ -139,7 +137,7 @@ class DominantFrequencyValue(Feature):
         return super().compute(signal, fs, axis=axis, col_axis=col_axis, columns=columns)
 
     def _compute(self, x, fs):
-        return extensions.dominant_frequency_value(x, fs, self.nfft, self.low_cut, self.high_cut)
+        return extensions.dominant_frequency_value(x, fs, self.padlevel, self.low_cut, self.high_cut)
 
 
 class PowerSpectralSum(Feature):
@@ -149,8 +147,8 @@ class PowerSpectralSum(Feature):
 
     Parameters
     ----------
-    nfft : int, optional
-        Number of points in the FFT to use. Default is 1024.
+    padlevel : int, optional
+        Padding (factors of 2) to use in the FFT computation. Default is 2.
     low_cutoff : float, optional
         Low value of the frequency range to look in. Default is 0.0 Hz
     high_cutoff : float, optional
@@ -158,22 +156,22 @@ class PowerSpectralSum(Feature):
 
     Notes
     -----
-    While the `nfft` parameter allows specification of arbitrary points to be used in the FFT,
-    fastest results will be for powers of 2. Additionally, there is a minimum `nfft` defined as
+    The `padlevel` parameter effects the number of points to be used in the FFT computation by
+    factors of 2. The computation of number of points is per
 
-    .. math:: NFFT_{min} = 2^{log_2(N)}
+    .. math:: nfft = 2^{ceil(log_2(N)) + padlevel}
 
-    where `N` is the number of points in the computation axis. If `nfft` is set below this, it
-    will be automatically bumped up, without warning.
+    So `padlevel=2` would mean that for a signal with length 150, the number of points used
+    in the FFT would go from 256 to 1024.
     """
-    def __init__(self, nfft=1024, low_cutoff=0.0, high_cutoff=5.0):
+    def __init__(self, padlevel=2, low_cutoff=0.0, high_cutoff=5.0):
         super(PowerSpectralSum, self).__init__(
-            nfft=nfft,
+            padlevel=padlevel,
             low_cutoff=low_cutoff,
             high_cutoff=high_cutoff
         )
 
-        self.nfft = nfft
+        self.padlevel = padlevel
         self.low_cut = low_cutoff
         self.high_cut = high_cutoff
 
@@ -204,7 +202,7 @@ class PowerSpectralSum(Feature):
         return super().compute(signal, fs, axis=axis, col_axis=col_axis, columns=columns)
 
     def _compute(self, x, fs):
-        return extensions.power_spectral_sum(x, fs, self.nfft, self.low_cut, self.high_cut)
+        return extensions.power_spectral_sum(x, fs, self.padlevel, self.low_cut, self.high_cut)
 
 
 class SpectralFlatness(Feature):
@@ -216,8 +214,8 @@ class SpectralFlatness(Feature):
 
     Parameters
     ----------
-    nfft : int, optional
-        Number of points in the FFT to use. Default is 1024.
+    padlevel : int, optional
+        Padding (factors of 2) to use in the FFT computation. Default is 2.
     low_cutoff : float, optional
         Low value of the frequency range to look in. Default is 0.0 Hz
     high_cutoff : float, optional
@@ -225,22 +223,22 @@ class SpectralFlatness(Feature):
 
     Notes
     -----
-    While the `nfft` parameter allows specification of arbitrary points to be used in the FFT,
-    fastest results will be for powers of 2. Additionally, there is a minimum `nfft` defined as
+    The `padlevel` parameter effects the number of points to be used in the FFT computation by
+    factors of 2. The computation of number of points is per
 
-    .. math:: NFFT_{min} = 2^{log_2(N)}
+    .. math:: nfft = 2^{ceil(log_2(N)) + padlevel}
 
-    where `N` is the number of points in the computation axis. If `nfft` is set below this, it
-    will be automatically bumped up, without warning.
+    So `padlevel=2` would mean that for a signal with length 150, the number of points used
+    in the FFT would go from 256 to 1024.
     """
-    def __init__(self, nfft=1024, low_cutoff=0.0, high_cutoff=5.0):
+    def __init__(self, padlevel=2, low_cutoff=0.0, high_cutoff=5.0):
         super(SpectralFlatness, self).__init__(
-            nfft=nfft,
+            padlevel=padlevel,
             low_cutoff=low_cutoff,
             high_cutoff=high_cutoff
         )
 
-        self.nfft = nfft
+        self.padlevel = padlevel
         self.low_cut = low_cutoff
         self.high_cut = high_cutoff
 
@@ -271,7 +269,7 @@ class SpectralFlatness(Feature):
         return super().compute(signal, fs, axis=axis, col_axis=col_axis, columns=columns)
 
     def _compute(self, x, fs):
-        return extensions.spectral_flatness(x, fs, self.nfft, self.low_cut, self.high_cut)
+        return extensions.spectral_flatness(x, fs, self.padlevel, self.low_cut, self.high_cut)
 
 
 class SpectralEntropy(Feature):
@@ -281,8 +279,8 @@ class SpectralEntropy(Feature):
 
     Parameters
     ----------
-    nfft : int, optional
-        Number of points in the FFT to use. Default is 1024.
+    padlevel : int, optional
+        Padding (factors of 2) to use in the FFT computation. Default is 2.
     low_cutoff : float, optional
         Low value of the frequency range to look in. Default is 0.0 Hz
     high_cutoff : float, optional
@@ -290,22 +288,22 @@ class SpectralEntropy(Feature):
 
     Notes
     -----
-    While the `nfft` parameter allows specification of arbitrary points to be used in the FFT,
-    fastest results will be for powers of 2. Additionally, there is a minimum `nfft` defined as
+    The `padlevel` parameter effects the number of points to be used in the FFT computation by
+    factors of 2. The computation of number of points is per
 
-    .. math:: nfft_{min} = 2^{log_2(N)}
+    .. math:: nfft = 2^{ceil(log_2(N)) + padlevel}
 
-    where `N` is the number of points in the computation axis. If `nfft` is set below this, it
-    will be automatically bumped up, without warning.
+    So `padlevel=2` would mean that for a signal with length 150, the number of points used
+    in the FFT would go from 256 to 1024.
     """
-    def __init__(self, nfft=1024, low_cutoff=0.0, high_cutoff=5.0):
+    def __init__(self, padlevel=2, low_cutoff=0.0, high_cutoff=5.0):
         super(SpectralEntropy, self).__init__(
-            nfft=nfft,
+            padlevel=padlevel,
             low_cutoff=low_cutoff,
             high_cutoff=high_cutoff
         )
 
-        self.nfft = nfft
+        self.padlevel = padlevel
         self.low_cut = low_cutoff
         self.high_cut = high_cutoff
 
@@ -336,4 +334,4 @@ class SpectralEntropy(Feature):
         return super().compute(signal, fs, axis=axis, col_axis=col_axis, columns=columns)
 
     def _compute(self, x, fs):
-        return extensions.spectral_entropy(x, fs, self.nfft, self.low_cut, self.high_cut)
+        return extensions.spectral_entropy(x, fs, self.padlevel, self.low_cut, self.high_cut)
