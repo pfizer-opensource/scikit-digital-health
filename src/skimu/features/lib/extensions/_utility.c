@@ -249,7 +249,6 @@ PyObject * cf_histogram(PyObject *NPY_UNUSED(self), PyObject *args){
 PyObject * cf_rfft(PyObject *NPY_UNUSED(self), PyObject *args){
     PyObject *x_;
     long nfft;
-    int fail = 0;
 
     if (!PyArg_ParseTuple(args, "Ol:dominant_frequency", &x_, &nfft)) return NULL;
 
@@ -268,23 +267,17 @@ PyObject * cf_rfft(PyObject *NPY_UNUSED(self), PyObject *args){
     npy_intp rdims[1] = {2 * nfft + 2};
 
     PyArrayObject *res = (PyArrayObject *)PyArray_EMPTY(1, rdims, NPY_DOUBLE, 0);
-
-    if (!res) fail = 1;
-    if (!fail){
-        double *dptr = (double *)PyArray_DATA(data);
-        double *rptr = (double *)PyArray_DATA(res);
-
-        long stride = ddims[0];
-
-        f_rfft(&stride, dptr, &nfft, rptr);
-    }
-    if (fail){
+    if (!res){
+        PyErr_SetString(PyExc_ValueError, "Failed to create results array.");
         Py_XDECREF(data);
-        Py_XDECREF(res);
         return NULL;
     }
+    double *dptr = (double *)PyArray_DATA(data);
+    double *rptr = (double *)PyArray_DATA(res);
+
+    f_rfft(&ddims[0], dptr, &nfft, rptr);
+
     Py_XDECREF(data);
-    // destroy the FFT plan created in the fortran module
     destroy_plan();
 
     return (PyObject *)res;
