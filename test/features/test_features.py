@@ -40,7 +40,7 @@ class TestPermutationEntropy(BaseTestFeature):
 
 # FREQUENCY FEATURES
 class TestDominantFrequency(BaseTestFeature):
-    feature = DominantFrequency(nfft=256, low_cutoff=0.0, high_cutoff=12.0)
+    feature = DominantFrequency(padlevel=0, low_cutoff=0.0, high_cutoff=12.0)
 
     @pytest.mark.parametrize('fs_', ([5], 'a', (10,)))
     def test_fs_error(self, fs_):
@@ -49,19 +49,19 @@ class TestDominantFrequency(BaseTestFeature):
 
 
 class TestDominantFrequencyValue(BaseTestFeature):
-    feature = DominantFrequencyValue(nfft=256, low_cutoff=0.0, high_cutoff=12.0)
+    feature = DominantFrequencyValue(padlevel=0, low_cutoff=0.0, high_cutoff=12.0)
 
 
 class TestPowerSpectralSum(BaseTestFeature):
-    feature = PowerSpectralSum(nfft=256, low_cutoff=0.0, high_cutoff=12.0)
+    feature = PowerSpectralSum(padlevel=0, low_cutoff=0.0, high_cutoff=12.0)
 
 
 class TestSpectralFlatness(BaseTestFeature):
-    feature = SpectralFlatness(nfft=256, low_cutoff=0.0, high_cutoff=12.0)
+    feature = SpectralFlatness(padlevel=0, low_cutoff=0.0, high_cutoff=12.0)
 
 
 class TestSpectralEntropy(BaseTestFeature):
-    feature = SpectralEntropy(nfft=256, low_cutoff=0.0, high_cutoff=12.0)
+    feature = SpectralEntropy(padlevel=0, low_cutoff=0.0, high_cutoff=12.0)
 
 
 # MISC FEATURES
