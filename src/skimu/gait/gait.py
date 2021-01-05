@@ -283,13 +283,15 @@ class Gait(_BaseProcess):
                 accel_ds[:, i] = interp(time_ds, time, accel[:, i])
 
             # get days if it exists, otherwise use the starts and end of the data
-            _days = asarray(kwargs.get(self._days, [[0, accel_ds.shape[0]]]))
+            _days = asarray(kwargs.get(self._days, [[0, accel.shape[0] - 1]]))
 
             days = zeros(asarray(_days).shape)
-            for i, day_idx in enumerate(days):
+            for i, day_idx in enumerate(_days):
                 i_guess = (day_idx * goal_fs / fs).astype(int) - 1000
+                i_guess[i_guess < 0] = 0
                 days[i, 0] = argmin(abs(time_ds[i_guess[0]:i_guess[0] + 2000] - time[day_idx[0]]))
                 days[i, 1] = argmin(abs(time_ds[i_guess[1]:i_guess[1] + 2000] - time[day_idx[1]]))
+                days[i] += i_guess  # make sure to add the starting index back in
         else:
             time_ds = time
             accel_ds = accel
