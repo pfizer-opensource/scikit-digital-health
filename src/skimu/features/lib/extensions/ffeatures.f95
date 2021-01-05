@@ -347,8 +347,6 @@ subroutine dominant_freq_value_1d(n, x, fs, nfft, low_cut, hi_cut, dfval) bind(C
     call execute_real_forward(2 * nfft, y, 1.0_c_double, sp_hat, ier)
 
     sp_norm = sp_hat(1:2 * nfft + 2:2)**2 + sp_hat(2:2 * nfft + 2:2)**2
-    print *, ilcut, ihcut, sum(sp_norm(ilcut:ihcut))
-    print *, sp_norm(:8)
     sp_norm = sp_norm / sum(sp_norm(ilcut:ihcut)) + 1.d-10
 
     ! find the maximum value
