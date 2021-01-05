@@ -295,7 +295,7 @@ subroutine dominant_freq_1d(n, x, fs, nfft, low_cut, hi_cut, df) bind(C, name="d
     call execute_real_forward(2 * nfft, y, 1.0_c_double, sp_hat, ier)
 
     sp_norm = sp_hat(1:2 * nfft + 2:2)**2 + sp_hat(2:2 * nfft + 2:2)**2
-    sp_norm = sp_norm / sum(sp_norm(ilcut:ihcut))
+    sp_norm = sp_norm / sum(sp_norm(ilcut:ihcut)) + 1.d-10
 
     ! find the maximum index
     imax = maxloc(sp_norm(ilcut:ihcut), dim=1) + ilcut - 1
@@ -347,7 +347,9 @@ subroutine dominant_freq_value_1d(n, x, fs, nfft, low_cut, hi_cut, dfval) bind(C
     call execute_real_forward(2 * nfft, y, 1.0_c_double, sp_hat, ier)
 
     sp_norm = sp_hat(1:2 * nfft + 2:2)**2 + sp_hat(2:2 * nfft + 2:2)**2
-    sp_norm = sp_norm / sum(sp_norm(ilcut:ihcut))
+    print *, ilcut, ihcut, sum(sp_norm(ilcut:ihcut))
+    print *, sp_norm(:8)
+    sp_norm = sp_norm / sum(sp_norm(ilcut:ihcut)) + 1.d-10
 
     ! find the maximum value
     dfval = maxval(sp_norm(ilcut:ihcut))
@@ -399,7 +401,7 @@ subroutine power_spectral_sum_1d(n, x, fs, nfft, low_cut, hi_cut, pss) bind(C, n
     call execute_real_forward(2 * nfft, y, 1.0_c_double, sp_hat, ier)
 
     sp_norm = sp_hat(1:2*nfft+2:2)**2 + sp_hat(2:2*nfft+2:2)**2
-    sp_norm = sp_norm / sum(sp_norm(ilcut:ihcut))
+    sp_norm = sp_norm / sum(sp_norm(ilcut:ihcut)) + 1.d-10
 
     ! find the maximum index.  minus 2 to account for adding min 1 (ilcut) and then shifting to 0
     ! at the first index
@@ -459,7 +461,7 @@ subroutine spectral_entropy_1d(n, x, fs, nfft, low_cut, hi_cut, sEnt) bind(C, na
     call execute_real_forward(2 * nfft, y, 1.0_c_double, sp_hat, ier)
 
     sp_norm = sp_hat(1:2*nfft+2:2)**2 + sp_hat(2:2*nfft+2:2)**2
-    sp_norm = sp_norm / sum(sp_norm(ilcut:ihcut))
+    sp_norm = sp_norm / sum(sp_norm(ilcut:ihcut)) + 1.d-10
 
     do i=ilcut, ihcut
         sEnt = sEnt - log(sp_norm(i)) / log2 * sp_norm(i)
@@ -511,7 +513,7 @@ subroutine spectral_flatness_1d(n, x, fs, nfft, low_cut, hi_cut, sFlat) bind(C, 
     call execute_real_forward(2 * nfft, y, 1._c_double, sp_hat, ier)
 
     sp_norm = sp_hat(1:2*nfft+2:2)**2 + sp_hat(2:2*nfft+2:2)**2
-    sp_norm = sp_norm / sum(sp_norm(ilcut:ihcut))
+    sp_norm = sp_norm / sum(sp_norm(ilcut:ihcut)) + 1.d-10
 
     mean = sum(sp_norm(ilcut:ihcut)) / (ihcut - ilcut + 1)
     call gmean(ihcut - ilcut + 1, sp_norm(ilcut:ihcut), sFlat)
