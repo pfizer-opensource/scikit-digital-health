@@ -17,6 +17,9 @@ extern void insertion_sort_2d(long *, long *, double *, long *);
 extern void quick_argsort_(long *, double *, long *);
 extern void quick_sort_(long *, double *);
 
+extern void f_rfft(long *, double *, long *, double *);
+extern void destroy_plan(void);
+
 
 PyObject * cf_mean_sd_1d(PyObject *NPY_UNUSED(self), PyObject *args){
     PyObject *x_;
@@ -243,6 +246,51 @@ PyObject * cf_histogram(PyObject *NPY_UNUSED(self), PyObject *args){
 }
 
 
+PyObject * cf_rfft(PyObject *NPY_UNUSED(self), PyObject *args){
+    PyObject *x_;
+    long nfft;
+    int fail = 0;
+
+    if (!PyArg_ParseTuple(args, "Ol:dominant_frequency", &x_, &nfft)) return NULL;
+
+    PyArrayObject *data = (PyArrayObject *)PyArray_FromAny(
+        x_, PyArray_DescrFromType(NPY_DOUBLE), 1, 0,
+        NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_CARRAY_RO, NULL
+    );
+    if (!data) return NULL;
+
+    int ndim = PyArray_NDIM(data);
+    if (ndim != 1){
+        PyErr_SetString(PyExc_ValueError, "Dimensions over 1 not supported");
+        return NULL;
+    }
+    npy_intp *ddims = PyArray_DIMS(data);
+    npy_intp rdims[1] = {2 * nfft + 2};
+
+    PyArrayObject *res = (PyArrayObject *)PyArray_EMPTY(1, rdims, NPY_DOUBLE, 0);
+
+    if (!res) fail = 1;
+    if (!fail){
+        double *dptr = (double *)PyArray_DATA(data);
+        double *rptr = (double *)PyArray_DATA(res);
+
+        long stride = ddims[0];
+
+        f_rfft(&stride, dptr, &nfft, rptr);
+    }
+    if (fail){
+        Py_XDECREF(data);
+        Py_XDECREF(res);
+        return NULL;
+    }
+    Py_XDECREF(data);
+    // destroy the FFT plan created in the fortran module
+    destroy_plan();
+
+    return (PyObject *)res;
+}
+
+
 static struct PyMethodDef methods[] = {
     {"cf_mean_sd_1d",   cf_mean_sd_1d,   1, NULL},  // last is test__doc__
     {"cf_unique",   cf_unique,   1, NULL},
@@ -250,6 +298,7 @@ static struct PyMethodDef methods[] = {
     {"cf_embed_sort",   cf_embed_sort,   1, NULL},
     {"cf_hist",   cf_hist,   1, NULL},
     {"cf_histogram",   cf_histogram,   1, NULL},
+    {"cf_rfft", cf_rfft, 1, NULL},
     {NULL, NULL, 0, NULL}          /* sentinel */
 };
 

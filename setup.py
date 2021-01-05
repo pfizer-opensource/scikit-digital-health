@@ -207,6 +207,7 @@ def configuration(parent_package='', top_path=None):
         sources=[
             "src/skimu/features/lib/extensions/ffeatures.f95",
             "src/skimu/features/lib/extensions/real_fft.f95",
+            "src/skimu/features/lib/extensions/f_rfft.f95",
             "src/skimu/features/lib/extensions/sort.f95",
             "src/skimu/features/lib/extensions/utility.f95"
         ]
