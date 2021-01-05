@@ -51,9 +51,7 @@ PyObject * dominant_frequency(PyObject *NPY_UNUSED(self), PyObject *args){
     PyArrayObject *res = (PyArrayObject *)PyArray_Empty(ndim-1, rdims, PyArray_DescrFromType(NPY_DOUBLE), 0);
     free(rdims);
 
-    // make sure that NFFT is large enough
     long nfft = (long)pow(2, ceil(log((double)ddims[ndim-1]) / log(2.)) - 1 + padlevel);
-    if (nfft < nfft_min) nfft = nfft_min;
 
     if (!res) fail = 1;
     if (!fail){
@@ -119,9 +117,7 @@ PyObject * dominant_frequency_value(PyObject *NPY_UNUSED(self), PyObject *args){
     PyArrayObject *res = (PyArrayObject *)PyArray_Empty(ndim-1, rdims, PyArray_DescrFromType(NPY_DOUBLE), 0);
     free(rdims);
 
-    // make sure that NFFT is large enough
     long nfft = (long)pow(2, ceil(log((double)ddims[ndim-1]) / log(2.)) - 1 + padlevel);
-    if (nfft < nfft_min) nfft = nfft_min;
 
     if (!res) fail = 1;
     if (!fail){
@@ -188,9 +184,7 @@ PyObject * power_spectral_sum(PyObject *NPY_UNUSED(self), PyObject *args){
     PyArrayObject *res = (PyArrayObject *)PyArray_Empty(ndim-1, rdims, PyArray_DescrFromType(NPY_DOUBLE), 0);
     free(rdims);
 
-    // make sure that NFFT is large enough
     long nfft = (long)pow(2, ceil(log((double)ddims[ndim-1]) / log(2.)) - 1 + padlevel);
-    if (nfft < nfft_min) nfft = nfft_min;
 
     if (!res) fail = 1;
     if (!fail){
@@ -257,9 +251,7 @@ PyObject * spectral_entropy(PyObject *NPY_UNUSED(self), PyObject *args){
     PyArrayObject *res = (PyArrayObject *)PyArray_Empty(ndim-1, rdims, PyArray_DescrFromType(NPY_DOUBLE), 0);
     free(rdims);
 
-    // make sure that NFFT is large enough
     long nfft = (long)pow(2, ceil(log((double)ddims[ndim-1]) / log(2.)) - 1 + padlevel);
-    if (nfft < nfft_min) nfft = nfft_min;
 
     if (!res) fail = 1;
     if (!fail){
@@ -326,9 +318,7 @@ PyObject * spectral_flatness(PyObject *NPY_UNUSED(self), PyObject *args){
     PyArrayObject *res = (PyArrayObject *)PyArray_Empty(ndim-1, rdims, PyArray_DescrFromType(NPY_DOUBLE), 0);
     free(rdims);
 
-    // make sure that NFFT is large enough
     long nfft = (long)pow(2, ceil(log((double)ddims[ndim-1]) / log(2.)) - 1 + padlevel);
-    if (nfft < nfft_min) nfft = nfft_min;
 
     if (!res) fail = 1;
     if (!fail){
