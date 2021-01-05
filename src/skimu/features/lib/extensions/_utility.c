@@ -250,7 +250,7 @@ PyObject * cf_rfft(PyObject *NPY_UNUSED(self), PyObject *args){
     PyObject *x_;
     long nfft;
 
-    if (!PyArg_ParseTuple(args, "Ol:dominant_frequency", &x_, &nfft)) return NULL;
+    if (!PyArg_ParseTuple(args, "Ol:cf_rfft", &x_, &nfft)) return NULL;
 
     PyArrayObject *data = (PyArrayObject *)PyArray_FromAny(
         x_, PyArray_DescrFromType(NPY_DOUBLE), 1, 0,
