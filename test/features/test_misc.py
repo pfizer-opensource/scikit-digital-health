@@ -7,6 +7,26 @@ from skimu.features import *
 from skimu.features import lib
 
 
+class TestFeatureClass:
+    def test_indexing_errors(self):
+        with pytest.raises(ValueError):
+            mn = Mean()[[1, ...]]
+
+        with pytest.raises(ValueError):
+            mn = Mean()[:5, :10]
+
+        with pytest.raises(ValueError):
+            mn = Mean()[[1, ...]]
+
+        with pytest.raises(ValueError):
+            mn = Mean()['test']
+
+    def test_get_columns(self):
+        res = Mean()._get_columns(['x'])
+
+        assert res == ['Mean_x']
+
+
 class _TestFeatureEquivalence:
     @pytest.mark.parametrize(
         ('f1', 'f2'),
