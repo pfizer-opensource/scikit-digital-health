@@ -61,9 +61,9 @@ class BaseTestFeature:
         df_truth, cols = get_dataframe_truth(self.feature.__class__.__name__)
 
         try:
-            df_pred = self.feature[[0, 2]].compute(df_acc, fs)
+            df_pred = self.feature.compute(df_acc, fs, columns=['x', 'z'])
         except TypeError:
-            df_pred = self.feature[[0, 2]].compute(df_acc)
+            df_pred = self.feature.compute(df_acc, columns=['x', 'z'])
 
         assert np.allclose(df_pred, df_truth[0, [0, 2]])
 
