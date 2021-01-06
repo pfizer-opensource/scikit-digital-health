@@ -57,6 +57,16 @@ class BaseTestFeature:
 
         assert np.allclose(df_pred, df_truth)
 
+    def test_dataframe_with_cols(self, fs, df_acc, get_dataframe_truth):
+        df_truth, cols = get_dataframe_truth(self.feature.__class__.__name__)
+
+        try:
+            df_pred = self.feature[[0, 2]].compute(df_acc, fs)
+        except TypeError:
+            df_pred = self.feature[[0, 2]].compute(df_acc)
+
+        assert np.allclose(df_pred, df_truth[0, [0, 2]])
+
 
 @fixture(scope='package')
 def fs():
