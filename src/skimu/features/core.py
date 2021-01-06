@@ -338,7 +338,7 @@ class Feature(ABC):
     def __getitem__(self, item):
         self.index = item
         # get the number of returns
-        if isinstance(item, Sized):
+        if isinstance(item, Sized) and not isinstance(item, str):
             if ... in item:
                 raise ValueError("Cannot use fancy indexing")
             if len(item) >= 2 and any([isinstance(i, slice) for i in item]):
