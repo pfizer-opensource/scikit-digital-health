@@ -50,7 +50,10 @@ def _normalize_axes(ndim, is_df, axis, col_axis):
         return ret_axis, 0
     else:
         ret_axis = axis if axis >= 0 else ndim + axis
-        ret_caxis = col_axis if col_axis >= 0 else ndim + col_axis
+        if col_axis is None:
+            ret_caxis = col_axis
+        else:
+            ret_caxis = col_axis if col_axis >= 0 else ndim + col_axis
 
         """
         If col_axis is equivalent to -1, the swap will be messed up because -1 is the axis dimension
@@ -186,7 +189,7 @@ class Bank:
             self.add(getattr(lib, name)(**params)[index])
 
     # COMPUTATION
-    def compute(self, signal, fs=None, *, axis=-1, col_axis=-2, columns=None):
+    def compute(self, signal, fs=None, *, axis=-1, col_axis=None, columns=None):
         """
         Compute the features in the Bank
 
@@ -199,8 +202,10 @@ class Bank:
         axis : int
             Axis along which the features are computed. Default is the last axis (-1)
         col_axis : int
-            Axis which corresponds to the columns. Default is second to last axis (-2). If signal
-            is 2D, this is automatically inferred to be the other dimension.
+            Axis which corresponds to the columns. If signal is 2D, this is automatically inferred
+            to be the other dimension. Default is None, which indicates that the column axis
+            is not part of the signal (ie 1 column). Therefore, if the input shape was
+            (50, 150), and there were 8 features to compute, the results size would be (8, 50).
         columns : array-like
             Array of column names. If passing a pandas.DataFrame, this will be used
             to select specific columns. If passing other types of data, this will be used
