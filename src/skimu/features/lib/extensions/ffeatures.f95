@@ -774,7 +774,7 @@ subroutine sparc_1d(n, x, fs, padlevel, fc, amp_thresh, sal) bind(C, name="sparc
     y = 0._c_double
     y(:n) = x
     call execute_real_forward(nfft, y, 1._c_double, sp_hat, ier)
-    if (ier .NE. 0) return
+    if (ier /= 0_c_long) return
 
     ! normalize the FFT response
     do i = 1, nfft + 2, 2
@@ -786,7 +786,7 @@ subroutine sparc_1d(n, x, fs, padlevel, fc, amp_thresh, sal) bind(C, name="sparc
     inxf = ixf
 
     do while ((Mf(inxi) < amp_thresh) .AND. (inxi < (nfft / 2 + 1)))
-        inxi = inxi - 1
+        inxi = inxi + 1
     end do
     do while ((Mf(inxf) < amp_thresh) .AND. (inxf > 1))
         inxf = inxf - 1
