@@ -5,6 +5,52 @@ from numpy import random
 
 from skimu.features import *
 from skimu.features import lib
+from skimu.features.core import _normalize_axes
+
+
+class TestNormalizeAxes:
+    @pytest.mark.parametrize(
+        ("ndim", "ax", "ca", "true_ax", "true_ca"),
+        (
+                (1, -1, -2, 0, -1),
+                (2, -1, -2, 1, 0),
+                (3, -1, -2, 2, 1),
+                (3, 0, 1, 0, 1),
+                (3, 0, 2, 0, 0),
+                (3, 1, 2, 1, 1),
+                (3, 2, 1, 2, 1)
+        )
+    )
+    def test_nd_dims(self, ndim, ax, ca, true_ax, true_ca):
+        pax, pca = _normalize_axes(ndim, False, ax, ca)
+
+        assert pax == true_ax
+        assert pca == true_ca
+
+    @pytest.mark.parametrize(
+        ("ax", "ca", "true_ax", "true_ca"),
+        (
+                (-1, -2, 0, 0),
+                (-2, -1, 0, 0),
+                (0, 1, 0, 0),
+                (1, 0, 0, 0)
+        )
+    )
+    def test_df_dims(self, ax, ca, true_ax, true_ca):
+        pax, pca = _normalize_axes(2, True, ax, ca)
+
+        assert pax == true_ax
+        assert pca == true_ca
+
+    def test_same_error(self):
+        with pytest.raises(ValueError):
+            _normalize_axes(8, False, 3, 3)
+
+        with pytest.raises(ValueError):
+            _normalize_axes(8, False, -1, -1)
+
+        with pytest.raises(ValueError):
+            _normalize_axes(2, True, 0, 0)
 
 
 class TestFeatureClass:
