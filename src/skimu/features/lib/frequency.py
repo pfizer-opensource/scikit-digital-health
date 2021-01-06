@@ -46,7 +46,7 @@ class DominantFrequency(Feature):
         self.low_cut = low_cutoff
         self.high_cut = high_cutoff
 
-    def compute(self, signal, fs, *, axis=-1, col_axis=-1, columns=None):
+    def compute(self, signal, fs, *, axis=-1, col_axis=-2, columns=None):
         """
         Compute the dominant frequency
 
