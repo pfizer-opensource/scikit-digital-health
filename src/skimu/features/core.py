@@ -51,7 +51,7 @@ def _normalize_axes(ndim, is_df, axis, col_axis):
     else:
         ret_axis = axis if axis >= 0 else ndim + axis
         if col_axis is None:
-            ret_caxis = col_axis
+            ret_caxis = None
         else:
             ret_caxis = col_axis if col_axis >= 0 else ndim + col_axis
 
@@ -72,6 +72,7 @@ class Bank:
 
     Examples
     --------
+    >>> from skimu.features import *
     >>> fb = Bank()
     >>> # add features to the bank
     >>> fb.add([Mean(), Range()])
