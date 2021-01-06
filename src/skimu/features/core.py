@@ -38,6 +38,10 @@ def _normalize_axes(ndim, is_df, axis, col_axis):
     """
     Normalize the input axes.  This accounts for the col_axis not undoing the previous swap
     """
+    # make sure col_axis and axis are not the same
+    if col_axis == axis:
+        raise ValueError("column_axis and axis cannot be the same")
+
     if ndim == 2:
         if is_df:
             return 0, 0
@@ -217,11 +221,6 @@ class Bank:
         ValueError
             If the number of provided column names doesn't match the shape of the columns axis
         """
-
-        # make sure col_axis and axis are not the same
-        if col_axis == axis:
-            raise ValueError("column_axis and axis cannot be the same")
-
         # standardize the input signal
         if isinstance(signal, DataFrame):
             if columns is not None:
