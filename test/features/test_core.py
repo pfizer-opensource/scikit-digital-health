@@ -98,11 +98,14 @@ class TestFeatureBank:
     @pytest.mark.parametrize(
         ("in_shape", "axis", "caxis", "out_shape"),
         (
+                # 1D
                 (150, 0, None, (3,)),
+                # 2D
                 ((5, 10), 0, 1, (5 * 3,)),
                 ((5, 10), 0, None, (3, 5)),
                 ((5, 10), 1, 0, (5 * 3,)),
                 ((5, 10), 1, None, (3, 5)),
+                # 3D
                 ((5, 10, 15), 0, 1, (10*3, 15)),
                 ((5, 10, 15), 0, 2, (10, 15*3)),
                 ((5, 10, 15), 0, None, (3, 10, 15)),
@@ -111,34 +114,51 @@ class TestFeatureBank:
                 ((5, 10, 15), 1, None, (3, 5, 15)),
                 ((5, 10, 15), 2, 0, (5*3, 10)),
                 ((5, 10, 15), 2, 1, (5, 10*3)),
-                ((5, 10, 15), 2, None, (3, 5, 10))
+                ((5, 10, 15), 2, None, (3, 5, 10)),
+                # some of 4D
+                ((5, 10, 15, 20), 0, 2, (10, 15*3, 20)),
+                ((5, 10, 15, 20), 0, None, (3, 10, 15, 20)),
+                ((5, 10, 15, 20), 2, 0, (5*3, 10, 20))
         )
     )
     def test_shape(self, in_shape, axis, caxis, out_shape):
         """
-        |  shape | ax | ia |  swap1 | ax | ia |  res  | ax | ia | res swap |
-        |--------|----|----|--------|----|----|-------|----|----|----------|
-        | (a, b) |  0 |  1 | (b, a) |  0 |  0 | (bf,) |    |    |          |
-        | (a, b) |  0 |  N | (b, a) |  0 |  N | (f, b)|    |    |          |
-        | (a, b) |  1 |  0 |        |    |    | (3a,) |    |    |          |
-        | (a, b) |  1 |  N |        |    |    | (f, a)|    |    |          |
-
-        |  shape   | ax| ia|   swap1  | ax| ia|   swap2  | ax | ia |   res    | ia |   | res swap |
-        |----------|---|---|----------|---|---|----------|----|----|----------|----|---|----------|
-        | (a, b, c)| 0 | 1 | (c, b, a)| 2 | 1 | (b, c, a)|  2 |  0 | (bf, c)  |  0 | 0 | (bf, c)  |
-        | (a, b, c)| 0 | 2 | (c, b, a)| 2 | 0 |          |    |    | (cf, b)  |  0 | 1 | (b, cf)  |
-        | (a, b, c)| 0 | N | (c, b, a)| 2 | N |          |    |    | (f, c, b)|  1 | 2 | (f, b, c)|
-        | (a, b, c)| 1 | 0 | (a, c, b)| 2 | 0 |          |    |    | (af, c)  |  0 | 0 | (af, c)  |
-        | (a, b, c)| 1 | 2 | (a, c, b)| 2 | 1 | (c, a, b)|  2 |  0 | (cf, a)  |  0 | 1 | (a, cf)  |
-        | (a, b, c)| 1 | N | (a, c, b)| 2 | N |          |    |    | (f, a, c)|  1 | 1 | (f, a, c)|
-        | (a, b, c)| 2 | 0 |          |   |   |          |    |    | (af, b)  |  0 | 0 | (af, b)  |
-        | (a, b, c)| 2 | 1 |          |   |   | (b, a, c)|  2 |  0 | (bf, a)  |  0 | 1 | (a, bf)  |
-        | (a, b, c)| 2 | N |          |   |   |          |    |    | (f, a, b)|  1 | 1 | (f, a, b)|
+        |  shape       | axis  | ind_ax |  res shape   |
+        |--------------|-------|--------|--------------|
+        | (a, b)       |   0   |    1   | (bf,)        |
+        | (a, b)       |   0   |    N   | (f, b)       |
+        | (a, b)       |   1   |    0   | (3a,)        |
+        | (a, b)       |   1   |    N   | (f, a)       |
+        | (a, b, c)    |   0   |  1(0)  | (bf, c)      |
+        | (a, b, c)    |   0   |  2(1)  | (b, cf)      |
+        | (a, b, c)    |   0   |  N     | (f, b, c)    |
+        | (a, b, c)    |   1   |  0     | (af, c)      |
+        | (a, b, c)    |   1   |  2(1)  | (a, cf)      |
+        | (a, b, c)    |   1   |  N     | (f, a, c)    |
+        | (a, b, c)    |   2   |  0     | (af, b)      |
+        | (a, b, c)    |   2   |  1     | (a, bf)      |
+        | (a, b, c)    |   2   |  N     | (f, a, b)    |
+        | (a, b, c, d) |   0   |  1(0)  | (bf, c, d)   |
+        | (a, b, c, d) |   0   |  2(1)  | (b, cf, d)   |
+        | (a, b, c, d) |   0   |  3(2)  | (d, c, df)   |
+        | (a, b, c, d) |   0   |  N     | (f, b, c, d) |
+        | (a, b, c, d) |   1   |  0     | (af, c, d)   |
+        | (a, b, c, d) |   1   |  2(1)  | (a, cf, d)   |
+        | (a, b, c, d) |   1   |  3(2)  | (a, c, df)   |
+        | (a, b, c, d) |   1   |  N     | (f, a, c, d) |
+        | (a, b, c, d) |   2   |  0     | (af, b, d)   |
+        | (a, b, c, d) |   2   |  1     | (a, bf, d)   |
+        | (a, b, c, d) |   2   |  3(2)  | (a, b, df)   |
+        | (a, b, c, d) |   2   |  N     | (f, a, b, d) |
+        | (a, b, c, d) |   3   |  0     | (af, b, c)   |
+        | (a, b, c, d) |   3   |  1     | (a, bf, c)   |
+        | (a, b, c, d) |   3   |  2     | (a, b, cf)   |
+        | (a, b, c, d) |   3   |  N     | (f, a, b, c) |
         """
         bank = self.test_add()
         x = random(in_shape)
 
-        res = bank.compute(x, 20., axis=axis, col_axis=caxis)
+        res = bank.compute(x, 20., axis=axis, index_axis=caxis)
 
         assert res.shape == out_shape
 
