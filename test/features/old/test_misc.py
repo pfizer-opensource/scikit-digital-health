@@ -5,7 +5,7 @@ from numpy import random
 
 from skimu.features import *
 from skimu.features import lib
-from skimu.features.core import _normalize_axes
+from skimu.features.core2 import _normalize_axes
 
 
 class TestNormalizeAxes:

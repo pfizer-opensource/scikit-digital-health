@@ -5,7 +5,7 @@ from numpy import allclose, random
 import pandas as pd
 
 from skimu.features import *
-from skimu.features.core import ArrayConversionError, NotAFeatureError
+from skimu.features.core2 import ArrayConversionError, NotAFeatureError
 
 
 class TestBank:
