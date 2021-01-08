@@ -4,7 +4,7 @@ Features dealing with the smoothness of a signal
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
-from numpy import log, abs
+from numpy import log as nplog, abs
 
 from skimu.features.core import Feature
 from skimu.features.lib import extensions
@@ -30,6 +30,8 @@ class JerkMetric(Feature):
     .. math:: s = \frac{360max(|a|)^2}{\Delta t}
     .. math:: J = \frac{\hat{J}}{2s}
     """
+    __slots__ = ()
+
     def __init__(self):
         super(JerkMetric, self).__init__()
 
@@ -101,6 +103,7 @@ class DimensionlessJerk(Feature):
         DJ = \frac{-\hat{J}_{type}}{s_{type}} \\
         DJ_{log} = -ln\left(\frac{\hat{J}_{type}}{s_{type}}\right)
     """
+    __slots__ = ("log", "i_type")
     _signal_type_options = ['velocity', 'acceleration', 'jerk']
 
     def __init__(self, log=False, signal_type='acceleration'):
@@ -138,7 +141,7 @@ class DimensionlessJerk(Feature):
         res = extensions.dimensionless_jerk_metric(x, self.i_type)
 
         if self.log:
-            return -log(abs(res))
+            return -nplog(abs(res))
         else:
             return res
 
@@ -168,6 +171,8 @@ class SPARC(Feature):
         Dec. 2015, doi: 10.1186/s12984-015-0090-9.
 
     """
+    __slots__ = ("padlevel", "fc", "amp_thresh")
+
     def __init__(self, padlevel=4, fc=10.0, amplitude_threshold=0.05):
         super(SPARC, self).__init__(
             padlevel=padlevel,
