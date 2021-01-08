@@ -154,7 +154,7 @@ class LinearSlope(Feature):
     def __init__(self):
         super(LinearSlope, self).__init__()
 
-    def compute(self, signal, fs, *, axis=-1):
+    def compute(self, signal, fs=1., *, axis=-1):
         """
         Compute the linear regression slope
 
@@ -163,7 +163,7 @@ class LinearSlope(Feature):
         signal : array-like
             Array-like containing values to compute the linear slope for.
         fs : float
-            Sampling frequency in Hz.
+            Sampling frequency in Hz. If not provided, default is 1.0Hz.
         axis : int, optional
             Axis along which the signal entropy will be computed. Ignored if `signal` is a
             pandas.DataFrame. Default is last (-1).
