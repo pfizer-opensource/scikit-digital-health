@@ -25,6 +25,8 @@ class Mean(Feature):
     >>> mn.compute(signal)
     array([6., 7., 8.])
     """
+    __slots__ = ()
+
     def __init__(self):
         super().__init__()
 
@@ -53,6 +55,8 @@ class MeanCrossRate(Feature):
     """
     Number of signal mean value crossings. Expressed as a percentage of signal length.
     """
+    __slots__ = ()
+
     def __init__(self):
         super(MeanCrossRate, self).__init__()
 
@@ -92,6 +96,8 @@ class StdDev(Feature):
     >>> StdDev().compute(signal)
     array([[4.74341649, 4.74341649, 4.74341649]])
     """
+    __slots__ = ()
+
     def __init__(self):
         super().__init__()
 
@@ -120,6 +126,8 @@ class Skewness(Feature):
     """
     The skewness of a signal. NaN inputs will be propagated through to the result.
     """
+    __slots__ = ()
+
     def __init__(self):
         super().__init__()
 
@@ -148,6 +156,8 @@ class Kurtosis(Feature):
     """
     The kurtosis of a signal. NaN inputs will be propagated through to the result.
     """
+    __slots__ = ()
+
     def __init__(self):
         super().__init__()
 
