@@ -33,7 +33,7 @@ class JerkMetric(Feature):
     def __init__(self):
         super(JerkMetric, self).__init__()
 
-    def compute(self, signal, fs, *, axis=-1, col_axis=-2, columns=None):
+    def compute(self, signal, fs=1., *, axis=-1):
         """
         Compute the jerk metric
 
@@ -41,25 +41,18 @@ class JerkMetric(Feature):
         ----------
         signal : array-like
             Array-like containing values to compute the jerk metric for.
-        fs : float
-            Sampling frequency in Hz
+        fs : float, optional
+            Sampling frequency in Hz. If not provided, default is 1.0Hz
         axis : int, optional
             Axis along which the signal entropy will be computed. Ignored if `signal` is a
             pandas.DataFrame. Default is last (-1).
-        col_axis : int, optional
-            Axis along which column indexing will be done. Ignored if `signal` is a pandas.DataFrame
-            or if `signal` is 2D.
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
 
         Returns
         -------
         jerk_metric : numpy.ndarray
             Computed jerk metric.
         """
-        return super().compute(signal, fs, axis=axis, col_axis=col_axis, columns=columns)
-
-    def _compute(self, x, fs):
+        x = super().compute(signal, fs, axis=axis)
         return extensions.jerk_metric(x, fs)
 
 
@@ -124,7 +117,7 @@ class DimensionlessJerk(Feature):
         except KeyError:
             raise ValueError(f"'signal_type' ({signal_type}) unrecognized.")
 
-    def compute(self, signal, *, axis=-1, col_axis=-2, columns=None):
+    def compute(self, signal, *, axis=-1):
         """
         Compute the dimensionless jerk metric
 
@@ -135,20 +128,13 @@ class DimensionlessJerk(Feature):
         axis : int, optional
             Axis along which the signal entropy will be computed. Ignored if `signal` is a
             pandas.DataFrame. Default is last (-1).
-        col_axis : int, optional
-            Axis along which column indexing will be done. Ignored if `signal` is a pandas.DataFrame
-            or if `signal` is 2D.
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
 
         Returns
         -------
         dimless_jerk_metric : numpy.ndarray
             Computed [log] dimensionless jerk metric.
         """
-        return super().compute(signal, fs=1., axis=axis, col_axis=col_axis, columns=columns)
-
-    def _compute(self, x, fs):
+        x = super().compute(signal, axis=axis)
         res = extensions.dimensionless_jerk_metric(x, self.i_type)
 
         if self.log:
@@ -193,7 +179,7 @@ class SPARC(Feature):
         self.fc = fc
         self.amp_thresh = amplitude_threshold
 
-    def compute(self, signal, fs, *, axis=-1, col_axis=-2, columns=None):
+    def compute(self, signal, fs=1., *, axis=-1):
         """
         compute(signal, fs, *, columns=None, windowed=False)
 
@@ -203,23 +189,16 @@ class SPARC(Feature):
         ----------
         signal : array-like
             Array-like containing values to compute the SPARC for.
-        fs : float
-            Sampling frequency in Hz
+        fs : float, optional
+            Sampling frequency in Hz. If not provided, default is 1.0Hz
         axis : int, optional
             Axis along which the signal entropy will be computed. Ignored if `signal` is a
             pandas.DataFrame. Default is last (-1).
-        col_axis : int, optional
-            Axis along which column indexing will be done. Ignored if `signal` is a pandas.DataFrame
-            or if `signal` is 2D.
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
 
         Returns
         -------
         sparc : numpy.ndarray
             Computed SPARC.
         """
-        return super().compute(signal, fs, axis=axis, col_axis=col_axis, columns=columns)
-
-    def _compute(self, x, fs):
+        x = super().compute(signal, fs, axis=axis)
         return extensions.SPARC(x, fs, self.padlevel, self.fc, self.amp_thresh)
