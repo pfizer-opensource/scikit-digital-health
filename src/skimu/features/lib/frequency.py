@@ -56,7 +56,7 @@ class DominantFrequency(Feature):
         ----------
         signal : array-like
             Array-like containing values to compute the dominant frequency for.
-        fs : float
+        fs : float, optional
             Sampling frequency in Hz. If not provided, default is assumed to be 1Hz.
         axis : int, optional
             Axis along which the signal entropy will be computed. Ignored if `signal` is a
@@ -115,7 +115,7 @@ class DominantFrequencyValue(Feature):
         ----------
         signal : array-like
             Array-like containing values to compute the dominant frequency value for.
-        fs : float
+        fs : float, optional
             Sampling frequency in Hz. If not provided, default is assumed to be 1Hz.
         axis : int, optional
             Axis along which the signal entropy will be computed. Ignored if `signal` is a
@@ -175,7 +175,7 @@ class PowerSpectralSum(Feature):
         ----------
         signal : array-like
             Array-like containing values to compute the power spectral sum for.
-        fs : float
+        fs : float, optional
             Sampling frequency in Hz. If not provided, default is assumed to be 1Hz.
         axis : int, optional
             Axis along which the signal entropy will be computed. Ignored if `signal` is a
@@ -237,7 +237,7 @@ class SpectralFlatness(Feature):
         ----------
         signal : array-like
             Array-like containing values to compute the spectral flatness for.
-        fs : float
+        fs : float, optional
             Sampling frequency in Hz. If not provided, default is assumed to be 1Hz.
         axis : int, optional
             Axis along which the signal entropy will be computed. Ignored if `signal` is a
@@ -297,7 +297,7 @@ class SpectralEntropy(Feature):
         ----------
         signal : array-like
             Array-like containing values to compute the spectral entropy for.
-        fs : float
+        fs : float, optional
             Sampling frequency in Hz. If not provided, default is assumed to be 1Hz.
         axis : int, optional
             Axis along which the signal entropy will be computed. Ignored if `signal` is a

@@ -162,7 +162,7 @@ class LinearSlope(Feature):
         ----------
         signal : array-like
             Array-like containing values to compute the linear slope for.
-        fs : float
+        fs : float, optional
             Sampling frequency in Hz. If not provided, default is 1.0Hz.
         axis : int, optional
             Axis along which the signal entropy will be computed. Ignored if `signal` is a
