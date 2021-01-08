@@ -51,7 +51,7 @@ class SignalEntropy(Feature):
     def __init__(self):
         super(SignalEntropy, self).__init__()
 
-    def compute(self, signal, *, axis=-1, col_axis=-2, columns=None):
+    def compute(self, signal, *, axis=-1):
         """
         Compute the signal entropy
 
@@ -62,20 +62,14 @@ class SignalEntropy(Feature):
         axis : int, optional
             Axis along which the signal entropy will be computed. Ignored if `signal` is a
             pandas.DataFrame. Default is last (-1).
-        col_axis : int, optional
-            Axis along which column indexing will be done. Ignored if `signal` is a pandas.DataFrame
-            or if `signal` is 2D.
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
 
         Returns
         -------
         sig_ent : numpy.ndarray
             Computed signal entropy.
         """
-        return super().compute(signal, fs=1., axis=axis, col_axis=col_axis, columns=columns)
+        x = super().compute(signal, axis=axis)
 
-    def _compute(self, x, fs):
         return extensions.signal_entropy(x)
 
 
@@ -118,7 +112,7 @@ class SampleEntropy(Feature):
         self.m = m
         self.r = r
 
-    def compute(self, signal, *, axis=-1, col_axis=-2, columns=None):
+    def compute(self, signal, *, axis=-1):
         """
         Compute the sample entropy of a signal
 
@@ -129,20 +123,13 @@ class SampleEntropy(Feature):
         axis : int, optional
             Axis along which the signal entropy will be computed. Ignored if `signal` is a
             pandas.DataFrame. Default is last (-1).
-        col_axis : int, optional
-            Axis along which column indexing will be done. Ignored if `signal` is a pandas.DataFrame
-            or if `signal` is 2D.
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
 
         Returns
         -------
         samp_en : numpy.ndarray
             Computed sample entropy.
         """
-        return super().compute(signal, fs=-1, axis=axis, col_axis=col_axis, columns=columns)
-
-    def _compute(self, x, fs):
+        x = super().compute(signal, axis=axis)
         return extensions.sample_entropy(x, self.m, self.r)
 
 
@@ -170,7 +157,7 @@ class PermutationEntropy(Feature):
         self.delay = delay
         self.normalize = normalize
 
-    def compute(self, signal, *, axis=-1, col_axis=-2, columns=None):
+    def compute(self, signal, *, axis=-1):
         """
         Compute the permutation entropy
 
@@ -181,18 +168,11 @@ class PermutationEntropy(Feature):
         axis : int, optional
             Axis along which the signal entropy will be computed. Ignored if `signal` is a
             pandas.DataFrame. Default is last (-1).
-        col_axis : int, optional
-            Axis along which column indexing will be done. Ignored if `signal` is a pandas.DataFrame
-            or if `signal` is 2D.
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
 
         Returns
         -------
         perm_en : numpy.ndarray
             Computed permutation entropy.
         """
-        return super().compute(signal, fs=1., axis=axis, col_axis=col_axis, columns=columns)
-
-    def _compute(self, x, fs):
+        x = super().compute(signal, axis=axis)
         return extensions.permutation_entropy(x, self.order, self.delay, self.normalize)
