@@ -28,7 +28,7 @@ class Mean(Feature):
     def __init__(self):
         super().__init__()
 
-    def compute(self, signal, *, axis=-1, col_axis=-2, columns=None):
+    def compute(self, signal, *, axis=-1):
         """
         Compute the mean.
 
@@ -39,20 +39,13 @@ class Mean(Feature):
         axis : int, optional
             Axis along which the signal entropy will be computed. Ignored if `signal` is a
             pandas.DataFrame. Default is last (-1).
-        col_axis : int, optional
-            Axis along which column indexing will be done. Ignored if `signal` is a pandas.DataFrame
-            or if `signal` is 2D.
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
 
         Returns
         -------
         mean : numpy.ndarray
             Computed mean.
         """
-        return super().compute(signal, fs=1., axis=axis, col_axis=col_axis, columns=columns)
-
-    def _compute(self, x, fs):
+        x = super().compute(signal, axis=axis)
         return mean(x, axis=-1)
 
 
@@ -63,7 +56,7 @@ class MeanCrossRate(Feature):
     def __init__(self):
         super(MeanCrossRate, self).__init__()
 
-    def compute(self, signal, *, axis=-1, col_axis=-2, columns=None):
+    def compute(self, signal, *, axis=-1):
         """
         Compute the mean cross rate
 
@@ -74,20 +67,14 @@ class MeanCrossRate(Feature):
         axis : int, optional
             Axis along which the signal entropy will be computed. Ignored if `signal` is a
             pandas.DataFrame. Default is last (-1).
-        col_axis : int, optional
-            Axis along which column indexing will be done. Ignored if `signal` is a pandas.DataFrame
-            or if `signal` is 2D.
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
 
         Returns
         -------
         mcr : numpy.ndarray
             Computed mean cross rate.
         """
-        return super().compute(signal, fs=1., axis=axis, col_axis=col_axis, columns=columns)
+        x = super().compute(signal, axis=axis)
 
-    def _compute(self, x, fs):
         x_nomean = x - mean(x, axis=-1, keepdims=True)
         mcr = sum(diff(sign(x_nomean), axis=-1) != 0, axis=-1)
 
@@ -108,7 +95,7 @@ class StdDev(Feature):
     def __init__(self):
         super().__init__()
 
-    def compute(self, signal, *, axis=-1, col_axis=-2, columns=None):
+    def compute(self, signal, *, axis=-1):
         """
         Compute the standard deviation
 
@@ -119,20 +106,13 @@ class StdDev(Feature):
         axis : int, optional
             Axis along which the signal entropy will be computed. Ignored if `signal` is a
             pandas.DataFrame. Default is last (-1).
-        col_axis : int, optional
-            Axis along which column indexing will be done. Ignored if `signal` is a pandas.DataFrame
-            or if `signal` is 2D.
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
 
         Returns
         -------
         stdev : numpy.ndarray
             Computed standard deviation.
         """
-        return super().compute(signal, fs=1., axis=axis, col_axis=col_axis, columns=columns)
-
-    def _compute(self, x, fs):
+        x = super().compute(signal, axis=axis)
         return std(x, axis=-1, ddof=1)
 
 
@@ -143,7 +123,7 @@ class Skewness(Feature):
     def __init__(self):
         super().__init__()
 
-    def compute(self, signal, *, axis=-1, col_axis=-2, columns=None):
+    def compute(self, signal, *, axis=-1):
         """
         Compute the skewness
 
@@ -154,20 +134,13 @@ class Skewness(Feature):
         axis : int, optional
             Axis along which the signal entropy will be computed. Ignored if `signal` is a
             pandas.DataFrame. Default is last (-1).
-        col_axis : int, optional
-            Axis along which column indexing will be done. Ignored if `signal` is a pandas.DataFrame
-            or if `signal` is 2D.
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
 
         Returns
         -------
         skew : numpy.ndarray
             Computed skewness.
         """
-        return super().compute(signal, fs=1., axis=axis, col_axis=col_axis, columns=columns)
-
-    def _compute(self, x, fs):
+        x = super().compute(signal, axis=axis)
         return skew(x, axis=-1, bias=False)
 
 
@@ -178,7 +151,7 @@ class Kurtosis(Feature):
     def __init__(self):
         super().__init__()
 
-    def compute(self, signal, *, axis=-1, col_axis=-2, columns=None):
+    def compute(self, signal, *, axis=-1):
         """
         Compute the kurtosis
 
@@ -189,18 +162,11 @@ class Kurtosis(Feature):
         axis : int, optional
             Axis along which the signal entropy will be computed. Ignored if `signal` is a
             pandas.DataFrame. Default is last (-1).
-        col_axis : int, optional
-            Axis along which column indexing will be done. Ignored if `signal` is a pandas.DataFrame
-            or if `signal` is 2D.
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
 
         Returns
         -------
         kurt : numpy.ndarray
             Computed kurtosis.
         """
-        return super().compute(signal, fs=1., axis=axis, col_axis=col_axis, columns=columns)
-
-    def _compute(self, x, fs):
+        x = super().compute(signal, axis=axis)
         return kurtosis(x, axis=-1, bias=False)
