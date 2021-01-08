@@ -266,7 +266,7 @@ class Bank:
 
         # make sure columns matches the shape
         if columns is not None:
-            if len(columns) != x.shape[col_axis]:
+            if len(columns) != x.shape[0]:  # has been swapped with 0 axis
                 raise ValueError("Provided columns does not match signal col_axis shape.")
 
         feats = zeros(shape[:-1])
