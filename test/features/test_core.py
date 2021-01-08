@@ -39,10 +39,10 @@ class TestFeatureBank:
 
         bank.add([Mean(), Range(), StdDev()], index=index_)
 
-        assert all([i.index == index_ for i in bank])
+        assert all([i == bank._indices[0] for i in bank._indices])
 
         x = random((10, 100, 150))
-        res = bank.compute(x, fs=20., axis=-1, col_axis=0)
+        res = bank.compute(x, fs=20., axis=-1, index_axis=0)
 
         assert res.shape == (len(bank) * index_length, 100)
 
@@ -186,14 +186,14 @@ class TestFeatureBank:
         bank = self.test_add()
 
         x = random((5, 100, 150))
-        truth1 = bank.compute(x, fs=20., axis=-1, col_axis=None)
-        truth2 = bank.compute(x, fs=20., axis=-1, col_axis=0)
+        truth1 = bank.compute(x, fs=20., axis=-1, index_axis=None)
+        truth2 = bank.compute(x, fs=20., axis=-1, index_axis=0)
 
         bank.save(bank_file)
 
         bank2 = Bank(bank_file=bank_file)
-        res1 = bank2.compute(x, fs=20., axis=-1, col_axis=None)
-        res2 = bank2.compute(x, fs=20., axis=-1, col_axis=0)
+        res1 = bank2.compute(x, fs=20., axis=-1, index_axis=None)
+        res2 = bank2.compute(x, fs=20., axis=-1, index_axis=0)
 
         assert allclose(res1, truth1)
         assert allclose(res2, truth2)
@@ -201,8 +201,8 @@ class TestFeatureBank:
         bank3 = Bank()
         bank3.load(bank_file)
 
-        res3 = bank3.compute(x, fs=20., axis=-1, col_axis=None)
-        res4 = bank3.compute(x, fs=20., axis=-1, col_axis=0)
+        res3 = bank3.compute(x, fs=20., axis=-1, index_axis=None)
+        res4 = bank3.compute(x, fs=20., axis=-1, index_axis=0)
 
         assert allclose(res3, truth1)
         assert allclose(res4, truth2)
