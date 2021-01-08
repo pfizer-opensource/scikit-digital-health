@@ -147,7 +147,7 @@ class Bank:
 
         Parameters
         ----------
-        features : {Feature, list-like}
+        features : {Feature, list}
             Single signal Feature, or list of signal Features to add to the feature Bank
         index : {int, slice, list}, optional
             Index to be applied to data input to each features. Either a index that will
