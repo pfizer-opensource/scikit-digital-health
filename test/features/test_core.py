@@ -7,6 +7,7 @@ from numpy.random import random
 from pandas import DataFrame
 
 from skimu.features import *
+from skimu.features import lib
 
 
 class TestFeatureBank:
@@ -206,3 +207,34 @@ class TestFeatureBank:
         assert allclose(res3, truth1)
         assert allclose(res4, truth2)
 
+
+class TestFeature:
+    def test_equivalence(self):
+        f1_a = DominantFrequency(padlevel=2, low_cutoff=0.0, high_cutoff=5.0)
+        f1_b = DominantFrequency(padlevel=4, low_cutoff=0.5, high_cutoff=9.0)
+        f2 = SPARC(padlevel=4, fc=10., amplitude_threshold=0.05)
+        f3 = Range()
+
+        assert f1_a == f1_a
+        assert f1_b == f1_b
+        assert f2 == f2
+        assert f3 == f3
+
+        assert f1_a != f1_b
+        assert f1_a != f2
+        assert f1_a != f3
+        assert f2 != f3
+
+    def test_output_shape(self):
+        for ndim in range(5):
+            for axis in range(ndim - 1):
+                in_shape = (5, 10, 15, 20, 25)[:ndim+1]
+                out_shape = (i for i in in_shape if i != axis)  # remove the axis of computation
+                x = random(in_shape)
+                for ft in lib.__all__:
+                    f = ft()  # default parameters
+                    res = f.compute(x, axis=axis)
+
+                    assert res.shape == out_shape, f"Failed on feature {f!s} for ndim {ndim} " \
+                                                   f"and axis {axis}. Input " \
+                                                   f"shape {in_shape} -> {out_shape}"
