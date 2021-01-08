@@ -19,7 +19,7 @@ class Range(Feature):
     def __init__(self):
         super().__init__()
 
-    def compute(self, signal, *, axis=-1, col_axis=-2, columns=None):
+    def compute(self, signal, *, axis=-1):
         """
         Compute the range
 
@@ -30,20 +30,13 @@ class Range(Feature):
         axis : int, optional
             Axis along which the signal entropy will be computed. Ignored if `signal` is a
             pandas.DataFrame. Default is last (-1).
-        col_axis : int, optional
-            Axis along which column indexing will be done. Ignored if `signal` is a pandas.DataFrame
-            or if `signal` is 2D.
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
 
         Returns
         -------
         range : numpy.ndarray
             Signal range.
         """
-        return super().compute(signal, fs=1., axis=axis, col_axis=col_axis, columns=columns)
-
-    def _compute(self, x, fs):
+        x = super().compute(signal, axis=axis)
         return max(x, axis=-1) - min(x, axis=-1)
 
 
@@ -54,7 +47,7 @@ class IQR(Feature):
     def __init__(self):
         super(IQR, self).__init__()
 
-    def compute(self, signal, *, axis=-1, col_axis=-2, columns=None):
+    def compute(self, signal, *, axis=-1):
         """
         Compute the IQR
 
@@ -65,20 +58,13 @@ class IQR(Feature):
         axis : int, optional
             Axis along which the signal entropy will be computed. Ignored if `signal` is a
             pandas.DataFrame. Default is last (-1).
-        col_axis : int, optional
-            Axis along which column indexing will be done. Ignored if `signal` is a pandas.DataFrame
-            or if `signal` is 2D.
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
 
         Returns
         -------
         iqr : numpy.ndarray
             Signal IQR.
         """
-        return super().compute(signal, fs=1., axis=axis, col_axis=col_axis, columns=columns)
-
-    def _compute(self, x, fs):
+        x = super().compute(signal, axis=axis)
         return quantile(x, 0.75, axis=-1) - quantile(x, 0.25, axis=-1)
 
 
@@ -89,7 +75,7 @@ class RMS(Feature):
     def __init__(self):
         super(RMS, self).__init__()
 
-    def compute(self, signal, *, axis=-1, col_axis=-2, columns=None):
+    def compute(self, signal, *, axis=-1):
         """
         Compute the RMS
 
@@ -100,20 +86,13 @@ class RMS(Feature):
         axis : int, optional
             Axis along which the signal entropy will be computed. Ignored if `signal` is a
             pandas.DataFrame. Default is last (-1).
-        col_axis : int, optional
-            Axis along which column indexing will be done. Ignored if `signal` is a pandas.DataFrame
-            or if `signal` is 2D.
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
 
         Returns
         -------
         rms : numpy.ndarray
             Signal RMS.
         """
-        return super().compute(signal, fs=1., axis=axis, col_axis=col_axis, columns=columns)
-
-    def _compute(self, x, fs):
+        x = super().compute(signal, axis=axis)
         return std(x - mean(x, axis=-1, keepdims=True), axis=-1, ddof=1)
 
 
@@ -137,7 +116,7 @@ class Autocorrelation(Feature):
         self.lag = lag
         self.normalize = normalize
 
-    def compute(self, signal, *, axis=-1, col_axis=-2, columns=None):
+    def compute(self, signal, *, axis=-1):
         """
         Compute the autocorrelation
 
@@ -148,20 +127,13 @@ class Autocorrelation(Feature):
         axis : int, optional
             Axis along which the signal entropy will be computed. Ignored if `signal` is a
             pandas.DataFrame. Default is last (-1).
-        col_axis : int, optional
-            Axis along which column indexing will be done. Ignored if `signal` is a pandas.DataFrame
-            or if `signal` is 2D.
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
 
         Returns
         -------
         ac : numpy.ndarray
             Signal autocorrelation.
         """
-        return super().compute(signal, fs=1., axis=axis, col_axis=col_axis, columns=columns)
-
-    def _compute(self, x, fs):
+        x = super().compute(signal, axis=axis)
         return extensions.autocorrelation(x, self.lag, self.normalize)
 
 
@@ -172,7 +144,7 @@ class LinearSlope(Feature):
     def __init__(self):
         super(LinearSlope, self).__init__()
 
-    def compute(self, signal, fs, *, axis=-1, col_axis=-2, columns=None):
+    def compute(self, signal, fs, *, axis=-1):
         """
         Compute the linear regression slope
 
@@ -185,20 +157,13 @@ class LinearSlope(Feature):
         axis : int, optional
             Axis along which the signal entropy will be computed. Ignored if `signal` is a
             pandas.DataFrame. Default is last (-1).
-        col_axis : int, optional
-            Axis along which column indexing will be done. Ignored if `signal` is a pandas.DataFrame
-            or if `signal` is 2D.
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
 
         Returns
         -------
         slope : numpy.ndarray
             Signal slope.
         """
-        return super().compute(signal, fs, axis=axis, col_axis=col_axis, columns=columns)
-
-    def _compute(self, x, fs):
+        x = super().compute(signal, fs, axis=axis)
         return extensions.linear_regression(x, fs)
 
 
