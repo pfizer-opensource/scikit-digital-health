@@ -35,6 +35,8 @@ class DominantFrequency(Feature):
     So `padlevel=2` would mean that for a signal with length 150, the number of points used
     in the FFT would go from 256 to 1024.
     """
+    __slots__ = ("pad", "low_cut", "high_cut")
+
     def __init__(self, padlevel=2, low_cutoff=0.0, high_cutoff=5.0):
         super(DominantFrequency, self).__init__(
             padlevel=padlevel,
@@ -92,6 +94,8 @@ class DominantFrequencyValue(Feature):
     So `padlevel=2` would mean that for a signal with length 150, the number of points used
     in the FFT would go from 256 to 1024.
     """
+    __slots__ = ("pad", "low_cut", "high_cut")
+
     def __init__(self, padlevel=2, low_cutoff=0.0, high_cutoff=5.0):
         super(DominantFrequencyValue, self).__init__(
             padlevel=padlevel,
@@ -150,6 +154,8 @@ class PowerSpectralSum(Feature):
     So `padlevel=2` would mean that for a signal with length 150, the number of points used
     in the FFT would go from 256 to 1024.
     """
+    __slots__ = ("pad", "low_cut", "high_cut")
+
     def __init__(self, padlevel=2, low_cutoff=0.0, high_cutoff=5.0):
         super(PowerSpectralSum, self).__init__(
             padlevel=padlevel,
@@ -210,6 +216,8 @@ class SpectralFlatness(Feature):
     So `padlevel=2` would mean that for a signal with length 150, the number of points used
     in the FFT would go from 256 to 1024.
     """
+    __slots__ = ("pad", "low_cut", "high_cut")
+
     def __init__(self, padlevel=2, low_cutoff=0.0, high_cutoff=5.0):
         super(SpectralFlatness, self).__init__(
             padlevel=padlevel,
@@ -268,6 +276,8 @@ class SpectralEntropy(Feature):
     So `padlevel=2` would mean that for a signal with length 150, the number of points used
     in the FFT would go from 256 to 1024.
     """
+    __slots__ = ("pad", "low_cut", "high_cut")
+
     def __init__(self, padlevel=2, low_cutoff=0.0, high_cutoff=5.0):
         super(SpectralEntropy, self).__init__(
             padlevel=padlevel,
