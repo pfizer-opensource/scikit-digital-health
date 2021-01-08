@@ -30,10 +30,12 @@ def partial_index_check(index):
 def normalize_indices(nfeat, index):
     if index is None:
         return [...] * nfeat
+    elif isinstance(index, int):
+        return [[index]] * nfeat
     elif not isinstance(index, Iterator):  # slice, single integer, etc
         return [partial_index_check(index)] * nfeat
     elif all([isinstance(i, int) for i in index]):  # iterable of ints
-        return [index] * nfeat
+        return [[index]] * nfeat
     elif isinstance(index, Sequence):  # able to be indexed
         return [partial_index_check(i) for i in index]
     else:
