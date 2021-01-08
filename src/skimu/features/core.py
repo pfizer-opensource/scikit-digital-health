@@ -8,9 +8,14 @@ import json
 from warnings import warn
 
 from pandas import DataFrame
+from numpy import float_, asarray, zeros, sum, moveaxis
 
 
 __all__ = ["Bank"]
+
+
+class ArrayConversionError(Exception):
+    pass
 
 
 def partial_index_check(index):
@@ -19,6 +24,19 @@ def partial_index_check(index):
     if index is None:
         index = ...
     return index
+
+
+def normalize_indices(nfeat, index):
+    if index is None:
+        return [...] * nfeat
+    elif not isinstance(index, Iterator):  # slice, single integer, etc
+        return [partial_index_check(index)] * nfeat
+    elif all([isinstance(i, int) for i in index]):  # iterable of ints
+        return [index] * nfeat
+    elif isinstance(index, Sequence):  # able to be indexed
+        return [partial_index_check(i) for i in index]
+    else:
+        raise IndexError("Index not understood")
 
 
 def normalize_axes(ndim, is_df, axis, ind_axis):
@@ -34,32 +52,52 @@ def normalize_axes(ndim, is_df, axis, ind_axis):
         return 0, None
     elif ndim >= 2:
         """
-        |  shape | ax | ia |  swap1 | ax | ia |  res  | ax | ia | res swap |
+        |  shape | ax | ia |  move1 | ax | ia |  res  | ax | ia | res move |
         |--------|----|----|--------|----|----|-------|----|----|----------|
         | (a, b) |  0 |  1 | (b, a) |  0 |  0 | (bf,) |    |    |          |
         | (a, b) |  0 |  N | (b, a) |  0 |  N | (f, b)|    |    |          |
         | (a, b) |  1 |  0 |        |    |    | (3a,) |    |    |          |
         | (a, b) |  1 |  N |        |    |    | (f, a)|    |    |          |
 
-        |  shape   | ax| ia|   swap1  | ax| ia|   swap2  | ax | ia |   res    | ia |   | res swap |
-        |----------|---|---|----------|---|---|----------|----|----|----------|----|---|----------|
-        | (a, b, c)| 0 | 1 | (c, b, a)| 2 | 1 | (b, c, a)|  2 |  0 | (bf, c)  |  0 | 0 | (bf, c)  |
-        | (a, b, c)| 0 | 2 | (c, b, a)| 2 | 0 |          |    |    | (cf, b)  |  0 | 1 | (b, cf)  |
-        | (a, b, c)| 0 | N | (c, b, a)| 2 | N |          |    |    | (f, c, b)|  1 | 2 | (f, b, c)|
-        | (a, b, c)| 1 | 0 | (a, c, b)| 2 | 0 |          |    |    | (af, c)  |  0 | 0 | (af, c)  |
-        | (a, b, c)| 1 | 2 | (a, c, b)| 2 | 1 | (c, a, b)|  2 |  0 | (cf, a)  |  0 | 1 | (a, cf)  |
-        | (a, b, c)| 1 | N | (a, c, b)| 2 | N |          |    |    | (f, a, c)|  1 | 1 | (f, a, c)|
-        | (a, b, c)| 2 | 0 |          |   |   |          |    |    | (af, b)  |  0 | 0 | (af, b)  |
-        | (a, b, c)| 2 | 1 |          |   |   | (b, a, c)|  2 |  0 | (bf, a)  |  0 | 1 | (a, bf)  |
-        | (a, b, c)| 2 | N |          |   |   |          |    |    | (f, a, b)|  1 | 1 | (f, a, b)|
+        
+        |  shape   | ax| ia   |   move1  | ax| ia|   move2  |   res    |    | ia| res move |
+        |----------|---|------|----------|---|---|----------|----------|----|---|----------|
+        | (a, b, c)| 0 | 1(0) | (b, c, a)|   |   |          | (bf, c)  |  0 | 0 |          |
+        | (a, b, c)| 0 | 2(1) | (b, c, a)|   | 1 | (c, b, a)| (cf, b)  |  0 | 1 | (b, cf)  |   
+        | (a, b, c)| 0 | N    | (b, c, a)|   |   |          | (f, b, c)|    |   |          |
+        | (a, b, c)| 1 | 0    | (a, c, b)|   |   |          | (af, c)  |  0 | 0 |          |
+        | (a, b, c)| 1 | 2(1) | (a, c, b)|   | 1 | (c, a, b)| (cf, a)  |  0 | 1 | (a, cf)  |
+        | (a, b, c)| 1 | N    | (a, c, b)|   |   |          | (f, a, c)|    |   |          |
+        | (a, b, c)| 2 | 0    | (a, b, c)|   |   |          | (af, b)  |  0 | 0 |          |
+        | (a, b, c)| 2 | 1    | (a, b, c)|   | 1 | (b, a, c)| (bf, a)  |  0 | 1 | (a, bf)  |
+        | (a, b, c)| 2 | N    | (a, b, c)|   |   |          | (f, a, b)|    |   |          |
+        
+        |  shape      | ax| ia   |   move1     | ia|   move2     |   res       |    | ia| res move  |
+        |-------------|---|------|-------------|---|-------------|-------------|----|---|-----------|
+        | (a, b, c, d)| 0 | 1(0) | (b, c, d, a)|   |             | (bf, c, d)  |  0 | 0 |           |
+        | (a, b, c, d)| 0 | 2(1) | (b, c, d, a)| 1 | (c, b, d, a)| (cf, b, d)  |  0 | 1 | (b, cf, d)|
+        | (a, b, c, d)| 0 | 3(2) | (b, c, d, a)| 2 | (d, b, c, a)| (df, b, c)  |  0 | 2 | (d, c, df)|
+        | (a, b, c, d)| 0 | N    | (b, c, d, a)|   |             | (f, b, c, d)|    |   |           |
+        | (a, b, c, d)| 1 | 0    | (a, c, d, b)|   |             | (af, c, d)  |    |   |           |
+        | (a, b, c, d)| 1 | 2(1) | (a, c, d, b)| 1 | (c, a, d, b)| (cf, a, d)  |  0 | 1 | (a, cf, d)|
+        | (a, b, c, d)| 1 | 3(2) | (a, c, d, b)| 2 | (d, a, c, b)| (df, a, c)  |  0 | 2 | (a, c, df)|
+        | (a, b, c, d)| 1 | N    | (a, c, d, b)|   |             | (f, a, c, d)|    |   |           |
+        | (a, b, c, d)| 2 | 0    | (a, b, d, c)|   |             | (af, b, d)  |    |   |           |
+        | (a, b, c, d)| 2 | 1    | (a, b, d, c)| 1 | (b, a, d, c)| (bf, a, d)  |  0 | 1 | (a, bf, d)|
+        | (a, b, c, d)| 2 | 3(2) | (a, b, d, c)| 2 | (d, a, b, c)| (df, a, b)  |  0 | 2 | (a, b, df)|
+        | (a, b, c, d)| 2 | N    | (a, b, d, c)|   |             | (f, a, b, d)|    |   |           |
+        | (a, b, c, d)| 3 | 0    | (a, b, c, d)|   |             | (af, b, c)  |    |   |           |
+        | (a, b, c, d)| 3 | 1    | (a, b, c, d)| 1 | (b, a, c, d)| (bf, a, c)  |  0 | 1 | (a, bf, c)|
+        | (a, b, c, d)| 3 | 2    | (a, b, c, d)| 2 | (c, a, b, d)| (cf, a, b)  |  0 | 2 | (a, b, cf)|
+        | (a, b, c, d)| 3 | N    | (a, b, c, d)|   |             | (f, a, b, c)|    |   |           |
         """
         ax = axis if axis >= 0 else ndim + axis
         if ind_axis is None:
             return ax, None
         ia = ind_axis if ind_axis >= 0 else ndim + ind_axis
 
-        if ia == ndim - 1:
-            ia = ax  # set to the axis, since this will be in the correct position after first swap
+        if ia > ax:
+            ia -= 1
 
         return ax, ia
 
@@ -118,27 +156,11 @@ class Bank:
         if isinstance(features, Feature):
             if features in self:
                 warn(f"Feature {features!s} already in the Bank, will be duplicated.")
-            self._idnices.append(partial_index_check(index))
+            self._indices.append(partial_index_check(index))
             self._feats.append(features)
         elif all([isinstance(i, Feature) for i in features]):
-            if index is None:
-                for ft in features:
-                    self._indices.append(...)
-                    self._feats.append(ft)
-            elif not isinstance(index, Iterator):  # slice, single integer, etc
-                for ft in features:
-                    self._indices.append(partial_index_check(index))
-                    self._feats.append(ft)
-            elif all([isinstance(i, int) for i in index]):  # iterable of ints
-                for ft in features:
-                    self._indices.append(index)
-                    self._feats.append(ft)
-            elif isinstance(index, Sequence):  # able to be indexed
-                for i, ft in enumerate(features):
-                    self._indices.append(partial_index_check(index[i]))
-                    self._feats.append(ft)
-            else:
-                raise IndexError("Index not understood.")
+            self._indices.extend(normalize_indices(len(features), index))
+            self._feats.extend(features)
 
     def save(self, file):
         """
@@ -190,7 +212,7 @@ class Bank:
             # add it to the feature bank
             self.add(getattr(lib, name)(**params), index=index)
 
-    def compute(self, signal, fs=1., *, axis=-1, index_axis=None, indices=None):
+    def compute(self, signal, fs=1., *, axis=-1, index_axis=None, indices=None, columns=None):
         """
         Compute the specified features for the given signal
 
@@ -205,17 +227,67 @@ class Bank:
         index_axis : {None, int}, optional
             Axis corresponding to the indices specified in `Bank.add` or `indices`. Default is
             None, which assumes that this axis is not part of the signal. Note that setting this to
-            None means values for `indices` or the indices set in `Bank.add` will be ignored
+            None means values for `indices` or the indices set in `Bank.add` will be ignored.
         indices : {None, int, list-like, slice, ellipsis}, optional
-            Indices to apply to the input signal. Either a integer, list-like, slice to apply to
-            each feature, or a list-like of lists/objects with a 1:1 correspondence to the
-            features present in the Bank.
+            Indices to apply to the input signal. Either None, a integer, list-like, slice to apply
+            to each feature, or a list-like of lists/objects with a 1:1 correspondence to the
+            features present in the Bank. If provided, takes precedence over any values given in
+            `Bank.add`. Default is None, which will use indices from `Bank.add`.
+        columns : {None, list-like}, optional
+            Columns to use if providing a dataframe. Default is None (uses all columns).
 
         Returns
         -------
         feats : numpy.ndarray
             Computed features.
         """
-        axis, index_axis = normalize_axes(
-            signal.ndim, isinstance(signal, DataFrame), axis, index_axis)
+        # standardize the input signal
+        if isinstance(signal, DataFrame):
+            columns = columns if columns is not None else signal.columns
+            x = signal[columns].values.astype(float_)
+        else:
+            try:
+                x = asarray(signal, dtype=float_)
+            except ValueError as e:
+                raise ArrayConversionError("Error converting signal to ndarray") from e
 
+        axis, index_axis = normalize_axes(x.ndim, isinstance(signal, DataFrame), axis, index_axis)
+
+        if index_axis is None:
+            indices = [...] * len(self)
+        else:
+            if indices is None:
+                indices = self._indices
+            else:
+                indices = normalize_indices(len(self), indices)
+
+        # get the number of features that will results. Needed to allocate the feature array
+        if index_axis is None:
+            # don't have to move any other axes than the computation axis
+            x = moveaxis(x, axis, -1)
+            # number of feats is 1 per
+            n_feats = [1] * len(self)
+            feats = zeros((sum(n_feats),) + x.shape[:-1], dtype=float_)
+        else:
+            # move both the computation and index axis
+            x = moveaxis(x, [axis, index_axis], [-1, 0])
+
+            n_feats = []
+            for ind in indices:
+                n_feats.append(x[ind].shape[0])
+
+            feats = zeros((sum(n_feats),) + x.shape[1:-1], dtype=float_)
+
+        feat_i = 0  # keep track of where in the feature array we are
+        for i, ft in enumerate(self._feats):
+            feats[feat_i:feat_i + n_feats[i]] = ft.compute(x[indices[i]], fs=fs, axis=-1)
+
+            feat_i += n_feats[i]
+
+        # Move the shape back to the correct one.
+        # only have to do this if there is an index axis, because otherwise the array is still in
+        # the same order as originally
+        if index_axis is not None:
+            feats = moveaxis(feats, 0, index_axis)  # undo the previous swap/move
+
+        return feats
