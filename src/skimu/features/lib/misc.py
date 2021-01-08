@@ -19,6 +19,8 @@ class ComplexityInvariantDistance(Feature):
     normalize : bool, optional
         Normalize the signal. Default is True.
     """
+    __slots__ = ("normalize",)
+
     def __init__(self, normalize=True):
         super(ComplexityInvariantDistance, self).__init__(
             normalize=normalize
@@ -57,6 +59,8 @@ class RangeCountPercentage(Feature):
     range_max : {int, float}, optional
         Maximum value of the range. Default value is 1.0
     """
+    __slots__ = ("rmin", "rmax")
+
     def __init__(self, range_min=-1.0, range_max=1.0):
         super(RangeCountPercentage, self).__init__(
             range_min=range_min,
@@ -96,6 +100,8 @@ class RatioBeyondRSigma(Feature):
     r : float, optional
         Number of standard deviations above or below the mean the range includes. Default is 2.0
     """
+    __slots__ = ("r",)
+
     def __init__(self, r=2.0):
         super(RatioBeyondRSigma, self).__init__(
             r=r
