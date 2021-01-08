@@ -41,7 +41,7 @@ class DetailPower(Feature):
         else:
             self.f_band = [1.0, 3.0]
 
-    def compute(self, signal, fs, *, axis=-1, col_axis=-2, columns=None):
+    def compute(self, signal, fs=1., *, axis=-1):
         """
         Compute the detail power
 
@@ -49,25 +49,19 @@ class DetailPower(Feature):
         ----------
         signal : array-like
             Array-like containing values to compute the detail power for.
-        fs : float
-            Sampling frequency in Hz.
+        fs : float, optional
+            Sampling frequency in Hz. If not provided, default is 1.0Hz.
         axis : int, optional
             Axis along which the signal entropy will be computed. Ignored if `signal` is a
             pandas.DataFrame. Default is last (-1).
-        col_axis : int, optional
-            Axis along which column indexing will be done. Ignored if `signal` is a pandas.DataFrame
-            or if `signal` is 2D.
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
 
         Returns
         -------
         power : numpy.ndarray
             Computed detail power.
         """
-        return super().compute(signal, fs, axis=axis, col_axis=col_axis, columns=columns)
+        x = super().compute(signal, fs, axis=axis)
 
-    def _compute(self, x, fs):
         # computation
         lvls = [
             int(ceil(log2(fs / self.f_band[0]))),  # maximum level needed
@@ -135,7 +129,7 @@ class DetailPowerRatio(Feature):
         else:
             self.f_band = [1.0, 10.0]
 
-    def compute(self, signal, fs, *, axis=-1, col_axis=-2, columns=None):
+    def compute(self, signal, fs=1., *, axis=-1):
         """
         Compute the detail power ratio
 
@@ -143,25 +137,19 @@ class DetailPowerRatio(Feature):
         ----------
         signal : array-like
             Array-like containing values to compute the detail power ratio for.
-        fs : float
-            Sampling frequency in Hz.
+        fs : float, optional
+            Sampling frequency in Hz. If not provided, default is 1.0Hz.
         axis : int, optional
             Axis along which the signal entropy will be computed. Ignored if `signal` is a
             pandas.DataFrame. Default is last (-1).
-        col_axis : int, optional
-            Axis along which column indexing will be done. Ignored if `signal` is a pandas.DataFrame
-            or if `signal` is 2D.
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
 
         Returns
         -------
         power_ratio : numpy.ndarray
             Computed detail power ratio.
         """
-        return super().compute(signal, fs, axis=axis, col_axis=col_axis, columns=columns)
+        x = super().compute(signal, fs, axis=axis)
 
-    def _compute(self, x, fs):
         # compute the required levels
         lvls = [
             int(ceil(log2(fs / self.f_band[0]))),  # maximum level needed
