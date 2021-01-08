@@ -3,6 +3,7 @@ Core functionality for feature computation
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
+from abc import ABC, abstractmethod
 from collections.abc import Iterator, Sequence
 import json
 from warnings import warn
@@ -291,3 +292,56 @@ class Bank:
             feats = moveaxis(feats, 0, index_axis)  # undo the previous swap/move
 
         return feats
+
+
+class Feature(ABC):
+    """
+    Base feature class
+    """
+    def __str__(self):
+        return self.__class__.__name__
+
+    def __repr__(self):
+        s = self.__class__.__name__ + "("
+        for p in self._params:
+            s += f"{p}={self._params[p]!r}, "
+        if len(self._params) > 0:
+            s = s[:-2]
+        return s + ")"
+
+    def __eq__(self, other):
+        if isinstance(other, type(self)):
+            # double check the name
+            eq = str(other) == str(self)
+            # check the parameters
+            eq &= other._params == self._params
+            return eq
+        else:
+            return False
+
+    __slots__ = ("_params",)
+
+    def __init__(self, **params):
+        self._params = params
+
+    @abstractmethod
+    def compute(self, signal, fs=1., *, axis=-1):
+        """
+        Compute the signal feature.
+
+        Parameters
+        ----------
+        signal : array-like
+            Signal to compute the feature over.
+        fs : float, optional
+            Sampling frequency in Hz. Default is 1.0
+        axis : int, optional
+            Axis over which to compute the feature. Default is -1 (last dimension)
+
+        Returns
+        -------
+        feat : numpy.ndarray
+            ndarray of the computed feature
+        """
+        # move the computation axis to the end
+        return moveaxis(asarray(signal, dtype=float_), axis, -1)
