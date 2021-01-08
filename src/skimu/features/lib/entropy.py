@@ -48,6 +48,8 @@ class SignalEntropy(Feature):
     .. [1] Wallis, Kenneth. "A note on the calculation of entropy from histograms". 2006.
     https://warwick.ac.uk/fac/soc/economics/staff/academic/wallis/publications/entropy.pdf
     """
+    __slots__ = ()
+
     def __init__(self):
         super(SignalEntropy, self).__init__()
 
@@ -106,6 +108,8 @@ class SampleEntropy(Feature):
     ----------
     .. [1] https://archive.physionet.org/physiotools/sampen/c/sampen.c
     """
+    __slots__ = ("m", "r")
+
     def __init__(self, m=4, r=1.0):
         super(SampleEntropy, self).__init__(m=m, r=r)
 
@@ -147,6 +151,8 @@ class PermutationEntropy(Feature):
     normalize : bool, optional
         Normalize the output between 0 and 1. Default is False.
     """
+    __slots__ = ("order", "delay", "normalize")
+
     def __init__(self, order=3, delay=1, normalize=False):
         super(PermutationEntropy, self).__init__(
             order=order,
