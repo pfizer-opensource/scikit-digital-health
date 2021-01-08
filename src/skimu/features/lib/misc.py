@@ -25,7 +25,7 @@ class ComplexityInvariantDistance(Feature):
         )
         self.normalize = normalize
 
-    def compute(self, signal, *, axis=-1, col_axis=-2, columns=None):
+    def compute(self, signal, *, axis=-1):
         """
         Compute the complexity invariant distance
 
@@ -36,20 +36,13 @@ class ComplexityInvariantDistance(Feature):
         axis : int, optional
             Axis along which the signal entropy will be computed. Ignored if `signal` is a
             pandas.DataFrame. Default is last (-1).
-        col_axis : int, optional
-            Axis along which column indexing will be done. Ignored if `signal` is a pandas.DataFrame
-            or if `signal` is 2D.
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
 
         Returns
         -------
         cid : numpy.ndarray
             Computed complexity invariant distance.
         """
-        return super().compute(signal, fs=1., axis=axis, col_axis=col_axis, columns=columns)
-
-    def _compute(self, x, fs):
+        x = super().compute(signal, axis=axis)
         return extensions.complexity_invariant_distance(x, self.normalize)
 
 
@@ -73,7 +66,7 @@ class RangeCountPercentage(Feature):
         self.rmin = range_min
         self.rmax = range_max
 
-    def compute(self, signal, *, axis=-1, col_axis=-2, columns=None):
+    def compute(self, signal, *, axis=-1):
         """
         Compute the range count percentage
 
@@ -84,20 +77,13 @@ class RangeCountPercentage(Feature):
         axis : int, optional
             Axis along which the signal entropy will be computed. Ignored if `signal` is a
             pandas.DataFrame. Default is last (-1).
-        col_axis : int, optional
-            Axis along which column indexing will be done. Ignored if `signal` is a pandas.DataFrame
-            or if `signal` is 2D.
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
 
         Returns
         -------
         rcp : numpy.ndarray
             Computed range count percentage.
         """
-        return super().compute(signal, fs=1., axis=axis, col_axis=col_axis, columns=columns)
-
-    def _compute(self, x, fs):
+        x = super().compute(signal, fs=1., axis=axis)
         return extensions.range_count(x, self.rmin, self.rmax)
 
 
@@ -117,7 +103,7 @@ class RatioBeyondRSigma(Feature):
 
         self.r = r
 
-    def compute(self, signal, *, axis=-1, col_axis=-2, columns=None):
+    def compute(self, signal, *, axis=-1):
         r"""
         Compute the ratio beyond :math:`r\sigma`
 
@@ -128,18 +114,11 @@ class RatioBeyondRSigma(Feature):
         axis : int, optional
             Axis along which the signal entropy will be computed. Ignored if `signal` is a
             pandas.DataFrame. Default is last (-1).
-        col_axis : int, optional
-            Axis along which column indexing will be done. Ignored if `signal` is a pandas.DataFrame
-            or if `signal` is 2D.
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
 
         Returns
         -------
         rbr : numpy.ndarray
             Computed ratio beyond r sigma.
         """
-        return super().compute(signal, fs=1., axis=axis, col_axis=col_axis, columns=columns)
-
-    def _compute(self, x, fs):
+        x = super().compute(signal, fs=1., axis=axis)
         return extensions.ratio_beyond_r_sigma(x, self.r)
