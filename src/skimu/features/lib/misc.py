@@ -27,8 +27,10 @@ class ComplexityInvariantDistance(Feature):
         )
         self.normalize = normalize
 
-    def compute(self, signal, *, axis=-1):
+    def compute(self, signal, *, axis=-1, **kwargs):
         """
+        compute(signal, *, axis=-1)
+
         Compute the complexity invariant distance
 
         Parameters
@@ -70,8 +72,10 @@ class RangeCountPercentage(Feature):
         self.rmin = range_min
         self.rmax = range_max
 
-    def compute(self, signal, *, axis=-1):
+    def compute(self, signal, *, axis=-1, **kwargs):
         """
+        compute(signal, *, axis=-1)
+
         Compute the range count percentage
 
         Parameters
@@ -109,8 +113,10 @@ class RatioBeyondRSigma(Feature):
 
         self.r = r
 
-    def compute(self, signal, *, axis=-1):
+    def compute(self, signal, *, axis=-1, **kwargs):
         r"""
+        compute(signal, *, axis=-1)
+
         Compute the ratio beyond :math:`r\sigma`
 
         Parameters

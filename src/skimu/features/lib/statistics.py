@@ -21,8 +21,10 @@ class Range(Feature):
     def __init__(self):
         super().__init__()
 
-    def compute(self, signal, *, axis=-1):
+    def compute(self, signal, *, axis=-1, **kwargs):
         """
+        compute(signal, *, axis=-1)
+
         Compute the range
 
         Parameters
@@ -51,8 +53,10 @@ class IQR(Feature):
     def __init__(self):
         super(IQR, self).__init__()
 
-    def compute(self, signal, *, axis=-1):
+    def compute(self, signal, *, axis=-1, **kwargs):
         """
+        compute(signal, *, axis=-1)
+
         Compute the IQR
 
         Parameters
@@ -81,8 +85,10 @@ class RMS(Feature):
     def __init__(self):
         super(RMS, self).__init__()
 
-    def compute(self, signal, *, axis=-1):
+    def compute(self, signal, *, axis=-1, **kwargs):
         """
+        compute(signal, *, axis=-1)
+
         Compute the RMS
 
         Parameters
@@ -124,8 +130,10 @@ class Autocorrelation(Feature):
         self.lag = lag
         self.normalize = normalize
 
-    def compute(self, signal, *, axis=-1):
+    def compute(self, signal, *, axis=-1, **kwargs):
         """
+        compute(signal, *, axis=-1)
+
         Compute the autocorrelation
 
         Parameters

@@ -120,8 +120,10 @@ class DimensionlessJerk(Feature):
         except KeyError:
             raise ValueError(f"'signal_type' ({signal_type}) unrecognized.")
 
-    def compute(self, signal, *, axis=-1):
+    def compute(self, signal, *, axis=-1, **kwargs):
         """
+        compute(signal, *, axis=-1)
+
         Compute the dimensionless jerk metric
 
         Parameters

@@ -53,8 +53,10 @@ class SignalEntropy(Feature):
     def __init__(self):
         super(SignalEntropy, self).__init__()
 
-    def compute(self, signal, *, axis=-1):
+    def compute(self, signal, *, axis=-1, **kwargs):
         """
+        compute(signal, *, axis=-1)
+
         Compute the signal entropy
 
         Parameters
@@ -116,8 +118,10 @@ class SampleEntropy(Feature):
         self.m = m
         self.r = r
 
-    def compute(self, signal, *, axis=-1):
+    def compute(self, signal, *, axis=-1, **kwargs):
         """
+        compute(signal, *, axis=-1)
+
         Compute the sample entropy of a signal
 
         Parameters
@@ -163,8 +167,10 @@ class PermutationEntropy(Feature):
         self.delay = delay
         self.normalize = normalize
 
-    def compute(self, signal, *, axis=-1):
+    def compute(self, signal, *, axis=-1, **kwargs):
         """
+        compute(signal, *, axis=-1)
+
         Compute the permutation entropy
 
         Parameters

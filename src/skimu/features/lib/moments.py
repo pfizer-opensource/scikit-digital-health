@@ -30,8 +30,10 @@ class Mean(Feature):
     def __init__(self):
         super().__init__()
 
-    def compute(self, signal, *, axis=-1):
+    def compute(self, signal, *, axis=-1, **kwargs):
         """
+        compute(signal, *, axis=-1)
+
         Compute the mean.
 
         Parameters
@@ -60,8 +62,10 @@ class MeanCrossRate(Feature):
     def __init__(self):
         super(MeanCrossRate, self).__init__()
 
-    def compute(self, signal, *, axis=-1):
+    def compute(self, signal, *, axis=-1, **kwargs):
         """
+        compute(signal, *, axis=-1)
+
         Compute the mean cross rate
 
         Parameters
@@ -101,8 +105,10 @@ class StdDev(Feature):
     def __init__(self):
         super().__init__()
 
-    def compute(self, signal, *, axis=-1):
+    def compute(self, signal, *, axis=-1, **kwargs):
         """
+        compute(signal, *, axis=-1)
+
         Compute the standard deviation
 
         Parameters
@@ -131,8 +137,10 @@ class Skewness(Feature):
     def __init__(self):
         super().__init__()
 
-    def compute(self, signal, *, axis=-1):
+    def compute(self, signal, *, axis=-1, **kwargs):
         """
+        compute(signal, *, axis=-1)
+
         Compute the skewness
 
         Parameters
@@ -161,8 +169,10 @@ class Kurtosis(Feature):
     def __init__(self):
         super().__init__()
 
-    def compute(self, signal, *, axis=-1):
+    def compute(self, signal, *, axis=-1, **kwargs):
         """
+        compute(signal, *, axis=-1)
+
         Compute the kurtosis
 
         Parameters
