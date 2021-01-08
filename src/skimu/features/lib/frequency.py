@@ -42,11 +42,11 @@ class DominantFrequency(Feature):
             high_cutoff=high_cutoff
         )
 
-        self.padlevel = padlevel
+        self.pad = padlevel
         self.low_cut = low_cutoff
         self.high_cut = high_cutoff
 
-    def compute(self, signal, fs, *, axis=-1, col_axis=-2, columns=None):
+    def compute(self, signal, fs=1., *, axis=-1):
         """
         Compute the dominant frequency
 
@@ -55,25 +55,18 @@ class DominantFrequency(Feature):
         signal : array-like
             Array-like containing values to compute the dominant frequency for.
         fs : float
-            Sampling frequency in Hz.
+            Sampling frequency in Hz. If not provided, default is assumed to be 1Hz.
         axis : int, optional
             Axis along which the signal entropy will be computed. Ignored if `signal` is a
             pandas.DataFrame. Default is last (-1).
-        col_axis : int, optional
-            Axis along which column indexing will be done. Ignored if `signal` is a pandas.DataFrame
-            or if `signal` is 2D.
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
 
         Returns
         -------
         dom_freq : numpy.ndarray
             Computed dominant frequency.
         """
-        return super().compute(signal, fs, axis=axis, col_axis=col_axis, columns=columns)
-
-    def _compute(self, x, fs):
-        return extensions.dominant_frequency(x, fs, self.padlevel, self.low_cut, self.high_cut)
+        x = super().compute(signal, fs, axis=axis)
+        return extensions.dominant_frequency(x, fs, self.pad, self.low_cut, self.high_cut)
 
 
 class DominantFrequencyValue(Feature):
@@ -106,11 +99,11 @@ class DominantFrequencyValue(Feature):
             high_cutoff=high_cutoff
         )
 
-        self.padlevel = padlevel
+        self.pad = padlevel
         self.low_cut = low_cutoff
         self.high_cut = high_cutoff
 
-    def compute(self, signal, fs, *, axis=-1, col_axis=-2, columns=None):
+    def compute(self, signal, fs=1., *, axis=-1):
         """
         Compute the dominant frequency value
 
@@ -119,25 +112,18 @@ class DominantFrequencyValue(Feature):
         signal : array-like
             Array-like containing values to compute the dominant frequency value for.
         fs : float
-            Sampling frequency in Hz.
+            Sampling frequency in Hz. If not provided, default is assumed to be 1Hz.
         axis : int, optional
             Axis along which the signal entropy will be computed. Ignored if `signal` is a
             pandas.DataFrame. Default is last (-1).
-        col_axis : int, optional
-            Axis along which column indexing will be done. Ignored if `signal` is a pandas.DataFrame
-            or if `signal` is 2D.
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
 
         Returns
         -------
         dom_freq_val : numpy.ndarray
             Computed dominant frequency value.
         """
-        return super().compute(signal, fs, axis=axis, col_axis=col_axis, columns=columns)
-
-    def _compute(self, x, fs):
-        return extensions.dominant_frequency_value(x, fs, self.padlevel, self.low_cut, self.high_cut)
+        x = super().compute(signal, fs, axis=axis)
+        return extensions.dominant_frequency_value(x, fs, self.pad, self.low_cut, self.high_cut)
 
 
 class PowerSpectralSum(Feature):
@@ -171,11 +157,11 @@ class PowerSpectralSum(Feature):
             high_cutoff=high_cutoff
         )
 
-        self.padlevel = padlevel
+        self.pad = padlevel
         self.low_cut = low_cutoff
         self.high_cut = high_cutoff
 
-    def compute(self, signal, fs, *, axis=-1, col_axis=-2, columns=None):
+    def compute(self, signal, fs=1., *, axis=-1):
         """
         Compute the power spectral sum
 
@@ -184,25 +170,18 @@ class PowerSpectralSum(Feature):
         signal : array-like
             Array-like containing values to compute the power spectral sum for.
         fs : float
-            Sampling frequency in Hz.
+            Sampling frequency in Hz. If not provided, default is assumed to be 1Hz.
         axis : int, optional
             Axis along which the signal entropy will be computed. Ignored if `signal` is a
             pandas.DataFrame. Default is last (-1).
-        col_axis : int, optional
-            Axis along which column indexing will be done. Ignored if `signal` is a pandas.DataFrame
-            or if `signal` is 2D.
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
 
         Returns
         -------
         pss : numpy.ndarray
             Computed power spectral sum.
         """
-        return super().compute(signal, fs, axis=axis, col_axis=col_axis, columns=columns)
-
-    def _compute(self, x, fs):
-        return extensions.power_spectral_sum(x, fs, self.padlevel, self.low_cut, self.high_cut)
+        x = super().compute(signal, fs, axis=axis)
+        return extensions.power_spectral_sum(x, fs, self.pad, self.low_cut, self.high_cut)
 
 
 class SpectralFlatness(Feature):
@@ -238,11 +217,11 @@ class SpectralFlatness(Feature):
             high_cutoff=high_cutoff
         )
 
-        self.padlevel = padlevel
+        self.pad = padlevel
         self.low_cut = low_cutoff
         self.high_cut = high_cutoff
 
-    def compute(self, signal, fs, *, axis=-1, col_axis=-2, columns=None):
+    def compute(self, signal, fs=1., *, axis=-1):
         """
         Compute the spectral flatness
 
@@ -251,25 +230,18 @@ class SpectralFlatness(Feature):
         signal : array-like
             Array-like containing values to compute the spectral flatness for.
         fs : float
-            Sampling frequency in Hz.
+            Sampling frequency in Hz. If not provided, default is assumed to be 1Hz.
         axis : int, optional
             Axis along which the signal entropy will be computed. Ignored if `signal` is a
             pandas.DataFrame. Default is last (-1).
-        col_axis : int, optional
-            Axis along which column indexing will be done. Ignored if `signal` is a pandas.DataFrame
-            or if `signal` is 2D.
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
 
         Returns
         -------
         spec_flat : numpy.ndarray
             Computed spectral flatness.
         """
-        return super().compute(signal, fs, axis=axis, col_axis=col_axis, columns=columns)
-
-    def _compute(self, x, fs):
-        return extensions.spectral_flatness(x, fs, self.padlevel, self.low_cut, self.high_cut)
+        x = super().compute(signal, fs, axis=axis)
+        return extensions.spectral_flatness(x, fs, self.pad, self.low_cut, self.high_cut)
 
 
 class SpectralEntropy(Feature):
@@ -303,11 +275,11 @@ class SpectralEntropy(Feature):
             high_cutoff=high_cutoff
         )
 
-        self.padlevel = padlevel
+        self.pad = padlevel
         self.low_cut = low_cutoff
         self.high_cut = high_cutoff
 
-    def compute(self, signal, fs, *, axis=-1, col_axis=-2, columns=None):
+    def compute(self, signal, fs=1., *, axis=-1):
         """
         Compute the spectral entropy
 
@@ -316,22 +288,15 @@ class SpectralEntropy(Feature):
         signal : array-like
             Array-like containing values to compute the spectral entropy for.
         fs : float
-            Sampling frequency in Hz.
+            Sampling frequency in Hz. If not provided, default is assumed to be 1Hz.
         axis : int, optional
             Axis along which the signal entropy will be computed. Ignored if `signal` is a
             pandas.DataFrame. Default is last (-1).
-        col_axis : int, optional
-            Axis along which column indexing will be done. Ignored if `signal` is a pandas.DataFrame
-            or if `signal` is 2D.
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
 
         Returns
         -------
         spec_ent : numpy.ndarray
             Computed spectral entropy.
         """
-        return super().compute(signal, fs, axis=axis, col_axis=col_axis, columns=columns)
-
-    def _compute(self, x, fs):
-        return extensions.spectral_entropy(x, fs, self.padlevel, self.low_cut, self.high_cut)
+        x = super().compute(signal, fs, axis=axis)
+        return extensions.spectral_entropy(x, fs, self.pad, self.low_cut, self.high_cut)
