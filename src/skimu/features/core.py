@@ -51,16 +51,14 @@ def normalize_indices(nfeat, index):
         raise IndexError("Index not understood")
 
 
-def normalize_axes(ndim, is_df, axis, ind_axis):
+def normalize_axes(ndim, axis, ind_axis):
     """
     Normalize input axes to be positive/correct for how the swapping has to work
     """
     if axis == ind_axis:
         raise IndexError("axis and index_axis cannot be the same")
 
-    if is_df:
-        return 0, 0  # has to be 0 for the way the double swap works
-    elif ndim == 1:
+    if ndim == 1:
         return 0, None
     elif ndim >= 2:
         """
@@ -265,7 +263,7 @@ class Bank:
             except ValueError as e:
                 raise ArrayConversionError("Error converting signal to ndarray") from e
 
-        axis, index_axis = normalize_axes(x.ndim, isinstance(signal, DataFrame), axis, index_axis)
+        axis, index_axis = normalize_axes(x.ndim, axis, index_axis)
 
         if index_axis is None:
             indices = [...] * len(self)
