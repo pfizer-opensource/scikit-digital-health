@@ -29,8 +29,8 @@ class BaseTestFeature:
         assert np.allclose(pred, truth)
 
     def test_dataframe(self, fs, df_acc, get_dataframe_truth):
-        df_truth = get_dataframe_truth(self.feature.__class__.__name__)
-        df_pred = self.feature.compute(df_acc, fs=fs)
+        df_truth, cols = get_dataframe_truth(self.feature.__class__.__name__)
+        df_pred = self.feature.compute(df_acc, fs=fs, axis=0)
 
         assert np.allclose(df_pred, df_truth)
 
