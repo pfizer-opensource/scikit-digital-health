@@ -10,6 +10,7 @@ from pandas import DataFrame
 
 from skimu.features import *
 from skimu.features import lib
+from skimu.features.core import ArrayConversionError
 
 
 class TestFeatureBank:
@@ -26,6 +27,12 @@ class TestFeatureBank:
 
         return bank
 
+    def test_array_conversion_error(self):
+        bank = self.test_add()
+
+        with pytest.raises(ArrayConversionError):
+            bank.compute([0, [1, 2, 3], [2, 9]])
+
     @pytest.mark.parametrize(
         ("index_", "index_length"),
         (
@@ -37,16 +44,23 @@ class TestFeatureBank:
         )
     )
     def test_add_single_index(self, index_, index_length):
+        # PART 1: test adding indices in bank.add
         bank = Bank()
-
         bank.add([Mean(), Range(), StdDev()], index=index_)
-
-        assert all([i == bank._indices[0] for i in bank._indices])
-
         x = random((10, 100, 150))
         res = bank.compute(x, fs=20., axis=-1, index_axis=0)
 
+        assert all([i == bank._indices[0] for i in bank._indices])
         assert res.shape == (len(bank) * index_length, 100)
+
+        # PART 2: test adding indices in bank.compute
+        bank2 = Bank()
+        bank2.add([Mean(), Range(), StdDev()])
+        x = random((10, 100, 150))
+        res2 = bank2.compute(x, fs=20., axis=-1, index_axis=0, indices=index_)
+
+        assert all([i == bank2._indices[0] for i in bank2._indices])
+        assert res2.shape == (len(bank2) * index_length, 100)
 
     @pytest.mark.parametrize(
         ("index_", "index_count", "index_equal"),
@@ -61,19 +75,27 @@ class TestFeatureBank:
         )
     )
     def test_add_multiple_index(self, index_, index_count, index_equal):
+        # PART 1: add indices in bank.add
         bank = Bank()
-
         bank.add([Mean(), Range(), RMS(), IQR()], index=index_)
-
-        if index_equal:
-            assert all([i == bank._indices[0] for i in bank._indices])
-
         bank.add(StdDev())  # another 10 elements, default is to include all elements
-
         x = random((10, 100, 150))
         res = bank.compute(x, fs=20., axis=-1, index_axis=0)
 
+        if index_equal:
+            assert all([i == bank._indices[0] for i in bank._indices[:-1]])
         assert res.shape == (index_count + 10, 100)
+
+        # PART 2: add indices in bank.compute
+        bank2 = Bank()
+        bank2.add([Mean(), Range(), RMS(), IQR()], index=index_)
+        bank2.add(StdDev())  # another 10 elements, default is to include all elements
+        x = random((10, 100, 150))
+        res2 = bank2.compute(x, fs=20., axis=-1, index_axis=0)
+
+        if index_equal:
+            assert all([i == bank2._indices[0] for i in bank2._indices[:-1]])
+        assert res2.shape == (index_count + 10, 100)
 
     def test_columns(self):
         bank = self.test_add()
