@@ -360,7 +360,4 @@ class Feature(ABC):
             ndarray of the computed feature
         """
         # move the computation axis to the end
-        if isinstance(signal, DataFrame):
-            return moveaxis(signal.values.astype(float_), 0, -1)
-        else:
-            return moveaxis(asarray(signal, dtype=float_), axis, -1)
+        return moveaxis(asarray(signal, dtype=float_), axis, -1)
