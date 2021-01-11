@@ -199,7 +199,7 @@ class TestFeatureBank:
         bank = self.test_add()
         x = DataFrame(data=random((100, 5)))
 
-        res = bank.compute(x)
+        res = bank.compute(x, axis=0, index_axis=1)
         assert res.shape == (15,)
 
     def test_contains(self):
