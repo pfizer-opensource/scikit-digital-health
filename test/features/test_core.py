@@ -1,6 +1,8 @@
 """
 Testing core functionality for the feature module
 """
+from tempfile import NamedTemporaryFile
+
 import pytest
 from numpy import allclose
 from numpy.random import random
@@ -54,7 +56,8 @@ class TestFeatureBank:
                 ([[3], 4, 0, 1], 4, False),  # this should also be 1 per feature
                 ([3, 4, 0, 1], 16, True),  # this should be applied to each feature, 4*4
                 (..., 40, True),
-                (4, 4, True)
+                (4, 4, True),
+                (None, 40, True)
         )
     )
     def test_add_multiple_index(self, index_, index_count, index_equal):
@@ -63,47 +66,64 @@ class TestFeatureBank:
         bank.add([Mean(), Range(), RMS(), IQR()], index=index_)
 
         if index_equal:
-            assert all([bank._indices[i] == index_ for i in range(4)])
+            assert all([i == bank._indices[0] for i in bank._indices])
 
         bank.add(StdDev())  # another 10 elements, default is to include all elements
 
         x = random((10, 100, 150))
-        res = bank.compute(x, fs=20., axis=-1, col_axis=0)
+        res = bank.compute(x, fs=20., axis=-1, index_axis=0)
 
         assert res.shape == (index_count + 10, 100)
-
-    def test_add_index_no_col_axis_error(self):
-        bank = Bank()
-
-        bank.add([Mean(), Range()], index=[0, 4])
-
-        x = random((10, 100, 150))
-
-        # TODO change this to specific error
-        with pytest.raises(Exception):
-            res = bank.compute(x, fs=20., axis=-1, col_axis=None)
 
     def test_columns(self):
         bank = self.test_add()
 
-        x = random((10, 100, 150))
-        res = bank.compute(x, axis=-1, col_axis=0, columns=slice(0, 10, 3))  # 0, 3, 6, 9
-
-        assert res.shape == (4 * 3, 100)
-
         x = DataFrame(data=random((100, 3)), columns=['x', 'y', 'z'])
-        res = bank.compute(x, axis=0, col_axis=1, columns=['x', 'z'])
+        res = bank.compute(x, axis=0, index_axis=1, columns=['x', 'z'])
 
-        assert res.shape == (100, 2 * 3)
+        assert res.shape == (2 * 3,)
 
+    """
+    |  shape       | axis  | ind_ax |  res shape   |
+    |--------------|-------|--------|--------------|
+    | (a, b)       |   0   |    1   | (bf,)        |
+    | (a, b)       |   0   |    N   | (f, b)       |
+    | (a, b)       |   1   |    0   | (3a,)        |
+    | (a, b)       |   1   |    N   | (f, a)       |
+    | (a, b, c)    |   0   |  1(0)  | (bf, c)      |
+    | (a, b, c)    |   0   |  2(1)  | (b, cf)      |
+    | (a, b, c)    |   0   |  N     | (f, b, c)    |
+    | (a, b, c)    |   1   |  0     | (af, c)      |
+    | (a, b, c)    |   1   |  2(1)  | (a, cf)      |
+    | (a, b, c)    |   1   |  N     | (f, a, c)    |
+    | (a, b, c)    |   2   |  0     | (af, b)      |
+    | (a, b, c)    |   2   |  1     | (a, bf)      |
+    | (a, b, c)    |   2   |  N     | (f, a, b)    |
+    | (a, b, c, d) |   0   |  1(0)  | (bf, c, d)   |
+    | (a, b, c, d) |   0   |  2(1)  | (b, cf, d)   |
+    | (a, b, c, d) |   0   |  3(2)  | (d, c, df)   |
+    | (a, b, c, d) |   0   |  N     | (f, b, c, d) |
+    | (a, b, c, d) |   1   |  0     | (af, c, d)   |
+    | (a, b, c, d) |   1   |  2(1)  | (a, cf, d)   |
+    | (a, b, c, d) |   1   |  3(2)  | (a, c, df)   |
+    | (a, b, c, d) |   1   |  N     | (f, a, c, d) |
+    | (a, b, c, d) |   2   |  0     | (af, b, d)   |
+    | (a, b, c, d) |   2   |  1     | (a, bf, d)   |
+    | (a, b, c, d) |   2   |  3(2)  | (a, b, df)   |
+    | (a, b, c, d) |   2   |  N     | (f, a, b, d) |
+    | (a, b, c, d) |   3   |  0     | (af, b, c)   |
+    | (a, b, c, d) |   3   |  1     | (a, bf, c)   |
+    | (a, b, c, d) |   3   |  2     | (a, b, cf)   |
+    | (a, b, c, d) |   3   |  N     | (f, a, b, c) |
+    """
     @pytest.mark.parametrize(
         ("in_shape", "axis", "caxis", "out_shape"),
         (
                 # 1D
                 (150, 0, None, (3,)),
                 # 2D
-                ((5, 10), 0, 1, (5 * 3,)),
-                ((5, 10), 0, None, (3, 5)),
+                ((5, 10), 0, 1, (10 * 3,)),
+                ((5, 10), 0, None, (3, 10)),
                 ((5, 10), 1, 0, (5 * 3,)),
                 ((5, 10), 1, None, (3, 5)),
                 # 3D
@@ -123,39 +143,6 @@ class TestFeatureBank:
         )
     )
     def test_shape(self, in_shape, axis, caxis, out_shape):
-        """
-        |  shape       | axis  | ind_ax |  res shape   |
-        |--------------|-------|--------|--------------|
-        | (a, b)       |   0   |    1   | (bf,)        |
-        | (a, b)       |   0   |    N   | (f, b)       |
-        | (a, b)       |   1   |    0   | (3a,)        |
-        | (a, b)       |   1   |    N   | (f, a)       |
-        | (a, b, c)    |   0   |  1(0)  | (bf, c)      |
-        | (a, b, c)    |   0   |  2(1)  | (b, cf)      |
-        | (a, b, c)    |   0   |  N     | (f, b, c)    |
-        | (a, b, c)    |   1   |  0     | (af, c)      |
-        | (a, b, c)    |   1   |  2(1)  | (a, cf)      |
-        | (a, b, c)    |   1   |  N     | (f, a, c)    |
-        | (a, b, c)    |   2   |  0     | (af, b)      |
-        | (a, b, c)    |   2   |  1     | (a, bf)      |
-        | (a, b, c)    |   2   |  N     | (f, a, b)    |
-        | (a, b, c, d) |   0   |  1(0)  | (bf, c, d)   |
-        | (a, b, c, d) |   0   |  2(1)  | (b, cf, d)   |
-        | (a, b, c, d) |   0   |  3(2)  | (d, c, df)   |
-        | (a, b, c, d) |   0   |  N     | (f, b, c, d) |
-        | (a, b, c, d) |   1   |  0     | (af, c, d)   |
-        | (a, b, c, d) |   1   |  2(1)  | (a, cf, d)   |
-        | (a, b, c, d) |   1   |  3(2)  | (a, c, df)   |
-        | (a, b, c, d) |   1   |  N     | (f, a, c, d) |
-        | (a, b, c, d) |   2   |  0     | (af, b, d)   |
-        | (a, b, c, d) |   2   |  1     | (a, bf, d)   |
-        | (a, b, c, d) |   2   |  3(2)  | (a, b, df)   |
-        | (a, b, c, d) |   2   |  N     | (f, a, b, d) |
-        | (a, b, c, d) |   3   |  0     | (af, b, c)   |
-        | (a, b, c, d) |   3   |  1     | (a, bf, c)   |
-        | (a, b, c, d) |   3   |  2     | (a, b, cf)   |
-        | (a, b, c, d) |   3   |  N     | (f, a, b, c) |
-        """
         bank = self.test_add()
         x = random(in_shape)
 
@@ -182,16 +169,18 @@ class TestFeatureBank:
         assert DominantFrequencyValue(padlevel=4, low_cutoff=0., high_cutoff=5.) in bank
         assert DominantFrequencyValue(padlevel=2, low_cutoff=0., high_cutoff=5.) not in bank
 
-    def test_save_load(self, bank_file):
+    def test_save_load(self):
         bank = self.test_add()
+
+        bank_file = NamedTemporaryFile('r+')
 
         x = random((5, 100, 150))
         truth1 = bank.compute(x, fs=20., axis=-1, index_axis=None)
         truth2 = bank.compute(x, fs=20., axis=-1, index_axis=0)
 
-        bank.save(bank_file)
+        bank.save(bank_file.name)
 
-        bank2 = Bank(bank_file=bank_file)
+        bank2 = Bank(bank_file=bank_file.name)
         res1 = bank2.compute(x, fs=20., axis=-1, index_axis=None)
         res2 = bank2.compute(x, fs=20., axis=-1, index_axis=0)
 
@@ -199,7 +188,9 @@ class TestFeatureBank:
         assert allclose(res2, truth2)
 
         bank3 = Bank()
-        bank3.load(bank_file)
+        bank3.load(bank_file.name)
+
+        bank_file.close()
 
         res3 = bank3.compute(x, fs=20., axis=-1, index_axis=None)
         res4 = bank3.compute(x, fs=20., axis=-1, index_axis=0)
@@ -229,11 +220,18 @@ class TestFeature:
         for ndim in range(5):
             for axis in range(ndim - 1):
                 in_shape = (5, 10, 15, 20, 25)[:ndim+1]
-                out_shape = (i for i in in_shape if i != axis)  # remove the axis of computation
+                out_shape = tuple(s for i, s in enumerate(in_shape) if i != axis)  # remove the axis of computation
                 x = random(in_shape)
                 for ft in lib.__all__:
-                    f = ft()  # default parameters
-                    res = f.compute(x, axis=axis)
+                    f = getattr(lib, ft)()  # default parameters
+
+                    # if testing detail power stuff, need more values
+                    if 'Detail' in ft:
+                        shape = list(in_shape)
+                        shape[axis] = 150
+                        x = random(tuple(shape))
+
+                    res = f.compute(x, axis=axis, fs=50.)
 
                     assert res.shape == out_shape, f"Failed on feature {f!s} for ndim {ndim} " \
                                                    f"and axis {axis}. Input " \
