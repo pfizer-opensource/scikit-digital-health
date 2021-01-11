@@ -33,6 +33,29 @@ class TestFeatureBank:
         with pytest.raises(ArrayConversionError):
             bank.compute([0, [1, 2, 3], [2, 9]])
 
+    def test_same_axis_error(self):
+        bank = self.test_add()
+
+        with pytest.raises(IndexError):
+            bank.compute([1, 2, 3, 4, 5, 6, 7], axis=0, index_axis=0)
+
+    @pytest.mark.parametrize("indices", ("135", 5.13513))
+    def test_axis_error(self, indices):
+        bank = self.test_add()
+
+        with pytest.raises(IndexError):
+            bank.compute(random((50, 150)), axis=-1, index_axis=0, indices=indices)
+
+    def test_duplicate_warning(self):
+        bank = Bank()
+        bank.add([Mean(), Range()])
+
+        with pytest.warns(UserWarning):
+            bank.add(Mean())
+
+        with pytest.warns(UserWarning):
+            bank.add([Range(), DominantFrequency()])
+
     @pytest.mark.parametrize(
         ("index_", "index_length"),
         (
