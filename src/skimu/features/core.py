@@ -167,10 +167,12 @@ class Bank:
         """
         if isinstance(features, Feature):
             if features in self:
-                warn(f"Feature {features!s} already in the Bank, will be duplicated.")
+                warn(f"Feature {features!s} already in the Bank, will be duplicated.", UserWarning)
             self._indices.append(partial_index_check(index))
             self._feats.append(features)
         elif all([isinstance(i, Feature) for i in features]):
+            if any([ft in self for ft in features]):
+                warn(f"Feature already in the Bank, will be duplicated.", UserWarning)
             self._indices.extend(normalize_indices(len(features), index))
             self._feats.extend(features)
 
