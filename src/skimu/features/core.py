@@ -19,6 +19,17 @@ class ArrayConversionError(Exception):
     pass
 
 
+def get_n_feats(size, index):
+    if isinstance(index, int):
+        return 1
+    elif isinstance(index, (Iterator, Sequence)):
+        return len(index)
+    elif isinstance(index, slice):
+        return len(range(*index.indices(size)))
+    elif isinstance(index, type(Ellipsis)):
+        return size
+
+
 def partial_index_check(index):
     if isinstance(index, str) or isinstance(index, float):
         raise IndexError("Indices cannot be strings or floats.")
@@ -30,12 +41,10 @@ def partial_index_check(index):
 def normalize_indices(nfeat, index):
     if index is None:
         return [...] * nfeat
-    elif isinstance(index, int):
-        return [[index]] * nfeat
-    elif not isinstance(index, Iterator):  # slice, single integer, etc
+    elif not isinstance(index, (Iterator, Sequence)):  # slice, single integer, etc
         return [partial_index_check(index)] * nfeat
     elif all([isinstance(i, int) for i in index]):  # iterable of ints
-        return [[index]] * nfeat
+        return [index] * nfeat
     elif isinstance(index, Sequence):  # able to be indexed
         return [partial_index_check(i) for i in index]
     else:
@@ -176,8 +185,8 @@ class Bank:
             File to be saved to. Creates a new file or overwrites an existing file.
         """
         out = []
-        for ft in self._feats:
-            idx = "Ellipsis" if ft.index is Ellipsis else ft.index
+        for i, ft in enumerate(self._feats):
+            idx = "Ellipsis" if self._indices[i] is Ellipsis else self._indices[i]
             out.append(
                 {
                     ft.__class__.__name__: {
@@ -236,7 +245,7 @@ class Bank:
             to each feature, or a list-like of lists/objects with a 1:1 correspondence to the
             features present in the Bank. If provided, takes precedence over any values given in
             `Bank.add`. Default is None, which will use indices from `Bank.add`.
-        columns : {None, list-like}, optional
+        columns : {None, list}, optional
             Columns to use if providing a dataframe. Default is None (uses all columns).
 
         Returns
@@ -272,12 +281,15 @@ class Bank:
             n_feats = [1] * len(self)
             feats = zeros((sum(n_feats),) + x.shape[:-1], dtype=float_)
         else:
-            # move both the computation and index axis
-            x = moveaxis(x, [axis, index_axis], [-1, 0])
+            # move both the computation and index axis. do this in two steps to allow for undoing
+            # just the index axis swap later. The index_axis has been adjusted appropriately
+            # to match this axis move in 2 steps
+            x = moveaxis(x, axis, -1)
+            x = moveaxis(x, index_axis, 0)
 
             n_feats = []
             for ind in indices:
-                n_feats.append(x[ind].shape[0])
+                n_feats.append(get_n_feats(x.shape[0], ind))
 
             feats = zeros((sum(n_feats),) + x.shape[1:-1], dtype=float_)
 
