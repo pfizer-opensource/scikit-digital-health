@@ -78,11 +78,12 @@ def get_gait_classification_lgbm(gait_pred, accel, fs):
         accel_w = get_windowed_view(accel_filt, wlen, wstep, ensure_c_contiguity=False)
 
         # get the feature bank
-        feat_bank = Bank(window_length=None, window_step=None)  # data is already windowed
+        feat_bank = Bank()  # data is already windowed
         feat_bank.load(_resolve_path('skimu.gait.model', 'final_features.json'))
 
         # compute the features
-        accel_feats = feat_bank.compute(accel_w, fs=fs, windowed=True)
+        accel_feats = feat_bank.compute(accel_w, fs=fs, axis=1, index_axis=None)
+        # output shape is (18, 99), need to transpose when passing to classifier
 
         # load the classification model
         lgb_file = str(
@@ -91,7 +92,7 @@ def get_gait_classification_lgbm(gait_pred, accel, fs):
         bst = lgb.Booster(model_file=lgb_file)
 
         # predict
-        gait_predictions = (bst.predict(accel_feats, raw_score=False) > thresh).astype(int_)
+        gait_predictions = (bst.predict(accel_feats.T, raw_score=False) > thresh).astype(int_)
 
         bout_starts = where(diff(gait_predictions) == 1)[0] + 1  # account for n-1 samples in diff
         bout_stops = where(diff(gait_predictions) == -1)[0] + 1

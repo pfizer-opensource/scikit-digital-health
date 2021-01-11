@@ -4,49 +4,77 @@ Different entropy measures
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
-from numpy import empty, arange, multiply, zeros, power, unique, log2
-from math import factorial
-
 from skimu.features.core import Feature
-from skimu.features.lib import _cython
+from skimu.features.lib import extensions
 
 __all__ = ['SignalEntropy', 'SampleEntropy', 'PermutationEntropy']
 
 
 class SignalEntropy(Feature):
-    """
+    r"""
     A Measure of the information contained in a signal. Also described as a measure of how
     surprising the outcome of a variable is.
-    """
-    def __init__(self):
-        super(SignalEntropy, self).__init__('SignalEntropy', {})
 
-    def compute(self, *args, **kwargs):
+    Notes
+    -----
+    The entropy is estimated using the histogram of the input signal. Bin limits for the
+    histogram are defined per
+
+    .. math::
+
+        n_{bins} = ceil(\sqrt{N})
+        \delta = \frac{x_{max} - x_{min}}{N - 1}
+        bin_{min} = x_{min} - \frac{\delta}{2}
+        bin_{max} = x_{max} + \frac{\delta}{2}
+
+    where :math:`N` is the number of samples in the signal. Note that the data is standardized
+    before computing (using mean and standard deviation).
+
+    With the histogram, then the estimate of the entropy is computed per
+
+    .. math::
+
+        H_{est} = -\sum_{i=1}^kf(x_i)ln(f(x_i)) + ln(w) - bias
+        w = \frac{bin_{max} - bin_{min}}{n_{bins}}
+        bias = -\frac{n_{bins} - 1}{2N}
+
+    Because of the standardization before the histogram computation, the entropy
+    estimate is scaled again per
+
+    .. math:: H_{est} = exp(H_{est}^2) - 2
+
+    References
+    ----------
+    .. [1] Wallis, Kenneth. "A note on the calculation of entropy from histograms". 2006.
+    https://warwick.ac.uk/fac/soc/economics/staff/academic/wallis/publications/entropy.pdf
+    """
+    __slots__ = ()
+
+    def __init__(self):
+        super(SignalEntropy, self).__init__()
+
+    def compute(self, signal, *, axis=-1, **kwargs):
         """
-        compute(signal, *, columns=None, windowed=False)
+        compute(signal, *, axis=-1)
 
         Compute the signal entropy
 
         Parameters
         ----------
-        signal : {numpy.ndarray, pandas.DataFrame}
-            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
-        windowed : bool, optional
-            If the signal has already been windowed. Default is False.
+        signal : array-like
+            Array-like containing values to compute the signal entropy for.
+        axis : int, optional
+            Axis along which the signal entropy will be computed. Ignored if `signal` is a
+            pandas.DataFrame. Default is last (-1).
 
         Returns
         -------
-        sig_en : {numpy.ndarray, pandas.DataFrame}
-            Computed signal entropy, returned as the same type as the input signal
+        sig_ent : numpy.ndarray
+            Computed signal entropy.
         """
-        return super().compute(*args, **kwargs)
+        x = super().compute(signal, axis=axis)
 
-    def _compute(self, x, fs):
-        super(SignalEntropy, self)._compute(x, fs)
-
-        self._result = _cython.SignalEntropy(x)
+        return extensions.signal_entropy(x)
 
 
 class SampleEntropy(Feature):
@@ -80,43 +108,37 @@ class SampleEntropy(Feature):
 
     References
     ----------
-    https://archive.physionet.org/physiotools/sampen/c/sampen.c
+    .. [1] https://archive.physionet.org/physiotools/sampen/c/sampen.c
     """
+    __slots__ = ("m", "r")
+
     def __init__(self, m=4, r=1.0):
-        super(SampleEntropy, self).__init__('SampleEntropy', {'m': m, 'r': r})
+        super(SampleEntropy, self).__init__(m=m, r=r)
 
         self.m = m
         self.r = r
 
-    def compute(self, *args, **kwargs):
+    def compute(self, signal, *, axis=-1, **kwargs):
         """
-        compute(signal, *, columns=None, windowed=False)
+        compute(signal, *, axis=-1)
 
-        Compute the detail power ratio
+        Compute the sample entropy of a signal
 
         Parameters
         ----------
-        signal : {numpy.ndarray, pandas.DataFrame}
-            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
-        windowed : bool, optional
-            If the signal has already been windowed. Default is False.
+        signal : array-like
+            Array-like containing values to compute the sample entropy for.
+        axis : int, optional
+            Axis along which the signal entropy will be computed. Ignored if `signal` is a
+            pandas.DataFrame. Default is last (-1).
 
         Returns
         -------
-        samp_en : {numpy.ndarray, pandas.DataFrame}
-            Computed sample entropy, returned as the same type as the input signal
+        samp_en : numpy.ndarray
+            Computed sample entropy.
         """
-        return super().compute(*args, **kwargs)
-
-    def _compute(self, x, fs):
-        super(SampleEntropy, self)._compute(x, fs)
-
-        # TODO check computation
-        res = _cython.SampleEntropy(x, self.m, self.r)
-
-        self._result = res[:, -1, :]
+        x = super().compute(signal, axis=axis)
+        return extensions.sample_entropy(x, self.m, self.r)
 
 
 class PermutationEntropy(Feature):
@@ -133,83 +155,36 @@ class PermutationEntropy(Feature):
     normalize : bool, optional
         Normalize the output between 0 and 1. Default is False.
     """
+    __slots__ = ("order", "delay", "normalize")
+
     def __init__(self, order=3, delay=1, normalize=False):
         super(PermutationEntropy, self).__init__(
-            "PermutationEntropy", {'order': order, 'delay': delay, 'normalize': normalize}
+            order=order,
+            delay=delay,
+            normalize=False
         )
         self.order = order
         self.delay = delay
         self.normalize = normalize
 
-    def compute(self, *args, **kwargs):
+    def compute(self, signal, *, axis=-1, **kwargs):
         """
-        compute(signal, *, columns=None, windowed=False)
+        compute(signal, *, axis=-1)
 
         Compute the permutation entropy
 
         Parameters
         ----------
-        signal : {numpy.ndarray, pandas.DataFrame}
-            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
-        windowed : bool, optional
-            If the signal has already been windowed. Default is False.
+        signal : array-like
+            Array-like containing values to compute the signal entropy for.
+        axis : int, optional
+            Axis along which the signal entropy will be computed. Ignored if `signal` is a
+            pandas.DataFrame. Default is last (-1).
 
         Returns
         -------
-        perm_en : {numpy.ndarray, pandas.DataFrame}
-            Computed permutation entropy, returned as the same type as the input signal
+        perm_en : numpy.ndarray
+            Computed permutation entropy.
         """
-        return super().compute(*args, **kwargs)
-
-    def _compute(self, x, fs):
-        super(PermutationEntropy, self)._compute(x, fs)
-
-        pe = zeros((x.shape[0], x.shape[2]))
-        hashmult = power(self.order, arange(self.order))
-
-        for wind in range(x.shape[0]):
-            for ax in range(x.shape[2]):
-                # Embed x and sort the order of permutations
-                sorted_idx = PermutationEntropy._embed(
-                    x[wind, :, ax], self.order, self.delay
-                ).argsort(kind='quicksort')
-
-                # Associate unique integer to each permutations
-                hashval = (multiply(sorted_idx, hashmult)).sum(1)
-
-                # Return the counts
-                _, c = unique(hashval, return_counts=True)
-
-                # Use true_divide for Python 2 compatibility
-                p = c / c.sum()
-                pe[wind, ax] = -multiply(p, log2(p)).sum()
-        if self.normalize:
-            pe = pe / log2(factorial(self.order))
-
-        self._result = pe
-
-    @staticmethod
-    def _embed(x_1d, order, delay):
-        """
-        Time-delay embedding.
-
-        Parameters
-        ----------
-        x_1d : 1d-array, shape (n_times)
-            Time series
-        order : int
-            Embedding dimension (order)
-        delay : int
-            Delay.
-        Returns
-        -------
-        embedded : ndarray, shape (n_times - (order - 1) * delay, order)
-            Embedded time-series.
-        """
-        N = x_1d.size
-        Y = empty((order, N - (order - 1) * delay))
-        for i in range(order):
-            Y[i] = x_1d[i * delay:i * delay + Y.shape[1]]
-        return Y.T
+        x = super().compute(signal, axis=axis)
+        return extensions.permutation_entropy(x, self.order, self.delay, self.normalize)

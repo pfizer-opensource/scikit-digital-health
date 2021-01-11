@@ -7,7 +7,7 @@ Pfizer DMTI 2020
 from numpy import max, min, quantile, mean, std, arange
 
 from skimu.features.core import Feature
-from skimu.features.lib import _cython
+from skimu.features.lib import extensions
 
 __all__ = ['Range', 'IQR', 'RMS', 'Autocorrelation', 'LinearSlope']
 
@@ -16,109 +16,96 @@ class Range(Feature):
     """
     The difference between the maximum and minimum value.
     """
-    def __init__(self):
-        super().__init__("Range", {})
+    __slots__ = ()
 
-    def compute(self, *args, **kwargs):
+    def __init__(self):
+        super().__init__()
+
+    def compute(self, signal, *, axis=-1, **kwargs):
         """
-        compute(signal, *, columns=None, windowed=False)
+        compute(signal, *, axis=-1)
 
         Compute the range
 
         Parameters
         ----------
-        signal : {numpy.ndarray, pandas.DataFrame}
-            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
-        windowed : bool, optional
-            If the signal has already been windowed. Default is False.
+        signal : array-like
+            Array-like containing values to compute the range for.
+        axis : int, optional
+            Axis along which the signal entropy will be computed. Ignored if `signal` is a
+            pandas.DataFrame. Default is last (-1).
 
         Returns
         -------
-        range : {numpy.ndarray, pandas.DataFrame}
-            Signal range, returned as the same type as `signal`
+        range : numpy.ndarray
+            Signal range.
         """
-        return super().compute(*args, **kwargs)
-
-    def _compute(self, x, fs):
-        super()._compute(x, fs)
-
-        self._result = max(x, axis=1) - min(x, axis=1)
+        x = super().compute(signal, axis=axis)
+        return max(x, axis=-1) - min(x, axis=-1)
 
 
 class IQR(Feature):
     """
     The difference between the 75th percentile and 25th percentile of the values.
     """
-    def __init__(self):
-        super(IQR, self).__init__("IQR", {})
+    __slots__ = ()
 
-    def compute(self, *args, **kwargs):
+    def __init__(self):
+        super(IQR, self).__init__()
+
+    def compute(self, signal, *, axis=-1, **kwargs):
         """
-        compute(signal, *, columns=None, windowed=False)
+        compute(signal, *, axis=-1)
 
         Compute the IQR
 
         Parameters
         ----------
-        signal : {numpy.ndarray, pandas.DataFrame}
-            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
-        windowed : bool, optional
-            If the signal has already been windowed. Default is False.
+        signal : array-like
+            Array-like containing values to compute the IQR for.
+        axis : int, optional
+            Axis along which the signal entropy will be computed. Ignored if `signal` is a
+            pandas.DataFrame. Default is last (-1).
 
         Returns
         -------
-        iqr : {numpy.ndarray, pandas.DataFrame}
-            Signal IQR, returned as the same type as `signal`
+        iqr : numpy.ndarray
+            Signal IQR.
         """
-        return super().compute(*args, **kwargs)
-
-    def _compute(self, x, fs):
-        super(IQR, self)._compute(x, fs)
-
-        self._result = quantile(x, 0.75, axis=1) - quantile(x, 0.25, axis=1)
+        x = super().compute(signal, axis=axis)
+        return quantile(x, 0.75, axis=-1) - quantile(x, 0.25, axis=-1)
 
 
 class RMS(Feature):
     """
     The root mean square value of the signal
-
-    Methods
-    -------
-    compute(signal[, columns=None, windowed=False])
     """
-    def __init__(self):
-        super(RMS, self).__init__('RMS', {})
+    __slots__ = ()
 
-    def compute(self, *args, **kwargs):
+    def __init__(self):
+        super(RMS, self).__init__()
+
+    def compute(self, signal, *, axis=-1, **kwargs):
         """
-        compute(signal, *, columns=None, windowed=False)
+        compute(signal, *, axis=-1)
 
         Compute the RMS
 
         Parameters
         ----------
-        signal : {numpy.ndarray, pandas.DataFrame}
-            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
-        windowed : bool, optional
-            If the signal has already been windowed. Default is False.
+        signal : array-like
+            Array-like containing values to compute the RMS for.
+        axis : int, optional
+            Axis along which the signal entropy will be computed. Ignored if `signal` is a
+            pandas.DataFrame. Default is last (-1).
 
         Returns
         -------
-        rms : {numpy.ndarray, pandas.DataFrame}
-            Signal RMS, returned as the same type as `signal`
+        rms : numpy.ndarray
+            Signal RMS.
         """
-        return super().compute(*args, **kwargs)
-
-    def _compute(self, x, fs):
-        super(RMS, self)._compute(x, fs)
-
-        self._result = std(x - mean(x, axis=1, keepdims=True), axis=1, ddof=1)
+        x = super().compute(signal, axis=axis)
+        return std(x - mean(x, axis=-1, keepdims=True), axis=-1, ddof=1)
 
 
 class Autocorrelation(Feature):
@@ -132,77 +119,70 @@ class Autocorrelation(Feature):
     normalize : bool, optional
         Normalize the result using the mean/std. deviation. Default is True
     """
+    __slots__ = ("lag", "normalize")
+
     def __init__(self, lag=1, normalize=True):
         super(Autocorrelation, self).__init__(
-            'Autocorrelation', {'lag': lag, 'normalize': normalize}
+            lag=lag,
+            normalize=normalize
         )
 
         self.lag = lag
         self.normalize = normalize
 
-    def compute(self, *args, **kwargs):
+    def compute(self, signal, *, axis=-1, **kwargs):
         """
-        compute(signal, *, columns=None, windowed=False)
+        compute(signal, *, axis=-1)
 
         Compute the autocorrelation
 
         Parameters
         ----------
-        signal : {numpy.ndarray, pandas.DataFrame}
-            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
-        windowed : bool, optional
-            If the signal has already been windowed. Default is False.
+        signal : array-like
+            Array-like containing values to compute the autocorrelation for.
+        axis : int, optional
+            Axis along which the signal entropy will be computed. Ignored if `signal` is a
+            pandas.DataFrame. Default is last (-1).
 
         Returns
         -------
-        ac : {numpy.ndarray, pandas.DataFrame}
-            Signal autocorrelation, returned as the same type as `signal`
+        ac : numpy.ndarray
+            Signal autocorrelation.
         """
-        return super().compute(*args, **kwargs)
-
-    def _compute(self, x, fs):
-        super(Autocorrelation, self)._compute(x, fs)
-
-        self._result = _cython.Autocorrelation(x, self.lag, self.normalize)
+        x = super().compute(signal, axis=axis)
+        return extensions.autocorrelation(x, self.lag, self.normalize)
 
 
 class LinearSlope(Feature):
     """
     The slope from linear regression of the signal
     """
+    __slots__ = ()
+
     def __init__(self):
-        super(LinearSlope, self).__init__('LinearSlope', {})
+        super(LinearSlope, self).__init__()
 
-    def compute(self, *args, **kwargs):
+    def compute(self, signal, fs=1., *, axis=-1):
         """
-        compute(signal, *, columns=None, windowed=False)
-
         Compute the linear regression slope
 
         Parameters
         ----------
-        signal : {numpy.ndarray, pandas.DataFrame}
-            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
-        windowed : bool, optional
-            If the signal has already been windowed. Default is False.
+        signal : array-like
+            Array-like containing values to compute the linear slope for.
+        fs : float, optional
+            Sampling frequency in Hz. If not provided, default is 1.0Hz.
+        axis : int, optional
+            Axis along which the signal entropy will be computed. Ignored if `signal` is a
+            pandas.DataFrame. Default is last (-1).
 
         Returns
         -------
-        slope : {numpy.ndarray, pandas.DataFrame}
-            Signal slope, returned as the same type as `signal`
+        slope : numpy.ndarray
+            Signal slope.
         """
-        return super().compute(*args, **kwargs)
-
-    def _compute(self, x, fs):
-        super(LinearSlope, self)._compute(x, fs)
-
-        t = arange(x.shape[1]) / fs
-
-        self._result, intercept = _cython.LinRegression(t, x)
+        x = super().compute(signal, fs, axis=axis)
+        return extensions.linear_regression(x, fs)
 
 
 '''

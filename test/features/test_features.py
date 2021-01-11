@@ -1,7 +1,38 @@
 import pytest
+import numpy as np
 
-from .conftest import BaseTestFeature
 from skimu.features import *
+
+
+class BaseTestFeature:
+    def test_1d_ndarray(self, fs, x, y, z, get_1d_truth):
+        xt, yt, zt = get_1d_truth(self.feature.__class__.__name__)
+
+        xp = self.feature.compute(x, fs=fs)
+        yp = self.feature.compute(y, fs=fs)
+        zp = self.feature.compute(z, fs=fs)
+
+        assert np.allclose(xp, xt)
+        assert np.allclose(yp, yt)
+        assert np.allclose(zp, zt)
+
+    def test_2d_ndarray(self, fs, acc, get_2d_truth):
+        truth = get_2d_truth(self.feature.__class__.__name__)
+        pred = self.feature.compute(acc, fs=fs, axis=0)
+
+        assert np.allclose(pred, truth)
+
+    def test_3d_ndarray(self, fs, win_acc, get_3d_truth):
+        truth = get_3d_truth(self.feature.__class__.__name__)
+        pred = self.feature.compute(win_acc, fs=fs, axis=1)
+
+        assert np.allclose(pred, truth)
+
+    def test_dataframe(self, fs, df_acc, get_dataframe_truth):
+        df_truth, cols = get_dataframe_truth(self.feature.__class__.__name__)
+        df_pred = self.feature.compute(df_acc, fs=fs, axis=0)
+
+        assert np.allclose(df_pred, df_truth)
 
 
 # STATISTICAL MOMENT FEATURES
@@ -40,28 +71,28 @@ class TestPermutationEntropy(BaseTestFeature):
 
 # FREQUENCY FEATURES
 class TestDominantFrequency(BaseTestFeature):
-    feature = DominantFrequency(low_cutoff=0.0, high_cutoff=12.0)
+    feature = DominantFrequency(padlevel=0, low_cutoff=0.0, high_cutoff=12.0)
 
     @pytest.mark.parametrize('fs_', ([5], 'a', (10,)))
     def test_fs_error(self, fs_):
-        with pytest.raises(ValueError):
+        with pytest.raises((TypeError, ValueError)):
             self.feature.compute(None, fs_)
 
 
 class TestDominantFrequencyValue(BaseTestFeature):
-    feature = DominantFrequencyValue(low_cutoff=0.0, high_cutoff=12.0)
+    feature = DominantFrequencyValue(padlevel=0, low_cutoff=0.0, high_cutoff=12.0)
 
 
 class TestPowerSpectralSum(BaseTestFeature):
-    feature = PowerSpectralSum(low_cutoff=0.0, high_cutoff=12.0)
+    feature = PowerSpectralSum(padlevel=0, low_cutoff=0.0, high_cutoff=12.0)
 
 
 class TestSpectralFlatness(BaseTestFeature):
-    feature = SpectralFlatness(low_cutoff=0.0, high_cutoff=12.0)
+    feature = SpectralFlatness(padlevel=0, low_cutoff=0.0, high_cutoff=12.0)
 
 
 class TestSpectralEntropy(BaseTestFeature):
-    feature = SpectralEntropy(low_cutoff=0.0, high_cutoff=12.0)
+    feature = SpectralEntropy(padlevel=0, low_cutoff=0.0, high_cutoff=12.0)
 
 
 # MISC FEATURES
@@ -79,7 +110,7 @@ class TestRatioBeyondRSigma(BaseTestFeature):
 
 # SMOOTHNESS FEATURES
 class TestJerkMetric(BaseTestFeature):
-    feature = JerkMetric(normalize=True)
+    feature = JerkMetric()
 
 
 class TestDimensionlessJerk(BaseTestFeature):

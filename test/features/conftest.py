@@ -1,6 +1,5 @@
 from pytest import fixture
-from numpy import allclose, broadcast_to, zeros
-from pandas.testing import assert_frame_equal
+import numpy as np
 from pandas import DataFrame
 import h5py
 
@@ -11,45 +10,11 @@ SAMPLE_DATA_PATH = resolve_data_path('sample_accelerometer.h5', 'features')
 FEATURES_TRUTH_PATH = resolve_data_path('features_truth.h5', 'features')
 
 
-class BaseTestFeature:
-    def test_1d_ndarray(self, fs, x, y, z, get_1d_truth):
-        x_truth, y_truth, z_truth = get_1d_truth(self.feature._name)
-
-        x_pred = self.feature.compute(x, fs)
-        y_pred = self.feature.compute(y, fs)
-        z_pred = self.feature.compute(z, fs)
-
-        assert allclose(x_pred, x_truth)
-        assert allclose(y_pred, y_truth)
-        assert allclose(z_pred, z_truth)
-
-    def test_2d_ndarray(self, fs, acc, get_2d_truth):
-        truth = get_2d_truth(self.feature._name)
-
-        pred = self.feature.compute(acc, fs)
-
-        assert allclose(pred, truth)
-
-    def test_3d_ndarray(self, fs, win_acc, get_3d_truth):
-        truth = get_3d_truth(self.feature._name)
-
-        pred = self.feature.compute(win_acc, fs)
-
-        assert allclose(pred, truth)
-
-    def test_dataframe(self, fs, df_acc, get_dataframe_truth):
-        df_truth = get_dataframe_truth(self.feature._name)
-
-        df_pred = self.feature.compute(df_acc, fs)
-
-        assert_frame_equal(df_pred, df_truth)
-
-
-@fixture(scope='package')
+@fixture(scope="module")
 def fs():
     path = SAMPLE_DATA_PATH
-    with h5py.File(path, 'r') as f:
-        ret = f.attrs.get('Sampling rate')
+    with h5py.File(path, "r") as f:
+        ret = f.attrs.get("Sampling rate")
 
     return ret
 
@@ -97,7 +62,7 @@ def win_acc():
         acc = f['Accelerometer'][()]
 
     # broadcast the acceleration into windows (with the same samples)
-    ret = broadcast_to(acc, (4, ) + acc.shape)
+    ret = np.broadcast_to(acc, (4, ) + acc.shape)
     return ret
 
 
@@ -143,7 +108,7 @@ def get_3d_truth():
         path = FEATURES_TRUTH_PATH
         with h5py.File(path, 'r') as f:
             truth = f[name][()].reshape((1, 3))
-        return broadcast_to(truth, (4, 3))
+        return np.broadcast_to(truth, (4, 3))
 
     return get_3d
 
@@ -155,24 +120,5 @@ def get_dataframe_truth():
         with h5py.File(path, 'r') as f:
             truth = f[name][()]
 
-        return DataFrame(data=truth, columns=[f'{name}_x', f'{name}_y', f'{name}_z'])
+        return truth, [f'{name}_x', f'{name}_y', f'{name}_z']
     return get_df
-
-
-@fixture(scope='package')
-def bank_2d_truth():
-    """
-    bank + Mean()
-    bank + Range()[['x', 'z']]
-    bank + JerkMetric(normalize=True)
-    bank + Range()['y']
-    """
-    truth = zeros((1, 9))
-
-    path = FEATURES_TRUTH_PATH
-    with h5py.File(path, 'r') as f:
-        truth[0, :3] = f['Mean']
-        truth[0, [3, 8, 4]] = f['Range']
-        truth[0, 5:8] = f['JerkMetric']
-
-    return truth

@@ -3,426 +3,359 @@ Core functionality for feature computation
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
-from numpy import ndarray, array, zeros, sum
-from pandas import DataFrame
+from abc import ABC, abstractmethod
+from collections.abc import Iterator, Sequence
 import json
+from warnings import warn
 
-from skimu.utility import compute_window_samples
-from skimu.features.utility import standardize_signal
-
-
-__all__ = ['Bank']
+from pandas import DataFrame
+from numpy import float_, asarray, zeros, sum, moveaxis
 
 
-class NotAFeatureError(Exception):
-    """
-    Custom error for indicating an attempt to add something that is not a feature to a
-    features.Bank
-    """
+__all__ = ["Bank"]
+
+
+class ArrayConversionError(Exception):
     pass
 
 
-class NoFeaturesError(Exception):
+def get_n_feats(size, index):
+    if isinstance(index, int):
+        return 1
+    elif isinstance(index, (Iterator, Sequence)):
+        return len(index)
+    elif isinstance(index, slice):
+        return len(range(*index.indices(size)))
+    elif isinstance(index, type(Ellipsis)):
+        return size
+
+
+def partial_index_check(index):
+    if isinstance(index, str) or isinstance(index, float):
+        raise IndexError("Indices cannot be strings or floats.")
+    if index is None:
+        index = ...
+    return index
+
+
+def normalize_indices(nfeat, index):
+    if index is None:
+        return [...] * nfeat
+    elif not isinstance(index, (Iterator, Sequence)):  # slice, single integer, etc
+        return [partial_index_check(index)] * nfeat
+    elif all([isinstance(i, int) for i in index]):  # iterable of ints
+        return [index] * nfeat
+    elif isinstance(index, Sequence):  # able to be indexed
+        return [partial_index_check(i) for i in index]
+    else:
+        raise IndexError("Index not understood")
+
+
+def normalize_axes(ndim, axis, ind_axis):
     """
-    Custom error if there are no features in the feature Bank
+    Normalize input axes to be positive/correct for how the swapping has to work
     """
-    pass
+    if axis == ind_axis:
+        raise IndexError("axis and index_axis cannot be the same")
+
+    if ndim == 1:
+        return 0, None
+    elif ndim >= 2:
+        """
+        |  shape | ax | ia |  move1 | ax | ia |  res  | ax | ia | res move |
+        |--------|----|----|--------|----|----|-------|----|----|----------|
+        | (a, b) |  0 |  1 | (b, a) |  0 |  0 | (bf,) |    |    |          |
+        | (a, b) |  0 |  N | (b, a) |  0 |  N | (f, b)|    |    |          |
+        | (a, b) |  1 |  0 |        |    |    | (3a,) |    |    |          |
+        | (a, b) |  1 |  N |        |    |    | (f, a)|    |    |          |
+
+        
+        |  shape   | ax| ia   |   move1  | ax| ia|   move2  |   res    |    | ia| res move |
+        |----------|---|------|----------|---|---|----------|----------|----|---|----------|
+        | (a, b, c)| 0 | 1(0) | (b, c, a)|   |   |          | (bf, c)  |  0 | 0 |          |
+        | (a, b, c)| 0 | 2(1) | (b, c, a)|   | 1 | (c, b, a)| (cf, b)  |  0 | 1 | (b, cf)  |   
+        | (a, b, c)| 0 | N    | (b, c, a)|   |   |          | (f, b, c)|    |   |          |
+        | (a, b, c)| 1 | 0    | (a, c, b)|   |   |          | (af, c)  |  0 | 0 |          |
+        | (a, b, c)| 1 | 2(1) | (a, c, b)|   | 1 | (c, a, b)| (cf, a)  |  0 | 1 | (a, cf)  |
+        | (a, b, c)| 1 | N    | (a, c, b)|   |   |          | (f, a, c)|    |   |          |
+        | (a, b, c)| 2 | 0    | (a, b, c)|   |   |          | (af, b)  |  0 | 0 |          |
+        | (a, b, c)| 2 | 1    | (a, b, c)|   | 1 | (b, a, c)| (bf, a)  |  0 | 1 | (a, bf)  |
+        | (a, b, c)| 2 | N    | (a, b, c)|   |   |          | (f, a, b)|    |   |          |
+        
+        |  shape      | ax| ia   |   move1     | ia|   move2     |   res       |    | ia| res move  |
+        |-------------|---|------|-------------|---|-------------|-------------|----|---|-----------|
+        | (a, b, c, d)| 0 | 1(0) | (b, c, d, a)|   |             | (bf, c, d)  |  0 | 0 |           |
+        | (a, b, c, d)| 0 | 2(1) | (b, c, d, a)| 1 | (c, b, d, a)| (cf, b, d)  |  0 | 1 | (b, cf, d)|
+        | (a, b, c, d)| 0 | 3(2) | (b, c, d, a)| 2 | (d, b, c, a)| (df, b, c)  |  0 | 2 | (d, c, df)|
+        | (a, b, c, d)| 0 | N    | (b, c, d, a)|   |             | (f, b, c, d)|    |   |           |
+        | (a, b, c, d)| 1 | 0    | (a, c, d, b)|   |             | (af, c, d)  |    |   |           |
+        | (a, b, c, d)| 1 | 2(1) | (a, c, d, b)| 1 | (c, a, d, b)| (cf, a, d)  |  0 | 1 | (a, cf, d)|
+        | (a, b, c, d)| 1 | 3(2) | (a, c, d, b)| 2 | (d, a, c, b)| (df, a, c)  |  0 | 2 | (a, c, df)|
+        | (a, b, c, d)| 1 | N    | (a, c, d, b)|   |             | (f, a, c, d)|    |   |           |
+        | (a, b, c, d)| 2 | 0    | (a, b, d, c)|   |             | (af, b, d)  |    |   |           |
+        | (a, b, c, d)| 2 | 1    | (a, b, d, c)| 1 | (b, a, d, c)| (bf, a, d)  |  0 | 1 | (a, bf, d)|
+        | (a, b, c, d)| 2 | 3(2) | (a, b, d, c)| 2 | (d, a, b, c)| (df, a, b)  |  0 | 2 | (a, b, df)|
+        | (a, b, c, d)| 2 | N    | (a, b, d, c)|   |             | (f, a, b, d)|    |   |           |
+        | (a, b, c, d)| 3 | 0    | (a, b, c, d)|   |             | (af, b, c)  |    |   |           |
+        | (a, b, c, d)| 3 | 1    | (a, b, c, d)| 1 | (b, a, c, d)| (bf, a, c)  |  0 | 1 | (a, bf, c)|
+        | (a, b, c, d)| 3 | 2    | (a, b, c, d)| 2 | (c, a, b, d)| (cf, a, b)  |  0 | 2 | (a, b, cf)|
+        | (a, b, c, d)| 3 | N    | (a, b, c, d)|   |             | (f, a, b, c)|    |   |           |
+        """
+        ax = axis if axis >= 0 else ndim + axis
+        if ind_axis is None:
+            return ax, None
+        ia = ind_axis if ind_axis >= 0 else ndim + ind_axis
+
+        if ia > ax:
+            ia -= 1
+
+        return ax, ia
 
 
 class Bank:
     """
-    A feature bank for ease in creating a table of features for a given signal, applying the
-    windowing as specified.
+    A feature bank object for ease in creating a table or pipeline of features to be computed.
 
     Parameters
     ----------
-    window_length : {None, float}, optional
-        Window length in seconds. If not provided (None), will do no windowing. Default is None
-    window_step : {None, float, int}, optional
-        Window step - the spacing between the start of windows. This can be specified several
-        different ways (see Notes). Default is 1.0
-
-    Notes
-    -----
-    Computation of the window step depends on the type of input provided, and the range.
-    - `window_step` is a float in (0.0, 1.0]: specifies the fraction of a window to skip to
-    get to the start of the next window
-    - `window_step` is an integer > 1: specifies the number of samples to skip to get to the
-    start of the next window
+    bank_file : {None, path-like}, optional
+        Path to a saved bank file to load. Optional
 
     Examples
     --------
-    >>> fb = Bank()
-    >>> # add features to the Bank
-    >>> fb + Mean()
-    >>> fb + Range()
-    >>> # add specific axes of features to the Bank
-    >>> fb + SignalEntropy()[0]
-    >>> fb + IQR()[[1, 2]]
-    >>> fb + SignalEntropy()[2]  # this will reuse the same instance created above
-    >>> features = fb.compute(signal)
     """
-    __slots__ = ('_feat_list', '_n_feats', '_eq_idx', 'wlen_s', 'wstep')
+    __slots__ = ("_feats", "_indices")
 
     def __str__(self):
-        return "FeatureBank"
+        return "Bank"
 
     def __repr__(self):
-        ret = '[\n'
-        for i in self._feat_list:
-            ret += f'\t{i.parent!r},\n'
-        ret += ']'
-        return ret
+        s = "Bank["
+        for f in self._feats:
+            s += f"\n\t{f!r},"
+        s += "\n]"
+        return s
 
-    def __init__(self, window_length=None, window_step=1.0):
-        # storage for the features to calculate
-        self._feat_list = []
-        # storage for the number of features that will be calculated
-        self._n_feats = None  # need to allocate in compute to reset for each compute call
-        # storage of the last instance of a particular class/instance, if it exists
-        self._eq_idx = None
+    def __contains__(self, item):
+        return item in self._feats
 
-        # windowing parameters
-        self.wlen_s = window_length
-        self.wstep = window_step
+    def __len__(self):
+        return len(self._feats)
 
-    def compute(self, signal, fs=None, columns=None, windowed=False):
+    def __init__(self, bank_file=None):
+        # initialize some variables
+        self._feats = []
+        self._indices = []
+
+        if bank_file is not None:
+            self.load(bank_file)
+
+    def add(self, features, index=None):
         """
-        Compute the features in the Bank.
+        Add a feature or features to the pipeline.
 
         Parameters
         ----------
-        signal : {numpy.ndarray, pandas.DataFrame}
-            Either a numpy array (up to 3D), or a pandas.DataFrame containing the signal to be
-            analyzed
-        fs : float, optional
-            Sampling frequency of the signal in Hz. Only required if the features in the Bank
-            require sampling frequency in the computation (see feature documentation), or if
-            windowing `signal`.
-        columns : array-like, optional
-            Columns to use from the pandas.DataFrame. If signal is a ndarray, providing columns
-            will provide a return of the column/feature name combinations that matches the columns
-            in the returned ndarray
-        windowed : bool, optional
-            If the signal has already been windowed. Default is False.
-
-        Returns
-        -------
-        features : {numpy.ndarray, pandas.DataFrame}
-            Table of computed features in the same type as the input.
-        feat_names : list, optional
-            Feature names. Only returned if `signal` is a ndarray and `columns`
-            was provided
-
-        Raises
-        ------
-        NoFeaturesError
-            If no features have been added to compute
-        ValueError
-            If the number of provided column names doesn't match the number of columns in the data
+        features : {Feature, list}
+            Single signal Feature, or list of signal Features to add to the feature Bank
+        index : {int, slice, list}, optional
+            Index to be applied to data input to each features. Either a index that will
+            apply to every feature, or a list of features corresponding to each feature being
+            added.
         """
-        if not self._feat_list:
-            raise NoFeaturesError('No features to compute.')
+        if isinstance(features, Feature):
+            if features in self:
+                warn(f"Feature {features!s} already in the Bank, will be duplicated.", UserWarning)
+            self._indices.append(partial_index_check(index))
+            self._feats.append(features)
+        elif all([isinstance(i, Feature) for i in features]):
+            if any([ft in self for ft in features]):
+                warn(f"Feature already in the Bank, will be duplicated.", UserWarning)
+            self._indices.extend(normalize_indices(len(features), index))
+            self._feats.extend(features)
 
-        self._n_feats = []
-
-        # compute windowing # of samples if necessary
-        window_length, window_step = compute_window_samples(fs, self.wlen_s, self.wstep)
-
-        # standardize the input signal, and perform windowing if desired
-        x, columns = standardize_signal(signal, windowed=windowed, window_length=window_length,
-                                        step=window_step, columns=columns)
-        feat_columns = []  # allocate if necessary
-
-        # ensure if passing an ndarray, that the columns matches the appropriate shape
-        if not isinstance(signal, DataFrame):
-            if columns is not None:
-                if len(columns) != x.shape[-1]:
-                    raise ValueError(f'Provided column names ({len(columns)}) does not match the '
-                                     f'number of columns in the data ({x.shape[-1]}).')
-
-        # first get the number of features expected so the space can be allocated
-        for dft in self._feat_list:
-            # need this if statement to deal with ellipsis indices
-            if dft.n == -1:
-                self._n_feats.append(x.shape[-1])  # number of axes is last
-            else:
-                self._n_feats.append(dft.n)
-
-        # allocate the feature table. This accounts for multiple columns per feature
-        feats = zeros((x.shape[0], sum(self._n_feats)))
-
-        idx = 0  # set a counter to keep track of where to put each computed feature
-
-        # iterate over all the features and compute them, saving the result as desired in the
-        # feature table
-        for i, dft in enumerate(self._feat_list):
-            dft._compute(x, fs)  # compute the feature without returning it
-
-            feats[:, idx:idx + self._n_feats[i]] = dft.get_result()  # get the result
-            if isinstance(signal, DataFrame) or columns is not None:
-                feat_columns.extend(dft.get_columns(columns))
-
-            idx += self._n_feats[i]  # increment the index tracker
-
-        if isinstance(signal, ndarray):
-            if columns is not None:
-                return feats, feat_columns
-            else:
-                return feats
-        elif isinstance(signal, DataFrame):
-            return DataFrame(data=feats, columns=feat_columns)
-
-    # SAVING and LOADING METHODS
     def save(self, file):
         """
-        Save the features in the feature bank to a JSON file for easy (re-)creation of the
-        FeatureBank
+        Save the feature Bank to a file for a persistent object that can be loaded later to create
+        the same Bank as before
 
         Parameters
         ----------
-        file : {str, Path}
-            File path to save to.
+        file : path-like
+            File to be saved to. Creates a new file or overwrites an existing file.
         """
         out = []
+        for i, ft in enumerate(self._feats):
+            idx = "Ellipsis" if self._indices[i] is Ellipsis else self._indices[i]
+            out.append(
+                {
+                    ft.__class__.__name__: {
+                        "Parameters": ft._params,
+                        "Index": idx
+                    }
+                }
+            )
 
-        for ft in self._feat_list:
-            idx = 'Ellipsis' if ft.index is Ellipsis else ft.index
-            out.append({ft.parent._name: {'Parameters': ft.parent._eq_params, 'Index': idx}})
-
-        with open(file, 'w') as f:
+        with open(file, "w") as f:
             json.dump(out, f)
 
     def load(self, file):
         """
-        Load a set of features from a JSON file.
+        Load a previously saved feature Bank from a json file.
 
         Parameters
         ----------
-        file : {str, Path}
-            File path to load from. File is the uutput of FeatureBank.save
+        file : path-like
+            File to be read to create the feature Bank.
         """
         # the import must be here, otherwise a circular import error occurs
         from skimu.features import lib
 
-        with open(file, 'r') as f:
+        with open(file, "r") as f:
             feats = json.load(f)
 
         for ft in feats:
             name = list(ft.keys())[0]
-            params = ft[name]['Parameters']
-            index = ft[name]['Index']
-            if index == 'Ellipsis':
+            params = ft[name]["Parameters"]
+            index = ft[name]["Index"]
+            if index == "Ellipsis":
                 index = Ellipsis
 
-            # add it to the FeatureBank
-            self + getattr(lib, name)(**params)[index]
+            # add it to the feature bank
+            self.add(getattr(lib, name)(**params), index=index)
 
-    # FUNCTIONALITY METHODS
-    def __contains__(self, item):
-        isin = False
-
-        if isinstance(item, (Feature, DeferredFeature)):
-            for i, dft in enumerate(self._feat_list):
-                comp = item == dft
-                isin |= comp
-
-                # save the location of the last equivalent item
-                if comp:
-                    self._eq_idx = i
-
-        return isin
-
-    def __add__(self, other):
-        if isinstance(other, Feature):
-            self._feat_list.append(DeferredFeature(other, ...))
-        elif isinstance(other, DeferredFeature):
-            if other in self:
-                self._feat_list.append(
-                    DeferredFeature(self._feat_list[self._eq_idx].parent, other.index)
-                )
-            else:
-                self._feat_list.append(other)
-        else:
-            raise NotAFeatureError(
-                f'Cannot add an object of type ({type(other)}) to a feature Bank.'
-            )
-
-
-class Feature:
-    def __str__(self):
-        return self._name
-
-    def __repr__(self):
-        s = ""
-        for key in self._eq_params:
-            s += f"{key}={self._eq_params[key]!r}, "
-        s = s[:-2]
-        return f"{self._name}({s})"
-
-    def __init__(self, name, eq_params):
+    def compute(self, signal, fs=1., *, axis=-1, index_axis=None, indices=None, columns=None):
         """
-        Base feature class. intended to be overwritten
+        Compute the specified features for the given signal
 
         Parameters
         ----------
-        name : str
-            Feature name. Used for creating the str/repr of the feature
-        eq_params : dict
-            Dictionary of parameter names and their values. Used for creating the str/repr of the
-            feature, and checking equivalence between features
-        """
-        self._x = None
-        self._result = None
-
-        # mappings for indices
-        self._xyz_map = {'x': 0, 'y': 1, 'z': 2}
-        self._xyz_comp_map = {'xy': 0, 'xz': 1, 'yz': 2}
-
-        # parameters/feature information
-        self._name = name
-        self._eq_params = eq_params
-
-    # PUBLIC METHODS
-    def compute(self, signal, fs=None, *, columns=None, windowed=False):
-        """
-        Compute the feature.
-
-        Parameters
-        ----------
-        signal : {numpy.ndarray, pandas.DataFrame}
-            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
+        signal : {array-like}
+            Array-like signal to have features computed for.
         fs : float, optional
-            Sampling frequency in Hz
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
-        windowed : bool, optional
-            If the signal has already been windowed. Default is False.
+            Sampling frequency in Hz. Default is 1Hz
+        axis : int, optional
+            Axis along which to compute the features. Default is -1.
+        index_axis : {None, int}, optional
+            Axis corresponding to the indices specified in `Bank.add` or `indices`. Default is
+            None, which assumes that this axis is not part of the signal. Note that setting this to
+            None means values for `indices` or the indices set in `Bank.add` will be ignored.
+        indices : {None, int, list-like, slice, ellipsis}, optional
+            Indices to apply to the input signal. Either None, a integer, list-like, slice to apply
+            to each feature, or a list-like of lists/objects with a 1:1 correspondence to the
+            features present in the Bank. If provided, takes precedence over any values given in
+            `Bank.add`. Default is None, which will use indices from `Bank.add`.
+        columns : {None, list}, optional
+            Columns to use if providing a dataframe. Default is None (uses all columns).
 
         Returns
         -------
-        feature : {numpy.ndarray, pandas.DataFrame}
-            Computed feature, returned as the same type as the input signal
+        feats : numpy.ndarray
+            Computed features.
         """
-        # check fs
-        if fs is not None:
-            if not isinstance(fs, (float, int)):
-                raise ValueError(
-                    "fs must be a float or int. If trying to use columns, it is keyword-required"
-                )
+        # standardize the input signal
+        if isinstance(signal, DataFrame):
+            columns = columns if columns is not None else signal.columns
+            x = signal[columns].values.astype(float_)
+        else:
+            try:
+                x = asarray(signal, dtype=float_)
+            except ValueError as e:
+                raise ArrayConversionError("Error converting signal to ndarray") from e
 
-        # set the result to None, to force re-computation. publicly should always be re-computing.
-        # The benefit for avoiding re-computation comes for the feature Bank pipeline of
-        # computation, where the same result might be used multiple times but for different indices
-        self._result = None
+        axis, index_axis = normalize_axes(x.ndim, axis, index_axis)
 
-        # extract and standardize the data. No windowing in the public method here
-        x, columns = standardize_signal(
-            signal, windowed=windowed, window_length=None, step=None, columns=columns
-        )
+        if index_axis is None:
+            indices = [...] * len(self)
+        else:
+            if indices is None:
+                indices = self._indices
+            else:
+                indices = normalize_indices(len(self), indices)
 
-        self._compute(x, fs)
+        # get the number of features that will results. Needed to allocate the feature array
+        if index_axis is None:
+            # don't have to move any other axes than the computation axis
+            x = moveaxis(x, axis, -1)
+            # number of feats is 1 per
+            n_feats = [1] * len(self)
+            feats = zeros((sum(n_feats),) + x.shape[:-1], dtype=float_)
+        else:
+            # move both the computation and index axis. do this in two steps to allow for undoing
+            # just the index axis swap later. The index_axis has been adjusted appropriately
+            # to match this axis move in 2 steps
+            x = moveaxis(x, axis, -1)
+            x = moveaxis(x, index_axis, 0)
 
-        if isinstance(signal, ndarray):
-            return self._result
-        elif isinstance(signal, DataFrame):
-            return DataFrame(data=self._result, columns=[f'{self._name}_{i}' for i in columns])
+            n_feats = []
+            for ind in indices:
+                n_feats.append(get_n_feats(x.shape[0], ind))
 
-    # PRIVATE METHODS
-    def _compute(self, x, fs):
-        # if the result is already defined, don't need to compute again. Note that if calling from
-        # the public Feature.compute() method, _result is automatically set to None for
-        # re-computation each time it is called
-        if self._result is not None:
-            return
+            feats = zeros((sum(n_feats),) + x.shape[1:-1], dtype=float_)
 
-    # FUNCTIONALITY METHODS
+        feat_i = 0  # keep track of where in the feature array we are
+        for i, ft in enumerate(self._feats):
+            feats[feat_i:feat_i + n_feats[i]] = ft.compute(x[indices[i]], fs=fs, axis=-1)
+
+            feat_i += n_feats[i]
+
+        # Move the shape back to the correct one.
+        # only have to do this if there is an index axis, because otherwise the array is still in
+        # the same order as originally
+        if index_axis is not None:
+            feats = moveaxis(feats, 0, index_axis)  # undo the previous swap/move
+
+        return feats
+
+
+class Feature(ABC):
+    """
+    Base feature class
+    """
+    def __str__(self):
+        return self.__class__.__name__
+
+    def __repr__(self):
+        s = self.__class__.__name__ + "("
+        for p in self._params:
+            s += f"{p}={self._params[p]!r}, "
+        if len(self._params) > 0:
+            s = s[:-2]
+        return s + ")"
+
     def __eq__(self, other):
         if isinstance(other, type(self)):
-            return (other._eq_params == self._eq_params) and (other._name == self._name)
-        elif isinstance(other, DeferredFeature):
-            return (other.parent._eq_params == self._eq_params) and \
-                   (other.parent._name == self._name)
+            # double check the name
+            eq = str(other) == str(self)
+            # check the parameters
+            eq &= other._params == self._params
+            return eq
         else:
             return False
 
-    def __getitem__(self, key):
-        index = None
-        if isinstance(key, str):
-            index = self._xyz_map.get(key, None)  # default return is None if doesn't exist
-            if index is None:
-                index = self._xyz_comp_map.get(key, None)
-        elif isinstance(key, (int, type(Ellipsis))):
-            index = key
-        elif isinstance(key, (list, tuple, ndarray)):
-            if key[0] in self._xyz_comp_map:
-                index = [self._xyz_comp_map[i] for i in key]
-            elif key[0] in self._xyz_map:
-                index = [self._xyz_map[i] for i in key]
-            else:
-                index = key if all(isinstance(i, int) for i in key) else None
+    __slots__ = ("_params",)
 
-        if index is None:
-            raise IndexError("Index must be an int, in ['x', 'y', 'z', 'xy', 'xz', 'yz'], an "
-                             "array-like of those, or an Ellipsis (...)")
+    def __init__(self, **params):
+        self._params = params
 
-        return DeferredFeature(self, index)
-
-
-class DeferredFeature:
-    __slots__ = ('parent', 'index', '_compute', 'n')  # limit attributes
-
-    def __str__(self):
-        return f'Deferred{self.parent.__str__()}'
-
-    def __repr__(self):
-        return f'deferred{self.parent.__repr__()}'
-
-    def __init__(self, parent, index):
+    @abstractmethod
+    def compute(self, signal, fs=1., *, axis=-1):
         """
-        An object for storing a feature for deferred computation. Stores the parent feature, as
-        well as the desired index to return of the results
+        Compute the signal feature.
 
         Parameters
         ----------
-        parent : Feature
-            Parent feature which contains the computations for feature calculation
-        index : int, array-like of ints, Ellipsis
-            Index to retrieve for the results
+        signal : array-like
+            Signal to compute the feature over.
+        fs : float, optional
+            Sampling frequency in Hz. Default is 1.0
+        axis : int, optional
+            Axis over which to compute the feature. Default is -1 (last dimension)
+
+        Returns
+        -------
+        feat : numpy.ndarray
+            ndarray of the computed feature
         """
-        if isinstance(parent, Feature):
-            self.parent = parent
-        else:
-            raise NotAFeatureError('DeferredFeature parent must be a Feature or subclass')
-
-        self.index = index
-        # we want the "private" method that doesn't return a value, and checks if the computation
-        # was done already
-        self._compute = self.parent._compute
-
-        # determine how many features will be returned
-        if hasattr(index, "__len__"):
-            self.n = len(index)
-        elif isinstance(index, type(Ellipsis)):
-            # can't figure this out until later, when we know signal size
-            self.n = -1
-        else:
-            self.n = 1  # if not an array-like, only returning 1 value
-
-    def get_result(self):
-        return self.parent._result[:, self.index]
-
-    def get_columns(self, columns):
-        return [f'{i}_{self.parent.__repr__()}' if i != '' else f'{self.parent.__repr__()}'
-                for i in array(columns)[self.index]]
-
-    # FUNCTIONALITY METHODS
-    def __eq__(self, other):
-        if isinstance(other, DeferredFeature):
-            return (other.parent._eq_params == self.parent._eq_params) \
-                   and (other.parent._name == self.parent._name)
-        elif isinstance(other, Feature):
-            return (other._eq_params == self.parent._eq_params) \
-                   and (other._name == self.parent._name)
-        else:
-            return False
+        # move the computation axis to the end
+        return moveaxis(asarray(signal, dtype=float_), axis, -1)

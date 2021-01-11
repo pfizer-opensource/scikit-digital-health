@@ -4,10 +4,10 @@ Features dealing with the smoothness of a signal
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
-from numpy import log, abs
+from numpy import log as nplog, abs
 
 from skimu.features.core import Feature
-from skimu.features.lib import _cython
+from skimu.features.lib import extensions
 
 __all__ = ['JerkMetric', 'DimensionlessJerk', 'SPARC']
 
@@ -16,10 +16,6 @@ class JerkMetric(Feature):
     r"""
     The normalized sum of jerk.  Assumes the input signal is acceleration, and therefore the jerk
     is the first time derivative of the input signal.
-
-    Methods
-    -------
-    compute(signal, fs[, columns=None, windowed=False])
 
     Notes
     -----
@@ -34,37 +30,32 @@ class JerkMetric(Feature):
     .. math:: s = \frac{360max(|a|)^2}{\Delta t}
     .. math:: J = \frac{\hat{J}}{2s}
     """
-    def __init__(self, normalize=True):
-        super(JerkMetric, self).__init__('JerkMetric', {'normalize': normalize})
-        self.normalize = normalize
+    __slots__ = ()
 
-    def compute(self, *args, **kwargs):
+    def __init__(self):
+        super(JerkMetric, self).__init__()
+
+    def compute(self, signal, fs=1., *, axis=-1):
         """
-        compute(signal, fs, *, columns=None, windowed=False)
-
         Compute the jerk metric
 
         Parameters
         ----------
-        signal : {numpy.ndarray, pandas.DataFrame}
-            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
+        signal : array-like
+            Array-like containing values to compute the jerk metric for.
         fs : float, optional
-            Sampling frequency in Hz
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
-        windowed : bool, optional
-            If the signal has already been windowed. Default is False.
+            Sampling frequency in Hz. If not provided, default is 1.0Hz
+        axis : int, optional
+            Axis along which the signal entropy will be computed. Ignored if `signal` is a
+            pandas.DataFrame. Default is last (-1).
 
         Returns
         -------
-        jerk_metric : {numpy.ndarray, pandas.DataFrame}
-            Computed jerk metric, returned as the same type as the input signal
+        jerk_metric : numpy.ndarray
+            Computed jerk metric.
         """
-        return super().compute(*args, **kwargs)
-
-    def _compute(self, x, fs):
-        super(JerkMetric, self)._compute(x, fs)
-        self._result = _cython.JerkMetric(x, fs)
+        x = super().compute(signal, fs, axis=axis)
+        return extensions.jerk_metric(x, fs)
 
 
 class DimensionlessJerk(Feature):
@@ -78,10 +69,6 @@ class DimensionlessJerk(Feature):
         Take the log of the dimensionless jerk. Default is False.
     signal_type : {'acceleration', 'velocity', 'jerk'}, optional
         The type of the signal being provided. Default is 'acceleration'
-
-    Methods
-    -------
-    compute(signal[, columns=None, windowed=False])
 
     Notes
     -----
@@ -116,11 +103,13 @@ class DimensionlessJerk(Feature):
         DJ = \frac{-\hat{J}_{type}}{s_{type}} \\
         DJ_{log} = -ln\left(\frac{\hat{J}_{type}}{s_{type}}\right)
     """
+    __slots__ = ("log", "i_type")
     _signal_type_options = ['velocity', 'acceleration', 'jerk']
 
     def __init__(self, log=False, signal_type='acceleration'):
         super(DimensionlessJerk, self).__init__(
-            'DimensionlessJerk', {'log': log, 'signal_type': signal_type}
+            log=log,
+            signal_type=signal_type
         )
 
         self.log = log
@@ -131,35 +120,32 @@ class DimensionlessJerk(Feature):
         except KeyError:
             raise ValueError(f"'signal_type' ({signal_type}) unrecognized.")
 
-    def compute(self, *args, **kwargs):
+    def compute(self, signal, *, axis=-1, **kwargs):
         """
-        compute(signal, *, columns=None, windowed=False)
+        compute(signal, *, axis=-1)
 
         Compute the dimensionless jerk metric
 
         Parameters
         ----------
-        signal : {numpy.ndarray, pandas.DataFrame}
-            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
-        windowed : bool, optional
-            If the signal has already been windowed. Default is False.
+        signal : array-like
+            Array-like containing values to compute the dimensionless jerk metric for.
+        axis : int, optional
+            Axis along which the signal entropy will be computed. Ignored if `signal` is a
+            pandas.DataFrame. Default is last (-1).
 
         Returns
         -------
-        dimless_jerk_metric : {numpy.ndarray, pandas.DataFrame}
-            Computed [log] dimensionless jerk metric, returned as the same type as the input signal
+        dimless_jerk_metric : numpy.ndarray
+            Computed [log] dimensionless jerk metric.
         """
-        return super().compute(*args, **kwargs)
-
-    def _compute(self, x, fs):
-        super(DimensionlessJerk, self)._compute(x, fs)
-
-        self._result = _cython.DimensionlessJerk(x, self.i_type)
+        x = super().compute(signal, axis=axis)
+        res = extensions.dimensionless_jerk_metric(x, self.i_type)
 
         if self.log:
-            self._result = -log(abs(self._result))
+            return -nplog(abs(res))
+        else:
+            return res
 
 
 class SPARC(Feature):
@@ -179,10 +165,6 @@ class SPARC(Feature):
         The amplitude threshold to used for determining the cut off frequency up to which the
         spectral arc length is to be estimated. Default is 0.05
 
-    Methods
-    -------
-    compute(signal, fs[, columns=None, windowed=False])
-
 
     References
     ----------
@@ -191,14 +173,20 @@ class SPARC(Feature):
         Dec. 2015, doi: 10.1186/s12984-015-0090-9.
 
     """
+    __slots__ = ("padlevel", "fc", "amp_thresh")
+
     def __init__(self, padlevel=4, fc=10.0, amplitude_threshold=0.05):
-        super(SPARC, self).__init__('SPARC', {'padlevel': padlevel, 'fc': fc,
-                                              'amplitude_threshold': amplitude_threshold})
+        super(SPARC, self).__init__(
+            padlevel=padlevel,
+            fc=fc,
+            amplitude_threshold=amplitude_threshold
+        )
+
         self.padlevel = padlevel
         self.fc = fc
         self.amp_thresh = amplitude_threshold
 
-    def compute(self, *args, **kwargs):
+    def compute(self, signal, fs=1., *, axis=-1):
         """
         compute(signal, fs, *, columns=None, windowed=False)
 
@@ -206,23 +194,18 @@ class SPARC(Feature):
 
         Parameters
         ----------
-        signal : {numpy.ndarray, pandas.DataFrame}
-            Either a numpy array (up to 3D) or a pandas dataframe containing the signal
+        signal : array-like
+            Array-like containing values to compute the SPARC for.
         fs : float, optional
-            Sampling frequency in Hz
-        columns : array_like, optional
-            Columns to use if signal is a pandas.DataFrame. If None, uses all columns.
-        windowed : bool, optional
-            If the signal has already been windowed. Default is False.
+            Sampling frequency in Hz. If not provided, default is 1.0Hz
+        axis : int, optional
+            Axis along which the signal entropy will be computed. Ignored if `signal` is a
+            pandas.DataFrame. Default is last (-1).
 
         Returns
         -------
-        sparc : {numpy.ndarray, pandas.DataFrame}
-            Computed SPARC, returned as the same type as the input signal
+        sparc : numpy.ndarray
+            Computed SPARC.
         """
-        return super().compute(*args, **kwargs)
-
-    def _compute(self, x, fs):
-        super(SPARC, self)._compute(x, fs)
-
-        self._result = _cython.SPARC(x, fs, self.padlevel, self.fc, self.amp_thresh)
+        x = super().compute(signal, fs, axis=axis)
+        return extensions.SPARC(x, fs, self.padlevel, self.fc, self.amp_thresh)
