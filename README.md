@@ -25,7 +25,6 @@ Full documentation is available [HERE INSERT LINK]()
 - pandas >= 0.23.4
 - lightgbm >= 2.3.0
 - pywavelets
-- `[`cython >= 0.29.14`]` : optional, only if cythonizing .pyx files before building
 
 ## Installation
 ```shell script
