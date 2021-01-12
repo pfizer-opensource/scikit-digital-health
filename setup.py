@@ -219,21 +219,6 @@ def configuration(parent_package='', top_path=None):
             libraries=["ffeatures"]
         )
 
-    # cython feature extensions
-    if os.environ.get('CYTHONIZE', 'False') == 'True':
-        from Cython.Build import cythonize
-
-        # create a c file from the cython file
-        for pyxf in list(Path('.').rglob('*/features/lib/_cython/*.pyx')):
-            cythonize(str(pyxf), compiler_directives={'language_level': 3})
-
-    # get a list of the c files to compile
-    for cf in list(Path('.').rglob('*/features/lib/_cython/*.c')):
-        config.add_extension(
-            str(Path(*cf.parts[1:]).with_suffix('')),
-            sources=[str(cf)]
-        )
-
     # ========================
     # DATA FILES
     # ========================
