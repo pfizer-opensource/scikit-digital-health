@@ -106,6 +106,6 @@ def get_gait_classification_lgbm(gait_pred, accel, fs):
 
         # convert to actual values that match up with data
         bout_starts *= wstep
-        bout_stops = bout_stops * wstep + (wlen - wstep)  # account for edges, of if windows overlap
+        bout_stops = bout_stops * wstep + (wlen - wstep)  # account for edges, if windows overlap
 
     return bout_starts, bout_stops

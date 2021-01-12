@@ -69,11 +69,10 @@ def normalize_axes(ndim, axis, ind_axis):
         | (a, b) |  1 |  0 |        |    |    | (3a,) |    |    |          |
         | (a, b) |  1 |  N |        |    |    | (f, a)|    |    |          |
 
-        
         |  shape   | ax| ia   |   move1  | ax| ia|   move2  |   res    |    | ia| res move |
         |----------|---|------|----------|---|---|----------|----------|----|---|----------|
         | (a, b, c)| 0 | 1(0) | (b, c, a)|   |   |          | (bf, c)  |  0 | 0 |          |
-        | (a, b, c)| 0 | 2(1) | (b, c, a)|   | 1 | (c, b, a)| (cf, b)  |  0 | 1 | (b, cf)  |   
+        | (a, b, c)| 0 | 2(1) | (b, c, a)|   | 1 | (c, b, a)| (cf, b)  |  0 | 1 | (b, cf)  |
         | (a, b, c)| 0 | N    | (b, c, a)|   |   |          | (f, b, c)|    |   |          |
         | (a, b, c)| 1 | 0    | (a, c, b)|   |   |          | (af, c)  |  0 | 0 |          |
         | (a, b, c)| 1 | 2(1) | (a, c, b)|   | 1 | (c, a, b)| (cf, a)  |  0 | 1 | (a, cf)  |
@@ -81,25 +80,25 @@ def normalize_axes(ndim, axis, ind_axis):
         | (a, b, c)| 2 | 0    | (a, b, c)|   |   |          | (af, b)  |  0 | 0 |          |
         | (a, b, c)| 2 | 1    | (a, b, c)|   | 1 | (b, a, c)| (bf, a)  |  0 | 1 | (a, bf)  |
         | (a, b, c)| 2 | N    | (a, b, c)|   |   |          | (f, a, b)|    |   |          |
-        
-        |  shape      | ax| ia   |   move1     | ia|   move2     |   res       |    | ia| res move  |
-        |-------------|---|------|-------------|---|-------------|-------------|----|---|-----------|
-        | (a, b, c, d)| 0 | 1(0) | (b, c, d, a)|   |             | (bf, c, d)  |  0 | 0 |           |
-        | (a, b, c, d)| 0 | 2(1) | (b, c, d, a)| 1 | (c, b, d, a)| (cf, b, d)  |  0 | 1 | (b, cf, d)|
-        | (a, b, c, d)| 0 | 3(2) | (b, c, d, a)| 2 | (d, b, c, a)| (df, b, c)  |  0 | 2 | (d, c, df)|
-        | (a, b, c, d)| 0 | N    | (b, c, d, a)|   |             | (f, b, c, d)|    |   |           |
-        | (a, b, c, d)| 1 | 0    | (a, c, d, b)|   |             | (af, c, d)  |    |   |           |
-        | (a, b, c, d)| 1 | 2(1) | (a, c, d, b)| 1 | (c, a, d, b)| (cf, a, d)  |  0 | 1 | (a, cf, d)|
-        | (a, b, c, d)| 1 | 3(2) | (a, c, d, b)| 2 | (d, a, c, b)| (df, a, c)  |  0 | 2 | (a, c, df)|
-        | (a, b, c, d)| 1 | N    | (a, c, d, b)|   |             | (f, a, c, d)|    |   |           |
-        | (a, b, c, d)| 2 | 0    | (a, b, d, c)|   |             | (af, b, d)  |    |   |           |
-        | (a, b, c, d)| 2 | 1    | (a, b, d, c)| 1 | (b, a, d, c)| (bf, a, d)  |  0 | 1 | (a, bf, d)|
-        | (a, b, c, d)| 2 | 3(2) | (a, b, d, c)| 2 | (d, a, b, c)| (df, a, b)  |  0 | 2 | (a, b, df)|
-        | (a, b, c, d)| 2 | N    | (a, b, d, c)|   |             | (f, a, b, d)|    |   |           |
-        | (a, b, c, d)| 3 | 0    | (a, b, c, d)|   |             | (af, b, c)  |    |   |           |
-        | (a, b, c, d)| 3 | 1    | (a, b, c, d)| 1 | (b, a, c, d)| (bf, a, c)  |  0 | 1 | (a, bf, c)|
-        | (a, b, c, d)| 3 | 2    | (a, b, c, d)| 2 | (c, a, b, d)| (cf, a, b)  |  0 | 2 | (a, b, cf)|
-        | (a, b, c, d)| 3 | N    | (a, b, c, d)|   |             | (f, a, b, c)|    |   |           |
+
+        |  shape     | ax| ia   |   move1     | ia|   move2     |   res       |   | ia| res move  |
+        |------------|---|------|-------------|---|-------------|-------------|---|---|-----------|
+        |(a, b, c, d)| 0 | 1(0) | (b, c, d, a)|   |             | (bf, c, d)  | 0 | 0 |           |
+        |(a, b, c, d)| 0 | 2(1) | (b, c, d, a)| 1 | (c, b, d, a)| (cf, b, d)  | 0 | 1 | (b, cf, d)|
+        |(a, b, c, d)| 0 | 3(2) | (b, c, d, a)| 2 | (d, b, c, a)| (df, b, c)  | 0 | 2 | (d, c, df)|
+        |(a, b, c, d)| 0 | N    | (b, c, d, a)|   |             | (f, b, c, d)|   |   |           |
+        |(a, b, c, d)| 1 | 0    | (a, c, d, b)|   |             | (af, c, d)  |   |   |           |
+        |(a, b, c, d)| 1 | 2(1) | (a, c, d, b)| 1 | (c, a, d, b)| (cf, a, d)  | 0 | 1 | (a, cf, d)|
+        |(a, b, c, d)| 1 | 3(2) | (a, c, d, b)| 2 | (d, a, c, b)| (df, a, c)  | 0 | 2 | (a, c, df)|
+        |(a, b, c, d)| 1 | N    | (a, c, d, b)|   |             | (f, a, c, d)|   |   |           |
+        |(a, b, c, d)| 2 | 0    | (a, b, d, c)|   |             | (af, b, d)  |   |   |           |
+        |(a, b, c, d)| 2 | 1    | (a, b, d, c)| 1 | (b, a, d, c)| (bf, a, d)  | 0 | 1 | (a, bf, d)|
+        |(a, b, c, d)| 2 | 3(2) | (a, b, d, c)| 2 | (d, a, b, c)| (df, a, b)  | 0 | 2 | (a, b, df)|
+        |(a, b, c, d)| 2 | N    | (a, b, d, c)|   |             | (f, a, b, d)|   |   |           |
+        |(a, b, c, d)| 3 | 0    | (a, b, c, d)|   |             | (af, b, c)  |   |   |           |
+        |(a, b, c, d)| 3 | 1    | (a, b, c, d)| 1 | (b, a, c, d)| (bf, a, c)  | 0 | 1 | (a, bf, c)|
+        |(a, b, c, d)| 3 | 2    | (a, b, c, d)| 2 | (c, a, b, d)| (cf, a, b)  | 0 | 2 | (a, b, cf)|
+        |(a, b, c, d)| 3 | N    | (a, b, c, d)|   |             | (f, a, b, c)|   |   |           |
         """
         ax = axis if axis >= 0 else ndim + axis
         if ind_axis is None:
@@ -170,7 +169,7 @@ class Bank:
             self._feats.append(features)
         elif all([isinstance(i, Feature) for i in features]):
             if any([ft in self for ft in features]):
-                warn(f"Feature already in the Bank, will be duplicated.", UserWarning)
+                warn("Feature already in the Bank, will be duplicated.", UserWarning)
             self._indices.extend(normalize_indices(len(features), index))
             self._feats.extend(features)
 

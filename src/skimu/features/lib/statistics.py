@@ -4,7 +4,7 @@ Signal features based on statistics measures
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
-from numpy import max, min, quantile, mean, std, arange
+from numpy import max, min, quantile, mean, std
 
 from skimu.features.core import Feature
 from skimu.features.lib import extensions

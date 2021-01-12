@@ -8,7 +8,8 @@ from collections.abc import Iterable
 from warnings import warn
 
 import h5py
-from numpy import mean, diff, arange, zeros, interp, float_, abs, argmax, sign, asarray, sum, argmin
+from numpy import mean, diff, arange, zeros, interp, float_, abs, argmax, sign, asarray, sum, \
+    argmin
 
 from skimu.base import _BaseProcess
 from skimu.gait.get_gait_classification import get_gait_classification_lgbm
@@ -313,7 +314,8 @@ class Gait(_BaseProcess):
         }
         # aux dictionary for storing values for computing gait metrics
         gait_aux = {
-            i: [] for i in ['vert axis', 'accel', 'vert velocity', 'vert position', 'inertial data i']
+            i: [] for i in
+            ['vert axis', 'accel', 'vert velocity', 'vert position', 'inertial data i']
         }
 
         # get the gait classification if necessary
@@ -362,7 +364,9 @@ class Gait(_BaseProcess):
                 # save some default per bout metrics
                 gait['Bout N'].extend([ibout + 1] * strides_in_bout)
                 gait['Bout Starts'].extend([time_ds[bout.start]] * strides_in_bout)
-                gait['Bout Duration'].extend([(bout.stop - bout.start) / goal_fs] * strides_in_bout)
+                gait['Bout Duration'].extend(
+                    [(bout.stop - bout.start) / goal_fs] * strides_in_bout
+                )
 
                 gait['Bout Steps'].extend([strides_in_bout] * strides_in_bout)
                 gait['Gait Cycles'].extend([sum(gait['valid cycle'][gait_i:])] * strides_in_bout)
