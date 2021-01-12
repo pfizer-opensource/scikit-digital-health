@@ -52,9 +52,9 @@ def get_gait_bouts(starts, stops, day_start, day_stop, ts, max_bout_sep, min_bou
         if (nb + ncb + 1) < starts_subset.size:
             # should be start - stop because it is start_(i+1)
             tdiff = ts[starts_subset[nb + ncb + 1]] - ts[stops_subset[nb + ncb]]
-            while (tdiff < max_bout_sep) and((nb + ncb + 2) < starts_subset.size):
+            while (tdiff < max_bout_sep) and ((nb + ncb + 2) < starts_subset.size):
                 ncb += 1
-                tdiff = ts[starts_subset[nb + ncb + 1]] - ts[stops_subset[nb + ncb ]]
+                tdiff = ts[starts_subset[nb + ncb + 1]] - ts[stops_subset[nb + ncb]]
 
         if (ts[stops_subset[nb + ncb] - 1] - ts[starts_subset[nb]]) > min_bout_time:
             bouts.append(slice(starts_subset[nb], stops_subset[nb + ncb]))

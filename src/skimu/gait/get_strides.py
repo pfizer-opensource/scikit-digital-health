@@ -60,7 +60,7 @@ def get_strides(gait, vert_accel, gait_index, ic, fc, ts, fs, max_stride_time, l
         # max_stride_time * loading_factor
         if (fc_forward_times < (curr_ic + loading_forward_time)).sum() != 1:
             continue  # skip this IC
-        # OPTIMIZATION 2: stance time should be less than half a gait cycle + initial double support
+        # OPTIMIZATION 2: stance time should be less than half gait cycle + initial double support
         if (fc_forward_times < (curr_ic + stance_forward_time)).sum() < 2:
             continue  # skip this IC
 

@@ -4,7 +4,7 @@ Function for getting gait events from an accelerometer signal
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
-from numpy import fft, argmax, std, abs, around
+from numpy import fft, argmax, std, abs
 from scipy.signal import detrend, butter, sosfiltfilt, find_peaks
 from scipy.integrate import cumtrapz
 from pywt import cwt
@@ -68,7 +68,7 @@ def get_gait_events(
         # IC scale: -10 * sf + 56
         # FC scale: -52 * sf + 131
         # TODO verify the FC scale equation. This is not in the paper but is a guess from the graph
-        scale1 = min(max(round((-10 * step_freq + 56) * (fs / 250)), 1), 90)  # 250Hz was original fs
+        scale1 = min(max(round((-10 * step_freq + 56) * (fs / 250)), 1), 90)  # orig fs = 250Hz
         scale2 = min(max(round((-52 * step_freq + 131) * (fs / 250)), 1), 90)
         # range is set to 1 <-> 90
     else:
