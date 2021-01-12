@@ -167,14 +167,18 @@ int read_block(FILE *fp, double *sec_base, double *sec_period, Info_t *info, Dat
                      + (data->dt[N * 7 + 4] * SECMIN)
                      + data->dt[N * 7 + 5])
                      + ((double)data->dt[N * 7 + 6]) / 1000000.0f;
-
+  
   double tmp = *sec_period - sec_hours;
-  if ((tmp >= 0) && (tmp < (FPAGE_SAMPLES / fs))){
-    data->idx[N] = -((long)(fs * tmp) + Nps);
+  double tmp2 = tmp + 86400.0;
+  double _dt = FPAGE_SAMPLES / fs;
+
+  if (((tmp >= 0) && (tmp < _dt)) || (tmp2 < _dt)){
+    data->idx[N] = -(Nps + (long)(fs * fmin(fabs(tmp), fabs(tmp2))));
   }
   tmp = *sec_base - sec_hours;
-  if ((tmp >= 0) && (tmp < (FPAGE_SAMPLES / fs))){
-    data->idx[N] = (long)(fs * tmp) + Nps;
+  tmp2 = tmp + 86400.0;
+  if (((tmp >= 0) && (tmp < _dt)) || (tmp2 < _dt)){
+    data->idx[N] = Nps + (long)(fs * fmin(fabs(tmp), fabs(tmp2)));
   }
   return 1;
 }
