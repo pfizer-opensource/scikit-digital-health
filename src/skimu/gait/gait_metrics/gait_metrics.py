@@ -36,7 +36,7 @@ from scipy.signal import butter, sosfiltfilt, find_peaks
 
 
 from skimu.gait.gait_metrics.base import EventMetric, BoutMetric, basic_asymmetry
-from skimu.features.lib._cython.sparc import sparc_1d
+from skimu.features.lib.extensions.smoothness import SPARC
 
 
 __all__ = ['StrideTime', 'StanceTime', 'SwingTime', 'StepTime', 'InitialDoubleSupport',
@@ -472,7 +472,7 @@ class StrideSPARC(EventMetric):
         for i, idx in enumerate(nonzero(mask)[0]):
             bout_i = gait_aux['inertial data i'][idx]
 
-            gait[self.k_][idx] = sparc_1d(
+            gait[self.k_][idx] = SPARC(
                 norm(gait_aux['accel'][bout_i][i1[i]:i2[i], :], axis=1) - 1,
                 fs,  # fsample
                 4,  # padlevel
