@@ -4,7 +4,7 @@ Function for getting the bouts of continuous gait
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
-from numpy import insert, append
+from numpy import insert, append, array
 
 
 def get_gait_bouts(starts, stops, day_start, day_stop, ts, max_bout_sep, min_bout_time):
@@ -36,6 +36,13 @@ def get_gait_bouts(starts, stops, day_start, day_stop, ts, max_bout_sep, min_bou
     # get the portion of bouts for the specified day
     starts_subset = starts[(starts >= day_start) & (starts < day_stop)]
     stops_subset = stops[(stops > day_start) & (stops <= day_stop)]
+
+    if starts_subset.size == 0 and stops_subset.size == 0:
+        return []
+    if starts_subset.size == 0 and stops_subset.size == 1:
+        starts_subset = array([day_start])
+    if starts_subset.size == 1 and stops_subset == 0:
+        stops_subset = array([day_stop])
 
     if starts_subset[0] > stops_subset[0]:
         starts_subset = insert(starts_subset, 0, day_start)
