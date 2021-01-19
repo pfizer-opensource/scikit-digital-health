@@ -4,7 +4,7 @@ Testing Calibration process
 from numpy import allclose, array
 
 from skimu.read import ReadBin
-from skimu.preprocessing import Calibrate
+from skimu.preprocessing import AccelerometerCalibrate
 
 
 class TestCalibration:
@@ -14,7 +14,7 @@ class TestCalibration:
         res = rdr.predict("/Users/lukasadamowicz/Downloads/long_sample_gnactv.bin")
 
         # Calibration
-        cal = Calibrate()
+        cal = AccelerometerCalibrate()
         cal_res = cal.predict(**res, apply=False)
 
         assert allclose(
