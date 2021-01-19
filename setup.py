@@ -173,6 +173,16 @@ def configuration(parent_package='', top_path=None):
 
     # EXTENSIONS
     # ========================
+    # UTILITY
+    config.add_library(
+        "frolling_moments",
+        sources="src/skimu/utility/_extensions/rolling_moments.f95"
+    )
+    config.add_extension(
+        "skimu/utility/_extensions/rolling_moments",
+        sources="scr/skimu/utility/_extensions/rolling_moments.c",
+        libraries=["frolling_moments"]
+    )
     # cwa (axivity)
     config.add_library(
         'fcwa_convert',
