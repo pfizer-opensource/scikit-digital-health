@@ -37,24 +37,27 @@ def rolling_mean(a, w_len, skip, axis=-1):
     -----
     On the rolling axis, the output length can be computed as follows:
 
-    .. math: \frac{n - w_len}{skip} + 1
+    .. math:: \frac{n - w_{len}}{skip} + 1
 
     where `n` is the length of the rolling axis.
 
     Examples
     --------
     Compute the with non-overlapping windows:
+
     >>> import numpy as np
     >>> x = np.arange(10)
     >>> rolling_mean(x, 3, 3)
     array([1., 4., 7.])
 
     Compute with overlapping windows:
+
     >>> rolling_mean(x, 3, 1)
     array([1., 2., 3., 4., 5., 6., 7., 8.])
 
     Compute on a nd-array to see output shape. On the rolling axis, the output should be equal to
-    :math:`(n - w_len) / skip + 1`.
+    :math:`(n - w_{len}) / skip + 1`.
+
     >>> n = 500
     >>> window_length = 100
     >>> window_skip = 50
@@ -65,6 +68,7 @@ def rolling_mean(a, w_len, skip, axis=-1):
     (3, 9, 5, 10)
 
     Check flags for different axis output
+
     >>> z = np.random.random((10, 10, 10))
     >>> rolling_mean(z, 3, 3, axis=0).flags['C_CONTIGUOUS']
     False
@@ -118,13 +122,14 @@ def rolling_sd(a, w_len, skip, axis=-1, return_previous=True):
     -----
     On the rolling axis, the output length can be computed as follows:
 
-    .. math: \frac{n - w_len}{skip} + 1
+    .. math:: \frac{n - w_{len}}{skip} + 1
 
     where `n` is the length of the rolling axis.
 
     Examples
     --------
     Compute the with non-overlapping windows:
+
     >>> import numpy as np
     >>> x = np.arange(10)**2
     >>> rolling_sd(x, 3, 3, return_previous=True)
@@ -132,12 +137,14 @@ def rolling_sd(a, w_len, skip, axis=-1, return_previous=True):
      array([ 1.66666667, 16.66666667, 49.66666667]))
 
     Compute with overlapping windows:
+
     >>> rolling_mean(x, 3, 1, return_previous=False)
     array([ 2.081666  ,  4.04145188,  6.02771377,  8.02080628, 10.0166528 ,
            12.01388086, 14.0118997 , 16.01041328])
 
     Compute on a nd-array to see output shape. On the rolling axis, the output should be equal to
-    :math:`(n - w_len) / skip + 1`.
+    :math:`(n - w_{len}) / skip + 1`.
+
     >>> n = 500
     >>> window_length = 100
     >>> window_skip = 50
@@ -148,6 +155,7 @@ def rolling_sd(a, w_len, skip, axis=-1, return_previous=True):
     (3, 9, 5, 10)
 
     Check flags for different axis output
+
     >>> z = np.random.random((10, 10, 10))
     >>> rolling_sd(z, 3, 3, axis=0, return_previous=False).flags['C_CONTIGUOUS']
     False
@@ -207,13 +215,14 @@ def rolling_skewness(a, w_len, skip, axis=-1, return_previous=True):
     -----
     On the rolling axis, the output length can be computed as follows:
 
-    .. math: \frac{n - w_len}{skip} + 1
+    .. math:: \frac{n - w_{len}}{skip} + 1
 
     where `n` is the length of the rolling axis.
 
     Examples
     --------
     Compute the with non-overlapping windows:
+
     >>> import numpy as np
     >>> x = np.arange(10)**2
     >>> rolling_skewness(x, 3, 3, return_previous=True)
@@ -222,12 +231,14 @@ def rolling_skewness(a, w_len, skip, axis=-1, return_previous=True):
      array([ 1.66666667, 16.66666667, 49.66666667]))
 
     Compute with overlapping windows:
+
     >>> rolling_skewness(x, 3, 1, return_previous=False)
     array([0.52800497, 0.29479961, 0.20070018, 0.15164108, 0.12172925,
            0.10163023, 0.08720961, 0.07636413])
 
     Compute on a nd-array to see output shape. On the rolling axis, the output should be equal to
-    :math:`(n - w_len) / skip + 1`.
+    :math:`(n - w_{len}) / skip + 1`.
+
     >>> n = 500
     >>> window_length = 100
     >>> window_skip = 50
@@ -238,6 +249,7 @@ def rolling_skewness(a, w_len, skip, axis=-1, return_previous=True):
     (3, 9, 5, 10)
 
     Check flags for different axis output
+
     >>> z = np.random.random((10, 10, 10))
     >>> rolling_skewness(z, 3, 3, axis=0, return_previous=False).flags['C_CONTIGUOUS']
     False
@@ -300,13 +312,14 @@ def rolling_kurtosis(a, w_len, skip, axis=-1, return_previous=True):
     -----
     On the rolling axis, the output length can be computed as follows:
 
-    .. math: \frac{n - w_len}{skip} + 1
+    .. math:: \frac{n - w_{len}}{skip} + 1
 
     where `n` is the length of the rolling axis.
 
     Examples
     --------
     Compute the with non-overlapping windows:
+
     >>> import numpy as np
     >>> x = np.arange(10)**2
     >>> rolling_kurtosis(x, 3, 3, return_previous=True)
@@ -316,11 +329,13 @@ def rolling_kurtosis(a, w_len, skip, axis=-1, return_previous=True):
      array([ 1.66666667, 16.66666667, 49.66666667]))  # mean
 
     Compute with overlapping windows:
+
     >>> rolling_kurtosis(np.random.random(100), 50, 20, return_previous=False)
     array([-1.10155074, -1.20785479, -1.24363625])  # random
 
     Compute on a nd-array to see output shape. On the rolling axis, the output should be equal to
-    :math:`(n - w_len) / skip + 1`.
+    :math:`(n - w_{len}) / skip + 1`.
+
     >>> n = 500
     >>> window_length = 100
     >>> window_skip = 50
@@ -331,6 +346,7 @@ def rolling_kurtosis(a, w_len, skip, axis=-1, return_previous=True):
     (3, 9, 5, 10)
 
     Check flags for different axis output
+
     >>> z = np.random.random((10, 10, 10))
     >>> rolling_kurtosis(z, 3, 3, axis=0, return_previous=False).flags['C_CONTIGUOUS']
     False
