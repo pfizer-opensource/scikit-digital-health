@@ -2,7 +2,8 @@ import pytest
 
 from numpy import asfortranarray, random
 
-from skimu.utility import get_windowed_view, compute_window_samples, DimensionError, ContiguityError
+from skimu.utility import get_windowed_view, compute_window_samples
+from skimu.utility.windowing import DimensionError, ContiguityError
 
 
 class TestGetWindowedView:
