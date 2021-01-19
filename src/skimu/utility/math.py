@@ -85,6 +85,10 @@ def rolling_mean(a, w_len, skip, axis=-1):
     # move computation axis to end
     x = moveaxis(a, axis, -1)
 
+    # check that there are enough samples
+    if w_len > x.shape[-1]:
+        raise ValueError("Cannot have a window length larger than the computation axis.")
+
     rmean = _extensions.rolling_mean(x, w_len, skip)
 
     # move computation axis back to original place and return
@@ -171,6 +175,10 @@ def rolling_sd(a, w_len, skip, axis=-1, return_previous=True):
 
     # move computation axis to end
     x = moveaxis(a, axis, -1)
+
+    # check that there are enough samples
+    if w_len > x.shape[-1]:
+        raise ValueError("Cannot have a window length larger than the computation axis.")
 
     res = _extensions.rolling_sd(x, w_len, skip, return_previous)
 
@@ -265,6 +273,10 @@ def rolling_skewness(a, w_len, skip, axis=-1, return_previous=True):
 
     # move computation axis to end
     x = moveaxis(a, axis, -1)
+
+    # check that there are enough samples
+    if w_len > x.shape[-1]:
+        raise ValueError("Cannot have a window length larger than the computation axis.")
 
     res = _extensions.rolling_skewness(x, w_len, skip, return_previous)
 
@@ -362,6 +374,10 @@ def rolling_kurtosis(a, w_len, skip, axis=-1, return_previous=True):
 
     # move computation axis to end
     x = moveaxis(a, axis, -1)
+
+    # check that there are enough samples
+    if w_len > x.shape[-1]:
+        raise ValueError("Cannot have a window length larger than the computation axis.")
 
     res = _extensions.rolling_kurtosis(x, w_len, skip, return_previous)
 
