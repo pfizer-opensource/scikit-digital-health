@@ -10,6 +10,11 @@ Misc. Math Functions
 .. autosummary::
     :toctree: generated/
 
+    math.rolling_mean
+    math.rolling_sd
+    math.rolling_skewness
+    math.rolling_kurtosis
+
 
 Windowing Functions
 -------------------
