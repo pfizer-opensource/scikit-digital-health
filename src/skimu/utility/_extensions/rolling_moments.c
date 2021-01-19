@@ -29,7 +29,10 @@ PyObject * rolling_mean(PyObject *NPY_UNUSED(self), PyObject *args){
     int ndim = PyArray_NDIM(data);
     npy_intp *ddims = PyArray_DIMS(data);
     npy_intp *rdims = (npy_intp *)malloc(ndim * sizeof(npy_intp));
-    if (!rdims) Py_XDECREF(data); return NULL;
+    if (!rdims){
+        Py_XDECREF(data);
+        return NULL;
+    }
     // create return shape
     for (int i = 0; i < (ndim - 1); ++i){
         rdims[i] = ddims[i];
@@ -39,7 +42,11 @@ PyObject * rolling_mean(PyObject *NPY_UNUSED(self), PyObject *args){
     PyArrayObject *rmean = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
     free(rdims);
 
-    if (!rmean) Py_XDECREF(data); Py_XDECREF(rmean); return NULL;
+    if (!rmean){
+        Py_XDECREF(data);
+        Py_XDECREF(rmean);
+        return NULL;
+    }
     // data pointers
     double *dptr = (double *)PyArray_DATA(data),
            *rmean_ptr = (double *)PyArray_DATA(rmean);
@@ -78,7 +85,10 @@ PyObject * rolling_sd(PyObject *NPY_UNUSED(self), PyObject *args){
     int ndim = PyArray_NDIM(data);
     npy_intp *ddims = PyArray_DIMS(data);
     npy_intp *rdims = (npy_intp *)malloc(ndim * sizeof(npy_intp));
-    if (!rdims) Py_XDECREF(data); return NULL;
+    if (!rdims){
+        Py_XDECREF(data);
+        return NULL;
+    }
     // create return shape
     for (int i = 0; i < (ndim - 1); ++i){
         rdims[i] = ddims[i];
@@ -89,7 +99,13 @@ PyObject * rolling_sd(PyObject *NPY_UNUSED(self), PyObject *args){
                   *rmean = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
     free(rdims);
 
-    if ((!rmean) || (!rsd)) Py_XDECREF(data); Py_XDECREF(rsd); Py_XDECREF(rmean); return NULL;
+    if ((!rmean) || (!rsd)){
+        Py_XDECREF(data);
+        Py_XDECREF(rmean);
+        Py_XDECREF(rsd);
+        return NULL;
+    }
+
     // data pointers
     double *dptr      = (double *)PyArray_DATA(data),
            *rmean_ptr = (double *)PyArray_DATA(rmean),
@@ -138,7 +154,10 @@ PyObject * rolling_skewness(PyObject *NPY_UNUSED(self), PyObject *args){
     int ndim = PyArray_NDIM(data);
     npy_intp *ddims = PyArray_DIMS(data);
     npy_intp *rdims = (npy_intp *)malloc(ndim * sizeof(npy_intp));
-    if (!rdims) Py_XDECREF(data); return NULL;
+    if (!rdims){
+        Py_XDECREF(data);
+        return NULL;
+    }
     // create return shape
     for (int i = 0; i < (ndim - 1); ++i){
         rdims[i] = ddims[i];
@@ -150,7 +169,14 @@ PyObject * rolling_skewness(PyObject *NPY_UNUSED(self), PyObject *args){
                   *rskew = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
     free(rdims);
 
-    if ((!rmean) || (!rsd)) Py_XDECREF(data); Py_XDECREF(rsd); Py_XDECREF(rmean); return NULL;
+    if ((!rmean) || (!rsd) || (!rskew)){
+        Py_XDECREF(data);
+        Py_XDECREF(rskew);
+        Py_XDECREF(rsd);
+        Py_XDECREF(rmean);
+        return NULL;
+    }
+
     // data pointers
     double *dptr      = (double *)PyArray_DATA(data),
            *rmean_ptr = (double *)PyArray_DATA(rmean),
@@ -203,7 +229,10 @@ PyObject * rolling_kurtosis(PyObject *NPY_UNUSED(self), PyObject *args){
     int ndim = PyArray_NDIM(data);
     npy_intp *ddims = PyArray_DIMS(data);
     npy_intp *rdims = (npy_intp *)malloc(ndim * sizeof(npy_intp));
-    if (!rdims) Py_XDECREF(data); return NULL;
+    if (!rdims){
+        Py_XDECREF(data);
+        return NULL;
+    }
     // create return shape
     for (int i = 0; i < (ndim - 1); ++i){
         rdims[i] = ddims[i];
@@ -216,7 +245,15 @@ PyObject * rolling_kurtosis(PyObject *NPY_UNUSED(self), PyObject *args){
                   *rkurt = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
     free(rdims);
 
-    if ((!rmean) || (!rsd)) Py_XDECREF(data); Py_XDECREF(rsd); Py_XDECREF(rmean); return NULL;
+    if (!rmean || !rsd || !rskew || !rkurt){
+        Py_XDECREF(data);
+        Py_XDECREF(rkurt);
+        Py_XDECREF(rskew);
+        Py_XDECREF(rsd);
+        Py_XDECREF(rmean);
+        return NULL;
+    }
+
     // data pointers
     double *dptr      = (double *)PyArray_DATA(data),
            *rmean_ptr = (double *)PyArray_DATA(rmean),
@@ -229,7 +266,7 @@ PyObject * rolling_kurtosis(PyObject *NPY_UNUSED(self), PyObject *args){
     int nrepeats = PyArray_SIZE(data) / stride;  // number of repetitions to cover all the data
 
     for (int i = 0; i < nrepeats; ++i){
-        rolling_moments_4(&stride, dptr, &lag, &skip, rmean_ptr, rsd_ptr, rskew_ptr, rkutr_ptr);
+        rolling_moments_4(&stride, dptr, &lag, &skip, rmean_ptr, rsd_ptr, rskew_ptr, rkurt_ptr);
         dptr += stride;
         rmean_ptr += res_stride;
         rsd_ptr += res_stride;
@@ -256,7 +293,7 @@ PyObject * rolling_kurtosis(PyObject *NPY_UNUSED(self), PyObject *args){
 }
 
 
-char *rmean_doc = "rolling_mean(a, lag, skip)\n\n"
+static const char rmean_doc[] = "rolling_mean(a, lag, skip)\n\n"
 "Compute the rolling mean over windows of length `lag` with `skip` samples between window starts.\n\n"
 "Paramters\n"
 "---------\n"
@@ -271,7 +308,7 @@ char *rmean_doc = "rolling_mean(a, lag, skip)\n\n"
 "rmean : numpy.ndarray\n"
 "    Rolling mean.";
 
-char *rsd_doc = "rolling_sd(a, lag, skip, return_previous)\n\n"
+static const char rsd_doc[] = "rolling_sd(a, lag, skip, return_previous)\n\n"
 "Compute the rolling standard deviation over windows of length `lag` with `skip` samples "
 "between window starts.  Because previous rolling moments have to be computed as part of "
 "the process, they are availble to return as well.\n\n"
@@ -292,7 +329,7 @@ char *rsd_doc = "rolling_sd(a, lag, skip, return_previous)\n\n"
 "rmean : numpy.ndarray, optional\n"
 "    Rolling mean. Only returned if `return_previous` is `True`.";
 
-char *rskew_doc = "rolling_skewness(a, lag, skip, return_previous)\n\n"
+static const char rskew_doc[] = "rolling_skewness(a, lag, skip, return_previous)\n\n"
 "Compute the rolling skewness over windows of length `lag` with `skip` samples "
 "between window starts.  Because previous rolling moments have to be computed as part of "
 "the process, they are availble to return as well.\n\n"
@@ -315,7 +352,7 @@ char *rskew_doc = "rolling_skewness(a, lag, skip, return_previous)\n\n"
 "rmean : numpy.ndarray, optional\n"
 "    Rolling mean. Only returned if `return_previous` is `True`.";
 
-char *rkurt_doc = "rolling_kurtosis(a, lag, skip, return_previous)\n\n"
+static const char rkurt_doc[] = "rolling_kurtosis(a, lag, skip, return_previous)\n\n"
 "Compute the rolling kurtosis over windows of length `lag` with `skip` samples "
 "between window starts.  Because previous rolling moments have to be computed as part of "
 "the process, they are availble to return as well.\n\n"
