@@ -30,7 +30,7 @@ subroutine rolling_moments_1(n, x, lag, skip, mean) bind(C, name="rolling_moment
     m1(1) = x(1)
 
     do i=2, n
-        m1(i) = m1(i - 1) + x(i)
+        m1(i) = m1(i-1) + x(i)
     end do
 
     j = 2_c_long
@@ -38,6 +38,7 @@ subroutine rolling_moments_1(n, x, lag, skip, mean) bind(C, name="rolling_moment
 
     do i=lag+skip, n, skip
         mean(j) = m1(i) - m1(i-lag)
+        j = j + 1
     end do
 
     mean = mean / lag
