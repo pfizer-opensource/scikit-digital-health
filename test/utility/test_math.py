@@ -30,3 +30,15 @@ class TestRollingMean:
         pred = rolling_mean(x, **kwargs)
 
         assert pred.shape == out_shape
+
+    def test_window_length_shape_error(self):
+        x = np.random.random((5, 10))
+
+        with pytest.raises(ValueError):
+            rolling_mean(x, 11, 1, axis=-1)
+
+    def test_negative_error(self):
+        x = np.random.random((100, 300))
+        for args in (-1, 10), (10, -1), (-5, -5):
+            with pytest.raises(ValueError):
+                rolling_mean(x, *args, axis=-1)
