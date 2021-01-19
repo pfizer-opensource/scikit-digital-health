@@ -325,7 +325,7 @@ static const char rsd_doc[] = "rolling_sd(a, lag, skip, return_previous)\n\n"
 "Returns\n"
 "-------\n"
 "rsd : numpy.ndarray\n"
-"    Rolling sample standard deviation."
+"    Rolling sample standard deviation.\n"
 "rmean : numpy.ndarray, optional\n"
 "    Rolling mean. Only returned if `return_previous` is `True`.";
 
@@ -348,7 +348,7 @@ static const char rskew_doc[] = "rolling_skewness(a, lag, skip, return_previous)
 "rskew : numpy.ndarray\n"
 "    Rolling skewness.\n"
 "rsd : numpy.ndarray, optional\n"
-"    Rolling sample standard deviation. Only returned if `return_previous` is `True`."
+"    Rolling sample standard deviation. Only returned if `return_previous` is `True`.\n"
 "rmean : numpy.ndarray, optional\n"
 "    Rolling mean. Only returned if `return_previous` is `True`.";
 
@@ -373,7 +373,7 @@ static const char rkurt_doc[] = "rolling_kurtosis(a, lag, skip, return_previous)
 "rskew : numpy.ndarray, optional\n"
 "    Rolling skewness. Only returned if `return_previous` is `True`.\n"
 "rsd : numpy.ndarray, optional\n"
-"    Rolling sample standard deviation. Only returned if `return_previous` is `True`."
+"    Rolling sample standard deviation. Only returned if `return_previous` is `True`.\n"
 "rmean : numpy.ndarray, optional\n"
 "    Rolling mean. Only returned if `return_previous` is `True`.";
 
