@@ -11,3 +11,4 @@ API Reference
     features
     gait
     sit2stand
+    utility

@@ -11,15 +11,6 @@ Pipeline Processing
     :toctree: generated/
 
     Pipeline
-
-Utility Functions
------------------
-
-.. autosummary::
-    :toctree: generated/
-
-    utility.compute_window_samples
-    utility.get_windowed_view
 """
 from skimu.version import __version__
 
