@@ -9,6 +9,9 @@ from numpy import moveaxis
 from skimu.utility import _extensions
 
 
+__all__ = ["rolling_mean", "rolling_sd", "rolling_skewness", "rolling_kurtosis"]
+
+
 def rolling_mean(a, w_len, skip, axis=-1):
     r"""
     Compute the rolling mean.
