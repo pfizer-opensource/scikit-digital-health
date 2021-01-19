@@ -180,7 +180,7 @@ def configuration(parent_package='', top_path=None):
     )
     config.add_extension(
         "skimu/utility/_extensions/rolling_moments",
-        sources="scr/skimu/utility/_extensions/rolling_moments.c",
+        sources="src/skimu/utility/_extensions/rolling_moments.c",
         libraries=["frolling_moments"]
     )
     # cwa (axivity)
