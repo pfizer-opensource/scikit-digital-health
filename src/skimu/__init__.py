@@ -24,4 +24,13 @@ from skimu import sit2stand
 from skimu import features
 
 __skimu_version__ = __version__
-__all__ = ['Pipeline', 'gait', 'sit2stand', 'read', 'features', 'utility', '__skimu_version__']
+__all__ = [
+    'Pipeline',
+    'gait',
+    'sit2stand',
+    'read',
+    'preprocessing',
+    'features',
+    'utility',
+    '__skimu_version__'
+]
