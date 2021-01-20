@@ -4,9 +4,14 @@ Inertial data/sensor calibration
 Lukas Adamowicz
 Pfizer DMTI 2021
 """
-from numpy import mean, diff
+from warnings import warn
+
+from numpy import mean, diff, zeros, ones, abs, all as npall, any as npany, isnan, around, Inf, \
+    sqrt, sum
+from numpy.linalg import norm
 
 from skimu.base import _BaseProcess
+from skimu.utility import rolling_mean, rolling_sd
 
 
 __all__ = ["AccelerometerCalibrate"]
@@ -32,6 +37,17 @@ class AccelerometerCalibrate(_BaseProcess):
         avialable (but still more than 12 hours), calibration will still be performed on all the
         data. If the calibration error is not under 0.01g after these hours, more data will be used
         in 12 hour increments.
+    sd_criteria : float, optional
+        The criteria for the rolling standard deviation to determine stillness, in g. This value
+        will likely change between devices. Default is 0.013g, which was found for GeneActiv
+        devices. If measuring the noise in a bench-top test, this threshold should be about
+        `1.2 * noise`.
+    max_iter : int, optional
+        Maximum number of iterations to perform during calibration. Default is 1000. Generally
+        should be left at this value.
+    tol : float, optional
+        Tolerance for stopping iteration. Default is 1e-10. Generally this should be left at this
+        value.
 
     Notes
     -----
@@ -46,14 +62,25 @@ class AccelerometerCalibrate(_BaseProcess):
     Journal of Applied Physiology, vol. 117, no. 7, pp. 738–744, Aug. 2014,
     doi: 10.1152/japplphysiol.00421.2014.
     """
-    def __init__(self, sphere_crit=0.3, min_hours=72):
+    def __init__(self, sphere_crit=0.3, min_hours=72, sd_criteria=0.013, max_iter=1000, tol=1e-10):
         if min_hours % 12 != 0 or min_hours <= 0:
             min_hours = ((min_hours // 12) + 1) * 12
 
-        super().__init__(sphere_crit=sphere_crit, min_hours=min_hours)
+        max_iter = int(max_iter)
+
+        super().__init__(
+            sphere_crit=sphere_crit,
+            min_hours=min_hours,
+            sd_criteria=sd_criteria,
+            max_iter=max_iter,
+            tol=tol
+        )
 
         self.sphere_crit = sphere_crit
         self.min_hours = min_hours
+        self.sd_crit = sd_criteria
+        self.max_iter = max_iter
+        self.tol = tol
 
     def predict(self, time=None, accel=None, *, apply=True, temp=None, **kwargs):
         """
@@ -88,4 +115,79 @@ class AccelerometerCalibrate(_BaseProcess):
         n10 = int(10 / fs)  # elements in 10 seconds
         nh = int(self.min_hours * 3600 / fs)  # elements in min_hours hours
         n12h = int(12 * 3600 / fs)  # elements in 12 hours
+
+        accel_rsd, accel_rm = rolling_sd(accel, n10, n10, axis=0, return_previous=True)
+        mag_rm = rolling_mean(norm(accel, axis=1), n10, n10)
+
+        if temp is not None:
+            temp_rm = rolling_mean(temp, n10, n10)
+        else:
+            temp_rm = zeros(mag_rm.size)
+
+        # less than 2 is to prevent clipped signals from being labeled
+        no_motion = npall(accel_rsd < self.sd_crit, axis=1) & npall(abs(accel_rm) < 2, axis=1)
+        # also add in nan values.  Only need one of accel_rm and accel_rsd
+        no_motion |= npany(isnan(accel_rm)) & isnan(mag_rm) & isnan(temp_rm)
+
+        # trim to no motion only
+        accel_rsd = accel_rsd[no_motion]
+        accel_rm = accel_rm[no_motion]
+        mag_rm = mag_rm[no_motion]
+        temp_rm = temp_rm[no_motion]
+
+        if accel_rsd.shape[0] > 1:
+            n_points = accel_rsd.shape[0]
+
+            # starting error
+            cal_error_start = around(mean(abs(norm(accel_rsd, axis=1) - 1)), decimals=5)
+
+            # check if the sphere is well populated
+            tel = (
+                    (accel_rm.min(axis=0) < -self.sphere_crit)
+                    & (accel_rm.max(axis=0) > self.sphere_crit)
+            ).sum()
+            if tel == 3:
+                sphere_populated = True
+            else:
+                sphere_populated = False
+                warn("Recalibration not done because no non-movement data available")
+        else:
+            warn(
+                "Recalibration not done because not enough data in the file or because the file "
+                "is corrupt"
+            )
+            sphere_populated = False
+
+        offset = zeros(3)
+        scale = ones(3)
+        temp_offset = zeros((1, 3))
+
+        if sphere_populated:
+            mean_temp = mean(temp_rm)
+            in_acc = accel_rm
+            in_temp = (temp_rm - mean_temp).reshape((-1, 1))
+
+            weights = ones(accel_rm.shape[0])
+            res = Inf
+
+            for iter in range(self.max_iter):
+                curr = (in_acc + offset) * scale + in_temp @ temp_offset
+
+                closestpoint = curr / sqrt(sum(curr**2, axis=1, keepdims=True))
+                offsetch = zeros(3)
+                scalech = ones(3)
+                toffch = zeros((1, 3))
+
+                for k in range(3):
+                    # there was some code dropping NANs from closest point, but these shouldn
+                    # be taken care of in the original mask. Division by zero should also
+                    # not be happening during motionless data, where 1 value should always be close
+                    # to 1
+                    pass
+
+
+
+
+
+
 
