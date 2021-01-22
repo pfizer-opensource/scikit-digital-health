@@ -535,7 +535,7 @@ class PhaseCoordinationIndex(BoutMetric):
             mask = gait_aux['inertial data i'] == i
 
             psi_abs = nanmean(abs(phase[mask] - 0.5))  # using % not degrees right now
-            psi_cv = nanstd(phase[mask], ddof=1, ) / nanmean(phase[mask])
+            psi_cv = nanstd(phase[mask], ddof=1) / nanmean(phase[mask])
 
             pci[i] = 100 * (psi_cv + psi_abs / 0.5)
 
@@ -675,7 +675,7 @@ class StepRegularityV(BoutMetric):
             lag = int(round(lag_))
             acf = _autocovariancefunction(acc[:, va], int(4.5 * fs))
             pks, _ = find_peaks(acf)
-            idx = argmin(abs(pks - lag))
+            idx = pks[argmin(abs(pks - lag))]
 
             stepreg[i] = acf[idx]
 
@@ -733,7 +733,7 @@ class StrideRegularityV(BoutMetric):
             lag = int(round(lag_))
             acf = _autocovariancefunction(acc[:, va], int(4.5 * fs))
             pks, _ = find_peaks(acf)
-            idx = argmin(abs(pks - lag))
+            idx = pks[argmin(abs(pks - lag))]
 
             stridereg[i] = acf[idx]
 
