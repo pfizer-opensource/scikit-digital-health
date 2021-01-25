@@ -7,8 +7,9 @@ Pfizer DMTI 2021
 from warnings import warn
 
 from numpy import mean, diff, zeros, ones, abs, all as npall, any as npany, isnan, around, Inf, \
-    sqrt, sum
+    sqrt, sum, vstack, minimum
 from numpy.linalg import norm
+from sklearn.linear_model import LinearRegression
 
 from skimu.base import _BaseProcess
 from skimu.utility import rolling_mean, rolling_sd
@@ -168,7 +169,8 @@ class AccelerometerCalibrate(_BaseProcess):
             in_temp = (temp_rm - mean_temp).reshape((-1, 1))
 
             weights = ones(accel_rm.shape[0])
-            res = Inf
+            res = [Inf]
+            LR = LinearRegression()
 
             for iter in range(self.max_iter):
                 curr = (in_acc + offset) * scale + in_temp @ temp_offset
@@ -179,11 +181,42 @@ class AccelerometerCalibrate(_BaseProcess):
                 toffch = zeros((1, 3))
 
                 for k in range(3):
-                    # there was some code dropping NANs from closest point, but these shouldn
+                    # there was some code dropping NANs from closest point, but these should
                     # be taken care of in the original mask. Division by zero should also
                     # not be happening during motionless data, where 1 value should always be close
                     # to 1
-                    pass
+                    x_ = vstack((ones(curr.shape[0]), curr[:, k], in_temp[:, k])).T
+                    LR.fit(
+                        x_,
+                        closestpoint[:, k],
+                        sample_weight=weights
+                    )
+                    offsetch[k] = LR.coef_[0]
+                    scalech[k] = LR.coef_[1]
+                    toffch[k] = LR.coef_[2]
+                    curr[:, k] = x_ @ LR.coef_
+
+                offset = offset + offsetch / (scale * scalech)
+                temp_offset = temp_offset * scalech + toffch
+
+                scale = scale * scalech
+                res.append(
+                    3 * mean(weights * (curr - closestpoint)**2 / sum(weights))
+                )
+                weights = minimum(
+                    1 / sqrt(sum((curr - closestpoint)**2)),
+                    1 / 0.01  # 100
+                )
+                if abs(res[iter] - res[iter-1]) < self.tol:
+                    break
+
+            in_acc2 = (in_acc + offset) * scale + (in_temp - mean_temp) * temp_offset
+            cal_error_end = around(mean(abs(norm(in_acc2, axis=1) - 1)), decimales=5)
+
+            # assess whether calibration error has been sufficiently improved
+            if (cal_error_end < cal_error_start) and (cal_error_end < 0.01) and (nhoursused > self.min_hours):
+                pass
+
 
 
 
