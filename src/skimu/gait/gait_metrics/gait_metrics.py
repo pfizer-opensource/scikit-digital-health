@@ -63,9 +63,9 @@ def _autocovariancefunction(x, max_lag, biased=False):
             (x[:N-i] - mean(x[:N-i], axis=axis)) * (x[i:] - mean(x[i:], axis=axis)), axis=axis
         )
         if biased:
-            ac[i] /= (N * std(x[:N-i], ddof=1) * std(x[i:], ddof=1))
+            ac[i] /= (N * std(x[:N-i], axis=axis) * std(x[i:], axis=axis))
         else:
-            ac[i] /= ((N - i) * std(x[:N-i], ddof=1) * std(x[i:], ddof=1))
+            ac[i] /= ((N - i) * std(x[:N-i], axis=axis) * std(x[i:], axis=axis))
 
     return ac
 
