@@ -29,8 +29,8 @@ stride length: step_length_i + step_length_i+1
 
 gait speed: stride_length / stride time
 """
-from numpy import zeros, nanmean, mean, nanstd, std, sum, sqrt, nan, nonzero, argmin, abs, round, \
-    float_, int_, fft, arange, isnan, maximum
+from numpy import zeros, nanmean, mean, nanstd, std, nanmedian, sum, sqrt, nan, nonzero, argmin, \
+    abs, round, float_, int_, fft, arange, isnan, maximum
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt, find_peaks
 
@@ -605,7 +605,7 @@ class GaitSymmetryIndex(BoutMetric):
         # setup acceleration filter
         sos = butter(4, 2 * 10 / fs, btype='low', output='sos')
         for i, acc in enumerate(gait_aux['accel']):
-            lag_ = nanmean(gait['PARAM:stride time'][gait_aux['inertial data i'] == i]) * fs
+            lag_ = nanmedian(gait['PARAM:stride time'][gait_aux['inertial data i'] == i]) * fs
             if isnan(lag_):  # if only nan values in the bout
                 gsi[i] = nan
                 continue
@@ -668,7 +668,7 @@ class StepRegularityV(BoutMetric):
                 stepreg[i] = nan
                 continue
             va = gait_aux['vert axis'][mask][0]
-            lag_ = nanmean(gait['PARAM:step time'][mask]) * fs
+            lag_ = nanmedian(gait['PARAM:step time'][mask]) * fs
             if isnan(lag_):  # if only nan values in the bout
                 stepreg[i] = nan
                 continue
@@ -726,7 +726,7 @@ class StrideRegularityV(BoutMetric):
                 stridereg[i] = nan
                 continue
             va = gait_aux['vert axis'][mask][0]
-            lag_ = nanmean(gait['PARAM:stride time'][mask]) * fs
+            lag_ = nanmedian(gait['PARAM:stride time'][mask]) * fs
             if isnan(lag_):  # if only nan values in the bout
                 stridereg[i] = nan
                 continue
