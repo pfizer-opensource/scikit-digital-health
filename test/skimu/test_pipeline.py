@@ -43,17 +43,18 @@ class TestPipeline:
     # acceleration values
     rtol = {
         'delta h': 7e-4,
-        'PARAM:step length': 4e-4,
+        'PARAM:step length': 3.1e-4,
         'PARAM:stride length': 3e-4,
         'PARAM:gait speed': 3e-4,
         'PARAM:intra-step covariance - V': 2e-3,
-        'PARAM:intra-stride covariance - V': 3e-3,
+        'PARAM:intra-stride covariance - V': 8e-4,
         'PARAM:harmonic ratio - V': 3e-3,
         'PARAM:stride SPARC': 9e-4,
-        'BOUTPARAM:gait symmetry index': 3e-5,
-        'BOUTPARAM:stride regularity - V': 5e-5,
-        'BOUTPARAM:autocovariance symmetry - V': 3e-4,
-        'BOUTPARAM:regularity index - V': 5e-5
+        'BOUTPARAM:gait symmetry index': 2e-5,
+        'BOUTPARAM:step regularity - V': 7e-5,
+        'BOUTPARAM:stride regularity - V': 1.1e-4,
+        'BOUTPARAM:autocovariance symmetry - V': 1.1e-3,
+        'BOUTPARAM:regularity index - V': 9e-5
     }
 
     @staticmethod
