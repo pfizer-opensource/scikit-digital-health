@@ -12,7 +12,7 @@ from numpy import mean, diff, arange, zeros, interp, float_, abs, argmax, sign, 
     argmin, ndarray
 
 from skimu.base import _BaseProcess
-from skimu.gait.get_gait_classification import get_gait_classification_lgbm
+from skimu.gait.get_gait_classification import get_gait_classification_lgbm, DimensionMismatchError
 from skimu.gait.get_gait_bouts import get_gait_bouts
 from skimu.gait.get_gait_events import get_gait_events
 from skimu.gait.get_strides import get_strides
@@ -45,13 +45,16 @@ def get_downsampled_data(time, accel, gait_pred, fs, goal_fs, days, downsample):
     days
     """
     if downsample:
-        _days = days
+        _days = asarray(days)
         time_ds = arange(time[0], time[-1], 1 / goal_fs)
         accel_ds = zeros((time_ds.size, 3), dtype=float_)
         for i in range(3):
             accel_ds[:, i] = interp(time_ds, time, accel[:, i])
 
         if isinstance(gait_pred, ndarray):
+            if gait_pred.size != accel.shape[0]:
+                raise DimensionMismatchError(
+                    "Number of gait predictions must match number of acceleration samples")
             gait_pred_ds = interp(time_ds, time, gait_pred)
         else:
             gait_pred_ds = gait_pred
@@ -322,7 +325,7 @@ class Gait(_BaseProcess):
         goal_fs = 50 if fs > (50 * 0.985) else 20
         downsample = False if ((0.985 * goal_fs) < fs < (1.015 * goal_fs)) else True
 
-        days = kwargs.get(self._days, [0, accel.shape[0]-1])
+        days = kwargs.get(self._days, [[0, accel.shape[0] - 1]])
         time_ds, accel_ds, gait_pred_ds, days = get_downsampled_data(
             time, accel, gait_pred, fs, goal_fs, days, downsample)
 

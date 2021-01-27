@@ -20,10 +20,6 @@ else:  # pragma: no cover
     import importlib_resources
 
 
-class DimensionMismatchError(Exception):
-    pass
-
-
 def _resolve_path(mod, file):
     if version_info >= (3, 7):
         with resources.path(mod, file) as file_path:
@@ -33,6 +29,10 @@ def _resolve_path(mod, file):
             path = file_path
 
     return path
+
+
+class DimensionMismatchError(Exception):
+    pass
 
 
 def get_gait_classification_lgbm(gait_pred, accel, fs):
@@ -52,7 +52,8 @@ def get_gait_classification_lgbm(gait_pred, accel, fs):
         if isinstance(gait_pred, ndarray):
             if gait_pred.size != accel.shape[0]:
                 raise DimensionMismatchError(
-                    "Number of gait predictions must match number of acceleration samples")
+                    "Number of gait predictions (possibly downsampled) must match number of "
+                    "acceleration samples")
             bout_starts = where(diff(gait_pred.astype(int_)) == 1)[0] + 1
             bout_stops = where(diff(gait_pred.astype(int_)) == -1)[0] + 1
 
