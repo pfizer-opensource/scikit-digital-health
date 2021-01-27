@@ -33,6 +33,8 @@ def get_gait_bouts(starts, stops, day_start, day_stop, ts, max_bout_sep, min_bou
     bouts : list
      List slices with the starts and stops of gait bouts
     """
+    day_start = int(day_start)
+    day_stop = int(day_stop)
     # get the portion of bouts for the specified day
     starts_subset = starts[(starts >= day_start) & (starts < day_stop)]
     stops_subset = stops[(stops > day_start) & (stops <= day_stop)]

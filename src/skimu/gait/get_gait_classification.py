@@ -60,9 +60,9 @@ def get_gait_classification_lgbm(gait_pred, accel, fs):
             if gait_pred[0]:
                 bout_starts = insert(bout_starts, 0, 0)
             if gait_pred[-1]:
-                bout_starts = append(bout_stops, accel.shape[0])
+                bout_stops = append(bout_stops, accel.shape[0])
         else:
-            bout_starts, bout_stops = array([0]), array([accel.shape[0]])
+            bout_starts, bout_stops = array([0], dtype="int"), array([accel.shape[0]], dtype="int")
     else:
         suffix = '50hz' if fs == 50.0 else '20hz'
 
@@ -109,4 +109,4 @@ def get_gait_classification_lgbm(gait_pred, accel, fs):
         bout_starts *= wstep
         bout_stops = bout_stops * wstep + (wlen - wstep)  # account for edges, if windows overlap
 
-    return bout_starts, bout_stops
+    return bout_starts.astype("int"), bout_stops.astype("int")
