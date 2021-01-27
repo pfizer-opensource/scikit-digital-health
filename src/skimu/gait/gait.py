@@ -348,7 +348,7 @@ class Gait(_BaseProcess):
         }
 
         # get the gait classification if necessary
-        gbout_starts, gbout_stops = get_gait_classification_lgbm(gait_pred, accel_ds, goal_fs)
+        gbout_starts, gbout_stops = get_gait_classification_lgbm(gait_pred_ds, accel_ds, goal_fs)
         self._save_classifier_fn(time_ds, gbout_starts, gbout_stops)
 
         gait_i = 0  # keep track of where everything is in the loops
