@@ -9,7 +9,7 @@ from warnings import warn
 
 import h5py
 from numpy import mean, diff, arange, zeros, interp, float_, abs, argmax, sign, asarray, sum, \
-    argmin
+    argmin, ndarray
 
 from skimu.base import _BaseProcess
 from skimu.gait.get_gait_classification import get_gait_classification_lgbm
@@ -22,6 +22,51 @@ from skimu.gait.gait_metrics import EventMetric, BoutMetric
 
 class LowFrequencyError(Exception):
     pass
+
+
+def get_downsampled_data(time, accel, gait_pred, fs, goal_fs, days, downsample):
+    """
+    Get the downsampled data from input data
+
+    Parameters
+    ----------
+    time
+    accel
+    gait_pred
+    goal_fs
+    downsample
+    kw
+
+    Returns
+    -------
+    time_ds
+    accel_ds
+    gait_pred_ds
+    days
+    """
+    if downsample:
+        _days = days
+        time_ds = arange(time[0], time[-1], 1 / goal_fs)
+        accel_ds = zeros((time_ds.size, 3), dtype=float_)
+        for i in range(3):
+            accel_ds[:, i] = interp(time_ds, time, accel[:, i])
+
+        if isinstance(gait_pred, ndarray):
+            gait_pred_ds = interp(time_ds, time, gait_pred)
+        else:
+            gait_pred_ds = gait_pred
+
+        days = zeros(asarray(_days).shape)
+        for i, day_idx in enumerate(_days):
+            i_guess = (day_idx * goal_fs / fs).astype(int) - 1000
+            i_guess[i_guess < 0] = 0
+            days[i, 0] = argmin(abs(time_ds[i_guess[0]:i_guess[0] + 2000] - time[day_idx[0]]))
+            days[i, 1] = argmin(abs(time_ds[i_guess[1]:i_guess[1] + 2000] - time[day_idx[1]]))
+            days[i] += i_guess  # make sure to add the starting index back in
+
+        return time_ds, accel_ds, gait_pred_ds, days
+    else:
+        return time, accel, gait_pred, days
 
 
 class Gait(_BaseProcess):
@@ -277,28 +322,9 @@ class Gait(_BaseProcess):
         goal_fs = 50 if fs > (50 * 0.985) else 20
         downsample = False if ((0.985 * goal_fs) < fs < (1.015 * goal_fs)) else True
 
-        if downsample:
-            time_ds = arange(time[0], time[-1], 1 / goal_fs)
-            accel_ds = zeros((time_ds.size, 3), dtype=float_)
-            for i in range(3):
-                accel_ds[:, i] = interp(time_ds, time, accel[:, i])
-
-            # get days if it exists, otherwise use the starts and end of the data
-            _days = asarray(kwargs.get(self._days, [[0, accel.shape[0] - 1]]))
-
-            days = zeros(asarray(_days).shape)
-            for i, day_idx in enumerate(_days):
-                i_guess = (day_idx * goal_fs / fs).astype(int) - 1000
-                i_guess[i_guess < 0] = 0
-                days[i, 0] = argmin(abs(time_ds[i_guess[0]:i_guess[0] + 2000] - time[day_idx[0]]))
-                days[i, 1] = argmin(abs(time_ds[i_guess[1]:i_guess[1] + 2000] - time[day_idx[1]]))
-                days[i] += i_guess  # make sure to add the starting index back in
-        else:
-            time_ds = time
-            accel_ds = accel
-
-            # get days if it exists, otherwise use the starts and end of the data
-            days = kwargs.get(self._days, [(0, accel_ds.shape[0])])
+        days = kwargs.get(self._days, [0, accel.shape[0]-1])
+        time_ds, accel_ds, gait_pred_ds, days = get_downsampled_data(
+            time, accel, gait_pred, fs, goal_fs, days, downsample)
 
         # original scale. Compute outside loop since stays the same
         # 1.25 comes from original paper, corresponds to desired frequency
