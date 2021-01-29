@@ -106,7 +106,7 @@ def rle(to_encode):
 
 def rolling_mean(arr, w_size, step=1):
     """
-    Computes the rolling mean of an array.
+    Computes the rolling mean of an array along the first axis.
 
     Parameters
     ----------
@@ -128,7 +128,7 @@ def rolling_mean(arr, w_size, step=1):
 
 def rolling_median(arr, w_size, step=1):
     """
-    Computes the rolling median of an array.
+    Computes the rolling median of an array along the first axis.
 
     Parameters
     ----------
@@ -150,7 +150,7 @@ def rolling_median(arr, w_size, step=1):
 
 def rolling_std(arr, w_size, step=1):
     """
-    Computes the rolling standard deviation of an array.
+    Computes the rolling standard deviation of an array along the first axis.
 
     Parameters
     ----------
