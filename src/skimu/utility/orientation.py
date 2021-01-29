@@ -31,12 +31,6 @@ def correct_accelerometer_orientation(accel, v_axis=None, ap_axis=None):
     co_accel : numpy.ndarray
         (N, 3) array of acceleration with best alignment to the human anatomical axes
 
-    References
-    ----------
-    .. [1] R. Moe-Nilssen, “A new method for evaluating motor control in gait under real-life
-        environmental conditions. Part 1: The instrument,” Clinical Biomechanics, vol. 13, no.
-        4–5, pp. 320–327, Jun. 1998, doi: 10.1016/S0268-0033(98)00089-8.
-
     Notes
     -----
     If `v_axis` is not provided (`None`), it is guessed as the largest mean valued axis (absolute
@@ -73,6 +67,12 @@ def correct_accelerometer_orientation(accel, v_axis=None, ap_axis=None):
     This is the part of the step that requires acceleration to be in "g", as well as mostly
     already aligned. If significantly out of alignment, then this small-angle relationship
     with sine starts to fall apart, and the correction will not be as appropriate.
+
+    References
+    ----------
+    .. [1] R. Moe-Nilssen, “A new method for evaluating motor control in gait under real-life
+        environmental conditions. Part 1: The instrument,” Clinical Biomechanics, vol. 13, no.
+        4–5, pp. 320–327, Jun. 1998, doi: 10.1016/S0268-0033(98)00089-8.
     """
     if v_axis is None:
         v_axis = argmax(abs(mean(accel, axis=0)))
