@@ -8,6 +8,9 @@ Pfizer DMTI
 from numpy import argmax, abs, mean, cos, arcsin, sign, zeros_like
 
 
+__all__ = ["correct_accelerometer_orientation"]
+
+
 def correct_accelerometer_orientation(accel, v_axis=None, ap_axis=None):
     """
     Applies the correction for acceleration from [1]_ to better align acceleration with the human

@@ -15,6 +15,14 @@ Misc. Math Functions
     math.rolling_skewness
     math.rolling_kurtosis
 
+Orientation Functions
+---------------------
+
+.. autosummary::
+    :toctree: generated/
+
+
+
 
 Windowing Functions
 -------------------
@@ -28,8 +36,11 @@ Windowing Functions
 
 from skimu.utility.math import rolling_mean, rolling_sd, rolling_skewness, rolling_kurtosis
 from skimu.utility import math
+from skimu.utility.orientation import correct_accelerometer_orientation
+from skimu.utility import orientation
 from skimu.utility.windowing import compute_window_samples, get_windowed_view
 from skimu.utility import windowing
 
 
-__all__ = ["math", "windowing"] + math.__all__ + windowing.__all__
+__all__ = ["math", "windowing", "orientation"] + math.__all__ + windowing.__all__ \
+          + orientation.__all__
