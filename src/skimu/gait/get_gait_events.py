@@ -4,34 +4,38 @@ Function for getting gait events from an accelerometer signal
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
-from numpy import fft, argmax, std, abs
+from numpy import fft, argmax, std, abs, argsort, corrcoef, mean, sign
 from scipy.signal import detrend, butter, sosfiltfilt, find_peaks
 from scipy.integrate import cumtrapz
 from pywt import cwt
 
+from skimu.utility import correct_accelerometer_orientation
+from skimu.gait.gait_metrics import gait_metrics
+
 
 def get_gait_events(
-        vert_accel, fs, ts, va_sign, orig_scale, filter_order, filter_cutoff, use_optimal_scale
+        accel, fs, ts, orig_scale, filter_order, filter_cutoff,
+        corr_accel_orient, use_optimal_scale
 ):
     """
     Get the bouts of gait from the acceleration during a gait bout
 
     Parameters
     ----------
-    vert_accel : numpy.ndarray
-        (N, ) array of vertical acceleration during the gait bout
+    accel : numpy.ndarray
+        (N, 3) array of acceleration during the gait bout
     fs : float
         Sampling frequency for the acceleration
     ts : numpy.ndarray
         Array of timestmaps (in seconds) corresponding to acceleration sampling times.
-    va_sign : int
-        Sign of the vertical acceleration
     orig_scale : int
         Original scale for the CWT
     filter_order : int
         Low-pass filter order
     filter_cutoff : float
         Low-pass filter cutoff in Hz
+    corr_accel_orient : bool
+        Correct the accelerometer orientation.
     use_optimal_scale : bool
         Use the optimal scale based on step frequency
 
@@ -43,10 +47,29 @@ def get_gait_events(
         Indices of final contacts
     vert_accel : numpy.ndarray
         Filtered vertical acceleration
+    v_axis : int
+        The axis corresponding to the vertical acceleration
     """
-    assert vert_accel.size == ts.size, "`vert_accel` and `ts` size must match"
+    assert accel.shape[0] == ts.size, "`vert_accel` and `ts` size must match"
 
-    vert_accel = detrend(vert_accel)  # detrend data just in case
+    # figure out vertical axis on a per-bout basis
+    acc_mean = mean(accel, axis=0)
+    v_axis = argmax(abs(acc_mean))
+    va_sign = sign(acc_mean[v_axis])  # sign of the vertical acceleration
+
+    # correct acceleration orientation if set
+    if corr_accel_orient:
+        # determine AP axis
+        ac = gait_metrics._autocovariancefunction(
+            accel,
+            min(accel.shape[0] - 1, 1000),
+            biased=True
+        )
+        ap_axis = argsort(corrcoef(ac[v_axis]))[-2]  # last is autocorrelation
+
+        accel = correct_accelerometer_orientation(accel, v_axis=v_axis, ap_axis=ap_axis)
+
+    vert_accel = detrend(accel[:, v_axis])  # detrend data just in case
 
     # low-pass filter
     if fs > (2 * filter_cutoff):
@@ -91,4 +114,4 @@ def get_gait_events(
     """
     final_contact, *_ = find_peaks(-va_sign * coef2[0], height=0.5 * std(coef2[0]))
 
-    return init_contact, final_contact, filt_vert_accel
+    return init_contact, final_contact, filt_vert_accel, v_axis

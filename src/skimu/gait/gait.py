@@ -80,6 +80,10 @@ class Gait(_BaseProcess):
 
     Parameters
     ----------
+    correct_accel_orient : bool, optional
+        Correct the acceleration orientation using the method from [7]_. This should only be '
+        applied if the accelerometer axes are already approximately aligned with the anatomical
+        axes. The correction is applied on a per-gait-bout basis. Default is True.
     use_cwt_scale_relation : bool, optional
         Use the optimal scale/frequency relationship (see Notes). This changes which
         scale is used for the smoothing/differentiation operation performed with the
@@ -148,6 +152,9 @@ class Gait(_BaseProcess):
     .. [6] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
         Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
         Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
+    .. [7] R. Moe-Nilssen, “A new method for evaluating motor control in gait under real-life
+        environmental conditions. Part 1: The instrument,” Clinical Biomechanics, vol. 13, no.
+        4–5, pp. 320–327, Jun. 1998, doi: 10.1016/S0268-0033(98)00089-8.
     """
     # gait parameters
     _params = [
@@ -179,6 +186,7 @@ class Gait(_BaseProcess):
 
     def __init__(
             self,
+            correct_accel_orient=True,
             use_cwt_scale_relation=True,
             min_bout_time=8.0,
             max_bout_separation_time=0.5,
@@ -191,6 +199,7 @@ class Gait(_BaseProcess):
     ):
         super().__init__(
             # key-word arguments for storage
+            correct_accel_orient=correct_accel_orient,
             use_cwt_scale_relation=use_cwt_scale_relation,
             min_bout_time=min_bout_time,
             max_bout_separation_time=max_bout_separation_time,
@@ -202,6 +211,7 @@ class Gait(_BaseProcess):
             filter_cutoff=filter_cutoff
         )
 
+        self.corr_accel_orient = correct_accel_orient
         self.use_opt_scale = use_cwt_scale_relation
         self.min_bout = min_bout_time
         self.max_bout_sep = max_bout_separation_time
@@ -363,18 +373,15 @@ class Gait(_BaseProcess):
             )
 
             for ibout, bout in enumerate(gait_bouts):
-                # figure out vertical axis on a per-bout basis
-                acc_mean = mean(accel_ds[bout], axis=0)
-                v_axis = argmax(abs(acc_mean))
-
-                ic, fc, vert_acc = get_gait_events(
-                    accel_ds[bout, v_axis],
+                # get the gait events, vertical acceleration, and vertical axis
+                ic, fc, vert_acc, v_axis = get_gait_events(
+                    accel_ds[bout],
                     goal_fs,
                     time_ds[bout],
-                    sign(acc_mean[v_axis]),
                     original_scale,
                     self.filt_ord,
                     self.filt_cut,
+                    self.corr_accel_orient,
                     self.use_opt_scale
                 )
 
