@@ -21,7 +21,7 @@ Orientation Functions
 .. autosummary::
     :toctree: generated/
 
-
+    orientation.correct_accelerometer_orientation
 
 
 Windowing Functions
