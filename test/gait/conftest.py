@@ -62,7 +62,7 @@ def get_sample_bout_accel():
         else:
             assert False, "Invalid frequency"
 
-        vaxis = np.argmax(np.mean(bout_acc, axis=0))
+        vaxis = np.argmax(np.abs(np.mean(bout_acc, axis=0)))
         return bout_acc, bout_time, vaxis, np.sign(np.mean(bout_acc, axis=0)[vaxis])
 
     return get_stuff
