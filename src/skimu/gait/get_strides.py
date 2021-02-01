@@ -5,7 +5,6 @@ Lukas Adamowicz
 Pfizer DMTI 2020
 """
 from numpy import nan, array
-from scipy.signal import detrend, butter, sosfiltfilt
 from scipy.integrate import cumtrapz
 
 
@@ -80,19 +79,14 @@ def get_strides(gait, vert_accel, gait_index, ic, fc, ts, fs, max_stride_time, l
     elif bout_n_steps > 0:
         gait['valid cycle'].extend([False] * bout_n_steps)
 
-    sos = butter(4, 2 * 0.1 / fs, btype='highpass', output='sos')
     for i in range(gait_index, gait_index + bout_n_steps - 1):
         i1 = gait['IC'][i]
         i2 = gait['IC'][i + 1]
 
         if gait['valid cycle'][i]:
-            vacc = detrend(vert_accel[i1:i2])
+            vacc = vert_accel[i1:i2]
             vvel = cumtrapz(vacc, x=ts[i1:i2], initial=0)
             vpos = cumtrapz(vvel, x=ts[i1:i2], initial=0)
-            try:
-                vpos = sosfiltfilt(sos, vpos)
-            except ValueError:  # not enough points for padding
-                pass
 
             gait['delta h'].append((vpos.max() - vpos.min()) * 9.81)  # convert to meters
         else:
