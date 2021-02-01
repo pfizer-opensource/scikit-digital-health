@@ -65,7 +65,7 @@ def get_gait_events(
             min(accel.shape[0] - 1, 1000),
             biased=True
         )
-        ap_axis = argsort(corrcoef(ac[v_axis]))[-2]  # last is autocorrelation
+        ap_axis = argsort(corrcoef(ac.T)[v_axis])[-2]  # last is autocorrelation
 
         accel = correct_accelerometer_orientation(accel, v_axis=v_axis, ap_axis=ap_axis)
 
