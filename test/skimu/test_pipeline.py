@@ -42,10 +42,10 @@ class TestPipeline:
     # some timestamp rounding causes slight changes in the filter cutoffs, effecting the
     # acceleration values
     rtol = {
-        'delta h': 7e-4,
-        'PARAM:step length': 3.1e-4,
-        'PARAM:stride length': 3e-4,
-        'PARAM:gait speed': 3e-4,
+        'delta h': 2e-3,
+        'PARAM:step length': 8.5e-4,
+        'PARAM:stride length': 6.5e-4,
+        'PARAM:gait speed': 6.5e-4,
         'PARAM:intra-step covariance - V': 2e-3,
         'PARAM:intra-stride covariance - V': 8e-4,
         'PARAM:harmonic ratio - V': 3e-3,
