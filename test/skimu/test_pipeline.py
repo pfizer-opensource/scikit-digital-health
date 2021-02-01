@@ -94,6 +94,7 @@ class TestPipeline:
         p.add(ReadCWA(base=None, period=None))
         p.add(
             Gait(
+                correct_accel_orient=False,
                 use_cwt_scale_relation=True,
                 min_bout_time=8.0,
                 max_bout_separation_time=0.5,
