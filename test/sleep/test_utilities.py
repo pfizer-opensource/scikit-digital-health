@@ -131,3 +131,95 @@ class TestComputeZAngle:
         out = compute_z_angle(acc)
         expected = np.asarray([90, 90, 90, 90, 90, 90])
         assert np.array_equal(out, expected)
+
+
+class TestComputeAbsoluteDifference:
+    def test_uniform_array(self):
+        arr = np.ones([10, 1])
+        out = compute_absolute_difference(arr)
+        expected = np.zeros([10, 1])
+        assert np.array_equal(out, expected)
+
+    def test_alternating_array(self):
+        arr = np.asarray([1, 0, 1, 0, 1, 0, 1, 0, 1, 0])
+        out = compute_absolute_difference(arr)
+        expected = np.asarray([0, 1, 1, 1, 1, 1, 1, 1, 1, 1])
+        assert np.array_equal(out, expected)
+
+    def test_random_array(self):
+        arr = np.asarray([1, 1, 0, 1, 0, 0, 0, 0, 1, 1])
+        out = compute_absolute_difference(arr)
+        expected = np.asarray([0, 0, 1, 1, 1, 0, 0, 0, 1, 0])
+        assert np.array_equal(out, expected)
+
+
+class TestDropMinBlocks:
+    def test_uniform(self):
+        arr = np.ones([10, 1])
+        out = drop_min_blocks(
+            arr, min_block_size=5, drop_value=1, replace_value=0, skip_bounds=False
+        )
+        expected = np.ones([10, 1])
+        assert np.array_equal(out, expected)
+
+    def test_alternating(self):
+        arr = np.asarray([1, 0, 1, 0, 1, 0, 1, 0, 1, 0])
+        out = drop_min_blocks(
+            arr, min_block_size=5, drop_value=1, replace_value=0, skip_bounds=False
+        )
+        expected = np.asarray([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+        assert np.array_equal(out, expected)
+
+    def test_skip_bounds(self):
+        arr = np.asarray([1, 0, 1, 0, 1, 0, 1, 0, 1, 0])
+        out = drop_min_blocks(
+            arr, min_block_size=5, drop_value=1, replace_value=0, skip_bounds=True
+        )
+        expected = np.asarray([1, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+        assert np.array_equal(out, expected)
+
+    def test_random(self):
+        arr = np.asarray([1, 1, 0, 1, 0, 0, 0, 0, 1, 1])
+        out = drop_min_blocks(
+            arr, min_block_size=2, drop_value=0, replace_value=2, skip_bounds=False
+        )
+        expected = np.asarray([1, 1, 2, 1, 0, 0, 0, 0, 1, 1])
+        assert np.array_equal(out, expected)
+
+    def test_value_not_present(self):
+        arr = np.asarray([1, 1, 0, 1, 0, 0, 0, 0, 1, 1])
+        out = drop_min_blocks(
+            arr, min_block_size=2, drop_value=2, replace_value=3, skip_bounds=False
+        )
+        expected = np.asarray([1, 1, 0, 1, 0, 0, 0, 0, 1, 1])
+        assert np.array_equal(out, expected)
+
+    def test_replace(self):
+        arr = np.asarray([1, 1, 0, 1, 0, 0, 0, 0, 1, 1])
+        out = drop_min_blocks(
+            arr, min_block_size=3, drop_value=1, replace_value=3, skip_bounds=False
+        )
+        expected = np.asarray([3, 3, 0, 3, 0, 0, 0, 0, 3, 3])
+        assert np.array_equal(out, expected)
+
+    def test_replace_skip(self):
+        arr = np.asarray([1, 1, 0, 1, 0, 0, 0, 0, 1, 1])
+        out = drop_min_blocks(
+            arr, min_block_size=3, drop_value=1, replace_value=3, skip_bounds=True
+        )
+        expected = np.asarray([1, 1, 0, 3, 0, 0, 0, 0, 1, 1])
+        assert np.array_equal(out, expected)
+
+
+class TestArgLongestBout:
+    def test_uniform(self):
+        assert False
+
+    def test_alternating(self):
+        assert False
+
+    def test_random(self):
+        assert False
+
+    def test_value_not_present(self):
+        assert False

@@ -191,7 +191,7 @@ def compute_z_angle(acc):
 
 def compute_absolute_difference(arr):
     """
-    Computes the absolute difference between an array and itself shifted by 1 sample.
+    Computes the absolute difference between an array and itself shifted by 1 sample along the first axis.
 
     Parameters
     ----------
@@ -234,11 +234,11 @@ def drop_min_blocks(arr, min_block_size, drop_value, replace_value, skip_bounds=
     ctr = 0
     n = len(lengths)
     for length, start, val in zip(lengths, starts, vals):
-        if skip_bounds & (ctr == 0 | ctr == n - 1):
+        ctr += 1
+        if skip_bounds and (ctr == 1 or ctr == n):
             continue
         if val == drop_value and length < min_block_size:
             arr[start : start + length] = replace_value
-        ctr += 1
     return arr
 
 
