@@ -84,6 +84,159 @@ class AccelerometerCalibrate(_BaseProcess):
         self.tol = tol
 
     def predict(self, time=None, accel=None, *, apply=True, temp=None, **kwargs):
+        super().predict(
+            time=time, accel=accel, apply=apply, temp=temp, **kwargs
+        )
+
+        # parameters
+        fs = 1 / mean(diff(time[:5000]))
+        n10 = int(10 * fs)  # samples in 10 seconds
+        nh = int(self.min_hours * 3600 * fs)  # samples in min_hours
+        n12h = int(12 * 3600 * fs)  # samples in 12 hours
+
+        i_h = 0  # keep track of number of extra 12 hour blocks used
+        if accel.shape[0] < nh:
+            warn(f"Less than {self.min_hours} of data ({accel.shape[0] / (fs * 3600)}. "
+                 f"No Calibration performed", UserWarning)
+            kwargs.update({self._time: time, self._acc: accel, self._temp: temp})
+            return kwargs
+
+        finished = False
+        while not finished:
+            finished, offset, scale, tempoffset = do_iterative_closest_point_fit(
+                accel[:nh + i_h * n12h], temp[:nh + i_h * n12h], self.min_hours + i_h
+            )
+            if not finished and (nh + i_h * n12h) > accel.shape[0]:
+                finished = True
+                warn(f"Recalibration not done with {self.min_hours + i_h * 12} hours due to "
+                     f"insufficient non-movement data available")
+            i_h += 1
+
+        if apply:
+            pass
+
+        kwargs.update({self._time: time, self._acc: accel, self._temp: temp})
+        return kwargs
+
+    def predict1(self, time=None, accel=None, *, apply=True, temp=None, **kwargs):
+        super().predict(
+            time=time, accel=accel, apply=apply, temp=temp, **kwargs
+        )
+
+        # various parameters
+        fs = 1 / mean(diff(time[:500]))
+        n10 = int(10 / fs)
+        nh = int(self.min_hours * 3600 / fs)  # elements in min_hours
+        n12h = int(12 * 3600 / fs)  # elements in 12 hours
+
+        i_h = 0  # number of extra 12 hour blocks used
+        if accel.shape[0] < nh:
+            warn(f"Less than {self.min_hours} of data ({accel.shape[0] / fs / 3600}). "
+                 f"No Calibration performed")
+            kwargs.update({self._time: time, self._acc: accel, self._temp: temp})
+            return kwargs
+
+        while ((nh + n12h * i_h) - accel.shape[0]) < n12h or i_h == 0:
+            accel_rsd, accel_rm = rolling_sd(
+                accel[0:nh + n12h * i_h], n10, n10, axis=0, return_previous=True)
+            mag_rm = rolling_mean(norm(accel[0:nh + n12h * i_h], axis=1), n10, n10)
+
+            if temp is not None:
+                temp_rm = rolling_mean(temp[0:nh + n12h * i_h], n10, n10)
+            else:
+                temp_rm = zeros(accel_rsd.shape[0])
+
+            # less than 2 is to prevent clipped signals from being labeled
+            no_motion = npall(accel_rsd < self.sd_crit, axis=1) & npall(abs(accel_rm) < 2, axis=1)
+            # nans are automatically excluded
+
+            # trim to no motion only
+            accel_rsd = accel_rsd[no_motion]
+            accel_rm = accel_rm[no_motion]
+            temp_rm = temp_rm[no_motion]
+
+            if accel_rsd.shape[0] > 1:
+                # starting error
+                cal_error_start = around(mean(abs(norm(accel_rsd, axis=1) - 1)), decimals=5)
+
+                # check if the sphere is well populated
+                tel = (
+                    (accel_rm.min(axis=0) < -self.sphere_crit)
+                    & (accel_rm.max(axis=0) > self.sphere_crit)
+                ).sum()
+                if tel == 3:
+                    sphere_populated = True
+                else:
+                    sphere_populated = False
+            else:
+                sphere_populated = False
+
+            offset = zeros(3)
+            scale = ones(3)
+            temp_offset = zeros((1, 3))
+
+            if not sphere_populated:
+                warn(f"Recalibration not done with {self.min_hours + i_h * 12} hours due to "
+                     f"insufficient non-movement data available")
+            else:
+                mean_temp = mean(temp_rm)
+                in_acc = accel_rm
+                in_temp = (temp_rm - mean_temp).reshape((-1, 1))
+
+                weights = ones(in_acc.shape[0])
+                res = [Inf]
+                LR = LinearRegression()
+
+                for niter in range(self.max_iter):
+                    curr = (in_acc + offset) * scale + in_temp @ temp_offset
+
+                    closest_point = curr / sqrt(sum(curr**2, axis=1, keepdims=True))
+                    offsetch = zeros(3)
+                    scalech = ones(3)
+                    toffch = zeros((1, 3))
+
+                    for k in range(3):
+                        # there was some code dropping NANs from closest point, but these should
+                        # be taken care of in the original mask. Division by zero should also
+                        # not be happening during motionless data, where 1 value should always be close
+                        # to 1
+                        x_ = vstack((ones(curr.shape[0]), curr[:, k], in_temp[:, k])).T
+                        LR.fit(
+                            x_,
+                            closest_point[:, k],
+                            sample_weight=weights
+                        )
+                        offsetch[k] = LR.coef_[0]
+                        scalech[k] = LR.coef_[1]
+                        toffch[k] = LR.coef_[2]
+                        curr[:, k] = x_ @ LR.coef_
+
+                    offset = offset + offsetch / (scale * scalech)
+                    temp_offset = temp_offset * scalech + toffch
+
+                    scale = scale * scalech
+                    res.append(
+                        3 * mean(weights * (curr - closest_point)**2 / sum(weights))
+                    )
+                    weights = minimum(
+                        1 / sqrt(sum((curr - closest_point)**2)),
+                        100
+                    )
+                    if abs(res[niter] - res[niter - 1]) < self.tol:
+                        break
+
+                in_acc = (in_acc + offset) * scale + (in_temp - mean_temp) * temp_offset
+                cal_error_end = around(mean(abs(norm(in_acc, axis=1) - 1)), decimals=5)
+
+                # assess whether calibration error has been sufficiently improved
+                if (cal_error_end < cal_error_start) and (cal_error_end < 0.01):
+                    break
+
+
+
+
+
+    def predict2(self, time=None, accel=None, *, apply=True, temp=None, **kwargs):
         """
         predict(time, accel, *, temp=None)
 
@@ -215,12 +368,13 @@ class AccelerometerCalibrate(_BaseProcess):
 
             # assess whether calibration error has been sufficiently improved
             if (cal_error_end < cal_error_start) and (cal_error_end < 0.01) and (nhoursused > self.min_hours):
-                pass
+                print("Calibration successful")
+            else:
+                add_more_hours()
 
+        # modify the acceleration with the scale/offset factors
+        accel_corr = (accel + offset) * scale + (temp - mean_temp) * temp_offset
 
+        kwargs.update({self._time: time, self._acc: accel_corr, self._temp: temp})
 
-
-
-
-
-
+        return kwargs
