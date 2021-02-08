@@ -100,7 +100,7 @@ static struct PyModuleDef moduledef = {
 };
 
 /* Initialization function for the module */
-PyMODINIT_FUNC PyInit_read_gt3x(void){
+PyMODINIT_FUNC PyInit_gt3x_convert(void){
     PyObject *m;
     m = PyModule_Create(&moduledef);
     if (m == NULL){

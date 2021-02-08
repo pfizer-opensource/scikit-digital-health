@@ -23,7 +23,7 @@ void set_error_message(int ierr){
 }
 
 
-static PyObject * bin_convert(PyObject *NPY_UNUSED(self), PyObject *args){
+static PyObject * read_bin(PyObject *NPY_UNUSED(self), PyObject *args){
     char *file;
     int ierr = -1, fail = 0;
     long base, period;
@@ -116,13 +116,13 @@ static const char bin_convert__doc__[] = "bin_convert(file, base, period)\n"
 
 
 static struct PyMethodDef methods[] = {
-  {"bin_convert", bin_convert, 1, bin_convert__doc__},
+  {"read_bin", bin_convert, 1, bin_convert__doc__},
   {NULL, NULL, 0, NULL}  /* sentinel */
 };
 
 static struct PyModuleDef moduledef = {
   PyModuleDef_HEAD_INIT,
-  "bin_convert",
+  "read_bin",
   NULL,
   -1,
   methods,
