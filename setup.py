@@ -183,20 +183,24 @@ def configuration(parent_package='', top_path=None):
         sources="src/skimu/utility/_extensions/rolling_moments.c",
         libraries=["frolling_moments"]
     )
-    # cwa (axivity)
+    # Read library
     config.add_library(
-        'fcwa_convert',
-        sources='src/skimu/read/_extensions/cwa_convert.f95'
+        'read',
+        sources=[
+            'src/skimu/read/_extensions/cwa_convert.f95',
+            'src/skimu/read/_extensions/bin_convert.c'
+        ]
     )
     config.add_extension(
         'skimu/read/_extensions/cwa_convert',
-        sources='src/skimu/read/_extensions/cwa_convert.c',
-        libraries=['fcwa_convert']
+        sources='src/skimu/read/_extensions/pycwa_convert.c',
+        libraries=['read']
     )
     # bin (geneactiv)
     config.add_extension(
         'skimu/read/_extensions/bin_convert',
-        sources='src/skimu/read/_extensions/bin_convert.c'
+        sources='src/skimu/read/_extensions/pybin_convert.c',
+        libraries=['read']
     )
     # gt3x (actigraph)
     config.add_library(
@@ -205,10 +209,10 @@ def configuration(parent_package='', top_path=None):
         include_dirs=[os.sep.join(sysconfig.get_path('include').split(os.sep)[:-1])]
     )
     config.add_extension(
-        'skimu/read/_extensions/read_gt3x',
-        sources=['src/skimu/read/_extensions/read_gt3x.c'],
+        'skimu/read/_extensions/gt3x_convert',
+        sources=['src/skimu/read/_extensions/pygt3x_convert.c'],
         libraries=['gt3x', 'zip'],
-        include_dirs=[os.sep.join(sysconfig.get_path('include').split(os.sep)[:-1])]
+        include_dirs=[os.sep.join(sysconfig.get_path('stdlib').split(os.sep)[:-1])]
     )
 
     # Fortran/C feature extensions
