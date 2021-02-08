@@ -109,7 +109,7 @@ class ReadBin(_BaseProcess):
             warn("File extension is not expected '.bin'", UserWarning)
 
         # read the file
-        nmax, hdr, acc, time, light, temp, idx, dtime = read_bin(file, self.base, self.period)
+        nmax, acc, time, light, temp, idx = read_bin(file, self.base, self.period)
 
         results = {
             self._time: time,
