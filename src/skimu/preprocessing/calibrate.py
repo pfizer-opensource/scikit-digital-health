@@ -6,7 +6,7 @@ Pfizer DMTI 2021
 """
 from warnings import warn
 
-from numpy import mean, diff, zeros, ones, abs, all as npall, around, Inf, sum, vstack, minimum, \
+from numpy import mean, diff, zeros, ones, abs, all as npall, around, Inf, vstack, minimum, \
     concatenate
 from numpy.linalg import norm
 from sklearn.linear_model import LinearRegression
@@ -161,8 +161,8 @@ class AccelerometerCalibrate(_BaseProcess):
         tmp_scale = zeros((1, 3))
 
         # get parts with no motion. <2 is to prevent clipped signals from being labeled
-        no_motion = npall(store.acc_rsd < self.sd_crit, axis=1) \
-                    & npall(abs(store.acc_rm) < 2, axis=1)
+        no_motion = (npall(store.acc_rsd < self.sd_crit, axis=1)
+                     & npall(abs(store.acc_rm) < 2, axis=1))
         # nans are automatically excluded
 
         # trim to no motion only

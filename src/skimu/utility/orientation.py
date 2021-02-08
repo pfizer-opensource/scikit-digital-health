@@ -12,7 +12,7 @@ __all__ = ["correct_accelerometer_orientation"]
 
 
 def correct_accelerometer_orientation(accel, v_axis=None, ap_axis=None):
-    """
+    r"""
     Applies the correction for acceleration from [1]_ to better align acceleration with the human
     body anatomical axes. This correction requires that the original device measuring accleration
     is somewhat closely aligned with the anatomical axes already, due to required assumptions.
@@ -105,4 +105,3 @@ def correct_accelerometer_orientation(accel, v_axis=None, ap_axis=None):
     co_accel[:, v_axis] = v_sign * accel[:, ml_axis] * s_theta_m + co_accel[:, v_axis] * c_theta_m
 
     return co_accel
-
