@@ -6,7 +6,8 @@ Pfizer DMTI 2021
 """
 from warnings import warn
 
-from numpy import mean, diff, zeros, ones, abs, all as npall, around, Inf, sum, vstack, minimum
+from numpy import mean, diff, zeros, ones, abs, all as npall, around, Inf, sum, vstack, minimum, \
+    concatenate
 from numpy.linalg import norm
 from sklearn.linear_model import LinearRegression
 
@@ -101,9 +102,17 @@ class AccelerometerCalibrate(_BaseProcess):
             return kwargs
 
         finished = False
+        # use the Store object in order to save computation time
+        store = Store(n10)
         while not finished:
+            store.acc_rsd = accel[:nh + i_h * n12h]
+            if temperature is not None:
+                store.tmp_rm = temperature[:nh + i_h * n12h]
+            else:
+                store._tmp_rm = zeros(store._acc_rm.shape[0])
+
             finished, offset, scale, temp_scale, temp_mean = self.do_iterative_closest_point_fit(
-                accel, temperature, nh + i_h * n12h, n10)
+                store)
 
             if not finished and (nh + i_h * n12h) > accel.shape[0]:
                 finished = True
@@ -123,20 +132,15 @@ class AccelerometerCalibrate(_BaseProcess):
         kwargs.update({self._time: time, self._acc: accel, self._temp: temperature})
         return kwargs
 
-    def do_iterative_closest_point_fit(self, acc, tmp, N, N10):
+    def do_iterative_closest_point_fit(self, store):
         """
         Perform the minimization using an iterative closest point fitting procedure
 
         Parameters
         ----------
-        acc : numpy.ndarray
-            Acceleration, shape (N, 3).
-        tmp : numpy.ndarray
-            Temperature, shape (N,).
-        N : int
-            Number of samples in `hours` worth of data.
-        N10 : int
-            Number of samples in 10 seconds worth of data.
+        store : Store
+            Stored rolling mean/sd values needed for the computation. Used in order to cut down
+            on computation time.
 
         Returns
         -------
@@ -156,22 +160,15 @@ class AccelerometerCalibrate(_BaseProcess):
         scale = ones(3)
         tmp_scale = zeros((1, 3))
 
-        # compute the rolling SD and mean for the acceleration and temperature
-        acc_rsd, acc_rm = rolling_sd(acc[:N], N10, N10, axis=0, return_previous=True)
-
-        if tmp is not None:
-            tmp_rm = rolling_mean(tmp[:N], N10, N10)
-        else:
-            tmp_rm = zeros(acc_rsd.shape[0])
-
         # get parts with no motion. <2 is to prevent clipped signals from being labeled
-        no_motion = npall(acc_rsd < self.sd_crit, axis=1) & npall(abs(acc_rm) < 2, axis=1)
+        no_motion = npall(store.acc_rsd < self.sd_crit, axis=1) \
+                    & npall(abs(store.acc_rm) < 2, axis=1)
         # nans are automatically excluded
 
         # trim to no motion only
-        acc_rsd = acc_rsd[no_motion]
-        acc_rm = acc_rm[no_motion]
-        tmp_rm = tmp_rm[no_motion]
+        acc_rsd = store.acc_rsd[no_motion]
+        acc_rm = store.acc_rm[no_motion]
+        tmp_rm = store.tmp_rm[no_motion]
 
         # make sure enough points
         if acc_rsd.shape[0] < 2:
@@ -242,3 +239,53 @@ class AccelerometerCalibrate(_BaseProcess):
         if (cal_error_end < cal_error_start) and (cal_error_end < 0.01):
             return True, offset, scale, tmp_scale, tmp_mean
 
+
+class Store:
+    """
+    Class for storing moving SD and mean values for update
+    """
+    __slots__ = ("_acc_rsd", "_acc_rm", "_tmp_rm", "_n", "_nt", "wlen")
+
+    def __init__(self, wlen):
+        self._acc_rsd = None
+        self._acc_rm = None
+        self._tmp_rm = None
+        self._n = 0
+        self._nt = 0
+
+        self.wlen = wlen
+
+    @property
+    def acc_rsd(self):
+        return self._acc_rsd
+
+    @acc_rsd.setter
+    def acc_rsd(self, value):
+        if self._acc_rsd is None:
+            self._acc_rsd, self._acc_rm = rolling_sd(
+                value, self.wlen, self.wlen, axis=0, return_previous=True)
+            self._n = int((value.shape[0] // self.wlen) * self.wlen)
+        else:
+            _rsd, _rm = rolling_sd(
+                value[self._n:], self.wlen, self.wlen, axis=0, return_previous=True)
+            self._acc_rsd = concatenate((self._acc_rsd, _rsd), axis=0)
+            self._acc_rm = concatenate((self._acc_rm, _rm), axis=0)
+            self._n += int((value[self._n:].shape[0] // self.wlen) * self.wlen)
+
+    @property
+    def acc_rm(self):
+        return self._acc_rm
+
+    @property
+    def tmp_rm(self):
+        return self._tmp_rm
+
+    @tmp_rm.setter
+    def tmp_rm(self, value):
+        if self._tmp_rm is None:
+            self._tmp_rm = rolling_mean(value, self.wlen, self.wlen)
+            self._nt = int((value.shape[0] // self.wlen) * self.wlen)
+        else:
+            _rm = rolling_mean(value[self._nt:], self.wlen, self.wlen)
+            self._tmp_rm = concatenate((self._tmp_rm, _rm), axis=0)
+            self._nt += int((value[self._nt:].shape[0] // self.wlen) * self.wlen)
