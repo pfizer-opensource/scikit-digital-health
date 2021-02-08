@@ -67,7 +67,7 @@ def get_sample_data():
             for key in data_names:
                 if key in h5:
                     if key == 'file':
-                        path = resolve_data_path(h5[key][0], 'data')
+                        path = resolve_data_path(h5[key][0], 'read')
                         res[key] = path
                     else:
                         res[key] = h5[key][()]
