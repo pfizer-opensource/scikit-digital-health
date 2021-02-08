@@ -213,7 +213,6 @@ class AccelerometerCalibrate(_BaseProcess):
                 x_ = vstack((curr[:, k], tmp_rm[:, 0])).T  # don't need the ones in Python
                 LR.fit(x_, closest_point[:, k], sample_weight=weights)
 
-                # offsetch[k] = LR.coef_[0]
                 offsetch[k] = LR.intercept_
                 scalech[k] = LR.coef_[0]
                 toffch[0, k] = LR.coef_[1]
