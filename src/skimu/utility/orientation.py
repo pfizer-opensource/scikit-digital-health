@@ -86,14 +86,14 @@ def correct_accelerometer_orientation(accel, v_axis=None, ap_axis=None):
     else:
         assert ap_axis < 3, "ap_axis must be in {0, 1, 2}"
         ml_axis = [i for i in range(3) if i not in [v_axis, ap_axis]][0]
-    
+
     s_theta_a = mean(accel[:, ap_axis])
     s_theta_m = mean(accel[:, ml_axis])
     c_theta_a = cos(arcsin(s_theta_a))
     c_theta_m = cos(arcsin(s_theta_m))
-    
+
     v_sign = sign(mean(accel[:, v_axis]))
-    
+
     co_accel = zeros_like(accel)
     # correct ap axis acceleration
     co_accel[:, ap_axis] = accel[:, ap_axis] * c_theta_a - v_sign * accel[:, v_axis] * s_theta_a
