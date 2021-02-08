@@ -35,7 +35,7 @@ static PyObject * read_bin(PyObject *NPY_UNUSED(self), PyObject *args){
     info.max_n = 0;  // initialize
 
     // get the python arguments
-    if (!PyArg_ParseTuple(args, "sll:bin_convert", &file, &base, &period)) return NULL;
+    if (!PyArg_ParseTuple(args, "sll:read_bin", &file, &base, &period)) return NULL;
 
     fp = fopen(file, "r");
     if (!fp){
@@ -116,7 +116,7 @@ static const char bin_convert__doc__[] = "bin_convert(file, base, period)\n"
 
 
 static struct PyMethodDef methods[] = {
-  {"read_bin", bin_convert, 1, bin_convert__doc__},
+  {"read_bin", read_bin, 1, bin_convert__doc__},
   {NULL, NULL, 0, NULL}  /* sentinel */
 };
 
