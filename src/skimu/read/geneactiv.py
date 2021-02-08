@@ -10,7 +10,7 @@ from numpy import vstack
 
 from skimu.base import _BaseProcess
 from skimu.read.get_window_start_stop import get_window_start_stop
-from skimu.read._extensions import bin_convert
+from skimu.read._extensions import read_bin
 
 
 class ReadBin(_BaseProcess):
@@ -109,7 +109,7 @@ class ReadBin(_BaseProcess):
             warn("File extension is not expected '.bin'", UserWarning)
 
         # read the file
-        nmax, hdr, acc, time, light, temp, idx, dtime = bin_convert(file, self.base, self.period)
+        nmax, hdr, acc, time, light, temp, idx, dtime = read_bin(file, self.base, self.period)
 
         results = {
             self._time: time,
