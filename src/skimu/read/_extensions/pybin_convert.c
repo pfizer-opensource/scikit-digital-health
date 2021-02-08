@@ -97,8 +97,8 @@ static PyObject * read_bin(PyObject *NPY_UNUSED(self), PyObject *args){
         info.max_n,
         (PyObject *)accel,
         (PyObject *)time,
-        (PyObject *)temp,
         (PyObject *)light,
+        (PyObject *)temp,
         (PyObject *)index
     );
 }
