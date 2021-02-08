@@ -202,7 +202,8 @@ def configuration(parent_package='', top_path=None):
         sources='src/skimu/read/_extensions/pybin_convert.c',
         libraries=['read']
     )
-    # gt3x (actigraph)
+
+    # gt3x (actigraph)  needs its own library for some reason
     config.add_library(
         'gt3x',
         sources='src/skimu/read/_extensions/gt3x.c',
