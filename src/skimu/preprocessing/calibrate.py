@@ -210,12 +210,13 @@ class AccelerometerCalibrate(_BaseProcess):
                 # be taken care of in the original mask. Division by zero should also
                 # not be happening during motionless data, where 1 value should always be close
                 # to 1
-                x_ = vstack((ones(curr.shape[0]), curr[:, k], tmp_rm[:, 0])).T
+                x_ = vstack((curr[:, k], tmp_rm[:, 0])).T  # don't need the ones in Python
                 LR.fit(x_, closest_point[:, k], sample_weight=weights)
 
-                offsetch[k] = LR.coef_[0]
-                scalech[k] = LR.coef_[1]
-                toffch[0, k] = LR.coef_[2]
+                # offsetch[k] = LR.coef_[0]
+                offsetch[k] = LR.intercept_
+                scalech[k] = LR.coef_[0]
+                toffch[0, k] = LR.coef_[1]
                 curr[:, k] = x_ @ LR.coef_
 
             offset = offset + offsetch / (scale * scalech)
