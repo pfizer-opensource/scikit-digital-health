@@ -1,10 +1,10 @@
 """
 Testing Calibration process
 """
-from numpy import allclose, array, around, mean, abs
+import pytest
+from numpy import allclose, around, mean, abs, arange, random, array, zeros
 from numpy.linalg import norm
 
-from skimu.read import ReadBin
 from skimu.preprocessing import CalibrateAccelerometer
 
 
@@ -40,3 +40,36 @@ class TestCalibration:
         assert allclose(cal_res["offset"], true_offset, atol=2e-4)
         # pretty lax again, since the values are very small themselves
         assert allclose(cal_res["temperature scale"], true_temp_scale, atol=2e-4)
+
+    def test_under_12h_data(self):
+        t = arange(0, 3600 * 11, 1/50)
+        a = random.random((t.size, 3))
+
+        # minimum hours should get set to 12
+        cal = CalibrateAccelerometer(min_hours=10)
+
+        assert cal.min_hours == 12
+
+        with pytest.warns(UserWarning):
+            cal.predict(t, a)
+
+    def test_all_motion(self):
+        t = arange(0, 3600 * 15, 1 / 50)
+        a = (random.random((t.size, 3)) - 0.5) * 0.25 + array([1, 0, 0])
+
+        cal = CalibrateAccelerometer(min_hours=12, sd_criteria=0.01)
+
+        with pytest.warns(UserWarning):
+            cal.predict(t, a)
+
+    def test_bad_sphere(self):
+        """
+        Testing not enough points around the full sphere
+        """
+        t = arange(0, 3600 * 15, 1 / 50)
+        a = zeros((t.size, 3)) + array([0.95, 0.001, -0.05])
+
+        cal = CalibrateAccelerometer(min_hours=12)
+
+        with pytest.warns(UserWarning):
+            cal.predict(t, a)
