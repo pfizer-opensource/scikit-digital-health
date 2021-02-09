@@ -1,31 +1,42 @@
 """
 Testing Calibration process
 """
-from numpy import allclose, array
+from numpy import allclose, array, around, mean, abs
+from numpy.linalg import norm
 
 from skimu.read import ReadBin
-from skimu.preprocessing import AccelerometerCalibrate
+from skimu.preprocessing import CalibrateAccelerometer
 
 
 class TestCalibration:
-    def test(self):
-        # load the data
-        rdr = ReadBin(base=0, period=24)
-        res = rdr.predict("/Users/lukasadamowicz/Downloads/long_sample_gnactv.bin")
+    def test_no_temp(self, sample_data_long):
+        t, acc, true_scale, true_offset = sample_data_long
 
-        # Calibration
-        cal = AccelerometerCalibrate()
-        cal_res = cal.predict(**res, apply=False)
+        error_start = around(mean(abs(norm(acc, axis=1) - 1)), decimals=5)
 
-        assert allclose(
-            cal_res["scale"],
-            array([1.00816559, 1.00257388, 1.00343983])
-        )  # GGIR: array([1.00731463792368, 1.00268720163593, 1.00349275392835])
-        assert allclose(
-            cal_res["offset"],
-            array([-0.00029996, -0.00026138, -0.00280073])
-        )  # GGIR: array([-0.000182315190654408, -0.000315021317133069, -0.00273379237669694])
-        assert allclose(
-            cal_res["temperature scale"],
-            array([[-5.62854755e-05, -4.41293910e-06,  3.01197144e-04]])
-        )  # GGIR: array([-4.13744070488941e-05, 8.93468717108127e-06, 0.000296623190202781])
+        cal = CalibrateAccelerometer()
+        cal_res = cal.predict(t, acc, apply=True)
+
+        error_end = around(mean(abs(norm(cal_res["accel"], axis=1) - 1)), decimals=5)
+
+        assert error_end < error_start
+        assert allclose(cal_res["scale"], true_scale, rtol=5e-5)
+        # pretty lax here, since offset can be different and still give good values
+        assert allclose(cal_res["offset"], true_offset, atol=2e-4)
+
+    def test_w_temp(self, sample_data_temp):
+        t, acc, temp, true_scale, true_offset, true_temp_scale = sample_data_temp
+
+        error_start = around(mean(abs(norm(acc, axis=1) - 1)), decimals=5)
+
+        cal = CalibrateAccelerometer()
+        cal_res = cal.predict(t, acc, apply=True, temperature=temp)
+
+        error_end = around(mean(abs(norm(cal_res["accel"], axis=1) - 1)), decimals=5)
+
+        assert error_end < error_start
+        assert allclose(cal_res["scale"], true_scale, rtol=5e-5)
+        # pretty lax here, since offset can be different and still give good values
+        assert allclose(cal_res["offset"], true_offset, atol=2e-4)
+        # pretty lax again, since the values are very small themselves
+        assert allclose(cal_res["temperature scale"], true_temp_scale, atol=2e-4)
