@@ -10,9 +10,9 @@ Sensor Calibration
 .. autosummary::
     :toctree: generated/
 
-    AccelerometerCalibrate
+    CalibrateAccelerometer
 """
-from skimu.preprocessing.calibrate import AccelerometerCalibrate
+from skimu.preprocessing.calibrate import CalibrateAccelerometer
 from skimu.preprocessing import calibrate
 
-__all__ = ("AccelerometerCalibrate", "calibrate")
+__all__ = ("CalibrateAccelerometer", "calibrate")

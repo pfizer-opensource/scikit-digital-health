@@ -15,10 +15,10 @@ from skimu.base import _BaseProcess
 from skimu.utility import rolling_mean, rolling_sd
 
 
-__all__ = ["AccelerometerCalibrate"]
+__all__ = ["CalibrateAccelerometer"]
 
 
-class AccelerometerCalibrate(_BaseProcess):
+class CalibrateAccelerometer(_BaseProcess):
     """
     Calibrate pre-recording acceleration readings based on the deviation from 1G when motionless.
     Acceleration values can be modified in place. Calibration typically requires a minimum amount
@@ -59,9 +59,9 @@ class AccelerometerCalibrate(_BaseProcess):
     References
     ----------
     .. [1] V. T. van Hees et al., “Autocalibration of accelerometer data for free-living physical
-    activity assessment using local gravity and temperature: an evaluation on four continents,”
-    Journal of Applied Physiology, vol. 117, no. 7, pp. 738–744, Aug. 2014,
-    doi: 10.1152/japplphysiol.00421.2014.
+        activity assessment using local gravity and temperature: an evaluation on four continents,”
+        Journal of Applied Physiology, vol. 117, no. 7, pp. 738–744, Aug. 2014,
+        doi: 10.1152/japplphysiol.00421.2014.
     """
     def __init__(self, sphere_crit=0.3, min_hours=72, sd_criteria=0.013, max_iter=1000, tol=1e-10):
         if min_hours % 12 != 0 or min_hours <= 0:
@@ -84,6 +84,40 @@ class AccelerometerCalibrate(_BaseProcess):
         self.tol = tol
 
     def predict(self, time=None, accel=None, *, apply=True, temperature=None, **kwargs):
+        r"""
+        Run the calibration on the accelerometer data.
+
+        Parameters
+        ----------
+        time : numpy.ndarray
+            (N, ) array of unix timestamps, in seconds.
+        accel : numpy.ndarray
+            (N, 3) array of accelerations measured by centrally mounted lumbar device, in
+            units of 'g'.
+        apply : bool, optional
+            Apply the calibration to the acceleration. Default is True. Both cases return the
+            scale, offset, and temperature scale in the return dictionary.
+        temperature : numpy.ndarray
+            (N, ) array of temperature measured by the sensor.
+
+        Returns
+        -------
+        results : dictionary
+            Returns input data, as well as the acceleration scale, acceleration offset, and
+            temperature scale.
+
+        Notes
+        -----
+        The scaling factors are applied as follows:
+
+        .. math:: a_i(t) = (y_i(t) + d_i)s_i + (T(t) - \bar{T}_c)m_i
+
+        where :math:`a_i` is the corrected acceleration in the *ith* axis, :math:`t` is a time
+        point, :math:`y_i` is the measured accleration in the *ith* axis, :math:`d_i` is the offset
+        for the *ith* axis, :math:`s_i` is the scale for the *ith* axis. If available, :math:`T` is
+        the sensor measured temperature, :math:`\bar{T}_c` is the mean temperature from the
+        calibration, and :math:`m_i` is the temperature scale for the *ith* axis.
+        """
         super().predict(
             time=time, accel=accel, apply=apply, temperature=temperature, **kwargs
         )
@@ -111,7 +145,7 @@ class AccelerometerCalibrate(_BaseProcess):
             else:
                 store._tmp_rm = zeros(store._acc_rm.shape[0])
 
-            finished, offset, scale, temp_scale, temp_mean = self.do_iterative_closest_point_fit(
+            finished, offset, scale, temp_scale, temp_mean = self._do_iterative_closest_point_fit(
                 store)
 
             if not finished and (nh + i_h * n12h) > accel.shape[0]:
@@ -132,7 +166,7 @@ class AccelerometerCalibrate(_BaseProcess):
         kwargs.update({self._time: time, self._acc: accel, self._temp: temperature})
         return kwargs
 
-    def do_iterative_closest_point_fit(self, store):
+    def _do_iterative_closest_point_fit(self, store):
         """
         Perform the minimization using an iterative closest point fitting procedure
 
