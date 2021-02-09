@@ -158,7 +158,7 @@ class CalibrateAccelerometer(_BaseProcess):
             if temperature is None:
                 accel = (accel + offset) * scale
             else:
-                accel = (accel + offset) * scale + (temperature - temp_mean) * temp_scale
+                accel = (accel + offset) * scale + (temperature - temp_mean)[:, None] * temp_scale
 
         # add the results to the returned values
         kwargs.update({"offset": offset, "scale": scale, "temperature scale": temp_scale})
