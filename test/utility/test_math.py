@@ -34,6 +34,30 @@ class BaseTestRolling:
 
             assert np.allclose(pred, truth)
 
+    @pytest.mark.parametrize("skip", (1, 2, 7, 150, 300))
+    def test_2d(self, skip):
+        """
+        Test various skips since there are different optimizations for different skip values
+        """
+        x = np.random.random((100000, 3))
+        xw = get_windowed_view(x, 150, skip)
+
+        if isinstance(self.truth_function, Iterable):
+            truth = []
+            for tf, tkw in zip(self.truth_function, self.truth_kw):
+                truth.append(tf(xw, axis=1, **tkw))
+
+            pred = self.function(x, 150, skip, axis=0)
+
+            for p, t in zip(pred, truth):
+                assert np.allclose(p, t)
+        else:
+            truth = self.truth_function(xw, axis=1, **self.truth_kw)
+
+            pred = self.function(x, 150, skip, axis=0)
+
+            assert np.allclose(pred, truth)
+
     @pytest.mark.parametrize(
         ("in_shape", "out_shape", "kwargs"),
         (
