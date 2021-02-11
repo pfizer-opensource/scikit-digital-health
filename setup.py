@@ -173,6 +173,10 @@ def configuration(parent_package='', top_path=None):
 
     # EXTENSIONS
     # ========================
+    # add extension paths all at once
+    config.add_include_dirs(
+        sysconfig.get_path("data") + os.sep + "include"
+    )
     # UTILITY
     config.add_library(
         "frolling_moments",
@@ -206,14 +210,13 @@ def configuration(parent_package='', top_path=None):
     # gt3x (actigraph)  needs its own library for some reason
     config.add_library(
         'gt3x',
-        sources='src/skimu/read/_extensions/gt3x.c',
-        include_dirs=sysconfig.get_path("data") + os.sep + "include"
+        sources='src/skimu/read/_extensions/gt3x.c'
     )
     config.add_extension(
         'skimu/read/_extensions/gt3x_convert',
         sources=['src/skimu/read/_extensions/pygt3x_convert.c'],
         libraries=['gt3x', 'zip'],
-        library_dirs=[sysconfig.get_path("data") + os.sep + "lib"]
+        # library_dirs=[sysconfig.get_path("data") + os.sep + "lib"]
     )
 
     # Fortran/C feature extensions
