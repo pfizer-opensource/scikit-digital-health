@@ -1,3 +1,5 @@
+from collections.abc import Iterable
+
 import pytest
 
 import numpy as np
@@ -8,6 +10,30 @@ from skimu.utility.math import *
 
 
 class BaseTestRolling:
+    @pytest.mark.parametrize("skip", (1, 2, 7, 150, 300))
+    def test(self, skip):
+        """
+        Test various skips since there are different optimizations for different skip values
+        """
+        x = np.random.random(100000)
+        xw = get_windowed_view(x, 150, skip)
+
+        if isinstance(self.truth_function, Iterable):
+            truth = []
+            for tf, tkw in zip(self.truth_function, self.truth_kw):
+                truth.append(tf(xw, axis=-1, **tkw))
+
+            pred = self.function(x, 150, skip)
+
+            for p, t in zip(pred, truth):
+                assert np.allclose(p, t)
+        else:
+            truth = self.truth_function(xw, axis=-1, **self.truth_kw)
+
+            pred = self.function(x, 150, skip)
+
+            assert np.allclose(pred, truth)
+
     @pytest.mark.parametrize(
         ("in_shape", "out_shape", "kwargs"),
         (
@@ -43,64 +69,28 @@ class BaseTestRolling:
 class TestRollingMean(BaseTestRolling):
     # need staticmethod so it doesn't think that self is the first argument
     function = staticmethod(rolling_mean)
-
-    def test(self):
-        x = np.random.random(10000)
-        xw = get_windowed_view(x, 150, 150)
-
-        truth = np.mean(xw, axis=-1)
-        pred = self.function(x, 150, 150)
-
-        assert np.allclose(pred, truth)
+    truth_function = staticmethod(np.mean)
+    truth_kw = {}
 
 
 class TestRollingSD(BaseTestRolling):
     function = staticmethod(rolling_sd)
-
-    def test(self):
-        x = np.random.random(10000)
-        xw = get_windowed_view(x, 150, 150)
-
-        true_mean = np.mean(xw, axis=-1)
-        true_sd = np.std(xw, axis=-1, ddof=1)  # sample std dev
-        pred_sd, pred_mean = self.function(x, 150, 150, return_previous=True)
-
-        assert np.allclose(pred_sd, true_sd)
-        assert np.allclose(pred_mean, true_mean)
+    truth_function = (np.std, np.mean)
+    truth_kw = ({"ddof": 1}, {})
 
 
 class TestRollingSkewness(BaseTestRolling):
     function = staticmethod(rolling_skewness)
-
-    def test(self):
-        x = np.random.random(10000)
-        xw = get_windowed_view(x, 150, 150)
-
-        true_mean = np.mean(xw, axis=-1)
-        true_sd = np.std(xw, axis=-1, ddof=1)  # sample std dev
-        true_skew = skew(xw, axis=-1, bias=True)
-        pred_skew, pred_sd, pred_mean = self.function(x, 150, 150, return_previous=True)
-
-        assert np.allclose(pred_skew, true_skew)
-        assert np.allclose(pred_sd, true_sd)
-        assert np.allclose(pred_mean, true_mean)
+    truth_function = (skew, np.std, np.mean)
+    truth_kw = ({"bias": True}, {"ddof": 1}, {})
 
 
 class TestRollingKurtosis(BaseTestRolling):
     function = staticmethod(rolling_kurtosis)
-
-    def test(self):
-        x = np.random.random(10000)
-        xw = get_windowed_view(x, 150, 150)
-
-        true_mean = np.mean(xw, axis=-1)
-        true_sd = np.std(xw, axis=-1, ddof=1)  # sample std dev
-        true_skew = skew(xw, axis=-1, bias=True)
-        true_kurt = kurtosis(xw, axis=-1, fisher=True, bias=True, nan_policy='propagate')
-
-        pred_kurt, pred_skew, pred_sd, pred_mean = self.function(x, 150, 150, return_previous=True)
-
-        assert np.allclose(pred_kurt, true_kurt)
-        assert np.allclose(pred_skew, true_skew)
-        assert np.allclose(pred_sd, true_sd)
-        assert np.allclose(pred_mean, true_mean)
+    truth_function = (kurtosis, skew, np.std, np.mean)
+    truth_kw = (
+        {"bias": True, "fisher": True, "nan_policy": "propagate"},
+        {"bias": True},
+        {"ddof": 1},
+        {}
+    )
