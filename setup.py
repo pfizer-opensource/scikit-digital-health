@@ -173,32 +173,49 @@ def configuration(parent_package='', top_path=None):
 
     # EXTENSIONS
     # ========================
-    # cwa (axivity)
+    # add extension paths all at once
+    config.add_include_dirs(
+        sysconfig.get_path("data") + os.sep + "include"
+    )
+    # UTILITY
     config.add_library(
-        'fcwa_convert',
-        sources='src/skimu/read/_extensions/cwa_convert.f95'
+        "frolling_moments",
+        sources="src/skimu/utility/_extensions/rolling_moments.f95"
+    )
+    config.add_extension(
+        "skimu/utility/_extensions/rolling_moments",
+        sources="src/skimu/utility/_extensions/rolling_moments.c",
+        libraries=["frolling_moments"]
+    )
+    # Read library
+    config.add_library(
+        'read',
+        sources=[
+            'src/skimu/read/_extensions/cwa_convert.f95',
+            'src/skimu/read/_extensions/bin_convert.c'
+        ]
     )
     config.add_extension(
         'skimu/read/_extensions/cwa_convert',
-        sources='src/skimu/read/_extensions/cwa_convert.c',
-        libraries=['fcwa_convert']
+        sources='src/skimu/read/_extensions/pycwa_convert.c',
+        libraries=['read']
     )
     # bin (geneactiv)
     config.add_extension(
         'skimu/read/_extensions/bin_convert',
-        sources='src/skimu/read/_extensions/bin_convert.c'
+        sources='src/skimu/read/_extensions/pybin_convert.c',
+        libraries=['read']
     )
-    # gt3x (actigraph)
+
+    # gt3x (actigraph)  needs its own library for some reason
     config.add_library(
         'gt3x',
-        sources='src/skimu/read/_extensions/gt3x.c',
-        include_dirs=[os.sep.join(sysconfig.get_path('include').split(os.sep)[:-1])]
+        sources='src/skimu/read/_extensions/gt3x.c'
     )
     config.add_extension(
-        'skimu/read/_extensions/read_gt3x',
-        sources=['src/skimu/read/_extensions/read_gt3x.c'],
-        libraries=['gt3x', 'zip'],
-        include_dirs=[os.sep.join(sysconfig.get_path('include').split(os.sep)[:-1])]
+        'skimu/read/_extensions/gt3x_convert',
+        sources=['src/skimu/read/_extensions/pygt3x_convert.c'],
+        libraries=['gt3x', 'zip']
     )
 
     # Fortran/C feature extensions

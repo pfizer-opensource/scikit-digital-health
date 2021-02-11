@@ -86,12 +86,21 @@ class TestGetGaitEvents:
 
         o_scale = round(0.4 / (2 * 1.25 / 50.0)) - 1
 
-        ic, fc, _ = get_gait_events(
-            sign * accel[:, axis],
+        sign_arr = zeros(3)
+        if axis == 0:
+            sign_arr[:] = [sign, sign, -sign]
+        elif axis == 1:
+            sign_arr[:] = [sign, sign, -sign]
+        else:
+            sign_arr[:] = [-sign, sign, sign]
+
+        ic, fc, *_ = get_gait_events(
+            accel * sign_arr,  # rotation of 180 degrees around an axis
             50.0,
             time,
-            sign * acc_sign,
-            o_scale, 4, 20.0, True
+            o_scale, 4, 20.0,
+            False,  # corr_accel_orient
+            False  # use_optimal_scale
         )
 
         assert allclose(ic, ic_truth)
@@ -104,12 +113,21 @@ class TestGetGaitEvents:
 
         o_scale = round(0.4 / (2 * 1.25 / 20.0)) - 1
 
-        ic, fc, _ = get_gait_events(
-            sign * accel[:, axis],
+        sign_arr = zeros(3)
+        if axis == 0:
+            sign_arr[:] = [sign, sign, -sign]
+        elif axis == 1:
+            sign_arr[:] = [sign, sign, -sign]
+        else:
+            sign_arr[:] = [-sign, sign, sign]
+
+        ic, fc, *_ = get_gait_events(
+            accel * sign_arr,  # rotation of 180 degrees around an axis
             20.0,
             time,
-            sign * acc_sign,
-            o_scale, 4, 20.0, False  # also test original scale
+            o_scale, 4, 20.0,
+            False,  # corr_accel_orient
+            False  # use_optimal_scale
         )
 
         assert allclose(ic, ic_truth)
@@ -127,7 +145,7 @@ class TestGetGaitStrides:
         gait = {i: [] for i in keys}
         bout_steps = get_strides(gait, accel[:, axis], 0, ic, fc, time, 50.0, 2.25, 0.2)
 
-        assert bout_steps == 42
+        assert bout_steps == 47
         for k in keys:
             assert allclose(gait[k], gait_truth[k], equal_nan=True)
 
@@ -141,7 +159,7 @@ class TestGetGaitStrides:
         gait = {i: [] for i in keys}
         bout_steps = get_strides(gait, accel[:, axis], 0, ic, fc, time, 20.0, 2.25, 0.2)
 
-        assert bout_steps == 39
+        assert bout_steps == 38
         for k in keys:
             assert allclose(gait[k], gait_truth[k], equal_nan=True)
 
@@ -201,6 +219,7 @@ class TestGait(BaseProcessTester):
         ])
 
         cls.process = Gait(
+            correct_accel_orient=False,
             use_cwt_scale_relation=True,
             min_bout_time=8.0,
             max_bout_separation_time=0.5,

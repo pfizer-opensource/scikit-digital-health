@@ -29,8 +29,8 @@ stride length: step_length_i + step_length_i+1
 
 gait speed: stride_length / stride time
 """
-from numpy import zeros, nanmean, mean, nanstd, std, sum, sqrt, nan, nonzero, argmin, abs, round, \
-    float_, int_, fft, arange, isnan
+from numpy import zeros, nanmean, mean, nanstd, std, nanmedian, sum, sqrt, nan, nonzero, argmin, \
+    abs, round, float_, int_, fft, arange, isnan, maximum
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt, find_peaks
 
@@ -63,9 +63,9 @@ def _autocovariancefunction(x, max_lag, biased=False):
             (x[:N-i] - mean(x[:N-i], axis=axis)) * (x[i:] - mean(x[i:], axis=axis)), axis=axis
         )
         if biased:
-            ac[i] /= (N * std(x[:N-i], ddof=1) * std(x[i:], ddof=1))
+            ac[i] /= (N * std(x[:N-i], axis=axis) * std(x[i:], axis=axis))
         else:
-            ac[i] /= ((N - i) * std(x[:N-i], ddof=1) * std(x[i:], ddof=1))
+            ac[i] /= ((N - i) * std(x[:N-i], axis=axis) * std(x[i:], axis=axis))
 
     return ac
 
@@ -535,7 +535,7 @@ class PhaseCoordinationIndex(BoutMetric):
             mask = gait_aux['inertial data i'] == i
 
             psi_abs = nanmean(abs(phase[mask] - 0.5))  # using % not degrees right now
-            psi_cv = nanstd(phase[mask], ddof=1, ) / nanmean(phase[mask])
+            psi_cv = nanstd(phase[mask], ddof=1) / nanmean(phase[mask])
 
             pci[i] = 100 * (psi_cv + psi_abs / 0.5)
 
@@ -605,7 +605,7 @@ class GaitSymmetryIndex(BoutMetric):
         # setup acceleration filter
         sos = butter(4, 2 * 10 / fs, btype='low', output='sos')
         for i, acc in enumerate(gait_aux['accel']):
-            lag_ = nanmean(gait['PARAM:stride time'][gait_aux['inertial data i'] == i]) * fs
+            lag_ = nanmedian(gait['PARAM:stride time'][gait_aux['inertial data i'] == i]) * fs
             if isnan(lag_):  # if only nan values in the bout
                 gsi[i] = nan
                 continue
@@ -616,9 +616,11 @@ class GaitSymmetryIndex(BoutMetric):
             # C_stride is the sum of 3 axes
             pks, _ = find_peaks(sum(ac, axis=1))
             # find the closest peak to the computed ideal half stride lag
-            idx = int(0.5 * argmin(abs(pks - lag)))
+            t_stride = pks[argmin(abs(pks - lag))]
+            idx = int(0.5 * t_stride)
 
-            gsi[i] = sqrt(sum(ac[idx])) / sqrt(3)
+            # maximum ensures no sqrt of negative numbers
+            gsi[i] = sqrt(sum(maximum(ac[idx], 0))) / sqrt(3)
 
         gait[self.k_] = gsi[gait_aux['inertial data i']]
 
@@ -666,14 +668,14 @@ class StepRegularityV(BoutMetric):
                 stepreg[i] = nan
                 continue
             va = gait_aux['vert axis'][mask][0]
-            lag_ = nanmean(gait['PARAM:step time'][mask]) * fs
+            lag_ = nanmedian(gait['PARAM:step time'][mask]) * fs
             if isnan(lag_):  # if only nan values in the bout
                 stepreg[i] = nan
                 continue
             lag = int(round(lag_))
             acf = _autocovariancefunction(acc[:, va], int(4.5 * fs))
             pks, _ = find_peaks(acf)
-            idx = argmin(abs(pks - lag))
+            idx = pks[argmin(abs(pks - lag))]
 
             stepreg[i] = acf[idx]
 
@@ -724,14 +726,14 @@ class StrideRegularityV(BoutMetric):
                 stridereg[i] = nan
                 continue
             va = gait_aux['vert axis'][mask][0]
-            lag_ = nanmean(gait['PARAM:stride time'][mask]) * fs
+            lag_ = nanmedian(gait['PARAM:stride time'][mask]) * fs
             if isnan(lag_):  # if only nan values in the bout
                 stridereg[i] = nan
                 continue
             lag = int(round(lag_))
             acf = _autocovariancefunction(acc[:, va], int(4.5 * fs))
             pks, _ = find_peaks(acf)
-            idx = argmin(abs(pks - lag))
+            idx = pks[argmin(abs(pks - lag))]
 
             stridereg[i] = acf[idx]
 

@@ -20,10 +20,6 @@ else:  # pragma: no cover
     import importlib_resources
 
 
-class DimensionMismatchError(Exception):
-    pass
-
-
 def _resolve_path(mod, file):
     if version_info >= (3, 7):
         with resources.path(mod, file) as file_path:
@@ -33,6 +29,10 @@ def _resolve_path(mod, file):
             path = file_path
 
     return path
+
+
+class DimensionMismatchError(Exception):
+    pass
 
 
 def get_gait_classification_lgbm(gait_pred, accel, fs):
@@ -52,16 +52,17 @@ def get_gait_classification_lgbm(gait_pred, accel, fs):
         if isinstance(gait_pred, ndarray):
             if gait_pred.size != accel.shape[0]:
                 raise DimensionMismatchError(
-                    "Number of gait predictions must match number of acceleration samples")
+                    "Number of gait predictions (possibly downsampled) must match number of "
+                    "acceleration samples")
             bout_starts = where(diff(gait_pred.astype(int_)) == 1)[0] + 1
             bout_stops = where(diff(gait_pred.astype(int_)) == -1)[0] + 1
 
             if gait_pred[0]:
                 bout_starts = insert(bout_starts, 0, 0)
             if gait_pred[-1]:
-                bout_starts = append(bout_stops, accel.shape[0])
+                bout_stops = append(bout_stops, accel.shape[0])
         else:
-            bout_starts, bout_stops = array([0]), array([accel.shape[0]])
+            bout_starts, bout_stops = array([0], dtype="int"), array([accel.shape[0]], dtype="int")
     else:
         suffix = '50hz' if fs == 50.0 else '20hz'
 
@@ -108,4 +109,4 @@ def get_gait_classification_lgbm(gait_pred, accel, fs):
         bout_starts *= wstep
         bout_stops = bout_stops * wstep + (wlen - wstep)  # account for edges, if windows overlap
 
-    return bout_starts, bout_stops
+    return bout_starts.astype("int"), bout_stops.astype("int")

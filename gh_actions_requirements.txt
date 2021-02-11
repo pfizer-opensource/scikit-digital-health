@@ -9,3 +9,4 @@ flake8
 pytest
 h5py
 wheel
+psutil
