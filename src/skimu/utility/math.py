@@ -47,7 +47,9 @@ def rolling_mean(a, w_len, skip, axis=-1):
     Warnings
     --------
     Catastropic cancellation is a concern when `skip` is less than `wlen` due to the cumulative
-    sum-type algorithm being used, when input values are very very large, or very very small.
+    sum-type algorithm being used, when input values are very very large, or very very small. With
+    typical IMU data values this should not be an issue, even for very long data series (multiple
+    days worth of data)
 
     Examples
     --------
@@ -144,7 +146,9 @@ def rolling_sd(a, w_len, skip, axis=-1, return_previous=True):
     Warnings
     --------
     Catastropic cancellation is a concern when `skip` is less than `wlen` due to the cumulative
-    sum-type algorithms being used, when input values are very very large, or very very small.
+    sum-type algorithms being used, when input values are very very large, or very very small. With
+    typical IMU data values this should not be an issue, even for very long data series (multiple
+    days worth of data).
 
     Examples
     --------
