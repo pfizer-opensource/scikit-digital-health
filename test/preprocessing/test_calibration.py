@@ -14,7 +14,7 @@ class TestCalibration:
 
         error_start = around(mean(abs(norm(acc, axis=1) - 1)), decimals=5)
 
-        cal = CalibrateAccelerometer()
+        cal = CalibrateAccelerometer(min_hours=12)
         cal_res = cal.predict(t, acc, apply=True)
 
         error_end = around(mean(abs(norm(cal_res["accel"], axis=1) - 1)), decimals=5)

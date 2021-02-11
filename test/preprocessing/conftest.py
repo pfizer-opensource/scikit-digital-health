@@ -7,7 +7,8 @@ from scipy.signal import butter, sosfiltfilt
 def sample_data_long():
     np.random.seed(1357)  # fix seed
 
-    t = np.arange(0, 300 * 3400, 1/50)
+    # make about 15 hours of data
+    t = np.arange(0, 15 * 3600, 1/50)
 
     a = (np.random.random((t.size, 3)) - 0.5) * 0.07
     N3 = a.shape[0] // 3
@@ -15,7 +16,7 @@ def sample_data_long():
     a[N3:2*N3, 1] = 0.5 + (np.random.random(N3) - 0.4) * 0.15
     a[2*N3:, 2] = 0.7 + (np.random.random(t.size - 2*N3) - 0.3) * 0.12
 
-    # rotate 1/6 segements so there are enough points around the sphere
+    # rotate 1/6 segments so there are enough points around the sphere
     N6 = a.shape[0] // 6
     a[N6:N3 + N6] *= np.array([-1, -1, 1])
     a[2 * N3 + N6:] *= np.array([-1, 1, -1])
@@ -38,10 +39,11 @@ def sample_data_long():
 def sample_data_temp():
     np.random.seed(1357)  # fix seed
 
-    t = np.arange(0, 300 * 3400, 1 / 50)
+    # make about 73 hours of data
+    t = np.arange(0, 73 * 3600, 1 / 50)
     block_temp = sosfiltfilt(
         butter(1, 0.33, output='sos', btype='low'),
-        (np.random.random(3400) - 0.5) * 10
+        (np.random.random(t.size // (300 * 50)) - 0.5) * 10
     )
     temp = 29.2 + np.repeat(block_temp, 300 * 50)
 
