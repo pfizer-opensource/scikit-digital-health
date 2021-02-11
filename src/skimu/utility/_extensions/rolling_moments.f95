@@ -102,7 +102,7 @@ subroutine rolling_moments_2(n, x, wlen, skip, mean, sd) bind(C, name="rolling_m
     ! local
     integer(c_long) :: i, j, k
     real(c_double) :: m1(0:n), m2(0:n)
-    real(c_double) :: delta, delta_n, term1
+    real(c_double) :: delta, delta_n, term1, tm1
 
     if ((skip < wlen) .AND. (mod(wlen, skip) == 0)) then
         m1(1) = x(1)
