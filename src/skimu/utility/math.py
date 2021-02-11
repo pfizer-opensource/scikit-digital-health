@@ -41,6 +41,14 @@ def rolling_mean(a, w_len, skip, axis=-1):
 
     where `n` is the length of the rolling axis.
 
+    Most efficient computations are for `skip` values that are either factors of `wlen`, or greater
+    or equal to `wlen`.
+
+    Warnings
+    --------
+    Catastropic cancellation is a concern when `skip` is less than `wlen` due to the cumulative
+    sum-type algorithm being used.
+
     Examples
     --------
     Compute the with non-overlapping windows:
@@ -129,6 +137,14 @@ def rolling_sd(a, w_len, skip, axis=-1, return_previous=True):
     .. math:: \frac{n - w_{len}}{skip} + 1
 
     where `n` is the length of the rolling axis.
+
+    Most efficient computations are for `skip` values that are either factors of `wlen`, or greater
+    or equal to `wlen`.
+
+    Warnings
+    --------
+    Catastropic cancellation is a concern when `skip` is less than `wlen` due to the cumulative
+    sum-type algorithms being used.
 
     Examples
     --------
@@ -226,6 +242,12 @@ def rolling_skewness(a, w_len, skip, axis=-1, return_previous=True):
     .. math:: \frac{n - w_{len}}{skip} + 1
 
     where `n` is the length of the rolling axis.
+
+    Warnings
+    --------
+    While this implementation is quite fast, it is also quite mememory inefficient. 3 arrays
+    of equal length to the computation axis are created during computation, which can easily
+    exceed system memory if already using a significant amount of memory.
 
     Examples
     --------
@@ -327,6 +349,12 @@ def rolling_kurtosis(a, w_len, skip, axis=-1, return_previous=True):
     .. math:: \frac{n - w_{len}}{skip} + 1
 
     where `n` is the length of the rolling axis.
+
+    Warnings
+    --------
+    While this implementation is quite fast, it is also quite mememory inefficient. 4 arrays
+    of equal length to the computation axis are created during computation, which can easily
+    exceed system memory if already using a significant amount of memory.
 
     Examples
     --------
