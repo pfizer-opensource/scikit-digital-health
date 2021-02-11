@@ -40,13 +40,13 @@ PyObject * rolling_mean(PyObject *NPY_UNUSED(self), PyObject *args){
     rdims[ndim-1] = (ddims[ndim-1] - wlen) / skip + 1;  // dimension of the roll
 
     PyArrayObject *rmean = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
-    free(rdims);
 
     if (!rmean){
         Py_XDECREF(data);
         Py_XDECREF(rmean);
         return NULL;
     }
+
     // data pointers
     double *dptr = (double *)PyArray_DATA(data),
            *rmean_ptr = (double *)PyArray_DATA(rmean);
@@ -55,12 +55,15 @@ PyObject * rolling_mean(PyObject *NPY_UNUSED(self), PyObject *args){
     long res_stride = rdims[ndim-1];  // stride to get to the next results "column"
     int nrepeats = PyArray_SIZE(data) / stride;  // number of repetitions to cover all the data
 
+    // has to be freed down here since its used by res_stride
+    free(rdims);
+
     for (int i = 0; i < nrepeats; ++i){
         rolling_moments_1(&stride, dptr, &wlen, &skip, rmean_ptr);
         dptr += stride;
         rmean_ptr += res_stride;
     }
-    
+
     Py_XDECREF(data);
 
     return (PyObject *)rmean;
@@ -97,7 +100,6 @@ PyObject * rolling_sd(PyObject *NPY_UNUSED(self), PyObject *args){
 
     PyArrayObject *rsd   = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0),
                   *rmean = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
-    free(rdims);
 
     if ((!rmean) || (!rsd)){
         Py_XDECREF(data);
@@ -114,6 +116,8 @@ PyObject * rolling_sd(PyObject *NPY_UNUSED(self), PyObject *args){
     long stride = ddims[ndim-1];  // stride to get to the next computation "column"
     long res_stride = rdims[ndim-1];  // stride to get to the next results "column"
     int nrepeats = PyArray_SIZE(data) / stride;  // number of repetitions to cover all the data
+    // has to be freed down here since its used by res_stride
+    free(rdims);
 
     for (int i = 0; i < nrepeats; ++i){
         rolling_moments_2(&stride, dptr, &wlen, &skip, rmean_ptr, rsd_ptr);
@@ -167,7 +171,6 @@ PyObject * rolling_skewness(PyObject *NPY_UNUSED(self), PyObject *args){
     PyArrayObject *rsd   = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0),
                   *rmean = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0),
                   *rskew = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
-    free(rdims);
 
     if ((!rmean) || (!rsd) || (!rskew)){
         Py_XDECREF(data);
@@ -186,6 +189,8 @@ PyObject * rolling_skewness(PyObject *NPY_UNUSED(self), PyObject *args){
     long stride = ddims[ndim-1];  // stride to get to the next computation "column"
     long res_stride = rdims[ndim-1];  // stride to get to the next results "column"
     int nrepeats = PyArray_SIZE(data) / stride;  // number of repetitions to cover all the data
+    // has to be freed down here since its used by res_stride
+    free(rdims);
 
     for (int i = 0; i < nrepeats; ++i){
         rolling_moments_3(&stride, dptr, &wlen, &skip, rmean_ptr, rsd_ptr, rskew_ptr);
@@ -243,7 +248,6 @@ PyObject * rolling_kurtosis(PyObject *NPY_UNUSED(self), PyObject *args){
                   *rmean = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0),
                   *rskew = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0),
                   *rkurt = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
-    free(rdims);
 
     if (!rmean || !rsd || !rskew || !rkurt){
         Py_XDECREF(data);
@@ -264,6 +268,8 @@ PyObject * rolling_kurtosis(PyObject *NPY_UNUSED(self), PyObject *args){
     long stride = ddims[ndim-1];  // stride to get to the next computation "column"
     long res_stride = rdims[ndim-1];  // stride to get to the next results "column"
     int nrepeats = PyArray_SIZE(data) / stride;  // number of repetitions to cover all the data
+    // has to be freed down here since its used by res_stride
+    free(rdims);
 
     for (int i = 0; i < nrepeats; ++i){
         rolling_moments_4(&stride, dptr, &wlen, &skip, rmean_ptr, rsd_ptr, rskew_ptr, rkurt_ptr);
