@@ -10,7 +10,7 @@ from skimu.preprocessing import CalibrateAccelerometer
 
 
 class TestCalibration:
-    @pytest.mark.skipif(psutil.virtual_memory().available < 90e6)
+    @pytest.mark.skipif(psutil.virtual_memory().available < 90e6, reason="Not enough memory")
     def test_no_temp(self, sample_data_long):
         t, acc, true_scale, true_offset = sample_data_long
 
@@ -26,7 +26,7 @@ class TestCalibration:
         # pretty lax here, since offset can be different and still give good values
         assert allclose(cal_res["offset"], true_offset, atol=2e-4)
 
-    @pytest.mark.skipif(psutil.virtual_memory().available < 90e6)
+    @pytest.mark.skipif(psutil.virtual_memory().available < 90e6, reason="Not enough memory")
     def test_w_temp(self, sample_data_temp):
         t, acc, temp, true_scale, true_offset, true_temp_scale = sample_data_temp
 
