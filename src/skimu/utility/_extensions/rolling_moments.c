@@ -15,9 +15,9 @@ extern void rolling_moments_4(long *, double *, long *, long *, double *, double
 
 PyObject * rolling_mean(PyObject *NPY_UNUSED(self), PyObject *args){
     PyObject *x_;
-    long lag, skip;
+    long wlen, skip;
 
-    if (!PyArg_ParseTuple(args, "Oll:rolling_mean", &x_, &lag, &skip)) return NULL;
+    if (!PyArg_ParseTuple(args, "Oll:rolling_mean", &x_, &wlen, &skip)) return NULL;
 
     PyArrayObject *data = (PyArrayObject *)PyArray_FromAny(
         x_, PyArray_DescrFromType(NPY_DOUBLE), 1, 0,
@@ -37,7 +37,7 @@ PyObject * rolling_mean(PyObject *NPY_UNUSED(self), PyObject *args){
     for (int i = 0; i < (ndim - 1); ++i){
         rdims[i] = ddims[i];
     }
-    rdims[ndim-1] = (ddims[ndim-1] - lag) / skip + 1;  // dimension of the roll
+    rdims[ndim-1] = (ddims[ndim-1] - wlen) / skip + 1;  // dimension of the roll
 
     PyArrayObject *rmean = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
     free(rdims);
@@ -56,7 +56,7 @@ PyObject * rolling_mean(PyObject *NPY_UNUSED(self), PyObject *args){
     int nrepeats = PyArray_SIZE(data) / stride;  // number of repetitions to cover all the data
 
     for (int i = 0; i < nrepeats; ++i){
-        rolling_moments_1(&stride, dptr, &lag, &skip, rmean_ptr);
+        rolling_moments_1(&stride, dptr, &wlen, &skip, rmean_ptr);
         dptr += stride;
         rmean_ptr += res_stride;
     }
@@ -70,10 +70,10 @@ PyObject * rolling_mean(PyObject *NPY_UNUSED(self), PyObject *args){
 
 PyObject * rolling_sd(PyObject *NPY_UNUSED(self), PyObject *args){
     PyObject *x_;
-    long lag, skip;
+    long wlen, skip;
     int return_others;
 
-    if (!PyArg_ParseTuple(args, "Ollp:rolling_sd", &x_, &lag, &skip, &return_others)) return NULL;
+    if (!PyArg_ParseTuple(args, "Ollp:rolling_sd", &x_, &wlen, &skip, &return_others)) return NULL;
 
     PyArrayObject *data = (PyArrayObject *)PyArray_FromAny(
         x_, PyArray_DescrFromType(NPY_DOUBLE), 1, 0,
@@ -93,7 +93,7 @@ PyObject * rolling_sd(PyObject *NPY_UNUSED(self), PyObject *args){
     for (int i = 0; i < (ndim - 1); ++i){
         rdims[i] = ddims[i];
     }
-    rdims[ndim-1] = (ddims[ndim-1] - lag) / skip + 1;  // dimension of the roll
+    rdims[ndim-1] = (ddims[ndim-1] - wlen) / skip + 1;  // dimension of the roll
 
     PyArrayObject *rsd   = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0),
                   *rmean = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
@@ -116,7 +116,7 @@ PyObject * rolling_sd(PyObject *NPY_UNUSED(self), PyObject *args){
     int nrepeats = PyArray_SIZE(data) / stride;  // number of repetitions to cover all the data
 
     for (int i = 0; i < nrepeats; ++i){
-        rolling_moments_2(&stride, dptr, &lag, &skip, rmean_ptr, rsd_ptr);
+        rolling_moments_2(&stride, dptr, &wlen, &skip, rmean_ptr, rsd_ptr);
         dptr += stride;
         rmean_ptr += res_stride;
         rsd_ptr += res_stride;
@@ -139,10 +139,10 @@ PyObject * rolling_sd(PyObject *NPY_UNUSED(self), PyObject *args){
 
 PyObject * rolling_skewness(PyObject *NPY_UNUSED(self), PyObject *args){
     PyObject *x_;
-    long lag, skip;
+    long wlen, skip;
     int return_others;
 
-    if (!PyArg_ParseTuple(args, "Ollp:rolling_skewness", &x_, &lag, &skip, &return_others)) return NULL;
+    if (!PyArg_ParseTuple(args, "Ollp:rolling_skewness", &x_, &wlen, &skip, &return_others)) return NULL;
 
     PyArrayObject *data = (PyArrayObject *)PyArray_FromAny(
         x_, PyArray_DescrFromType(NPY_DOUBLE), 1, 0,
@@ -162,7 +162,7 @@ PyObject * rolling_skewness(PyObject *NPY_UNUSED(self), PyObject *args){
     for (int i = 0; i < (ndim - 1); ++i){
         rdims[i] = ddims[i];
     }
-    rdims[ndim-1] = (ddims[ndim-1] - lag) / skip + 1;  // dimension of the roll
+    rdims[ndim-1] = (ddims[ndim-1] - wlen) / skip + 1;  // dimension of the roll
 
     PyArrayObject *rsd   = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0),
                   *rmean = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0),
@@ -188,7 +188,7 @@ PyObject * rolling_skewness(PyObject *NPY_UNUSED(self), PyObject *args){
     int nrepeats = PyArray_SIZE(data) / stride;  // number of repetitions to cover all the data
 
     for (int i = 0; i < nrepeats; ++i){
-        rolling_moments_3(&stride, dptr, &lag, &skip, rmean_ptr, rsd_ptr, rskew_ptr);
+        rolling_moments_3(&stride, dptr, &wlen, &skip, rmean_ptr, rsd_ptr, rskew_ptr);
         dptr += stride;
         rmean_ptr += res_stride;
         rsd_ptr += res_stride;
@@ -214,10 +214,10 @@ PyObject * rolling_skewness(PyObject *NPY_UNUSED(self), PyObject *args){
 
 PyObject * rolling_kurtosis(PyObject *NPY_UNUSED(self), PyObject *args){
     PyObject *x_;
-    long lag, skip;
+    long wlen, skip;
     int return_others;
 
-    if (!PyArg_ParseTuple(args, "Ollp:rolling_kurtosis", &x_, &lag, &skip, &return_others)) return NULL;
+    if (!PyArg_ParseTuple(args, "Ollp:rolling_kurtosis", &x_, &wlen, &skip, &return_others)) return NULL;
 
     PyArrayObject *data = (PyArrayObject *)PyArray_FromAny(
         x_, PyArray_DescrFromType(NPY_DOUBLE), 1, 0,
@@ -237,7 +237,7 @@ PyObject * rolling_kurtosis(PyObject *NPY_UNUSED(self), PyObject *args){
     for (int i = 0; i < (ndim - 1); ++i){
         rdims[i] = ddims[i];
     }
-    rdims[ndim-1] = (ddims[ndim-1] - lag) / skip + 1;  // dimension of the roll
+    rdims[ndim-1] = (ddims[ndim-1] - wlen) / skip + 1;  // dimension of the roll
 
     PyArrayObject *rsd   = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0),
                   *rmean = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0),
@@ -266,7 +266,7 @@ PyObject * rolling_kurtosis(PyObject *NPY_UNUSED(self), PyObject *args){
     int nrepeats = PyArray_SIZE(data) / stride;  // number of repetitions to cover all the data
 
     for (int i = 0; i < nrepeats; ++i){
-        rolling_moments_4(&stride, dptr, &lag, &skip, rmean_ptr, rsd_ptr, rskew_ptr, rkurt_ptr);
+        rolling_moments_4(&stride, dptr, &wlen, &skip, rmean_ptr, rsd_ptr, rskew_ptr, rkurt_ptr);
         dptr += stride;
         rmean_ptr += res_stride;
         rsd_ptr += res_stride;
@@ -293,33 +293,33 @@ PyObject * rolling_kurtosis(PyObject *NPY_UNUSED(self), PyObject *args){
 }
 
 
-static const char rmean_doc[] = "rolling_mean(a, lag, skip)\n\n"
-"Compute the rolling mean over windows of length `lag` with `skip` samples between window starts.\n\n"
+static const char rmean_doc[] = "rolling_mean(a, wlen, skip)\n\n"
+"Compute the rolling mean over windows of length `wlen` with `skip` samples between window starts.\n\n"
 "Paramters\n"
 "---------\n"
 "a : array-like\n"
 "    Array of data to compute the rolling mean for. Computation axis is the last axis.\n"
-"lag : int\n"
+"wlen : int\n"
 "    Window size in samples.\n"
 "skip : int\n"
-"    Samples between window starts. `skip=lag` would result in non-overlapping sequential windows.\n\n"
+"    Samples between window starts. `skip=wlen` would result in non-overlapping sequential windows.\n\n"
 "Returns\n"
 "-------\n"
 "rmean : numpy.ndarray\n"
 "    Rolling mean.";
 
-static const char rsd_doc[] = "rolling_sd(a, lag, skip, return_previous)\n\n"
-"Compute the rolling standard deviation over windows of length `lag` with `skip` samples "
+static const char rsd_doc[] = "rolling_sd(a, wlen, skip, return_previous)\n\n"
+"Compute the rolling standard deviation over windows of length `wlen` with `skip` samples "
 "between window starts.  Because previous rolling moments have to be computed as part of "
 "the process, they are availble to return as well.\n\n"
 "Paramters\n"
 "---------\n"
 "a : array-like\n"
 "    Array of data to compute the rolling standar deviation for. Computation axis is the last axis.\n"
-"lag : int\n"
+"wlen : int\n"
 "    Window size in samples.\n"
 "skip : int\n"
-"    Samples between window starts. `skip=lag` would result in non-overlapping sequential windows.\n"
+"    Samples between window starts. `skip=wlen` would result in non-overlapping sequential windows.\n"
 "return_previous : bool\n"
 "    Return the previous rolling moments."
 "Returns\n"
@@ -329,18 +329,18 @@ static const char rsd_doc[] = "rolling_sd(a, lag, skip, return_previous)\n\n"
 "rmean : numpy.ndarray, optional\n"
 "    Rolling mean. Only returned if `return_previous` is `True`.";
 
-static const char rskew_doc[] = "rolling_skewness(a, lag, skip, return_previous)\n\n"
-"Compute the rolling skewness over windows of length `lag` with `skip` samples "
+static const char rskew_doc[] = "rolling_skewness(a, wlen, skip, return_previous)\n\n"
+"Compute the rolling skewness over windows of length `wlen` with `skip` samples "
 "between window starts.  Because previous rolling moments have to be computed as part of "
 "the process, they are availble to return as well.\n\n"
 "Paramters\n"
 "---------\n"
 "a : array-like\n"
 "    Array of data to compute the rolling skewness for. Computation axis is the last axis.\n"
-"lag : int\n"
+"wlen : int\n"
 "    Window size in samples.\n"
 "skip : int\n"
-"    Samples between window starts. `skip=lag` would result in non-overlapping sequential windows.\n"
+"    Samples between window starts. `skip=wlen` would result in non-overlapping sequential windows.\n"
 "return_previous : bool\n"
 "    Return the previous rolling moments."
 "Returns\n"
@@ -352,18 +352,18 @@ static const char rskew_doc[] = "rolling_skewness(a, lag, skip, return_previous)
 "rmean : numpy.ndarray, optional\n"
 "    Rolling mean. Only returned if `return_previous` is `True`.";
 
-static const char rkurt_doc[] = "rolling_kurtosis(a, lag, skip, return_previous)\n\n"
-"Compute the rolling kurtosis over windows of length `lag` with `skip` samples "
+static const char rkurt_doc[] = "rolling_kurtosis(a, wlen, skip, return_previous)\n\n"
+"Compute the rolling kurtosis over windows of length `wlen` with `skip` samples "
 "between window starts.  Because previous rolling moments have to be computed as part of "
 "the process, they are availble to return as well.\n\n"
 "Paramters\n"
 "---------\n"
 "a : array-like\n"
 "    Array of data to compute the rolling kurtosis for. Computation axis is the last axis.\n"
-"lag : int\n"
+"wlen : int\n"
 "    Window size in samples.\n"
 "skip : int\n"
-"    Samples between window starts. `skip=lag` would result in non-overlapping sequential windows.\n"
+"    Samples between window starts. `skip=wlen` would result in non-overlapping sequential windows.\n"
 "return_previous : bool\n"
 "    Return the previous rolling moments."
 "Returns\n"
