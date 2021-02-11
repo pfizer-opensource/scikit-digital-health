@@ -215,8 +215,7 @@ def configuration(parent_package='', top_path=None):
     config.add_extension(
         'skimu/read/_extensions/gt3x_convert',
         sources=['src/skimu/read/_extensions/pygt3x_convert.c'],
-        libraries=['gt3x', 'zip'],
-        # library_dirs=[sysconfig.get_path("data") + os.sep + "lib"]
+        libraries=['gt3x', 'zip']
     )
 
     # Fortran/C feature extensions
