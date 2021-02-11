@@ -207,7 +207,7 @@ def configuration(parent_package='', top_path=None):
     config.add_library(
         'gt3x',
         sources='src/skimu/read/_extensions/gt3x.c',
-        include_dirs=[os.sep.join(sysconfig.get_path('include').split(os.sep)[:-1])]
+        include_dirs=sysconfig.get_path("data") + os.sep + "include"
     )
     config.add_extension(
         'skimu/read/_extensions/gt3x_convert',
