@@ -138,7 +138,7 @@ def _modify_wear_times(nonwear, wskip):
         w_times = (w_stop - w_start) * (wskip / 60)  # in hours
 
         # 3 different paths based on times length
-        if nw_times.size == w_times.size:  # [NW][W][NW][W] or [W][NW][W][NW]
+        if nw_times.size == w_times.size:  # [NW][W][NW][W][NW][W] or [W][NW][W][NW][W][NW]
             if w_start[0] < nw_start[0]:
                 idx = slice(1, None, None)
             else:
@@ -158,11 +158,16 @@ def _modify_wear_times(nonwear, wskip):
         switch6 = wt6[pct[wt6] < 0.3]
         switch3 = wt3[pct[wt3] < 0.8]
 
-        switch = unique(concatenate((switch6, switch3))) + idx.indices(3)[0]  # start is always under 3
-        w_start = delete(w_start, switch)
-        w_stop = delete(w_stop, switch)
+        switch = unique(concatenate((switch6, switch3))) + idx.indices(4)[0]  # start is always <4
+        if switch.size > 0:
+            nw_start = delete(nw_start, switch + abs(idx.indices(3)[0] - 1))
+            if (switch[-1] == w_stop.size - 1) and (nw_stop[-1] == nonwear.size):
+                nw_stop = delete(nw_stop, switch)
+                nw_stop[-1] = nonwear.size
+            else:
+                nw_stop = delete(nw_stop, switch)
 
-        nw_start = delete(nw_start, switch + abs(idx.indices(3)[0] - 1))
-        nw_stop = delete(nw_stop, switch)
+            w_start = delete(w_start, switch)
+            w_stop = delete(w_stop, switch)
 
     return w_start, w_stop

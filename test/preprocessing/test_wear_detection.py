@@ -58,14 +58,23 @@ class TestWearDetection:
             [73, 75],  # 2 w surrounded by 5 + 1 nw   : filtered 2 < 0.8(6)
             [76, 77]   # 1 w surrounded by 1 + 4 nw   : filtered 1 < 0.8(5)
         ]) * nh  # convert to blocks of wskip minutes
+        """
+        After 1st pass ->
+        starts_stops = [
+            [ 0, 15],  # 15 > 6
+            [25, 35],  # 10 > 6
+            [36, 62],  # 26 > 6
+            [63, 67]   # [1][4][14] 4 < 0.3(15) -> removed
+        ]
+        """
 
         nonwear = np.ones(81 * nh, dtype=np.bool_)
         for stst in wear_starts_stops:
             nonwear[stst[0]:stst[1]] = False
 
         # returned starts and stops:
-        t_starts = np.array([0, 25, 36, 63]) * nh
-        t_stops = np.array([15, 35, 62, 67]) * nh
+        t_starts = np.array([0, 25, 36]) * nh
+        t_stops = np.array([15, 35, 62]) * nh
 
         starts, stops = _modify_wear_times(nonwear, wskip)
 
@@ -85,6 +94,15 @@ class TestWearDetection:
             [73, 75],  # 2 w surrounded by 5 + 1 nw   : filtered 2 < 0.8(6)
             [76, 81]   # 5 w surrounded by 1 + 0 nw   : kept
         ]) * nh  # convert to blocks of wskip minutes
+        """
+        After 1st pass ->
+        starts_stops = [
+            [25, 35],  # 10 > 6
+            [36, 62],  # 26 > 6
+            [63, 67],  # [1][4][9] 4 !< 0.3(10) kept
+            [76, 81]   # 5 but at end
+        ]
+        """
 
         nonwear = np.ones(81 * nh, dtype=np.bool_)
         for stst in wear_starts_stops:
@@ -112,6 +130,16 @@ class TestWearDetection:
             [73, 75],  # 2 w surrounded by 5 + 1 nw   : filtered 2 < 0.8(6)
             [76, 81]   # 5 w surrounded by 1 + 0 nw   : kept
         ]) * nh  # convert to blocks of wskip minutes
+        """
+        After 1st pass ->
+        starts_stops = [
+            [ 0, 15],  # 15 > 6
+            [25, 35],  # 10 > 6
+            [36, 62],  # 26 > 6
+            [63, 67],  # [1][4][9] 4 !< 0.3(10) kept
+            [76, 81]   # 5 but at end
+        ]
+        """
 
         nonwear = np.ones(81 * nh, dtype=np.bool_)
         for stst in wear_starts_stops:
