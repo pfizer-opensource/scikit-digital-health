@@ -132,32 +132,37 @@ def _modify_wear_times(nonwear, wskip):
     else:
         w_stop = append(w_stop, nonwear.size)
 
-    nw_times = (nw_stop - nw_start) * (wskip / 60)
-    w_times = (w_stop - w_start) * (wskip / 60)  # in hours
+    # repeat the iterative removal 3 times
+    for i in range(3):
+        nw_times = (nw_stop - nw_start) * (wskip / 60)
+        w_times = (w_stop - w_start) * (wskip / 60)  # in hours
 
-    # 3 different paths based on times length
-    if nw_times.size == w_times.size:  # [NW][W][NW][W] or [W][NW][W][NW]
-        if w_start[0] < nw_start[0]:
-            idx = slice(1, None, None)
+        # 3 different paths based on times length
+        if nw_times.size == w_times.size:  # [NW][W][NW][W] or [W][NW][W][NW]
+            if w_start[0] < nw_start[0]:
+                idx = slice(1, None, None)
+            else:
+                idx = slice(None, -1, None)
+        elif nw_times.size == w_times.size - 1:  # [W][NW][W][NW][W]
+            idx = slice(1, -1, None)
+        elif nw_times.size == w_times.size + 1:  # [NW][W][NW][W][NW]
+            idx = slice(None, None, None)
         else:
-            idx = slice(None, -1, None)
-    elif nw_times.size == w_times.size - 1:  # [W][NW][W][NW][W]
-        idx = slice(1, -1, None)
-    elif nw_times.size == w_times.size + 1:  # [NW][W][NW][W][NW]
-        idx = slice(None, None, None)
-    else:
-        warn("Wear/non-wear periods are not correct, skipping...", UserWarning)
-        return None, None
+            warn("Wear/non-wear periods are not correct, skipping...", UserWarning)
+            return None, None
 
-    pct = w_times[idx] / (nw_times[:-1] + nw_times[1:])
-    wt6 = nonzero(w_times[idx] <= 6)[0]
-    wt3 = nonzero(w_times[idx] <= 3)[0]
+        pct = w_times[idx] / (nw_times[:-1] + nw_times[1:])
+        wt6 = nonzero(w_times[idx] <= 6)[0]
+        wt3 = nonzero(w_times[idx] <= 3)[0]
 
-    switch6 = wt6[pct[wt6] < 0.3]
-    switch3 = wt3[pct[wt3] < 0.8]
+        switch6 = wt6[pct[wt6] < 0.3]
+        switch3 = wt3[pct[wt3] < 0.8]
 
-    switch = unique(concatenate((switch6, switch3))) + idx.indices(3)[0]  # start is always under 3
-    w_start = delete(w_start, switch)
-    w_stop = delete(w_stop, switch)
+        switch = unique(concatenate((switch6, switch3))) + idx.indices(3)[0]  # start is always under 3
+        w_start = delete(w_start, switch)
+        w_stop = delete(w_stop, switch)
+
+        nw_start = delete(nw_start, switch + abs(idx.indices(3)[0] - 1))
+        nw_stop = delete(nw_stop, switch)
 
     return w_start, w_stop
