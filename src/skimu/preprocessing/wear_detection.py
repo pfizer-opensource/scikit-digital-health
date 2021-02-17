@@ -24,31 +24,63 @@ class DetectWear(_BaseProcess):
         on the brand of accelerometer being used.
     range_crit : float, optional
         Acceleration window range threshold for determining non-wear. Default is 0.050.
+    apply_setup_criteria : bool, optional
+        Apply criteria to the beginning of the recording to account for device setup. Default is
+        True.
+    shipping_criteria : {bool, int, list}, optional
+        Apply shipping criteria to the ends of the trial. Options are False (default, no criteria
+        applied), True (criteria applied to the first and last 24 hours), an integer (criteria
+        applied to the first and last `shipping_criteria` hours), or a length 2 list of
+        integers (criteria applied to the first `shipping_criteria[0]` hours and the last
+        `shipping_criteria[1]` hours).
     window_length : int, optional
         Number of minutes in a window used to determine non-wear. Default is 60 minutes.
     window_skip : int, optional
         Number of minutes to skip between windows. Default is 15 minutes, which would result
         in window overlaps of 45 minutes with the default 60 minute `window_length`.
 
-
     References
     ----------
     .. [1] V. T. van Hees et al., “Separating Movement and Gravity Components in an Acceleration
         Signal and Implications for the Assessment of Human Daily Physical Activity,” PLOS ONE,
         vol. 8, no. 4, p. e61691, Apr. 2013, doi: 10.1371/journal.pone.0061691.
+
+    Notes
+    -----
+    _Setup Criteria_ is the rule that if the data starts with a period of non-wear of less than 3
+    hours followed by a non-wear period of any length, then that first block of wear is changed
+    to non-wear.
+
+    _Shipping Criteria_ is an additional rule that may help in cases where the device is being
+    shipped either to or from the participant (or both). Wear periods at the start of the recording
+    are filtered by those less than 3 hours that are followed by 1 hour of non-wear are
+    re-classified as non-wear. Wear periods at the end of the recording that are less than 3 hours
+    that are preceded by 1 hour of non-wear are re-classified as non-wear.
     """
-    def __init__(self, sd_crit=0.013, range_crit=0.050, window_length=60, window_skip=15):
+    def __init__(self, sd_crit=0.013, range_crit=0.050, apply_setup_criteria=True,
+                 shipping_criteria=False, window_length=60, window_skip=15):
         window_length = int(window_length)
         window_skip = int(window_skip)
+        if isinstance(shipping_criteria, (list, tuple)):
+            shipping_criteria = [int(shipping_criteria[i]) for i in range(2)]
+        elif isinstance(shipping_criteria, int):
+            shipping_criteria = [shipping_criteria, shipping_criteria]
+        elif isinstance(shipping_criteria, bool):
+            shipping_criteria = [24, 24]
+
         super().__init__(
             sd_crit=sd_crit,
             range_crit=range_crit,
+            apply_setup_criteria=apply_setup_criteria,
+            shipping_criteria=shipping_criteria,
             window_length=window_length,
             window_skip=window_skip
         )
 
         self.sd_crit = sd_crit
         self.range_crit = range_crit
+        self.apply_setup_crit = apply_setup_criteria
+        self.ship_crit = shipping_criteria
         self.wlen = window_length
         self.wskip = window_skip
 
@@ -86,88 +118,94 @@ class DetectWear(_BaseProcess):
         nonwear = sum((acc_rsd < self.sd_crit) & (acc_w_range < 0.050), axis=1) >= 2
 
         # flip to wear starts/stops now
-        wear_start = nonzero(diff(nonwear.astype(int_)) == -1)[0] + 1
-        wear_stop = nonzero(diff(nonwear.astype(int_)) == 1)[0] + 1
+        wear_starts, wear_stops = _modify_wear_times(
+            nonwear, self.wskip, self.apply_setup_crit, self.ship_crit)
 
-        if (wear_stop[0] < wear_start[0]) & (not nonwear[0]):
-            wear_start = insert(wear_start, 0, 0)
-        else:
-            warn("Non-wear periods have incompatible starts/stops. Skipping nonwear detection.")
-            kwargs.update({self._time: time, self._acc: accel})
-            return kwargs
+        wear_blocks = []
+        for ws, we in zip(wear_starts, wear_stops):
+            wear_blocks.append([ws * n_wskip, we * n_wskip])
 
-        if (wear_stop[-1] < wear_start[-1]) & (not nonwear[-1]):
-            wear_stop = append(wear_stop, nonwear.size - 1)
-        else:
-            warn("Non-wear periods have incompatible starts/stops. Skipping nonwear detection.")
-            kwargs.update({self._time: time, self._acc: accel})
-            return kwargs
-
-        wear_time = (wear_stop - wear_start) * (self.wskip / 60)  # in hours
-        nonwear_times = (wear_start[1:] - wear_stop[:-1]) * (self.wskip / 60)  # in hours
-
-        # compute the wear time as a percentage of the sum of surrounding non-wear time
-        perc_time = wear_time[1:-1] / (nonwear_times[:-1] + nonwear_times[1:])
-
-        # filter out wear times less than 6 hours comprising less than 30% of surrounding non-wear
-        wt6 = nonzero(wear_time[1:-1] <= 6)
-        switch6 = wt6[perc_time[wt6] <= 0.3]
-
-        # filter out wear times less than 3 hours comprising less than 80% of surrounding non-wear
-        wt3 = nonzero(wear_time[1:-1] <= 3)
-        switch3 = wt3[perc_time[wt3] <= 0.8]
+        kwargs.update({self._time: time, self._acc: accel, "wear": wear_blocks})
+        return kwargs
 
 
-def _modify_wear_times(nonwear, wskip):
-    nw_start = w_stop = nonzero(diff(nonwear.astype(int_)) == 1)[0] + 1
-    nw_stop = w_start = nonzero(diff(nonwear.astype(int_)) == -1)[0] + 1
+def _modify_wear_times(nonwear, wskip, apply_setup_rule, shipping_crit):
+    """
+    Modify the wear times based on a set of rules.
 
-    if nonwear[0]:
-        nw_start = insert(nw_start, 0, 0)
-    else:
-        w_start = insert(w_start, 0, 0)
+    Parameters
+    ----------
+    nonwear : numpy.ndarray
+        Boolean array of nonwear in blocks.
+    wskip : int
+        Minutes skipped between start of each block.
+    apply_setup_rule : bool
+        Apply the setup filtering
+    shipping_crit : list
+        Two element list of number of hours to apply shipping criteria.
 
-    if nonwear[-1]:
-        nw_stop = append(nw_stop, nonwear.size)
-    else:
-        w_stop = append(w_stop, nonwear.size)
+    Returns
+    -------
+    w_starts : numpy.ndarray
+        Indices of blocks of wear time starts.
+    w_stops : numpy.ndarray
+        Indicies of blocks of wear time ends.
+    """
+    nph = int(60 / wskip)  # number of blocks per hour
+    # get the changes in nonwear status
+    ch = nonzero(diff(nonwear.astype(int_)))[0] + 1
+    ch = insert(ch, [0, ch.size], [0, nonwear.size])  # make sure ends are accounted for
+    start_with_wear = not nonwear[0]  # does data start with wear period
+    end_with_wear = not nonwear[-1]  # does data end with wear period
 
-    # repeat the iterative removal 3 times
+    # always want to start and end with nonwear, as these blocks wont change
+    if start_with_wear:
+        ch = insert(ch, 0, 0)  # extra 0 length nonwear period -> always start with nonwear
+    if end_with_wear:
+        ch = append(ch, nonwear.size)  # extra 0 length wear period ->  always end with nonwear
+
+    # pattern is now always [NW][W][NW][W]...[W][NW][W][NW]
     for i in range(3):
-        nw_times = (nw_stop - nw_start) * (wskip / 60)
-        w_times = (w_stop - w_start) * (wskip / 60)  # in hours
+        nw_times = (ch[1:None:2] - ch[0:None:2]) / nph  # N
+        w_times = (ch[2:-1:2] - ch[1:-1:2]) / nph  # N - 1
 
-        # 3 different paths based on times length
-        if nw_times.size == w_times.size:  # [NW][W][NW][W][NW][W] or [W][NW][W][NW][W][NW]
-            if w_start[0] < nw_start[0]:
-                idx = slice(1, None, None)
-            else:
-                idx = slice(None, -1, None)
-        elif nw_times.size == w_times.size - 1:  # [W][NW][W][NW][W]
-            idx = slice(1, -1, None)
-        elif nw_times.size == w_times.size + 1:  # [NW][W][NW][W][NW]
-            idx = slice(None, None, None)
-        else:
-            warn("Wear/non-wear periods are not correct, skipping...", UserWarning)
-            return None, None
+        # percentage based rules
+        pct = w_times / (nw_times[0:-1] + nw_times[1:None])
+        thresh6 = nonzero((w_times <= 6) & (w_times > 3))[0]
+        thresh3 = nonzero(w_times <= 3)[0]
 
-        pct = w_times[idx] / (nw_times[:-1] + nw_times[1:])
-        wt6 = nonzero(w_times[idx] <= 6)[0]
-        wt3 = nonzero(w_times[idx] <= 3)[0]
+        pct_thresh6 = thresh6[pct[thresh6] < 0.3]
+        pct_thresh3 = thresh3[pct[thresh3] < 0.8]
 
-        switch6 = wt6[pct[wt6] < 0.3]
-        switch3 = wt3[pct[wt3] < 0.8]
+        """
+        shipping rules
+        NOTE: shipping at the start is applied the opposite of shipping at the end, requiring
+        a 1+ hour nonwear period following wear periods less than 3 hours
+        """
+        ship_start = nonzero((w_times <= 3) & (ch[2:-1:2] <= (shipping_crit[0] * nph)))[0]
+        ship_end = nonzero((w_times <= 3) & (ch[1:-1:2] >= ch[-1] - (shipping_crit[1] * nph)))[0]
 
-        switch = unique(concatenate((switch6, switch3))) + idx.indices(4)[0]  # start is always <4
-        if switch.size > 0:
-            nw_start = delete(nw_start, switch + abs(idx.indices(3)[0] - 1))
-            if (switch[-1] == w_stop.size - 1) and (nw_stop[-1] == nonwear.size):
-                nw_stop = delete(nw_stop, switch)
-                nw_stop[-1] = nonwear.size
-            else:
-                nw_stop = delete(nw_stop, switch)
+        ship_start = ship_start[nw_times[ship_start + 1] >= 1]
+        ship_end = ship_end[nw_times[ship_end] >= 1]
 
-            w_start = delete(w_start, switch)
-            w_stop = delete(w_stop, switch)
+        switch = concatenate((
+            pct_thresh6 * 2 + 1,  # start index
+            pct_thresh6 * 2 + 2,  # end index
+            pct_thresh3 * 2 + 1,  # start index
+            pct_thresh3 * 2 + 2,  # end index
+            ship_start * 2 + 1,
+            ship_start * 2 + 2,
+            ship_end * 2 + 1,
+            ship_end * 2 + 2
+        ))
 
-    return w_start, w_stop
+        ch = delete(ch, switch)
+
+    w_starts = ch[1:-1:2]
+    w_stops = ch[2:-1:2]
+
+    if apply_setup_rule and (w_starts[0] == 0) and (w_stops[0] <= (3 * nph)):
+        w_starts = w_starts[1:]
+        w_stops = w_stops[1:]
+
+    return w_starts, w_stops
