@@ -7,7 +7,7 @@ Pfizer DMTI 2021
 import pytest
 import numpy as np
 
-from skimu.preprocessing.wear_detection import _modify_wear_times3 as _modify_wear_times
+from skimu.preprocessing.wear_detection import _modify_wear_times
 
 
 class TestWearDetection:
