@@ -74,7 +74,51 @@ def sample_data_temp():
 
 
 @fixture
-def sample_nonwear_data():
+def accel_with_nonwear():
+    def get_sample(app_setup_crit, ship_crit):
+        np.random.seed(1357)  # fix seed
+
+        fs = 2
+
+        # make 160 hours of data
+        t = np.arange(0, 160 * 3600, 1 / fs)
+        a = (np.random.random((t.size, 3)) - 0.5) * 0.02
+        a[:, 0] += 1  # vertical axis
+
+        wss = np.array([
+            [0, 2],  # [    ][w-2][nw-1]   NF: setup after all passes
+            [3, 5],  # [nw-1][w-2][nw-1]   NF: 2 !< 0.8(2)
+            [6, 8],  # [nw-1][w-2][nw-1]   NF: 2 !< 0.8(2)
+            [9, 70],  # w-61                NF
+            [90, 94],  # [nw-20][w-4][nw-16]  F: 4 < 0.3(36)
+            [110, 140],  # w-30                NF
+            [141, 142],  # [nw-1][w-1][nw-2]    F: 1 < 0.8(3)
+            [144, 149],  # [nw-2][w-5][nw-4]   NF: 5 !< 0.3(6)
+            [153, 155],  # [nw-4][w-2][nw-3]    F: 2 < 0.8(7)
+            [158, 159]  # [nw-3][w-1][nw-1]    F: 1 < 0.8(4)
+        ]) * 3600 * fs  # convert to indices
+        wss[1:, 0] += int(0.75 * 3600 * fs)  # because the way the windows overlap
+
+        for se in wss:
+            a[se[0]:se[1]] += (np.random.random((se[1] - se[0], 3)) - 0.5) * 0.5
+
+        starts = np.array([0, 3, 6, 9, 110, 144]) * 3600 * fs
+        stops = np.array([2, 5, 8, 70, 140, 149]) * 3600 * fs
+
+        if app_setup_crit:
+            starts = starts[1:]
+            stops = stops[1:]
+        starts = starts[stops > (ship_crit[0] * 3600 * fs)]
+        stops = stops[stops > (ship_crit[0] * 3600 * fs)]
+
+        wear = [[i, j] for i, j in zip(starts, stops)]
+
+        return t, a, wear
+    return get_sample
+
+
+@fixture
+def simple_nonwear_data():
     def sample(case, wskip, app_setup_crit, ship_crit):
         nh = int(60 / wskip)
         if case == 1:
