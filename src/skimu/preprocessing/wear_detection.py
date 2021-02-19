@@ -4,9 +4,7 @@ Wear detection algorithms
 Lukas Adamowicz
 Pfizer DMTI 2021
 """
-from warnings import warn
-
-from numpy import mean, diff, sum, insert, append, nonzero, delete, concatenate, unique, int_
+from numpy import mean, diff, sum, insert, append, nonzero, delete, concatenate, int_
 
 from skimu.base import _BaseProcess
 from skimu.utility import rolling_sd, get_windowed_view
