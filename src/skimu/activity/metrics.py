@@ -4,7 +4,7 @@ Metrics for classifying activity
 Lukas Adamowicz
 Pfizer DMTI 2021
 """
-from numpy import minimum
+from numpy import minimum, abs
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt
 
@@ -26,7 +26,7 @@ def metric_en(accel, *args, **kwargs):
     return norm(accel, axis=1)
 
 
-def metric_enmo(accel, *args, trim_zero=True, **kwargs):
+def metric_enmo(accel, *args, take_abs=False, trim_zero=True, **kwargs):
     """
     Euclidean norm minus 1. Works best when the accelerometer data has been calibrated so that
     at rest the norm meaures 1g.
@@ -35,6 +35,8 @@ def metric_enmo(accel, *args, trim_zero=True, **kwargs):
     ----------
     accel : numpy.ndarray
         (N, 3) array of acceleration values in g.
+    take_abs : bool, optional
+        Use the absolute value of the difference between euclidean norm and 1g. Default is False.
     trim_zero : bool, optional
         Trim values to no less than 0. Default is True.
 
@@ -43,8 +45,11 @@ def metric_enmo(accel, *args, trim_zero=True, **kwargs):
     enmo : numpy.ndarray
         (N, ) array of euclidean norms minus 1.
     """
+    enmo = norm(accel, axis=1) - 1
+    if take_abs:
+        enmo = abs(enmo)
     if trim_zero:
-        return minimum(norm(accel, axis=1) - 1, 0)
+        return minimum(enmo, 0)
     else:
         return norm(accel, axis=1) - 1
 
