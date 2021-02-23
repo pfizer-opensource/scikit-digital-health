@@ -109,8 +109,8 @@ References
     acceleration sedentary thresholds in children and adults,” Scandinavian Journal of Medicine &
     Science in Sports, vol. 27, no. 12, pp. 1814–1823, 2017, doi: https://doi.org/10.1111/sms.12795.
 """
-from skimu.gait.gait import Gait
-from skimu.gait import gait
-from skimu.gait.gait_metrics import *
-from skimu.gait import gait_metrics
-from skimu.gait import train_classifier
+from skimu.activity.core import MVPActivityClassification
+from skimu.activity.metrics import *
+from skimu.activity import metrics
+
+__all__ = ["MVPActivityClassification", "metrics"] + metrics.__all__
