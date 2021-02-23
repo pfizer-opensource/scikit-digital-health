@@ -63,8 +63,8 @@ following:
 - `"hildebrand_wrist_child7-11_actigraph"` [5]_, [6]_
 - `"hildebrand_wrist_child7-11_geneactiv"` [5]_, [6]_
 
-The thresholds have been automatically scaled to the average value for 1s windows, and use the
-appropriate acceleration metric.
+The thresholds have been automatically scaled to the average values, and can be used with any
+length windows (though most originally use 1s windows), and use the appropriate acceleration metric.
 
 Using Custom Cutpoints/Metrics
 ------------------------------
