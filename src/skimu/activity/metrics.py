@@ -18,7 +18,7 @@ __all__ = [
 
 def metric_en(accel, wlen, *args, **kwargs):
     """
-    Euclidean norm
+    Compute the euclidean norm.
 
     Parameters
     ----------
@@ -37,8 +37,8 @@ def metric_en(accel, wlen, *args, **kwargs):
 
 def metric_enmo(accel, wlen, *args, take_abs=False, trim_zero=True, **kwargs):
     """
-    Euclidean norm minus 1. Works best when the accelerometer data has been calibrated so that
-    at rest the norm meaures 1g.
+    Compute the euclidean norm minus 1. Works best when the accelerometer data has been calibrated
+    so that devices at rest measure acceleration norms of 1g.
 
     Parameters
     ----------
@@ -67,7 +67,7 @@ def metric_enmo(accel, wlen, *args, take_abs=False, trim_zero=True, **kwargs):
 
 def metric_bfen(accel, wlen, fs, low_cutoff=0.2, high_cutoff=15, trim_zero=True, **kwargs):
     """
-    Band-pass filtered euclidean norm.
+    Compute the band-pass filtered euclidean norm.
 
     Parameters
     ----------
@@ -98,7 +98,7 @@ def metric_bfen(accel, wlen, fs, low_cutoff=0.2, high_cutoff=15, trim_zero=True,
 
 def metric_hfen(accel, wlen, fs, low_cutoff=0.2, trim_zero=True, **kwargs):
     """
-    High-pass filtered euclidean norm.
+    Compute the high-pass filtered euclidean norm.
 
     Parameters
     ----------
@@ -128,7 +128,8 @@ def metric_hfen(accel, wlen, fs, low_cutoff=0.2, trim_zero=True, **kwargs):
 
 def metric_hfenplus(accel, wlen, fs, cutoff=0.2, trim_zero=True, **kwargs):
     """
-    High-pass filtered euclidean norm plus the low-pass filtered euclidean norm minus 1g.
+    Compute the high-pass filtered euclidean norm plus the low-pass filtered euclidean norm
+    minus 1g.
 
     Parameters
     ----------
