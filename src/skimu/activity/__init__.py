@@ -45,23 +45,23 @@ Different research has yielded different methods of estimating these thresholds,
 acceleration metrics and cutpoints for those metrics. The ones available by default are the
 following:
 
-- esliger_lwrist_adult [1]_ Note that these use light and moderate thresholds of 4 and 7 METs
-- esliger_rwirst_adult [1]_ Note that these use light and moderate thresholds of 4 and 7 METs
-- esliger_lumbar_adult [1]_ Note that these use light and moderate thresholds of 4 and 7 METs
-- schaefer_ndomwrist_child6-11 [2]_
-- phillips_rwrist_child8-14 [3]_
-- phillips_lwrist_child8-14 [3]_
-- phillips_hip_child8-14 [3]_
-- vaha-ypya_hip_adult [4]_ Note that this uses the MAD metric, and originally used 6 second long
-    windows
-- hildebrand_hip_adult_actigraph [5]_, [6]_
-- hildebrand_hip_adult_geneactv [5]_, [6]_
-- hildebrand_wrist_adult_actigraph [5]_, [6]_
-- hildebrand_wrist_adult_geneactiv [5]_, [6]_
-- hildebrand_hip_child7-11_actigraph [5]_, [6]_
-- hildebrand_hip_child7-11_geneactiv [5]_, [6]_
-- hildebrand_wrist_child7-11_actigraph [5]_, [6]_
-- hildebrand_wrist_child7-11_geneactiv [5]_, [6]_
+- `"esliger_lwrist_adult"` [1]_ Note that these use light and moderate thresholds of 4 and 7 METs
+- `"esliger_rwirst_adult"` [1]_ Note that these use light and moderate thresholds of 4 and 7 METs
+- `"esliger_lumbar_adult"` [1]_ Note that these use light and moderate thresholds of 4 and 7 METs
+- `"schaefer_ndomwrist_child6-11"` [2]_
+- `"phillips_rwrist_child8-14"` [3]_
+- `"phillips_lwrist_child8-14"` [3]_
+- `"phillips_hip_child8-14"` [3]_
+- `"vaha-ypya_hip_adult"` [4]_ Note that this uses the MAD metric, and originally used 6 second
+  long windows
+- `"hildebrand_hip_adult_actigraph"` [5]_, [6]_
+- `"hildebrand_hip_adult_geneactv"` [5]_, [6]_
+- `"hildebrand_wrist_adult_actigraph"` [5]_, [6]_
+- `"hildebrand_wrist_adult_geneactiv"` [5]_, [6]_
+- `"hildebrand_hip_child7-11_actigraph"` [5]_, [6]_
+- `"hildebrand_hip_child7-11_geneactiv"` [5]_, [6]_
+- `"hildebrand_wrist_child7-11_actigraph"` [5]_, [6]_
+- `"hildebrand_wrist_child7-11_geneactiv"` [5]_, [6]_
 
 The thresholds have been automatically scaled to the average value for 1s windows, and use the
 appropriate acceleration metric.
@@ -71,8 +71,9 @@ Using Custom Cutpoints/Metrics
 If you would like to use your own custom cutpoints/metric, they can be supplied in a dictionary
 as follows:
 
-.. code-block::python
+.. code-block:: python
 
+    from skimu.activity import MVPActivityClassification
     from skimu.utility import rolling_mean
 
     def metric_fn(accel, wlen, \*args, \*\*kwargs):
@@ -87,6 +88,8 @@ as follows:
         "light": light_max,  # maximum value for light acvitity (min value for moderate)
         "moderate": moderate_max  # max value for moderate (min value for vigorous)
     }
+
+    mvpa = MVPActivityClassification(cutpoints=custom_cutpoints)
 
 References
 ----------
