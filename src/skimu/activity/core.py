@@ -15,25 +15,25 @@ cutpoints = {}
 cutpoints["esliger_lwrist_adult"] = {
     "metric": metric_enmo,
     "kwargs": {"take_abs": True},
-    "sedentary": 217 / 80,  # paper at 80hz, summed for each 1s window
-    "light": 644 / 80,
-    "moderate": 1810 / 80
+    "sedentary": 217 / 80 / 60,  # paper at 80hz, summed for each minute long window
+    "light": 644 / 80 / 60,
+    "moderate": 1810 / 80 / 60
 }
 
 cutpoints["esliger_rwirst_adult"] = {
     "metric": metric_enmo,
     "kwargs": {"take_abs": True},
-    "sedentary": 386 / 80,  # paper at 80hz, summed for each 1s window
-    "light": 439 / 80,
-    "moderate": 2098 / 80
+    "sedentary": 386 / 80 / 60,  # paper at 80hz, summed for each 1min window
+    "light": 439 / 80 / 60,
+    "moderate": 2098 / 80 / 60
 }
 
 cutpoints["esliger_lumbar_adult"] = {
     "metric": metric_enmo,
     "kwargs": {"take_abs": True},
-    "sedentary": 77 / 80,  # paper at 80hz, summed for each 1s window
-    "light": 219 / 80,
-    "moderate": 2056 / 80
+    "sedentary": 77 / 80 / 60,  # paper at 80hz, summed for each 1min window
+    "light": 219 / 80 / 60,
+    "moderate": 2056 / 80 / 60
 }
 
 cutpoints["schaefer_ndomwrist_child6-11"] = {
@@ -49,7 +49,7 @@ cutpoints["phillips_rwrist_child8-14"] = {
     "kwargs": {"take_abs": True},
     "sedentary": 6 / 80,  # paper at 80hz, summed for each 1s window
     "light": 21 / 80,
-    "moderate": 56
+    "moderate": 56 / 80
 }
 
 cutpoints["phillips_lwrist_child8-14"] = {

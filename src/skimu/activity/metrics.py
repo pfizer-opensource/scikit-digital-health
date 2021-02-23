@@ -11,7 +11,9 @@ from scipy.signal import butter, sosfiltfilt
 from skimu.utility import rolling_mean
 
 
-__all__ = ["metric_en", "metric_enmo", "metric_bfen", "metric_hfen", "metric_hfenplus"]
+__all__ = [
+    "metric_en", "metric_enmo", "metric_bfen", "metric_hfen", "metric_hfenplus", "metric_mad"
+]
 
 
 def metric_en(accel, wlen, *args, **kwargs):
