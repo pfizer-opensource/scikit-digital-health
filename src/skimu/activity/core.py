@@ -4,8 +4,9 @@ Activity level classification based on accelerometer data
 Lukas Adamowicz
 Pfizer DMTI 2021
 """
-from skimu.base import _BaseProcess
+from numpy import nonzero, array, insert, append
 
+from skimu.base import _BaseProcess
 from skimu.activity.metrics import *
 
 # ==========================================================
@@ -183,12 +184,83 @@ class MVPActivityClassification(_BaseProcess):
 
         Parameters
         ----------
-        time
-        accel
-        wear
-        kwargs
+        time : numpy.ndarray
+            (N, ) array of continuous unix timestamps, in seconds
+        accel : numpy.ndarray
+            (N, 3) array of accelerations measured by centrally mounted lumbar device, in
+            units of 'g'
+        wear : {None, list}, optional
+            List of length-2 lists of wear-time ([start, stop]). Default is None, which uses the
+            whole recording as wear time.
 
         Returns
         -------
-
+        activity_res : dict
+            Computed activity level metrics.
         """
+        super().predict(time=time, accel=accel, wear=wear, **kwargs)
+
+        if wear is None:
+            self.logger.info(f"[{self!s}] Wear detection not provided. Assuming 100% wear time.")
+            wear_starts = array([0])
+            wear_stops = array([time.size])
+        else:
+            tmp = array(wear).astype("int")  # make sure it can broadcast correctly
+            wear_starts = tmp[:, 0]
+            wear_stops = tmp[:, 1]
+
+        days = kwargs.get(self._days, [[0, time.size - 1]])
+
+        for iday, day_idx in enumerate(days):
+            start, stop = day_idx
+
+            # get the intersection of wear time and day
+            day_wear_start, day_wear_stop = get_day_wear_intersection(
+                wear_starts, wear_stops, start, stop)
+
+
+def get_day_wear_intersection(starts, stops, day_start, day_stop):
+    """
+    Get the intersection between wear times and day starts/stops.
+
+    Parameters
+    ----------
+    starts : numpy.ndarray
+        Array of integer indices where gait bouts start.
+    stops : numpy.ndarray
+        Array of integer indices where gait bouts stop.
+    day_start : int
+        Index of the day start.
+    day_stop : int
+        Index of the day stop.
+
+    Returns
+    -------
+    day_wear_starts : numpy.ndarray
+        Array of wear start indices for the day.
+    day_wear_stops : numpy.ndarray
+        Array of wear stop indices for the day
+    """
+    day_start, day_stop = int(day_start), int(day_stop)
+    # get the portion of wear times for the day
+    starts_subset = starts[(starts >= day_start) & (starts < day_stop)]
+    stops_subset = stops[(stops > day_start) & (stops <= day_stop)]
+
+    if starts_subset.size == 0 and stops_subset.size == 0:
+        if stops[nonzero(starts <= day_start)[0][-1]] >= day_stop:
+            return array(day_start), array(day_stop)
+        else:
+            return array([0]), array([0])
+    if starts_subset.size == 0 and stops_subset.size == 1:
+        starts_subset = array([day_start])
+    if starts_subset.size == 1 and stops_subset.size == 0:
+        stops_subset = array([day_stop])
+
+    if starts_subset[0] > stops_subset[0]:
+        starts_subset = insert(starts_subset, 0, day_start)
+    if starts_subset[-1] > stops_subset[-1]:
+        stops_subset = append(stops_subset, day_stop)
+
+    assert starts_subset.size == stops_subset.size, "bout starts and stops do not match"
+
+    return starts_subset, stops_subset
