@@ -42,29 +42,32 @@ are typically
 - vigorous (> 6 MET)
 
 Different research has yielded different methods of estimating these thresholds, with different
-acceleration metrics and cutpoints for those metrics. The ones available by default are the
-following:
+acceleration metrics and cutpoints for those metrics. The ones available as part of Scikit-IMU are
+the following:
 
-- `"esliger_lwrist_adult"` [1]_ Note that these use light and moderate thresholds of 4 and 7 METs
-- `"esliger_rwirst_adult"` [1]_ Note that these use light and moderate thresholds of 4 and 7 METs
-- `"esliger_lumbar_adult"` [1]_ Note that these use light and moderate thresholds of 4 and 7 METs
-- `"schaefer_ndomwrist_child6-11"` [2]_
-- `"phillips_rwrist_child8-14"` [3]_
-- `"phillips_lwrist_child8-14"` [3]_
-- `"phillips_hip_child8-14"` [3]_
-- `"vaha-ypya_hip_adult"` [4]_ Note that this uses the MAD metric, and originally used 6 second
+- ``"esliger_lwrist_adult"`` [1]_ Note that these use light and moderate thresholds of 4 and 7 METs
+- ``"esliger_rwirst_adult"`` [1]_ Note that these use light and moderate thresholds of 4 and 7 METs
+- ``"esliger_lumbar_adult"`` [1]_ Note that these use light and moderate thresholds of 4 and 7 METs
+- ``"schaefer_ndomwrist_child6-11"`` [2]_
+- ``"phillips_rwrist_child8-14"`` [3]_
+- ``"phillips_lwrist_child8-14"`` [3]_
+- ``"phillips_hip_child8-14"`` [3]_
+- ``"vaha-ypya_hip_adult"`` [4]_ Note that this uses the MAD metric, and originally used 6 second
   long windows
-- `"hildebrand_hip_adult_actigraph"` [5]_, [6]_
-- `"hildebrand_hip_adult_geneactv"` [5]_, [6]_
-- `"hildebrand_wrist_adult_actigraph"` [5]_, [6]_
-- `"hildebrand_wrist_adult_geneactiv"` [5]_, [6]_
-- `"hildebrand_hip_child7-11_actigraph"` [5]_, [6]_
-- `"hildebrand_hip_child7-11_geneactiv"` [5]_, [6]_
-- `"hildebrand_wrist_child7-11_actigraph"` [5]_, [6]_
-- `"hildebrand_wrist_child7-11_geneactiv"` [5]_, [6]_
+- ``"hildebrand_hip_adult_actigraph"`` [5]_, [6]_
+- ``"hildebrand_hip_adult_geneactv"`` [5]_, [6]_
+- ``"hildebrand_wrist_adult_actigraph"`` [5]_, [6]_
+- ``"hildebrand_wrist_adult_geneactiv"`` [5]_, [6]_
+- ``"hildebrand_hip_child7-11_actigraph"`` [5]_, [6]_
+- ``"hildebrand_hip_child7-11_geneactiv"`` [5]_, [6]_
+- ``"hildebrand_wrist_child7-11_actigraph"`` [5]_, [6]_
+- ``"hildebrand_wrist_child7-11_geneactiv"`` [5]_, [6]_
+- ``"migueles_wrist_adult"`` [7]_ **these are the default cutpoints used**
 
 The thresholds have been automatically scaled to the average values, and can be used with any
 length windows (though most originally use 1s windows), and use the appropriate acceleration metric.
+
+.. _Using Custom Cutpoints:
 
 Using Custom Cutpoints/Metrics
 ------------------------------
@@ -111,6 +114,10 @@ References
 .. [6] M. Hildebrand, B. H. Hansen, V. T. van Hees, and U. Ekelund, “Evaluation of raw
     acceleration sedentary thresholds in children and adults,” Scandinavian Journal of Medicine &
     Science in Sports, vol. 27, no. 12, pp. 1814–1823, 2017, doi: https://doi.org/10.1111/sms.12795.
+.. [7] J. H. Migueles et al., “Comparability of accelerometer signal aggregation metrics across
+    placements and dominant wrist cut points for the assessment of physical activity in adults,”
+    Scientific Reports, vol. 9, no. 1, Art. no. 1, Dec. 2019, doi: 10.1038/s41598-019-54267-y.
+
 """
 from skimu.activity.core import MVPActivityClassification
 from skimu.activity.metrics import *
