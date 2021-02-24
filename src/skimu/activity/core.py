@@ -10,9 +10,9 @@ from skimu.activity.metrics import *
 
 # ==========================================================
 # Activity cutpoints
-cutpoints = {}
+_base_cutpoints = {}
 
-cutpoints["esliger_lwrist_adult"] = {
+_base_cutpoints["esliger_lwrist_adult"] = {
     "metric": metric_enmo,
     "kwargs": {"take_abs": True},
     "sedentary": 217 / 80 / 60,  # paper at 80hz, summed for each minute long window
@@ -20,7 +20,7 @@ cutpoints["esliger_lwrist_adult"] = {
     "moderate": 1810 / 80 / 60
 }
 
-cutpoints["esliger_rwirst_adult"] = {
+_base_cutpoints["esliger_rwirst_adult"] = {
     "metric": metric_enmo,
     "kwargs": {"take_abs": True},
     "sedentary": 386 / 80 / 60,  # paper at 80hz, summed for each 1min window
@@ -28,7 +28,7 @@ cutpoints["esliger_rwirst_adult"] = {
     "moderate": 2098 / 80 / 60
 }
 
-cutpoints["esliger_lumbar_adult"] = {
+_base_cutpoints["esliger_lumbar_adult"] = {
     "metric": metric_enmo,
     "kwargs": {"take_abs": True},
     "sedentary": 77 / 80 / 60,  # paper at 80hz, summed for each 1min window
@@ -36,7 +36,7 @@ cutpoints["esliger_lumbar_adult"] = {
     "moderate": 2056 / 80 / 60
 }
 
-cutpoints["schaefer_ndomwrist_child6-11"] = {
+_base_cutpoints["schaefer_ndomwrist_child6-11"] = {
     "metric": metric_bfen,
     "kwargs": {"low_cutoff": 0.2, "high_cutoff": 15, "trim_zero": False},
     "sedentary": 0.190,
@@ -44,7 +44,7 @@ cutpoints["schaefer_ndomwrist_child6-11"] = {
     "moderate": 0.998
 }
 
-cutpoints["phillips_rwrist_child8-14"] = {
+_base_cutpoints["phillips_rwrist_child8-14"] = {
     "metric": metric_enmo,
     "kwargs": {"take_abs": True},
     "sedentary": 6 / 80,  # paper at 80hz, summed for each 1s window
@@ -52,7 +52,7 @@ cutpoints["phillips_rwrist_child8-14"] = {
     "moderate": 56 / 80
 }
 
-cutpoints["phillips_lwrist_child8-14"] = {
+_base_cutpoints["phillips_lwrist_child8-14"] = {
     "metric": metric_enmo,
     "kwargs": {"take_abs": True},
     "sedentary": 7 / 80,
@@ -60,7 +60,7 @@ cutpoints["phillips_lwrist_child8-14"] = {
     "moderate": 60 / 80
 }
 
-cutpoints["phillips_hip_child8-14"] = {
+_base_cutpoints["phillips_hip_child8-14"] = {
     "metric": metric_enmo,
     "kwargs": {"take_abs": True},
     "sedentary": 3 / 80,
@@ -68,14 +68,14 @@ cutpoints["phillips_hip_child8-14"] = {
     "moderate": 51 / 80
 }
 
-cutpoints["vaha-ypya_hip_adult"] = {
+_base_cutpoints["vaha-ypya_hip_adult"] = {
     "metric": metric_mad,
     "kwargs": {},
     "light": 0.091,  # originally presented in mg
     "moderate": 0.414
 }
 
-cutpoints["hildebrand_hip_adult_actigraph"] = {
+_base_cutpoints["hildebrand_hip_adult_actigraph"] = {
     "metric": metric_enmo,
     "kwargs": {"take_abs": False, "trim_zero": True},
     "sedentary": 0.0474,
@@ -83,7 +83,7 @@ cutpoints["hildebrand_hip_adult_actigraph"] = {
     "moderate": 0.2587
 }
 
-cutpoints["hildebrand_hip_adult_geneactv"] = {
+_base_cutpoints["hildebrand_hip_adult_geneactv"] = {
     "metric": metric_enmo,
     "kwargs": {"take_abs": False, "trim_zero": True},
     "sedentary": 0.0469,
@@ -91,7 +91,7 @@ cutpoints["hildebrand_hip_adult_geneactv"] = {
     "moderate": 0.2668
 }
 
-cutpoints["hildebrand_wrist_adult_actigraph"] = {
+_base_cutpoints["hildebrand_wrist_adult_actigraph"] = {
     "metric": metric_enmo,
     "kwargs": {"take_abs": False, "trim_zero": True},
     "sedentary": 0.0448,
@@ -99,7 +99,7 @@ cutpoints["hildebrand_wrist_adult_actigraph"] = {
     "moderate": 0.4288
 }
 
-cutpoints["hildebrand_wrist_adult_geneactiv"] = {
+_base_cutpoints["hildebrand_wrist_adult_geneactiv"] = {
     "metric": metric_enmo,
     "kwargs": {"take_abs": False, "trim_zero": True},
     "sedentary": 0.0458,
@@ -107,7 +107,7 @@ cutpoints["hildebrand_wrist_adult_geneactiv"] = {
     "moderate": 0.4183
 }
 
-cutpoints["hildebrand_hip_child7-11_actigraph"] = {
+_base_cutpoints["hildebrand_hip_child7-11_actigraph"] = {
     "metric": metric_enmo,
     "kwargs": {"take_abs": False, "trim_zero": True},
     "sedentary": 0.0633,
@@ -115,7 +115,7 @@ cutpoints["hildebrand_hip_child7-11_actigraph"] = {
     "moderate": 0.4646
 }
 
-cutpoints["hildebrand_hip_child7-11_geneactiv"] = {
+_base_cutpoints["hildebrand_hip_child7-11_geneactiv"] = {
     "metric": metric_enmo,
     "kwargs": {"take_abs": False, "trim_zero": True},
     "sedentary": 0.0641,
@@ -123,7 +123,7 @@ cutpoints["hildebrand_hip_child7-11_geneactiv"] = {
     "moderate": 0.5143
 }
 
-cutpoints["hildebrand_wrist_child7-11_actigraph"] = {
+_base_cutpoints["hildebrand_wrist_child7-11_actigraph"] = {
     "metric": metric_enmo,
     "kwargs": {"take_abs": False, "trim_zero": True},
     "sedentary": 0.0356,
@@ -131,7 +131,7 @@ cutpoints["hildebrand_wrist_child7-11_actigraph"] = {
     "moderate": 0.707
 }
 
-cutpoints["hildebrand_wrist_child7-11_geneactiv"] = {
+_base_cutpoints["hildebrand_wrist_child7-11_geneactiv"] = {
     "metric": metric_enmo,
     "kwargs": {"take_abs": False, "trim_zero": True},
     "sedentary": 0.0563,
@@ -139,12 +139,20 @@ cutpoints["hildebrand_wrist_child7-11_geneactiv"] = {
     "moderate": 0.6958
 }
 
+_base_cutpoints["migueles_wrist_adult"] = {
+    "metric": metric_enmo,
+    "kwargs": {"take_abs": False, "trim_zero": True},
+    "sedentary": 0.050,
+    "light": 0.110,
+    "moderate": 0.440
+}
+
 
 def get_available_cutpoints():
     """
     Print the available cutpoints for activity level segmentation.
     """
-    print(cutpoints.keys())
+    print(_base_cutpoints.keys())
 
 
 class MVPActivityClassification(_BaseProcess):
@@ -154,5 +162,33 @@ class MVPActivityClassification(_BaseProcess):
 
     Parameters
     ----------
-
+    cutpoints : {str, dict, list}, optional
+        Cutpoints to use for sedentary/light/moderate/vigorous activity classification. Default
+        is "migueles_wrist_adult". For a list of all available metrics use
+        `skimu.activity.get_available_cutpoints()`. Custom cutpoints can be provided in a
+        dictionary (see :ref:`Using Custom Cutpoints`).
     """
+    def __init__(self, cutpoints="migueles_wrist_adult"):
+        cutpoints = _base_cutpoints.get(cutpoints, _base_cutpoints["migueles_wrist_adult"])
+
+        super().__init__(
+            cutpoints=cutpoints
+        )
+
+    def predict(self, time=None, accel=None, *, wear=None, **kwargs):
+        """
+        predict(time, accel, *, wear=None)
+
+        Compute the time spent in different activity levels.
+
+        Parameters
+        ----------
+        time
+        accel
+        wear
+        kwargs
+
+        Returns
+        -------
+
+        """
