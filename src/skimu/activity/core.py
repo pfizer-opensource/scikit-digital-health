@@ -4,7 +4,7 @@ Activity level classification based on accelerometer data
 Lukas Adamowicz
 Pfizer DMTI 2021
 """
-from numpy import nonzero, array, insert, append
+from numpy import nonzero, array, insert, append, mean, diff, sum
 
 from skimu.base import _BaseProcess
 from skimu.activity.metrics import *
@@ -163,18 +163,25 @@ class MVPActivityClassification(_BaseProcess):
 
     Parameters
     ----------
+    min_wear_time : int, optional
+        Minimum wear time in hours for a day to be analyzed. Default is 10 hours.
     cutpoints : {str, dict, list}, optional
         Cutpoints to use for sedentary/light/moderate/vigorous activity classification. Default
         is "migueles_wrist_adult". For a list of all available metrics use
         `skimu.activity.get_available_cutpoints()`. Custom cutpoints can be provided in a
         dictionary (see :ref:`Using Custom Cutpoints`).
     """
-    def __init__(self, cutpoints="migueles_wrist_adult"):
+    def __init__(self, min_wear_time=10, cutpoints="migueles_wrist_adult"):
+        min_wear_time = int(min_wear_time)
         cutpoints = _base_cutpoints.get(cutpoints, _base_cutpoints["migueles_wrist_adult"])
 
         super().__init__(
+            min_wear_time=min_wear_time,
             cutpoints=cutpoints
         )
+
+        self.min_wear = min_wear_time
+        self.cutpoints = cutpoints
 
     def predict(self, time=None, accel=None, *, wear=None, **kwargs):
         """
@@ -200,6 +207,10 @@ class MVPActivityClassification(_BaseProcess):
         """
         super().predict(time=time, accel=accel, wear=wear, **kwargs)
 
+        # longer than it needs to be really, but due to weird timesamps for some devices
+        # using this for now
+        fs = 1 / mean(diff(time))
+
         if wear is None:
             self.logger.info(f"[{self!s}] Wear detection not provided. Assuming 100% wear time.")
             wear_starts = array([0])
@@ -215,8 +226,32 @@ class MVPActivityClassification(_BaseProcess):
             start, stop = day_idx
 
             # get the intersection of wear time and day
-            day_wear_start, day_wear_stop = get_day_wear_intersection(
+            day_wear_starts, day_wear_stops = get_day_wear_intersection(
                 wear_starts, wear_stops, start, stop)
+
+            # less wear time than minimum
+            day_wear_hours = sum(day_wear_stops - day_wear_starts) / fs / 3600
+            if day_wear_hours < self.min_wear:
+                continue  # skip day
+
+            for dwstart, dwstop in zip(day_wear_starts, day_wear_stops):
+                hours = (dwstop - dwstart) / fs / 3600
+                # compute the metric for the acceleration
+                accel_metric = self.cutpoints["metric"](
+                    accel[dwstart:dwstop], int(fs), fs,
+                    **self.cutpoints["kwargs"]
+                )
+
+                # get the starts and stops of different activity levels
+                lt_sed = accel_metric < self.cutpoints["sedentary"]
+                lt_light = accel_metric < self.cutpoints["light"]
+                lt_mod = accel_metric < self.cutpoints["moderate"]
+
+                sed_starts, sed_stops = _get_level_starts_stops(lt_sed)
+                light_starts, light_stops = _get_level_starts_stops(~lt_sed & lt_light)
+                mod_starts, mod_stops = _get_level_starts_stops(~lt_light & lt_mod)
+                vig_starts, vig_stops = _get_level_starts_stops(~lt_mod)
+
 
 
 def get_day_wear_intersection(starts, stops, day_start, day_stop):
@@ -264,3 +299,32 @@ def get_day_wear_intersection(starts, stops, day_start, day_stop):
     assert starts_subset.size == stops_subset.size, "bout starts and stops do not match"
 
     return starts_subset, stops_subset
+
+
+def _get_level_starts_stops(mask):
+    """
+    Get the start and stop indices for a mask.
+
+    Parameters
+    ----------
+    mask : numpy.ndarray
+        Boolean numpy array.
+
+    Returns
+    -------
+    starts : numpy.ndarray
+        Starts of `True` value blocks in `mask`.
+    stops : numpy.ndarray
+        Stops of `True` value blocks in `mask`.
+    """
+    delta = diff(mask.astype("int"))
+
+    starts = nonzero(delta == 1)[0] + 1
+    stops = nonzero(delta == -1)[0] + 1
+
+    if starts[0] > stops[0]:
+        starts = insert(starts, 0, 0)
+    if stops[-1] < starts[-1]:
+        stops = append(stops, mask.size)
+
+    return starts, stops
