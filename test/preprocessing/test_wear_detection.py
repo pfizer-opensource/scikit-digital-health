@@ -47,9 +47,9 @@ class TestWearDetection:
     def test_wear_time_modifiction(self, case, setup, ship, simple_nonwear_data):
         wskip = 15  # minutes
 
-        nonwear, t_starts, t_stops = simple_nonwear_data(case, wskip, setup, ship)
+        nonwear, true_wear = simple_nonwear_data(case, wskip, setup, ship)
 
         starts, stops = _modify_wear_times(nonwear, wskip, setup, ship)
 
-        assert np.allclose(starts, t_starts)
-        assert np.allclose(stops, t_stops)
+        assert np.allclose(starts, true_wear[:, 0])
+        assert np.allclose(stops, true_wear[:, 1])
