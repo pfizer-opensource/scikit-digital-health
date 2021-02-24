@@ -4,7 +4,7 @@ Metrics for classifying activity
 Lukas Adamowicz
 Pfizer DMTI 2021
 """
-from numpy import minimum, abs, repeat
+from numpy import minimum, abs, repeat, arctan, sqrt, pi
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt
 
@@ -12,8 +12,29 @@ from skimu.utility import rolling_mean
 
 
 __all__ = [
-    "metric_en", "metric_enmo", "metric_bfen", "metric_hfen", "metric_hfenplus", "metric_mad"
+    "metric_anglez", "metric_en", "metric_enmo", "metric_bfen", "metric_hfen", "metric_hfenplus",
+    "metric_mad"
 ]
+
+
+def metric_anglez(accel, wlen, *args, **kwargs):
+    """
+    Compute the angle between the accelerometer z axis and the horizontal plane.
+
+    Parameters
+    ----------
+    accel : numpy.ndarray
+        (N, 3) array of acceleration values in g.
+    wlen : int
+        Window length (in number of samples) for non-overlapping windows.
+
+    Returns
+    -------
+    anglez : numpy.ndarray
+        (N, ) array of angles between accelerometer z axis and horizontal plane in degrees.
+    """
+    anglez = arctan(accel[:, 2] / sqrt(accel[:, 0]**2 + accel[:, 1]**2)) * (180 / pi)
+    return rolling_mean(anglez, wlen, wlen)
 
 
 def metric_en(accel, wlen, *args, **kwargs):
