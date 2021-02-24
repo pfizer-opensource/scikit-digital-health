@@ -119,7 +119,7 @@ class DetectWear(_BaseProcess):
         wear_starts, wear_stops = _modify_wear_times(
             nonwear, self.wskip, self.apply_setup_crit, self.ship_crit)
 
-        wear = concatenate((wear_starts, wear_stops)).reshape((2, -1)).T
+        wear = concatenate((wear_starts, wear_stops)).reshape((2, -1)).T * n_wskip
 
         kwargs.update({self._time: time, self._acc: accel, "wear": wear})
         return kwargs
