@@ -6,7 +6,8 @@ Pfizer DMTI 2021
 """
 from warnings import warn
 
-from numpy import nonzero, array, insert, append, mean, diff, sum, zeros, abs, argmin, max
+from numpy import nonzero, array, insert, append, mean, diff, sum, zeros, abs, argmin, argmax, \
+    max, maximum, int_
 
 from skimu.base import _BaseProcess
 from skimu.utility import rolling_mean
@@ -348,120 +349,138 @@ def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, b
     -------
 
     """
-    nboutdur = boutdur * (60 / wlen)
+    nboutdur = int(boutdur * (60 / wlen))
 
     time_in_bout = 0
 
     if boutmetric == 1:
-        x = zeros(accm.size + 1)
-        x[1:] = accm > mvpa_thresh  # makes it so that dont have to worry about inserting an index
-        starts = nonzero(diff(x.astype("int")) == 1)[0]
-        x = x[1:]  # dont need that start now
+        x = (accm > mvpa_thresh).astype(int_)
+        p = nonzero(x)[0]
+        i_mvpa = 0
 
-        for start in starts:
+        while i_mvpa < p.size:
+            start = p[i_mvpa]
             end = start + nboutdur
             if end < x.size:
                 if sum(x[start:end]) > (nboutdur * boutcrit):
-                    while sum(x[start:end]) > ((end - start) * boutcrit) and (end < x.size):
+                    while (sum(x[start:end]) > ((end - start) * boutcrit)) and (end < x.size):
                         end += 1
-                    time_in_bout +=
-
-
-
-    p = nonzero(x)[0]
-    if boutmetric == 1:
-        xt = x.astype("int")
-        boutcount = zeros(x.size)
-        jmvpa = 1  # index
-        Lx = x.size
-        while jmvpa <= p.size:
-            endi = p[jmvpa] + boutdur
-            if endi <= Lx:  # does bout fall within measurement
-                if sum(x[p[jmvpa]:endi]) > (boutdur * boutcrit):
-                    while (sum(x[p[jmvpa]:endi]) > ((endi - p[jmvpa]) * boutcrit)) and (endi < Lx):
-                        endi += 1
-                    select = p[jmvpa:max(nonzero(p < endi)[0])]
-                    jump = select.size
-                    xt[select] = 2  # remember this was a bout
-                    boutcount[p[jmvpa]:p[max(nonzero(p < endi))]] = 1
+                    select = p[i_mvpa:][p[i_mvpa:] < end]
+                    jump = maximum(select.size, 1)
+                    if closedbout:
+                        time_in_bout += (p[argmax(p < end)] - start) * (wlen / 60)
+                    else:
+                        time_in_bout += jump * (wlen / 60)  # in minutes
                 else:
                     jump = 1
-                    x[p[jmvpa]] = 0
             else:
                 jump = 1
-                if (p.size > 1) and (jmvpa > 2):
-                    x[p[jmvpa]] = x[p[jmvpa - 1]]
-            jmvpa = jmvpa + jump
-        x[xt == 2] = 1
-        if nonzero(xt == 1)[0].size > 0:
-            x[xt == 1] = 0
-        if closedbout:
-            x = boutcount
-    elif boutmetric == 2:  # MVPA based on percentage relative to start of bout
-        xt = x.astype("int")
-        jmvpa = 1
-        while jmvpa <= p.size:
-            endi = p[jmvpa] + boutdur
-            if endi < x.size:
-                lengthbout = sum(x[p[jmvpa]:endi])
-                if lengthbout > (boutdur * boutcrit):
-                    xt[p[jmvpa]:endi] = 2
+            i_mvpa += jump
+    elif boutmetric == 2:
+        x = (accm > mvpa_thresh).astype(int_)
+        xt = zeros(x.size, dtype=int_)
+        p = nonzero(x)[0]
+
+        i_mvpa = 0
+        while i_mvpa < p.size:
+            start = p[i_mvpa]
+            end = start + nboutdur
+            if end < x.size:
+                if sum(x[start:end]) > (nboutdur * boutcrit):
+                    xt[start:end + 1] = 2
                 else:
-                    x[p[jmvpa]] = 0
+                    x[start] = 0
             else:
-                if (p.size > 1) and (jmvpa > 2):
-                    x[p[jmvpa]] = x[p[jmvpa - 1]]
-            jmvpa += 1
+                if p.size > 1 and i_mvpa > 2:
+                    x[p[i_mvpa]] = x[p[i_mvpa - 1]]
+            i_mvpa += 1
         x[xt == 2] = 1
-        boutcount = x
-    elif boutmetric == 3:  # simply look at % of moving window that meets criteria
-        xt = x.astype("int")
+        time_in_bout += sum(x) * (wlen / 60)  # in minutes
+    elif boutmetric == 3:
+        x = (accm > mvpa_thresh).astype(int_)
+        xt = x * 1  # not a view
         # look for breaks larger than 1 minute
         lookforbreaks = zeros(x.size)
         N = int(60 / wlen)
-        lookforbreaks[N//2:-N//2] = rolling_mean(x.astype("int"), N, 1)
+        lookforbreaks[N // 2:-N // 2 + 1] = rolling_mean(x, N, 1)
         # insert negative numbers to prevent these minutes from being counted in bouts
-        xt[lookforbreaks] = -N * boutdur
+        xt[lookforbreaks == 0] = -(60 / wlen) * nboutdur
         # in this way there will not be bout breaks lasting longer than 1 minute
-        RM = zeros(xt.size)
-        RM[boutdur//2:-boutdur//2] = rolling_mean(xt, boutdur, 1)
-        p = nonzero(RM > boutcrit)[0]
-        starti = int(round(boutdur / 2))
-        for gi in range(boutdur):
-            inde = p - starti + gi
-            xt[inde[(inde > 0) & (inde < xt.size)]] = 2
+        rm = zeros(x.size)
+        rm[N // 2:-N // 2 + 1] = rolling_mean(xt, N, 1)
+
+        p = nonzero(rm > boutcrit)[0]
+        start = int(round(nboutdur / 2))
+        for gi in range(nboutdur):
+            ind = p - start + gi
+            xt[ind[(ind > 0) & (ind < xt.size)]] = 2
         x[xt != 2] = 0
         x[xt == 2] = 1
-        boutcount = x
+        time_in_bout += sum(x) * (wlen / 60)
     elif boutmetric == 4:
-        xt = x.astype("int")
-        # look for breaks larger than 1 minute
+        x = (accm > mvpa_thresh).astype(int_)
+        xt = x * 1  # not a view
+        # look for breaks longer than 1 minute
         lookforbreaks = zeros(x.size)
         N = int(60 / wlen)
-        lookforbreaks[N // 2:-N // 2] = rolling_mean(x.astype("int"), N, 1)
+        lookforbreaks[N // 2:-N // 2 + 1] = rolling_mean(x, N, 1)
         # insert negative numbers to prevent these minutes from being counted in bouts
-        xt[lookforbreaks] = -N * boutdur
+        xt[lookforbreaks == 0] = -(60 / wlen) * nboutdur
+
         # in this way there will not be bout breaks lasting longer than 1 minute
-        RM = zeros(xt.size)
-        RM[boutdur // 2:-boutdur // 2] = rolling_mean(xt, boutdur, 1)
-        p = nonzero(RM > boutcrit)[0]
-        starti = int(round(boutdur / 2))
+        rm = zeros(x.size)
+        rm[N // 2:-N // 2 + 1] = rolling_mean(xt, N, 1)
+
+        p = nonzero(rm > boutcrit)[0]
+        start = int(round(nboutdur / 2))
         # only consider windows that at least start and end with value that meets criteria
-        tri = p - starti
-        kep = nonzero((tri > 0) & (tri < (x.size - (boutdur - 1))))[0]
-        if kep.size > 0:
-            tri = tri[kep]
-        p = p[nonzero(x[tri] == 1 & (x[tri + (boutdur - 1)] == 1))[0]]
-        # mark all epochs that are covered by remaining windows
-        for gi in range(boutdur):
-            inde = p - starti + gi
-            xt[inde[nonzero(inde > 0 & (inde < x.size))]] = 2
+        tri = p - start
+        # kep = nonzero((tri > 0) & (tri < x.size - nboutdur))[0]
+        # if kep.size > 0:
+        #     tri = tri[kep]
+        tri = tri[(tri > 0) & (tri < (x.size - nboutdur))]
+        p = p[nonzero((x[tri] == 1) & (x[tri + nboutdur - 1] == 1))]
+        # now mark all epochs that are covered by the remaining windows
+        for gi in range(nboutdur):
+            ind = p - start + gi
+            xt[ind[nonzero((ind > 0) & (ind < xt.size))]] = 2
         x[xt != 2] = 0
-        x[xt == 2] = 0
-        boutcount = x
+        x[xt == 2] = 1
+        time_in_bout += sum(x) * (wlen / 60)
     elif boutmetric == 5:
+        x = (accm > mvpa_thresh).astype(int_)
+        xt = x * 1  # not a view
+        # look for breaks longer than 1 minute
+        lookforbreaks = zeros(x.size)
+        N = int(60 / wlen)
+        lookforbreaks[N // 2:-N // 2 + 1] = rolling_mean(x, N, 1)
+        # insert negative numbers to prevent these minutes from being counted in bouts
+        xt[lookforbreaks == 0] = -(60 / wlen) * nboutdur
 
+        # in this way there will not be bout breaks lasting longer than 1 minute
+        rm = zeros(x.size)
+        rm[N // 2:-N // 2 + 1] = rolling_mean(xt, N, 1)
 
+        p = nonzero(rm >= boutcrit)[0]
+        start = int(round(nboutdur / 2))
+
+        # only consider windows that at least start and end with value that meets crit
+        tri = p - start
+        # kep = nonzero(tri > 0 & tri < (x.size - nboutdur))[0]
+        # if kep.size > 0:
+        #     tri = tri[kep]
+        tri = tri[(tri > 0) & (tri < (x.size - nboutdur))]
+        p = p[nonzero((x[tri] == 1) & (x[tri + nboutdur - 1] == 1))]
+
+        for gi in range(nboutdur):
+            ind = p - start + gi
+            xt[ind[nonzero((ind > 0) & (ind < xt.size))]] = 2
+
+        x[xt != 2] = 0
+        x[xt == 2] = 1
+        time_in_bout += sum(x) * (wlen / 60)  # in minutes
+
+    return time_in_bout
 
 
 def get_day_wear_intersection(starts, stops, day_start, day_stop):
