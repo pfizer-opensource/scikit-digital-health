@@ -408,13 +408,11 @@ def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, b
         # insert negative numbers to prevent these minutes from being counted in bouts
         xt[lookforbreaks == 0] = -(60 / wlen) * nboutdur
         # in this way there will not be bout breaks lasting longer than 1 minute
-        rm = zeros(x.size)
-        rm[nboutdur // 2:-nboutdur // 2 + 1] = rolling_mean(xt, nboutdur, 1)
+        rm = rolling_mean(xt, nboutdur, 1)  # window determination can go back to left justified
 
         p = nonzero(rm > boutcrit)[0]
-        start = int(round(nboutdur / 2))
         for gi in range(nboutdur):
-            ind = p - start + gi
+            ind = p + gi
             xt[ind[(ind > 0) & (ind < xt.size)]] = 2
         x[xt != 2] = 0
         x[xt == 2] = 1
