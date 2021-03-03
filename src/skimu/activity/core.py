@@ -409,7 +409,7 @@ def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, b
         xt[lookforbreaks == 0] = -(60 / wlen) * nboutdur
         # in this way there will not be bout breaks lasting longer than 1 minute
         rm = zeros(x.size)
-        rm[N // 2:-N // 2 + 1] = rolling_mean(xt, nboutdur, 1)
+        rm[nboutdur // 2:-nboutdur // 2 + 1] = rolling_mean(xt, nboutdur, 1)
 
         p = nonzero(rm > boutcrit)[0]
         start = int(round(nboutdur / 2))
@@ -431,7 +431,7 @@ def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, b
 
         # in this way there will not be bout breaks lasting longer than 1 minute
         rm = zeros(x.size)
-        rm[N // 2:-N // 2 + 1] = rolling_mean(xt, nboutdur, 1)
+        rm[nboutdur // 2:-nboutdur // 2 + 1] = rolling_mean(xt, nboutdur, 1)
 
         p = nonzero(rm > boutcrit)[0]
         start = int(round(nboutdur / 2))
@@ -461,7 +461,7 @@ def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, b
 
         # in this way there will not be bout breaks lasting longer than 1 minute
         rm = zeros(x.size)
-        rm[N // 2:-N // 2 + 1] = rolling_mean(xt, nboutdur, 1)
+        rm[nboutdur // 2:-nboutdur // 2 + 1] = rolling_mean(xt, nboutdur, 1)
 
         p = nonzero(rm >= boutcrit)[0]
         start = int(round(nboutdur / 2))
