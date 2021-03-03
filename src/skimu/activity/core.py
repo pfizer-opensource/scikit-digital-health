@@ -387,7 +387,7 @@ def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, b
             start = p[i_mvpa]
             end = start + nboutdur
             if end < x.size:
-                if sum(x[start:end]) > (nboutdur * boutcrit):
+                if sum(x[start:end + 1]) > (nboutdur * boutcrit):
                     xt[start:end + 1] = 2
                 else:
                     x[start] = 0
