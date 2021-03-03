@@ -449,7 +449,7 @@ def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, b
         # look for breaks longer than 1 minute
         lookforbreaks = zeros(x.size)
         N = int(60 / wlen)
-        lookforbreaks[N // 2:-N // 2 + 1] = rolling_mean(x, N, 1)
+        lookforbreaks[N // 2:-N // 2] = rolling_mean(x, N + 1, 1)
         # insert negative numbers to prevent these minutes from being counted in bouts
         xt[lookforbreaks == 0] = -(60 / wlen) * nboutdur
 
