@@ -428,21 +428,17 @@ def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, b
         xt[lookforbreaks == 0] = -(60 / wlen) * nboutdur
 
         # in this way there will not be bout breaks lasting longer than 1 minute
-        rm = zeros(x.size)
-        rm[nboutdur // 2:-nboutdur // 2 + 1] = rolling_mean(xt, nboutdur, 1)
+        rm = rolling_mean(xt, nboutdur, 1)
 
         p = nonzero(rm > boutcrit)[0]
-        start = int(round(nboutdur / 2))
+        # start = int(round(nboutdur / 2))
         # only consider windows that at least start and end with value that meets criteria
-        tri = p - start
-        # kep = nonzero((tri > 0) & (tri < x.size - nboutdur))[0]
-        # if kep.size > 0:
-        #     tri = tri[kep]
+        tri = p
         tri = tri[(tri > 0) & (tri < (x.size - nboutdur))]
         p = p[nonzero((x[tri] == 1) & (x[tri + nboutdur - 1] == 1))]
         # now mark all epochs that are covered by the remaining windows
         for gi in range(nboutdur):
-            ind = p - start + gi
+            ind = p + gi
             xt[ind[nonzero((ind > 0) & (ind < xt.size))]] = 2
         x[xt != 2] = 0
         x[xt == 2] = 1
