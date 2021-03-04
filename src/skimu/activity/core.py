@@ -7,7 +7,7 @@ Pfizer DMTI 2021
 from warnings import warn
 
 from numpy import nonzero, array, insert, append, mean, diff, sum, zeros, abs, argmin, argmax, \
-    max, maximum, int_, floor, ceil
+    maximum, int_, floor, ceil
 
 from skimu.base import _BaseProcess
 from skimu.utility import rolling_mean
@@ -358,7 +358,6 @@ def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, b
         x = (accm > mvpa_thresh).astype(int_)
         p = nonzero(x)[0]
         i_mvpa = 0
-
         while i_mvpa < p.size:
             start = p[i_mvpa]
             end = start + nboutdur
