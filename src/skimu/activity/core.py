@@ -7,7 +7,7 @@ Pfizer DMTI 2021
 from warnings import warn
 
 from numpy import nonzero, array, insert, append, mean, diff, sum, zeros, abs, argmin, argmax, \
-    max, maximum, int_
+    max, maximum, int_, floor, ceil
 
 from skimu.base import _BaseProcess
 from skimu.utility import rolling_mean
@@ -423,7 +423,9 @@ def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, b
         # look for breaks longer than 1 minute
         lookforbreaks = zeros(x.size)
         N = int(60 / wlen)
-        lookforbreaks[N // 2:-N // 2 + 1] = rolling_mean(x, N, 1)
+        i1 = int(floor((N + 1) / 2)) - 1
+        i2 = int(ceil(x.size - N / 2))
+        lookforbreaks[i1:i2] = rolling_mean(x, N, 1)
         # insert negative numbers to prevent these minutes from being counted in bouts
         xt[lookforbreaks == 0] = -(60 / wlen) * nboutdur
 
@@ -431,10 +433,10 @@ def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, b
         rm = rolling_mean(xt, nboutdur, 1)
 
         p = nonzero(rm > boutcrit)[0]
-        # start = int(round(nboutdur / 2))
+        start = int(floor((nboutdur + 1) / 2)) - 1 - int(round(nboutdur / 2))
         # only consider windows that at least start and end with value that meets criteria
-        tri = p
-        tri = tri[(tri > 0) & (tri < (x.size - nboutdur))]
+        tri = p + start
+        tri = tri[(tri > 0) & (tri < (x.size - nboutdur - 1))]
         p = p[nonzero((x[tri] == 1) & (x[tri + nboutdur - 1] == 1))]
         # now mark all epochs that are covered by the remaining windows
         for gi in range(nboutdur):
