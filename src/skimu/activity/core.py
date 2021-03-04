@@ -7,7 +7,8 @@ Pfizer DMTI 2021
 from warnings import warn
 
 from numpy import nonzero, array, insert, append, mean, diff, sum, zeros, abs, argmin, argmax, \
-    maximum, int_, floor, ceil
+    maximum, int_, floor, ceil, histogram, log
+from scipy.stats import linregress
 
 from skimu.base import _BaseProcess
 from skimu.utility import rolling_mean
@@ -299,6 +300,9 @@ class MVPActivityClassification(_BaseProcess):
         nblen1 = int(self.blen1 * 60 * fs)
         nblen2 = int(self.blen2 * 60 * fs)
 
+        iglevels = array([i for i in range(0, 4001, 25)] + [8000])  # default from rowlands
+        igvals = (iglevels[1:] + iglevels[:-1]) / 2
+
         if wear is None:
             self.logger.info(f"[{self!s}] Wear detection not provided. Assuming 100% wear time.")
             wear_starts = array([0])
@@ -323,6 +327,9 @@ class MVPActivityClassification(_BaseProcess):
                 continue  # skip day
 
             mvpa = zeros(6)  # per epoch, per 1min epoch, per 5min epoch, per bout lengths
+
+            # intensity gradient should be done on the whole days worth of data
+            hist = zeros(iglevels.size - 1)
 
             for dwstart, dwstop in zip(day_wear_starts, day_wear_stops):
                 hours = (dwstop - dwstart) / fs / 3600
@@ -356,6 +363,15 @@ class MVPActivityClassification(_BaseProcess):
                 mvpa[5] += get_activity_bouts(
                     accel_metric, self.cutpoints["light"], self.wlen, self.blen3, self.boutcrit
                 )
+
+                # intensity gradient. Density = false to return counts
+                hist += histogram(accel_metric, bins=iglevels, density=False)[0]
+
+            # intensity gradient computation per day
+            hist *= (self.wlen / 60)
+            grad, itcpt, rsq = get_intensity_gradient(igvals, hist)
+
+
 
 
 def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, boutmetric=1):
@@ -526,6 +542,39 @@ def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, b
         time_in_bout += sum(x) * (wlen / 60)  # in minutes
 
     return time_in_bout
+
+
+def get_intensity_gradient(ig_values, counts):
+    """
+    Compute the intensity gradient metrics from the bin midpoints and the number of minutes spent
+    in that bin.
+
+    First computes the natural log of the intensity levels and the minutes in each intensity level.
+    Then creates the best linear fit to these data. The slope, y-intercept, and R-squared value
+    are of interest for the intensity gradient analysis.
+
+    Parameters
+    ----------
+    ig_values : numpy.ndarray
+        (N, ) array of intensity level bin midpoints
+    counts : numpy.ndarray
+        (N, ) array of minutes spent in each intensity bin
+
+    Returns
+    -------
+    gradient : float
+        The slope of the natural log of `ig_values` and `counts`.
+    intercept : float
+        The intercept of the linear regression fit.
+    r_squared : float
+        R-squared value for the linear regression fit.
+    """
+    lx = log(ig_values)
+    ly = log(counts)
+
+    slope, intercept, rval, pval, stderr, intercept_stderr = linregress(lx, ly)
+
+    return slope, intercept, rval**2
 
 
 def get_day_wear_intersection(starts, stops, day_start, day_stop):
