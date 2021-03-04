@@ -198,23 +198,23 @@ class MVPActivityClassification(_BaseProcess):
     While the `bout_metric` methods all should yield fairly similar results, there are subtle
     differences in how the results are computed:
 
-    - 1: MVPA bout definition from [2]_ and [3]_. Here the algorithm looks for `bout_len` minute
-        windows in which more than `bout_criteria` percent of the epochs are above the MVPA
-        threshold (above the "light" activity threshold) and then counts the entire window as mvpa.
-        The motivation for this definition was as follows: A person who spends 10 minutes in MVPA
-        with a 2 minute break in the middle is equally active as a person who spends 8 minutes in
-        MVPA without taking a break. Therefore, both should be counted equal.
-    - 2: Look for groups of epochs with a value above the MVPA threshold that span a time
-        window of at least `bout_len` minutes in which more than `bout_criteria` percent of the
-        epochs are above the threshold. Motivation: not counting breaks towards MVPA may simplify
-        interpretation and still counts the two persons in the above example as each others equal.
-    - 3: Use a sliding window across the data to test `bout_criteria` per window and do not allow
-        for breaks larger than 1 minute, and with fraction of time larger than the `bout_criteria`
-        threshold.
-    - 4: Same as 3, but also requires the first and last epoch to meet the threshold criteria.
-    - 5: Same as 4, but now looks for breaks larger than a minute such that 1 minute breaks
-        are allowed, and the fraction of time that meets the threshold should be equal
-        or greater than the `bout_criteria` threshold.
+    1. MVPA bout definition from [2]_ and [3]_. Here the algorithm looks for `bout_len` minute
+       windows in which more than `bout_criteria` percent of the epochs are above the MVPA
+       threshold (above the "light" activity threshold) and then counts the entire window as mvpa.
+       The motivation for this definition was as follows: A person who spends 10 minutes in MVPA
+       with a 2 minute break in the middle is equally active as a person who spends 8 minutes in
+       MVPA without taking a break. Therefore, both should be counted equal.
+    2. Look for groups of epochs with a value above the MVPA threshold that span a time
+       window of at least `bout_len` minutes in which more than `bout_criteria` percent of the
+       epochs are above the threshold. Motivation: not counting breaks towards MVPA may simplify
+       interpretation and still counts the two persons in the above example as each others equal.
+    3. Use a sliding window across the data to test `bout_criteria` per window and do not allow
+       for breaks larger than 1 minute, and with fraction of time larger than the `bout_criteria`
+       threshold.
+    4. Same as 3, but also requires the first and last epoch to meet the threshold criteria.
+    5. Same as 4, but now looks for breaks larger than a minute such that 1 minute breaks
+       are allowed, and the fraction of time that meets the threshold should be equal
+       or greater than the `bout_criteria` threshold.
 
     References
     ----------
