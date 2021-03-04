@@ -176,16 +176,63 @@ class MVPActivityClassification(_BaseProcess):
         Activity bout length 2, in minutes. Default is 5 minutes.
     bout_len3 : int, optional
         Activity bout length 3, in minutes. Default is 10 minutes.
+    bout_criteria : float, optional
+        Value between 0 and 1 for how much of a bout must be above the specified threshold. Default
+        is 0.8
+    bout_metric : {1, 2, 3, 4, 5}, optional
+        How a bout of MVPA is computed. Default is 1. See notes for descriptions of each method.
+    closed_bout : bool, optional
+        If True then count breaks in a bout towards the bout duration. If False then only count
+        time spent above the threshold towards the bout duration. Only used if `bout_metric=1`.
+        Default is False.
     min_wear_time : int, optional
         Minimum wear time in hours for a day to be analyzed. Default is 10 hours.
     cutpoints : {str, dict, list}, optional
         Cutpoints to use for sedentary/light/moderate/vigorous activity classification. Default
-        is "migueles_wrist_adult". For a list of all available metrics use
+        is "migueles_wrist_adult" [1]_. For a list of all available metrics use
         `skimu.activity.get_available_cutpoints()`. Custom cutpoints can be provided in a
         dictionary (see :ref:`Using Custom Cutpoints`).
+
+    Notes
+    -----
+    While the `bout_metric` methods all should yield fairly similar results, there are subtle
+    differences in how the results are computed:
+
+    - 1: MVPA bout definition from [2]_ and [3]_. Here the algorithm looks for `bout_len` minute
+        windows in which more than `bout_criteria` percent of the epochs are above the MVPA
+        threshold (above the "light" activity threshold) and then counts the entire window as mvpa.
+        The motivation for this definition was as follows: A person who spends 10 minutes in MVPA
+        with a 2 minute break in the middle is equally active as a person who spends 8 minutes in
+        MVPA without taking a break. Therefore, both should be counted equal.
+    - 2: Look for groups of epochs with a value above the MVPA threshold that span a time
+        window of at least `bout_len` minutes in which more than `bout_criteria` percent of the
+        epochs are above the threshold. Motivation: not counting breaks towards MVPA may simplify
+        interpretation and still counts the two persons in the above example as each others equal.
+    - 3: Use a sliding window across the data to test `bout_criteria` per window and do not allow
+        for breaks larger than 1 minute, and with fraction of time larger than the `bout_criteria`
+        threshold.
+    - 4: Same as 3, but also requires the first and last epoch to meet the threshold criteria.
+    - 5: Same as 4, but now looks for breaks larger than a minute such that 1 minute breaks
+        are allowed, and the fraction of time that meets the threshold should be equal
+        or greater than the `bout_criteria` threshold.
+
+    References
+    ----------
+    .. [1] J. H. Migueles et al., “Comparability of accelerometer signal aggregation metrics
+        across placements and dominant wrist cut points for the assessment of physical activity in
+        adults,” Scientific Reports, vol. 9, no. 1, Art. no. 1, Dec. 2019,
+        doi: 10.1038/s41598-019-54267-y.
+    .. [2] I. C. da Silva et al., “Physical activity levels in three Brazilian birth cohorts as
+        assessed with raw triaxial wrist accelerometry,” International Journal of Epidemiology,
+        vol. 43, no. 6, pp. 1959–1968, Dec. 2014, doi: 10.1093/ije/dyu203.
+    .. [3] S. Sabia et al., “Association between questionnaire- and accelerometer-assessed
+        physical activity: the role of sociodemographic factors,” Am J Epidemiol, vol. 179,
+        no. 6, pp. 781–790, Mar. 2014, doi: 10.1093/aje/kwt330.
     """
-    def __init__(self, short_wlen=5, bout_len1=1, bout_len2=5, bout_len3=10, min_wear_time=10,
-                 cutpoints="migueles_wrist_adult"):
+    def __init__(
+            self, short_wlen=5, bout_len1=1, bout_len2=5, bout_len3=10, bout_criteria=0.8,
+            bout_metric=1, closed_bout=False, min_wear_time=10, cutpoints="migueles_wrist_adult"
+    ):
         if (60 % short_wlen) != 0:
             tmp = [1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30]
             short_wlen = tmp[argmin(abs(array(tmp) - short_wlen))]
@@ -203,6 +250,9 @@ class MVPActivityClassification(_BaseProcess):
             bout_len1=bout_len1,
             bout_len2=bout_len2,
             bout_len3=bout_len3,
+            bout_criteria=bout_criteria,
+            bout_metric=bout_metric,
+            closed_bout=closed_bout,
             min_wear_time=min_wear_time,
             cutpoints=cutpoints
         )
@@ -211,6 +261,9 @@ class MVPActivityClassification(_BaseProcess):
         self.blen1 = bout_len1
         self.blen2 = bout_len2
         self.blen3 = bout_len3
+        self.boutcrit = bout_criteria
+        self.boutmetric = bout_metric
+        self.closedbout = closed_bout
         self.min_wear = min_wear_time
         self.cutpoints = cutpoints
 
@@ -289,22 +342,20 @@ class MVPActivityClassification(_BaseProcess):
                 tmp = rolling_mean(accel_metric, int(300 / self.wlen), int(300 / self.wlen))
                 mvpa[2] += sum(tmp >= self.cutpoints["light"]) * 5  # in minutes
 
-                # time in bout1 minutes
-                nbout = self.blen1 * (60 / self.wlen)
-
-
-
-
-                # get the starts and stops of different activity levels
-                lt_sed = accel_metric < self.cutpoints["sedentary"]
-                lt_light = accel_metric < self.cutpoints["light"]
-                lt_mod = accel_metric < self.cutpoints["moderate"]
-
-                # make sure the indices are into the full accel array
-                sed_starts, sed_stops = _get_level_starts_stops(lt_sed) + dwstart
-                light_starts, light_stops = _get_level_starts_stops(~lt_sed & lt_light) + dwstart
-                mod_starts, mod_stops = _get_level_starts_stops(~lt_light & lt_mod) + dwstart
-                vig_starts, vig_stops = _get_level_starts_stops(~lt_mod) + dwstart
+                # total time in bout1 minute bouts
+                mvpa[3] += get_activity_bouts(
+                    accel_metric, self.cutpoints["light"], self.wlen, self.blen1, self.boutcrit,
+                    self.closedbout, self.boutmetric
+                )
+                # total time in bout2 minute bouts
+                mvpa[4] += get_activity_bouts(
+                    accel_metric, self.cutpoints["light"], self.wlen, self.blen2, self.boutcrit,
+                    self.closedbout, self.boutmetric
+                )
+                # total time in bout3 minute bouts
+                mvpa[5] += get_activity_bouts(
+                    accel_metric, self.cutpoints["light"], self.wlen, self.blen3, self.boutcrit
+                )
 
 
 def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, boutmetric=1):
@@ -325,7 +376,7 @@ def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, b
         Fraction of the bout that needs to be above the threshold to qualify as a bout.
     closedbout : bool
         If True then count breaks in a bout towards the bout duration. If False then only count
-        time spent above the threshold towards the bout duration
+        time spent above the threshold towards the bout duration.
     boutmetric : {1, 2, 3, 4, 5}, optional
         - 1: MVPA bout definition from Sabia AJE 2014 and da Silva IJE 2014. Here the algorithm
             looks for 10 minute windows in which more than XX percent of the epochs are above mvpa
