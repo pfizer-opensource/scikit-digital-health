@@ -465,7 +465,7 @@ def get_intensity_gradient(ig_values, counts):
     lx = log(ig_values)
     ly = log(counts)
 
-    slope, intercept, rval, pval, stderr, intercept_stderr = linregress(lx, ly)
+    slope, intercept, rval, *_ = linregress(lx, ly)
 
     return slope, intercept, rval**2
 
