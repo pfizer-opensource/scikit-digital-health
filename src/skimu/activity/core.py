@@ -246,7 +246,8 @@ class MVPActivityClassification(_BaseProcess):
                 )
                 # total time in bout3 minute bouts
                 res[f"MVPA {self.blen3}min Bouts"][-1] += get_activity_bouts(
-                    accel_metric, self.cutpoints["light"], self.wlen, self.blen3, self.boutcrit
+                    accel_metric, self.cutpoints["light"], self.wlen, self.blen3, self.boutcrit,
+                    self.closedbout, self.boutmetric
                 )
 
                 # intensity gradient. Density = false to return counts
