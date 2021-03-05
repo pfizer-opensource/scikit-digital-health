@@ -4,10 +4,11 @@ Activity level classification based on accelerometer data
 Lukas Adamowicz
 Pfizer DMTI 2021
 """
+from datetime import datetime
 from warnings import warn
 
 from numpy import nonzero, array, insert, append, mean, diff, sum, zeros, abs, argmin, argmax, \
-    maximum, int_, floor, ceil, histogram, log, nan
+    maximum, int_, floor, ceil, histogram, log, nan, around
 from scipy.stats import linregress
 
 from skimu.base import _BaseProcess
@@ -151,6 +152,7 @@ class MVPActivityClassification(_BaseProcess):
         fs = 1 / mean(diff(time))
 
         nwlen = int(self.wlen * fs)
+        epm = int(60 / self.wlen)  # epochs per minute
 
         iglevels = array([i for i in range(0, 4001, 25)] + [8000])  # default from rowlands
         igvals = (iglevels[1:] + iglevels[:-1]) / 2
@@ -166,41 +168,50 @@ class MVPActivityClassification(_BaseProcess):
 
         days = kwargs.get(self._days, [[0, time.size - 1]])
 
-        keys = [
+        general_keys = [
             "Date",
+            "Weekday",
             "Day N",
             "N hours",
-            "N wear hours",
+            "N wear hours"
+        ]
+        mvpa_keys = [
             "MVPA 5sec Epochs",
             "MVPA 1min Epochs",
             "MVPA 5min Epochs",
             f"MVPA {self.blen1}min Bouts",
             f"MVPA {self.blen2}min Bouts",
-            f"MVPA {self.blen3}min Bouts",
+            f"MVPA {self.blen3}min Bouts"
+        ]
+        ig_keys = [
             "IG Gradient",
             "IG Intercept",
             "IG R-squared"
         ]
-        res = {i: [] for i in keys}
+        res = {i: [] for i in general_keys + mvpa_keys + ig_keys}
 
         for iday, day_idx in enumerate(days):
             # populate the results dictionary
-            for k in res:
+            for k in general_keys + ig_keys:
                 res[k].append(nan)
+            for k in mvpa_keys:
+                res[k].append(0)
 
             start, stop = day_idx
 
+            res["Date"][-1] = datetime.utcfromtimestamp(time[start + 5]).strftime("%Y-%m-%d")
+            res["Weekday"][-1] = datetime.utcfromtimestamp(time[start + 5]).strftime("%A")
+            res["Day N"][-1] = iday
+            res["N hours"] = around((time[stop] - time[start]) / 3600, 1)
 
             # get the intersection of wear time and day
             day_wear_starts, day_wear_stops = get_day_wear_intersection(
                 wear_starts, wear_stops, start, stop)
 
             # less wear time than minimum
-            day_wear_hours = sum(day_wear_stops - day_wear_starts) / fs / 3600
-            if day_wear_hours < self.min_wear:
+            res["N wear hours"][-1] = sum(day_wear_stops - day_wear_starts) / fs / 3600
+            if res["N wear hours"][-1] < self.min_wear:
                 continue  # skip day
-
-            mvpa = zeros(6)  # per epoch, per 1min epoch, per 5min epoch, per bout lengths
 
             # intensity gradient should be done on the whole days worth of data
             hist = zeros(iglevels.size - 1)
@@ -215,26 +226,26 @@ class MVPActivityClassification(_BaseProcess):
 
                 # MVPA
                 # total time of `wlen` epochs in minutes
-                mvpa[0] += sum(accel_metric >= self.cutpoints["light"]) * (self.wlen / 60)
+                res["MVPA 5sec Epochs"][-1] += sum(accel_metric >= self.cutpoints["light"]) / epm
                 # total time of 1 minute epochs
-                tmp = rolling_mean(accel_metric, int(60 / self.wlen), int(60 / self.wlen))
-                mvpa[1] += sum(tmp >= self.cutpoints["light"])  # already in minutes
+                tmp = rolling_mean(accel_metric, epm, epm)
+                res["MVPA 1min Epochs"][-1] += sum(tmp >= self.cutpoints["light"])  # in minutes
                 # total time in 5 minute epochs
-                tmp = rolling_mean(accel_metric, int(300 / self.wlen), int(300 / self.wlen))
-                mvpa[2] += sum(tmp >= self.cutpoints["light"]) * 5  # in minutes
+                tmp = rolling_mean(accel_metric, 5 * epm, 5 * epm)
+                res["MVPA 5min Epochs"][-1] += sum(tmp >= self.cutpoints["light"]) * 5  # in minutes
 
                 # total time in bout1 minute bouts
-                mvpa[3] += get_activity_bouts(
+                res[f"MVPA {self.blen1}min Bouts"][-1] += get_activity_bouts(
                     accel_metric, self.cutpoints["light"], self.wlen, self.blen1, self.boutcrit,
                     self.closedbout, self.boutmetric
                 )
                 # total time in bout2 minute bouts
-                mvpa[4] += get_activity_bouts(
+                res[f"MVPA {self.blen2}min Bouts"][-1] += get_activity_bouts(
                     accel_metric, self.cutpoints["light"], self.wlen, self.blen2, self.boutcrit,
                     self.closedbout, self.boutmetric
                 )
                 # total time in bout3 minute bouts
-                mvpa[5] += get_activity_bouts(
+                res[f"MVPA {self.blen3}min Bouts"][-1] += get_activity_bouts(
                     accel_metric, self.cutpoints["light"], self.wlen, self.blen3, self.boutcrit
                 )
 
@@ -243,9 +254,16 @@ class MVPActivityClassification(_BaseProcess):
 
             # intensity gradient computation per day
             hist *= (self.wlen / 60)
-            grad, itcpt, rsq = get_intensity_gradient(igvals, hist)
+            res["IG Gradient"][-1], \
+                res["IG Intercept"][-1], \
+                res["IG R-squared"][-1] = get_intensity_gradient(igvals, hist)
 
+        kwargs.update({self._time: time, self._acc: accel})
 
+        if self._in_pipeline:
+            return kwargs, res
+        else:
+            return res
 
 
 def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, boutmetric=1):
