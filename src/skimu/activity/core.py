@@ -154,7 +154,7 @@ class MVPActivityClassification(_BaseProcess):
         nwlen = int(self.wlen * fs)
         epm = int(60 / self.wlen)  # epochs per minute
 
-        iglevels = array([i for i in range(0, 4001, 25)] + [8000])  # default from rowlands
+        iglevels = array([i for i in range(0, 4001, 25)] + [8000]) / 1000  # default from rowlands
         igvals = (iglevels[1:] + iglevels[:-1]) / 2
 
         if wear is None:
@@ -194,15 +194,13 @@ class MVPActivityClassification(_BaseProcess):
             # populate the results dictionary
             for k in general_keys + ig_keys:
                 res[k].append(nan)
-            for k in mvpa_keys:
-                res[k].append(0)
 
             start, stop = day_idx
 
             res["Date"][-1] = datetime.utcfromtimestamp(time[start + 5]).strftime("%Y-%m-%d")
             res["Weekday"][-1] = datetime.utcfromtimestamp(time[start + 5]).strftime("%A")
             res["Day N"][-1] = iday
-            res["N hours"][-1] = around((time[stop] - time[start]) / 3600, 1)
+            res["N hours"][-1] = around((time[stop - 1] - time[start]) / 3600, 1)
 
             # get the intersection of wear time and day
             day_wear_starts, day_wear_stops = get_day_wear_intersection(
@@ -211,7 +209,12 @@ class MVPActivityClassification(_BaseProcess):
             # less wear time than minimum
             res["N wear hours"][-1] = around(sum(day_wear_stops - day_wear_starts) / fs / 3600, 1)
             if res["N wear hours"][-1] < self.min_wear:
+                for k in mvpa_keys:
+                    res[k].append(nan)
                 continue  # skip day
+            else:
+                for k in mvpa_keys:
+                    res[k].append(0.0)
 
             # intensity gradient should be done on the whole days worth of data
             hist = zeros(iglevels.size - 1)
@@ -462,8 +465,8 @@ def get_intensity_gradient(ig_values, counts):
     r_squared : float
         R-squared value for the linear regression fit.
     """
-    lx = log(ig_values)
-    ly = log(counts)
+    lx = log(ig_values[counts > 0])
+    ly = log(counts[counts > 0])
 
     slope, intercept, rval, *_ = linregress(lx, ly)
 
