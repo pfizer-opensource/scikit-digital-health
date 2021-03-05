@@ -4,7 +4,7 @@ Metrics for classifying activity
 Lukas Adamowicz
 Pfizer DMTI 2021
 """
-from numpy import minimum, abs, repeat, arctan, sqrt, pi
+from numpy import maximum, abs, repeat, arctan, sqrt, pi
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt
 
@@ -81,7 +81,7 @@ def metric_enmo(accel, wlen, *args, take_abs=False, trim_zero=True, **kwargs):
     if take_abs:
         enmo = abs(enmo)
     if trim_zero:
-        return rolling_mean(minimum(enmo, 0), wlen, wlen)
+        return rolling_mean(maximum(enmo, 0), wlen, wlen)
     else:
         return rolling_mean(enmo, wlen, wlen)
 
@@ -112,7 +112,7 @@ def metric_bfen(accel, wlen, fs, low_cutoff=0.2, high_cutoff=15, trim_zero=True,
     """
     sos = butter(4, [2 * low_cutoff / fs, 2 * high_cutoff / fs], btype='bandpass', output='sos')
     if trim_zero:
-        return rolling_mean(minimum(norm(sosfiltfilt(sos, accel, axis=0), axis=1), 0), wlen, wlen)
+        return rolling_mean(maximum(norm(sosfiltfilt(sos, accel, axis=0), axis=1), 0), wlen, wlen)
     else:
         return rolling_mean(norm(sosfiltfilt(sos, accel, axis=0), axis=1), wlen, wlen)
 
@@ -142,7 +142,7 @@ def metric_hfen(accel, wlen, fs, low_cutoff=0.2, trim_zero=True, **kwargs):
     sos = butter(4, 2 * low_cutoff / fs, btype='high', output='sos')
     
     if trim_zero:
-        return rolling_mean(minimum(norm(sosfiltfilt(sos, accel, axis=0), axis=1), 0), wlen, wlen)
+        return rolling_mean(maximum(norm(sosfiltfilt(sos, accel, axis=0), axis=1), 0), wlen, wlen)
     else:
         return rolling_mean(norm(sosfiltfilt(sos, accel, axis=0), axis=1), wlen, wlen)
 
@@ -178,7 +178,7 @@ def metric_hfenplus(accel, wlen, fs, cutoff=0.2, trim_zero=True, **kwargs):
     acc_low = norm(sosfiltfilt(sos_low, accel, axis=0), axis=1)
     
     if trim_zero:
-        return rolling_mean(minimum(acc_high + acc_low - 1, 0), wlen, wlen)
+        return rolling_mean(maximum(acc_high + acc_low - 1, 0), wlen, wlen)
     else:
         return rolling_mean(acc_high + acc_low - 1, wlen, wlen)
 
