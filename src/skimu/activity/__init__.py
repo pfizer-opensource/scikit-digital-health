@@ -122,5 +122,6 @@ References
 from skimu.activity.core import MVPActivityClassification
 from skimu.activity.metrics import *
 from skimu.activity import metrics
+from skimu.activity.cutpoints import get_available_cutpoints
 
-__all__ = ["MVPActivityClassification", "metrics"] + metrics.__all__
+__all__ = ["MVPActivityClassification", "metrics", "get_available_cutpoints"] + metrics.__all__
