@@ -465,7 +465,7 @@ def get_intensity_gradient(ig_values, counts):
     r_squared : float
         R-squared value for the linear regression fit.
     """
-    lx = log(ig_values[counts > 0])
+    lx = log(ig_values[counts > 0] * 1000)  # convert back to mg to match GGIR/existing work
     ly = log(counts[counts > 0])
 
     slope, intercept, rval, *_ = linregress(lx, ly)
