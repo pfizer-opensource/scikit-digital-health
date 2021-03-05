@@ -209,7 +209,7 @@ class MVPActivityClassification(_BaseProcess):
                 wear_starts, wear_stops, start, stop)
 
             # less wear time than minimum
-            res["N wear hours"][-1] = sum(day_wear_stops - day_wear_starts) / fs / 3600
+            res["N wear hours"][-1] = around(sum(day_wear_stops - day_wear_starts) / fs / 3600, 1)
             if res["N wear hours"][-1] < self.min_wear:
                 continue  # skip day
 
@@ -499,7 +499,7 @@ def get_day_wear_intersection(starts, stops, day_start, day_stop):
 
     if starts_subset.size == 0 and stops_subset.size == 0:
         if stops[nonzero(starts <= day_start)[0][-1]] >= day_stop:
-            return array(day_start), array(day_stop)
+            return array([day_start]), array([day_stop])
         else:
             return array([0]), array([0])
     if starts_subset.size == 0 and stops_subset.size == 1:

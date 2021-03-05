@@ -10,6 +10,12 @@ from numpy import allclose, isclose
 
 from skimu.activity.core import get_activity_bouts
 
+from skimu import Pipeline
+from skimu.read import ReadBin
+from skimu.preprocessing import CalibrateAccelerometer
+from skimu.preprocessing import DetectWear
+from skimu.activity import MVPActivityClassification
+
 
 class TestGetActivityBouts:
     @pytest.mark.parametrize(
@@ -47,3 +53,18 @@ class TestGetActivityBouts:
         )
 
         assert isclose(mvpa_time, mvpa_time_true)
+
+
+class TestMVPActivityClassification:
+    def test(self):
+        pipe = Pipeline()
+        pipe.add(ReadBin(base=0, period=24))
+        pipe.add(CalibrateAccelerometer())
+        pipe.add(DetectWear())
+        pipe.add(
+            MVPActivityClassification(),
+            save_results=True,
+            save_name="/Users/lukasadamowicz/Downloads/STRYDE/skimu_results/activity_results.csv"
+        )
+
+        pipe.run(file="/Users/lukasadamowicz/Downloads/STRYDE/stryde/100111980001_GNACTV_LeftWrist.bin")
