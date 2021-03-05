@@ -7,158 +7,12 @@ Pfizer DMTI 2021
 from warnings import warn
 
 from numpy import nonzero, array, insert, append, mean, diff, sum, zeros, abs, argmin, argmax, \
-    maximum, int_, floor, ceil, histogram, log
+    maximum, int_, floor, ceil, histogram, log, nan
 from scipy.stats import linregress
 
 from skimu.base import _BaseProcess
 from skimu.utility import rolling_mean
-from skimu.activity.metrics import *
-
-# ==========================================================
-# Activity cutpoints
-_base_cutpoints = {}
-
-_base_cutpoints["esliger_lwrist_adult"] = {
-    "metric": metric_enmo,
-    "kwargs": {"take_abs": True},
-    "sedentary": 217 / 80 / 60,  # paper at 80hz, summed for each minute long window
-    "light": 644 / 80 / 60,
-    "moderate": 1810 / 80 / 60
-}
-
-_base_cutpoints["esliger_rwirst_adult"] = {
-    "metric": metric_enmo,
-    "kwargs": {"take_abs": True},
-    "sedentary": 386 / 80 / 60,  # paper at 80hz, summed for each 1min window
-    "light": 439 / 80 / 60,
-    "moderate": 2098 / 80 / 60
-}
-
-_base_cutpoints["esliger_lumbar_adult"] = {
-    "metric": metric_enmo,
-    "kwargs": {"take_abs": True},
-    "sedentary": 77 / 80 / 60,  # paper at 80hz, summed for each 1min window
-    "light": 219 / 80 / 60,
-    "moderate": 2056 / 80 / 60
-}
-
-_base_cutpoints["schaefer_ndomwrist_child6-11"] = {
-    "metric": metric_bfen,
-    "kwargs": {"low_cutoff": 0.2, "high_cutoff": 15, "trim_zero": False},
-    "sedentary": 0.190,
-    "light": 0.314,
-    "moderate": 0.998
-}
-
-_base_cutpoints["phillips_rwrist_child8-14"] = {
-    "metric": metric_enmo,
-    "kwargs": {"take_abs": True},
-    "sedentary": 6 / 80,  # paper at 80hz, summed for each 1s window
-    "light": 21 / 80,
-    "moderate": 56 / 80
-}
-
-_base_cutpoints["phillips_lwrist_child8-14"] = {
-    "metric": metric_enmo,
-    "kwargs": {"take_abs": True},
-    "sedentary": 7 / 80,
-    "light": 19 / 80,
-    "moderate": 60 / 80
-}
-
-_base_cutpoints["phillips_hip_child8-14"] = {
-    "metric": metric_enmo,
-    "kwargs": {"take_abs": True},
-    "sedentary": 3 / 80,
-    "light": 16 / 80,
-    "moderate": 51 / 80
-}
-
-_base_cutpoints["vaha-ypya_hip_adult"] = {
-    "metric": metric_mad,
-    "kwargs": {},
-    "light": 0.091,  # originally presented in mg
-    "moderate": 0.414
-}
-
-_base_cutpoints["hildebrand_hip_adult_actigraph"] = {
-    "metric": metric_enmo,
-    "kwargs": {"take_abs": False, "trim_zero": True},
-    "sedentary": 0.0474,
-    "light": 0.0691,
-    "moderate": 0.2587
-}
-
-_base_cutpoints["hildebrand_hip_adult_geneactv"] = {
-    "metric": metric_enmo,
-    "kwargs": {"take_abs": False, "trim_zero": True},
-    "sedentary": 0.0469,
-    "light": 0.0687,
-    "moderate": 0.2668
-}
-
-_base_cutpoints["hildebrand_wrist_adult_actigraph"] = {
-    "metric": metric_enmo,
-    "kwargs": {"take_abs": False, "trim_zero": True},
-    "sedentary": 0.0448,
-    "light": 0.1006,
-    "moderate": 0.4288
-}
-
-_base_cutpoints["hildebrand_wrist_adult_geneactiv"] = {
-    "metric": metric_enmo,
-    "kwargs": {"take_abs": False, "trim_zero": True},
-    "sedentary": 0.0458,
-    "light": 0.0932,
-    "moderate": 0.4183
-}
-
-_base_cutpoints["hildebrand_hip_child7-11_actigraph"] = {
-    "metric": metric_enmo,
-    "kwargs": {"take_abs": False, "trim_zero": True},
-    "sedentary": 0.0633,
-    "light": 0.1426,
-    "moderate": 0.4646
-}
-
-_base_cutpoints["hildebrand_hip_child7-11_geneactiv"] = {
-    "metric": metric_enmo,
-    "kwargs": {"take_abs": False, "trim_zero": True},
-    "sedentary": 0.0641,
-    "light": 0.1528,
-    "moderate": 0.5143
-}
-
-_base_cutpoints["hildebrand_wrist_child7-11_actigraph"] = {
-    "metric": metric_enmo,
-    "kwargs": {"take_abs": False, "trim_zero": True},
-    "sedentary": 0.0356,
-    "light": 0.2014,
-    "moderate": 0.707
-}
-
-_base_cutpoints["hildebrand_wrist_child7-11_geneactiv"] = {
-    "metric": metric_enmo,
-    "kwargs": {"take_abs": False, "trim_zero": True},
-    "sedentary": 0.0563,
-    "light": 0.1916,
-    "moderate": 0.6958
-}
-
-_base_cutpoints["migueles_wrist_adult"] = {
-    "metric": metric_enmo,
-    "kwargs": {"take_abs": False, "trim_zero": True},
-    "sedentary": 0.050,
-    "light": 0.110,
-    "moderate": 0.440
-}
-
-
-def get_available_cutpoints():
-    """
-    Print the available cutpoints for activity level segmentation.
-    """
-    print(_base_cutpoints.keys())
+from skimu.activity.cutpoints import _base_cutpoints
 
 
 class MVPActivityClassification(_BaseProcess):
@@ -297,8 +151,6 @@ class MVPActivityClassification(_BaseProcess):
         fs = 1 / mean(diff(time))
 
         nwlen = int(self.wlen * fs)
-        nblen1 = int(self.blen1 * 60 * fs)
-        nblen2 = int(self.blen2 * 60 * fs)
 
         iglevels = array([i for i in range(0, 4001, 25)] + [8000])  # default from rowlands
         igvals = (iglevels[1:] + iglevels[:-1]) / 2
@@ -314,8 +166,30 @@ class MVPActivityClassification(_BaseProcess):
 
         days = kwargs.get(self._days, [[0, time.size - 1]])
 
+        keys = [
+            "Date",
+            "Day N",
+            "N hours",
+            "N wear hours",
+            "MVPA 5sec Epochs",
+            "MVPA 1min Epochs",
+            "MVPA 5min Epochs",
+            f"MVPA {self.blen1}min Bouts",
+            f"MVPA {self.blen2}min Bouts",
+            f"MVPA {self.blen3}min Bouts",
+            "IG Gradient",
+            "IG Intercept",
+            "IG R-squared"
+        ]
+        res = {i: [] for i in keys}
+
         for iday, day_idx in enumerate(days):
+            # populate the results dictionary
+            for k in res:
+                res[k].append(nan)
+
             start, stop = day_idx
+
 
             # get the intersection of wear time and day
             day_wear_starts, day_wear_stops = get_day_wear_intersection(
