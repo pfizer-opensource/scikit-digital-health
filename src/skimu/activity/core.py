@@ -202,7 +202,7 @@ class MVPActivityClassification(_BaseProcess):
             res["Date"][-1] = datetime.utcfromtimestamp(time[start + 5]).strftime("%Y-%m-%d")
             res["Weekday"][-1] = datetime.utcfromtimestamp(time[start + 5]).strftime("%A")
             res["Day N"][-1] = iday
-            res["N hours"] = around((time[stop] - time[start]) / 3600, 1)
+            res["N hours"][-1] = around((time[stop] - time[start]) / 3600, 1)
 
             # get the intersection of wear time and day
             day_wear_starts, day_wear_stops = get_day_wear_intersection(
