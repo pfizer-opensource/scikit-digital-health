@@ -100,7 +100,8 @@ class TestReadBin(BaseProcessTester):
         cls.truth_data_keys = [
             'time',
             'accel',
-            'day_ends'
+            'day_ends',
+            'temperature'
         ]
 
         cls.test_results = False

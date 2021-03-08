@@ -8,6 +8,8 @@ API Reference
 
     skimu
     read
+    preprocessing
     features
     gait
     sit2stand
+    utility

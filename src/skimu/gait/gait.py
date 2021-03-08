@@ -8,11 +8,10 @@ from collections.abc import Iterable
 from warnings import warn
 
 import h5py
-from numpy import mean, diff, arange, zeros, interp, float_, abs, argmax, sign, asarray, sum, \
-    argmin
+from numpy import mean, diff, arange, zeros, interp, float_, abs, asarray, sum, argmin, ndarray
 
 from skimu.base import _BaseProcess
-from skimu.gait.get_gait_classification import get_gait_classification_lgbm
+from skimu.gait.get_gait_classification import get_gait_classification_lgbm, DimensionMismatchError
 from skimu.gait.get_gait_bouts import get_gait_bouts
 from skimu.gait.get_gait_events import get_gait_events
 from skimu.gait.get_strides import get_strides
@@ -24,6 +23,54 @@ class LowFrequencyError(Exception):
     pass
 
 
+def get_downsampled_data(time, accel, gait_pred, fs, goal_fs, days, downsample):
+    """
+    Get the downsampled data from input data
+
+    Parameters
+    ----------
+    time
+    accel
+    gait_pred
+    goal_fs
+    downsample
+    kw
+
+    Returns
+    -------
+    time_ds
+    accel_ds
+    gait_pred_ds
+    days
+    """
+    if downsample:
+        _days = asarray(days)
+        time_ds = arange(time[0], time[-1], 1 / goal_fs)
+        accel_ds = zeros((time_ds.size, 3), dtype=float_)
+        for i in range(3):
+            accel_ds[:, i] = interp(time_ds, time, accel[:, i])
+
+        if isinstance(gait_pred, ndarray):
+            if gait_pred.size != accel.shape[0]:
+                raise DimensionMismatchError(
+                    "Number of gait predictions must match number of acceleration samples")
+            gait_pred_ds = interp(time_ds, time, gait_pred)
+        else:
+            gait_pred_ds = gait_pred
+
+        days = zeros(asarray(_days).shape)
+        for i, day_idx in enumerate(_days):
+            i_guess = (day_idx * goal_fs / fs).astype(int) - 1000
+            i_guess[i_guess < 0] = 0
+            days[i, 0] = argmin(abs(time_ds[i_guess[0]:i_guess[0] + 2000] - time[day_idx[0]]))
+            days[i, 1] = argmin(abs(time_ds[i_guess[1]:i_guess[1] + 2000] - time[day_idx[1]]))
+            days[i] += i_guess  # make sure to add the starting index back in
+
+        return time_ds, accel_ds, gait_pred_ds, days
+    else:
+        return time, accel, gait_pred, days
+
+
 class Gait(_BaseProcess):
     """
     Process IMU data to extract metrics of gait. Detect gait, extract gait events (heel-strikes,
@@ -32,6 +79,10 @@ class Gait(_BaseProcess):
 
     Parameters
     ----------
+    correct_accel_orient : bool, optional
+        Correct the acceleration orientation using the method from [7]_. This should only be '
+        applied if the accelerometer axes are already approximately aligned with the anatomical
+        axes. The correction is applied on a per-gait-bout basis. Default is True.
     use_cwt_scale_relation : bool, optional
         Use the optimal scale/frequency relationship (see Notes). This changes which
         scale is used for the smoothing/differentiation operation performed with the
@@ -100,6 +151,9 @@ class Gait(_BaseProcess):
     .. [6] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
         Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
         Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
+    .. [7] R. Moe-Nilssen, “A new method for evaluating motor control in gait under real-life
+        environmental conditions. Part 1: The instrument,” Clinical Biomechanics, vol. 13, no.
+        4–5, pp. 320–327, Jun. 1998, doi: 10.1016/S0268-0033(98)00089-8.
     """
     # gait parameters
     _params = [
@@ -131,6 +185,7 @@ class Gait(_BaseProcess):
 
     def __init__(
             self,
+            correct_accel_orient=True,
             use_cwt_scale_relation=True,
             min_bout_time=8.0,
             max_bout_separation_time=0.5,
@@ -143,6 +198,7 @@ class Gait(_BaseProcess):
     ):
         super().__init__(
             # key-word arguments for storage
+            correct_accel_orient=correct_accel_orient,
             use_cwt_scale_relation=use_cwt_scale_relation,
             min_bout_time=min_bout_time,
             max_bout_separation_time=max_bout_separation_time,
@@ -154,6 +210,7 @@ class Gait(_BaseProcess):
             filter_cutoff=filter_cutoff
         )
 
+        self.corr_accel_orient = correct_accel_orient
         self.use_opt_scale = use_cwt_scale_relation
         self.min_bout = min_bout_time
         self.max_bout_sep = max_bout_separation_time
@@ -277,28 +334,9 @@ class Gait(_BaseProcess):
         goal_fs = 50 if fs > (50 * 0.985) else 20
         downsample = False if ((0.985 * goal_fs) < fs < (1.015 * goal_fs)) else True
 
-        if downsample:
-            time_ds = arange(time[0], time[-1], 1 / goal_fs)
-            accel_ds = zeros((time_ds.size, 3), dtype=float_)
-            for i in range(3):
-                accel_ds[:, i] = interp(time_ds, time, accel[:, i])
-
-            # get days if it exists, otherwise use the starts and end of the data
-            _days = asarray(kwargs.get(self._days, [[0, accel.shape[0] - 1]]))
-
-            days = zeros(asarray(_days).shape)
-            for i, day_idx in enumerate(_days):
-                i_guess = (day_idx * goal_fs / fs).astype(int) - 1000
-                i_guess[i_guess < 0] = 0
-                days[i, 0] = argmin(abs(time_ds[i_guess[0]:i_guess[0] + 2000] - time[day_idx[0]]))
-                days[i, 1] = argmin(abs(time_ds[i_guess[1]:i_guess[1] + 2000] - time[day_idx[1]]))
-                days[i] += i_guess  # make sure to add the starting index back in
-        else:
-            time_ds = time
-            accel_ds = accel
-
-            # get days if it exists, otherwise use the starts and end of the data
-            days = kwargs.get(self._days, [(0, accel_ds.shape[0])])
+        days = kwargs.get(self._days, [[0, accel.shape[0] - 1]])
+        time_ds, accel_ds, gait_pred_ds, days = get_downsampled_data(
+            time, accel, gait_pred, fs, goal_fs, days, downsample)
 
         # original scale. Compute outside loop since stays the same
         # 1.25 comes from original paper, corresponds to desired frequency
@@ -319,7 +357,7 @@ class Gait(_BaseProcess):
         }
 
         # get the gait classification if necessary
-        gbout_starts, gbout_stops = get_gait_classification_lgbm(gait_pred, accel_ds, goal_fs)
+        gbout_starts, gbout_stops = get_gait_classification_lgbm(gait_pred_ds, accel_ds, goal_fs)
         self._save_classifier_fn(time_ds, gbout_starts, gbout_stops)
 
         gait_i = 0  # keep track of where everything is in the loops
@@ -334,18 +372,15 @@ class Gait(_BaseProcess):
             )
 
             for ibout, bout in enumerate(gait_bouts):
-                # figure out vertical axis on a per-bout basis
-                acc_mean = mean(accel_ds[bout], axis=0)
-                v_axis = argmax(abs(acc_mean))
-
-                ic, fc, vert_acc = get_gait_events(
-                    accel_ds[bout, v_axis],
+                # get the gait events, vertical acceleration, and vertical axis
+                ic, fc, vert_acc, v_axis = get_gait_events(
+                    accel_ds[bout],
                     goal_fs,
                     time_ds[bout],
-                    sign(acc_mean[v_axis]),
                     original_scale,
                     self.filt_ord,
                     self.filt_cut,
+                    self.corr_accel_orient,
                     self.use_opt_scale
                 )
 
