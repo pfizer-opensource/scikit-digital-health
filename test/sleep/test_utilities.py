@@ -6,7 +6,7 @@ Pfizer DMTI 2021
 """
 import pytest
 import numpy as np
-from src.skimu.sleep.utility import *
+from skimu.sleep.utility import *
 
 
 class TestRollingMean:

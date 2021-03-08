@@ -4,7 +4,7 @@ Function for the detection of sleep boundaries, here defined as the total sleep 
 Yiorgos Christakis
 Pfizer DMTI 2021
 """
-from src.skimu.sleep.utility import *
+from skimu.sleep.utility import *
 
 
 def detect_tso(
