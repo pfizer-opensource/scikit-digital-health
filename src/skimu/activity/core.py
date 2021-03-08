@@ -99,7 +99,8 @@ class MVPActivityClassification(_BaseProcess):
         bout_len2 = int(bout_len2)
         bout_len3 = int(bout_len3)
         min_wear_time = int(min_wear_time)
-        cutpoints = _base_cutpoints.get(cutpoints, _base_cutpoints["migueles_wrist_adult"])
+        if isinstance(cutpoints, str):
+            cutpoints = _base_cutpoints.get(cutpoints, _base_cutpoints["migueles_wrist_adult"])
 
         super().__init__(
             short_wlen=short_wlen,
