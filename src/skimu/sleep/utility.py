@@ -4,8 +4,8 @@ Utility functions required for sleep metric generation
 Yiorgos Christakis
 Pfizer DMTI 2021
 """
-import numpy as np
-import pandas as pd
+from numpy import any, asarray, append, where, cumsum, flip, arctan, pi, roll, abs, argmax, diff
+from pandas import DataFrame
 
 
 def detect_nonwear_mvmt(acc, fs, move_td=0.001):
@@ -28,16 +28,16 @@ def detect_nonwear_mvmt(acc, fs, move_td=0.001):
 
     """
     # rolling 5s median
-    rmd = rolling_median(acc, fs * 5, 1)
+    rmd = rolling_median(acc, int(fs * 5), 1)
 
     # rolling 5s mean (non-overlapping windows)
-    mn = rolling_mean(rmd, fs * 5, fs * 5)
+    mn = rolling_mean(rmd, int(fs * 5), int(fs * 5))
 
     # rolling 30m STD
     rstd_mn = rolling_std(mn, 5 * 12 * 30, 1)
 
     # threshold
-    move_mask = np.any(rstd_mn <= move_td, axis=1)
+    move_mask = any(rstd_mn <= move_td, axis=1)
     return move_mask
 
 
@@ -61,16 +61,16 @@ def detect_nonwear_temp(t, fs, temp_td=25.0):
 
     """
     # rolling 5s median
-    rmd = rolling_median(t, fs * 5, 1)
+    rmd = rolling_median(t, int(fs * 5), 1)
 
     # rolling 5s mean (non-overlapping windows)
-    mn = rolling_mean(rmd, fs * 5, fs * 5)
+    mn = rolling_mean(rmd, int(fs * 5), int(fs * 5))
 
     # rolling 5m median.
     rmdn_mn = rolling_median(mn, 5 * 12 * 5, 1)
 
     # threshold
-    temp_mask = np.any(rmdn_mn < temp_td, axis=1)
+    temp_mask = any(rmdn_mn < temp_td, axis=1)
     return temp_mask
 
 
@@ -92,13 +92,13 @@ def rle(to_encode):
         The value repeated for the duration of each block.
 
     """
-    array = np.asarray(to_encode)
+    array = asarray(to_encode)
     n = array.size
 
-    diff = np.array(array[1:] != array[:-1])
-    block_end_indices = np.append(np.where(diff), n - 1)
-    lengths = np.diff(np.append(-1, block_end_indices))
-    block_start_indices = np.cumsum(np.append(0, lengths))[:-1]
+    diff = asarray(array[1:] != array[:-1])
+    block_end_indices = append(where(diff), n - 1)
+    lengths = diff(append(-1, block_end_indices))
+    block_start_indices = cumsum(append(0, lengths))[:-1]
     block_values = array[block_start_indices]
 
     return lengths, block_start_indices, block_values
@@ -121,8 +121,8 @@ def rolling_mean(arr, w_size, step=1):
     rmn : array
 
     """
-    df = pd.DataFrame(np.flip(arr, axis=0))
-    rmn = np.flip(df.rolling(w_size).mean().values, axis=0)[0 : -(w_size - 1)][::step]
+    df = DataFrame(flip(arr, axis=0))
+    rmn = flip(df.rolling(w_size).mean().values, axis=0)[0: -(w_size - 1)][::step]
     return rmn
 
 
@@ -143,8 +143,8 @@ def rolling_median(arr, w_size, step=1):
     rmd : array
 
     """
-    df = pd.DataFrame(np.flip(arr, axis=0))
-    rmd = np.flip(df.rolling(w_size).median().values, axis=0)[0 : -(w_size - 1)][::step]
+    df = DataFrame(flip(arr, axis=0))
+    rmd = flip(df.rolling(w_size).median().values, axis=0)[0: -(w_size - 1)][::step]
     return rmd
 
 
@@ -165,8 +165,8 @@ def rolling_std(arr, w_size, step=1):
     rstd : array
 
     """
-    df = pd.DataFrame(np.flip(arr, axis=0))
-    rstd = np.flip(df.rolling(w_size).std().values, axis=0)[0 : -(w_size - 1)][::step]
+    df = DataFrame(flip(arr, axis=0))
+    rstd = flip(df.rolling(w_size).std().values, axis=0)[0: -(w_size - 1)][::step]
     return rstd
 
 
@@ -183,9 +183,7 @@ def compute_z_angle(acc):
     z : array
 
     """
-    z = np.arctan(acc[:, 2] / ((acc[:, 0] ** 2 + acc[:, 1] ** 2) ** 0.5)) * (
-        180.0 / np.pi
-    )
+    z = arctan(acc[:, 2] / ((acc[:, 0] ** 2 + acc[:, 1] ** 2) ** 0.5)) * (180.0 / pi)
     return z
 
 
@@ -202,9 +200,9 @@ def compute_absolute_difference(arr):
     absd: array
 
     """
-    shifted = np.roll(arr, 1)
+    shifted = roll(arr, 1)
     shifted[0] = shifted[1]
-    absd = np.abs(arr - shifted)
+    absd = abs(arr - shifted)
     return absd
 
 
@@ -238,7 +236,7 @@ def drop_min_blocks(arr, min_block_size, drop_value, replace_value, skip_bounds=
         if skip_bounds and (ctr == 1 or ctr == n):
             continue
         if val == drop_value and length < min_block_size:
-            arr[start : start + length] = replace_value
+            arr[start: start + length] = replace_value
     return arr
 
 
@@ -263,7 +261,7 @@ def arg_longest_bout(arr, block_val):
     vals = vals.flatten()
     val_mask = vals == block_val
     if len(lengths[val_mask]):
-        max_index = np.argmax(lengths[val_mask])
+        max_index = argmax(lengths[val_mask])
         max_start = starts[val_mask][max_index]
         longest_bout = max_start, max_start + lengths[val_mask][max_index]
     else:
