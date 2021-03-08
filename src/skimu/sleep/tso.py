@@ -4,6 +4,9 @@ Function for the detection of sleep boundaries, here defined as the total sleep 
 Yiorgos Christakis
 Pfizer DMTI 2021
 """
+from numpy import arange, zeros, float_, interp, pad, min, max, percentile
+
+from skimu.utility import rolling_mean
 from skimu.sleep.utility import *
 
 
@@ -55,18 +58,18 @@ def detect_tso(
     # upsample/downsample to 20hz if necessary
     if fs != 20.0:
         # get timestamps
-        t_ds = np.arange(t[0], t[-1], 1 / 20.0)
+        t_ds = arange(t[0], t[-1], 1 / 20.0)
 
         # get acceleration
-        acc_ds = np.zeros((t_ds.size, 3), dtype=np.float_)
+        acc_ds = zeros((t_ds.size, 3), dtype=float_)
         for i in range(3):
-            acc_ds[:, i] = np.interp(t_ds, t, acc[:, i])
+            acc_ds[:, i] = interp(t_ds, t, acc[:, i])
         acc = acc_ds
 
         # get temp
         if temp is not None:
-            temp_ds = np.zeros((t_ds.size, 1), dtype=np.float_)
-            temp_ds[:, 0] = np.interp(t_ds, t, temp)
+            temp_ds = zeros((t_ds.size, 1), dtype=float_)
+            temp_ds[:, 0] = interp(t_ds, t, temp)
             temp = temp_ds
 
         # reset time
@@ -101,7 +104,7 @@ def detect_tso(
 
     # apply movement-based non-wear mask
     if move_mask is not None:
-        move_mask = np.pad(
+        move_mask = pad(
             move_mask,
             (0, len(rmd_dmnz) - len(move_mask)),
             mode="constant",
@@ -111,7 +114,7 @@ def detect_tso(
 
     # apply temperature-based non-wear mask
     if temp_mask is not None:
-        temp_mask = np.pad(
+        temp_mask = pad(
             temp_mask,
             (0, len(rmd_dmnz) - len(temp_mask)),
             mode="constant",
@@ -157,23 +160,5 @@ def compute_tso_threshold(arr, min_td=0.1, max_td=0.5):
     td : float
 
     """
-    td = np.min((np.max((np.percentile(arr, 10) * 15.0, min_td)), max_td))
+    td = min((max((percentile(arr, 10) * 15.0, min_td)), max_td))
     return td
-
-
-def check_tso_detection():
-    from skimu.read import ReadBin
-
-    src = "/Users/ladmin/Desktop/PfyMU_development/sleeppy_pfymu/test_data/demo.bin"
-    reader = ReadBin(base=12, period=24)
-    res = reader.predict(src)
-    for day in res["day_ends"]:
-        acc = res["accel"][day[0] : day[1]]
-        t = res["time"][day[0] : day[1]]
-        fs = 100
-        temp = res["temperature"][day[0] : day[1]]
-        temp = np.repeat(temp, 300)
-        out = detect_tso(acc=acc, t=t, fs=fs, temp=temp)
-    print(out)
-    print(pd.to_datetime(out[0], unit="s"), pd.to_datetime(out[1], unit="s"))
-
