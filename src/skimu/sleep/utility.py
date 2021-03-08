@@ -7,6 +7,11 @@ Pfizer DMTI 2021
 from numpy import any, asarray, append, where, cumsum, flip, arctan, pi, roll, abs, argmax, diff
 from pandas import DataFrame
 
+__all__ = [
+    "detect_nonwear_mvmt", "detect_nonwear_temp", "rle", "rolling_median", "compute_z_angle",
+    "compute_absolute_difference", "drop_min_blocks", "arg_longest_bout"
+]
+
 
 def detect_nonwear_mvmt(acc, fs, move_td=0.001):
     """
