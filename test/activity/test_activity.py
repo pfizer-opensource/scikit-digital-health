@@ -15,6 +15,7 @@ from skimu.read import ReadBin
 from skimu.preprocessing import CalibrateAccelerometer
 from skimu.preprocessing import DetectWear
 from skimu.activity import MVPActivityClassification
+from skimu.activity.metrics import metric_enmo
 
 
 class TestGetActivityBouts:
@@ -62,7 +63,10 @@ class TestMVPActivityClassification:
         pipe.add(CalibrateAccelerometer())
         pipe.add(DetectWear())
         pipe.add(
-            MVPActivityClassification(),
+            MVPActivityClassification(
+                bout_metric=4,
+                cutpoints={"metric": metric_enmo, "light": 0.1, "kwargs": {"take_abs": False, "trim_zero": True}}
+            ),
             save_results=True,
             save_name="/Users/lukasadamowicz/Downloads/STRYDE/skimu_results/activity_results.csv"
         )
