@@ -7,6 +7,8 @@ Pfizer DMTI 2021
 from numpy import any, asarray, append, where, cumsum, flip, arctan, pi, roll, abs, argmax, diff
 from pandas import DataFrame
 
+from skimu.utility import rolling_mean, rolling_sd
+
 __all__ = [
     "detect_nonwear_mvmt", "detect_nonwear_temp", "rle", "rolling_median", "compute_z_angle",
     "compute_absolute_difference", "drop_min_blocks", "arg_longest_bout"
@@ -39,7 +41,7 @@ def detect_nonwear_mvmt(acc, fs, move_td=0.001):
     mn = rolling_mean(rmd, int(fs * 5), int(fs * 5))
 
     # rolling 30m STD
-    rstd_mn = rolling_std(mn, 5 * 12 * 30, 1)
+    rstd_mn = rolling_sd(mn, 5 * 12 * 30, 1)
 
     # threshold
     move_mask = any(rstd_mn <= move_td, axis=1)
@@ -109,7 +111,7 @@ def rle(to_encode):
     return lengths, block_start_indices, block_values
 
 
-def rolling_mean(arr, w_size, step=1):
+def _rolling_mean(arr, w_size, step=1):
     """
     Computes the rolling mean of an array along the first axis.
 
@@ -153,7 +155,7 @@ def rolling_median(arr, w_size, step=1):
     return rmd
 
 
-def rolling_std(arr, w_size, step=1):
+def _rolling_std(arr, w_size, step=1):
     """
     Computes the rolling standard deviation of an array along the first axis.
 
