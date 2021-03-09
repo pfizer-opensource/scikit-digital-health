@@ -38,10 +38,10 @@ def detect_nonwear_mvmt(acc, fs, move_td=0.001):
     rmd = rolling_median(acc, int(fs * 5), 1)
 
     # rolling 5s mean (non-overlapping windows)
-    mn = rolling_mean(rmd, int(fs * 5), int(fs * 5))
+    mn = rolling_mean(rmd, int(fs * 5), int(fs * 5), axis=0)
 
     # rolling 30m STD
-    rstd_mn = rolling_sd(mn, 5 * 12 * 30, 1)
+    rstd_mn = rolling_sd(mn, 5 * 12 * 30, 1, axis=0, return_previous=False)
 
     # threshold
     move_mask = any(rstd_mn <= move_td, axis=1)
