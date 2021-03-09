@@ -15,10 +15,10 @@ def detect_tso(
     t,
     fs,
     temp=None,
-    min_rest=30,
-    min_act=60,
-    min_td=0.1,
-    max_td=0.5,
+    min_rest_block=30,
+    allowed_rest_break=60,
+    min_angle_threshold=0.1,
+    max_angle_threshold=0.5,
     move_td=0.001,
     temp_td=25.0,
 ):
@@ -35,13 +35,13 @@ def detect_tso(
         Sampling frequency.
     temp : array
         Temperature data.
-    min_rest : int
+    min_rest_block : int
         Minimum number of minutes required to consider a rest period valid.
-    min_act : int
+    allowed_rest_break : int
         Minimum number of minutes required to consider an active period valid.
-    min_td : float
+    min_angle_threshold : float
         Minimum dz-angle threshold.
-    max_td : float
+    max_angle_threshold : float
         Maximum dz-angle threshold.
     move_td : float
         Movement-based non-wear threshold value. Boolean False negates use.
@@ -54,40 +54,18 @@ def detect_tso(
         First and last timestamps of the tso window. First and last indices of tso window.
 
     """
-
-    # upsample/downsample to 20hz if necessary
-    if fs != 20.0:
-        # get timestamps
-        t_ds = arange(t[0], t[-1], 1 / 20.0)
-
-        # get acceleration
-        acc_ds = zeros((t_ds.size, 3), dtype=float_)
-        for i in range(3):
-            acc_ds[:, i] = interp(t_ds, t, acc[:, i])
-        acc = acc_ds
-
-        # get temp
-        if temp is not None:
-            temp_ds = zeros((t_ds.size, 1), dtype=float_)
-            temp_ds[:, 0] = interp(t_ds, t, temp)
-            temp = temp_ds
-
-        # reset time
-        t = t_ds
-    fs = 20
-
     # compute non-wear
     move_mask = detect_nonwear_mvmt(acc, fs, move_td) if move_td else None
     temp_mask = detect_nonwear_temp(temp, fs, temp_td) if temp is not None else None
 
     # rolling 5s median
-    rmd = rolling_median(acc, fs * 5, 1)
+    rmd = rolling_median(acc, int(fs * 5), 1)
 
     # compute z-angle
     z = compute_z_angle(rmd)
 
     # rolling 5s mean (non-overlapping windows)
-    mnz = rolling_mean(z, fs * 5, fs * 5)
+    mnz = rolling_mean(z, int(fs * 5), int(fs * 5))
 
     # compute dz-angle
     dmnz = compute_absolute_difference(mnz)
@@ -123,7 +101,7 @@ def detect_tso(
         rmd_dmnz[temp_mask] = 1
 
     # drop rest blocks less than minimum allowed rest length
-    rmd_dmnz = drop_min_blocks(rmd_dmnz, 12 * min_rest, drop_value=0, replace_value=1)
+    rmd_dmnz = drop_min_blocks(rmd_dmnz, 12 * min_rest_block, drop_value=0, replace_value=1)
 
     # drop active blocks less than minimum allowed active length
     rmd_dmnz = drop_min_blocks(rmd_dmnz, 12 * min_act, drop_value=1, replace_value=0)
