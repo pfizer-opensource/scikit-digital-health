@@ -15,14 +15,14 @@ __all__ = [
 ]
 
 
-def detect_nonwear_mvmt(acc, fs, move_td=0.001):
+def detect_nonwear_mvmt(acc_rmed, fs, move_td=0.001):
     """
     Movement-based function for detecting non-wear.
 
     Parameters
     ----------
-    acc : array
-        Tri-axial accelerometer data.
+    acc_rmed : array
+        5 second rolling mean of acceleration data
     fs : float
         Sampling frequency.
     move_td : float
@@ -34,11 +34,8 @@ def detect_nonwear_mvmt(acc, fs, move_td=0.001):
         Epoch-level binary predictions of non-wear. 1 corresponds to a non-wear bout, 0 to a wear bout.
 
     """
-    # rolling 5s median
-    rmd = rolling_median(acc, int(fs * 5), 1)
-
     # rolling 5s mean (non-overlapping windows)
-    mn = rolling_mean(rmd, int(fs * 5), int(fs * 5), axis=0)
+    mn = rolling_mean(acc_rmed, int(fs * 5), int(fs * 5), axis=0)
 
     # rolling 30m STD
     rstd_mn = rolling_sd(mn, 5 * 12 * 30, 1, axis=0, return_previous=False)
@@ -68,7 +65,7 @@ def detect_nonwear_temp(t, fs, temp_td=25.0):
 
     """
     # rolling 5s median
-    rmd = rolling_median(t, int(fs * 5), 1)
+    rmd = rolling_median(t, int(fs * 5), 1).ravel()
 
     # rolling 5s mean (non-overlapping windows)
     mn = rolling_mean(rmd, int(fs * 5), int(fs * 5))
@@ -77,7 +74,7 @@ def detect_nonwear_temp(t, fs, temp_td=25.0):
     rmdn_mn = rolling_median(mn, 5 * 12 * 5, 1)
 
     # threshold
-    temp_mask = any(rmdn_mn < temp_td, axis=1)
+    temp_mask = rmdn_mn < temp_td
     return temp_mask
 
 
@@ -102,8 +99,8 @@ def rle(to_encode):
     array = asarray(to_encode)
     n = array.size
 
-    diff = asarray(array[1:] != array[:-1])
-    block_end_indices = append(where(diff), n - 1)
+    is_diff = asarray(array[1:] != array[:-1])
+    block_end_indices = append(where(is_diff), n - 1)
     lengths = diff(append(-1, block_end_indices))
     block_start_indices = cumsum(append(0, lengths))[:-1]
     block_values = array[block_start_indices]
