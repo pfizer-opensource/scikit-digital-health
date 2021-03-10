@@ -4,7 +4,7 @@ Function for the detection of sleep boundaries, here defined as the total sleep 
 Yiorgos Christakis
 Pfizer DMTI 2021
 """
-from numpy import arange, zeros, float_, interp, pad, min, max, percentile
+from numpy import pad, min, max, percentile
 
 from skimu.utility import rolling_mean
 from skimu.sleep.utility import *
@@ -54,12 +54,12 @@ def detect_tso(
         First and last timestamps of the tso window. First and last indices of tso window.
 
     """
-    # compute non-wear
-    move_mask = detect_nonwear_mvmt(acc, fs, move_td) if move_td else None
-    temp_mask = detect_nonwear_temp(temp, fs, temp_td) if temp is not None else None
-
-    # rolling 5s median
+    # compute rolling 5s median only 1 time
     rmd = rolling_median(acc, int(fs * 5), 1)
+
+    # compute non-wear
+    move_mask = detect_nonwear_mvmt(rmd, fs, move_td) if move_td else None
+    temp_mask = detect_nonwear_temp(temp, fs, temp_td) if temp is not None else None
 
     # compute z-angle
     z = compute_z_angle(rmd)
@@ -74,7 +74,7 @@ def detect_tso(
     rmd_dmnz = rolling_median(dmnz, 5 * 12 * 5, 1)
 
     # compute threshold
-    td = compute_tso_threshold(rmd_dmnz, min_td=min_td, max_td=max_td)
+    td = compute_tso_threshold(rmd_dmnz, min_td=min_angle_threshold, max_td=max_angle_threshold)
 
     # apply threshold
     rmd_dmnz[rmd_dmnz < td] = 0
@@ -104,20 +104,19 @@ def detect_tso(
     rmd_dmnz = drop_min_blocks(rmd_dmnz, 12 * min_rest_block, drop_value=0, replace_value=1)
 
     # drop active blocks less than minimum allowed active length
-    rmd_dmnz = drop_min_blocks(rmd_dmnz, 12 * min_act, drop_value=1, replace_value=0)
+    rmd_dmnz = drop_min_blocks(rmd_dmnz, 12 * allowed_rest_break, drop_value=1, replace_value=0)
 
     # get indices of longest bout
     arg_start, arg_end = arg_longest_bout(rmd_dmnz, 0)
 
     # get timestamps of longest bout
-    t_5s = t[:: 5 * fs]
+    t_5s = t[::int(5 * fs)]
     if arg_start is not None:
         start, end = t_5s[arg_start], t_5s[arg_end]
     else:
         start, end = None, None
 
-    tso = (start, end, arg_start, arg_end)
-    return tso
+    return start, end, arg_start, arg_end
 
 
 def compute_tso_threshold(arr, min_td=0.1, max_td=0.5):
