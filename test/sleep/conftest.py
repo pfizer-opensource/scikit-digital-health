@@ -31,7 +31,8 @@ def tso_dummy_data():
         temp = np.random.uniform(-4, 5, time.size)
         lux = np.random.uniform(0, 80, time.size)
 
-        accel[sleep_starti:sleep_endi] = 0.001
+        accel[sleep_starti:sleep_endi] *= 0.01
+        accel[sleep_starti:sleep_endi, 2] += 1
         temp[:] = 27.0
 
         return (time, accel, temp, lux), (sleep_start, sleep_end)
