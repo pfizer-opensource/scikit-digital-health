@@ -14,6 +14,7 @@ Misc. Math Functions
     math.rolling_sd
     math.rolling_skewness
     math.rolling_kurtosis
+    math.rolling_median
 
 Orientation Functions
 ---------------------
@@ -34,7 +35,7 @@ Windowing Functions
     windowing.get_windowed_view
 """
 
-from skimu.utility.math import rolling_mean, rolling_sd, rolling_skewness, rolling_kurtosis
+from skimu.utility.math import *
 from skimu.utility import math
 from skimu.utility.orientation import correct_accelerometer_orientation
 from skimu.utility import orientation
