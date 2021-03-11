@@ -25,20 +25,21 @@ class Sleep(_BaseProcess):
         Lowest temperature for which a data point is considered valid/wear. Default is 25C.
     min_rest_block : int, optional
         Number of minutes required to consider a rest period valid. Default is 30 minutes.
-    allowed_rest_break : int, optional
-        Number of minutes allowed to interrupt the major rest period. Default is 30 minutes
-    min_rest_threshold : float, optional
+    max_activity_break : int, optional
+        Number of minutes of activity allowed to interrupt the major rest period. Default is 30
+        minutes.
+    min_angle_thresh : float, optional
         Minimum allowed z-angle threshold for determining major rest period. Default is 0.1.
-    max_rest_threshold : float, optional
+    max_angle_thresh : float, optional
         Maximum allowed z-angle threshold for determining major rest period. Default is 1.0.
     min_rest_period : float, optional
         Minimum length allowed for major rest period. Default is None
-    movement_based_nonwear : float, optional
+    nonwear_move_thresh : float, optional
         Threshold for movement based non-wear. Default is None.
     min_wear_time : float, optional
-        Used with `movement_based_nonwear`.  Wear time in minutes required for data to be considered
+        Used with `nonwear_move_thresh`.  Wear time in minutes required for data to be considered
         valid. Default is 0
-    minimum_hours : float, optional
+    min_day_hours : float, optional
         Minimum number of hours required to consider a day useable. Default is 6 hours.
     downsample : bool, optional
         Downsample to 20Hz. Default is True.
@@ -71,22 +72,22 @@ class Sleep(_BaseProcess):
     """
     def __init__(
             self, start_buffer=0, stop_buffer=0, temperature_threshold=25, min_rest_block=30,
-            allowed_rest_break=30, min_rest_threshold=0.1, max_rest_threshold=1.0,
-            min_rest_period=None, movement_based_nonwear=None, min_wear_time=0,
-            minimum_hours=6, downsample=True
+            max_activity_break=30, min_angle_thresh=0.1, max_angle_thresh=1.0,
+            min_rest_period=None, nonwear_move_thresh=None, min_wear_time=0,
+            min_day_hours=6, downsample=True
     ):
         super().__init__(
             start_buffer=start_buffer,
             stop_buffer=stop_buffer,
             temperature_threshold=temperature_threshold,
             min_rest_block=min_rest_block,
-            allowed_rest_break=allowed_rest_break,
-            min_rest_threshold=min_rest_threshold,
-            max_rest_threshold=max_rest_threshold,
+            max_activity_break=max_activity_break,
+            min_angle_thresh=min_angle_thresh,
+            max_angle_thresh=max_angle_thresh,
             min_rest_period=min_rest_period,
-            movement_based_nonwear=movement_based_nonwear,
+            nonwear_move_thresh=nonwear_move_thresh,
             min_wear_time=min_wear_time,
-            minimum_hours=minimum_hours,
+            min_day_hours=min_day_hours,
             downsample=downsample
         )
 
@@ -94,14 +95,15 @@ class Sleep(_BaseProcess):
         self.hp_cut = 0.25
         self.start_buff = start_buffer
         self.stop_buff = stop_buffer
-        self.T_min = temperature_threshold
+        self.nw_temp = temperature_threshold
         self.min_rest_block = min_rest_block
-        self.allowed_rest_break = allowed_rest_break
-        self.min_rest_thresh = min_rest_threshold
-        self.max_rest_thresh = max_rest_threshold
+        self.max_act_break = max_activity_break
+        self.min_angle = min_angle_thresh
+        self.max_angle = max_angle_thresh
         self.min_rest_period = min_rest_period
-        self.move_based_nwear = movement_based_nonwear
+        self.nw_thresh = nonwear_move_thresh
         self.min_wear_time = min_wear_time
+        self.min_day_hrs = min_day_hours
         self.downsample = downsample
 
     def predict(self, time=None, accel=None, *, temp=None, fs=None, **kwargs):
@@ -148,7 +150,10 @@ class Sleep(_BaseProcess):
             accel_ds = accel
             temp_ds = temp
 
-        tso = detect_tso(accel_ds, time_ds, goal_fs, temp_ds, self.min_rest_block, )
+        tso = detect_tso(
+            accel_ds, time_ds, goal_fs, temp_ds, self.min_rest_block, self.max_act_break,
+            self.min_angle, self.max_angle, self.nw_thresh, self.nw_temp
+        )
         # FULL SLEEP PIPELINE
         # compute total sleep opportunity window
         # compute activity index
