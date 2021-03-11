@@ -5,7 +5,7 @@ Yiorgos Christakis
 Pfizer DMTI 2019-2021
 """
 # TODO: build predict function using tso.py, activity_index.py, sleep_classification.py, endpoints.py
-from numpy import zeros, arange, interp, float_
+from numpy import zeros, arange, interp, float_, mean, diff
 
 from skimu.base import _BaseProcess  # import the base process class
 from skimu.sleep.tso import detect_tso
@@ -122,9 +122,12 @@ class Sleep(_BaseProcess):
             Sampling frequency in Hz for the acceleration and temperature values. If None,
             will be inferred from the timestamps
         """
+        if fs is None:
+            fs = mean(diff(time[:5000]))
+
         # downsample if necessary
         goal_fs = 20.
-        if fs != goal_fs:
+        if fs != goal_fs and self.downsample:
             # get timestamps
             time_ds = arange(time[0], time[-1], 1 / 20.0)
 
@@ -139,6 +142,11 @@ class Sleep(_BaseProcess):
                 temp_ds[:, 0] = interp(time_ds, time, temp)
             else:
                 temp_ds = None
+        else:
+            goal_fs = fs
+            time_ds = time
+            accel_ds = accel
+            temp_ds = temp
 
         tso = detect_tso(accel_ds, time_ds, goal_fs, temp_ds, self.min_rest_block, )
         # FULL SLEEP PIPELINE
