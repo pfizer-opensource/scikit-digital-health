@@ -134,14 +134,27 @@ class TestDropMinBlocks:
 
 
 class TestArgLongestBout:
-    def test_uniform(self):
-        assert False
+    def test(self):
+        arr = np.array([0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0])
 
-    def test_alternating(self):
-        assert False
+        out = arg_longest_bout(arr, 1)
+        assert out == (1, 4)
 
-    def test_random(self):
-        assert False
+        out = arg_longest_bout(arr, 0)
+        assert out == (7, 11)
 
-    def test_value_not_present(self):
-        assert False
+    def test_with_ends(self):
+        arr = np.array([1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0])
+
+        out = arg_longest_bout(arr, 1)
+        assert out == (0, 3)
+
+        out = arg_longest_bout(arr, 0)
+        assert out == (15, 20)
+
+    def test_2_same_length(self):
+        arr = np.array([0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 0, 0])
+        out = arg_longest_bout(arr, 1)
+
+        expected = 1, 4
+        assert out == expected
