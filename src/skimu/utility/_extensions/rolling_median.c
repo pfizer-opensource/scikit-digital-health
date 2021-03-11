@@ -30,7 +30,7 @@ PyObject * roll_median(PyObject *NPY_UNUSED(self), PyObject *args){
     // data pointers
     double *dptr = (double *)PyArray_DATA(data);
     
-    gsl_movstat_workspace *w = gsl_movstat_alloc((size_t)wlen);
+    gsl_movstat_workspace *w = gsl_movstat_alloc2(0, (size_t)wlen - 1);
 
     gsl_vector x;
     x.size = ddims[ndim-1];
@@ -40,8 +40,14 @@ PyObject * roll_median(PyObject *NPY_UNUSED(self), PyObject *args){
     x.owner = 0;
 
     // RETURN
-    PyArrayObject *rmean = (PyArrayObject *)PyArray_EMPTY(ndim, ddims, NPY_DOUBLE, 0);
-    double *rptr = (double *)PyArray_DATA(rmean);
+    PyArrayObject *rmed = (PyArrayObject *)PyArray_EMPTY(ndim, ddims, NPY_DOUBLE, 0);
+    if (!rmed){
+        Py_XDECREF(data);
+        Py_XDECREF(rmed);
+        gsl_movstat_free(w);
+        return NULL;
+    }
+    double *rptr = (double *)PyArray_DATA(rmed);
 
     gsl_vector xmean;
     xmean.size = ddims[ndim-1];
@@ -63,10 +69,10 @@ PyObject * roll_median(PyObject *NPY_UNUSED(self), PyObject *args){
         dptr += stride;
         rptr += stride;
     }
-    
+    gsl_movstat_free(w);
     Py_XDECREF(data);
 
-    return (PyObject *)rmean;
+    return (PyObject *)rmed;
 }
 
 static struct PyMethodDef methods[] = {
