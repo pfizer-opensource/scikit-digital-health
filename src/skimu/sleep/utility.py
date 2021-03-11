@@ -4,8 +4,7 @@ Utility functions required for sleep metric generation
 Yiorgos Christakis
 Pfizer DMTI 2021
 """
-from numpy import any, asarray, append, where, cumsum, arctan, pi, roll, abs, argmax, diff, \
-    nonzero, insert
+from numpy import any, asarray, arctan, pi, roll, abs, argmax, diff, nonzero, insert
 
 from skimu.utility import rolling_mean, rolling_sd, rolling_median
 
