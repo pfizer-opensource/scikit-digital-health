@@ -124,3 +124,16 @@ class TestRollingMedian(BaseTestRolling):
     function = staticmethod(rolling_median)
     truth_function = staticmethod(np.median)
     truth_kw = {}
+
+    @pytest.mark.parametrize("skip", (1, 2, 7, 150, 300))
+    def test_pad(self, skip):
+        x = np.random.random(100000)
+        xw = get_windowed_view(x, 150, skip)
+
+        truth = self.truth_function(xw, axis=-1, **self.truth_kw)
+        pred = self.function(x, 150, skip, pad=True)
+
+        N = ((x.size - 150) // skip + 1)
+
+        assert np.allclose(pred[:N], truth)
+        assert np.all(np.isnan(pred[N:]))
