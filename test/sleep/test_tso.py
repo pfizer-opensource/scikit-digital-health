@@ -8,8 +8,8 @@ class TestDetectTSO:
 
         # calculate tso
         tso = detect_tso(
-            acc, time, 20.0, temp, min_rest_block=30, allowed_rest_break=60,
-            min_angle_threshold=0.1, max_angle_threshold=1.0, move_td=0.001, temp_td=25.0
+            acc, time, 20.0, temp, min_rest_block=30, max_act_break=60,
+            min_angle_thresh=0.1, max_angle_thresh=1.0, move_thresh=0.001, temp_thresh=25.0
         )
 
         assert abs(tso[0] - sleep[0]) < 30  # less than 30 seconds off
