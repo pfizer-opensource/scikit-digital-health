@@ -4,7 +4,7 @@ Utility functions required for sleep metric generation
 Yiorgos Christakis
 Pfizer DMTI 2021
 """
-from numpy import any, asarray, arctan, pi, roll, abs, argmax, diff, nonzero, insert
+from numpy import any, asarray, arctan, pi, roll, abs, argmax, diff, nonzero, insert, sqrt
 
 from skimu.utility import rolling_mean, rolling_sd, rolling_median
 
@@ -116,7 +116,7 @@ def compute_z_angle(acc):
     -------
     z : array
     """
-    z = arctan(acc[:, 2] / ((acc[:, 0] ** 2 + acc[:, 1] ** 2) ** 0.5)) * (180.0 / pi)
+    z = arctan(acc[:, 2] / sqrt(acc[:, 0] ** 2 + acc[:, 1] ** 2)) * (180.0 / pi)
     return z
 
 
