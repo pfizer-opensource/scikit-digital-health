@@ -4,8 +4,8 @@ Utility functions required for sleep metric generation
 Yiorgos Christakis
 Pfizer DMTI 2021
 """
-from numpy import any, asarray, append, where, cumsum, flip, arctan, pi, roll, abs, argmax, diff
-from pandas import DataFrame
+from numpy import any, asarray, append, where, cumsum, arctan, pi, roll, abs, argmax, diff, \
+    nonzero, insert
 
 from skimu.utility import rolling_mean, rolling_sd, rolling_median
 
@@ -94,16 +94,15 @@ def rle(to_encode):
     block_values : array
         The value repeated for the duration of each block.
     """
-    array = asarray(to_encode)
-    n = array.size
+    starts = nonzero(diff(to_encode))[0] + 1
+    # add the end too for length computation
+    starts = insert(starts, (0, starts.size), (0, len(to_encode)))
 
-    is_diff = asarray(array[1:] != array[:-1])
-    block_end_indices = append(where(is_diff), n - 1)
-    lengths = diff(append(-1, block_end_indices))
-    block_start_indices = cumsum(append(0, lengths))[:-1]
-    block_values = array[block_start_indices]
+    lengths = diff(starts)
+    starts = starts[:-1]  # remove that last index which isn't actually a start
+    values = asarray(to_encode)[starts]
 
-    return lengths, block_start_indices, block_values
+    return lengths, starts, values
 
 
 def compute_z_angle(acc):
