@@ -31,14 +31,15 @@ def detect_nonwear_mvmt(acc_rmed, fs, move_td=0.001):
     Returns
     -------
     move_mask : array
-        Epoch-level binary predictions of non-wear. 1 corresponds to a non-wear bout, 0 to a wear bout.
+        Epoch-level binary predictions of non-wear. 1 corresponds to a non-wear bout, 0 to a wear
+        bout.
 
     """
     # rolling 5s mean (non-overlapping windows)
     mn = rolling_mean(acc_rmed, int(fs * 5), int(fs * 5), axis=0)
 
-    # rolling 30m STD
-    rstd_mn = rolling_sd(mn, 5 * 12 * 30, 1, axis=0, return_previous=False)
+    # rolling 30m STD  5s windows -> 12 windows per minute
+    rstd_mn = rolling_sd(mn, 12 * 30, 1, axis=0, return_previous=False)
 
     # threshold
     move_mask = any(rstd_mn <= move_td, axis=1)
@@ -71,7 +72,7 @@ def detect_nonwear_temp(t, fs, temp_td=25.0):
     mn = rolling_mean(rmd, int(fs * 5), int(fs * 5))
 
     # rolling 5m median.
-    rmdn_mn = rolling_median(mn, 5 * 12 * 5, 1)
+    rmdn_mn = rolling_median(mn, 12 * 5, 1)
 
     # threshold
     temp_mask = rmdn_mn < temp_td

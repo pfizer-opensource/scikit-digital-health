@@ -71,7 +71,7 @@ def detect_tso(
     dmnz = compute_absolute_difference(mnz)
 
     # rolling 5m median
-    rmd_dmnz = rolling_median(dmnz, 5 * 12 * 5, 1)
+    rmd_dmnz = rolling_median(dmnz, 12 * 5, 1)  # 12 windows per minute (5s windows) * 5 minutes
 
     # compute threshold
     td = compute_tso_threshold(rmd_dmnz, min_td=min_angle_threshold, max_td=max_angle_threshold)
