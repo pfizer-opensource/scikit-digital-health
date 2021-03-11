@@ -118,3 +118,9 @@ class TestRollingKurtosis(BaseTestRolling):
         {"ddof": 1},
         {}
     )
+
+
+class TestRollingMedian(BaseTestRolling):
+    function = staticmethod(rolling_median)
+    truth_function = staticmethod(np.median)
+    truth_kw = {}
