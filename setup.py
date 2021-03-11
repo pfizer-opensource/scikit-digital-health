@@ -187,6 +187,11 @@ def configuration(parent_package='', top_path=None):
         sources="src/skimu/utility/_extensions/rolling_moments.c",
         libraries=["frolling_moments"]
     )
+    config.add_extension(
+        "skimu/utility/_extensions/rolling_median",
+        sources="src/skimu/utility/_extensions/rolling_median.c",
+        libraries=["gsl"]
+    )
     # Read library
     config.add_library(
         'read',
