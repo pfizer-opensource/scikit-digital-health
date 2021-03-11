@@ -55,7 +55,7 @@ def detect_tso(
 
     """
     # compute rolling 5s median only 1 time
-    rmd = rolling_median(acc, int(fs * 5), skip=1, pad=False)
+    rmd = rolling_median(acc, int(fs * 5), skip=1, pad=False, axis=0)
 
     # compute non-wear
     move_mask = detect_nonwear_mvmt(rmd, fs, move_td) if move_td else None
@@ -110,9 +110,8 @@ def detect_tso(
     arg_start, arg_end = arg_longest_bout(rmd_dmnz, 0)
 
     # get timestamps of longest bout
-    t_5s = t[::int(5 * fs)]
     if arg_start is not None:
-        start, end = t_5s[arg_start], t_5s[arg_end]
+        start, end = t[arg_start * int(5 * fs)], t[arg_end * int(5 * fs)]
     else:
         start, end = None, None
 
