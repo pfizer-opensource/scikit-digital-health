@@ -6,7 +6,7 @@ Pfizer DMTI 2021
 """
 from numpy import pad, min, max, percentile
 
-from skimu.utility import rolling_mean
+from skimu.utility import rolling_mean, rolling_median
 from skimu.sleep.utility import *
 
 
@@ -55,7 +55,7 @@ def detect_tso(
 
     """
     # compute rolling 5s median only 1 time
-    rmd = rolling_median(acc, int(fs * 5), 1)
+    rmd = rolling_median(acc, int(fs * 5), skip=1, pad=False)
 
     # compute non-wear
     move_mask = detect_nonwear_mvmt(rmd, fs, move_td) if move_td else None
@@ -70,8 +70,8 @@ def detect_tso(
     # compute dz-angle
     dmnz = compute_absolute_difference(mnz)
 
-    # rolling 5m median
-    rmd_dmnz = rolling_median(dmnz, 12 * 5, 1)  # 12 windows per minute (5s windows) * 5 minutes
+    # rolling 5m median, 12 windows per minute (5s windows) * 5 minutes
+    rmd_dmnz = rolling_median(dmnz, 12 * 5, skip=1, pad=False)
 
     # compute threshold
     td = compute_tso_threshold(rmd_dmnz, min_td=min_angle_threshold, max_td=max_angle_threshold)
