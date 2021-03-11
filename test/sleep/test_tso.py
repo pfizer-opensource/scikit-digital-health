@@ -1,6 +1,3 @@
-from numpy import repeat
-from pandas import to_datetime
-
 from skimu.sleep.tso import detect_tso
 
 
