@@ -109,6 +109,10 @@ def detect_tso(
     # get indices of longest bout
     arg_start, arg_end = arg_longest_bout(rmd_dmnz, 0)
 
+    # account for left-justified windows - times need to be bumped up by half a window
+    arg_start += 30
+    arg_end += 30  # 12 * 5 / 2
+
     # get timestamps of longest bout
     if arg_start is not None:
         start, end = t[arg_start * int(5 * fs)], t[arg_end * int(5 * fs)]
