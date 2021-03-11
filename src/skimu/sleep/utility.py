@@ -15,7 +15,7 @@ __all__ = [
 ]
 
 
-def detect_nonwear_mvmt(acc_rmed, fs, move_td=0.001):
+def detect_nonwear_mvmt(acc_rmed, fs, move_td):
     """
     Movement-based function for detecting non-wear.
 
@@ -33,7 +33,6 @@ def detect_nonwear_mvmt(acc_rmed, fs, move_td=0.001):
     move_mask : array
         Epoch-level binary predictions of non-wear. 1 corresponds to a non-wear bout, 0 to a wear
         bout.
-
     """
     # rolling 5s mean (non-overlapping windows)
     mn = rolling_mean(acc_rmed, int(fs * 5), int(fs * 5), axis=0)
@@ -46,7 +45,7 @@ def detect_nonwear_mvmt(acc_rmed, fs, move_td=0.001):
     return move_mask
 
 
-def detect_nonwear_temp(t, fs, temp_td=25.0):
+def detect_nonwear_temp(t, fs, temp_td):
     """
     Temperature-based function for detecting non-wear periods during sleep.
 
@@ -63,7 +62,6 @@ def detect_nonwear_temp(t, fs, temp_td=25.0):
     -------
     temp_mask : array
         Epoch-level binary predictions of non-wear. 1 corresponds to a non-wear bout, 0 to a wear bout.
-
     """
     # rolling 5s median
     rmd = rolling_median(t, int(fs * 5), skip=1, pad=False)
@@ -95,7 +93,6 @@ def rle(to_encode):
         Indices of the start of each block.
     block_values : array
         The value repeated for the duration of each block.
-
     """
     array = asarray(to_encode)
     n = array.size
@@ -120,7 +117,6 @@ def compute_z_angle(acc):
     Returns
     -------
     z : array
-
     """
     z = arctan(acc[:, 2] / ((acc[:, 0] ** 2 + acc[:, 1] ** 2) ** 0.5)) * (180.0 / pi)
     return z
@@ -137,7 +133,6 @@ def compute_absolute_difference(arr):
     Returns
     -------
     absd: array
-
     """
     shifted = roll(arr, 1)
     shifted[0] = shifted[1]
@@ -165,7 +160,6 @@ def drop_min_blocks(arr, min_block_size, drop_value, replace_value, skip_bounds=
     Returns
     -------
     arr : array
-
     """
     lengths, starts, vals = rle(arr)
     ctr = 0
@@ -194,7 +188,6 @@ def arg_longest_bout(arr, block_val):
     -------
     longest_bout : tuple
         First, last indices of the longest block.
-
     """
     lengths, starts, vals = rle(arr)
     vals = vals.flatten()
