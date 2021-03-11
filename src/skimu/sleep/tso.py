@@ -11,16 +11,8 @@ from skimu.sleep.utility import *
 
 
 def detect_tso(
-    acc,
-    t,
-    fs,
-    temp=None,
-    min_rest_block=30,
-    allowed_rest_break=60,
-    min_angle_threshold=0.1,
-    max_angle_threshold=0.5,
-    move_td=0.001,
-    temp_td=25.0,
+        acc, t, fs, temp, min_rest_block, max_act_break, min_angle_thresh,
+        max_angle_thresh, move_thresh, temp_thresh
 ):
     """
     Computes the total sleep opportunity window bounds.
@@ -37,15 +29,15 @@ def detect_tso(
         Temperature data.
     min_rest_block : int
         Minimum number of minutes required to consider a rest period valid.
-    allowed_rest_break : int
-        Minimum number of minutes required to consider an active period valid.
-    min_angle_threshold : float
+    max_act_break : int
+        Maximum number of minutes of an activity period that doesn't interrupt a rest period.
+    min_angle_thresh : float
         Minimum dz-angle threshold.
-    max_angle_threshold : float
+    max_angle_thresh : float
         Maximum dz-angle threshold.
-    move_td : float
+    move_thresh : float
         Movement-based non-wear threshold value. Boolean False negates use.
-    temp_td : float
+    temp_thresh : float
         Temperature-based non-wear threshold value.
 
     Returns
@@ -58,8 +50,8 @@ def detect_tso(
     rmd = rolling_median(acc, int(fs * 5), skip=1, pad=False, axis=0)
 
     # compute non-wear
-    move_mask = detect_nonwear_mvmt(rmd, fs, move_td) if move_td else None
-    temp_mask = detect_nonwear_temp(temp, fs, temp_td) if temp is not None else None
+    move_mask = detect_nonwear_mvmt(rmd, fs, move_thresh) if move_thresh else None
+    temp_mask = detect_nonwear_temp(temp, fs, temp_thresh) if temp is not None else None
 
     # compute z-angle
     z = compute_z_angle(rmd)
@@ -74,7 +66,7 @@ def detect_tso(
     rmd_dmnz = rolling_median(dmnz, 12 * 5, skip=1, pad=False)
 
     # compute threshold
-    td = compute_tso_threshold(rmd_dmnz, min_td=min_angle_threshold, max_td=max_angle_threshold)
+    td = compute_tso_threshold(rmd_dmnz, min_td=min_angle_thresh, max_td=max_angle_thresh)
 
     # apply threshold
     rmd_dmnz[rmd_dmnz < td] = 0
@@ -103,8 +95,8 @@ def detect_tso(
     # drop rest blocks less than minimum allowed rest length
     rmd_dmnz = drop_min_blocks(rmd_dmnz, 12 * min_rest_block, drop_value=0, replace_value=1)
 
-    # drop active blocks less than minimum allowed active length
-    rmd_dmnz = drop_min_blocks(rmd_dmnz, 12 * allowed_rest_break, drop_value=1, replace_value=0)
+    # drop active blocks less than maximum allowed active length
+    rmd_dmnz = drop_min_blocks(rmd_dmnz, 12 * max_act_break, drop_value=1, replace_value=0)
 
     # get indices of longest bout
     arg_start, arg_end = arg_longest_bout(rmd_dmnz, 0)
