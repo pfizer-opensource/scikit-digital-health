@@ -1,0 +1,2 @@
+libzip
+gsl
