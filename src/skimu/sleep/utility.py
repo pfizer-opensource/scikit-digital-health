@@ -7,10 +7,10 @@ Pfizer DMTI 2021
 from numpy import any, asarray, append, where, cumsum, flip, arctan, pi, roll, abs, argmax, diff
 from pandas import DataFrame
 
-from skimu.utility import rolling_mean, rolling_sd
+from skimu.utility import rolling_mean, rolling_sd, rolling_median
 
 __all__ = [
-    "detect_nonwear_mvmt", "detect_nonwear_temp", "rle", "rolling_median", "compute_z_angle",
+    "detect_nonwear_mvmt", "detect_nonwear_temp", "rle", "compute_z_angle",
     "compute_absolute_difference", "drop_min_blocks", "arg_longest_bout"
 ]
 
@@ -66,13 +66,13 @@ def detect_nonwear_temp(t, fs, temp_td=25.0):
 
     """
     # rolling 5s median
-    rmd = rolling_median(t, int(fs * 5), 1).ravel()
+    rmd = rolling_median(t, int(fs * 5), skip=1, pad=False)
 
     # rolling 5s mean (non-overlapping windows)
     mn = rolling_mean(rmd, int(fs * 5), int(fs * 5))
 
     # rolling 5m median.
-    rmdn_mn = rolling_median(mn, 12 * 5, 1)
+    rmdn_mn = rolling_median(mn, 12 * 5, skip=1, pad=False)
 
     # threshold
     temp_mask = rmdn_mn < temp_td
@@ -131,7 +131,7 @@ def _rolling_mean(arr, w_size, step=1):
     return rmn
 
 
-def rolling_median(arr, w_size, step=1):
+def _rolling_median(arr, w_size, step=1):
     """
     Computes the rolling median of an array along the first axis.
 
