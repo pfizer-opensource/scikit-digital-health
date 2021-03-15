@@ -176,7 +176,7 @@ class Sit2Stand(_BaseProcess):
 
     def predict(self, time=None, accel=None, **kwargs):
         """
-        predict(time, accel)
+        predict(time, accel, *, day_ends={})
 
         Predict the sit-to-stand transfers, and compute per-transition quantities
 
@@ -186,6 +186,10 @@ class Sit2Stand(_BaseProcess):
             (N, ) array of timestamps (in seconds since 1970-1-1 00:00:00)
         accel : ndarray
             (N, 3) array of acceleration, with units of 'g'.
+        day_ends : dict, optional
+            Optional dictionary containing (N, 2) arrays of start and stop indices for invididual
+            days. Dictionary keys are in the format "{base}, {period}". If not provided, or the
+            key specified by `day_window` is not found, no day-based windowing will be done.
         """
         super().predict(time=time, accel=accel, **kwargs)
 

@@ -287,7 +287,7 @@ class Gait(_BaseProcess):
 
     def predict(self, time=None, accel=None, *, gyro=None, height=None, gait_pred=None, **kwargs):
         """
-        predict(time, accel, *, gyro=None, height=None, gait_pred=None)
+        predict(time, accel, *, gyro=None, height=None, gait_pred=None, day_ends={})
 
         Get the gait events and metrics from a time series signal
 
@@ -310,6 +310,10 @@ class Gait(_BaseProcess):
             (N, ) array of boolean predictions of gait, or any value that is not None. If not an
             ndarray but not None, the entire recording will be taken as gait. If not provided
             (or None), gait classification will be performed on the acceleration data.
+        day_ends : dict, optional
+            Optional dictionary containing (N, 2) arrays of start and stop indices for invididual
+            days. Dictionary keys are in the format "{base}, {period}". If not provided, or the
+            key specified by `day_window` is not found, no day-based windowing will be done.
 
         Returns
         -------
