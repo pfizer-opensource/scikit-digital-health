@@ -49,10 +49,6 @@ def detect_tso(
     # compute rolling 5s median only 1 time
     rmd = rolling_median(acc, int(fs * 5), skip=1, pad=False, axis=0)
 
-    # compute non-wear
-    move_mask = detect_nonwear_mvmt(rmd, fs, move_thresh) if move_thresh else None
-    temp_mask = detect_nonwear_temp(temp, fs, temp_thresh) if temp is not None else None
-
     # compute z-angle
     z = compute_z_angle(rmd)
 
@@ -62,7 +58,7 @@ def detect_tso(
     # compute dz-angle
     dmnz = compute_absolute_difference(mnz)
 
-    # rolling 5m median, 12 windows per minute (5s windows) * 5 minutes
+    # rolling 5m median. 12 windows per minute (5s windows) * 5 minutes
     rmd_dmnz = rolling_median(dmnz, 12 * 5, skip=1, pad=False)
 
     # compute threshold
@@ -71,6 +67,10 @@ def detect_tso(
     # apply threshold
     rmd_dmnz[rmd_dmnz < td] = 0
     rmd_dmnz[rmd_dmnz >= td] = 1
+
+    # compute non-wear
+    move_mask = detect_nonwear_mvmt(rmd, fs, move_thresh) if move_thresh else None
+    temp_mask = detect_nonwear_temp(temp, fs, temp_thresh) if temp is not None else None
 
     # apply movement-based non-wear mask
     if move_mask is not None:
