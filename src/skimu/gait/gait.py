@@ -334,8 +334,17 @@ class Gait(_BaseProcess):
         goal_fs = 50 if fs > (50 * 0.985) else 20
         downsample = False if ((0.985 * goal_fs) < fs < (1.015 * goal_fs)) else True
 
-        days = kwargs.get(self._days, {"0, 24": [[0, accel.shape[0] - 1]]})
-        days = days["0, 24"]  # get the 0 base, 24 period time window
+        if self._days in kwargs:
+            days = kwargs.get(self._days)  # , {"0, 24": [[0, accel.shape[0] - 1]]})
+            if "0, 24" in days:
+                days = days["0, 24"]  # get the 0 base, 24 period time window
+            else:
+                warn("Base 0, period 24 day not found, no splits per day")
+                days = [[0, accel.shape[0] - 1]]
+        else:
+            warn("No day windowing found, using all data")
+            days = [[0, accel.shape[0] - 1]]
+
         time_ds, accel_ds, gait_pred_ds, days = get_downsampled_data(
             time, accel, gait_pred, fs, goal_fs, days, downsample)
 
