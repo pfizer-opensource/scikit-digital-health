@@ -10,6 +10,34 @@ from skimu.utility import rolling_mean, rolling_median
 from skimu.sleep.utility import *
 
 
+def get_total_sleep_opportunity(
+        fs, time, accel, temp, min_rest_block, max_act_break, min_angle_thresh, max_angle_thresh,
+        move_thresh, temp_thresh
+):
+    # samples in 5 seconds
+    n5 = int(5 * fs)
+    # compute the rolling median for 5s windows
+    acc_rmd = rolling_median(accel, n5, skip=1, pad=False, axis=0)
+
+    # compute the z-angle
+    z = compute_z_angle(acc_rmd)
+
+    # rolling 5s mean with non-overlapping windows for the z-angle
+    z_rm = rolling_mean(z, n5, n5)
+
+    # the angle differences
+    dz_rm = compute_absolute_difference(z_rm)
+
+    # rolling 5 minute median. 12 windows per minute * 5 minutes
+    dz_rm_rmd = rolling_median(dz_rm, 12 * 5, skip=1, pad=False)
+
+    # compute the TSO threshold
+    tso_thresh = compute_tso_threshold(dz_rm_rmd, min_td=min_angle_thresh, max_td=max_angle_thresh)
+
+    # apply the threshold
+    tso = dz_rm_rmd < tso_thresh
+
+
 def detect_tso(
         acc, t, fs, temp, min_rest_block, max_act_break, min_angle_thresh,
         max_angle_thresh, move_thresh, temp_thresh

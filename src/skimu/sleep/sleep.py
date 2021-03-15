@@ -1,13 +1,14 @@
 """
 Sleep and major rest period detection
 
-Yiorgos Christakis
+Yiorgos Christakis, Lukas Adamowicz
 Pfizer DMTI 2019-2021
 """
 # TODO: build predict function using tso.py, activity_index.py, sleep_classification.py, endpoints.py
-from numpy import zeros, arange, interp, float_, mean, diff
+from numpy import zeros, arange, interp, float_, mean, diff, around, int_, full
 
 from skimu.base import _BaseProcess  # import the base process class
+from skimu.utility.internal import get_day_wear_intersection, apply_downsample
 from skimu.sleep.tso import detect_tso
 
 
@@ -43,6 +44,11 @@ class Sleep(_BaseProcess):
         Minimum number of hours required to consider a day useable. Default is 6 hours.
     downsample : bool, optional
         Downsample to 20Hz. Default is True.
+    day_window : array-like
+        Two (2) element array-like of the base and period of the window to use for determining
+        days. Default is (12, 24), which will look for days starting at 12 noon and lasting 24
+        hours. This should only be changed if the data coming in is from someone who sleeps
+        during the day, in which case (0, 24) makes the most sense.
 
     Notes
     -----
@@ -74,7 +80,7 @@ class Sleep(_BaseProcess):
             self, start_buffer=0, stop_buffer=0, temperature_threshold=25, min_rest_block=30,
             max_activity_break=30, min_angle_thresh=0.1, max_angle_thresh=1.0,
             min_rest_period=None, nonwear_move_thresh=None, min_wear_time=0,
-            min_day_hours=6, downsample=True
+            min_day_hours=6, downsample=True, day_window=(12, 24)
     ):
         super().__init__(
             start_buffer=start_buffer,
@@ -88,7 +94,8 @@ class Sleep(_BaseProcess):
             nonwear_move_thresh=nonwear_move_thresh,
             min_wear_time=min_wear_time,
             min_day_hours=min_day_hours,
-            downsample=downsample
+            downsample=downsample,
+            day_window=day_window
         )
 
         self.window_size = 60
@@ -106,9 +113,14 @@ class Sleep(_BaseProcess):
         self.min_day_hrs = min_day_hours
         self.downsample = downsample
 
+        if day_window is None:
+            self.day_key = "-1, -1"
+        else:
+            self.day_key = f"{day_window[0]}, {day_window[1]}"
+
     def predict(self, time=None, accel=None, *, temp=None, fs=None, **kwargs):
         """
-        predict(time, accel, *, temp=None, fs=None)
+        predict(time, accel, *, temp=None, fs=None, day_ends={})
 
         Generate the sleep boundaries and endpoints for a time series signal.
 
@@ -123,9 +135,17 @@ class Sleep(_BaseProcess):
         fs : float, optional
             Sampling frequency in Hz for the acceleration and temperature values. If None,
             will be inferred from the timestamps
+        day_ends : dict
+            Dictionary containing (N, 2) arrays of start and stop indices for individual days.
+            Must have the key
         """
         if fs is None:
             fs = mean(diff(time[:5000]))
+
+        # get the individual days
+        days = kwargs.get(self._days, {}).get("12, 24", None)
+        if days is None:
+            raise ValueError(f"Day indices for {self.day_key} (base, period) not found.")
 
         # downsample if necessary
         goal_fs = 20.
@@ -143,17 +163,30 @@ class Sleep(_BaseProcess):
                 temp_ds = zeros(time_ds.size, dtype=float_)
                 temp_ds[:, 0] = interp(time_ds, time, temp)
             else:
-                temp_ds = None
+                temp_ds = full(time_ds.size, self.nw_temp * 2)  # make it above thresh
+
+            # days - make sure we can use to index into accel/time data
+            days_ds = zeros(days.shape, dtype=int_)
+            for i in range(2):
+                # should be broadcast to int to match days_ds type
+                days_ds[:, i] = around(interp(time[days[:, i]], time_ds, arange(time_ds.size)))
         else:
             goal_fs = fs
             time_ds = time
             accel_ds = accel
-            temp_ds = temp
+            temp_ds = temp if temp is not None else full(time_ds.size, self.nw_temp * 2)
+            days_ds = days
 
-        tso = detect_tso(
-            accel_ds, time_ds, goal_fs, temp_ds, self.min_rest_block, self.max_act_break,
-            self.min_angle, self.max_angle, self.nw_thresh, self.nw_temp
-        )
+        for iday, day_idx in enumerate(days_ds):
+            start, stop = day_idx
+
+            tso = detect_tso(
+                accel_ds[start:stop], time_ds[start:stop],
+                goal_fs,
+                temp_ds[start:stop],
+                self.min_rest_block, self.max_act_break, self.min_angle, self.max_angle,
+                self.nw_thresh, self.nw_temp
+            )
         # FULL SLEEP PIPELINE
         # compute total sleep opportunity window
         # compute activity index
