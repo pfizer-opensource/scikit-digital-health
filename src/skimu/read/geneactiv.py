@@ -6,7 +6,7 @@ Pfizer DMTI 2020
 """
 from warnings import warn
 
-from numpy import vstack
+from numpy import vstack, asarray, int_
 
 from skimu.base import _BaseProcess
 from skimu.read.get_window_start_stop import get_window_start_stop
@@ -48,24 +48,31 @@ class ReadBin(_BaseProcess):
     def __init__(self, bases=None, periods=None):
         super().__init__(
             # kwargs
-            base=base,
-            period=period
+            bases=bases,
+            periods=periods
         )
 
-        if (base is None) and (period is None):
+        if (bases is None) and (periods is None):
             self.window = False
-            self.base = 0  # needs to be defined for passing to extensions
-            self.period = 12
-        elif (base is None) or (period is None):
+            self.bases = asarray([0])  # needs to be defined for passing to extensions
+            self.periods = asarray([12])
+        elif (bases is None) or (periods is None):
             warn("One of base or period is None, not windowing", UserWarning)
             self.window = False
-            self.base = 0
-            self.period = 12
+            self.bases = asarray([0])
+            self.periods = asarray([12])
         else:
-            if (0 <= base <= 23) and (1 <= period <= 24):
+            if isinstance(bases, int) and isinstance(periods, int):
+                bases = asarray([bases])
+                periods = asarray([periods])
+            else:
+                bases = asarray(bases, dtype=int_)
+                periods = asarray(periods, dtype=int_)
+
+            if ((0 <= bases) & (bases <= 23)).all() and ((1 <= periods) & (periods <= 24)).all():
                 self.window = True
-                self.base = base
-                self.period = period
+                self.bases = bases
+                self.periods = periods
             else:
                 raise ValueError("Base must be in [0, 23] and period must be in [1, 23]")
 
@@ -111,7 +118,7 @@ class ReadBin(_BaseProcess):
             warn("File extension is not expected '.bin'", UserWarning)
 
         # read the file
-        nmax, acc, time, light, temp, idx = read_bin(file, self.base, self.period)
+        nmax, acc, time, light, temp, idx = read_bin(file, self.bases, self.periods)
 
         results = {
             self._time: time,
