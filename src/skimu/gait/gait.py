@@ -334,7 +334,8 @@ class Gait(_BaseProcess):
         goal_fs = 50 if fs > (50 * 0.985) else 20
         downsample = False if ((0.985 * goal_fs) < fs < (1.015 * goal_fs)) else True
 
-        days = kwargs.get(self._days, [[0, accel.shape[0] - 1]])
+        days = kwargs.get(self._days, {"0, 24": [[0, accel.shape[0] - 1]]})
+        days = days["0, 24"]  # get the 0 base, 24 period time window
         time_ds, accel_ds, gait_pred_ds, days = get_downsampled_data(
             time, accel, gait_pred, fs, goal_fs, days, downsample)
 
