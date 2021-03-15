@@ -21,12 +21,14 @@ class ReadBin(_BaseProcess):
 
     Parameters
     ----------
-    base : {None, int}, optional
-        Base hour [0, 23] in which to start a window of time. Default is None, which will not
-        do any windowing. Both `base` and `period` must be defined in order to window.
-    period : {None, int}, optional
-        Period for each window, in [1, 24]. Defines the number of hours per window. Default is
-        None, which will do no windowing. Both `period` and `base` must be defined to window
+    bases : {None, int, list-like}, optional
+        Base hours [0, 23] in which to start a window of time. Default is None, which will not
+        do any windowing. Both `base` and `period` must be defined in order to window. Can use
+        multiple, but the number of `bases` must match the number of `periods`.
+    periods : {None, int, list-like}, optional
+        Periods for each window, in [1, 24]. Defines the number of hours per window. Default is
+        None, which will do no windowing. Both `period` and `base` must be defined to window. Can
+        use multiple but the number of `periods` must math the number of `bases`.
 
     Examples
     ========
@@ -38,12 +40,12 @@ class ReadBin(_BaseProcess):
 
     Setup a reader that does windowing between 8:00 AM and 8:00 PM (20:00):
 
-    >>> reader = ReadBin(base=8, period=12)  # 8 + 12 = 20
+    >>> reader = ReadBin(bases=8, periods=12)  # 8 + 12 = 20
     >>> reader.predict('example.bin')
     {'accel': ..., 'time': ..., 'day_ends': [130, 13951, ...]}
     """
 
-    def __init__(self, base=None, period=None):
+    def __init__(self, bases=None, periods=None):
         super().__init__(
             # kwargs
             base=base,
