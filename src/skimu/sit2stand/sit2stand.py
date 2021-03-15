@@ -4,6 +4,8 @@ Sit-to-stand transfer detection and processing
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
+from warnings import warn
+
 from numpy import array, sum, mean, std, around, arange, nonzero, diff, ascontiguousarray
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt, find_peaks
@@ -185,8 +187,16 @@ class Sit2Stand(_BaseProcess):
         sos = butter(self.lp_ord, 2 * self.lp_cut * dt, btype='low', output='sos')
 
         # check if windows exist for days
-        days = kwargs.get(self._days, {"0, 24": [(0, accel.shape[0])]})
-        days = days["0, 24"]
+        if self._days in kwargs:
+            days = kwargs.get(self._days)  # , {"0, 24": [[0, accel.shape[0] - 1]]})
+            if "0, 24" in days:
+                days = days["0, 24"]  # get the 0 base, 24 period time window
+            else:
+                warn("Base=0, period=24 day not found, no splits per day", UserWarning)
+                days = [[0, accel.shape[0] - 1]]
+        else:
+            warn("No day windowing found, using all data", UserWarning)
+            days = [[0, accel.shape[0] - 1]]
 
         # results storage
         sts = {

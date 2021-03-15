@@ -339,10 +339,10 @@ class Gait(_BaseProcess):
             if "0, 24" in days:
                 days = days["0, 24"]  # get the 0 base, 24 period time window
             else:
-                warn("Base 0, period 24 day not found, no splits per day")
+                warn("Base=0, period=24 day not found, no splits per day", UserWarning)
                 days = [[0, accel.shape[0] - 1]]
         else:
-            warn("No day windowing found, using all data")
+            warn("No day windowing found, using all data", UserWarning)
             days = [[0, accel.shape[0] - 1]]
 
         time_ds, accel_ds, gait_pred_ds, days = get_downsampled_data(
