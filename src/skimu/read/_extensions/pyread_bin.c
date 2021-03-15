@@ -168,8 +168,9 @@ static PyObject *read_bin(PyObject *NPY_UNUSED(self), PyObject *args)
     }
 
     return Py_BuildValue(
-        "lOOOOOO",
+        "lfOOOOOO",
         info.max_n,
+        info.fs,
         (PyObject *)accel,
         (PyObject *)time,
         (PyObject *)light,
@@ -179,7 +180,7 @@ static PyObject *read_bin(PyObject *NPY_UNUSED(self), PyObject *args)
     );
 }
 
-static const char bin_convert__doc__[] = "bin_convert(file, bases, periods)\n"
+static const char read_bin__doc__[] = "read_bin(file, bases, periods)\n"
 "Read a Geneactiv File\n\n"
 "Parameters\n"
 "----------\n"
@@ -193,6 +194,8 @@ static const char bin_convert__doc__[] = "bin_convert(file, bases, periods)\n"
 "-------\n"
 "N : int\n"
 "   Number of pages read.\n"
+"fs : float\n"
+"   Sampling frequency in Hz.\n"
 "accel : numpy.ndarray\n"
 "time : numpy.ndarray\n"
 "light : numpy.ndarray\n"
