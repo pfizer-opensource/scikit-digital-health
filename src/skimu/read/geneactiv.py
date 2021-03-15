@@ -118,7 +118,7 @@ class ReadBin(_BaseProcess):
             warn("File extension is not expected '.bin'", UserWarning)
 
         # read the file
-        nmax, acc, time, light, temp, idx = read_bin(file, self.bases, self.periods)
+        nmax, fs, acc, time, light, temp, starts, stops = read_bin(file, self.bases, self.periods)
 
         results = {
             self._time: time,
@@ -128,8 +128,12 @@ class ReadBin(_BaseProcess):
         }
 
         if self.window:
-            day_starts, day_stops = get_window_start_stop(idx, time.size)
-            results[self._days] = vstack((day_starts, day_stops)).T
+            results[self._days] = {}
+            for i, data in enumerate(zip(self.bases, self.periods)):
+                strt = starts[stops[:, i] != 0, i]
+                stp = stops[stops[:, i] != 0, i]
+
+                results[self._days][f"{data[0], data[1]}"] = vstack((strt, stp)).T
 
         kwargs.update(results)
         if self._in_pipeline:
