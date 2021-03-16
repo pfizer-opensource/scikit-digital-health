@@ -33,10 +33,13 @@ def get_day_wear_intersection(starts, stops, day_start, day_stop):
     stops_subset = stops[(stops > day_start) & (stops <= day_stop)]
 
     if starts_subset.size == 0 and stops_subset.size == 0:
-        if stops[nonzero(starts <= day_start)[0][-1]] >= day_stop:
-            return array([day_start]), array([day_stop])
-        else:
-            return array([0]), array([0])
+        try:
+            if stops[nonzero(starts <= day_start)[0][-1]] >= day_stop:
+                return array([day_start]), array([day_stop])
+            else:
+                return array([]), array([])
+        except IndexError:
+            return array([]), array([])
     if starts_subset.size == 0 and stops_subset.size == 1:
         starts_subset = array([day_start])
     if starts_subset.size == 1 and stops_subset.size == 0:
