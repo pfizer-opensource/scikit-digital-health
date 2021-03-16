@@ -204,7 +204,7 @@ static const char read_bin__doc__[] = "read_bin(file, bases, periods)\n"
 "stops : numpy.ndarray\n";
 
 static struct PyMethodDef methods[] = {
-  {"read_bin", read_bin, 1, bin_convert__doc__},
+  {"read_bin", read_bin, 1, read_bin__doc__},
   {NULL, NULL, 0, NULL}  /* sentinel */
 };
 
