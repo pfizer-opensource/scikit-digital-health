@@ -21,7 +21,9 @@ class DetectWear(_BaseProcess):
         was observed for GeneActiv devices during motionless bench tests, and will likely depend
         on the brand of accelerometer being used.
     range_crit : float, optional
-        Acceleration window range threshold for determining non-wear. Default is 0.050.
+        Acceleration window range threshold for determining non-wear. Default is 0.067, which was
+        found for several GeneActiv accelerometers in a bench test as the 75th percentile
+        of the ranges over 60 minute windows.
     apply_setup_criteria : bool, optional
         Apply criteria to the beginning of the recording to account for device setup. Default is
         True.
@@ -55,7 +57,7 @@ class DetectWear(_BaseProcess):
     re-classified as non-wear. Wear periods at the end of the recording that are less than 3 hours
     that are preceded by 1 hour of non-wear are re-classified as non-wear.
     """
-    def __init__(self, sd_crit=0.013, range_crit=0.050, apply_setup_criteria=True,
+    def __init__(self, sd_crit=0.013, range_crit=0.067, apply_setup_criteria=True,
                  shipping_criteria=False, window_length=60, window_skip=15):
         window_length = int(window_length)
         window_skip = int(window_skip)
