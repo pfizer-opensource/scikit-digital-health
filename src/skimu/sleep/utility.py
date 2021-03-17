@@ -10,8 +10,7 @@ from numpy import any, asarray, arctan, pi, roll, abs, argmax, diff, nonzero, in
 from skimu.utility import rolling_mean, rolling_sd, rolling_median
 
 __all__ = [
-    "detect_nonwear_mvmt", "detect_nonwear_temp", "rle", "compute_z_angle",
-    "compute_absolute_difference", "drop_min_blocks", "arg_longest_bout"
+    "rle", "compute_z_angle", "compute_absolute_difference", "drop_min_blocks", "arg_longest_bout"
 ]
 
 
