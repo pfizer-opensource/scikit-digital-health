@@ -4,12 +4,12 @@ Sleep predictions
 Yiorgos Christakis, Lukas Adamowicz
 Pfizer DMTI 2019-2021
 """
-from numpy import array, convolve, sum, nonzero, diff, insert, append, int_
+from numpy import array, convolve, int_
 
 from skimu.sleep.utility import rle
 
 
-def apply_cole_kripke(act_index, sf=0.243):
+def compute_sleep_predictions(act_index, sf=0.243):
     """
     Apply the Cole-Kripke algorithm to activity index data
 
