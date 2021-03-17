@@ -1,4 +1,6 @@
-from skimu.sleep.tso import detect_tso
+import numpy as np
+
+from skimu.sleep.tso import get_total_sleep_opportunity
 
 
 class TestDetectTSO:
@@ -7,9 +9,14 @@ class TestDetectTSO:
         time, acc, temp, lux = data
 
         # calculate tso
-        tso = detect_tso(
-            acc, time, 20.0, temp, min_rest_block=30, max_act_break=60,
-            min_angle_thresh=0.1, max_angle_thresh=1.0, move_thresh=0.001, temp_thresh=25.0
+        tso = get_total_sleep_opportunity(
+            20., time, acc,
+            np.array([0]), np.array([time.size]),
+            min_rest_block=30,
+            max_act_break=60,
+            min_angle_thresh=0.1,
+            max_angle_thresh=1.0,
+            idx_start=0
         )
 
         assert abs(tso[0] - sleep[0]) < 30  # less than 30 seconds off
