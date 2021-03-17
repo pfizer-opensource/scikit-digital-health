@@ -29,6 +29,7 @@ def compute_sleep_predictions(act_index, sf=0.243):
     -----
     Applies Webster's rescoring rules as described in the Cole-Kripke paper.
     """
+    # paper writes this backwards [::-1]. For convolution has to be written this way though
     kernel = array([0., 0., 4.024, 5.84, 16.19, 5.07, 3.75, 6.87, 4.64]) * sf
 
     scores = convolve(act_index, kernel, "same")
