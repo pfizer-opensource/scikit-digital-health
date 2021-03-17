@@ -12,6 +12,8 @@ from numpy import mean, diff, full, array
 from skimu.base import _BaseProcess  # import the base process class
 from skimu.utility.internal import get_day_wear_intersection, apply_downsample
 from skimu.sleep.tso import get_total_sleep_opportunity
+from skimu.sleep.activity_index import calculate_activity_index
+from skimu.sleep.sleep_classification import compute_sleep_predictions
 
 
 class Sleep(_BaseProcess):
@@ -180,7 +182,7 @@ class Sleep(_BaseProcess):
 
             # start time, end time, start index, end index
             tso = get_total_sleep_opportunity(
-                fs,
+                goal_fs,
                 time_ds[start:stop],
                 accel_ds[start:stop],
                 dw_starts,
@@ -191,9 +193,25 @@ class Sleep(_BaseProcess):
                 self.max_angle,
                 idx_start=start
             )
+
+            # calculate activity index
+            act_index = calculate_activity_index(goal_fs, accel_ds[start:stop])
+
+            # sleep wake predictions
+            predictions = compute_sleep_predictions(act_index, sf=0.243)
+
+            tso_start = int((tso[2] - start) / int(60 * fs))  # convert to minute indexing
+            tso_stop = int((tso[3] - start) / int(60 * fs))
+            pred_during_tso = predictions[tso_start:tso_stop]
+
+            # endpoint computation
+            total_sleep_time = get_total_sleep_time(predictions)
+            percent_time_asleep = get_percent_time_asleep(predictions)
+
+
         # FULL SLEEP PIPELINE
-        # compute total sleep opportunity window
-        # compute activity index
+        # [done] compute total sleep opportunity window
+        # [done] compute activity index
         # compute sleep predictions
         # compute sleep related endpoints
 
