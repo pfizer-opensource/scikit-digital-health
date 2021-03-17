@@ -7,6 +7,12 @@ Pfizer DMTI 2019-2021
 from numpy import around, nonzero, diff, argmax, sum, int_
 
 
+__all__ = [
+    "total_sleep_time", "percent_time_asleep", "number_of_wake_bouts", "sleep_onset_latency",
+    "wake_after_sleep_onset"
+]
+
+
 def total_sleep_time(sleep_predictions):
     """
     Compute the total time spent asleep, in minutes from sleep predictions.
