@@ -12,7 +12,7 @@ from skimu.sleep.utility import *
 
 def get_total_sleep_opportunity(
         fs, time, accel, wear_starts, wear_stops, min_rest_block, max_act_break,
-        min_angle_thresh, max_angle_thresh
+        min_angle_thresh, max_angle_thresh, idx_start=0
 ):
     # samples in 5 seconds
     n5 = int(5 * fs)
@@ -36,8 +36,9 @@ def get_total_sleep_opportunity(
 
     # create the TSO mask (1 -> sleep opportunity, only happends during wear)
     tso = zeros(dz_rm_rmd.size, dtype=bool_)
-    for strt, stp in zip(wear_starts / n5, wear_stops / n5):  # scale by 5s blocks
-        tso[strt:stp] = True
+    # block off nonwear times, scale by 5s blocks
+    for strt, stp in zip((wear_starts - idx_start) / n5, (wear_stops - idx_start) / n5):
+        tso[int(strt):int(stp)] = True
 
     # apply the threshold
     tso &= dz_rm_rmd < tso_thresh  # now only blocks where there is no movement, and wear are left
@@ -51,16 +52,17 @@ def get_total_sleep_opportunity(
     arg_start, arg_end = arg_longest_bout(tso, 1)
 
     # account for left justified windows - times need to be bumped up by half a window
-    arg_start += 30  # 12 * 5 / 2
-    arg_end += 30
+    # account for 5s windows in indexing
+    arg_start = (arg_start + 30) * n5  # 12 * 5 / 2
+    arg_end = (arg_end + 30) * n5
 
     # get the timestamps of the longest bout
     if arg_start is not None:
-        start, end = time[arg_start * n5], time[arg_end * n5]
+        start, end = time[arg_start], time[arg_end]
     else:
         start = end = None
 
-    return start, end, arg_start, arg_end
+    return start, end, arg_start + idx_start, arg_end + idx_start
 
 
 def detect_tso(
