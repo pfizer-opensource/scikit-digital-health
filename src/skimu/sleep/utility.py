@@ -4,7 +4,8 @@ Utility functions required for sleep metric generation
 Yiorgos Christakis
 Pfizer DMTI 2021
 """
-from numpy import any, asarray, arctan, pi, roll, abs, argmax, diff, nonzero, insert, sqrt
+from numpy import any, asarray, arctan, pi, roll, abs, argmax, diff, nonzero, insert, sqrt, pad, \
+    int_, append
 
 from skimu.utility import rolling_mean, rolling_sd, rolling_median
 
@@ -14,66 +15,59 @@ __all__ = [
 ]
 
 
-def detect_nonwear_mvmt(acc_rmed, fs, move_td):
+def get_weartime(acc_rmed, temp, fs, move_thresh, temp_thresh):
     """
-    Movement-based function for detecting non-wear.
+    Compute the wear time using acceleration and temperature data.
 
     Parameters
     ----------
-    acc_rmed : array
-        5 second rolling mean of acceleration data
+    acc_rmed : numpy.ndarray
+        Rolling median acceleration with 5s windows and 1 sample skips.
+    temp : numpy.ndarray
+        Raw temperature data.
     fs : float
         Sampling frequency.
-    move_td : float
-        Movement threshold.
+    move_thresh : float
+        Threshold to classify acceleration as wear/nonwear
+    temp_thresh : float
+        Temperature threshold to classify as wear/nonwear
 
     Returns
     -------
-    move_mask : array
-        Epoch-level binary predictions of non-wear. 1 corresponds to a non-wear bout, 0 to a wear
-        bout.
+    wear : numpy.ndarray
+        (N, 2) array of [start, stop] indices of blocks of wear time.
     """
+    n5 = int(5 * fs)
     # rolling 5s mean (non-overlapping windows)
-    mn = rolling_mean(acc_rmed, int(fs * 5), int(fs * 5), axis=0)
+    mn = rolling_mean(acc_rmed, n5, n5, axis=0)
+    # rolling 30min StDev.  5s windows -> 12 windows per minute
+    acc_rsd = rolling_sd(mn, 12 * 30, 1, axis=0, return_previous=False)
 
-    # rolling 30m STD  5s windows -> 12 windows per minute
-    rstd_mn = rolling_sd(mn, 12 * 30, 1, axis=0, return_previous=False)
+    # rolling 5s median of temperature
+    rmd = rolling_median(temp, n5, skip=1, pad=False)
+    # rolling 5s mean (non-overlapping)
+    mn = rolling_mean(rmd, n5, n5)
+    # rolling 5m median
+    temp_rmd = rolling_median(mn, 12 * 5, skip=1, pad=False)
 
-    # threshold
-    move_mask = any(rstd_mn <= move_td, axis=1)
-    return move_mask
+    move_mask = any(acc_rsd > move_thresh, axis=1)
+    temp_mask = temp_rmd >= temp_thresh
 
+    # pad the movement mask, temperature mask is the correct size
+    npad = temp_mask.size - move_mask.size
+    move_mask = pad(move_mask, (0, npad), mode="constant", constant_values=0)
 
-def detect_nonwear_temp(t, fs, temp_td):
-    """
-    Temperature-based function for detecting non-wear periods during sleep.
+    dwear = diff((move_mask | temp_mask).astype(int_))
 
-    Parameters
-    ----------
-    t : array
-        Near-body temperature data.
-    fs : float
-        Sampling frequency.
-    temp_td :
-        Temperature threshold.
+    starts = nonzero(dwear == 1)[0] + 1
+    stops = nonzero(dwear == -1)[0] + 1
 
-    Returns
-    -------
-    temp_mask : array
-        Epoch-level binary predictions of non-wear. 1 corresponds to a non-wear bout, 0 to a wear bout.
-    """
-    # rolling 5s median
-    rmd = rolling_median(t, int(fs * 5), skip=1, pad=False)
+    if move_mask[0] or temp_mask[0]:
+        starts = insert(starts, 0, 0)
+    if move_mask[-1] or temp_mask[-1]:
+        stops = append(stops, move_mask.size)
 
-    # rolling 5s mean (non-overlapping windows)
-    mn = rolling_mean(rmd, int(fs * 5), int(fs * 5))
-
-    # rolling 5m median.
-    rmdn_mn = rolling_median(mn, 12 * 5, skip=1, pad=False)
-
-    # threshold
-    temp_mask = rmdn_mn < temp_td
-    return temp_mask
+    return starts, stops
 
 
 def rle(to_encode):
