@@ -4,12 +4,14 @@ Sleep and major rest period detection
 Yiorgos Christakis, Lukas Adamowicz
 Pfizer DMTI 2019-2021
 """
+from warnings import warn
+
 # TODO: build predict function using tso.py, activity_index.py, sleep_classification.py, endpoints.py
-from numpy import zeros, arange, interp, float_, mean, diff, around, int_, full
+from numpy import mean, diff, full, array
 
 from skimu.base import _BaseProcess  # import the base process class
 from skimu.utility.internal import get_day_wear_intersection, apply_downsample
-from skimu.sleep.tso import detect_tso
+from skimu.sleep.tso import get_total_sleep_opportunity
 
 
 class Sleep(_BaseProcess):
@@ -118,7 +120,7 @@ class Sleep(_BaseProcess):
         else:
             self.day_key = f"{day_window[0]}, {day_window[1]}"
 
-    def predict(self, time=None, accel=None, *, temp=None, fs=None, **kwargs):
+    def predict(self, time=None, accel=None, *, temp=None, fs=None, wear=None, **kwargs):
         """
         predict(time, accel, *, temp=None, fs=None, day_ends={})
 
@@ -135,6 +137,8 @@ class Sleep(_BaseProcess):
         fs : float, optional
             Sampling frequency in Hz for the acceleration and temperature values. If None,
             will be inferred from the timestamps
+        wear : numpy.ndarray, optional
+            (P, 2) array of indices indicating where the device is worn. Optional.
         day_ends : dict
             Dictionary containing (N, 2) arrays of start and stop indices for individual days.
             Must have the key
@@ -147,45 +151,45 @@ class Sleep(_BaseProcess):
         if days is None:
             raise ValueError(f"Day indices for {self.day_key} (base, period) not found.")
 
+        # get the wear time from previous steps
+        if wear is None:
+            warn(f"[{self!s}] Wear detection not provided. Assuming 100% wear time.")
+            wear = array([[0, time.size]])
+
         # downsample if necessary
         goal_fs = 20.
         if fs != goal_fs and self.downsample:
-            # get timestamps
-            time_ds = arange(time[0], time[-1], 1 / 20.0)
-
-            # get acceleration
-            accel_ds = zeros((time_ds.size, 3), dtype=float_)
-            for i in range(3):
-                accel_ds[:, i] = interp(time_ds, time, accel[:, i])
-
-            # get temp
-            if temp is not None:
-                temp_ds = zeros(time_ds.size, dtype=float_)
-                temp_ds[:, 0] = interp(time_ds, time, temp)
-            else:
-                temp_ds = full(time_ds.size, self.nw_temp * 2)  # make it above thresh
-
-            # days - make sure we can use to index into accel/time data
-            days_ds = zeros(days.shape, dtype=int_)
-            for i in range(2):
-                # should be broadcast to int to match days_ds type
-                days_ds[:, i] = around(interp(time[days[:, i]], time_ds, arange(time_ds.size)))
+            time_ds, (accel_ds, temp_ds), (days_ds, wear_ds) = apply_downsample(
+                goal_fs, time, data=(accel, temp), indices=(days, wear)
+            )
+            if temp is None:
+                temp_ds += 2 * self.nw_temp  # make sure its above the threshold for nonwear
         else:
             goal_fs = fs
             time_ds = time
             accel_ds = accel
             temp_ds = temp if temp is not None else full(time_ds.size, self.nw_temp * 2)
             days_ds = days
+            wear_ds = wear
 
         for iday, day_idx in enumerate(days_ds):
             start, stop = day_idx
+            # get the starts and stops of wear during the day
+            dw_starts, dw_stops = get_day_wear_intersection(
+                wear_ds[:, 0], wear_ds[:, 1], start, stop)
 
-            tso = detect_tso(
-                accel_ds[start:stop], time_ds[start:stop],
-                goal_fs,
-                temp_ds[start:stop],
-                self.min_rest_block, self.max_act_break, self.min_angle, self.max_angle,
-                self.nw_thresh, self.nw_temp
+            # start time, end time, start index, end index
+            tso = get_total_sleep_opportunity(
+                fs,
+                time_ds[start:stop],
+                accel_ds[start:stop],
+                dw_starts,
+                dw_stops,
+                self.min_rest_block,
+                self.max_act_break,
+                self.min_angle,
+                self.max_angle,
+                idx_start=start
             )
         # FULL SLEEP PIPELINE
         # compute total sleep opportunity window
