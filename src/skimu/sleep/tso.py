@@ -4,15 +4,15 @@ Function for the detection of sleep boundaries, here defined as the total sleep 
 Yiorgos Christakis
 Pfizer DMTI 2021
 """
-from numpy import pad, min, max, percentile
+from numpy import pad, min, max, percentile, zeros, bool_
 
 from skimu.utility import rolling_mean, rolling_median
 from skimu.sleep.utility import *
 
 
 def get_total_sleep_opportunity(
-        fs, time, accel, temp, min_rest_block, max_act_break, min_angle_thresh, max_angle_thresh,
-        move_thresh, temp_thresh
+        fs, time, accel, wear_starts, wear_stops, min_rest_block, max_act_break,
+        min_angle_thresh, max_angle_thresh
 ):
     # samples in 5 seconds
     n5 = int(5 * fs)
@@ -34,8 +34,33 @@ def get_total_sleep_opportunity(
     # compute the TSO threshold
     tso_thresh = compute_tso_threshold(dz_rm_rmd, min_td=min_angle_thresh, max_td=max_angle_thresh)
 
+    # create the TSO mask (1 -> sleep opportunity, only happends during wear)
+    tso = zeros(dz_rm_rmd.size, dtype=bool_)
+    for strt, stp in zip(wear_starts / n5, wear_stops / n5):  # scale by 5s blocks
+        tso[strt:stp] = True
+
     # apply the threshold
-    tso = dz_rm_rmd < tso_thresh
+    tso &= dz_rm_rmd < tso_thresh  # now only blocks where there is no movement, and wear are left
+
+    # drop rest blocks less than minimum allowed rest length
+    tso = drop_min_blocks(tso, 12 * min_rest_block, drop_value=1, replace_value=0)
+    # drop active blocks less than maximum allowed active length
+    tso = drop_min_blocks(tso, 12 * max_act_break, drop_value=0, replace_value=1)
+
+    # get the indices of the longest bout
+    arg_start, arg_end = arg_longest_bout(tso, 1)
+
+    # account for left justified windows - times need to be bumped up by half a window
+    arg_start += 30  # 12 * 5 / 2
+    arg_end += 30
+
+    # get the timestamps of the longest bout
+    if arg_start is not None:
+        start, end = time[arg_start * n5], time[arg_end * n5]
+    else:
+        start = end = None
+
+    return start, end, arg_start, arg_end
 
 
 def detect_tso(
