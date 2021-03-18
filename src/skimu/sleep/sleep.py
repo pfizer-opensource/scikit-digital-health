@@ -5,9 +5,10 @@ Yiorgos Christakis, Lukas Adamowicz
 Pfizer DMTI 2019-2021
 """
 from warnings import warn
+from datetime import datetime
 
 # TODO: build predict function using tso.py, activity_index.py, sleep_classification.py, endpoints.py
-from numpy import mean, diff, full, array
+from numpy import mean, diff, array, nan
 
 from skimu.base import _BaseProcess  # import the base process class
 from skimu.utility.internal import get_day_wear_intersection, apply_downsample
@@ -27,8 +28,6 @@ class Sleep(_BaseProcess):
         Number of seconds to ignore at the beginning of a recording. Default is 0 seconds.
     stop_buffer : int, optional
         Number of seconds to ignore at the end of a recording. Default is 0 seconds.
-    temperature_threshold : float, optional
-        Lowest temperature for which a data point is considered valid/wear. Default is 25C.
     min_rest_block : int, optional
         Number of minutes required to consider a rest period valid. Default is 30 minutes.
     max_activity_break : int, optional
@@ -82,15 +81,24 @@ class Sleep(_BaseProcess):
         https://doi.org/10.1371/journal.pone.0160644
     """
     def __init__(
-            self, start_buffer=0, stop_buffer=0, temperature_threshold=25, min_rest_block=30,
-            max_activity_break=30, min_angle_thresh=0.1, max_angle_thresh=1.0,
-            min_rest_period=None, nonwear_move_thresh=None, min_wear_time=0,
-            min_day_hours=6, downsample=True, day_window=(12, 24)
+            self,
+            start_buffer=0,
+            stop_buffer=0,
+            min_rest_block=30,
+            max_activity_break=30,
+            min_angle_thresh=0.1,
+            max_angle_thresh=1.0,
+            min_rest_period=None,
+            nonwear_move_thresh=None,
+            min_wear_time=0,
+            min_day_hours=6,
+            downsample=True,
+            day_window=(12, 24)
     ):
         super().__init__(
             start_buffer=start_buffer,
             stop_buffer=stop_buffer,
-            temperature_threshold=temperature_threshold,
+            # temperature_threshold=temperature_threshold,
             min_rest_block=min_rest_block,
             max_activity_break=max_activity_break,
             min_angle_thresh=min_angle_thresh,
@@ -107,7 +115,7 @@ class Sleep(_BaseProcess):
         self.hp_cut = 0.25
         self.start_buff = start_buffer
         self.stop_buff = stop_buffer
-        self.nw_temp = temperature_threshold
+        # self.nw_temp = temperature_threshold
         self.min_rest_block = min_rest_block
         self.max_act_break = max_activity_break
         self.min_angle = min_angle_thresh
@@ -123,7 +131,7 @@ class Sleep(_BaseProcess):
         else:
             self.day_key = f"{day_window[0]}, {day_window[1]}"
 
-    def predict(self, time=None, accel=None, *, temp=None, fs=None, wear=None, **kwargs):
+    def predict(self, time=None, accel=None, *, fs=None, wear=None, **kwargs):
         """
         predict(time, accel, *, temp=None, fs=None, day_ends={})
 
@@ -135,8 +143,6 @@ class Sleep(_BaseProcess):
             (N, ) array of unix timestamps, in seconds
         accel : numpy.ndarray
             (N, 3) array of acceleration, in units of 'g'
-        temp : numpy.ndarray, optional
-            (N, ) array of temperature values, units of 'C'
         fs : float, optional
             Sampling frequency in Hz for the acceleration and temperature values. If None,
             will be inferred from the timestamps
@@ -163,20 +169,33 @@ class Sleep(_BaseProcess):
         goal_fs = 20.
         if fs != goal_fs and self.downsample:
             time_ds, (accel_ds, temp_ds), (days_ds, wear_ds) = apply_downsample(
-                goal_fs, time, data=(accel, temp), indices=(days, wear)
+                goal_fs, time, data=(accel,), indices=(days, wear)
             )
-            if temp is None:
-                temp_ds += 2 * self.nw_temp  # make sure its above the threshold for nonwear
+
         else:
             goal_fs = fs
             time_ds = time
             accel_ds = accel
-            temp_ds = temp if temp is not None else full(time_ds.size, self.nw_temp * 2)
             days_ds = days
             wear_ds = wear
 
+        # setup the storage for the sleep parameters
+        sleep = {
+            i: [] for i in [
+                "Day N", "Date", "TSO Start Timestamp", "TSO Start", "TSO Duration",
+                "Total Sleep Time", "Percent Time Asleep", "Wake After Sleep Onset",
+                "Sleep Onset Latency", "Number Wake Bouts"
+            ]
+        }
+
+        # iterate over the days
         for iday, day_idx in enumerate(days_ds):
             start, stop = day_idx
+
+            # initialize all the sleep values for the day
+            for k in sleep:
+                sleep[k].append(nan)
+
             # get the starts and stops of wear during the day
             dw_starts, dw_stops = get_day_wear_intersection(
                 wear_ds[:, 0], wear_ds[:, 1], start, stop)
@@ -200,16 +219,27 @@ class Sleep(_BaseProcess):
 
             # sleep wake predictions
             predictions = compute_sleep_predictions(act_index, sf=0.243)
-
-            tso_start = int((tso[2] - start) / int(60 * fs))  # convert to minute indexing
-            tso_stop = int((tso[3] - start) / int(60 * fs))
+            # tso indices are already relative to day start
+            tso_start = int(tso[2] / int(60 * fs))  # convert to minute indexing
+            tso_stop = int(tso[3] / int(60 * fs))
             pred_during_tso = predictions[tso_start:tso_stop]
 
-            # endpoint computation
-            tst = total_sleep_time(predictions)
-            pta = percent_time_asleep(predictions)
-            waso = wake_after_sleep_onset(predictions)
-            sol = sleep_onset_latency(predictions)
-            nwb = number_of_wake_bouts(predictions)
+            # results fill out
+            tso_start_dt = datetime.utcfromtimestamp(time[tso[2] + start])
+            sleep["Day N"][-1] = iday + 1
+            sleep["Date"][-1] = tso_start_dt.strftime("%Y-%m-%d")
+            sleep["TSO Start Timestamp"][-1] = tso[0]
+            sleep["TSO Start"][-1] = tso_start_dt.strftime("%Y-%m-%d %H:%M:%S.%f")
+            sleep["TSO Duration"][-1] = (tso[3] - tso[2]) / (fs * 60)  # in minutes
+            sleep["Total Sleep Time"][-1] = total_sleep_time(pred_during_tso)
+            sleep["Percent Time Asleep"][-1] = percent_time_asleep(pred_during_tso)
+            sleep["Wake After Sleep Onset"][-1] = wake_after_sleep_onset(pred_during_tso)
+            sleep["Sleep Onset Latency"][-1] = sleep_onset_latency(pred_during_tso)
+            sleep["Number Wake Bouts"][-1] = number_of_wake_bouts(pred_during_tso)
 
+        kwargs.update({self._acc: accel, self._time: time, "fs": fs, "wear": wear})
+        if self._in_pipeline:
+            return kwargs, sleep
+        else:
+            return sleep
 
