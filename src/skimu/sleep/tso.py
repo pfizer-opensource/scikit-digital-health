@@ -14,6 +14,50 @@ def get_total_sleep_opportunity(
         fs, time, accel, wear_starts, wear_stops, min_rest_block, max_act_break,
         min_angle_thresh, max_angle_thresh, idx_start=0
 ):
+    """
+    Compute the period of time in which sleep can occur for a given days worth of data. For this
+    algorithm, it is the longest period of wear-time that has low activity.
+
+    Parameters
+    ----------
+    fs : float
+        Sampling frequency of the time and acceleration data, in Hz.
+    time : numpy.ndarray
+        Timestamps for the acceleration.
+    accel : numpy.ndarray
+        (N, 3) array of acceleration values in g.
+    wear_starts : numpy.ndarray
+        Indices for the starts of wear-time. Note that while `time` and `accel` should be the values
+        for one day, `wear_starts` is likely indexed to the whole data series. This offset can
+        be adjusted by `idx_start`. If indexing only into the one day, `idx_start` should be 0.
+    wear_stops : numpy.ndarray
+        Indices for the stops of wear-time. Note that while `time` and `accel` should be the values
+        for one day, `wear_stops` is likely indexed to the whole data series. This offset can
+        be adjusted by `idx_start`. If indexing only into the one day, `idx_start` should be 0.
+    min_rest_block : int
+        Minimum number of minutes that a rest period can be
+    max_act_break : int
+        Maximum number of minutes an active block can be so that it doesn't interrupt a longer
+        rest period.
+    min_angle_thresh : float
+        Minimum angle threshold used to compute the TSO threshold.
+    max_angle_thresh : float
+        Maximum angle threshold used to compute the TSO threshold
+    idx_start : int, optional
+        Offset index for wear-time indices. If `wear_starts` and `wear_stops` are relative to the
+        day of interest, then `idx_start` should equal 0.
+
+    Returns
+    -------
+    start : float
+        Total sleep opportunity start timestamp.
+    stop : float
+        Total sleep opportunity stop timestamp.
+    arg_start : int
+        Total sleep opportunity start index, into the specific period of time.
+    arg_stop : int
+        Total sleep opportunity stop index, into the specific period of time.
+    """
     # samples in 5 seconds
     n5 = int(5 * fs)
     # compute the rolling median for 5s windows
@@ -53,7 +97,7 @@ def get_total_sleep_opportunity(
 
     # account for left justified windows - times need to be bumped up by half a window
     # account for 5s windows in indexing
-    arg_start = (arg_start + 30) * n5  # 12 * 5 / 2
+    arg_start = (arg_start + 30) * n5  # 12 * 5 / 2 = 30
     arg_end = (arg_end + 30) * n5
 
     # get the timestamps of the longest bout
@@ -62,7 +106,7 @@ def get_total_sleep_opportunity(
     else:
         start = end = None
 
-    return start, end, arg_start + idx_start, arg_end + idx_start
+    return start, end, arg_start, arg_end
 
 
 def compute_tso_threshold(arr, min_td=0.1, max_td=0.5):
