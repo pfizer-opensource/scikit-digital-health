@@ -14,6 +14,7 @@ from skimu.utility.internal import get_day_wear_intersection, apply_downsample
 from skimu.sleep.tso import get_total_sleep_opportunity
 from skimu.sleep.activity_index import calculate_activity_index
 from skimu.sleep.sleep_classification import compute_sleep_predictions
+from skimu.sleep.endpoints import *
 
 
 class Sleep(_BaseProcess):
@@ -205,14 +206,10 @@ class Sleep(_BaseProcess):
             pred_during_tso = predictions[tso_start:tso_stop]
 
             # endpoint computation
-            total_sleep_time = get_total_sleep_time(predictions)
-            percent_time_asleep = get_percent_time_asleep(predictions)
-
-
-        # FULL SLEEP PIPELINE
-        # [done] compute total sleep opportunity window
-        # [done] compute activity index
-        # compute sleep predictions
-        # compute sleep related endpoints
+            tst = total_sleep_time(predictions)
+            pta = percent_time_asleep(predictions)
+            waso = wake_after_sleep_onset(predictions)
+            sol = sleep_onset_latency(predictions)
+            nwb = number_of_wake_bouts(predictions)
 
 
