@@ -4,7 +4,10 @@ Sleep-based endpoints
 Yiorgos Christakis, Lukas Adamowicz
 Pfizer DMTI 2019-2021
 """
-from numpy import around, nonzero, diff, argmax, sum, int_
+from numpy import around, nonzero, diff, argmax, sum, mean, log, unique, argsort, cumsum, insert, \
+    int_
+
+from skimu.sleep.utility import rle, gini
 
 
 __all__ = [
@@ -102,3 +105,285 @@ def wake_after_sleep_onset(sleep_predictions):
     first_epoch, last_epoch = nonzero(sleep_predictions)[0][[0, -1]]
     waso = (last_epoch - first_epoch) - sum(sleep_predictions[first_epoch:last_epoch])
     return waso
+
+
+def average_sleep_duration(sleep_predictions):
+    """
+    Compute the average duration of a sleep bout.
+
+    Parameters
+    ----------
+    sleep_predictions : numpy.ndarray
+        Boolean array indicating sleep (True = sleeping).
+
+    Returns
+    -------
+    asp : float
+        Average number of minutes per bout of sleep during total sleep opportunity.
+
+    References
+    ----------
+    .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are associated with
+        mortality in US adults: The NHANES study,” bioRxiv, p. 182337, Aug. 2017,
+        doi: 10.1101/182337.
+    """
+    lengths, starts, vals = rle(sleep_predictions)
+    sleep_lengths = lengths[vals == 1]
+
+    return mean(sleep_lengths)
+
+
+def average_wake_duration(sleep_predictions):
+    """
+    Compute the average duration of wake bouts during sleep.
+
+    Parameters
+    ----------
+    sleep_predictions : numpy.ndarray
+        Boolean array indicating sleep (True = sleeping).
+
+    Returns
+    -------
+    awp : float
+        Average number of minutes per bout of wake during total sleep opportunity.
+
+    References
+    ----------
+    .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are associated with
+        mortality in US adults: The NHANES study,” bioRxiv, p. 182337, Aug. 2017,
+        doi: 10.1101/182337.
+    """
+    lengths, starts, vals = rle(sleep_predictions)
+    wake_lengths = lengths[vals == 0]
+
+    return mean(wake_lengths)
+
+
+def sleep_awake_transition_probability(sleep_predictions):
+    """
+    Compute the probability of transitioning from sleep state to awake state
+
+    Parameters
+    ----------
+    sleep_predictions : numpy.ndarray
+        Boolean array indicating sleep (True = sleeping).
+
+    Returns
+    -------
+    satp : float
+        Sleep to awake transition probability during the total sleep opportunity.
+
+    References
+    ----------
+    .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are associated with
+        mortality in US adults: The NHANES study,” bioRxiv, p. 182337, Aug. 2017,
+        doi: 10.1101/182337.
+    """
+    lengths, starts, vals = rle(sleep_predictions)
+    sleep_lengths = lengths[vals == 1]
+
+    return 1 / mean(sleep_lengths)
+
+
+def awake_sleep_transition_probability(sleep_predictions):
+    """
+    Compute the probability of transitioning from awake state to sleep state.
+
+    Parameters
+    ----------
+    sleep_predictions : numpy.ndarray
+        Boolean array indicating sleep (True = sleeping).
+
+    Returns
+    -------
+    astp : float
+        Awake to sleep transition probability during the total sleep opportunity.
+
+    References
+    ----------
+    .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are associated with
+        mortality in US adults: The NHANES study,” bioRxiv, p. 182337, Aug. 2017,
+        doi: 10.1101/182337.
+    """
+    lengths, starts, vals = rle(sleep_predictions)
+    wake_lengths = lengths[vals == 0]
+
+    return 1 / mean(wake_lengths)
+
+
+def sleep_gini_index(sleep_predictions):
+    """
+    Compute the normalized variability of the sleep bouts, also known as the Gini Index from
+    economics.
+
+    Parameters
+    ----------
+    sleep_predictions : numpy.ndarray
+        Boolean array indicating sleep (True = sleeping).
+
+    Returns
+    -------
+    gini : float
+        Sleep normalized variability or Gini Index during total sleep opportunity.
+
+    References
+    ----------
+    .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are associated with
+        mortality in US adults: The NHANES study,” bioRxiv, p. 182337, Aug. 2017,
+        doi: 10.1101/182337.
+    """
+    lengths, starts, vals = rle(sleep_predictions)
+    sleep_lengths = lengths[vals == 1]
+
+    return gini(sleep_lengths, w=None, corr=True)
+
+
+def awake_gini_index(sleep_predictions):
+    """
+    Compute the normalized variability of the awake bouts, also known as the Gini Index from
+    economics.
+
+    Parameters
+    ----------
+    sleep_predictions : numpy.ndarray
+        Boolean array indicating sleep (True = sleeping).
+
+    Returns
+    -------
+    gini : float
+        Awake normalized variability or Gini Index during total sleep opportunity.
+
+    References
+    ----------
+    .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are associated with
+        mortality in US adults: The NHANES study,” bioRxiv, p. 182337, Aug. 2017,
+        doi: 10.1101/182337.
+    """
+    lengths, starts, vals = rle(sleep_predictions)
+    wake_lengths = lengths[vals == 0]
+
+    return gini(wake_lengths, w=None, corr=True)
+
+
+def sleep_power_law_distribution(sleep_predictions):
+    """
+    Compute the scaling factor for a power law distribution over the sleep bouts lengths.
+
+    Parameters
+    ----------
+    sleep_predictions : numpy.ndarray
+        Boolean array indicating sleep (True = sleeping).
+
+    Returns
+    -------
+    alpha : float
+        Sleep bout power law distribution scaling parameter.
+
+    References
+    ----------
+    .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are associated with
+        mortality in US adults: The NHANES study,” bioRxiv, p. 182337, Aug. 2017,
+        doi: 10.1101/182337.
+    """
+    lengths, starts, vals = rle(sleep_predictions)
+    sleep_lengths = lengths[vals == 1]
+
+    return 1 + sleep_lengths.size / sum(log(sleep_lengths / (sleep_lengths.min() - 0.5)))
+
+
+def awake_power_law_distribution(sleep_predictions):
+    """
+    Compute the scaling factor for a power law distribution over the awake bouts lengths.
+
+    Parameters
+    ----------
+    sleep_predictions : numpy.ndarray
+        Boolean array indicating sleep (True = sleeping).
+
+    Returns
+    -------
+    alpha : float
+        Awake bout power law distribution scaling parameter.
+
+    References
+    ----------
+    .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are associated with
+        mortality in US adults: The NHANES study,” bioRxiv, p. 182337, Aug. 2017,
+        doi: 10.1101/182337.
+    """
+    lengths, starts, vals = rle(sleep_predictions)
+    wake_lengths = lengths[vals == 0]
+
+    return 1 + wake_lengths.size / sum(log(wake_lengths / (wake_lengths.min() - 0.5)))
+
+
+def sleep_average_hazard(sleep_predictions):
+    """
+    Compute the average hazard summary of the hazard function as a function of the sleep bout
+    duration. The average hazard represents a summary of the frequency of transitioning from
+    a sleep to awake state.
+
+    Parameters
+    ----------
+    sleep_predictions : numpy.ndarray
+        Boolean array indicating sleep (True = sleeping).
+
+    Returns
+    -------
+    h_sleep : float
+        Sleep bout average hazard.
+
+    References
+    ----------
+    .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are associated with
+        mortality in US adults: The NHANES study,” bioRxiv, p. 182337, Aug. 2017,
+        doi: 10.1101/182337.
+    """
+    lengths, starts, vals = rle(sleep_predictions)
+    sleep_lengths = lengths[vals == 1]
+
+    u_sl, c_sl = unique(sleep_lengths, return_counts=True)
+    sidx = argsort(u_sl)
+
+    c_sl = c_sl[sidx]
+    cs_c_sl = insert(cumsum(c_sl), 0, 0)
+
+    h_i = c_sl / (cs_c_sl[-1] - cs_c_sl[:-1])
+
+    return sum(h_i) / u_sl.size
+
+
+def awake_average_hazard(sleep_predictions):
+    """
+    Compute the average hazard summary of the hazard function as a function of the awake bout
+    duration. The average hazard represents a summary of the frequency of transitioning from
+    an awake to sleep state.
+
+    Parameters
+    ----------
+    sleep_predictions : numpy.ndarray
+        Boolean array indicating sleep (True = sleeping).
+
+    Returns
+    -------
+    h_awake : float
+        Awake bout average hazard.
+
+    References
+    ----------
+    .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are associated with
+        mortality in US adults: The NHANES study,” bioRxiv, p. 182337, Aug. 2017,
+        doi: 10.1101/182337.
+    """
+    lengths, starts, vals = rle(sleep_predictions)
+    wake_lengths = lengths[vals == 0]
+
+    u_al, c_al = unique(wake_lengths, return_counts=True)
+    sidx = argsort(u_al)
+
+    c_al = c_al[sidx]
+    cs_c_al = insert(cumsum(c_al), 0, 0)
+
+    h_i = c_al / (cs_c_al[-1] - cs_c_al[:-1])
+
+    return sum(h_i) / u_al.size
