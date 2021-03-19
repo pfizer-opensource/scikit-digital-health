@@ -5,12 +5,13 @@ Yiorgos Christakis
 Pfizer DMTI 2021
 """
 from numpy import any, asarray, arctan, pi, roll, abs, argmax, diff, nonzero, insert, sqrt, pad, \
-    int_, append
+    int_, append, argsort, sort, cumsum, sum, float_
 
 from skimu.utility import rolling_mean, rolling_sd, rolling_median
 
 __all__ = [
-    "rle", "compute_z_angle", "compute_absolute_difference", "drop_min_blocks", "arg_longest_bout"
+    "rle", "compute_z_angle", "compute_absolute_difference", "drop_min_blocks", "arg_longest_bout",
+    "gini"
 ]
 
 
@@ -190,3 +191,51 @@ def arg_longest_bout(arr, block_val):
     else:
         longest_bout = None, None
     return longest_bout
+
+
+def gini(x, w=None, corr=True):
+    """
+    Compute the GINI Index.
+
+    Parameters
+    ----------
+    x : numpy.ndarray
+        Array of bout lengths
+    w : numpy.ndarray
+        Weights for x. Must be the same size. If None, weights are not used.
+    corr : bool, optional
+        Apply finite sample correction. Default is True.
+
+    Returns
+    -------
+    g : float
+        Gini index
+
+    References
+    ----------
+    .. [1] https://stackoverflow.com/questions/48999542/more-efficient-weighted-gini-coefficient-in
+        -python/48999797#48999797
+    """
+    # The rest of the code requires numpy arrays.
+    if w is not None:
+        sorted_indices = argsort(x)
+        sorted_x = x[sorted_indices]
+        sorted_w = w[sorted_indices]
+        # Force float dtype to avoid overflows
+        cumw = cumsum(sorted_w, dtype=float_)
+        cumxw = cumsum(sorted_x * sorted_w, dtype=float_)
+        g = (sum(cumxw[1:] * cumw[:-1] - cumxw[:-1] * cumw[1:]) / (cumxw[-1] * cumw[-1]))
+        if corr:
+            return g * x.size / (x.size - 1)
+        else:
+            return g
+    else:
+        sorted_x = sort(x)
+        n = x.size
+        cumx = cumsum(sorted_x, dtype=float_)
+        # The above formula, with all weights equal to 1 simplifies to:
+        g = (n + 1 - 2 * sum(cumx) / cumx[-1]) / n
+        if corr:
+            return g * n / (n - 1)
+        else:
+            return g

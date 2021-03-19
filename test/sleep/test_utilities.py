@@ -164,3 +164,18 @@ class TestArgLongestBout:
 
         expected = 1, 4
         assert out == expected
+
+
+class TestGini:
+    def test1(self):
+        x = np.array([1, 1, 1, 1, 1000])
+
+        assert np.isclose(np.around(gini(x, corr=False), 3), 0.796)
+        assert np.isclose(np.around(gini(x, corr=True), 3), 0.995)
+
+    def test2(self):
+        x = np.array([3, 1, 6, 2, 1])
+        w = np.array([4, 2, 2, 10, 1])
+
+        assert np.isclose(np.around(gini(x, w=w, corr=False), 4), 0.2553)
+        assert np.isclose(np.around(gini(x, w=w, corr=True), 4), np.around(0.2553 * 5 / 4, 4))
