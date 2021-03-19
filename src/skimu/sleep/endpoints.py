@@ -13,6 +13,7 @@ from numpy import around, nonzero, diff, argmax, sum, mean, log, unique, argsort
 from skimu.sleep.utility import gini
 
 __all__ = [
+    "SleepMetric",
     "TotalSleepTime", "PercentTimeAsleep", "NumberWakeBouts", "SleepOnsetLatency",
     "WakeAfterSleepOnset", "AverageSleepDuration", "AverageWakeDuration",
     "SleepWakeTransitionProbability", "WakeSleepTransitionProbability", "SleepGiniIndex",
