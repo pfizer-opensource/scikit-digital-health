@@ -8,7 +8,6 @@ from collections.abc import Iterable
 from warnings import warn
 from datetime import datetime
 
-# TODO: build predict function using tso.py, activity_index.py, sleep_classification.py, endpoints.py
 from numpy import mean, diff, array, nan
 
 from skimu.base import _BaseProcess  # import the base process class
