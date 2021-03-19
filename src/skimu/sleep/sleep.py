@@ -4,6 +4,7 @@ Sleep and major rest period detection
 Yiorgos Christakis, Lukas Adamowicz
 Pfizer DMTI 2019-2021
 """
+from collections.abc import Iterable
 from warnings import warn
 from datetime import datetime
 
@@ -15,6 +16,7 @@ from skimu.utility.internal import get_day_wear_intersection, apply_downsample
 from skimu.sleep.tso import get_total_sleep_opportunity
 from skimu.sleep.activity_index import calculate_activity_index
 from skimu.sleep.sleep_classification import compute_sleep_predictions
+from skimu.sleep.utility import rle
 from skimu.sleep.endpoints import *
 
 
@@ -80,6 +82,26 @@ class Sleep(_BaseProcess):
         Data and Its Comparison with Other Activity Metrics. PLoS ONE 11(8): e0160644.
         https://doi.org/10.1371/journal.pone.0160644
     """
+    _params = [
+        # normal metrics
+        TotalSleepTime,
+        PercentTimeAsleep,
+        NumberWakeBouts,
+        SleepOnsetLatency,
+        WakeAfterSleepOnset,
+        # fragmentation metrics
+        AverageSleepDuration,
+        AverageWakeDuration,
+        SleepWakeTransitionProbability,
+        WakeSleepTransitionProbability,
+        SleepGiniIndex,
+        WakeGiniIndex,
+        SleepAverageHazard,
+        WakeAverageHazard,
+        SleepPowerLawDistribution,
+        WakePowerLawDistribution
+    ]
+
     def __init__(
             self,
             start_buffer=0,
@@ -130,6 +152,39 @@ class Sleep(_BaseProcess):
             self.day_key = "-1, -1"
         else:
             self.day_key = f"{day_window[0]}, {day_window[1]}"
+
+    def add_metrics(self, metrics):
+        """
+        Add metrics to be computed
+
+        Parameters
+        ----------
+        metrics : {Iterable, callable}
+            Either an iterable of EventMetric or BoutMetric references or an individual
+            EventMetric/BoutMetric reference to be added to the list of metrics to be computed
+
+        Examples
+        --------
+        >>> from skimu.sleep.endpoints import SleepMetric
+        >>> class NewSleepMetric(SleepMetric):
+        >>>     def __init__(self):
+        >>>         super().__init__("metric name", __name__)  # __name__ remains unchanged
+        >>>     def predict(self, **kwargs):
+        >>>         pass
+        >>>
+        >>> sleep = Sleep()
+        >>> sleep.add_metrics(NewSleepMetric)
+        """
+        if isinstance(metrics, Iterable):
+            if all(isinstance(i(), SleepMetric) for i in metrics):
+                self._params.extend(metrics)
+            else:
+                raise ValueError("Not all objects are `SleepMetric`s.")
+        else:
+            if isinstance(metrics(), SleepMetric):
+                self._params.append(metrics)
+            else:
+                raise ValueError(f"Metric {metrics!r} is not a `SleepMetric`.")
 
     def predict(self, time=None, accel=None, *, fs=None, wear=None, **kwargs):
         """
@@ -182,11 +237,15 @@ class Sleep(_BaseProcess):
         # setup the storage for the sleep parameters
         sleep = {
             i: [] for i in [
-                "Day N", "Date", "TSO Start Timestamp", "TSO Start", "TSO Duration",
-                "Total Sleep Time", "Percent Time Asleep", "Wake After Sleep Onset",
-                "Sleep Onset Latency", "Number Wake Bouts"
+                "Day N", "Date", "TSO Start Timestamp", "TSO Start", "TSO Duration"
             ]
         }
+
+        # iterate over the parameters, initialize them, and put their names into sleep
+        init_params = []
+        for param in self._params:
+            init_params.append(param())
+            sleep[init_params[-1].name] = []
 
         # iterate over the days
         for iday, day_idx in enumerate(days_ds):
@@ -223,6 +282,8 @@ class Sleep(_BaseProcess):
             tso_start = int(tso[2] / int(60 * fs))  # convert to minute indexing
             tso_stop = int(tso[3] / int(60 * fs))
             pred_during_tso = predictions[tso_start:tso_stop]
+            # run length encoding for sleep metrics
+            sw_lengths, sw_starts, sw_vals = rle(pred_during_tso)
 
             # results fill out
             tso_start_dt = datetime.utcfromtimestamp(time[tso[2] + start])
@@ -231,11 +292,14 @@ class Sleep(_BaseProcess):
             sleep["TSO Start Timestamp"][-1] = tso[0]
             sleep["TSO Start"][-1] = tso_start_dt.strftime("%Y-%m-%d %H:%M:%S.%f")
             sleep["TSO Duration"][-1] = (tso[3] - tso[2]) / (fs * 60)  # in minutes
-            sleep["Total Sleep Time"][-1] = total_sleep_time(pred_during_tso)
-            sleep["Percent Time Asleep"][-1] = percent_time_asleep(pred_during_tso)
-            sleep["Wake After Sleep Onset"][-1] = wake_after_sleep_onset(pred_during_tso)
-            sleep["Sleep Onset Latency"][-1] = sleep_onset_latency(pred_during_tso)
-            sleep["Number Wake Bouts"][-1] = number_of_wake_bouts(pred_during_tso)
+
+            for param in init_params:
+                sleep[param.name][-1] = param.predict(
+                    predictions=pred_during_tso,
+                    lengths=sw_lengths,
+                    starts=sw_starts,
+                    values=sw_vals
+                )
 
         kwargs.update({self._acc: accel, self._time: time, "fs": fs, "wear": wear})
         if self._in_pipeline:
