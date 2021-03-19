@@ -167,6 +167,11 @@ class TestArgLongestBout:
 
 
 class TestGini:
+    """
+    Test values pulled from here:
+    https://stackoverflow.com/questions/48999542/more-efficient-weighted-gini-coefficient-in-
+    python/48999797#48999797
+    """
     def test1(self):
         x = np.array([1, 1, 1, 1, 1000])
 
