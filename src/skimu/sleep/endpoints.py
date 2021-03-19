@@ -12,7 +12,10 @@ from skimu.sleep.utility import rle, gini
 
 __all__ = [
     "total_sleep_time", "percent_time_asleep", "number_of_wake_bouts", "sleep_onset_latency",
-    "wake_after_sleep_onset"
+    "wake_after_sleep_onset", "average_sleep_duration", "average_wake_duration",
+    "sleep_awake_transition_probability", "awake_sleep_transition_probability",
+    "sleep_gini_index", "awake_gini_index", "sleep_average_hazard", "awake_average_hazard",
+    "sleep_power_law_distribution", "awake_power_law_distribution"
 ]
 
 
