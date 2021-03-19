@@ -126,6 +126,10 @@ def average_sleep_duration(sleep_predictions):
     .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are associated with
         mortality in US adults: The NHANES study,” bioRxiv, p. 182337, Aug. 2017,
         doi: 10.1101/182337.
+
+    Notes
+    -----
+    Higher values indicate longer bouts of sleep.
     """
     lengths, starts, vals = rle(sleep_predictions)
     sleep_lengths = lengths[vals == 1]
@@ -152,6 +156,10 @@ def average_wake_duration(sleep_predictions):
     .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are associated with
         mortality in US adults: The NHANES study,” bioRxiv, p. 182337, Aug. 2017,
         doi: 10.1101/182337.
+
+    Notes
+    -----
+    Higher values indicate longer bouts of wakefulness.
     """
     lengths, starts, vals = rle(sleep_predictions)
     wake_lengths = lengths[vals == 0]
@@ -181,6 +189,9 @@ def sleep_awake_transition_probability(sleep_predictions):
 
     Notes
     -----
+    Higher values indicate more frequent switching between states, and as a result may indicate
+    greater fragmentation of sleep.
+
     The implementation is straightforward [1]_, and is simply defined as
 
     .. math:: satp = \frac{1}{\mu_{sleep}}
@@ -215,6 +226,9 @@ def awake_sleep_transition_probability(sleep_predictions):
 
     Notes
     -----
+    Higher values indicate more frequent switching between states, and as a result may indicate
+    greater fragmentation of sleep.
+
     The implementation is straightforward [1]_, and is simply defined as
 
     .. math:: satp = \frac{1}{\mu_{awake}}
@@ -247,6 +261,12 @@ def sleep_gini_index(sleep_predictions):
     .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are associated with
         mortality in US adults: The NHANES study,” bioRxiv, p. 182337, Aug. 2017,
         doi: 10.1101/182337.
+
+    Notes
+    -----
+    Gini Index values are bounded between 0 and 1, with values near 1 indicating the total
+    time accumulating due to a small number of longer bouts, whereas values near 0 indicate all
+    bouts contribute more equally to the total time.
     """
     lengths, starts, vals = rle(sleep_predictions)
     sleep_lengths = lengths[vals == 1]
@@ -274,81 +294,17 @@ def awake_gini_index(sleep_predictions):
     .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are associated with
         mortality in US adults: The NHANES study,” bioRxiv, p. 182337, Aug. 2017,
         doi: 10.1101/182337.
+
+    Notes
+    -----
+    Gini Index values are bounded between 0 and 1, with values near 1 indicating the total
+    time accumulating due to a small number of longer bouts, whereas values near 0 indicate all
+    bouts contribute more equally to the total time.
     """
     lengths, starts, vals = rle(sleep_predictions)
     wake_lengths = lengths[vals == 0]
 
     return gini(wake_lengths, w=None, corr=True)
-
-
-def sleep_power_law_distribution(sleep_predictions):
-    r"""
-    Compute the scaling factor for a power law distribution over the sleep bouts lengths.
-
-    Parameters
-    ----------
-    sleep_predictions : numpy.ndarray
-        Boolean array indicating sleep (True = sleeping).
-
-    Returns
-    -------
-    alpha : float
-        Sleep bout power law distribution scaling parameter.
-
-    References
-    ----------
-    .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are associated with
-        mortality in US adults: The NHANES study,” bioRxiv, p. 182337, Aug. 2017,
-        doi: 10.1101/182337.
-
-    Notes
-    -----
-    The power law scaling factor is computer per [1]_:
-
-    .. math:: 1 + \frac{n_{sleep}}{\sum_{i}\log{t_i / \left(min(t) - 0.5\right)}}
-
-    where :math:`n_{sleep}` is the number of sleep bouts, :math:`t_i` is the duration of the
-    :math:`ith` sleep bout, and :math:`min(t)` is the length of the shortest sleep bout.
-    """
-    lengths, starts, vals = rle(sleep_predictions)
-    sleep_lengths = lengths[vals == 1]
-
-    return 1 + sleep_lengths.size / sum(log(sleep_lengths / (sleep_lengths.min() - 0.5)))
-
-
-def awake_power_law_distribution(sleep_predictions):
-    """
-    Compute the scaling factor for a power law distribution over the awake bouts lengths.
-
-    Parameters
-    ----------
-    sleep_predictions : numpy.ndarray
-        Boolean array indicating sleep (True = sleeping).
-
-    Returns
-    -------
-    alpha : float
-        Awake bout power law distribution scaling parameter.
-
-    References
-    ----------
-    .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are associated with
-        mortality in US adults: The NHANES study,” bioRxiv, p. 182337, Aug. 2017,
-        doi: 10.1101/182337.
-
-    Notes
-    -----
-    The power law scaling factor is computer per [1]_:
-
-    .. math:: 1 + \frac{n_{awake}}{\sum_{i}\log{t_i / \left(min(t) - 0.5\right)}}
-
-    where :math:`n_{awake}` is the number of awake bouts, :math:`t_i` is the duration of the
-    :math:`ith` awake bout, and :math:`min(t)` is the length of the shortest awake bout.
-    """
-    lengths, starts, vals = rle(sleep_predictions)
-    wake_lengths = lengths[vals == 0]
-
-    return 1 + wake_lengths.size / sum(log(wake_lengths / (wake_lengths.min() - 0.5)))
 
 
 def sleep_average_hazard(sleep_predictions):
@@ -375,6 +331,8 @@ def sleep_average_hazard(sleep_predictions):
 
     Notes
     -----
+    Higher values indicate higher frequency in switching from sleep to awake states.
+
     The average hazard is computed per [1]_:
 
     .. math::
@@ -426,6 +384,8 @@ def awake_average_hazard(sleep_predictions):
 
     Notes
     -----
+    Higher values indicate higher frequency in switching from awake to sleep states.
+
     The average hazard is computed per [1]_:
 
     .. math::
@@ -451,3 +411,79 @@ def awake_average_hazard(sleep_predictions):
     h_i = c_al / (cs_c_al[-1] - cs_c_al[:-1])
 
     return sum(h_i) / u_al.size
+
+
+def sleep_power_law_distribution(sleep_predictions):
+    r"""
+    Compute the scaling factor for a power law distribution over the sleep bouts lengths.
+
+    Parameters
+    ----------
+    sleep_predictions : numpy.ndarray
+        Boolean array indicating sleep (True = sleeping).
+
+    Returns
+    -------
+    alpha : float
+        Sleep bout power law distribution scaling parameter.
+
+    References
+    ----------
+    .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are associated with
+        mortality in US adults: The NHANES study,” bioRxiv, p. 182337, Aug. 2017,
+        doi: 10.1101/182337.
+
+    Notes
+    -----
+    Larger `alpha` values indicate that the total sleeping time is accumulated with a larger
+    portion of shorter sleep bouts.
+
+    The power law scaling factor is computer per [1]_:
+
+    .. math:: 1 + \frac{n_{sleep}}{\sum_{i}\log{t_i / \left(min(t) - 0.5\right)}}
+
+    where :math:`n_{sleep}` is the number of sleep bouts, :math:`t_i` is the duration of the
+    :math:`ith` sleep bout, and :math:`min(t)` is the length of the shortest sleep bout.
+    """
+    lengths, starts, vals = rle(sleep_predictions)
+    sleep_lengths = lengths[vals == 1]
+
+    return 1 + sleep_lengths.size / sum(log(sleep_lengths / (sleep_lengths.min() - 0.5)))
+
+
+def awake_power_law_distribution(sleep_predictions):
+    """
+    Compute the scaling factor for a power law distribution over the awake bouts lengths.
+
+    Parameters
+    ----------
+    sleep_predictions : numpy.ndarray
+        Boolean array indicating sleep (True = sleeping).
+
+    Returns
+    -------
+    alpha : float
+        Awake bout power law distribution scaling parameter.
+
+    References
+    ----------
+    .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are associated with
+        mortality in US adults: The NHANES study,” bioRxiv, p. 182337, Aug. 2017,
+        doi: 10.1101/182337.
+
+    Notes
+    -----
+    Larger `alpha` values indicate that the total awake time is accumulated with a larger
+    portion of shorter awake bouts.
+
+    The power law scaling factor is computer per [1]_:
+
+    .. math:: 1 + \frac{n_{awake}}{\sum_{i}\log{t_i / \left(min(t) - 0.5\right)}}
+
+    where :math:`n_{awake}` is the number of awake bouts, :math:`t_i` is the duration of the
+    :math:`ith` awake bout, and :math:`min(t)` is the length of the shortest awake bout.
+    """
+    lengths, starts, vals = rle(sleep_predictions)
+    wake_lengths = lengths[vals == 0]
+
+    return 1 + wake_lengths.size / sum(log(wake_lengths / (wake_lengths.min() - 0.5)))
