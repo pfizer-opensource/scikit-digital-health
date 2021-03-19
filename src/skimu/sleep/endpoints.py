@@ -160,7 +160,7 @@ def average_wake_duration(sleep_predictions):
 
 
 def sleep_awake_transition_probability(sleep_predictions):
-    """
+    r"""
     Compute the probability of transitioning from sleep state to awake state
 
     Parameters
@@ -178,6 +178,14 @@ def sleep_awake_transition_probability(sleep_predictions):
     .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are associated with
         mortality in US adults: The NHANES study,” bioRxiv, p. 182337, Aug. 2017,
         doi: 10.1101/182337.
+
+    Notes
+    -----
+    The implementation is straightforward [1]_, and is simply defined as
+
+    .. math:: satp = \frac{1}{\mu_{sleep}}
+
+    where :math:`\mu_{sleep}` is the mean sleep bout time.
     """
     lengths, starts, vals = rle(sleep_predictions)
     sleep_lengths = lengths[vals == 1]
@@ -186,7 +194,7 @@ def sleep_awake_transition_probability(sleep_predictions):
 
 
 def awake_sleep_transition_probability(sleep_predictions):
-    """
+    r"""
     Compute the probability of transitioning from awake state to sleep state.
 
     Parameters
@@ -204,6 +212,14 @@ def awake_sleep_transition_probability(sleep_predictions):
     .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are associated with
         mortality in US adults: The NHANES study,” bioRxiv, p. 182337, Aug. 2017,
         doi: 10.1101/182337.
+
+    Notes
+    -----
+    The implementation is straightforward [1]_, and is simply defined as
+
+    .. math:: satp = \frac{1}{\mu_{awake}}
+
+    where :math:`\mu_{awake}` is the mean awake bout time.
     """
     lengths, starts, vals = rle(sleep_predictions)
     wake_lengths = lengths[vals == 0]
@@ -266,7 +282,7 @@ def awake_gini_index(sleep_predictions):
 
 
 def sleep_power_law_distribution(sleep_predictions):
-    """
+    r"""
     Compute the scaling factor for a power law distribution over the sleep bouts lengths.
 
     Parameters
@@ -284,6 +300,15 @@ def sleep_power_law_distribution(sleep_predictions):
     .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are associated with
         mortality in US adults: The NHANES study,” bioRxiv, p. 182337, Aug. 2017,
         doi: 10.1101/182337.
+
+    Notes
+    -----
+    The power law scaling factor is computer per [1]_:
+
+    .. math:: 1 + \frac{n_{sleep}}{\sum_{i}\log{t_i / \left(min(t) - 0.5\right)}}
+
+    where :math:`n_{sleep}` is the number of sleep bouts, :math:`t_i` is the duration of the
+    :math:`ith` sleep bout, and :math:`min(t)` is the length of the shortest sleep bout.
     """
     lengths, starts, vals = rle(sleep_predictions)
     sleep_lengths = lengths[vals == 1]
@@ -310,6 +335,15 @@ def awake_power_law_distribution(sleep_predictions):
     .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are associated with
         mortality in US adults: The NHANES study,” bioRxiv, p. 182337, Aug. 2017,
         doi: 10.1101/182337.
+
+    Notes
+    -----
+    The power law scaling factor is computer per [1]_:
+
+    .. math:: 1 + \frac{n_{awake}}{\sum_{i}\log{t_i / \left(min(t) - 0.5\right)}}
+
+    where :math:`n_{awake}` is the number of awake bouts, :math:`t_i` is the duration of the
+    :math:`ith` awake bout, and :math:`min(t)` is the length of the shortest awake bout.
     """
     lengths, starts, vals = rle(sleep_predictions)
     wake_lengths = lengths[vals == 0]
@@ -318,7 +352,7 @@ def awake_power_law_distribution(sleep_predictions):
 
 
 def sleep_average_hazard(sleep_predictions):
-    """
+    r"""
     Compute the average hazard summary of the hazard function as a function of the sleep bout
     duration. The average hazard represents a summary of the frequency of transitioning from
     a sleep to awake state.
@@ -338,6 +372,21 @@ def sleep_average_hazard(sleep_predictions):
     .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are associated with
         mortality in US adults: The NHANES study,” bioRxiv, p. 182337, Aug. 2017,
         doi: 10.1101/182337.
+
+    Notes
+    -----
+    The average hazard is computed per [1]_:
+
+    .. math::
+
+        h(t_n_i) = \frac{n\left(t_n_i\right)}{n - n^c\left(t_n_{i-1}\right)}
+        \har{h} = \frac{1}{m}\sum_{t\in D}h(t)
+
+    where :math:`h(t_n_i)` is the hazard for the sleep bout of length :math:`t_n_i`,
+    :math:`n(t_n_i)` is the number of bouts of length :math:`t_n_i`, :math:`n` is the total
+    number of sleep bouts, :math:`n^c(t_n_i)` is the sum number of bouts less than or equal to
+    length :math:`t_n_i`, and :math:`t\in D` indicates all bouts up to the maximum length
+    (:math:`D`).
     """
     lengths, starts, vals = rle(sleep_predictions)
     sleep_lengths = lengths[vals == 1]
@@ -354,7 +403,7 @@ def sleep_average_hazard(sleep_predictions):
 
 
 def awake_average_hazard(sleep_predictions):
-    """
+    r"""
     Compute the average hazard summary of the hazard function as a function of the awake bout
     duration. The average hazard represents a summary of the frequency of transitioning from
     an awake to sleep state.
@@ -374,6 +423,21 @@ def awake_average_hazard(sleep_predictions):
     .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are associated with
         mortality in US adults: The NHANES study,” bioRxiv, p. 182337, Aug. 2017,
         doi: 10.1101/182337.
+
+    Notes
+    -----
+    The average hazard is computed per [1]_:
+
+    .. math::
+
+        h(t_n_i) = \frac{n\left(t_n_i\right)}{n - n^c\left(t_n_{i-1}\right)}
+        \har{h} = \frac{1}{m}\sum_{t\in D}h(t)
+
+    where :math:`h(t_n_i)` is the hazard for the awake bout of length :math:`t_n_i`,
+    :math:`n(t_n_i)` is the number of bouts of length :math:`t_n_i`, :math:`n` is the total
+    number of awake bouts, :math:`n^c(t_n_i)` is the sum number of bouts less than or equal to
+    length :math:`t_n_i`, and :math:`t\in D` indicates all bouts up to the maximum length
+    (:math:`D`).
     """
     lengths, starts, vals = rle(sleep_predictions)
     wake_lengths = lengths[vals == 0]
