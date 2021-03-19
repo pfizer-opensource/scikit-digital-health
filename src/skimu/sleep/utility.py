@@ -201,7 +201,7 @@ def gini(x, w=None, corr=True):
     ----------
     x : numpy.ndarray
         Array of bout lengths
-    w : numpy.ndarray
+    w : {None, numpy.ndarray}, optional
         Weights for x. Must be the same size. If None, weights are not used.
     corr : bool, optional
         Apply finite sample correction. Default is True.
