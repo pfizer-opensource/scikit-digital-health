@@ -1,6 +1,7 @@
 import numpy as np
 
-from skimu.sleep.endpoints import sleep_average_hazard
+from skimu.sleep.utility import rle
+from skimu.sleep.endpoints import SleepAverageHazard
 
 
 class TestSleepAverageHazard:
@@ -9,7 +10,8 @@ class TestSleepAverageHazard:
             [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0,
              0]
         )
+        l, s, v = rle(x)
 
-        sh = sleep_average_hazard(x)
+        sh = SleepAverageHazard().predict(lengths=l, starts=s, values=v)
 
         assert np.isclose(sh, 0.8333333)
