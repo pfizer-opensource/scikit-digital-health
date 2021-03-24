@@ -222,6 +222,23 @@ def gini(x, w=None, corr=True):
 
 
 def calculate_activity_index(fs, accel, hp_cut=0.25):
+    """
+    Calculate the activity index
+
+    Parameters
+    ----------
+    fs : float
+        Sampling frequency in Hz
+    accel : numpy.ndarray
+        Acceleration
+    hp_cut : float
+        High-pass filter cutoff
+
+    Returns
+    -------
+    ai : numpy.ndarray
+        The activity index of non-overlapping 60s windows
+    """
     # high pass filter
     sos = butter(3, hp_cut * 2 / fs, btype="high", output="sos")
     accel_hf = ascontiguousarray(sosfiltfilt(sos, accel, axis=0))
