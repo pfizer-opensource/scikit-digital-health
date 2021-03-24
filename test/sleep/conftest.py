@@ -37,3 +37,11 @@ def tso_dummy_data():
 
         return (time, accel, temp, lux), (sleep_start, sleep_end)
     return get_data
+
+
+@fixture(scope="module")
+def dummy_sleep_predictions():
+    return np.array(
+            [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+             0]
+        )
