@@ -162,6 +162,10 @@ class TestGini:
 
 class TestComputeActivityIndex:
     def test(self):
-        x = np.arange(120 * 3).reshape((-1, 3))
+        rng = np.random.default_rng(seed=5)
+        x = np.arange(120 * 3, dtype=np.float_).reshape((-1, 3))
+        x += rng.normal(loc=0., scale=0.5, size=x.shape)
 
-        res = compute_activity_index
+        res = compute_activity_index(1., x, hp_cut=1e-3)
+
+        assert np.allclose(res, np.array([0.4047359, 0.45388503]))
