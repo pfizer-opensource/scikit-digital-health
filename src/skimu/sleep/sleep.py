@@ -290,7 +290,7 @@ class Sleep(_BaseProcess):
             sleep["Date"][-1] = tso_start_dt.strftime("%Y-%m-%d")
             sleep["TSO Start Timestamp"][-1] = tso[0]
             sleep["TSO Start"][-1] = tso_start_dt.strftime("%Y-%m-%d %H:%M:%S.%f")
-            sleep["TSO Duration"][-1] = (tso[3] - tso[2]) / (fs * 60)  # in minutes
+            sleep["TSO Duration"][-1] = (tso[3] - tso[2]) / (goal_fs * 60)  # in minutes
 
             for param in init_params:
                 sleep[param.name][-1] = param.predict(
