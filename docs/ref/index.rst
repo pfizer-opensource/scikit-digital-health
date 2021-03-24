@@ -10,6 +10,7 @@ API Reference
     read
     preprocessing
     features
+    sleep
     gait
     sit2stand
     utility
