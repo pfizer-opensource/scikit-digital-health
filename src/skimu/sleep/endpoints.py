@@ -175,6 +175,8 @@ class WakeAfterSleepOnset(SleepMetric):
         waso : int
             Total number of minutes spent awake after the first sleep period
         """
+        if not sleep_predictions.any():
+            return nan  # if never fell asleep then metric should be undefined
         first_epoch, last_epoch = nonzero(sleep_predictions)[0][[0, -1]]
         waso = (last_epoch - first_epoch) - sum(sleep_predictions[first_epoch:last_epoch])
         return waso
