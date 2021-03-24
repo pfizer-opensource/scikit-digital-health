@@ -8,7 +8,7 @@ from abc import ABC, abstractmethod
 import logging
 
 from numpy import around, nonzero, diff, argmax, sum, mean, log, unique, argsort, cumsum, insert, \
-    int_, maximum
+    int_, maximum, nan
 
 from skimu.sleep.utility import gini
 
@@ -148,6 +148,8 @@ class SleepOnsetLatency(SleepMetric):
         sol : int
             Total number of minutes spent awake before the first sleep period
         """
+        if (sleep_predictions == 0).all():
+            return nan  # want it to be undefined if no sleep occurred
         return argmax(sleep_predictions)  # samples = minutes
 
 
