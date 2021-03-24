@@ -105,7 +105,7 @@ class TestReadBin(BaseProcessTester):
         ]
 
         cls.test_results = False
-        cls.process = ReadBin(base=8, period=12)
+        cls.process = ReadBin(bases=8, periods=12)
 
         cls.atol = 5e-5  # this is for accel, because GeneActiv csv file values are truncated
 
@@ -114,22 +114,22 @@ class TestReadBin(BaseProcessTester):
             self.process.predict(file=None)
 
     def test_window(self):
-        r = ReadBin(base=8, period=12)
+        r = ReadBin(bases=8, periods=12)
 
         assert r.window
-        assert r.base == 8
-        assert r.period == 12
+        assert r.bases == [8]
+        assert r.periods == [12]
 
     def test_window_warning(self):
         with pytest.warns(UserWarning):
-            ReadBin(base=None, period=12)
+            ReadBin(bases=None, periods=12)
         with pytest.warns(UserWarning):
-            ReadBin(base=8, period=None)
+            ReadBin(bases=8, periods=None)
 
     @pytest.mark.parametrize(('base', 'period'), ((-1, 12), (0, 25), (8, 30), (24, 12), (8, -12)))
     def test_window_bounds_error(self, base, period):
         with pytest.raises(ValueError):
-            ReadBin(base=base, period=period)
+            ReadBin(bases=base, periods=period)
 
     def test_extension_warning(self):
         with pytest.warns(UserWarning):
