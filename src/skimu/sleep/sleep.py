@@ -210,7 +210,7 @@ class Sleep(_BaseProcess):
             fs = mean(diff(time[:5000]))
 
         # get the individual days
-        days = kwargs.get(self._days, {}).get("12, 24", None)
+        days = kwargs.get(self._days, {}).get("(12, 24)", None)
         if days is None:
             raise ValueError(f"Day indices for {self.day_key} (base, period) not found.")
 
