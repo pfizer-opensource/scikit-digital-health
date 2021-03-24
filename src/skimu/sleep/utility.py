@@ -4,14 +4,17 @@ Utility functions required for sleep metric generation
 Yiorgos Christakis
 Pfizer DMTI 2021
 """
-from numpy import any, asarray, arctan, pi, roll, abs, argmax, diff, nonzero, insert, sqrt, pad, \
-    int_, append, argsort, sort, cumsum, sum, float_, minimum
+from numpy import any, arctan, pi, roll, abs, argmax, diff, nonzero, insert, sqrt, pad, \
+    int_, append, argsort, sort, cumsum, sum, float_, minimum, mean, var, ascontiguousarray
+from scipy.signal import butter, sosfiltfilt
 
+from skimu.utility import get_windowed_view
 from skimu.utility import rolling_mean, rolling_sd, rolling_median
+from skimu.utility.internal import rle
 
 __all__ = [
-    "rle", "compute_z_angle", "compute_absolute_difference", "drop_min_blocks", "arg_longest_bout",
-    "gini"
+    "compute_z_angle", "compute_absolute_difference", "drop_min_blocks", "arg_longest_bout",
+    "gini", "calculate_activity_index"
 ]
 
 
@@ -216,3 +219,17 @@ def gini(x, w=None, corr=True):
             return minimum(g * n / (n - 1), 1)
         else:
             return g
+
+
+def calculate_activity_index(fs, accel, hp_cut=0.25):
+    # high pass filter
+    sos = butter(3, hp_cut * 2 / fs, btype="high", output="sos")
+    accel_hf = ascontiguousarray(sosfiltfilt(sos, accel, axis=0))
+
+    # non-overlapping 60s windows
+    acc_w = get_windowed_view(accel_hf, int(60 * fs), int(60 * fs))
+
+    # compute activity index
+    act_ind = sqrt(mean(var(acc_w, axis=2), axis=1))
+
+    return act_ind
