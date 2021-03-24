@@ -160,7 +160,7 @@ class TestReadGT3X(BaseProcessTester):
             self.process.predict(file=None)
 
     def test_window(self):
-        r = ReadBin(base=8, period=12)
+        r = ReadGT3X(base=8, period=12)
 
         assert r.window
         assert r.base == 8
@@ -168,16 +168,16 @@ class TestReadGT3X(BaseProcessTester):
 
     def test_window_warning(self):
         with pytest.warns(UserWarning):
-            ReadBin(base=None, period=12)
+            ReadGT3X(base=None, period=12)
         with pytest.warns(UserWarning):
-            ReadBin(base=8, period=None)
+            ReadGT3X(base=8, period=None)
 
     @pytest.mark.parametrize(('base', 'period'), ((-1, 12), (0, 25), (8, 30), (24, 12), (8, -12)))
     def test_window_bounds_error(self, base, period):
         with pytest.raises(ValueError):
-            ReadBin(base=base, period=period)
+            ReadGT3X(base=base, period=period)
 
     def test_extension_warning(self):
         with pytest.warns(UserWarning):
             with pytest.raises(OSError):
-                ReadBin().predict('test.random')
+                ReadGT3X().predict('test.random')
