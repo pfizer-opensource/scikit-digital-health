@@ -4,7 +4,7 @@ Wear detection algorithms
 Lukas Adamowicz
 Pfizer DMTI 2021
 """
-from numpy import mean, diff, sum, insert, append, nonzero, delete, concatenate, int_
+from numpy import array, mean, diff, sum, insert, append, nonzero, delete, concatenate, int_
 
 from skimu.base import _BaseProcess
 from skimu.utility import rolling_sd, get_windowed_view
@@ -125,7 +125,7 @@ class DetectWear(_BaseProcess):
         for ws, we in zip(wear_starts, wear_stops):
             wear_blocks.append([ws * n_wskip, we * n_wskip])
 
-        kwargs.update({self._time: time, self._acc: accel, "wear": wear_blocks})
+        kwargs.update({self._time: time, self._acc: accel, "wear": array(wear_blocks)})
         if self._in_pipeline:
             return kwargs, None
         else:
