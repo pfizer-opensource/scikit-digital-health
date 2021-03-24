@@ -126,7 +126,10 @@ class DetectWear(_BaseProcess):
             wear_blocks.append([ws * n_wskip, we * n_wskip])
 
         kwargs.update({self._time: time, self._acc: accel, "wear": wear_blocks})
-        return kwargs
+        if self._in_pipeline:
+            return kwargs, None
+        else:
+            return kwargs
 
 
 def _modify_wear_times(nonwear, wskip, apply_setup_rule, shipping_crit):
