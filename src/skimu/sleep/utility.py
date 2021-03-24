@@ -14,7 +14,7 @@ from skimu.utility.internal import rle
 
 __all__ = [
     "compute_z_angle", "compute_absolute_difference", "drop_min_blocks", "arg_longest_bout",
-    "gini", "calculate_activity_index"
+    "gini", "compute_activity_index"
 ]
 
 
