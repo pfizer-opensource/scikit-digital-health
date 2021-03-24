@@ -78,6 +78,49 @@ class TestWakeAfterSleepOnset(_BaseTestEndpoint):
     zeros_result = np.nan
     ones_result = 0.
 
+
+class TestAverageSleepDuration(_BaseTestEndpoint):
+    metric = AverageSleepDuration
+    normal_result = 13 / 3
+    zeros_result = 0.
+    ones_result = 30.
+
+
+class TestAverageWakeDuration(_BaseTestEndpoint):
+    metric = AverageWakeDuration
+    normal_result = 17 / 4
+    zeros_result = 30.
+    ones_result = 0.
+
+
+class TestSleepWakeTransitionProbability(_BaseTestEndpoint):
+    metric = SleepWakeTransitionProbability
+    normal_result = 3 / 13
+    zeros_result = np.nan
+    ones_result = 1 / 30
+
+
+class TestWakeSleepTransitionProbability(_BaseTestEndpoint):
+    metric = WakeSleepTransitionProbability
+    normal_result = 4 / 17
+    zeros_result = 1/30
+    ones_result = np.nan
+
+
+class TestSleepGiniIndex(_BaseTestEndpoint):
+    metric = SleepGiniIndex
+    normal_result = 0.3076923
+    zeros_result = 0.
+    ones_result = 1.
+
+
+class TestWakeGiniIndex(_BaseTestEndpoint):
+    metric = WakeGiniIndex
+    normal_result = 1 / 3
+    zeros_result = 1.
+    ones_result = 0.
+
+
 class TestSleepAverageHazard(_BaseTestEndpoint):
     metric = SleepAverageHazard
     normal_result = 0.8333333
@@ -90,3 +133,17 @@ class TestWakeAverageHazard(_BaseTestEndpoint):
     normal_result = 0.52083333333333
     zeros_result = 1.0
     ones_result = np.nan
+
+
+class TestSleepPowerLawDistribution(_BaseTestEndpoint):
+    metric = SleepPowerLawDistribution
+    normal_result = 3.151675
+    zeros_result = 1.
+    ones_result = 1 + 1 / np.log(30 / 29.5)
+
+
+class TestWakePowerLawDistribution(_BaseTestEndpoint):
+    metric = WakePowerLawDistribution
+    normal_result = 2.073754
+    zeros_result = 1 + 1 / np.log(30 / 29.5)
+    ones_result = 1.
