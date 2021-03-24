@@ -5,7 +5,7 @@ Yiorgos Christakis
 Pfizer DMTI 2021
 """
 from numpy import any, asarray, arctan, pi, roll, abs, argmax, diff, nonzero, insert, sqrt, pad, \
-    int_, append, argsort, sort, cumsum, sum, float_
+    int_, append, argsort, sort, cumsum, sum, float_, minimum
 
 from skimu.utility import rolling_mean, rolling_sd, rolling_median
 
@@ -216,6 +216,11 @@ def gini(x, w=None, corr=True):
     .. [1] https://stackoverflow.com/questions/48999542/more-efficient-weighted-gini-coefficient-in
         -python/48999797#48999797
     """
+    if x.size == 0:
+        return 0.
+    elif x.size == 1:
+        return 1.
+
     # The rest of the code requires numpy arrays.
     if w is not None:
         sorted_indices = argsort(x)
@@ -236,6 +241,6 @@ def gini(x, w=None, corr=True):
         # The above formula, with all weights equal to 1 simplifies to:
         g = (n + 1 - 2 * sum(cumx) / cumx[-1]) / n
         if corr:
-            return g * n / (n - 1)
+            return minimum(g * n / (n - 1), 1)
         else:
             return g
