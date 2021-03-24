@@ -106,7 +106,7 @@ def apply_downsample(goal_fs, time, data=(), indices=()):
                 ).astype(int_),
             )
         elif idx.ndim == 2:
-            indices_ds += (zeros(idx.shape, dtype=int_))
+            indices_ds += (zeros(idx.shape, dtype=int_),)
             for i in range(idx.shape[1]):
                 indices_ds[-1][:, i] = around(
                     interp(time[idx[:, i]], time_ds, arange(time_ds.size))  # cast to int on insert
