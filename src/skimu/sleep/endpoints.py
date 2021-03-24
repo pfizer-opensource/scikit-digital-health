@@ -214,6 +214,8 @@ class AverageSleepDuration(SleepMetric):
             Average number of minutes per bout of sleep during total sleep opportunity.
         """
         sleep_lengths = lengths[values == 1]
+        if sleep_lengths.size == 0:
+            return 0.
 
         return mean(sleep_lengths)
 
@@ -253,6 +255,8 @@ class AverageWakeDuration(SleepMetric):
             Average number of minutes per bout of wake during total sleep opportunity.
         """
         wake_lengths = lengths[values == 0]
+        if wake_lengths.size == 0:
+            return 0.
 
         return mean(wake_lengths)
 
