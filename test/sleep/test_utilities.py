@@ -4,12 +4,9 @@ Testing of utility functions for sleep analysis.
 Yiorgos Christakis
 Pfizer DMTI 2021
 """
-import pytest
 import numpy as np
+
 from skimu.sleep.utility import *
-
-
-
 
 
 class TestComputeZAngle:
@@ -161,3 +158,10 @@ class TestGini:
 
         assert np.isclose(np.around(gini(x, w=w, corr=False), 4), 0.2553)
         assert np.isclose(np.around(gini(x, w=w, corr=True), 4), np.around(0.2553 * 5 / 4, 4))
+
+
+class TestComputeActivityIndex:
+    def test(self):
+        x = np.arange(120 * 3).reshape((-1, 3))
+
+        res = compute_activity_index

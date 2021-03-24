@@ -221,7 +221,7 @@ def gini(x, w=None, corr=True):
             return g
 
 
-def calculate_activity_index(fs, accel, hp_cut=0.25):
+def compute_activity_index(fs, accel, hp_cut=0.25):
     """
     Calculate the activity index
 

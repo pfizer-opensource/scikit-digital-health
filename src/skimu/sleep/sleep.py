@@ -13,7 +13,7 @@ from numpy import mean, diff, array, nan
 from skimu.base import _BaseProcess  # import the base process class
 from skimu.utility.internal import get_day_wear_intersection, apply_downsample, rle
 from skimu.sleep.tso import get_total_sleep_opportunity
-from skimu.sleep.utility import calculate_activity_index
+from skimu.sleep.utility import compute_activity_index
 from skimu.sleep.sleep_classification import compute_sleep_predictions
 from skimu.sleep.endpoints import *
 
@@ -272,7 +272,7 @@ class Sleep(_BaseProcess):
             )
 
             # calculate activity index
-            act_index = calculate_activity_index(goal_fs, accel_ds[start:stop])
+            act_index = compute_activity_index(goal_fs, accel_ds[start:stop])
 
             # sleep wake predictions
             predictions = compute_sleep_predictions(act_index, sf=0.243)
