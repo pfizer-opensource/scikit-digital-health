@@ -70,34 +70,6 @@ def get_weartime(acc_rmed, temp, fs, move_thresh, temp_thresh):
     return starts, stops
 
 
-def rle(to_encode):
-    """
-    Run length encoding.
-
-    Parameters
-    ----------
-    to_encode : array-like
-
-    Returns
-    -------
-    lengths : array
-        Lengths of each block.
-    block_start_indices : array
-        Indices of the start of each block.
-    block_values : array
-        The value repeated for the duration of each block.
-    """
-    starts = nonzero(diff(to_encode))[0] + 1
-    # add the end too for length computation
-    starts = insert(starts, (0, starts.size), (0, len(to_encode)))
-
-    lengths = diff(starts)
-    starts = starts[:-1]  # remove that last index which isn't actually a start
-    values = asarray(to_encode)[starts]
-
-    return lengths, starts, values
-
-
 def compute_z_angle(acc):
     """
     Computes the z-angle of a tri-axial accelerometer signal with columns X, Y, Z per sample.

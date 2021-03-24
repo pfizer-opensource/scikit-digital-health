@@ -4,7 +4,8 @@ Internal utility functions that don't necessarily need to be exposed in the publ
 Lukas Adamowicz
 Pfizer DMTI 2021
 """
-from numpy import array, nonzero, insert, append, arange, interp, zeros, around, float_, int_
+from numpy import asarray, nonzero, insert, append, arange, interp, zeros, around, diff, float_,\
+    int_
 
 
 def get_day_wear_intersection(starts, stops, day_start, day_stop):
@@ -35,15 +36,15 @@ def get_day_wear_intersection(starts, stops, day_start, day_stop):
     if starts_subset.size == 0 and stops_subset.size == 0:
         try:
             if stops[nonzero(starts <= day_start)[0][-1]] >= day_stop:
-                return array([day_start]), array([day_stop])
+                return asarray([day_start]), asarray([day_stop])
             else:
-                return array([]), array([])
+                return asarray([]), asarray([])
         except IndexError:
-            return array([]), array([])
+            return asarray([]), asarray([])
     if starts_subset.size == 0 and stops_subset.size == 1:
-        starts_subset = array([day_start])
+        starts_subset = asarray([day_start])
     if starts_subset.size == 1 and stops_subset.size == 0:
-        stops_subset = array([day_stop])
+        stops_subset = asarray([day_stop])
 
     if starts_subset[0] > stops_subset[0]:
         starts_subset = insert(starts_subset, 0, day_start)
@@ -119,3 +120,31 @@ def apply_downsample(goal_fs, time, data=(), indices=()):
         ret += (indices_ds,)
 
     return ret
+
+
+def rle(to_encode):
+    """
+    Run length encoding.
+
+    Parameters
+    ----------
+    to_encode : array-like
+
+    Returns
+    -------
+    lengths : array
+        Lengths of each block.
+    block_start_indices : array
+        Indices of the start of each block.
+    block_values : array
+        The value repeated for the duration of each block.
+    """
+    starts = nonzero(diff(to_encode))[0] + 1
+    # add the end too for length computation
+    starts = insert(starts, (0, starts.size), (0, len(to_encode)))
+
+    lengths = diff(starts)
+    starts = starts[:-1]  # remove that last index which isn't actually a start
+    values = asarray(to_encode)[starts]
+
+    return lengths, starts, values
