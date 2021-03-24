@@ -278,8 +278,8 @@ class Sleep(_BaseProcess):
             # sleep wake predictions
             predictions = compute_sleep_predictions(act_index, sf=0.243)
             # tso indices are already relative to day start
-            tso_start = int(tso[2] / int(60 * fs))  # convert to minute indexing
-            tso_stop = int(tso[3] / int(60 * fs))
+            tso_start = int(tso[2] / int(60 * goal_fs))  # convert to minute indexing
+            tso_stop = int(tso[3] / int(60 * goal_fs))
             pred_during_tso = predictions[tso_start:tso_stop]
             # run length encoding for sleep metrics
             sw_lengths, sw_starts, sw_vals = rle(pred_during_tso)
@@ -294,7 +294,7 @@ class Sleep(_BaseProcess):
 
             for param in init_params:
                 sleep[param.name][-1] = param.predict(
-                    predictions=pred_during_tso,
+                    sleep_predictions=pred_during_tso,
                     lengths=sw_lengths,
                     starts=sw_starts,
                     values=sw_vals
