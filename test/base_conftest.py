@@ -84,7 +84,12 @@ def get_truth_data():
         with h5py.File(file, 'r') as h5:
             for key in data_names:
                 if key in h5[truth_key]:
-                    truth[key] = h5[truth_key][key][()]
+                    if isinstance(h5[truth_key][key], h5py.Group):
+                        truth[key] = {}
+                        for key2 in h5[truth_key][key]:
+                            truth[key][key2] = h5[truth_key][key][key2][()]
+                    else:
+                        truth[key] = h5[truth_key][key][()]
 
         return truth
     return truth_data
