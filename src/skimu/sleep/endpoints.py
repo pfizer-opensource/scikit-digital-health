@@ -8,7 +8,7 @@ from abc import ABC, abstractmethod
 import logging
 
 from numpy import around, nonzero, diff, argmax, sum, mean, log, unique, argsort, cumsum, insert, \
-    int_
+    int_, maximum
 
 from skimu.sleep.utility import gini
 
@@ -124,7 +124,7 @@ class NumberWakeBouts(SleepMetric):
             Number of waking bouts.
         """
         # -1 to exclude the last wakeup
-        return nonzero(diff(sleep_predictions.astype(int_)) == -1)[0].size - 1
+        return maximum(nonzero(diff(sleep_predictions.astype(int_)) == -1)[0].size - 1, 0)
 
 
 class SleepOnsetLatency(SleepMetric):
