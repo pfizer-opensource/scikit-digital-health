@@ -55,8 +55,14 @@ class BaseProcessTester:
                 assert allclose(ptime, ttime, atol=self.atol_time), \
                     f"{self.process._name} test for value ({key}) not close to truth"
             else:
-                assert allclose(pred[key], truth[key], atol=self.atol, equal_nan=True), \
-                    f"{self.process._name} test for value ({key}) not close to truth"
+                if isinstance(truth[key], dict):
+                    for k2 in truth[key]:
+                        assert allclose(
+                            pred[key][k2], truth[key][k2], atol=self.atol, equal_nan=True), \
+                            f"{self.process._name} test for value ({key}/{k2}) not close to truth"
+                else:
+                    assert allclose(pred[key], truth[key], atol=self.atol, equal_nan=True), \
+                        f"{self.process._name} test for value ({key}) not close to truth"
 
 
 @fixture(scope='module')
