@@ -148,7 +148,7 @@ class SleepOnsetLatency(SleepMetric):
         sol : int
             Total number of minutes spent awake before the first sleep period
         """
-        if (sleep_predictions == 0).all():
+        if not sleep_predictions.any():
             return nan  # want it to be undefined if no sleep occurred
         return argmax(sleep_predictions)  # samples = minutes
 
