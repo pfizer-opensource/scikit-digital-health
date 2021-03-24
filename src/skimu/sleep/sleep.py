@@ -285,7 +285,7 @@ class Sleep(_BaseProcess):
             sw_lengths, sw_starts, sw_vals = rle(pred_during_tso)
 
             # results fill out
-            tso_start_dt = datetime.utcfromtimestamp(time[tso[2] + start])
+            tso_start_dt = datetime.utcfromtimestamp(tso[0])
             sleep["Day N"][-1] = iday + 1
             sleep["Date"][-1] = tso_start_dt.strftime("%Y-%m-%d")
             sleep["TSO Start Timestamp"][-1] = tso[0]
