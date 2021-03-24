@@ -610,6 +610,9 @@ class SleepPowerLawDistribution(SleepMetric):
         """
         sleep_lengths = lengths[values == 1]
 
+        if sleep_lengths.size == 0:
+            return 1.
+
         return 1 + sleep_lengths.size / sum(log(sleep_lengths / (sleep_lengths.min() - 0.5)))
 
 
@@ -659,5 +662,8 @@ class WakePowerLawDistribution(SleepMetric):
             Awake bout power law distribution scaling parameter.
         """
         wake_lengths = lengths[values == 0]
+
+        if wake_lengths.size == 0:
+            return 1.
 
         return 1 + wake_lengths.size / sum(log(wake_lengths / (wake_lengths.min() - 0.5)))
