@@ -222,7 +222,7 @@ class Sleep(_BaseProcess):
         # downsample if necessary
         goal_fs = 20.
         if fs != goal_fs and self.downsample:
-            time_ds, (accel_ds, temp_ds), (days_ds, wear_ds) = apply_downsample(
+            time_ds, (accel_ds,), (days_ds, wear_ds) = apply_downsample(
                 goal_fs, time, data=(accel,), indices=(days, wear)
             )
 
