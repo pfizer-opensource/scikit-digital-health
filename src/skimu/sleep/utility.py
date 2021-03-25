@@ -45,6 +45,10 @@ def get_weartime(acc_rmed, temp, fs, move_thresh, temp_thresh):
     mn = rolling_mean(acc_rmed, n5, n5, axis=0)
     # rolling 30min StDev.  5s windows -> 12 windows per minute
     acc_rsd = rolling_sd(mn, 12 * 30, 1, axis=0, return_previous=False)
+    # TODO note that this 30 min rolling standard deviation likely means that our wear/nonwear
+    # timest could be off by as much as 30 mins, due to windows extending into the wear time.
+    # this is likely going to be an issue for all wear time algorithms due to long
+    # windows, however.
 
     # rolling 5s median of temperature
     rmd = rolling_median(temp, n5, skip=1, pad=False)
@@ -70,7 +74,7 @@ def get_weartime(acc_rmed, temp, fs, move_thresh, temp_thresh):
     if move_mask[-1] or temp_mask[-1]:
         stops = append(stops, move_mask.size)
 
-    return starts, stops
+    return starts * n5, stops * n5
 
 
 def compute_z_angle(acc):
