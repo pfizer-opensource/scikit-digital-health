@@ -105,7 +105,7 @@ class Sleep(_BaseProcess):
             start_buffer=0,
             stop_buffer=0,
             min_rest_block=30,
-            max_activity_break=30,
+            max_activity_break=60,
             min_angle_thresh=0.1,
             max_angle_thresh=1.0,
             min_rest_period=None,
