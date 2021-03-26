@@ -95,13 +95,13 @@ def get_total_sleep_opportunity(
     # get the indices of the longest bout
     arg_start, arg_end = arg_longest_bout(tso, 1)
 
-    # account for left justified windows - times need to be bumped up by half a window
-    # account for 5s windows in indexing
-    arg_start = (arg_start + 30) * n5  # 12 * 5 / 2 = 30
-    arg_end = (arg_end + 30) * n5
-
     # get the timestamps of the longest bout
     if arg_start is not None:
+        # account for left justified windows - times need to be bumped up by half a window
+        # account for 5s windows in indexing
+        arg_start = (arg_start + 30) * n5  # 12 * 5 / 2 = 30
+        arg_end = (arg_end + 30) * n5
+
         start, end = time[arg_start], time[arg_end]
     else:
         start = end = None

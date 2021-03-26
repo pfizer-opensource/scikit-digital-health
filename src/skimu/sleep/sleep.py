@@ -252,6 +252,9 @@ class Sleep(_BaseProcess):
             # initialize all the sleep values for the day
             for k in sleep:
                 sleep[k].append(nan)
+            # fill out Day number and date
+            sleep["Day N"][-1] = iday + 1
+            sleep["Date"][-1] = datetime.utcfromtimestamp(time_ds[start]).strftime("%Y-%m-%d")
 
             # get the starts and stops of wear during the day
             dw_starts, dw_stops = get_day_wear_intersection(
@@ -271,6 +274,9 @@ class Sleep(_BaseProcess):
                 idx_start=start
             )
 
+            if tso[0] is None:
+                continue
+
             # calculate activity index
             act_index = compute_activity_index(goal_fs, accel_ds[start:stop])
 
@@ -285,8 +291,6 @@ class Sleep(_BaseProcess):
 
             # results fill out
             tso_start_dt = datetime.utcfromtimestamp(tso[0])
-            sleep["Day N"][-1] = iday + 1
-            sleep["Date"][-1] = tso_start_dt.strftime("%Y-%m-%d")
             sleep["TSO Start Timestamp"][-1] = tso[0]
             sleep["TSO Start"][-1] = tso_start_dt.strftime("%Y-%m-%d %H:%M:%S.%f")
             sleep["TSO Duration"][-1] = (tso[3] - tso[2]) / (goal_fs * 60)  # in minutes
