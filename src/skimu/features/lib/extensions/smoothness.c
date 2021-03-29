@@ -160,6 +160,7 @@ PyObject * SPARC(PyObject *NPY_UNUSED(self), PyObject *args){
     if (fail){
         Py_XDECREF(data);
         Py_XDECREF(res);
+        destroy_plan();  // destroy the FFT plan
         return NULL;
     }
     Py_XDECREF(data);
