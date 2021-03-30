@@ -64,12 +64,16 @@ static PyObject *read_bin(PyObject *NPY_UNUSED(self), PyObject *args)
     );
 
     if (!bases || !periods)
+        Py_XDECREF(bases);
+        Py_XDECREF(periods);
         return NULL;
     
     /* WINDOING INFO INIT */
     winfo.n = PyArray_Size(bases);
     if (winfo.n != PyArray_Size(periods))
     {
+        Py_XDECREF(bases);
+        Py_XDECREF(periods);
         PyErr_SetString(PyExc_ValueError, "Size mismatch between bases and periods");
         return NULL;
     }
@@ -85,6 +89,8 @@ static PyObject *read_bin(PyObject *NPY_UNUSED(self), PyObject *args)
     fp = fopen(file, "r");
     if (!fp)
     {
+        Py_XDECREF(bases);
+        Py_XDECREF(periods);
         PyErr_SetString(PyExc_IOError, "Error opening file");
         return NULL;
     }
@@ -94,6 +100,8 @@ static PyObject *read_bin(PyObject *NPY_UNUSED(self), PyObject *args)
 
     if (info.npages == -1)
     {
+        Py_XDECREF(bases);
+        Py_XDECREF(periods);
         PyErr_SetString(PyExc_IOError, "Cannot read number of blocks");
         return NULL;
     }
@@ -117,6 +125,9 @@ static PyObject *read_bin(PyObject *NPY_UNUSED(self), PyObject *args)
 
     if (!accel || !time || !light || !temp || !starts || !stops)
     {
+        Py_XDECREF(bases);
+        Py_XDECREF(periods);
+
         Py_XDECREF(accel);
         Py_XDECREF(time);
         Py_XDECREF(temp);
@@ -153,6 +164,10 @@ static PyObject *read_bin(PyObject *NPY_UNUSED(self), PyObject *args)
     fclose(fp);
     free(winfo.i_start);
     free(winfo.i_stop);
+
+    /* decrease ref count if successful or failed */
+    Py_XDECREF(bases);
+    Py_XDECREF(periods);
 
     if (fail)
     {
