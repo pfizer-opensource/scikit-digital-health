@@ -63,10 +63,11 @@ static PyObject *read_bin(PyObject *NPY_UNUSED(self), PyObject *args)
         NULL
     );
 
-    if (!bases || !periods)
+    if (!bases || !periods){
         Py_XDECREF(bases);
         Py_XDECREF(periods);
         return NULL;
+    }
     
     /* WINDOING INFO INIT */
     winfo.n = PyArray_Size(bases);
