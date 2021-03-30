@@ -184,7 +184,7 @@ static PyObject *read_bin(PyObject *NPY_UNUSED(self), PyObject *args)
     }
 
     return Py_BuildValue(
-        "lfOOOOOO",
+        "lfNNNNNN",  /* need to use N to not increment reference counter */
         info.max_n,
         info.fs,
         (PyObject *)accel,

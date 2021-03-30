@@ -130,7 +130,7 @@ PyObject * rolling_sd(PyObject *NPY_UNUSED(self), PyObject *args){
 
     if (return_others){
         return Py_BuildValue(
-            "OO",
+            "NN",  /* dont want to increase ref count */
             (PyObject *)rsd,
             (PyObject *)rmean
         );
@@ -204,7 +204,7 @@ PyObject * rolling_skewness(PyObject *NPY_UNUSED(self), PyObject *args){
 
     if (return_others){
         return Py_BuildValue(
-            "OOO",
+            "NNN",  /* dont want to increase ref count */
             (PyObject *)rskew,
             (PyObject *)rsd,
             (PyObject *)rmean
@@ -284,7 +284,7 @@ PyObject * rolling_kurtosis(PyObject *NPY_UNUSED(self), PyObject *args){
 
     if (return_others){
         return Py_BuildValue(
-            "OOOO",
+            "NNNN",  /* dont want to increase ref count */
             (PyObject *)rkurt,
             (PyObject *)rskew,
             (PyObject *)rsd,

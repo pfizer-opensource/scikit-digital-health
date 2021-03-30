@@ -107,7 +107,14 @@ PyObject * read_cwa(PyObject *NPY_UNUSED(self), PyObject *args){
     return NULL;
   }
 
-  return Py_BuildValue("OOOOO", metadata, (PyObject *)imudata, (PyObject *)timestamps, (PyObject *)index, (PyObject *)light);
+  return Py_BuildValue(
+    "NNNNN",  /* N doesnt increase reference counter */
+    metadata,
+    (PyObject *)imudata,
+    (PyObject *)timestamps,
+    (PyObject *)index,
+    (PyObject *)light
+  );
 }
 
 static struct PyMethodDef methods[] = {
