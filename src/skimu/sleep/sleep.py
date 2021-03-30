@@ -8,7 +8,7 @@ from collections.abc import Iterable
 from warnings import warn
 from datetime import datetime
 
-from numpy import mean, diff, array, nan
+from numpy import mean, diff, array, nan, sum
 
 from skimu.base import _BaseProcess  # import the base process class
 from skimu.utility.internal import get_day_wear_intersection, apply_downsample, rle
@@ -249,6 +249,10 @@ class Sleep(_BaseProcess):
         for iday, day_idx in enumerate(days_ds):
             start, stop = day_idx
 
+            if ((stop - start) / (3600 * goal_fs)) < self.min_day_hrs:
+                self.logger.info(f"Day {iday} has less than {self.min_day_hrs}. Skipping")
+                continue
+
             # initialize all the sleep values for the day
             for k in sleep:
                 sleep[k].append(nan)
@@ -259,6 +263,11 @@ class Sleep(_BaseProcess):
             # get the starts and stops of wear during the day
             dw_starts, dw_stops = get_day_wear_intersection(
                 wear_ds[:, 0], wear_ds[:, 1], start, stop)
+
+            if (sum(dw_stops - dw_starts) / (3600 * goal_fs)) < self.min_wear_time:
+                self.logger.info(
+                    f"Day {iday} has less than {self.min_wear_time} wear hours. Skipping")
+                continue
 
             # start time, end time, start index, end index
             tso = get_total_sleep_opportunity(
