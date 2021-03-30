@@ -12,7 +12,8 @@ from skimu.sleep import Sleep
 
 class TestSleep:
     def test(self):
-        file = "/Users/lukasadamowicz/Documents/Packages/sleeppy/sleeppy/test/test_data/demo.bin"
+        # file = "/Users/lukasadamowicz/Documents/Packages/sleeppy/sleeppy/test/test_data/demo.bin"
+        file = "/Users/lukasadamowicz/Downloads/SQUAD_acc_0000_nonsensitive_20200101_100706184003_left_2.bin"
 
         p = Pipeline()
         p.add(ReadBin(bases=[12], periods=[24]))
