@@ -243,7 +243,7 @@ class Sit2Stand(_BaseProcess):
             )
 
             # fill out the day information
-            sts["Day Number"].append([iday] * (len(sts["Date"]) - len(sts["Day Number"])))
+            sts["Day Number"].extend([iday + 1] * (len(sts["Date"]) - len(sts["Day Number"])))
 
         # get rid of the partial transitions
         partial = array(sts["Partial"])
