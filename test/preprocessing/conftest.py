@@ -111,7 +111,7 @@ def accel_with_nonwear():
         starts = starts[stops > (ship_crit[0] * 3600 * fs)]
         stops = stops[stops > (ship_crit[0] * 3600 * fs)]
 
-        wear = [[i, j] for i, j in zip(starts, stops)]
+        wear = np.concatenate((starts, stops)).reshape((2, -1)).T
 
         return t, a, wear
     return get_sample
@@ -234,5 +234,7 @@ def simple_nonwear_data():
         for stst in wss:
             nonwear[int(stst[0]):int(stst[1])] = False
 
-        return nonwear, starts * nh, stops * nh
+        wear = np.concatenate((starts, stops)).reshape((2, -1)).T
+
+        return nonwear, wear * nh
     return sample

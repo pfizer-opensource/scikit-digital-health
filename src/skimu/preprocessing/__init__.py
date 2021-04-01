@@ -14,5 +14,7 @@ Sensor Calibration
 """
 from skimu.preprocessing.calibrate import CalibrateAccelerometer
 from skimu.preprocessing import calibrate
+from skimu.preprocessing.wear_detection import DetectWear
+from skimu.preprocessing import wear_detection
 
-__all__ = ("CalibrateAccelerometer", "calibrate")
+__all__ = ("CalibrateAccelerometer", "calibrate", "DetectWear", "wear_detection")

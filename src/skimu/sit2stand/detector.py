@@ -4,6 +4,8 @@ Sit-to-stand transfer detection and processing
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
+import datetime
+
 from numpy import array, zeros, ceil, around, mean, std, sum, abs, gradient, where, diff, insert, \
     append, sign, median, arange, sqrt, log2
 from numpy.fft import fft
@@ -314,6 +316,11 @@ class Detector:
                 vdisp_ = v_pos[t_end_i] - v_pos[t_start_i]
                 sal_ = self.sparc(norm(raw_acc[sts_start:sts_end], axis=1), 1 / dt)
 
+                dtime = datetime.datetime.utcfromtimestamp(time[sts_start])
+                sts["Date"].append(dtime.strftime("%Y-%m-%d"))
+                sts["Time"].append(dtime.strftime("%H:%M:%S.%f"))
+                sts["Hour"].append(dtime.hour)
+
                 sts['STS Start'].append(time[sts_start])
                 sts['STS End'].append(time[sts_end])
                 sts['Duration'].append(dur_)
@@ -329,6 +336,11 @@ class Detector:
                     mn_ = filt_acc[sts_start:sts_end].min()
                     vdisp_ = v_pos[t_end_i] - v_pos[t_start_i]
                     sal_ = self.sparc(norm(raw_acc[sts_start:sts_end], axis=1), 1 / dt)
+
+                    dtime = datetime.datetime.utcfromtimestamp(time[sts_start])
+                    sts["Date"].append(dtime.strftime("%Y-%m-%d"))
+                    sts["Time"].append(dtime.strftime("%H:%M:%S.%f"))
+                    sts["Hour"].append(dtime.hour)
 
                     sts['STS Start'].append(time[sts_start])
                     sts['STS End'].append(time[sts_end])
