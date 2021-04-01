@@ -249,7 +249,7 @@ class Sit2Stand(_BaseProcess):
         partial = array(sts["Partial"])
 
         for k in [i for i in sts if i != "Partial"]:
-            sts[k] = array(sts[k])[~partial]
+            sts[k] = array(sts[k])[~partial] if partial != array([]) else array([])
 
         sts.pop("Partial")
 
