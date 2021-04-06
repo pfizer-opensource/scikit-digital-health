@@ -98,8 +98,8 @@ class DetectWear(_BaseProcess):
         Returns
         -------
         results : dictionary
-            Dictionary of inputs, plus the key `wear` which is a (N, ) boolean array where `True`
-            indicates the accelerometer was worn.
+            Dictionary of inputs, plus the key `wear` which is an array-like (N, 2) indicating
+            the start and stop indices of wear.
         """
         # dont start at zero due to timestamp weirdness with some devices
         fs = 1 / mean(diff(time[1000:5000]))
@@ -121,11 +121,9 @@ class DetectWear(_BaseProcess):
         wear_starts, wear_stops = _modify_wear_times(
             nonwear, self.wskip, self.apply_setup_crit, self.ship_crit)
 
-        wear_blocks = []
-        for ws, we in zip(wear_starts, wear_stops):
-            wear_blocks.append([ws * n_wskip, we * n_wskip])
+        wear = concatenate((wear_starts, wear_stops)).reshape((2, -1)).T * n_wskip
 
-        kwargs.update({self._time: time, self._acc: accel, "wear": array(wear_blocks)})
+        kwargs.update({self._time: time, self._acc: accel, "wear": wear})
         if self._in_pipeline:
             return kwargs, None
         else:

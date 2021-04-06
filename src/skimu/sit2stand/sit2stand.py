@@ -44,7 +44,7 @@ class Sit2Stand(_BaseProcess):
         Low-pass filter frequency cutoff for estimating the direction of gravity.
         Default is 0.8Hz.
     continuous_wavelet : str, optional
-        Continuous wavelet to use for signal deconstruction. Default is 'gaus1'. CWT
+        Continuous wavelet to use for signal deconstruction. Default is `gaus1`. CWT
         coefficients will be summed in the frequency range defined by `power_band`
     power_band : {array_like, int, float}, optional
         Frequency band in which to sum the CWT coefficients. Either an array_like of length 2,
@@ -104,7 +104,7 @@ class Sit2Stand(_BaseProcess):
             still_window=0.3,
             gravity_pass_order=4,
             gravity_pass_cutoff=0.8,
-            continuous_wavelet='gaus1',
+            continuous_wavelet="gaus1",
             power_band=None,
             power_peak_kw=None,
             power_std_height=True,
@@ -150,7 +150,7 @@ class Sit2Stand(_BaseProcess):
         self.std_trim = min(0, power_std_trim)
 
         if power_peak_kw is None:
-            self.power_peak_kw = {'height': 90 / 9.81}  # convert for g
+            self.power_peak_kw = {"height": 90 / 9.81}  # convert for g
         else:
             self.power_peak_kw = power_peak_kw
 
@@ -199,24 +199,30 @@ class Sit2Stand(_BaseProcess):
         dt = mean(diff(time[:500]))
 
         # setup filter
-        sos = butter(self.lp_ord, 2 * self.lp_cut * dt, btype='low', output='sos')
+        sos = butter(self.lp_ord, 2 * self.lp_cut * dt, btype="low", output="sos")
 
         # check if windows exist for days
         days = kwargs.get(self._days, {}).get(self.day_key, None)
         if days is None:
-            warn(f"Day indices for {self.day_key} (base, period) not found. No day separation used")
+            warn(
+                f"Day indices for {self.day_key} (base, period) not found. No day separation used"
+            )
             days = [[0, accel.shape[0] - 1]]
 
         # results storage
         sts = {
-            'STS Start': [],
-            'STS End': [],
-            'Duration': [],
-            'Max. Accel.': [],
-            'Min. Accel.': [],
-            'SPARC': [],
-            'Vertical Displacement': [],
-            'Partial': []
+            "Date": [],
+            "Day Number": [],
+            "Time": [],
+            "Hour": [],
+            "STS Start": [],
+            "STS End": [],
+            "Duration": [],
+            "Max. Accel.": [],
+            "Min. Accel.": [],
+            "SPARC": [],
+            "Vertical Displacement": [],
+            "Partial": []
         }
 
         for iday, day_idx in enumerate(days):
@@ -225,7 +231,7 @@ class Sit2Stand(_BaseProcess):
             # compute the magnitude of the acceleration
             m_acc = norm(accel[start:stop, :], axis=1)
             # filtered acceleration
-            f_acc = ascontiguousarray(sosfiltfilt(sos, m_acc, padtype='odd', padlen=None))
+            f_acc = ascontiguousarray(sosfiltfilt(sos, m_acc, padtype="odd", padlen=None))
 
             # reconstructed acceleration
             n_window = int(around(self.rwindow / dt))
@@ -244,7 +250,7 @@ class Sit2Stand(_BaseProcess):
             # find the peaks in the power data
             if self.std_height:
                 trim = int(self.std_trim / dt)
-                self.power_peak_kw['height'] = std(
+                self.power_peak_kw["height"] = std(
                     power[trim:-trim] if trim != 0 else power, ddof=1)
 
             power_peaks, _ = find_peaks(power, **self.power_peak_kw)
@@ -258,18 +264,16 @@ class Sit2Stand(_BaseProcess):
                 power_peaks
             )
 
+            # fill out the day information
+            sts["Day Number"].extend([iday + 1] * (len(sts["Date"]) - len(sts["Day Number"])))
+
         # get rid of the partial transitions
-        partial = array(sts['Partial'])
+        partial = array(sts["Partial"])
 
-        sts['STS Start'] = array(sts['STS Start'])[~partial]
-        sts['STS End'] = array(sts['STS End'])[~partial]
-        sts['Duration'] = array(sts['Duration'])[~partial]
-        sts['Max. Accel.'] = array(sts['Max. Accel.'])[~partial]
-        sts['Min. Accel.'] = array(sts['Min. Accel.'])[~partial]
-        sts['SPARC'] = array(sts['SPARC'])[~partial]
-        sts['Vertical Displacement'] = array(sts['Vertical Displacement'])[~partial]
+        for k in [i for i in sts if i != "Partial"]:
+            sts[k] = array(sts[k])[~partial]
 
-        sts.pop('Partial')
+        sts.pop("Partial")
 
         kwargs.update({self._time: time, self._acc: accel})
         if self._in_pipeline:

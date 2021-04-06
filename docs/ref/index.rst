@@ -10,7 +10,11 @@ API Reference
     read
     preprocessing
     features
+<<<<<<< HEAD
     sleep
+=======
+    activity
+>>>>>>> origin/master
     gait
     sit2stand
     utility

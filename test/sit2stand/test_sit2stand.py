@@ -45,9 +45,6 @@ class TestMovingStats:
 
 
 class TestDetector:
-    def test(self):
-        pass
-
     def test_update_threshold(self):
         det = Detector(stillness_constraint=True, gravity=9.81, thresholds={'duration factor': 5},
                        gravity_pass_order=4, gravity_pass_cutoff=0.8, long_still=0.5,
