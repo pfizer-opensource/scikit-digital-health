@@ -147,9 +147,9 @@ class Sleep(_BaseProcess):
         self.downsample = downsample
 
         if day_window is None:
-            self.day_key = "-1, -1"
+            self.day_key = "(-1, -1)"
         else:
-            self.day_key = f"{day_window[0]}, {day_window[1]}"
+            self.day_key = f"({day_window[0]}, {day_window[1]})"
 
     def add_metrics(self, metrics):
         """
