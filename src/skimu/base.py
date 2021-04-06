@@ -50,6 +50,9 @@ class _BaseProcess:
 
         self.logger = logging.getLogger(__name__)
 
+        # for plotting
+        self.f = self.ax = None
+
     def predict(self, *args, **kwargs):
         """
         Intended to be overwritten in the subclass. Should still be called with super though
@@ -80,3 +83,10 @@ class _BaseProcess:
         file_name = file_name.format(date=date, name=name)
 
         DataFrame(results).to_csv(file_name, index=False)
+
+    def _setup_plotting(self):
+        """
+        Setup plotting. If this needs to be available to the end user, it should be aliased as
+        `setup_plotting`. (See Sleep for an example).
+        """
+        pass
