@@ -87,6 +87,11 @@ class _BaseProcess:
     def _setup_plotting(self):
         """
         Setup plotting. If this needs to be available to the end user, it should be aliased as
-        `setup_plotting`. (See Sleep for an example).
+        `setup_plotting` inside __init__
+
+        >>> class NewClass(_BaseProcess)
+        >>>     def __init__(self):
+        >>>         super().__init__()
+        >>>         self.setup_plotting = self._setup_plotting
         """
         pass
