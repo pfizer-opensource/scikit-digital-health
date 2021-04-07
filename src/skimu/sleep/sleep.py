@@ -352,6 +352,8 @@ class Sleep(_BaseProcess):
                     values=sw_vals
                 )
 
+            self._tabulate_results(sleep)
+
         # finalize plotting
         self._finalize_plots()
 
@@ -500,6 +502,25 @@ class Sleep(_BaseProcess):
             self.ax[-1][-1].legend(
                 handles=[h1, h2, h3], bbox_to_anchor=(0, 0.5), loc="center right"
             )
+
+    def _tabulate_results(self, results):
+        """
+        Put some of the sleep results into a table on the visualization
+        """
+        keys = [
+            "total sleep time", "percent time asleep", "number of wake bouts",
+            "sleep onset latency", "wake after sleep onset"
+        ]
+        # SleepWakeTransitionProbability,
+        # WakeSleepTransitionProbability,
+        # SleepGiniIndex,
+        # WakeGiniIndex,
+        # SleepAverageHazard,
+        # WakeAverageHazard,
+        # SleepPowerLawDistribution,
+        # WakePowerLawDistribution
+        if self.f is not None:
+            self.ax[-1][0].table([[results[i][-1] for i in keys]], colLabels=keys, loc="top")
 
     def _finalize_plots(self):
         """
