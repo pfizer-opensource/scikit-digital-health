@@ -133,7 +133,8 @@ class ReadCWA(_BaseProcess):
             raise UnexpectedAxesError("Unexpected number of axes in the IMU data")
 
         results = {
-            self._time: ts
+            self._time: ts,
+            "file": file
         }
         if acc_axes is not None:
             results[self._acc] = imudata[:, acc_axes]

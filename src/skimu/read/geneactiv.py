@@ -125,7 +125,8 @@ class ReadBin(_BaseProcess):
             self._acc: acc,
             self._temp: temp,
             "light": light,
-            "fs": fs
+            "fs": fs,
+            "file": file
         }
 
         if self.window:
