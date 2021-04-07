@@ -13,7 +13,7 @@ from skimu.sleep import Sleep
 class TestSleep:
     def test(self):
         file = "/Users/lukasadamowicz/Documents/Packages/sleeppy/sleeppy/test/test_data/demo.bin"
-        # file = "/Users/lukasadamowicz/Downloads/SQUAD_acc_0000_nonsensitive_20200101_100706184003_left_2.bin"
+        file = "/Users/lukasadamowicz/Downloads/STEPP_QC/0074_GNACTV_LeftWrist.bin"
 
         slp = Sleep(
             start_buffer=0,
@@ -38,7 +38,7 @@ class TestSleep:
                 sd_crit=0.013,
                 range_crit=0.067,
                 apply_setup_criteria=True,
-                shipping_criteria=False,
+                shipping_criteria=True,
                 window_length=60,
                 window_skip=15
             )
