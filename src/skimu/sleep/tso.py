@@ -12,7 +12,7 @@ from skimu.sleep.utility import *
 
 def get_total_sleep_opportunity(
         fs, time, accel, wear_starts, wear_stops, min_rest_block, max_act_break,
-        min_angle_thresh, max_angle_thresh, idx_start=0
+        min_angle_thresh, max_angle_thresh, plot_fn, idx_start=0
 ):
     """
     Compute the period of time in which sleep can occur for a given days worth of data. For this
@@ -42,7 +42,9 @@ def get_total_sleep_opportunity(
     min_angle_thresh : float
         Minimum angle threshold used to compute the TSO threshold.
     max_angle_thresh : float
-        Maximum angle threshold used to compute the TSO threshold
+        Maximum angle threshold used to compute the TSO threshold.
+    plot_fn : function
+        Plotting function for the arm angle.
     idx_start : int, optional
         Offset index for wear-time indices. If `wear_starts` and `wear_stops` are relative to the
         day of interest, then `idx_start` should equal 0.
@@ -68,6 +70,8 @@ def get_total_sleep_opportunity(
 
     # rolling 5s mean with non-overlapping windows for the z-angle
     z_rm = rolling_mean(z, n5, n5)
+    # plot arm angle
+    plot_fn(z_rm)
 
     # the angle differences
     dz_rm = compute_absolute_difference(z_rm)
