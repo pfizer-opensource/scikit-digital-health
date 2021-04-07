@@ -6,9 +6,15 @@ Pfizer DMTI 2019-2021
 """
 from collections.abc import Iterable
 from warnings import warn
-from datetime import datetime
+from datetime import datetime, timedelta
+from pathlib import Path
 
-from numpy import mean, diff, array, nan, sum
+from numpy import mean, diff, array, nan, sum, arange
+from numpy.ma import masked_where
+import matplotlib
+from matplotlib.backends.backend_pdf import PdfPages
+import matplotlib.lines as mlines
+import matplotlib.pyplot as plt
 
 from skimu.base import _BaseProcess  # import the base process class
 from skimu.utility.internal import get_day_wear_intersection, apply_downsample, rle
@@ -16,6 +22,9 @@ from skimu.sleep.tso import get_total_sleep_opportunity
 from skimu.sleep.utility import compute_activity_index
 from skimu.sleep.sleep_classification import compute_sleep_predictions
 from skimu.sleep.endpoints import *
+
+matplotlib.use("PDF")  # non-interactive, dont want to be displaying plots constantly
+plt.style.use("ggplot")
 
 
 class Sleep(_BaseProcess):
@@ -147,9 +156,21 @@ class Sleep(_BaseProcess):
         self.downsample = downsample
 
         if day_window is None:
-            self.day_key = "(-1, -1)"
+            self.day_key = (-1, -1)
         else:
-            self.day_key = f"({day_window[0]}, {day_window[1]})"
+            self.day_key = day_window
+
+        # enable plotting as a public method
+        self.setup_plotting = self._setup_plotting
+        self.t60 = None  # plotting time
+
+    def _setup_plotting(self, save_file):
+        """
+        Setup sleep specific plotting
+        """
+        self.f = []  # need a plot for each day
+        self.ax = []  # correspond to each day
+        self.plot_fname = save_file
 
     def add_metrics(self, metrics):
         """
@@ -209,7 +230,7 @@ class Sleep(_BaseProcess):
             fs = mean(diff(time[:5000]))
 
         # get the individual days
-        days = kwargs.get(self._days, {}).get(self.day_key, None)
+        days = kwargs.get(self._days, {}).get(f"{self.day_key}", None)
         if days is None:
             raise ValueError(f"Day indices for {self.day_key} (base, period) not found.")
 
@@ -258,7 +279,18 @@ class Sleep(_BaseProcess):
                 sleep[k].append(nan)
             # fill out Day number and date
             sleep["Day N"][-1] = iday + 1
-            sleep["Date"][-1] = datetime.utcfromtimestamp(time_ds[start]).strftime("%Y-%m-%d")
+
+            # get the start timestamp and make sure its in the correct hour due to indexing
+            start_datetime = datetime.utcfromtimestamp(time_ds[start + 50])
+            if start_datetime.hour == self.day_key[0]:
+                sleep["Date"][-1] = start_datetime.strftime("%Y-%m-%d")
+            else:
+                sleep["Date"][-1] = (start_datetime - timedelta(days=1)).strftime("%Y-%m-%d")
+
+            # plotting
+            source_f = kwargs.get("file", "unknown")
+            self._setup_day_plot(iday + 1, source_f, sleep["Date"][-1], start_datetime)
+            self._plot_accel(goal_fs, accel_ds[start:stop])
 
             # get the starts and stops of wear during the day
             dw_starts, dw_stops = get_day_wear_intersection(
@@ -280,6 +312,7 @@ class Sleep(_BaseProcess):
                 self.max_act_break,
                 self.min_angle,
                 self.max_angle,
+                self._plot_arm_angle,
                 idx_start=start
             )
 
@@ -289,6 +322,8 @@ class Sleep(_BaseProcess):
             # calculate activity index
             act_index = compute_activity_index(goal_fs, accel_ds[start:stop])
 
+            self._plot_activity_index(act_index)
+
             # sleep wake predictions
             predictions = compute_sleep_predictions(act_index, sf=0.243)
             # tso indices are already relative to day start
@@ -297,6 +332,11 @@ class Sleep(_BaseProcess):
             pred_during_tso = predictions[tso_start:tso_stop]
             # run length encoding for sleep metrics
             sw_lengths, sw_starts, sw_vals = rle(pred_during_tso)
+
+            # plotting
+            self._plot_sleep_wear_predictions(
+                goal_fs, predictions, tso_start, tso_stop, dw_starts, dw_stops
+            )
 
             # results fill out
             tso_start_dt = datetime.utcfromtimestamp(tso[0])
@@ -312,9 +352,165 @@ class Sleep(_BaseProcess):
                     values=sw_vals
                 )
 
+        # finalize plotting
+        self._finalize_plots()
+
         kwargs.update({self._acc: accel, self._time: time, "fs": fs, "wear": wear})
         if self._in_pipeline:
             return kwargs, sleep
         else:
             return sleep
 
+    def _setup_day_plot(self, iday, source_file, date_str, start_dt):
+        if self.f is not None:
+            f, ax = plt.subplots(
+                nrows=4, figsize=(10, 6), sharex=True, gridspec_kw={'height_ratios': [1, 1, 1, 0.5]}
+            )
+
+            f.suptitle(f"Visual Report: {Path(source_file).name}\nDay: {iday}\nDate: {date_str}")
+
+            for x in ax:
+                x.grid(False)
+                x.spines["left"].set_visible(False)
+                x.spines["right"].set_visible(False)
+                x.spines["top"].set_visible(False)
+                x.spines["bottom"].set_visible(False)
+
+                x.tick_params(
+                    axis='both',
+                    which='both',  # both major and minor ticks are affected
+                    bottom=False,  # ticks along the bottom edge are off
+                    top=False,  # ticks along the top edge are off
+                    right=False,
+                    left=False
+                )
+
+                x.set_yticks([])
+                x.set_xticks([])
+
+            self.f.append(f)
+            self.ax.append(ax)
+
+            # setup the timestamps for plotting
+            start_hr = start_dt.hour + start_dt.minute / 60 + start_dt.second / 3600
+            self.t60 = arange(start_hr, self.day_key[1] + self.day_key[0], 1 / 60)
+
+    def _plot_accel(self, fs, accel):
+        """
+        Plot the acceleration.
+
+        Parameters
+        ----------
+        fs : float
+            Sampling frequency in Hz.
+        accel : numpy.ndarray
+        """
+        if self.f is not None:
+            acc = accel[::int(fs * 60)]
+
+            self.ax[-1][0].plot(self.t60[:acc.shape[0]], acc, lw=0.5)
+
+            hx = mlines.Line2D([], [], color="C0", label="X", lw=0.5)
+            hy = mlines.Line2D([], [], color="C1", label="Y", lw=0.5)
+            hz = mlines.Line2D([], [], color="C2", label="Z", lw=0.5)
+            self.ax[-1][0].legend(handles=[hx, hy, hz], bbox_to_anchor=(0, 0.5), loc="center right")
+
+    def _plot_activity_index(self, index):
+        """
+        Plot the activity measure
+
+        Parameters
+        ----------
+        index : numpy.ndarray
+        """
+        if self.f is not None:
+            self.ax[-1][1].plot(self.t60[:index.size], index, lw=1, color="C3", label="Activity")
+
+            self.ax[-1][1].legend(bbox_to_anchor=(0, 0.5), loc="center right")
+
+    def _plot_arm_angle(self, arm_angle):
+        """
+        Plot the arm angle
+
+        Parameters
+        ----------
+        arm_angle : numpy.ndarray
+            Arm angle sampled every 5 seconds
+        """
+        if self.f is not None:
+            aa = arm_angle[::12]  # resample to every minute
+            self.ax[-1][2].plot(self.t60[:aa.size], aa, color="C4", lw=1, label="Arm Angle")
+
+            self.ax[-1][2].legend(bbox_to_anchor=(0, 0.5), loc="center right")
+
+    def _plot_sleep_wear_predictions(
+            self, fs, slp, tso_start_i, tso_end_i, wear_starts, wear_stops
+    ):
+        """
+        Plot the sleep predictions
+
+        Parameters
+        ----------
+        fs : float
+            Sampling frequency in Hz.
+        slp : numpy.ndarray
+            Minute-by-minute sleep predictions for the whole day
+        tso_start_i : int
+            Start index for TSO in minute length epochs
+        tso_end_i : int
+            End index for TSO in minute length epochs
+        wear_starts : numpy.ndarray
+            Indices for wear starts. Indexed to `fs`.
+        wear_stops : numpy.ndarray
+            Indices for wear ends. Indexed to `fs`.
+        """
+        if self.f is not None:
+            # wear
+            h1 = mlines.Line2D(
+                [], [], color="C0", label="Wear Prediction", lw=3, solid_capstyle="round"
+            )
+            for s, e in zip(wear_starts, wear_stops):
+                # convert to hours
+                sh = s / (fs * 3600) + self.t60[0]
+                eh = e / (fs * 3600) + self.t60[0]
+                self.ax[-1][-1].plot(
+                    [sh, eh], [2, 2], color="C0", lw=3, solid_capstyle="round"
+                )
+            # Sleep predictions
+            h2, = self.ax[-1][-1].plot(
+                self.t60[:slp.size], masked_where(slp == 1, slp) + 1, solid_capstyle="round", lw=3,
+                color="C1", label="Wake Predictions"
+            )
+            # Total sleep opportunity
+            h3, = self.ax[-1][-1].plot(
+                [self.t60[tso_start_i], self.t60[tso_end_i]], [0, 0], solid_capstyle="round",
+                lw=3, color="C2", label="Sleep Opportunity"
+            )
+
+            self.ax[-1][-1].set_xlim([self.day_key[0], sum(self.day_key)])
+            self.ax[-1][-1].set_ylim([-0.25, 2.25])
+            self.ax[-1][-1].set_xticks(
+                [i for i in range(self.day_key[0], sum(self.day_key) + 1, 3)]
+            )
+            self.ax[-1][-1].set_xticklabels(
+                [f"{int(i % 24)}:00" for i in self.ax[-1][-1].get_xticks()]
+            )
+
+            self.ax[-1][-1].legend(
+                handles=[h1, h2, h3], bbox_to_anchor=(0, 0.5), loc="center right"
+            )
+
+    def _finalize_plots(self):
+        """
+        Finalize and save the plots for sleep
+        """
+        if self.f is not None:
+
+            pp = PdfPages(Path(self.plot_fname).with_suffix(".pdf"))
+
+            for f in self.f:
+                f.tight_layout()
+                f.subplots_adjust(hspace=0)
+                pp.savefig(f)
+
+            pp.close()
