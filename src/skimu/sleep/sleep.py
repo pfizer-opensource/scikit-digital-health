@@ -511,14 +511,6 @@ class Sleep(_BaseProcess):
             "total sleep time", "percent time asleep", "number of wake bouts",
             "sleep onset latency", "wake after sleep onset"
         ]
-        # SleepWakeTransitionProbability,
-        # WakeSleepTransitionProbability,
-        # SleepGiniIndex,
-        # WakeGiniIndex,
-        # SleepAverageHazard,
-        # WakeAverageHazard,
-        # SleepPowerLawDistribution,
-        # WakePowerLawDistribution
         if self.f is not None:
             self.ax[-1][0].table([[results[i][-1] for i in keys]], colLabels=keys, loc="top")
 
