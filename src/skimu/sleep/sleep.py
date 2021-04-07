@@ -288,7 +288,7 @@ class Sleep(_BaseProcess):
                 sleep["Date"][-1] = (start_datetime - timedelta(days=1)).strftime("%Y-%m-%d")
 
             # plotting
-            source_f = kwargs.get("file", "unknown")
+            source_f = kwargs.get("file", self.plot_fname)
             self._setup_day_plot(iday + 1, source_f, sleep["Date"][-1], start_datetime)
             self._plot_accel(goal_fs, accel_ds[start:stop])
 
