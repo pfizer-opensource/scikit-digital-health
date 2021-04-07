@@ -51,7 +51,7 @@ class _BaseProcess:
         self.logger = logging.getLogger(__name__)
 
         # for plotting
-        self.f = self.ax = None
+        self.f = self.ax = self.fname = None
 
     def predict(self, *args, **kwargs):
         """
