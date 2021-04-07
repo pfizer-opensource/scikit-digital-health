@@ -335,7 +335,7 @@ class Sleep(_BaseProcess):
 
             # plotting
             self._plot_sleep_wear_predictions(
-                goal_fs, predictions, tso_start, tso_stop, dw_starts, dw_stops
+                goal_fs, predictions, tso_start, tso_stop, dw_starts - start, dw_stops - start
             )
 
             # results fill out
@@ -364,7 +364,7 @@ class Sleep(_BaseProcess):
     def _setup_day_plot(self, iday, source_file, date_str, start_dt):
         if self.f is not None:
             f, ax = plt.subplots(
-                nrows=4, figsize=(10, 6), sharex=True, gridspec_kw={'height_ratios': [1, 1, 1, 0.5]}
+                nrows=4, figsize=(12, 6), sharex=True, gridspec_kw={'height_ratios': [1, 1, 1, 0.5]}
             )
 
             f.suptitle(f"Visual Report: {Path(source_file).name}\nDay: {iday}\nDate: {date_str}")
@@ -393,7 +393,8 @@ class Sleep(_BaseProcess):
 
             # setup the timestamps for plotting
             start_hr = start_dt.hour + start_dt.minute / 60 + start_dt.second / 3600
-            self.t60 = arange(start_hr, self.day_key[1] + self.day_key[0], 1 / 60)
+            self.t60 = arange(start_hr, self.day_key[1] + self.day_key[0] + 0.1, 1 / 60)
+            # pad the end a little to make sure we have enough samples
 
     def _plot_accel(self, fs, accel):
         """
