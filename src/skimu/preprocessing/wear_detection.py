@@ -28,7 +28,8 @@ class DetectWear(_BaseProcess):
         Minimum temperature to indicate wear in Celsius. Default is 25 deg. C.
     temperature_factor : int, optional
         Factor by which to multiply boolean array of wear based on temperature. Default is 1.
-        Setting to 2 would result in temperature being able to indicate non-wear by itself.
+        Setting to 2 would result in temperature being able to indicate non-wear by itself. Setting
+        to 0 will disable using temperature for wear detection.
     apply_setup_criteria : bool, optional
         Apply criteria to the beginning of the recording to account for device setup. Default is
         True.
