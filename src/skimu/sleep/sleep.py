@@ -23,9 +23,6 @@ from skimu.sleep.utility import compute_activity_index
 from skimu.sleep.sleep_classification import compute_sleep_predictions
 from skimu.sleep.endpoints import *
 
-matplotlib.use("PDF")  # non-interactive, dont want to be displaying plots constantly
-plt.style.use("ggplot")
-
 
 class Sleep(_BaseProcess):
     """
@@ -168,6 +165,10 @@ class Sleep(_BaseProcess):
         """
         Setup sleep specific plotting
         """
+        # move this inside here so that it doesnt effect everything on load
+        matplotlib.use("PDF")  # non-interactive, dont want to be displaying plots constantly
+        plt.style.use("ggplot")
+
         self.f = []  # need a plot for each day
         self.ax = []  # correspond to each day
         self.plot_fname = save_file
