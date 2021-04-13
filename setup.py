@@ -179,17 +179,17 @@ def configuration(parent_package='', top_path=None):
     )
     # UTILITY
     config.add_library(
-        "frolling_moments",
-        sources="src/skimu/utility/_extensions/rolling_moments.f95"
+        "fmoving_moments",
+        sources="src/skimu/utility/_extensions/moving_moments.f95"
     )
     config.add_extension(
-        "skimu/utility/_extensions/rolling_moments",
-        sources="src/skimu/utility/_extensions/rolling_moments.c",
-        libraries=["frolling_moments"]
+        "skimu/utility/_extensions/moving_moments",
+        sources="src/skimu/utility/_extensions/moving_moments.c",
+        libraries=["fmoving_moments"]
     )
     config.add_extension(
-        "skimu/utility/_extensions/rolling_median",
-        sources="src/skimu/utility/_extensions/rolling_median.c",
+        "skimu/utility/_extensions/moving_median",
+        sources="src/skimu/utility/_extensions/moving_median.c",
         libraries=["gsl"]
     )
     # Read library

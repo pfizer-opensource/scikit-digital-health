@@ -11,11 +11,11 @@
 #include <gsl/gsl_vector.h>
 
 
-PyObject * rolling_median(PyObject *NPY_UNUSED(self), PyObject *args){
+PyObject * moving_median(PyObject *NPY_UNUSED(self), PyObject *args){
     PyObject *x_;
     long wlen;
 
-    if (!PyArg_ParseTuple(args, "Ol:rolling_median", &x_, &wlen)) return NULL;
+    if (!PyArg_ParseTuple(args, "Ol:moving_median", &x_, &wlen)) return NULL;
 
     PyArrayObject *data = (PyArrayObject *)PyArray_FromAny(
         x_, PyArray_DescrFromType(NPY_DOUBLE), 1, 0,
@@ -76,13 +76,13 @@ PyObject * rolling_median(PyObject *NPY_UNUSED(self), PyObject *args){
 }
 
 static struct PyMethodDef methods[] = {
-    {"rolling_median",   rolling_median,   1, NULL},  // last is the docstring
+    {"moving_median",   moving_median,   1, NULL},  // last is the docstring
     {NULL, NULL, 0, NULL}          /* sentinel */
 };
 
 static struct PyModuleDef moduledef = {
         PyModuleDef_HEAD_INIT,
-        "rolling_median",
+        "moving_median",
         NULL,
         -1,
         methods,
@@ -93,7 +93,7 @@ static struct PyModuleDef moduledef = {
 };
 
 /* Initialization function for the module */
-PyMODINIT_FUNC PyInit_rolling_median(void)
+PyMODINIT_FUNC PyInit_moving_median(void)
 {
     PyObject *m;
     m = PyModule_Create(&moduledef);
