@@ -16,6 +16,7 @@ class TestDetectTSO:
             max_act_break=60,
             min_angle_thresh=0.1,
             max_angle_thresh=1.0,
+            plot_fn=lambda x: None,
             idx_start=0
         )
 
