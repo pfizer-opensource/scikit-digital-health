@@ -9,7 +9,7 @@ from numpy import any, arctan, pi, roll, abs, argmax, diff, nonzero, insert, sqr
 from scipy.signal import butter, sosfiltfilt
 
 from skimu.utility import get_windowed_view
-from skimu.utility import rolling_mean, rolling_sd, rolling_median
+from skimu.utility import moving_mean, moving_sd, moving_median
 from skimu.utility.internal import rle
 
 __all__ = [
@@ -42,20 +42,20 @@ def get_weartime(acc_rmed, temp, fs, move_thresh, temp_thresh):
     """
     n5 = int(5 * fs)
     # rolling 5s mean (non-overlapping windows)
-    mn = rolling_mean(acc_rmed, n5, n5, axis=0)
+    mn = moving_mean(acc_rmed, n5, n5, axis=0)
     # rolling 30min StDev.  5s windows -> 12 windows per minute
-    acc_rsd = rolling_sd(mn, 12 * 30, 1, axis=0, return_previous=False)
+    acc_rsd = moving_sd(mn, 12 * 30, 1, axis=0, return_previous=False)
     # TODO note that this 30 min rolling standard deviation likely means that our wear/nonwear
     # timest could be off by as much as 30 mins, due to windows extending into the wear time.
     # this is likely going to be an issue for all wear time algorithms due to long
     # windows, however.
 
     # rolling 5s median of temperature
-    rmd = rolling_median(temp, n5, skip=1, pad=False)
+    rmd = moving_median(temp, n5, skip=1, pad=False)
     # rolling 5s mean (non-overlapping)
-    mn = rolling_mean(rmd, n5, n5)
+    mn = moving_mean(rmd, n5, n5)
     # rolling 5m median
-    temp_rmd = rolling_median(mn, 12 * 5, skip=1, pad=False)
+    temp_rmd = moving_median(mn, 12 * 5, skip=1, pad=False)
 
     move_mask = any(acc_rsd > move_thresh, axis=1)
     temp_mask = temp_rmd >= temp_thresh

@@ -6,7 +6,7 @@ Pfizer DMTI 2021
 """
 import numpy as np
 
-from skimu.utility import rolling_median
+from skimu.utility import moving_median
 from skimu.sleep.utility import *
 from skimu.sleep.utility import get_weartime
 
@@ -24,7 +24,7 @@ class TestGetWearTime:
 
         x[n1:n2] = [0, 0, 1]
         t[n1:n2] = 22.
-        rmd = rolling_median(x, 250, 1, pad=False, axis=0)
+        rmd = moving_median(x, 250, 1, pad=False, axis=0)
 
         wt = get_weartime(
             rmd,
