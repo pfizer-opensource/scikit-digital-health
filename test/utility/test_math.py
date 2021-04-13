@@ -92,25 +92,25 @@ class BaseTestRolling:
 
 class TestRollingMean(BaseTestRolling):
     # need staticmethod so it doesn't think that self is the first argument
-    function = staticmethod(rolling_mean)
+    function = staticmethod(moving_mean)
     truth_function = staticmethod(np.mean)
     truth_kw = {}
 
 
 class TestRollingSD(BaseTestRolling):
-    function = staticmethod(rolling_sd)
+    function = staticmethod(moving_sd)
     truth_function = (np.std, np.mean)
     truth_kw = ({"ddof": 1}, {})
 
 
 class TestRollingSkewness(BaseTestRolling):
-    function = staticmethod(rolling_skewness)
+    function = staticmethod(moving_skewness)
     truth_function = (skew, np.std, np.mean)
     truth_kw = ({"bias": True}, {"ddof": 1}, {})
 
 
 class TestRollingKurtosis(BaseTestRolling):
-    function = staticmethod(rolling_kurtosis)
+    function = staticmethod(moving_kurtosis)
     truth_function = (kurtosis, skew, np.std, np.mean)
     truth_kw = (
         {"bias": True, "fisher": True, "nan_policy": "propagate"},
@@ -121,7 +121,7 @@ class TestRollingKurtosis(BaseTestRolling):
 
 
 class TestRollingMedian(BaseTestRolling):
-    function = staticmethod(rolling_median)
+    function = staticmethod(moving_median)
     truth_function = staticmethod(np.median)
     truth_kw = {}
 
