@@ -28,7 +28,7 @@ class InternalDetectWear(_BaseProcess):
         n5 = int(5 * fs)
         shift = int(floor(n5 / 2))
         # 5s rolling median. Roll to replicate centered
-        rmd5_acc = roll(moving_median(accel, n5, 1, pad=True), shift, axis=0)
+        rmd5_acc = roll(moving_median(accel, n5, 1, axis=0, pad=True), shift, axis=0)
         rmd5_temp = roll(moving_median(temperature, n5, 1, pad=True), shift)
 
         # 5s mean, non-overlapping. These might be 1 shorter than pandas
@@ -52,7 +52,7 @@ class InternalDetectWear(_BaseProcess):
         lengths = lengths[values == 0]
         starts = starts[values == 0]
 
-        wear = concatenate((starts, starts + lengths)).reshape((2, -1)).T * int(fs * 5 * 60)
+        wear = concatenate((starts, starts + lengths)).reshape((2, -1)).T * int(fs * 5)
 
         kwargs.update({self._time: time, self._acc: accel, "wear": wear})
         if self._in_pipeline:
