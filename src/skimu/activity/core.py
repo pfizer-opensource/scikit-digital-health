@@ -12,7 +12,7 @@ from numpy import nonzero, array, insert, append, mean, diff, sum, zeros, abs, a
 from scipy.stats import linregress
 
 from skimu.base import _BaseProcess
-from skimu.utility import rolling_mean
+from skimu.utility import moving_mean
 from skimu.activity.cutpoints import _base_cutpoints
 
 
@@ -232,10 +232,10 @@ class MVPActivityClassification(_BaseProcess):
                 # total time of `wlen` epochs in minutes
                 res["MVPA 5sec Epochs"][-1] += sum(accel_metric >= self.cutpoints["light"]) / epm
                 # total time of 1 minute epochs
-                tmp = rolling_mean(accel_metric, epm, epm)
+                tmp = moving_mean(accel_metric, epm, epm)
                 res["MVPA 1min Epochs"][-1] += sum(tmp >= self.cutpoints["light"])  # in minutes
                 # total time in 5 minute epochs
-                tmp = rolling_mean(accel_metric, 5 * epm, 5 * epm)
+                tmp = moving_mean(accel_metric, 5 * epm, 5 * epm)
                 res["MVPA 5min Epochs"][-1] += sum(tmp >= self.cutpoints["light"]) * 5  # in minutes
 
                 # total time in bout1 minute bouts
@@ -367,11 +367,11 @@ def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, b
         # look for breaks larger than 1 minute
         lookforbreaks = zeros(x.size)
         N = int(60 / wlen)
-        lookforbreaks[N // 2:-N // 2 + 1] = rolling_mean(x, N, 1)
+        lookforbreaks[N // 2:-N // 2 + 1] = moving_mean(x, N, 1)
         # insert negative numbers to prevent these minutes from being counted in bouts
         xt[lookforbreaks == 0] = -(60 / wlen) * nboutdur
         # in this way there will not be bout breaks lasting longer than 1 minute
-        rm = rolling_mean(xt, nboutdur, 1)  # window determination can go back to left justified
+        rm = moving_mean(xt, nboutdur, 1)  # window determination can go back to left justified
 
         p = nonzero(rm > boutcrit)[0]
         for gi in range(nboutdur):
@@ -388,12 +388,12 @@ def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, b
         N = int(60 / wlen)
         i1 = int(floor((N + 1) / 2)) - 1
         i2 = int(ceil(x.size - N / 2))
-        lookforbreaks[i1:i2] = rolling_mean(x, N, 1)
+        lookforbreaks[i1:i2] = moving_mean(x, N, 1)
         # insert negative numbers to prevent these minutes from being counted in bouts
         xt[lookforbreaks == 0] = -(60 / wlen) * nboutdur
 
         # in this way there will not be bout breaks lasting longer than 1 minute
-        rm = rolling_mean(xt, nboutdur, 1)
+        rm = moving_mean(xt, nboutdur, 1)
 
         p = nonzero(rm > boutcrit)[0]
         start = int(floor((nboutdur + 1) / 2)) - 1 - int(round(nboutdur / 2))
@@ -416,12 +416,12 @@ def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, b
         N = int(60 / wlen)
         i1 = int(floor((N + 1) / 2)) - 1
         i2 = int(ceil(x.size - N / 2)) - 1
-        lookforbreaks[i1:i2] = rolling_mean(x, N + 1, 1)
+        lookforbreaks[i1:i2] = moving_mean(x, N + 1, 1)
         # insert negative numbers to prevent these minutes from being counted in bouts
         xt[lookforbreaks == 0] = -(60 / wlen) * nboutdur
 
         # in this way there will not be bout breaks lasting longer than 1 minute
-        rm = rolling_mean(xt, nboutdur, 1)
+        rm = moving_mean(xt, nboutdur, 1)
 
         p = nonzero(rm >= boutcrit)[0]
         start = int(floor((nboutdur + 1) / 2)) - 1 - int(round(nboutdur / 2))
