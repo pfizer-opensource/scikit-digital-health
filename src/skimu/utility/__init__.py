@@ -10,11 +10,11 @@ Misc. Math Functions
 .. autosummary::
     :toctree: generated/
 
-    math.rolling_mean
-    math.rolling_sd
-    math.rolling_skewness
-    math.rolling_kurtosis
-    math.rolling_median
+    math.moving_mean
+    math.moving_sd
+    math.moving_skewness
+    math.moving_kurtosis
+    math.moving_median
 
 Orientation Functions
 ---------------------
