@@ -6,7 +6,7 @@ Pfizer DMTI 2019-2021
 """
 from skimu import Pipeline
 from skimu.read import ReadBin
-from skimu.preprocessing.wear_detection import DetectWear
+from skimu.preprocessing.internal_wear import InternalDetectWear
 from skimu.sleep import Sleep
 
 
@@ -34,13 +34,9 @@ class TestSleep:
         p = Pipeline()
         p.add(ReadBin(bases=[12], periods=[24]))
         p.add(
-            DetectWear(
-                sd_crit=0.013,
-                range_crit=0.067,
-                apply_setup_criteria=True,
-                shipping_criteria=True,
-                window_length=60,
-                window_skip=15
+            InternalDetectWear(
+                temp_thresh=25.0,
+                move_nonwear_thresh=0.0010
             )
         )
         p.add(
