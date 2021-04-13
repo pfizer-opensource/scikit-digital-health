@@ -7,7 +7,7 @@ Pfizer DMTI 2021
 from numpy import mean, diff, sum, insert, append, nonzero, delete, concatenate, int_, full
 
 from skimu.base import _BaseProcess
-from skimu.utility import rolling_mean, rolling_sd, get_windowed_view
+from skimu.utility import moving_mean, moving_sd, get_windowed_view
 
 
 class DetectWear(_BaseProcess):
@@ -145,7 +145,7 @@ class DetectWear(_BaseProcess):
         # note that while this block starts at 0, the method uses centered blocks, which
         # means that the first block actually corresponds to a block starting 22.5 minutes into
         # the recording
-        acc_rsd = rolling_sd(accel, n_wlen, n_wskip, axis=0, return_previous=False)
+        acc_rsd = moving_sd(accel, n_wlen, n_wskip, axis=0, return_previous=False)
 
         # get the accelerometer range in each 60min window
         acc_w = get_windowed_view(accel, n_wlen, n_wskip)
@@ -155,7 +155,7 @@ class DetectWear(_BaseProcess):
         if temperature is None or self.temp_f < 1:
             nonwear = sum((acc_rsd < self.sd_crit) & (acc_w_range < self.range_crit), axis=1) >= 2
         else:
-            temp_rm = rolling_mean(temperature, n_wlen, n_wskip)
+            temp_rm = moving_mean(temperature, n_wlen, n_wskip)
 
             if self.ship_temp:
                 ship_i1 = self.ship_crit[0] * int(60 / self.wskip)
