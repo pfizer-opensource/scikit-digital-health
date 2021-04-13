@@ -282,7 +282,7 @@ subroutine dominant_freq_1d(n, x, fs, nfft, low_cut, hi_cut, df) bind(C, name="d
     real(c_double) :: sp_hat(2 * nfft + 2), y(2 * nfft)
 
     ! find the cutoff indices for the high and low cutoffs
-    ihcut = min(floor(hi_cut / (fs / 2) * (nfft - 1) + 1, c_long), int(nfft / 2 + 1, c_long))
+    ihcut = min(floor(hi_cut / (fs / 2) * (nfft - 1) + 1, c_long), nfft + 1)
     ilcut = max(ceiling(low_cut / (fs / 2) * (nfft - 1) + 1, c_long), 1_c_long)
 
     if (ihcut > nfft) then
@@ -334,7 +334,7 @@ subroutine dominant_freq_value_1d(n, x, fs, nfft, low_cut, hi_cut, dfval) bind(C
     real(c_double) :: sp_hat(2 * nfft + 2), y(2 * nfft)
 
     ! find the cutoff indices for the high and low cutoffs
-    ihcut = min(floor(hi_cut / (fs / 2) * (nfft - 1) + 1, c_long), int(nfft / 2 + 1, c_long))
+    ihcut = min(floor(hi_cut / (fs / 2) * (nfft - 1) + 1, c_long), nfft + 1)
     ilcut = max(ceiling(low_cut / (fs / 2) * (nfft - 1) + 1, c_long), 1_c_long)
 
     if (ihcut > nfft) then
@@ -348,7 +348,6 @@ subroutine dominant_freq_value_1d(n, x, fs, nfft, low_cut, hi_cut, dfval) bind(C
 
     sp_norm = sp_hat(1:2 * nfft + 2:2)**2 + sp_hat(2:2 * nfft + 2:2)**2
     sp_norm = sp_norm / sum(sp_norm(ilcut:ihcut)) + 1.d-10
-
     ! find the maximum value
     dfval = maxval(sp_norm(ilcut:ihcut))
 end subroutine
@@ -384,7 +383,7 @@ subroutine power_spectral_sum_1d(n, x, fs, nfft, low_cut, hi_cut, pss) bind(C, n
     real(c_double) :: sp_hat(2 * nfft + 2), y(2 * nfft)
 
     ! find the cutoff indices for the high and low cutoffs
-    ihcut = min(floor(hi_cut / (fs / 2) * (nfft - 1) + 1, c_long), int(nfft / 2 + 1, c_long))
+    ihcut = min(floor(hi_cut / (fs / 2) * (nfft - 1) + 1, c_long), nfft + 1)
     ilcut = max(ceiling(low_cut / (fs / 2) * (nfft - 1) + 1, c_long), 1_c_long)
 
     if (ihcut > nfft) then
@@ -444,7 +443,7 @@ subroutine spectral_entropy_1d(n, x, fs, nfft, low_cut, hi_cut, sEnt) bind(C, na
     real(c_double) :: y(2 * nfft)
 
     ! find the cutoff indices for the high and low cutoffs
-    ihcut = min(floor(hi_cut / (fs / 2) * (nfft - 1) + 1, c_long), int(nfft / 2 + 1, c_long))
+    ihcut = min(floor(hi_cut / (fs / 2) * (nfft - 1) + 1, c_long), nfft + 1)
     ilcut = max(ceiling(low_cut / (fs / 2) * (nfft - 1) + 1, c_long), 1_c_long)
     
     if (ihcut > nfft) then
@@ -498,7 +497,7 @@ subroutine spectral_flatness_1d(n, x, fs, nfft, low_cut, hi_cut, sFlat) bind(C, 
     real(c_double) :: sp_hat(2 * nfft+2), y(2*nfft), mean
 
     ! find the cutoff indices for the high and low cutoffs
-    ihcut = min(floor(hi_cut / (fs / 2) * (nfft - 1) + 1, c_long), int(nfft / 2 + 1, c_long))
+    ihcut = min(floor(hi_cut / (fs / 2) * (nfft - 1) + 1, c_long), nfft + 1)
     ilcut = max(ceiling(low_cut / (fs / 2) * (nfft - 1) + 1, c_long), 1_c_long)
     
     if (ihcut > nfft) then
