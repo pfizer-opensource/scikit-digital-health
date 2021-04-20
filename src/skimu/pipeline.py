@@ -57,10 +57,11 @@ class Pipeline:
             pipe.append(
                 {
                     step._name: {
-                        'module': step.__class__.__module__.split('.', 1)[1],
-                        'Parameters': step._kw,
-                        'save_result': step.pipe_save,
-                        'save_name': step.pipe_fname
+                        "module": step.__class__.__module__.split('.', 1)[1],
+                        "Parameters": step._kw,
+                        "save_result": step.pipe_save,
+                        "save_name": step.pipe_fname,
+                        "plot_save_name": step.plot_fname
                     }
                 }
             )
@@ -79,7 +80,7 @@ class Pipeline:
         """
         import skimu
 
-        with open(file, 'r') as f:
+        with open(file, "r") as f:
             procs = json.load(f)
 
         for proc in procs:
@@ -88,6 +89,7 @@ class Pipeline:
             params = proc[name]["Parameters"]
             save_result = proc[name]["save_result"]
             save_name = proc[name]["save_name"]
+            plot_fname = proc[name]["plot_save_name"]
 
             try:
                 process = attrgetter(f"{mod}.{name}")(skimu)
@@ -98,8 +100,12 @@ class Pipeline:
                 )
                 continue
 
+            proc = process(**params)
+            if plot_fname is not None:
+                proc._setup_plotting(plot_fname)
+
             self.add(
-                process(**params),
+                proc,
                 save_results=save_result,
                 save_name=save_name
             )
