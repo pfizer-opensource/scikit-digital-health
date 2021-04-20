@@ -227,6 +227,8 @@ class Sleep(_BaseProcess):
             Dictionary containing (N, 2) arrays of start and stop indices for individual days.
             Must have the key
         """
+        super().predict(time=time, accel=accel, fs=fs, wear=wear, **kwargs)
+
         if fs is None:
             fs = mean(diff(time[:5000]))
 
