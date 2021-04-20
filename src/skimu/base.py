@@ -58,6 +58,8 @@ class _BaseProcess:
         Intended to be overwritten in the subclass. Should still be called with super though
         """
         self.logger.info(f"Entering {self._name} processing with call {self!r}")
+        # save the filename for saving reference
+        self._file_name = kwargs.get("file", "")
 
     def save_results(self, results, file_name):
         """
@@ -74,13 +76,13 @@ class _BaseProcess:
         -----
         Available format variables available:
 
-        - date: todays date expressed in yyyymmdd format
-        - name: process name
+        - date: todays date expressed in yyyymmdd format.
+        - name: process name.
+        - file: file name used in the pipeline, or "" if not found.
         """
         date = dt_date.today().strftime('%Y%m%d')
-        name = self._name
 
-        file_name = file_name.format(date=date, name=name)
+        file_name = file_name.format(date=date, name=self._name, file=self._file_name)
 
         DataFrame(results).to_csv(file_name, index=False)
 
