@@ -145,15 +145,9 @@ Operating System :: MacOS
 """
 
 
-REQUIREMENTS = [
-    'numpy>=1.17.2',
-    'scipy>=1.3.1',
-    'pandas>=0.23.4',
-    'lightgbm>=2.3.0',
-    'pywavelets',
-    'scikit-learn',  # needed for lightgbm
-    'h5py'  # currently for gait classifier dataset loading
-]
+with open("requirements.txt", "r") as f:
+    _req = f.readlines()
+REQUIREMENTS = [i.strip() for i in _req]
 
 if sys.version_info < (3, 7):
     REQUIREMENTS.append('importlib_resources')
