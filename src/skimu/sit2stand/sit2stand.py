@@ -170,9 +170,9 @@ class Sit2Stand(_BaseProcess):
         )
 
         if day_window is None:
-            self.day_key = "-1, -1"
+            self.day_key = (-1, -1)
         else:
-            self.day_key = f"{day_window[0]}, {day_window[1]}"
+            self.day_key = tuple(day_window)
 
     def predict(self, time=None, accel=None, **kwargs):
         """

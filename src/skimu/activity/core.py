@@ -48,6 +48,10 @@ class MVPActivityClassification(_BaseProcess):
         is "migueles_wrist_adult" [1]_. For a list of all available metrics use
         `skimu.activity.get_available_cutpoints()`. Custom cutpoints can be provided in a
         dictionary (see :ref:`Using Custom Cutpoints`).
+    day_window : array-like
+        Two (2) element array-like of the base and period of the window to use for determining
+        days. Default is (0, 24), which will look for days starting at midnight and lasting 24
+        hours. None removes any day-based windowing.
 
     Notes
     -----
@@ -87,7 +91,8 @@ class MVPActivityClassification(_BaseProcess):
     """
     def __init__(
             self, short_wlen=5, bout_len1=1, bout_len2=5, bout_len3=10, bout_criteria=0.8,
-            bout_metric=1, closed_bout=False, min_wear_time=10, cutpoints="migueles_wrist_adult"
+            bout_metric=1, closed_bout=False, min_wear_time=10, cutpoints="migueles_wrist_adult",
+            day_window=(0, 24)
     ):
         if (60 % short_wlen) != 0:
             tmp = [1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30]
@@ -123,6 +128,11 @@ class MVPActivityClassification(_BaseProcess):
         self.closedbout = closed_bout
         self.min_wear = min_wear_time
         self.cutpoints = cutpoints
+
+        if day_window is None:
+            self.day_key = (-1, -1)
+        else:
+            self.day_key = tuple(day_window)
 
     def predict(self, time=None, accel=None, *, wear=None, **kwargs):
         """
@@ -167,7 +177,13 @@ class MVPActivityClassification(_BaseProcess):
             wear_starts = tmp[:, 0]
             wear_stops = tmp[:, 1]
 
-        days = kwargs.get(self._days, [[0, time.size - 1]])
+        # check if windows exist for days
+        days = kwargs.get(self._days, {}).get(self.day_key, None)
+        if days is None:
+            warn(
+                f"Day indices for {self.day_key} (base, period) not found. No day separation used"
+            )
+            days = [[0, accel.shape[0] - 1]]
 
         general_keys = [
             "Date",

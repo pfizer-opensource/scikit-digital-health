@@ -236,9 +236,9 @@ class Gait(_BaseProcess):
         self._save_classifier_fn = lambda time, starts, stops: None
 
         if day_window is None:
-            self.day_key = "-1, -1"
+            self.day_key = (-1, -1)
         else:
-            self.day_key = f"{day_window[0]}, {day_window[1]}"
+            self.day_key = tuple(day_window)
 
     def _save_classifier_predictions(self, fname):
         def fn(time, starts, stops):
@@ -312,7 +312,7 @@ class Gait(_BaseProcess):
             (or None), gait classification will be performed on the acceleration data.
         day_ends : dict, optional
             Optional dictionary containing (N, 2) arrays of start and stop indices for invididual
-            days. Dictionary keys are in the format "{base}, {period}". If not provided, or the
+            days. Dictionary keys are in the format ({base}, {period}). If not provided, or the
             key specified by `day_window` is not found, no day-based windowing will be done.
 
         Returns
