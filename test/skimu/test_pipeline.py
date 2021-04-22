@@ -130,6 +130,7 @@ class TestPipeline:
         nap = NotAProcess()
         nap.pipe_save = False
         nap.pipe_fname = 'test'
+        nap.plot_fname = None
 
         nap._kw = {'a': 5}
         nap._name = 'NotAProcess'

@@ -57,8 +57,9 @@ class BaseProcessTester:
             else:
                 if isinstance(truth[key], dict):
                     for k2 in truth[key]:
+                        tuple_k2 = tuple(int(i) for i in k2.strip("()").split(", "))
                         assert allclose(
-                            pred[key][k2], truth[key][k2], atol=self.atol, equal_nan=True), \
+                            pred[key][tuple_k2], truth[key][k2], atol=self.atol, equal_nan=True), \
                             f"{self.process._name} test for value ({key}/{k2}) not close to truth"
                 else:
                     assert allclose(pred[key], truth[key], atol=self.atol, equal_nan=True), \
