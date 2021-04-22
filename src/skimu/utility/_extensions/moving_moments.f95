@@ -17,7 +17,7 @@
 ! Outputs
 !    mean : array((n-wlen)/skip + 1)
 !         Computed moving mean
-subroutine rolling_moments_1(n, x, wlen, skip, mean) bind(C, name="rolling_moments_1")
+subroutine moving_moments_1(n, x, wlen, skip, mean) bind(C, name="moving_moments_1")
     use, intrinsic :: iso_c_binding
     implicit none
     integer(c_long), intent(in) :: n, wlen, skip
@@ -92,7 +92,7 @@ end subroutine
 !         Computed moving mean
 !    sd : array((n-wlen)/skip + 1)
 !         Computed moving standard deviation
-subroutine rolling_moments_2(n, x, wlen, skip, mean, sd) bind(C, name="rolling_moments_2")
+subroutine moving_moments_2(n, x, wlen, skip, mean, sd) bind(C, name="moving_moments_2")
     use, intrinsic :: iso_c_binding
     implicit none
     integer(c_long), intent(in) :: n, wlen, skip
@@ -228,7 +228,7 @@ end subroutine
 !         Computed moving standard deviation
 !    skew : array((n-wlen)/skip + 1)
 !         Computed moving skewness
-subroutine rolling_moments_3(n, x, wlen, skip, mean, sd, skew) bind(C, name="rolling_moments_3")
+subroutine moving_moments_3(n, x, wlen, skip, mean, sd, skew) bind(C, name="moving_moments_3")
     use, intrinsic :: iso_c_binding
     implicit none
     integer(c_long), intent(in) :: n, wlen, skip
@@ -306,7 +306,7 @@ end subroutine
 !         Computed moving skewness
 !    kurt : array((n-wlen)/skip + 1)
 !         Computed moving kurtosis
-subroutine rolling_moments_4(n, x, wlen, skip, mean, sd, skew, kurt) bind(C, name="rolling_moments_4")
+subroutine moving_moments_4(n, x, wlen, skip, mean, sd, skew, kurt) bind(C, name="moving_moments_4")
     use, intrinsic :: iso_c_binding
     implicit none
     integer(c_long), intent(in) :: n, wlen, skip

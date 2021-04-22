@@ -8,7 +8,7 @@ from numpy import maximum, abs, repeat, arctan, sqrt, pi
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt
 
-from skimu.utility import rolling_mean
+from skimu.utility import moving_mean
 
 
 __all__ = [
@@ -34,7 +34,7 @@ def metric_anglez(accel, wlen, *args, **kwargs):
         (N, ) array of angles between accelerometer z axis and horizontal plane in degrees.
     """
     anglez = arctan(accel[:, 2] / sqrt(accel[:, 0]**2 + accel[:, 1]**2)) * (180 / pi)
-    return rolling_mean(anglez, wlen, wlen)
+    return moving_mean(anglez, wlen, wlen)
 
 
 def metric_en(accel, wlen, *args, **kwargs):
@@ -53,7 +53,7 @@ def metric_en(accel, wlen, *args, **kwargs):
     en : numpy.ndarray
         (N, ) array of euclidean norms.
     """
-    return rolling_mean(norm(accel, axis=1), wlen, wlen)
+    return moving_mean(norm(accel, axis=1), wlen, wlen)
 
 
 def metric_enmo(accel, wlen, *args, take_abs=False, trim_zero=True, **kwargs):
@@ -81,9 +81,9 @@ def metric_enmo(accel, wlen, *args, take_abs=False, trim_zero=True, **kwargs):
     if take_abs:
         enmo = abs(enmo)
     if trim_zero:
-        return rolling_mean(maximum(enmo, 0), wlen, wlen)
+        return moving_mean(maximum(enmo, 0), wlen, wlen)
     else:
-        return rolling_mean(enmo, wlen, wlen)
+        return moving_mean(enmo, wlen, wlen)
 
 
 def metric_bfen(accel, wlen, fs, low_cutoff=0.2, high_cutoff=15, trim_zero=True, **kwargs):
@@ -112,9 +112,9 @@ def metric_bfen(accel, wlen, fs, low_cutoff=0.2, high_cutoff=15, trim_zero=True,
     """
     sos = butter(4, [2 * low_cutoff / fs, 2 * high_cutoff / fs], btype='bandpass', output='sos')
     if trim_zero:
-        return rolling_mean(maximum(norm(sosfiltfilt(sos, accel, axis=0), axis=1), 0), wlen, wlen)
+        return moving_mean(maximum(norm(sosfiltfilt(sos, accel, axis=0), axis=1), 0), wlen, wlen)
     else:
-        return rolling_mean(norm(sosfiltfilt(sos, accel, axis=0), axis=1), wlen, wlen)
+        return moving_mean(norm(sosfiltfilt(sos, accel, axis=0), axis=1), wlen, wlen)
 
 
 def metric_hfen(accel, wlen, fs, low_cutoff=0.2, trim_zero=True, **kwargs):
@@ -142,9 +142,9 @@ def metric_hfen(accel, wlen, fs, low_cutoff=0.2, trim_zero=True, **kwargs):
     sos = butter(4, 2 * low_cutoff / fs, btype='high', output='sos')
     
     if trim_zero:
-        return rolling_mean(maximum(norm(sosfiltfilt(sos, accel, axis=0), axis=1), 0), wlen, wlen)
+        return moving_mean(maximum(norm(sosfiltfilt(sos, accel, axis=0), axis=1), 0), wlen, wlen)
     else:
-        return rolling_mean(norm(sosfiltfilt(sos, accel, axis=0), axis=1), wlen, wlen)
+        return moving_mean(norm(sosfiltfilt(sos, accel, axis=0), axis=1), wlen, wlen)
 
 
 def metric_hfenplus(accel, wlen, fs, cutoff=0.2, trim_zero=True, **kwargs):
@@ -178,9 +178,9 @@ def metric_hfenplus(accel, wlen, fs, cutoff=0.2, trim_zero=True, **kwargs):
     acc_low = norm(sosfiltfilt(sos_low, accel, axis=0), axis=1)
     
     if trim_zero:
-        return rolling_mean(maximum(acc_high + acc_low - 1, 0), wlen, wlen)
+        return moving_mean(maximum(acc_high + acc_low - 1, 0), wlen, wlen)
     else:
-        return rolling_mean(acc_high + acc_low - 1, wlen, wlen)
+        return moving_mean(acc_high + acc_low - 1, wlen, wlen)
 
 
 def metric_mad(accel, wlen, *args, **kwargs):
@@ -200,7 +200,7 @@ def metric_mad(accel, wlen, *args, **kwargs):
         (N, ) array of computed MAD values.
     """
     acc_norm = norm(accel, axis=1)
-    r_avg = repeat(rolling_mean(acc_norm, wlen, wlen), wlen)
+    r_avg = repeat(moving_mean(acc_norm, wlen, wlen), wlen)
 
-    mad = rolling_mean(abs(acc_norm[:r_avg.size] - r_avg), wlen, wlen)
+    mad = moving_mean(abs(acc_norm[:r_avg.size] - r_avg), wlen, wlen)
     return mad

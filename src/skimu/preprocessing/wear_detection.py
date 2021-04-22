@@ -4,14 +4,14 @@ Wear detection algorithms
 Lukas Adamowicz
 Pfizer DMTI 2021
 """
-from numpy import mean, diff, sum, insert, append, nonzero, delete, concatenate, int_
+from numpy import mean, diff, sum, insert, append, nonzero, delete, concatenate, int_, full
 
 from skimu.base import _BaseProcess
-from skimu.utility import rolling_sd, get_windowed_view
+from skimu.utility import moving_mean, moving_sd, get_windowed_view
 
 
 class DetectWear(_BaseProcess):
-    """
+    r"""
     Detect periods of non-wear in accelerometer recordings.
 
     Parameters
@@ -21,7 +21,15 @@ class DetectWear(_BaseProcess):
         was observed for GeneActiv devices during motionless bench tests, and will likely depend
         on the brand of accelerometer being used.
     range_crit : float, optional
-        Acceleration window range threshold for determining non-wear. Default is 0.050.
+        Acceleration window range threshold for determining non-wear. Default is 0.067, which was
+        found for several GeneActiv accelerometers in a bench test as the 75th percentile
+        of the ranges over 60 minute windows.
+    temperature_crit : float, optional
+        Minimum temperature to indicate wear in Celsius. Default is 25 deg. C.
+    temperature_factor : int, optional
+        Factor by which to multiply boolean array of wear based on temperature. Default is 1.
+        Setting to 2 would result in temperature being able to indicate non-wear by itself. Setting
+        to 0 will disable using temperature for wear detection.
     apply_setup_criteria : bool, optional
         Apply criteria to the beginning of the recording to account for device setup. Default is
         True.
@@ -31,6 +39,10 @@ class DetectWear(_BaseProcess):
         applied to the first and last `shipping_criteria` hours), or a length 2 list of
         integers (criteria applied to the first `shipping_criteria[0]` hours and the last
         `shipping_criteria[1]` hours).
+    shipping_temperature : bool, optional
+        Apply the `shipping_criteria` rules to `temperature_factor`. For example, setting
+        to true would mean with `temperature_factor=2` that during the first and last 24 hours
+        (or specified times) the temperature could solely determine non-wear. Defautl is False.
     window_length : int, optional
         Number of minutes in a window used to determine non-wear. Default is 60 minutes.
     window_skip : int, optional
@@ -45,6 +57,17 @@ class DetectWear(_BaseProcess):
 
     Notes
     -----
+    Non-wear is computed by the following:
+
+    .. math::
+
+        NW_{acc} = \sum_{i=\{x,y,z\}}[(a_{(sd, i)} < S) \& (a_{(range, i)} < R)]\\
+        NW = \left(NW_{acc} + (temp < T)F_t\right) >= 2
+
+    where :math:`a_{sd}` is the acceleration standard deviation of a window, :math:`a_{range}` is
+    the range of acceleration of a window, :math:`S` is the `sd_crit`, :math:`R` is `range_crit`,
+    :math:`T` is `temperature_crit`, and :math:`F_t` is the `temperature_factor`.
+
     _Setup Criteria_ is the rule that if the data starts with a period of non-wear of less than 3
     hours followed by a non-wear period of any length, then that first block of wear is changed
     to non-wear.
@@ -55,8 +78,17 @@ class DetectWear(_BaseProcess):
     re-classified as non-wear. Wear periods at the end of the recording that are less than 3 hours
     that are preceded by 1 hour of non-wear are re-classified as non-wear.
     """
-    def __init__(self, sd_crit=0.013, range_crit=0.050, apply_setup_criteria=True,
-                 shipping_criteria=False, window_length=60, window_skip=15):
+    def __init__(
+        self,
+        sd_crit=0.013,
+        range_crit=0.067,
+        temperature_crit=25.0,
+        temperature_factor=1,
+        apply_setup_criteria=True,
+        shipping_criteria=False,
+        shipping_temperature=False,
+        window_length=60, window_skip=15
+    ):
         window_length = int(window_length)
         window_skip = int(window_skip)
         if isinstance(shipping_criteria, (list, tuple)):
@@ -69,20 +101,26 @@ class DetectWear(_BaseProcess):
         super().__init__(
             sd_crit=sd_crit,
             range_crit=range_crit,
+            temperature_crit=temperature_crit,
+            temperature_factor=temperature_factor,
             apply_setup_criteria=apply_setup_criteria,
             shipping_criteria=shipping_criteria,
+            shipping_temperature=shipping_temperature,
             window_length=window_length,
             window_skip=window_skip
         )
 
         self.sd_crit = sd_crit
         self.range_crit = range_crit
+        self.temp_crit = temperature_crit
+        self.temp_f = temperature_factor
         self.apply_setup_crit = apply_setup_criteria
         self.ship_crit = shipping_criteria
+        self.ship_temp = shipping_temperature
         self.wlen = window_length
         self.wskip = window_skip
 
-    def predict(self, time=None, accel=None, **kwargs):
+    def predict(self, time=None, accel=None, temperature=None, **kwargs):
         """
         Detect the periods of non-wear
 
@@ -107,13 +145,32 @@ class DetectWear(_BaseProcess):
         # note that while this block starts at 0, the method uses centered blocks, which
         # means that the first block actually corresponds to a block starting 22.5 minutes into
         # the recording
-        acc_rsd = rolling_sd(accel, n_wlen, n_wskip, axis=0, return_previous=False)
+        acc_rsd = moving_sd(accel, n_wlen, n_wskip, axis=0, return_previous=False)
 
         # get the accelerometer range in each 60min window
         acc_w = get_windowed_view(accel, n_wlen, n_wskip)
         acc_w_range = acc_w.max(axis=1) - acc_w.min(axis=1)
 
-        nonwear = sum((acc_rsd < self.sd_crit) & (acc_w_range < 0.050), axis=1) >= 2
+        # deal with temperature
+        if temperature is None or self.temp_f < 1:
+            nonwear = sum((acc_rsd < self.sd_crit) & (acc_w_range < self.range_crit), axis=1) >= 2
+        else:
+            temp_rm = moving_mean(temperature, n_wlen, n_wskip)
+
+            if self.ship_temp:
+                ship_i1 = self.ship_crit[0] * int(60 / self.wskip)
+                ship_i2 = self.ship_crit[0] * int(60 / self.wskip)
+
+                temp_f = full(temp_rm.size, self.temp_f, dtype="int")
+                temp_f[ship_i1:-ship_i2] = 1
+            else:
+                temp_f = self.temp_f
+
+            nw_temp = (temp_rm < self.temp_crit).astype("int") * temp_f
+            nonwear = (
+                sum((acc_rsd < self.sd_crit) & (acc_w_range < self.range_crit), axis=1)
+                + nw_temp
+            ) >= 2
 
         # flip to wear starts/stops now
         wear_starts, wear_stops = _modify_wear_times(

@@ -7,17 +7,17 @@
 #include <math.h>
 
 
-extern void rolling_moments_1(long *, double *, long *, long *, double *);
-extern void rolling_moments_2(long *, double *, long *, long *, double *, double *);
-extern void rolling_moments_3(long *, double *, long *, long *, double *, double *, double *);
-extern void rolling_moments_4(long *, double *, long *, long *, double *, double *, double *, double *);
+extern void moving_moments_1(long *, double *, long *, long *, double *);
+extern void moving_moments_2(long *, double *, long *, long *, double *, double *);
+extern void moving_moments_3(long *, double *, long *, long *, double *, double *, double *);
+extern void moving_moments_4(long *, double *, long *, long *, double *, double *, double *, double *);
 
 
-PyObject * rolling_mean(PyObject *NPY_UNUSED(self), PyObject *args){
+PyObject * moving_mean(PyObject *NPY_UNUSED(self), PyObject *args){
     PyObject *x_;
     long wlen, skip;
 
-    if (!PyArg_ParseTuple(args, "Oll:rolling_mean", &x_, &wlen, &skip)) return NULL;
+    if (!PyArg_ParseTuple(args, "Oll:moving_mean", &x_, &wlen, &skip)) return NULL;
 
     PyArrayObject *data = (PyArrayObject *)PyArray_FromAny(
         x_, PyArray_DescrFromType(NPY_DOUBLE), 1, 0,
@@ -59,7 +59,7 @@ PyObject * rolling_mean(PyObject *NPY_UNUSED(self), PyObject *args){
     free(rdims);
 
     for (int i = 0; i < nrepeats; ++i){
-        rolling_moments_1(&stride, dptr, &wlen, &skip, rmean_ptr);
+        moving_moments_1(&stride, dptr, &wlen, &skip, rmean_ptr);
         dptr += stride;
         rmean_ptr += res_stride;
     }
@@ -71,12 +71,12 @@ PyObject * rolling_mean(PyObject *NPY_UNUSED(self), PyObject *args){
 }
 
 
-PyObject * rolling_sd(PyObject *NPY_UNUSED(self), PyObject *args){
+PyObject * moving_sd(PyObject *NPY_UNUSED(self), PyObject *args){
     PyObject *x_;
     long wlen, skip;
     int return_others;
 
-    if (!PyArg_ParseTuple(args, "Ollp:rolling_sd", &x_, &wlen, &skip, &return_others)) return NULL;
+    if (!PyArg_ParseTuple(args, "Ollp:moving_sd", &x_, &wlen, &skip, &return_others)) return NULL;
 
     PyArrayObject *data = (PyArrayObject *)PyArray_FromAny(
         x_, PyArray_DescrFromType(NPY_DOUBLE), 1, 0,
@@ -120,7 +120,7 @@ PyObject * rolling_sd(PyObject *NPY_UNUSED(self), PyObject *args){
     free(rdims);
 
     for (int i = 0; i < nrepeats; ++i){
-        rolling_moments_2(&stride, dptr, &wlen, &skip, rmean_ptr, rsd_ptr);
+        moving_moments_2(&stride, dptr, &wlen, &skip, rmean_ptr, rsd_ptr);
         dptr += stride;
         rmean_ptr += res_stride;
         rsd_ptr += res_stride;
@@ -130,7 +130,7 @@ PyObject * rolling_sd(PyObject *NPY_UNUSED(self), PyObject *args){
 
     if (return_others){
         return Py_BuildValue(
-            "OO",
+            "NN",  /* dont want to increase ref count */
             (PyObject *)rsd,
             (PyObject *)rmean
         );
@@ -141,12 +141,12 @@ PyObject * rolling_sd(PyObject *NPY_UNUSED(self), PyObject *args){
 }
 
 
-PyObject * rolling_skewness(PyObject *NPY_UNUSED(self), PyObject *args){
+PyObject * moving_skewness(PyObject *NPY_UNUSED(self), PyObject *args){
     PyObject *x_;
     long wlen, skip;
     int return_others;
 
-    if (!PyArg_ParseTuple(args, "Ollp:rolling_skewness", &x_, &wlen, &skip, &return_others)) return NULL;
+    if (!PyArg_ParseTuple(args, "Ollp:moving_skewness", &x_, &wlen, &skip, &return_others)) return NULL;
 
     PyArrayObject *data = (PyArrayObject *)PyArray_FromAny(
         x_, PyArray_DescrFromType(NPY_DOUBLE), 1, 0,
@@ -193,7 +193,7 @@ PyObject * rolling_skewness(PyObject *NPY_UNUSED(self), PyObject *args){
     free(rdims);
 
     for (int i = 0; i < nrepeats; ++i){
-        rolling_moments_3(&stride, dptr, &wlen, &skip, rmean_ptr, rsd_ptr, rskew_ptr);
+        moving_moments_3(&stride, dptr, &wlen, &skip, rmean_ptr, rsd_ptr, rskew_ptr);
         dptr += stride;
         rmean_ptr += res_stride;
         rsd_ptr += res_stride;
@@ -204,7 +204,7 @@ PyObject * rolling_skewness(PyObject *NPY_UNUSED(self), PyObject *args){
 
     if (return_others){
         return Py_BuildValue(
-            "OOO",
+            "NNN",  /* dont want to increase ref count */
             (PyObject *)rskew,
             (PyObject *)rsd,
             (PyObject *)rmean
@@ -217,12 +217,12 @@ PyObject * rolling_skewness(PyObject *NPY_UNUSED(self), PyObject *args){
 }
 
 
-PyObject * rolling_kurtosis(PyObject *NPY_UNUSED(self), PyObject *args){
+PyObject * moving_kurtosis(PyObject *NPY_UNUSED(self), PyObject *args){
     PyObject *x_;
     long wlen, skip;
     int return_others;
 
-    if (!PyArg_ParseTuple(args, "Ollp:rolling_kurtosis", &x_, &wlen, &skip, &return_others)) return NULL;
+    if (!PyArg_ParseTuple(args, "Ollp:moving_kurtosis", &x_, &wlen, &skip, &return_others)) return NULL;
 
     PyArrayObject *data = (PyArrayObject *)PyArray_FromAny(
         x_, PyArray_DescrFromType(NPY_DOUBLE), 1, 0,
@@ -272,7 +272,7 @@ PyObject * rolling_kurtosis(PyObject *NPY_UNUSED(self), PyObject *args){
     free(rdims);
 
     for (int i = 0; i < nrepeats; ++i){
-        rolling_moments_4(&stride, dptr, &wlen, &skip, rmean_ptr, rsd_ptr, rskew_ptr, rkurt_ptr);
+        moving_moments_4(&stride, dptr, &wlen, &skip, rmean_ptr, rsd_ptr, rskew_ptr, rkurt_ptr);
         dptr += stride;
         rmean_ptr += res_stride;
         rsd_ptr += res_stride;
@@ -284,7 +284,7 @@ PyObject * rolling_kurtosis(PyObject *NPY_UNUSED(self), PyObject *args){
 
     if (return_others){
         return Py_BuildValue(
-            "OOOO",
+            "NNNN",  /* dont want to increase ref count */
             (PyObject *)rkurt,
             (PyObject *)rskew,
             (PyObject *)rsd,
@@ -299,7 +299,7 @@ PyObject * rolling_kurtosis(PyObject *NPY_UNUSED(self), PyObject *args){
 }
 
 
-static const char rmean_doc[] = "rolling_mean(a, wlen, skip)\n\n"
+static const char rmean_doc[] = "moving_mean(a, wlen, skip)\n\n"
 "Compute the rolling mean over windows of length `wlen` with `skip` samples between window starts.\n\n"
 "Paramters\n"
 "---------\n"
@@ -314,7 +314,7 @@ static const char rmean_doc[] = "rolling_mean(a, wlen, skip)\n\n"
 "rmean : numpy.ndarray\n"
 "    Rolling mean.";
 
-static const char rsd_doc[] = "rolling_sd(a, wlen, skip, return_previous)\n\n"
+static const char rsd_doc[] = "moving_sd(a, wlen, skip, return_previous)\n\n"
 "Compute the rolling standard deviation over windows of length `wlen` with `skip` samples "
 "between window starts.  Because previous rolling moments have to be computed as part of "
 "the process, they are availble to return as well.\n\n"
@@ -335,7 +335,7 @@ static const char rsd_doc[] = "rolling_sd(a, wlen, skip, return_previous)\n\n"
 "rmean : numpy.ndarray, optional\n"
 "    Rolling mean. Only returned if `return_previous` is `True`.";
 
-static const char rskew_doc[] = "rolling_skewness(a, wlen, skip, return_previous)\n\n"
+static const char rskew_doc[] = "moving_skewness(a, wlen, skip, return_previous)\n\n"
 "Compute the rolling skewness over windows of length `wlen` with `skip` samples "
 "between window starts.  Because previous rolling moments have to be computed as part of "
 "the process, they are availble to return as well.\n\n"
@@ -358,7 +358,7 @@ static const char rskew_doc[] = "rolling_skewness(a, wlen, skip, return_previous
 "rmean : numpy.ndarray, optional\n"
 "    Rolling mean. Only returned if `return_previous` is `True`.";
 
-static const char rkurt_doc[] = "rolling_kurtosis(a, wlen, skip, return_previous)\n\n"
+static const char rkurt_doc[] = "moving_kurtosis(a, wlen, skip, return_previous)\n\n"
 "Compute the rolling kurtosis over windows of length `wlen` with `skip` samples "
 "between window starts.  Because previous rolling moments have to be computed as part of "
 "the process, they are availble to return as well.\n\n"
@@ -384,16 +384,16 @@ static const char rkurt_doc[] = "rolling_kurtosis(a, wlen, skip, return_previous
 "    Rolling mean. Only returned if `return_previous` is `True`.";
 
 static struct PyMethodDef methods[] = {
-    {"rolling_mean",   rolling_mean,   1, rmean_doc},  // last is the docstring
-    {"rolling_sd",   rolling_sd,   1, rsd_doc},  // last is the docstring
-    {"rolling_skewness",   rolling_skewness,   1, rskew_doc},  // last is the docstring
-    {"rolling_kurtosis",   rolling_kurtosis,   1, rkurt_doc},  // last is the docstring
+    {"moving_mean",   moving_mean,   1, rmean_doc},  // last is the docstring
+    {"moving_sd",   moving_sd,   1, rsd_doc},  // last is the docstring
+    {"moving_skewness",   moving_skewness,   1, rskew_doc},  // last is the docstring
+    {"moving_kurtosis",   moving_kurtosis,   1, rkurt_doc},  // last is the docstring
     {NULL, NULL, 0, NULL}          /* sentinel */
 };
 
 static struct PyModuleDef moduledef = {
         PyModuleDef_HEAD_INIT,
-        "rolling_moments",
+        "moving_moments",
         NULL,
         -1,
         methods,
@@ -404,7 +404,7 @@ static struct PyModuleDef moduledef = {
 };
 
 /* Initialization function for the module */
-PyMODINIT_FUNC PyInit_rolling_moments(void)
+PyMODINIT_FUNC PyInit_moving_moments(void)
 {
     PyObject *m;
     m = PyModule_Create(&moduledef);

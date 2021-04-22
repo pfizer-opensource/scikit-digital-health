@@ -12,7 +12,7 @@ from numpy.linalg import norm
 from sklearn.linear_model import LinearRegression
 
 from skimu.base import _BaseProcess
-from skimu.utility import rolling_mean, rolling_sd
+from skimu.utility import moving_mean, moving_sd
 
 
 __all__ = ["CalibrateAccelerometer"]
@@ -299,11 +299,11 @@ class Store:
     @acc_rsd.setter
     def acc_rsd(self, value):
         if self._acc_rsd is None:
-            self._acc_rsd, self._acc_rm = rolling_sd(
+            self._acc_rsd, self._acc_rm = moving_sd(
                 value, self.wlen, self.wlen, axis=0, return_previous=True)
             self._n = int((value.shape[0] // self.wlen) * self.wlen)
         else:
-            _rsd, _rm = rolling_sd(
+            _rsd, _rm = moving_sd(
                 value[self._n:], self.wlen, self.wlen, axis=0, return_previous=True)
             self._acc_rsd = concatenate((self._acc_rsd, _rsd), axis=0)
             self._acc_rm = concatenate((self._acc_rm, _rm), axis=0)
@@ -320,9 +320,9 @@ class Store:
     @tmp_rm.setter
     def tmp_rm(self, value):
         if self._tmp_rm is None:
-            self._tmp_rm = rolling_mean(value, self.wlen, self.wlen)
+            self._tmp_rm = moving_mean(value, self.wlen, self.wlen)
             self._nt = int((value.shape[0] // self.wlen) * self.wlen)
         else:
-            _rm = rolling_mean(value[self._nt:], self.wlen, self.wlen)
+            _rm = moving_mean(value[self._nt:], self.wlen, self.wlen)
             self._tmp_rm = concatenate((self._tmp_rm, _rm), axis=0)
             self._nt += int((value[self._nt:].shape[0] // self.wlen) * self.wlen)
