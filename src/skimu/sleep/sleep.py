@@ -165,6 +165,20 @@ class Sleep(_BaseProcess):
     def _setup_plotting(self, save_file):
         """
         Setup sleep specific plotting
+
+        Parameters
+        ----------
+        save_file : str
+            The file name to save the resulting plot to. Extension will be set to PDF. There
+            are formatting options as well for dynamically generated names. See Notes
+
+        Notes
+        -----
+        Available format variables available:
+
+        - date: todays date expressed in yyyymmdd format.
+        - name: process name.
+        - file: file name used in the pipeline, or "" if not found.
         """
         # move this inside here so that it doesnt effect everything on load
         matplotlib.use("PDF")  # non-interactive, dont want to be displaying plots constantly
