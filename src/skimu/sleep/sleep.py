@@ -8,6 +8,7 @@ from collections.abc import Iterable
 from warnings import warn
 from datetime import datetime, timedelta
 from pathlib import Path
+from datetime import date as dt_date
 
 from numpy import mean, diff, array, nan, sum, arange
 from numpy.ma import masked_where
@@ -522,8 +523,9 @@ class Sleep(_BaseProcess):
         Finalize and save the plots for sleep
         """
         if self.f is not None:
-
-            pp = PdfPages(Path(self.plot_fname).with_suffix(".pdf"))
+            date = dt_date.today().strftime('%Y%m%d')
+            form_fname = self.plot_fname.format(date=date, name=self._name, file=self._file_name)
+            pp = PdfPages(Path(form_fname).with_suffix(".pdf"))
 
             for f in self.f:
                 f.tight_layout()
