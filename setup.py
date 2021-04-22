@@ -145,15 +145,9 @@ Operating System :: MacOS
 """
 
 
-REQUIREMENTS = [
-    'numpy>=1.17.2',
-    'scipy>=1.3.1',
-    'pandas>=0.23.4',
-    'lightgbm>=2.3.0',
-    'pywavelets',
-    'scikit-learn',  # needed for lightgbm
-    'h5py'  # currently for gait classifier dataset loading
-]
+with open("requirements.txt", "r") as f:
+    _req = f.readlines()
+REQUIREMENTS = [i.strip() for i in _req]
 
 if sys.version_info < (3, 7):
     REQUIREMENTS.append('importlib_resources')
@@ -179,20 +173,25 @@ def configuration(parent_package='', top_path=None):
     )
     # UTILITY
     config.add_library(
-        "frolling_moments",
-        sources="src/skimu/utility/_extensions/rolling_moments.f95"
+        "fmoving_moments",
+        sources="src/skimu/utility/_extensions/moving_moments.f95"
     )
     config.add_extension(
-        "skimu/utility/_extensions/rolling_moments",
-        sources="src/skimu/utility/_extensions/rolling_moments.c",
-        libraries=["frolling_moments"]
+        "skimu/utility/_extensions/moving_moments",
+        sources="src/skimu/utility/_extensions/moving_moments.c",
+        libraries=["fmoving_moments"]
+    )
+    config.add_extension(
+        "skimu/utility/_extensions/moving_median",
+        sources="src/skimu/utility/_extensions/moving_median.c",
+        libraries=["gsl"]
     )
     # Read library
     config.add_library(
         'read',
         sources=[
             'src/skimu/read/_extensions/cwa_convert.f95',
-            'src/skimu/read/_extensions/bin_convert.c'
+            'src/skimu/read/_extensions/read_bin.c'
         ]
     )
     config.add_extension(
@@ -202,8 +201,8 @@ def configuration(parent_package='', top_path=None):
     )
     # bin (geneactiv)
     config.add_extension(
-        'skimu/read/_extensions/bin_convert',
-        sources='src/skimu/read/_extensions/pybin_convert.c',
+        'skimu/read/_extensions/read_bin',
+        sources='src/skimu/read/_extensions/pyread_bin.c',
         libraries=['read']
     )
 

@@ -71,7 +71,7 @@ PyObject * read_gt3x(PyObject *NPY_UNUSED(self), PyObject *args){
     zip_close(gt3x);
 
     return Py_BuildValue(
-        "OOOOO",
+        "NNNNN",  /* N doesnt increase ref counter */
         (PyObject *)time,
         (PyObject *)accel,
         (PyObject *)lux,

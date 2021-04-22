@@ -110,6 +110,10 @@ class Gait(_BaseProcess):
         Acceleration low-pass filter order. Default is 4
     filter_cutoff : float, optional
         Acceleration low-pass filter cutoff in Hz. Default is 20.0Hz
+    day_window : array-like
+        Two (2) element array-like of the base and period of the window to use for determining
+        days. Default is (0, 24), which will look for days starting at midnight and lasting 24
+        hours. None removes any day-based windowing.
 
     Notes
     -----
@@ -194,7 +198,8 @@ class Gait(_BaseProcess):
             height_factor=0.53,
             prov_leg_length=False,
             filter_order=4,
-            filter_cutoff=20.0
+            filter_cutoff=20.0,
+            day_window=(0, 24)
     ):
         super().__init__(
             # key-word arguments for storage
@@ -207,7 +212,8 @@ class Gait(_BaseProcess):
             height_factor=height_factor,
             prov_leg_length=prov_leg_length,
             filter_order=filter_order,
-            filter_cutoff=filter_cutoff
+            filter_cutoff=filter_cutoff,
+            day_window=day_window
         )
 
         self.corr_accel_orient = correct_accel_orient
@@ -228,6 +234,11 @@ class Gait(_BaseProcess):
 
         # for saving gait predictions
         self._save_classifier_fn = lambda time, starts, stops: None
+
+        if day_window is None:
+            self.day_key = "-1, -1"
+        else:
+            self.day_key = f"{day_window[0]}, {day_window[1]}"
 
     def _save_classifier_predictions(self, fname):
         def fn(time, starts, stops):
@@ -276,7 +287,7 @@ class Gait(_BaseProcess):
 
     def predict(self, time=None, accel=None, *, gyro=None, height=None, gait_pred=None, **kwargs):
         """
-        predict(time, accel, *, gyro=None, height=None, gait_pred=None)
+        predict(time, accel, *, gyro=None, height=None, gait_pred=None, day_ends={})
 
         Get the gait events and metrics from a time series signal
 
@@ -299,6 +310,10 @@ class Gait(_BaseProcess):
             (N, ) array of boolean predictions of gait, or any value that is not None. If not an
             ndarray but not None, the entire recording will be taken as gait. If not provided
             (or None), gait classification will be performed on the acceleration data.
+        day_ends : dict, optional
+            Optional dictionary containing (N, 2) arrays of start and stop indices for invididual
+            days. Dictionary keys are in the format "{base}, {period}". If not provided, or the
+            key specified by `day_window` is not found, no day-based windowing will be done.
 
         Returns
         -------
@@ -324,7 +339,7 @@ class Gait(_BaseProcess):
 
         # compute fs/delta t
         fs = 1 / mean(diff(time))
-        if fs < 20.0:
+        if fs <= 20.0:
             raise LowFrequencyError(f"Frequency ({fs:.2f}Hz) is too low (<20Hz).")
         if fs < (50.0 * 0.985):  # 1.5% margin
             warn("Frequency is less than 50Hz. Downsampling to 20Hz. Note that this may effect "
@@ -334,7 +349,12 @@ class Gait(_BaseProcess):
         goal_fs = 50 if fs > (50 * 0.985) else 20
         downsample = False if ((0.985 * goal_fs) < fs < (1.015 * goal_fs)) else True
 
-        days = kwargs.get(self._days, [[0, accel.shape[0] - 1]])
+        # day separation
+        days = kwargs.get(self._days, {}).get(self.day_key, None)
+        if days is None:
+            warn(f"Day indices for {self.day_key} (base, period) not found. No day separation used")
+            days = [[0, accel.shape[0] - 1]]
+
         time_ds, accel_ds, gait_pred_ds, days = get_downsampled_data(
             time, accel, gait_pred, fs, goal_fs, days, downsample)
 

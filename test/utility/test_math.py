@@ -92,25 +92,25 @@ class BaseTestRolling:
 
 class TestRollingMean(BaseTestRolling):
     # need staticmethod so it doesn't think that self is the first argument
-    function = staticmethod(rolling_mean)
+    function = staticmethod(moving_mean)
     truth_function = staticmethod(np.mean)
     truth_kw = {}
 
 
 class TestRollingSD(BaseTestRolling):
-    function = staticmethod(rolling_sd)
+    function = staticmethod(moving_sd)
     truth_function = (np.std, np.mean)
     truth_kw = ({"ddof": 1}, {})
 
 
 class TestRollingSkewness(BaseTestRolling):
-    function = staticmethod(rolling_skewness)
+    function = staticmethod(moving_skewness)
     truth_function = (skew, np.std, np.mean)
     truth_kw = ({"bias": True}, {"ddof": 1}, {})
 
 
 class TestRollingKurtosis(BaseTestRolling):
-    function = staticmethod(rolling_kurtosis)
+    function = staticmethod(moving_kurtosis)
     truth_function = (kurtosis, skew, np.std, np.mean)
     truth_kw = (
         {"bias": True, "fisher": True, "nan_policy": "propagate"},
@@ -118,3 +118,22 @@ class TestRollingKurtosis(BaseTestRolling):
         {"ddof": 1},
         {}
     )
+
+
+class TestRollingMedian(BaseTestRolling):
+    function = staticmethod(moving_median)
+    truth_function = staticmethod(np.median)
+    truth_kw = {}
+
+    @pytest.mark.parametrize("skip", (1, 2, 7, 150, 300))
+    def test_pad(self, skip):
+        x = np.random.random(100000)
+        xw = get_windowed_view(x, 150, skip)
+
+        truth = self.truth_function(xw, axis=-1, **self.truth_kw)
+        pred = self.function(x, 150, skip, pad=True)
+
+        N = ((x.size - 150) // skip + 1)
+
+        assert np.allclose(pred[:N], truth)
+        assert np.all(np.isnan(pred[N:]))

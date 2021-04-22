@@ -55,8 +55,14 @@ class BaseProcessTester:
                 assert allclose(ptime, ttime, atol=self.atol_time), \
                     f"{self.process._name} test for value ({key}) not close to truth"
             else:
-                assert allclose(pred[key], truth[key], atol=self.atol, equal_nan=True), \
-                    f"{self.process._name} test for value ({key}) not close to truth"
+                if isinstance(truth[key], dict):
+                    for k2 in truth[key]:
+                        assert allclose(
+                            pred[key][k2], truth[key][k2], atol=self.atol, equal_nan=True), \
+                            f"{self.process._name} test for value ({key}/{k2}) not close to truth"
+                else:
+                    assert allclose(pred[key], truth[key], atol=self.atol, equal_nan=True), \
+                        f"{self.process._name} test for value ({key}) not close to truth"
 
 
 @fixture(scope='module')
@@ -84,7 +90,12 @@ def get_truth_data():
         with h5py.File(file, 'r') as h5:
             for key in data_names:
                 if key in h5[truth_key]:
-                    truth[key] = h5[truth_key][key][()]
+                    if isinstance(h5[truth_key][key], h5py.Group):
+                        truth[key] = {}
+                        for key2 in h5[truth_key][key]:
+                            truth[key][key2] = h5[truth_key][key][key2][()]
+                    else:
+                        truth[key] = h5[truth_key][key][()]
 
         return truth
     return truth_data

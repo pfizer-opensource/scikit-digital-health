@@ -112,7 +112,8 @@ class ReadGT3X(_BaseProcess):
 
         results = {
             self._time: time[:N],
-            self._acc: accel[:N]
+            self._acc: accel[:N],
+            "file": file
         }
 
         if not all(lux == 0.0):

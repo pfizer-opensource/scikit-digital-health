@@ -4,6 +4,8 @@ Sit-to-stand transfer detection and processing
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
+from warnings import warn
+
 from numpy import array, sum, mean, std, around, arange, nonzero, diff, ascontiguousarray
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt, find_peaks
@@ -65,6 +67,10 @@ class Sit2Stand(_BaseProcess):
         Initial low-pass filtering cuttoff, in Hz. Default is 5Hz.
     reconstruction_window : float, optional
         Window to use for moving average, in seconds. Default is 0.25s.
+    day_window : array-like
+        Two (2) element array-like of the base and period of the window to use for determining
+        days. Default is (0, 24), which will look for days starting at midnight and lasting 24
+        hours. None removes any day-based windowing.
 
     Notes
     -----
@@ -105,7 +111,8 @@ class Sit2Stand(_BaseProcess):
             power_std_trim=0,
             lowpass_order=4,
             lowpass_cutoff=5,
-            reconstruction_window=0.25
+            reconstruction_window=0.25,
+            day_window=(0, 24)
     ):
         super().__init__(
             # kwarg saving
@@ -123,7 +130,8 @@ class Sit2Stand(_BaseProcess):
             power_std_trim=power_std_trim,
             lowpass_order=lowpass_order,
             lowpass_cutoff=lowpass_cutoff,
-            reconstruction_window=reconstruction_window
+            reconstruction_window=reconstruction_window,
+            day_window=day_window
         )
 
         # FILTER PARAMETERS
@@ -161,9 +169,14 @@ class Sit2Stand(_BaseProcess):
             still_window=still_window
         )
 
+        if day_window is None:
+            self.day_key = "-1, -1"
+        else:
+            self.day_key = f"{day_window[0]}, {day_window[1]}"
+
     def predict(self, time=None, accel=None, **kwargs):
         """
-        predict(time, accel)
+        predict(time, accel, *, day_ends={})
 
         Predict the sit-to-stand transfers, and compute per-transition quantities
 
@@ -172,7 +185,11 @@ class Sit2Stand(_BaseProcess):
         time : ndarray
             (N, ) array of timestamps (in seconds since 1970-1-1 00:00:00)
         accel : ndarray
-            (N, 3) array of acceleration, with units of "g".
+            (N, 3) array of acceleration, with units of 'g'.
+        day_ends : dict, optional
+            Optional dictionary containing (N, 2) arrays of start and stop indices for invididual
+            days. Dictionary keys are in the format "{base}, {period}". If not provided, or the
+            key specified by `day_window` is not found, no day-based windowing will be done.
         """
         super().predict(time=time, accel=accel, **kwargs)
 
@@ -185,7 +202,12 @@ class Sit2Stand(_BaseProcess):
         sos = butter(self.lp_ord, 2 * self.lp_cut * dt, btype="low", output="sos")
 
         # check if windows exist for days
-        days = kwargs.get(self._days, [(0, accel.shape[0])])
+        days = kwargs.get(self._days, {}).get(self.day_key, None)
+        if days is None:
+            warn(
+                f"Day indices for {self.day_key} (base, period) not found. No day separation used"
+            )
+            days = [[0, accel.shape[0] - 1]]
 
         # results storage
         sts = {

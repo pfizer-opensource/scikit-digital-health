@@ -50,11 +50,16 @@ class _BaseProcess:
 
         self.logger = logging.getLogger(__name__)
 
+        # for plotting
+        self.f = self.ax = self.plot_fname = None
+
     def predict(self, *args, **kwargs):
         """
         Intended to be overwritten in the subclass. Should still be called with super though
         """
         self.logger.info(f"Entering {self._name} processing with call {self!r}")
+        # save the filename for saving reference
+        self._file_name = kwargs.get("file", "")
 
     def save_results(self, results, file_name):
         """
@@ -71,12 +76,24 @@ class _BaseProcess:
         -----
         Available format variables available:
 
-        - date: todays date expressed in yyyymmdd format
-        - name: process name
+        - date: todays date expressed in yyyymmdd format.
+        - name: process name.
+        - file: file name used in the pipeline, or "" if not found.
         """
         date = dt_date.today().strftime('%Y%m%d')
-        name = self._name
 
-        file_name = file_name.format(date=date, name=name)
+        file_name = file_name.format(date=date, name=self._name, file=self._file_name)
 
         DataFrame(results).to_csv(file_name, index=False)
+
+    def _setup_plotting(self, save_name):
+        """
+        Setup plotting. If this needs to be available to the end user, it should be aliased as
+        `setup_plotting` inside __init__
+
+        >>> class NewClass(_BaseProcess)
+        >>>     def __init__(self):
+        >>>         super().__init__()
+        >>>         self.setup_plotting = self._setup_plotting
+        """
+        pass

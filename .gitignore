@@ -3,6 +3,10 @@
 .idea/*
 .idea*
 
+# VSCode
+.vscode
+.vscode/*
+
 # other
 .DS_Store
 memprofiling/

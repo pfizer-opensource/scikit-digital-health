@@ -70,6 +70,8 @@ PyObject * dominant_frequency(PyObject *NPY_UNUSED(self), PyObject *args){
     if (fail){
         Py_XDECREF(data);
         Py_XDECREF(res);
+        // destroy the FFT plan created in the fortran module
+        destroy_plan();
         return NULL;
     }
     Py_XDECREF(data);
@@ -136,6 +138,8 @@ PyObject * dominant_frequency_value(PyObject *NPY_UNUSED(self), PyObject *args){
     if (fail){
         Py_XDECREF(data);
         Py_XDECREF(res);
+        // destroy the FFT plan created in the fortran module
+        destroy_plan();
         return NULL;
     }
     Py_XDECREF(data);
@@ -203,6 +207,8 @@ PyObject * power_spectral_sum(PyObject *NPY_UNUSED(self), PyObject *args){
     if (fail){
         Py_XDECREF(data);
         Py_XDECREF(res);
+        // destroy the FFT plan created in the fortran module
+        destroy_plan();
         return NULL;
     }
     Py_XDECREF(data);
@@ -270,6 +276,8 @@ PyObject * spectral_entropy(PyObject *NPY_UNUSED(self), PyObject *args){
     if (fail){
         Py_XDECREF(data);
         Py_XDECREF(res);
+        // destroy the FFT plan created in the fortran module
+        destroy_plan();
         return NULL;
     }
     Py_XDECREF(data);
@@ -337,6 +345,8 @@ PyObject * spectral_flatness(PyObject *NPY_UNUSED(self), PyObject *args){
     if (fail){
         Py_XDECREF(data);
         Py_XDECREF(res);
+        // destroy the FFT plan created in the fortran module
+        destroy_plan();
         return NULL;
     }
     Py_XDECREF(data);

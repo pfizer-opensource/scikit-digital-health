@@ -133,7 +133,8 @@ class ReadCWA(_BaseProcess):
             raise UnexpectedAxesError("Unexpected number of axes in the IMU data")
 
         results = {
-            self._time: ts
+            self._time: ts,
+            "file": file
         }
         if acc_axes is not None:
             results[self._acc] = imudata[:, acc_axes]
@@ -144,7 +145,7 @@ class ReadCWA(_BaseProcess):
 
         if self.window:
             day_starts, day_stops = get_window_start_stop(idx, ts.size)
-            results[self._days] = vstack((day_starts, day_stops)).T
+            results[self._days] = {f"{self.base}, {self.period}": vstack((day_starts, day_stops)).T}
 
         kwargs.update(results)
         if self._in_pipeline:

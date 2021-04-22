@@ -19,6 +19,7 @@ from skimu.pipeline import Pipeline
 from skimu import utility
 from skimu import read
 from skimu import preprocessing
+from skimu import sleep
 from skimu import activity
 from skimu import gait
 from skimu import sit2stand
@@ -26,13 +27,14 @@ from skimu import features
 
 __skimu_version__ = __version__
 __all__ = [
-    'Pipeline',
-    'activity',
-    'gait',
-    'sit2stand',
-    'read',
-    'preprocessing',
-    'features',
-    'utility',
-    '__skimu_version__'
+    "Pipeline",
+    "activity",
+    "gait",
+    "sit2stand",
+    "read",
+    "sleep",
+    "preprocessing",
+    "features",
+    "utility",
+    "__skimu_version__"
 ]

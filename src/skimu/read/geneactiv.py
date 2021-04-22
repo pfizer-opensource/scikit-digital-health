@@ -6,7 +6,7 @@ Pfizer DMTI 2020
 """
 from warnings import warn
 
-from numpy import vstack
+from numpy import vstack, asarray, int_
 
 from skimu.base import _BaseProcess
 from skimu.read.get_window_start_stop import get_window_start_stop
@@ -21,12 +21,14 @@ class ReadBin(_BaseProcess):
 
     Parameters
     ----------
-    base : {None, int}, optional
-        Base hour [0, 23] in which to start a window of time. Default is None, which will not
-        do any windowing. Both `base` and `period` must be defined in order to window.
-    period : {None, int}, optional
-        Period for each window, in [1, 24]. Defines the number of hours per window. Default is
-        None, which will do no windowing. Both `period` and `base` must be defined to window
+    bases : {None, int, list-like}, optional
+        Base hours [0, 23] in which to start a window of time. Default is None, which will not
+        do any windowing. Both `base` and `period` must be defined in order to window. Can use
+        multiple, but the number of `bases` must match the number of `periods`.
+    periods : {None, int, list-like}, optional
+        Periods for each window, in [1, 24]. Defines the number of hours per window. Default is
+        None, which will do no windowing. Both `period` and `base` must be defined to window. Can
+        use multiple but the number of `periods` must math the number of `bases`.
 
     Examples
     ========
@@ -38,32 +40,39 @@ class ReadBin(_BaseProcess):
 
     Setup a reader that does windowing between 8:00 AM and 8:00 PM (20:00):
 
-    >>> reader = ReadBin(base=8, period=12)  # 8 + 12 = 20
+    >>> reader = ReadBin(bases=8, periods=12)  # 8 + 12 = 20
     >>> reader.predict('example.bin')
     {'accel': ..., 'time': ..., 'day_ends': [130, 13951, ...]}
     """
 
-    def __init__(self, base=None, period=None):
+    def __init__(self, bases=None, periods=None):
         super().__init__(
             # kwargs
-            base=base,
-            period=period
+            bases=bases,
+            periods=periods
         )
 
-        if (base is None) and (period is None):
+        if (bases is None) and (periods is None):
             self.window = False
-            self.base = 0  # needs to be defined for passing to extensions
-            self.period = 12
-        elif (base is None) or (period is None):
+            self.bases = asarray([0])  # needs to be defined for passing to extensions
+            self.periods = asarray([12])
+        elif (bases is None) or (periods is None):
             warn("One of base or period is None, not windowing", UserWarning)
             self.window = False
-            self.base = 0
-            self.period = 12
+            self.bases = asarray([0])
+            self.periods = asarray([12])
         else:
-            if (0 <= base <= 23) and (1 <= period <= 24):
+            if isinstance(bases, int) and isinstance(periods, int):
+                bases = asarray([bases])
+                periods = asarray([periods])
+            else:
+                bases = asarray(bases, dtype=int_)
+                periods = asarray(periods, dtype=int_)
+
+            if ((0 <= bases) & (bases <= 23)).all() and ((1 <= periods) & (periods <= 24)).all():
                 self.window = True
-                self.base = base
-                self.period = period
+                self.bases = bases
+                self.periods = periods
             else:
                 raise ValueError("Base must be in [0, 23] and period must be in [1, 23]")
 
@@ -109,18 +118,24 @@ class ReadBin(_BaseProcess):
             warn("File extension is not expected '.bin'", UserWarning)
 
         # read the file
-        nmax, acc, time, light, temp, idx = read_bin(file, self.base, self.period)
+        nmax, fs, acc, time, light, temp, starts, stops = read_bin(file, self.bases, self.periods)
 
         results = {
             self._time: time,
             self._acc: acc,
             self._temp: temp,
-            'light': light
+            "light": light,
+            "fs": fs,
+            "file": file
         }
 
         if self.window:
-            day_starts, day_stops = get_window_start_stop(idx, time.size)
-            results[self._days] = vstack((day_starts, day_stops)).T
+            results[self._days] = {}
+            for i, data in enumerate(zip(self.bases, self.periods)):
+                strt = starts[stops[:, i] != 0, i]
+                stp = stops[stops[:, i] != 0, i]
+
+                results[self._days][f"{data[0], data[1]}"] = vstack((strt, stp)).T
 
         kwargs.update(results)
         if self._in_pipeline:
