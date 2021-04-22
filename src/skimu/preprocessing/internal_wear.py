@@ -54,6 +54,9 @@ class InternalDetectWear(_BaseProcess):
 
         wear = concatenate((starts, starts + lengths)).reshape((2, -1)).T * int(fs * 5)
 
+        # make sure it isn't longer than it can be
+        wear[wear > (time.size - 1)] = time.size - 1
+
         kwargs.update({self._time: time, self._acc: accel, "wear": wear, "fs": fs})
         if self._in_pipeline:
             return kwargs, None
