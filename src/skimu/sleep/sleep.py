@@ -240,7 +240,7 @@ class Sleep(_BaseProcess):
         # get the wear time from previous steps
         if wear is None:
             warn(f"[{self!s}] Wear detection not provided. Assuming 100% wear time.")
-            wear = array([[0, time.size]])
+            wear = array([[0, time.size - 1]])
 
         # downsample if necessary
         goal_fs = 20.
