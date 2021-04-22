@@ -6,6 +6,7 @@
 # other
 .DS_Store
 memprofiling/
+.vscode
 
 
 # Byte-compiled / optimized / DLL files
