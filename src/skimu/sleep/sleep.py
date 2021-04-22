@@ -155,7 +155,7 @@ class Sleep(_BaseProcess):
         if day_window is None:
             self.day_key = (-1, -1)
         else:
-            self.day_key = day_window
+            self.day_key = tuple(day_window)
 
         # enable plotting as a public method
         self.setup_plotting = self._setup_plotting
