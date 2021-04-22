@@ -245,7 +245,7 @@ class Sleep(_BaseProcess):
         super().predict(time=time, accel=accel, fs=fs, wear=wear, **kwargs)
 
         if fs is None:
-            fs = mean(diff(time[:5000]))
+            fs = 1 / mean(diff(time[:5000]))
 
         # get the individual days
         days = kwargs.get(self._days, {}).get(self.day_key, None)
