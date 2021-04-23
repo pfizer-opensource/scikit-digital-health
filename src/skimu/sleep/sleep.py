@@ -95,10 +95,12 @@ class Sleep(_BaseProcess):
         Downsample to 20Hz. Default is True.
     internal_wear_temp_thresh : float, optional
         Internal wear calculation temperature threshold in celsius. Internal wear detection is
-        performed if no wear is provided, and temperature values exist. Default is 25.0 C.
+        performed if no wear is provided, and temperature values exist. Default is 25.0 C. Can
+        be disabled by setting to 0.0
     internal_wear_move_thresh : float, optional
         Internal wear calculation movement threshold in g. Internal wear detection is performed if
-        no wear is provided, and temperature values are provided. Default is 0.001 g.
+        no wear is provided, and temperature values are provided. Default is 0.001 g. Can be
+        disabled by setting to 0.0
     day_window : array-like
         Two (2) element array-like of the base and period of the window to use for determining
         days. Default is (12, 24), which will look for days starting at 12 noon and lasting 24
@@ -307,10 +309,8 @@ class Sleep(_BaseProcess):
 
         # get the wear time from previous steps
         if wear is None:
-            if temperature is None:
-                warn(f"[{self!s}] Wear detection not provided. Assuming 100% wear time.")
-                wear = array([[0, time.size - 1]])
-            # else: will use internal wear calculation
+            warn(f"[{self!s}] External wear detection not provided. Assuming 100% wear time.")
+            wear = array([[0, time.size - 1]])
 
         # downsample if necessary
         goal_fs = 20.
@@ -363,12 +363,8 @@ class Sleep(_BaseProcess):
             self._plot_accel(goal_fs, accel_ds[start:stop])
 
             # get the starts and stops of wear during the day
-            if wear_ds is not None:
-                dw_starts, dw_stops = get_day_wear_intersection(
-                    wear_ds[:, 0], wear_ds[:, 1], start, stop)
-            else:
-                dw_starts = array([start])
-                dw_stops = array([stop])
+            dw_starts, dw_stops = get_day_wear_intersection(
+                wear_ds[:, 0], wear_ds[:, 1], start, stop)
 
             if (sum(dw_stops - dw_starts) / (3600 * goal_fs)) < self.min_wear_time:
                 self.logger.info(
@@ -382,12 +378,15 @@ class Sleep(_BaseProcess):
                 goal_fs,
                 time_ds[start:stop],
                 accel_ds[start:stop],
+                temp_ds[start:stop] if temp_ds is not None else None,
                 dw_starts,
                 dw_stops,
                 self.min_rest_block,
                 self.max_act_break,
                 self.min_angle,
                 self.max_angle,
+                self.int_w_temp,
+                self.int_w_move,
                 self._plot_arm_angle,
                 idx_start=start
             )
