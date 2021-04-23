@@ -60,7 +60,8 @@ class _BaseProcess:
         """
         self.logger.info(f"Entering {self._name} processing with call {self!r}")
         # save the filename for saving reference
-        self._file_name = Path(kwargs.get("file", "")).stem
+        fname = kwargs.get("file", "")
+        self._file_name = Path(fname if fname is not None else "").stem
 
     def save_results(self, results, file_name):
         """
