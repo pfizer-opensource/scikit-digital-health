@@ -10,12 +10,14 @@ class TestDetectTSO:
 
         # calculate tso
         tso = get_total_sleep_opportunity(
-            20., time, acc,
+            20., time, acc, temp,
             np.array([0]), np.array([time.size]),
             min_rest_block=30,
             max_act_break=60,
             min_angle_thresh=0.1,
             max_angle_thresh=1.0,
+            int_wear_temp=25.0,
+            int_wear_move=0.001,
             plot_fn=lambda x: None,
             idx_start=0
         )
