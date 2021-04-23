@@ -4,15 +4,15 @@ Function for the detection of sleep boundaries, here defined as the total sleep 
 Yiorgos Christakis
 Pfizer DMTI 2021
 """
-from numpy import pad, min, max, percentile, zeros, bool_
+from numpy import min, max, percentile, zeros, bool_, pad
 
-from skimu.utility import moving_mean, moving_median
+from skimu.utility import moving_mean, moving_median, moving_sd
 from skimu.sleep.utility import *
 
 
 def get_total_sleep_opportunity(
-        fs, time, accel, wear_starts, wear_stops, min_rest_block, max_act_break,
-        min_angle_thresh, max_angle_thresh, plot_fn, idx_start=0
+        fs, time, accel, temperature, wear_starts, wear_stops, min_rest_block, max_act_break,
+        min_angle_thresh, max_angle_thresh, int_wear_temp, int_wear_move, plot_fn, idx_start=0
 ):
     """
     Compute the period of time in which sleep can occur for a given days worth of data. For this
@@ -26,14 +26,18 @@ def get_total_sleep_opportunity(
         Timestamps for the acceleration.
     accel : numpy.ndarray
         (N, 3) array of acceleration values in g.
-    wear_starts : numpy.ndarray
+    temperature : numpy.ndarray
+        (N, 3) array of temperature values in celsius.
+    wear_starts : {numpy.ndarray, None}
         Indices for the starts of wear-time. Note that while `time` and `accel` should be the values
         for one day, `wear_starts` is likely indexed to the whole data series. This offset can
         be adjusted by `idx_start`. If indexing only into the one day, `idx_start` should be 0.
-    wear_stops : numpy.ndarray
+        If None, will compute wear internally.
+    wear_stops : {numpy.ndarray, None}
         Indices for the stops of wear-time. Note that while `time` and `accel` should be the values
         for one day, `wear_stops` is likely indexed to the whole data series. This offset can
         be adjusted by `idx_start`. If indexing only into the one day, `idx_start` should be 0.
+        If None, will compute wear internally.
     min_rest_block : int
         Minimum number of minutes that a rest period can be
     max_act_break : int
@@ -43,6 +47,10 @@ def get_total_sleep_opportunity(
         Minimum angle threshold used to compute the TSO threshold.
     max_angle_thresh : float
         Maximum angle threshold used to compute the TSO threshold.
+    int_wear_temp : float
+        Internal wear temperature threshold in celsius.
+    int_wear_move : float
+        Internal wear movement threshold in g.
     plot_fn : function
         Plotting function for the arm angle.
     idx_start : int, optional
@@ -82,11 +90,33 @@ def get_total_sleep_opportunity(
     # compute the TSO threshold
     tso_thresh = compute_tso_threshold(dz_rm_rmd, min_td=min_angle_thresh, max_td=max_angle_thresh)
 
-    # create the TSO mask (1 -> sleep opportunity, only happends during wear)
+    # create the TSO mask (1 -> sleep opportunity, only happens during wear)
     tso = zeros(dz_rm_rmd.size, dtype=bool_)
-    # block off nonwear times, scale by 5s blocks
+    # block off external non-wear times, scale by 5s blocks
     for strt, stp in zip((wear_starts - idx_start) / n5, (wear_stops - idx_start) / n5):
         tso[int(strt):int(stp)] = True
+
+    # check if we can compute wear internally
+    if temperature is not None and int_wear_temp > 0.0:
+        t_rmed_5s = moving_median(temperature, n5, 1, pad=False)
+        t_rmean_5s = moving_mean(t_rmed_5s, n5, n5)
+        t_rmed_60s = moving_median(t_rmean_5s, 60, 1, pad=False)  # 5 min rolling median
+
+        temp_nonwear = t_rmed_60s < int_wear_temp
+
+        tso[temp_nonwear] = False  # non-wear -> not a TSO opportunity
+
+    if int_wear_move > 0.0:
+        acc_rmean_5s = moving_mean(acc_rmd, n5, n5, axis=0)
+        acc_rsd_30m = moving_sd(acc_rmean_5s, 360, 1, axis=0, return_previous=False)
+
+        move_nonwear = pad(
+            (acc_rsd_30m < int_wear_move).any(axis=1),
+            pad_width=(150, 150),
+            constant_values=False
+        )
+
+        tso[move_nonwear] = False
 
     # apply the threshold
     tso &= dz_rm_rmd < tso_thresh  # now only blocks where there is no movement, and wear are left

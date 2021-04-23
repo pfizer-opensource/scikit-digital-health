@@ -251,6 +251,8 @@ class Detector:
 
             # INTEGRATE between the determined indices
             if (end_still < prev_int_start) or (start_still > prev_int_end):
+                # original subtracted gravity, however given how this is integrated this makes no
+                # difference to the end result
                 v_vel, v_pos = self._integrate(v_acc[end_still:start_still], dt, still_at_end)
 
                 # save integration region limits -- avoid extra processing if possible

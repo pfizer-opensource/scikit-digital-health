@@ -6,6 +6,7 @@ Pfizer DMTI 2020
 """
 from datetime import date as dt_date
 import logging
+from pathlib import Path
 
 from pandas import DataFrame
 
@@ -59,7 +60,7 @@ class _BaseProcess:
         """
         self.logger.info(f"Entering {self._name} processing with call {self!r}")
         # save the filename for saving reference
-        self._file_name = kwargs.get("file", "")
+        self._file_name = Path(kwargs.get("file", "")).stem
 
     def save_results(self, results, file_name):
         """

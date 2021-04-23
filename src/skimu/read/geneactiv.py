@@ -135,7 +135,7 @@ class ReadBin(_BaseProcess):
                 strt = starts[stops[:, i] != 0, i]
                 stp = stops[stops[:, i] != 0, i]
 
-                results[self._days][f"{data[0], data[1]}"] = vstack((strt, stp)).T
+                results[self._days][(data[0], data[1])] = vstack((strt, stp)).T
 
         kwargs.update(results)
         if self._in_pipeline:

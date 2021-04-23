@@ -34,12 +34,6 @@ class TestSleep:
         p = Pipeline()
         p.add(ReadBin(bases=[12], periods=[24]))
         p.add(
-            InternalDetectWear(
-                temp_thresh=25.0,
-                move_nonwear_thresh=0.0010
-            )
-        )
-        p.add(
             slp,
             save_results=True,
             save_name="sleep_results.csv"

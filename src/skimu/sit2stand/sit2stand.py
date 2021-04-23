@@ -170,9 +170,9 @@ class Sit2Stand(_BaseProcess):
         )
 
         if day_window is None:
-            self.day_key = "-1, -1"
+            self.day_key = (-1, -1)
         else:
-            self.day_key = f"{day_window[0]}, {day_window[1]}"
+            self.day_key = tuple(day_window)
 
     def predict(self, time=None, accel=None, **kwargs):
         """
@@ -271,7 +271,7 @@ class Sit2Stand(_BaseProcess):
         partial = array(sts["Partial"])
 
         for k in [i for i in sts if i != "Partial"]:
-            sts[k] = array(sts[k])[~partial]
+            sts[k] = array(sts[k])[~partial] if partial != array([]) else array([])
 
         sts.pop("Partial")
 
