@@ -275,7 +275,7 @@ class Sleep(_BaseProcess):
 
     def predict(self, time=None, accel=None, *, temperature=None, fs=None, wear=None, **kwargs):
         """
-        predict(time, accel, *, temp=None, fs=None, day_ends={})
+        predict(time, accel, *, temperature=None, fs=None, wear=None, day_ends={})
 
         Generate the sleep boundaries and endpoints for a time series signal.
 
@@ -297,7 +297,7 @@ class Sleep(_BaseProcess):
             Dictionary containing (N, 2) arrays of start and stop indices for individual days.
             Must have the key
         """
-        super().predict(time=time, accel=accel, fs=fs, wear=wear, **kwargs)
+        super().predict(time=time, accel=accel, temperature=temperature, fs=fs, wear=wear, **kwargs)
 
         if fs is None:
             fs = 1 / mean(diff(time[:5000]))
