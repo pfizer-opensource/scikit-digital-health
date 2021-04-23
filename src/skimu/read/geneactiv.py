@@ -108,14 +108,14 @@ class ReadBin(_BaseProcess):
         - `temperature`: temperature [deg C]
         - `day_ends`: window indices
         """
-        super().predict(file=file, **kwargs)
-
         if file is None:
             raise ValueError("file must not be None")
         if not isinstance(file, str):
             file = str(file)
         if file[-3:] != "bin":
             warn("File extension is not expected '.bin'", UserWarning)
+
+        super().predict(file=file, **kwargs)
 
         # read the file
         nmax, fs, acc, time, light, temp, starts, stops = read_bin(file, self.bases, self.periods)

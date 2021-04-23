@@ -99,14 +99,14 @@ class ReadGT3X(_BaseProcess):
         - `lux`: light readings. Note that this will not be returned if the data is not valid
         - `day_ends`: window indices
         """
-        super().predict(file=file, **kwargs)
-
         if file is None:
             raise ValueError("file must not be None")
         if not isinstance(file, str):
             file = str(file)
         if file[-4:] != "gt3x":
             warn("File extension is not expected '.gt3x'", UserWarning)
+
+        super().predict(file=file, **kwargs)
 
         time, accel, lux, index, N = read_gt3x(file, self.base, self.period)
 
