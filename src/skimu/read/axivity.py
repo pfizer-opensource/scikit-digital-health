@@ -106,14 +106,14 @@ class ReadCWA(_BaseProcess):
         - `time`: timestamps [s]
         - `day_ends`: window indices
         """
-        super().predict(file=file, **kwargs)
-
         if file is None:
             raise ValueError("file must not be None")
         if not isinstance(file, str):
             file = str(file)
         if file[-3:] != "cwa":
             warn("File extension is not expected '.cwa'", UserWarning)
+
+        super().predict(file=file, **kwargs)
 
         # read the file
         meta, imudata, ts, idx, light = read_cwa(file, self.base, self.period)
