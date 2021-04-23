@@ -87,7 +87,7 @@ def apply_downsample(goal_fs, time, data=(), indices=()):
 
     for dat in data:
         if dat is None:
-            data_ds += (zeros(time_ds.size, dtype=float_))
+            data_ds += (None,)
         elif dat.ndim == 1:
             data_ds += (interp(time_ds, time, dat))
         elif dat.ndim == 2:
@@ -100,7 +100,9 @@ def apply_downsample(goal_fs, time, data=(), indices=()):
     # downsampling indices
     indices_ds = ()
     for idx in indices:
-        if idx.ndim == 1:
+        if idx is None:
+            indices_ds += (None,)
+        elif idx.ndim == 1:
             indices_ds += (
                 around(
                     interp(time[idx], time_ds, arange(time_ds.size))
