@@ -25,6 +25,44 @@ from skimu.sleep.sleep_classification import compute_sleep_predictions
 from skimu.sleep.endpoints import *
 
 
+def _get_date(epoch_ts, day_start_hour):
+    """
+    Compute the actual day start. Deals with the start days where the day may not start at the day
+    windowing time.
+
+    Parameters
+    ----------
+    epoch_ts : float
+        Epoch timestamp in seconds.
+    day_start_hour : int
+        The hour of the start of a day window
+
+    Returns
+    -------
+    start_datetime : datetime.datetime
+        Datetime of the start of the data.
+    day_str : str
+        Formatted YYYY-MM-DD string of the start of the day for that window.
+
+    Notes
+    -----
+    This function works such that if the day window starts at 12:00, and the recording starts at
+    10:00, the day returned will be the day *before*, as this would correspond to when the window
+    would have started provided the data. This matches the dates schema for the rest of the data.
+    """
+    # add 15 seconds to make sure any rounding effects for the hour dont adversely effect the result
+    # of the comparison
+    start_dt = datetime.utcfromtimestamp(epoch_ts + 15)
+
+    if start_dt.hour < day_start_hour:
+        day_str = (start_dt - timedelta(days=1)).strftime("%Y-%m-%d")
+    else:
+        day_str = start_dt.strftime("%Y-%m-%d")
+
+    # make sure to remove the 15s from the returned start datetime
+    return start_dt - timedelta(seconds=15), day_str
+
+
 class Sleep(_BaseProcess):
     """
     Process raw accelerometer data from the wrist to determine various sleep metrics and endpoints.
@@ -55,6 +93,12 @@ class Sleep(_BaseProcess):
         Minimum number of hours required to consider a day useable. Default is 6 hours.
     downsample : bool, optional
         Downsample to 20Hz. Default is True.
+    internal_wear_temp_thresh : float, optional
+        Internal wear calculation temperature threshold in celsius. Internal wear detection is
+        performed if no wear is provided, and temperature values exist. Default is 25.0 C.
+    internal_wear_move_thresh : float, optional
+        Internal wear calculation movement threshold in g. Internal wear detection is performed if
+        no wear is provided, and temperature values are provided. Default is 0.001 g.
     day_window : array-like
         Two (2) element array-like of the base and period of the window to use for determining
         days. Default is (12, 24), which will look for days starting at 12 noon and lasting 24
@@ -120,6 +164,8 @@ class Sleep(_BaseProcess):
             min_wear_time=0,
             min_day_hours=6,
             downsample=True,
+            internal_wear_temp_thresh=25.0,
+            internal_wear_move_thresh=0.001,
             day_window=(12, 24)
     ):
         super().__init__(
@@ -135,6 +181,8 @@ class Sleep(_BaseProcess):
             min_wear_time=min_wear_time,
             min_day_hours=min_day_hours,
             downsample=downsample,
+            internal_wear_temp_thresh=internal_wear_temp_thresh,
+            internal_wear_move_thresh=internal_wear_move_thresh,
             day_window=day_window
         )
 
@@ -152,6 +200,8 @@ class Sleep(_BaseProcess):
         self.min_wear_time = min_wear_time
         self.min_day_hrs = min_day_hours
         self.downsample = downsample
+        self.int_w_temp = internal_wear_temp_thresh
+        self.int_w_move = internal_wear_move_thresh
 
         if day_window is None:
             self.day_key = (-1, -1)
@@ -221,7 +271,7 @@ class Sleep(_BaseProcess):
             else:
                 raise ValueError(f"Metric {metrics!r} is not a `SleepMetric`.")
 
-    def predict(self, time=None, accel=None, *, fs=None, wear=None, **kwargs):
+    def predict(self, time=None, accel=None, *, temperature=None, fs=None, wear=None, **kwargs):
         """
         predict(time, accel, *, temp=None, fs=None, day_ends={})
 
@@ -233,6 +283,9 @@ class Sleep(_BaseProcess):
             (N, ) array of unix timestamps, in seconds
         accel : numpy.ndarray
             (N, 3) array of acceleration, in units of 'g'
+        temperature : numpy.ndarray, optional
+            (N, ) array of temperature values, in celsius. Will be used for internal wear
+            calculation if `wear` is not provided.
         fs : float, optional
             Sampling frequency in Hz for the acceleration and temperature values. If None,
             will be inferred from the timestamps
@@ -254,20 +307,23 @@ class Sleep(_BaseProcess):
 
         # get the wear time from previous steps
         if wear is None:
-            warn(f"[{self!s}] Wear detection not provided. Assuming 100% wear time.")
-            wear = array([[0, time.size - 1]])
+            if temperature is None:
+                warn(f"[{self!s}] Wear detection not provided. Assuming 100% wear time.")
+                wear = array([[0, time.size - 1]])
+            # else: will use internal wear calculation
 
         # downsample if necessary
         goal_fs = 20.
         if fs != goal_fs and self.downsample:
-            time_ds, (accel_ds,), (days_ds, wear_ds) = apply_downsample(
-                goal_fs, time, data=(accel,), indices=(days, wear)
+            time_ds, (accel_ds, temp_ds), (days_ds, wear_ds) = apply_downsample(
+                goal_fs, time, data=(accel, temperature), indices=(days, wear)
             )
 
         else:
             goal_fs = fs
             time_ds = time
             accel_ds = accel
+            temp_ds = temperature
             days_ds = days
             wear_ds = wear
 
@@ -289,7 +345,7 @@ class Sleep(_BaseProcess):
             start, stop = day_idx
 
             if ((stop - start) / (3600 * goal_fs)) < self.min_day_hrs:
-                self.logger.info(f"Day {iday} has less than {self.min_day_hrs}. Skipping")
+                self.logger.info(f"Day {iday} has less than {self.min_day_hrs} hours. Skipping")
                 continue
 
             # initialize all the sleep values for the day
@@ -299,11 +355,7 @@ class Sleep(_BaseProcess):
             sleep["Day N"][-1] = iday + 1
 
             # get the start timestamp and make sure its in the correct hour due to indexing
-            start_datetime = datetime.utcfromtimestamp(time_ds[start + 50])
-            if start_datetime.hour == self.day_key[0]:
-                sleep["Date"][-1] = start_datetime.strftime("%Y-%m-%d")
-            else:
-                sleep["Date"][-1] = (start_datetime - timedelta(days=1)).strftime("%Y-%m-%d")
+            start_datetime, sleep["Date"][-1] = _get_date(time_ds[start], self.day_key[0])
 
             # plotting
             source_f = kwargs.get("file", self.plot_fname)
@@ -311,12 +363,18 @@ class Sleep(_BaseProcess):
             self._plot_accel(goal_fs, accel_ds[start:stop])
 
             # get the starts and stops of wear during the day
-            dw_starts, dw_stops = get_day_wear_intersection(
-                wear_ds[:, 0], wear_ds[:, 1], start, stop)
+            if wear_ds is not None:
+                dw_starts, dw_stops = get_day_wear_intersection(
+                    wear_ds[:, 0], wear_ds[:, 1], start, stop)
+            else:
+                dw_starts = array([start])
+                dw_stops = array([stop])
 
             if (sum(dw_stops - dw_starts) / (3600 * goal_fs)) < self.min_wear_time:
                 self.logger.info(
-                    f"Day {iday} has less than {self.min_wear_time} wear hours. Skipping")
+                    f"Day {iday} has less than {self.min_wear_time} externally calculated wear "
+                    f"hours. Skipping"
+                )
                 continue
 
             # start time, end time, start index, end index
