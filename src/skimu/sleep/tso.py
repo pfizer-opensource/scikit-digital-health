@@ -4,7 +4,7 @@ Function for the detection of sleep boundaries, here defined as the total sleep 
 Yiorgos Christakis
 Pfizer DMTI 2021
 """
-from numpy import min, max, percentile, zeros, bool_, floor
+from numpy import min, max, percentile, zeros, bool_, pad
 
 from skimu.utility import moving_mean, moving_median, moving_sd
 from skimu.sleep.utility import *
@@ -98,22 +98,25 @@ def get_total_sleep_opportunity(
 
     # check if we can compute wear internally
     if temperature is not None and int_wear_temp > 0.0:
-        shift = int(floor(n5 / 2))
         t_rmed_5s = moving_median(temperature, n5, 1, pad=False)
         t_rmean_5s = moving_mean(t_rmed_5s, n5, n5)
         t_rmed_60s = moving_median(t_rmean_5s, 60, 1, pad=False)  # 5 min rolling median
 
         temp_nonwear = t_rmed_60s < int_wear_temp
 
-        # tso[temp_nonwear] = True
+        tso[temp_nonwear] = False  # non-wear -> not a TSO opportunity
 
     if int_wear_move > 0.0:
         acc_rmean_5s = moving_mean(acc_rmd, n5, n5, axis=0)
         acc_rsd_30m = moving_sd(acc_rmean_5s, 360, 1, axis=0, return_previous=False)
 
-        move_nonwear = (acc_rsd_30m < int_wear_move).any(axis=1)
+        move_nonwear = pad(
+            (acc_rsd_30m < int_wear_move).any(axis=1),
+            pad_width=(150, 150),
+            constant_values=False
+        )
 
-        # tso[move_nonwear] = True
+        tso[move_nonwear] = False
 
     # apply the threshold
     tso &= dz_rm_rmd < tso_thresh  # now only blocks where there is no movement, and wear are left
