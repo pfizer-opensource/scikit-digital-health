@@ -89,7 +89,7 @@ def apply_downsample(goal_fs, time, data=(), indices=()):
         if dat is None:
             data_ds += (None,)
         elif dat.ndim == 1:
-            data_ds += (interp(time_ds, time, dat))
+            data_ds += (interp(time_ds, time, dat),)
         elif dat.ndim == 2:
             data_ds += (zeros((time_ds.size, dat.shape[1]), dtype=float_),)
             for i in range(dat.shape[1]):
