@@ -6,7 +6,6 @@ Pfizer DMTI 2019-2021
 """
 from skimu import Pipeline
 from skimu.read import ReadBin
-from skimu.preprocessing.internal_wear import InternalDetectWear
 from skimu.sleep import Sleep
 
 
