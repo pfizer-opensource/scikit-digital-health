@@ -122,6 +122,7 @@ def get_total_sleep_opportunity(
     tso &= dz_rm_rmd < tso_thresh  # now only blocks where there is no movement, and wear are left
 
     # drop rest blocks less than minimum allowed rest length
+    # even though rolling 5min, the underlying windows are 5s, so 12 * minutes => number of samples
     tso = drop_min_blocks(tso, 12 * min_rest_block, drop_value=1, replace_value=0)
     # drop active blocks less than maximum allowed active length
     tso = drop_min_blocks(tso, 12 * max_act_break, drop_value=0, replace_value=1)
