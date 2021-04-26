@@ -100,9 +100,9 @@ def get_total_sleep_opportunity(
     if temperature is not None and int_wear_temp > 0.0:
         t_rmed_5s = moving_median(temperature, n5, 1, pad=False)
         t_rmean_5s = moving_mean(t_rmed_5s, n5, n5)
-        t_rmed_60s = moving_median(t_rmean_5s, 60, 1, pad=False)  # 5 min rolling median
+        t_rmed_5m = moving_median(t_rmean_5s, 60, 1, pad=False)  # 5 min rolling median
 
-        temp_nonwear = t_rmed_60s < int_wear_temp
+        temp_nonwear = t_rmed_5m < int_wear_temp
 
         tso[temp_nonwear] = False  # non-wear -> not a TSO opportunity
 
