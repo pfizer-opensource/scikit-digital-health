@@ -128,12 +128,7 @@ int get_timestamps(long *Nps, char time[40], Info_t *info, Data_t *data, Window_
 {
     struct tm tm0;
     double t0;
-    double base_sec;  /* base time converted to seconds */
-    double period_sec;  /* period time + base time converted to seconds */
-    double curr_sec;  /* block time since start of day */
-    double tmp = -1.f, tmp2 = -1.f, _dt = -1.f;  /* for indexing */
     long hour, min, sec, msec;  /* time values needed multiple times */
-    long ltmp;
 
     /* time */
     hour = DATETIME_HOUR(time);
