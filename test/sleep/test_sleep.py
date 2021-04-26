@@ -13,6 +13,7 @@ class TestSleep:
     def test(self):
         file = "/Users/lukasadamowicz/Documents/Packages/sleeppy/sleeppy/test/test_data/demo.bin"
         # file = "/Users/lukasadamowicz/Downloads/STEPP_QC/0074_GNACTV_LeftWrist.bin"
+        file = "/Users/lukasadamowicz/Downloads/SQUAD_acc_0000_nonsensitive_20200101_100706184018_left_2.bin"
 
         slp = Sleep(
             start_buffer=0,

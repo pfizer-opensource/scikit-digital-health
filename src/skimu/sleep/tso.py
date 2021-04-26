@@ -123,9 +123,9 @@ def get_total_sleep_opportunity(
 
     # drop rest blocks less than minimum allowed rest length
     # even though rolling 5min, the underlying windows are 5s, so 12 * minutes => number of samples
-    tso = drop_min_blocks(tso, 12 * min_rest_block, drop_value=1, replace_value=0)
+    tso = drop_min_blocks(tso, 12 * min_rest_block, drop_value=1, replace_value=0, skip_bounds=True)
     # drop active blocks less than maximum allowed active length
-    tso = drop_min_blocks(tso, 12 * max_act_break, drop_value=0, replace_value=1)
+    tso = drop_min_blocks(tso, 12 * max_act_break, drop_value=0, replace_value=1, skip_bounds=True)
 
     # get the indices of the longest bout
     arg_start, arg_end = arg_longest_bout(tso, 1)
