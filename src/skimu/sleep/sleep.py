@@ -73,6 +73,14 @@ class Sleep(_BaseProcess):
         Number of seconds to ignore at the beginning of a recording. Default is 0 seconds.
     stop_buffer : int, optional
         Number of seconds to ignore at the end of a recording. Default is 0 seconds.
+    internal_wear_temp_thresh : float, optional
+        Internal wear calculation temperature threshold in celsius. Internal wear detection is
+        performed if no wear is provided, and temperature values exist. Default is 25.0 C. Can
+        be disabled by setting to 0.0
+    internal_wear_move_thresh : float, optional
+        Internal wear calculation movement threshold in g. Internal wear detection is performed if
+        no wear is provided, and temperature values are provided. Default is 0.001 g. Can be
+        disabled by setting to 0.0
     min_rest_block : int, optional
         Number of minutes required to consider a rest period valid. Default is 30 minutes.
     max_activity_break : int, optional
@@ -93,14 +101,6 @@ class Sleep(_BaseProcess):
         Minimum number of hours required to consider a day useable. Default is 6 hours.
     downsample : bool, optional
         Downsample to 20Hz. Default is True.
-    internal_wear_temp_thresh : float, optional
-        Internal wear calculation temperature threshold in celsius. Internal wear detection is
-        performed if no wear is provided, and temperature values exist. Default is 25.0 C. Can
-        be disabled by setting to 0.0
-    internal_wear_move_thresh : float, optional
-        Internal wear calculation movement threshold in g. Internal wear detection is performed if
-        no wear is provided, and temperature values are provided. Default is 0.001 g. Can be
-        disabled by setting to 0.0
     day_window : array-like
         Two (2) element array-like of the base and period of the window to use for determining
         days. Default is (12, 24), which will look for days starting at 12 noon and lasting 24
@@ -157,6 +157,8 @@ class Sleep(_BaseProcess):
             self,
             start_buffer=0,
             stop_buffer=0,
+            internal_wear_temp_thresh=25.0,
+            internal_wear_move_thresh=0.001,
             min_rest_block=30,
             max_activity_break=60,
             min_angle_thresh=0.1,
@@ -166,14 +168,13 @@ class Sleep(_BaseProcess):
             min_wear_time=0,
             min_day_hours=6,
             downsample=True,
-            internal_wear_temp_thresh=25.0,
-            internal_wear_move_thresh=0.001,
             day_window=(12, 24)
     ):
         super().__init__(
             start_buffer=start_buffer,
             stop_buffer=stop_buffer,
-            # temperature_threshold=temperature_threshold,
+            internal_wear_temp_thresh=internal_wear_temp_thresh,
+            internal_wear_move_thresh=internal_wear_move_thresh,
             min_rest_block=min_rest_block,
             max_activity_break=max_activity_break,
             min_angle_thresh=min_angle_thresh,
@@ -183,8 +184,6 @@ class Sleep(_BaseProcess):
             min_wear_time=min_wear_time,
             min_day_hours=min_day_hours,
             downsample=downsample,
-            internal_wear_temp_thresh=internal_wear_temp_thresh,
-            internal_wear_move_thresh=internal_wear_move_thresh,
             day_window=day_window
         )
 
@@ -192,7 +191,8 @@ class Sleep(_BaseProcess):
         self.hp_cut = 0.25
         self.start_buff = start_buffer
         self.stop_buff = stop_buffer
-        # self.nw_temp = temperature_threshold
+        self.int_w_temp = internal_wear_temp_thresh
+        self.int_w_move = internal_wear_move_thresh
         self.min_rest_block = min_rest_block
         self.max_act_break = max_activity_break
         self.min_angle = min_angle_thresh
@@ -202,8 +202,6 @@ class Sleep(_BaseProcess):
         self.min_wear_time = min_wear_time
         self.min_day_hrs = min_day_hours
         self.downsample = downsample
-        self.int_w_temp = internal_wear_temp_thresh
-        self.int_w_move = internal_wear_move_thresh
 
         if day_window is None:
             self.day_key = (-1, -1)
