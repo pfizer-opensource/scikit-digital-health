@@ -164,6 +164,7 @@ int read_block(FILE *fp, Window_t *w_info, Info_t *info, Data_t *data)
     char buff[255], data_str[3610], p[4], time[40];
     long N = 0, Nps = 0, t_ = 0;
     double fs, temp;
+    int ier = READ_E_NONE;
 
     /* skip first 2 lines */
     READLINE; READLINE;
@@ -187,17 +188,13 @@ int read_block(FILE *fp, Window_t *w_info, Info_t *info, Data_t *data)
     fs = strtod(&buff[22], NULL);
     if ((fs != info->fs) && (info->fs_err < 1)){
         /* set a warning */
-        char warn_str[120];
         sprintf(warn_str, "Block (%li) fs [%.2f] is not the same as header fs [%.2f]. Setting fs to block fs.", N, fs, info->fs);
-        int err_ret = PyErr_WarnEx(PyExc_RuntimeWarning, warn_str, 1);
 
         info->fs_err ++;  /* increment the error counter, this error should only happen once */
         /* set the sampling frequency to that of the block */
         info->fs = fs;
 
-        /* if warnings are being caught as exceptions */
-        if (err_ret == -1)
-            return READ_E_BLOCK_FS;
+        ier = READ_E_BLOCK_FS_WARN;  /* set so that the warning message can be printed after function */
     } else if ((fs != info->fs) && (info->fs_err >= 1))
         return READ_E_BLOCK_FS;
 
@@ -228,5 +225,5 @@ int read_block(FILE *fp, Window_t *w_info, Info_t *info, Data_t *data)
 
     get_timestamps(&Nps, time, info, data, w_info);
 
-    return READ_E_NONE;
+    return ier;
 }

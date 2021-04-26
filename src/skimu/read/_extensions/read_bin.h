@@ -26,6 +26,7 @@ typedef enum {
     READ_E_NONE,  /* no error return value */
     READ_E_BLOCK_TIMESTAMP,  /* issue reading timestamp from block */
     READ_E_BLOCK_FS,  /* block FS does not match header fs */
+    READ_E_BLOCK_FS_WARN,
     READ_E_BLOCK_DATA,  /* error reading block data */
     READ_E_BLOCK_DATA_LEN  /* data is less than 3600 characters */
 } Read_Bin_Error_t;
@@ -63,3 +64,5 @@ typedef struct {
 int read_header(FILE *fp, Info_t *info);
 int read_block(FILE *fp, Window_t *w_info, Info_t *info, Data_t *data);
 int read_block2(FILE *fp, Window_t *winfo, Info_t *info, Data_t *data);
+
+char warn_str[120];

@@ -154,7 +154,17 @@ static PyObject *read_bin(PyObject *NPY_UNUSED(self), PyObject *args)
     {
         ierr = read_block(fp, &winfo, &info, &data);
 
-        if (ierr != READ_E_NONE)
+        if (ierr == READ_E_BLOCK_FS_WARN)
+        {
+            int err_ret = PyErr_WarnEx(PyExc_RuntimeWarning, warn_str, 1);
+
+            if (err_ret == -1)  /* warnings are being raised as exceptions */
+            {
+                fail = 1;
+                break;
+            }
+        }
+        else if (ierr != READ_E_NONE)
         {
             fail = 1;
             break;
