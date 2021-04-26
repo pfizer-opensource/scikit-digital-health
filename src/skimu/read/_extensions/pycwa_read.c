@@ -1,25 +1,11 @@
 #define PY_SSIZE_T_CLEAN
 #include "Python.h"
 #include "numpy/arrayobject.h"
+#include "cwa_read.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-typedef struct {
-    long base;
-    long period;
-    long deviceID;
-    long sessionID;
-    int nblocks;
-    int8_t axes;
-    int16_t count;
-    double tLast;
-    int N;
-    double frequency;
-} FileInfo_t;
-
-extern void fread_cwa(long *, char[], FileInfo_t *, double *, double *, long *, long *);
 
 
 PyObject * read_cwa(PyObject *NPY_UNUSED(self), PyObject *args){
@@ -29,6 +15,7 @@ PyObject * read_cwa(PyObject *NPY_UNUSED(self), PyObject *args){
     char annotation_block[960];
     Py_ssize_t flen;
     FileInfo_t info;
+    Window_t winfo;
     PyObject *bases_, *periods_;
 
     if (!PyArg_ParseTuple(args, "O&ll:read_cwa", PyUnicode_FSConverter, &bytes, &bases, &periods_)) return NULL;
@@ -58,6 +45,24 @@ PyObject * read_cwa(PyObject *NPY_UNUSED(self), PyObject *args){
         return NULL;
     }
 
+    /* WINDOWING INFO INIT */
+    winfo.n = PyArray_Size(bases);
+    if (winfo.n != PyArray_Size(periods))
+    {
+        Py_XDECREF(bases);
+        Py_XDECREF(periods);
+        PyErr_SetString(PyExc_ValueError, "Size mismatch between bases and periods");
+        return NULL;
+    }
+    winfo.i_start = (long *)malloc(winfo.n * sizeof(winfo.i_start));
+    winfo.i_stop = (long *)malloc(winfo.n * sizeof(winfo.i_stop));
+    winfo.bases = (long *)PyArray_DATA(bases);
+    winfo.periods = (long *)PyArray_DATA(periods);
+    /* set the indices to 0 initially */
+    memset(winfo.i_start, 0, winfo.n * sizeof(winfo.i_start))
+    memset(winfo.i_stop, 0, winfo.n * sizeof(winfo.i_stop))
+
+    /* OPEN THE FILE */
     FILE *fp = fopen(filename, "rb");
     if (!fp)
     {
@@ -102,12 +107,33 @@ PyObject * read_cwa(PyObject *NPY_UNUSED(self), PyObject *args){
     npy_intp imu_dims[2]   = {info.count * (info.nblocks-2), info.axes};
     npy_intp ts_dims[1]    = {info.count * (info.nblocks-2)},
     npy_intp block_dims[1] = {info.nblocks-2};
+    npy_intp idx_dims[2] = {MAX_DAYS, winfo.n};
   
     PyArrayObject *imudata    = (PyArrayObject *)PyArray_Empty(2, imu_dims, PyArray_DescrFromType(NPY_DOUBLE), 0)
     PyArrayObject *timestamps = (PyArrayObject *)PyArray_Empty(1, ts_dims, PyArray_DescrFromType(NPY_DOUBLE), 0)
     PyArrayObject *light = (PyArrayObject *)PyArray_Empty(1, block_dims, PyArray_DescrFromType(NPY_LONG), 0)
-    PyArrayObject *index = (PyArrayObject *)PyArray_Empty(1, block_dims, PyArray_DescrFromType(NPY_LONG), 0);
 
+    PyArrayObject *starts = (PyArrayObject *)PyArray_ZEROS(2, idx_dims, NPY_LONG, 0);
+    PyArrayObject *stops = (PyArrayObject *)PyArray_ZEROS(2, idx_dims, NPY_LONG, 0);
+
+    if (!imudata || !timestamps || !light || !starts || !stops)
+    {
+        Py_XDECREF(bases);
+        Py_XDECREF(periods);
+
+        Py_XDECREF(imudata);
+        Py_XDECREF(timestamps);
+        Py_XDECREF(light);
+        Py_XDECREF(starts);
+        Py_XDECREF(stops);
+
+        free(winfo.i_start);
+        free(winfo.i_stop);
+
+        return NULL;
+    }
+
+    /* SET POINTERS */
     double *data_ptr = (double *)PyArray_DATA(imudata);
     double *ts_ptr = (double *)PyArray_DATA(timestamps);
     long *lgt_ptr = (long *)PyArray_DATA(light);
