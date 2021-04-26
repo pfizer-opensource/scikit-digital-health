@@ -196,7 +196,7 @@ static struct PyModuleDef moduledef = {
 };
 
 /* Initialization function for the module */
-PyMODINIT_FUNC PyInit_cwa_convert(void)
+PyMODINIT_FUNC PyInit_cwa_read(void)
 {
     PyObject *m;
     m = PyModule_Create(&moduledef);

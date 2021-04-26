@@ -190,13 +190,13 @@ def configuration(parent_package='', top_path=None):
     config.add_library(
         'read',
         sources=[
-            'src/skimu/read/_extensions/cwa_convert.f95',
+            'src/skimu/read/_extensions/cwa_read.f95',
             'src/skimu/read/_extensions/read_bin.c'
         ]
     )
     config.add_extension(
-        'skimu/read/_extensions/cwa_convert',
-        sources='src/skimu/read/_extensions/pycwa_convert.c',
+        'skimu/read/_extensions/cwa_read',
+        sources='src/skimu/read/_extensions/pycwa_read.c',
         libraries=['read']
     )
     # bin (geneactiv)
