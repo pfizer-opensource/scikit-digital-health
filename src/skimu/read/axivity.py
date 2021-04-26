@@ -134,7 +134,8 @@ class ReadCWA(_BaseProcess):
 
         results = {
             self._time: ts,
-            "file": file
+            "file": file,
+            "fs": meta["Frequency"]
         }
         if acc_axes is not None:
             results[self._acc] = imudata[:, acc_axes]
