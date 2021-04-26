@@ -96,6 +96,9 @@ def get_total_sleep_opportunity(
     for strt, stp in zip((wear_starts - idx_start) / n5, (wear_stops - idx_start) / n5):
         tso[int(strt):int(stp)] = True
 
+    # apply the threshold before any internal wear checking
+    tso &= dz_rm_rmd < tso_thresh  # now only blocks where there is no movement, and wear are left
+
     # check if we can compute wear internally
     if temperature is not None and int_wear_temp > 0.0:
         t_rmed_5s = moving_median(temperature, n5, 1, pad=False)
@@ -117,9 +120,6 @@ def get_total_sleep_opportunity(
         )
 
         tso[move_nonwear] = False
-
-    # apply the threshold
-    tso &= dz_rm_rmd < tso_thresh  # now only blocks where there is no movement, and wear are left
 
     # drop rest blocks less than minimum allowed rest length
     # even though rolling 5min, the underlying windows are 5s, so 12 * minutes => number of samples
