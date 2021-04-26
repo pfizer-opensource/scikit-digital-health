@@ -190,7 +190,20 @@ int read_block(FILE *fp, Window_t *w_info, Info_t *info, Data_t *data)
     /* skip 2 more lines then read the sampling rate */
     READLINE; READLINE; READLINE;
     fs = strtod(&buff[22], NULL);
-    if (fs != info->fs)
+    if ((fs != info->fs) && (info->fs_err < 1)){
+        /* set a warning */
+        char warn_str[120];
+        sprintf(warn_str, "Block (%li) fs [%.2f] is not the same as header fs [%.2f]. Setting fs to block fs.", N, fs, info->fs);
+        int err_ret = PyErr_WarnEx(PyExc_RuntimeWarning, warn_str, 1);
+
+        info->fs_err ++;  /* increment the error counter, this error should only happen once */
+        /* set the sampling frequency to that of the block */
+        info->fs = fs;
+
+        /* if warnings are being caught as exceptions */
+        if (err_ret == -1)
+            return READ_E_BLOCK_FS;
+    } else if ((fs != info->fs) && (info->fs_err >= 1))
         return READ_E_BLOCK_FS;
 
     /* read the 3600 character data string */

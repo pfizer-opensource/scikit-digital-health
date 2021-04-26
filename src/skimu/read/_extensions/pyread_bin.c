@@ -10,7 +10,7 @@ void set_error_message(int ierr)
     switch (ierr)
     {
         case READ_E_BLOCK_TIMESTAMP :
-            PyErr_SetString(PyExc_RuntimeError, "Error reading tiemstamp from data block");
+            PyErr_SetString(PyExc_RuntimeError, "Error reading timestamp from data block");
             break;
         case READ_E_BLOCK_FS :
             PyErr_SetString(PyExc_RuntimeError, "Block sampling frequency does not match header");
@@ -38,6 +38,7 @@ static PyObject *read_bin(PyObject *NPY_UNUSED(self), PyObject *args)
     Window_t winfo;
 
     /* INITIALIZATION */
+    info.fs_err = 0;
     info.max_n = 0;
     info.npages = -1;
 
@@ -111,9 +112,7 @@ static PyObject *read_bin(PyObject *NPY_UNUSED(self), PyObject *args)
     npy_intp dim3[2] = {info.npages * PAGE_SAMPLES, 3};
     npy_intp dim1[1] = {info.npages * PAGE_SAMPLES};
 
-    long ndays = (long)ceil(((double)info.npages * (FPAGE_SAMPLES / info.fs)) / 86400.0);
-
-    npy_intp dim_idx[2] = {ndays + 1, winfo.n};
+    npy_intp dim_idx[2] = {MAX_DAYS, winfo.n};  /* battery can't last longer than this */
 
     /* DATA ARRAYS */
     PyArrayObject *accel = (PyArrayObject *)PyArray_ZEROS(2, dim3, NPY_DOUBLE, 0);

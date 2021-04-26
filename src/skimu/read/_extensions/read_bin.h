@@ -4,6 +4,7 @@
 #include <time.h>
 #include <math.h>
 
+#define MAX_DAYS 25  /* upper limit on number of days device can record */
 #define PAGE_SAMPLES 300
 #define FPAGE_SAMPLES 300.0f
 #define SECMIN 60
@@ -32,6 +33,7 @@ typedef enum {
 /* Information structures */
 typedef struct {
     double fs;  /* sampling frequency */
+    int fs_err;  /* keep track of differing values of fs during block reading */
     double gain[3];  /* raw accel value gain for converting to g */
     double offset[3];  /* raw accel value offset for converting to g */
     double volts;
