@@ -4,6 +4,7 @@ Sleep and major rest period detection
 Yiorgos Christakis, Lukas Adamowicz
 Pfizer DMTI 2019-2021
 """
+from sys import gettrace
 from collections.abc import Iterable
 from warnings import warn
 from datetime import datetime, timedelta
@@ -231,7 +232,8 @@ class Sleep(_BaseProcess):
         - file: file name used in the pipeline, or "" if not found.
         """
         # move this inside here so that it doesnt effect everything on load
-        matplotlib.use("PDF")  # non-interactive, dont want to be displaying plots constantly
+        if gettrace() is None:  # only set if not debugging
+            matplotlib.use("PDF")  # non-interactive, dont want to be displaying plots constantly
         plt.style.use("ggplot")
 
         self.f = []  # need a plot for each day
