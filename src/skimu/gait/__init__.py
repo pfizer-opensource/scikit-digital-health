@@ -193,4 +193,3 @@ from skimu.gait.gait import Gait
 from skimu.gait import gait
 from skimu.gait.gait_metrics import *
 from skimu.gait import gait_metrics
-from skimu.gait import train_classifier
