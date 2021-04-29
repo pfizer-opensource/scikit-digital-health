@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from datetime import date as dt_date
 
-from numpy import mean, diff, array, nan, sum, arange
+from numpy import mean, diff, array, nan, sum, arange, nonzero, full, int_
 from numpy.ma import masked_where
 import matplotlib
 from matplotlib.backends.backend_pdf import PdfPages
@@ -333,6 +333,8 @@ class Sleep(_BaseProcess):
                 "Day N", "Date", "TSO Start Timestamp", "TSO Start", "TSO Duration"
             ]
         }
+        # setup storage for sleep indices
+        sleep_idx = full(days_ds.shape, -1, dtype=int_)
 
         # iterate over the parameters, initialize them, and put their names into sleep
         init_params = []
@@ -408,6 +410,11 @@ class Sleep(_BaseProcess):
             # run length encoding for sleep metrics
             sw_lengths, sw_starts, sw_vals = rle(pred_during_tso)
 
+            # set the sleep start and end values from the predictions indexed into original data
+            to_start = int(tso_start * fs / goal_fs) + int(start * fs / goal_fs)
+            sleep_idx[iday, 0] = int(nonzero(pred_during_tso)[0][0] * 60 * fs) + to_start
+            sleep_idx[iday, 1] = int(nonzero(pred_during_tso)[0][-1] * 60 * fs) + to_start
+
             # plotting
             self._plot_sleep_wear_predictions(
                 goal_fs, predictions, tso_start, tso_stop, dw_starts - start, dw_stops - start
@@ -432,7 +439,9 @@ class Sleep(_BaseProcess):
         # finalize plotting
         self._finalize_plots()
 
-        kwargs.update({self._acc: accel, self._time: time, "fs": fs, "wear": wear})
+        kwargs.update(
+            {self._acc: accel, self._time: time, "fs": fs, "wear": wear, "sleep": sleep_idx}
+        )
         if self._in_pipeline:
             return kwargs, sleep
         else:
