@@ -1,3 +1,5 @@
+! -*- f95 -*-
+
 module axivity
     use, intrinsic :: iso_c_binding
     implicit none
@@ -176,7 +178,7 @@ contains
     ! axivity_read_block : read a single block (512 bytes) of data from an axivity file and 
     !   put the data into its respective storage arrays
     ! =============================================================================================
-    subroutine axivity_read_block(info, pos, imudata, timestamps, light, bases, periods, starts,
+    subroutine axivity_read_block(info, pos, imudata, timestamps, light, bases, periods, starts, &
         i_start, stops, i_stop, ierr) bind(C, name="axivity_read_block")
         type(FileInfo_t), intent(inout) :: info  ! file information storage structure
         ! position of the file to read from. should be a multiple of 512
