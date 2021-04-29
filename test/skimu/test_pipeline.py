@@ -91,7 +91,7 @@ class TestPipeline:
     def test(self, get_truth_data, gait_res_file, pipeline_file):
         p = Pipeline()
 
-        p.add(ReadCWA(base=None, period=None))
+        p.add(ReadCWA(bases=None, periods=None))
         p.add(
             Gait(
                 correct_accel_orient=False,
