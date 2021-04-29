@@ -117,7 +117,7 @@ class ReadBin(_BaseProcess):
         super().predict(file=file, **kwargs)
 
         # read the file
-        nmax, fs, acc, time, light, temp, starts, stops = read_bin(file, self.bases, self.periods)
+        nmax, fs, acc, time, light, temp, starts, stops = read_geneactiv(file, self.bases, self.periods)
 
         results = {
             self._time: time,
