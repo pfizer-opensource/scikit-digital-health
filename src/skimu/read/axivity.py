@@ -6,11 +6,10 @@ Pfizer DMTI 2020
 """
 from warnings import warn
 
-from numpy import vstack
+from numpy import vstack, asarray, int_
 
 from skimu.base import _BaseProcess
-from skimu.read.get_window_start_stop import get_window_start_stop
-from skimu.read._extensions import read_cwa
+from skimu.read._extensions import read_axivity
 
 
 class UnexpectedAxesError(Exception):
@@ -43,32 +42,39 @@ class ReadCWA(_BaseProcess):
 
     Setup a reader that does windowing between 8:00 AM and 8:00 PM (20:00):
 
-    >>> reader = ReadCWA(base=8, period=12)  # 8 + 12 = 20
+    >>> reader = ReadCWA(bases=8, periods=12)  # 8 + 12 = 20
     >>> reader.predict('example.cwa')
     {'accel': ..., 'time': ..., 'day_ends': [130, 13951, ...], ...}
     """
 
-    def __init__(self, base=None, period=None):
+    def __init__(self, bases=None, periods=None):
         super().__init__(
             # kwargs
-            base=base,
-            period=None
+            bases=bases,
+            periods=periods
         )
 
-        if (base is None) and (period is None):
+        if (bases is None) and (periods is None):
             self.window = False
-            self.base = 0  # needs to be defined for passing to extensions
-            self.period = 12
-        elif (base is None) or (period is None):
+            self.bases = asarray([0])  # needs to be defined for passing to extensions
+            self.periods = asarray([12])
+        elif (bases is None) or (periods is None):
             warn("One of base or period is None, not windowing", UserWarning)
             self.window = False
-            self.base = 0
-            self.period = 12
+            self.bases = asarray([0])
+            self.periods = asarray([12])
         else:
-            if (0 <= base <= 23) and (1 <= period <= 24):
+            if isinstance(bases, int) and isinstance(periods, int):
+                bases = asarray([bases])
+                periods = asarray([periods])
+            else:
+                bases = asarray(bases, dtype=int_)
+                periods = asarray(periods, dtype=int_)
+
+            if ((0 <= bases) & (bases <= 23)).all() and ((1 <= periods) & (periods <= 24)).all():
                 self.window = True
-                self.base = base
-                self.period = period
+                self.bases = bases
+                self.periods = periods
             else:
                 raise ValueError("Base must be in [0, 23] and period must be in [1, 23]")
 
@@ -116,7 +122,7 @@ class ReadCWA(_BaseProcess):
         super().predict(file=file, **kwargs)
 
         # read the file
-        meta, imudata, ts, idx, light = read_cwa(file, self.base, self.period)
+        fs, imudata, ts, light, starts, stops = read_axivity(file, self.bases, self.periods)
 
         num_axes = imudata.shape[1]
         gyr_axes = mag_axes = None
@@ -135,7 +141,7 @@ class ReadCWA(_BaseProcess):
         results = {
             self._time: ts,
             "file": file,
-            "fs": meta["Frequency"]
+            "fs": fs
         }
         if acc_axes is not None:
             results[self._acc] = imudata[:, acc_axes]
@@ -145,8 +151,12 @@ class ReadCWA(_BaseProcess):
             results[self._mag] = imudata[:, mag_axes]
 
         if self.window:
-            day_starts, day_stops = get_window_start_stop(idx, ts.size)
-            results[self._days] = {f"{self.base}, {self.period}": vstack((day_starts, day_stops)).T}
+            results[self._days] = {}
+            for i, data in enumerate(zip(self.bases, self.periods)):
+                strt = starts[stops[:, i] != 0, i]
+                stp = stops[stops[:, i] != 0, i]
+
+                results[self._days][(data[0], data[1])] = vstack((strt, stp)).T
 
         kwargs.update(results)
         if self._in_pipeline:
