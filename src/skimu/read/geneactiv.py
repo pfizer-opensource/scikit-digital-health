@@ -9,8 +9,7 @@ from warnings import warn
 from numpy import vstack, asarray, int_
 
 from skimu.base import _BaseProcess
-from skimu.read.get_window_start_stop import get_window_start_stop
-from skimu.read._extensions import read_bin
+from skimu.read._extensions import read_geneactiv
 
 
 class ReadBin(_BaseProcess):
