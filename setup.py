@@ -190,9 +190,10 @@ def configuration(parent_package='', top_path=None):
     config.add_library(
         "read",
         sources=[
+            # utility HAS to be first so that read_axivity can use the module it compiles
+            "src/skimu/read/_extensions/utility.f95",
             'src/skimu/read/_extensions/read_axivity.f95',
-            'src/skimu/read/_extensions/read_geneactiv.c',
-            "src/skimu/read/_extensions/utility.f95"
+            'src/skimu/read/_extensions/read_geneactiv.c'
         ]
     )
     config.add_extension(
