@@ -5,6 +5,7 @@ Lukas Adamowicz
 Pfizer DMTI 2020
 """
 from warnings import warn
+from pathlib import Path
 
 from numpy import vstack, asarray, int_
 
@@ -118,6 +119,8 @@ class ReadCWA(_BaseProcess):
             file = str(file)
         if file[-3:] != "cwa":
             warn("File extension is not expected '.cwa'", UserWarning)
+        if not Path(file).exists():
+            raise FileNotFoundError(f"File [{file}] does not exist.")
 
         super().predict(file=file, **kwargs)
 
