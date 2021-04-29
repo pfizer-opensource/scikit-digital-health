@@ -44,7 +44,7 @@ class TestReadAx3CWA(BaseProcessTester):
 
     def test_none_file(self):
         with pytest.raises(ValueError):
-            self.process.predict(files=None)
+            self.process.predict(file=None)
 
     def test_window(self):
         r = ReadCWA(bases=8, periods=12)
@@ -64,9 +64,9 @@ class TestReadAx3CWA(BaseProcessTester):
         with pytest.raises(ValueError):
             ReadCWA(bases=base, periods=period)
 
-    def test_extension_warning(self):
+    def test_extension_warning_not_exist(self):
         with pytest.warns(UserWarning):
-            with pytest.raises(OSError):
+            with pytest.raises(FileNotFoundError):
                 ReadCWA().predict('test.bin')
 
 
