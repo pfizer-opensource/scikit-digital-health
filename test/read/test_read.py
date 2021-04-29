@@ -1,5 +1,5 @@
 import pytest
-from numpy import allclose
+from numpy import allclose, array
 
 from ..base_conftest import *
 
@@ -38,31 +38,31 @@ class TestReadAx3CWA(BaseProcessTester):
             'time',
             'accel'
         ]
-        cls.process = ReadCWA(base=None, period=None)
+        cls.process = ReadCWA(bases=None, periods=None)
 
         cls.atol_time = 5e-5
 
     def test_none_file(self):
         with pytest.raises(ValueError):
-            self.process.predict(file=None)
+            self.process.predict(files=None)
 
     def test_window(self):
-        r = ReadCWA(base=8, period=12)
+        r = ReadCWA(bases=8, periods=12)
 
         assert r.window
-        assert r.base == 8
-        assert r.period == 12
+        assert r.bases == array([8])
+        assert r.periods == array([12])
 
     def test_window_warning(self):
         with pytest.warns(UserWarning):
-            ReadCWA(base=None, period=12)
+            ReadCWA(bases=None, periods=12)
         with pytest.warns(UserWarning):
-            ReadCWA(base=8, period=None)
+            ReadCWA(bases=8, periods=None)
 
     @pytest.mark.parametrize(('base', 'period'), ((-1, 12), (0, 25), (8, 30), (24, 12), (8, -12)))
     def test_window_bounds_error(self, base, period):
         with pytest.raises(ValueError):
-            ReadCWA(base=base, period=period)
+            ReadCWA(bases=base, periods=period)
 
     def test_extension_warning(self):
         with pytest.warns(UserWarning):
@@ -83,7 +83,7 @@ class TestReadAx6CWA(BaseProcessTester):
             'accel',
             'gyro'
         ]
-        cls.process = ReadCWA(base=8, period=12)
+        cls.process = ReadCWA(bases=8, periods=12)
 
         cls.atol_time = 5e-5
         cls.atol = 5e-6
