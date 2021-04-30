@@ -480,53 +480,6 @@ def get_intensity_gradient(ig_values, counts):
     return slope, intercept, rval**2
 
 
-def get_day_wear_intersection(starts, stops, day_start, day_stop):
-    """
-    Get the intersection between wear times and day starts/stops.
-
-    Parameters
-    ----------
-    starts : numpy.ndarray
-        Array of integer indices where gait bouts start.
-    stops : numpy.ndarray
-        Array of integer indices where gait bouts stop.
-    day_start : int
-        Index of the day start.
-    day_stop : int
-        Index of the day stop.
-
-    Returns
-    -------
-    day_wear_starts : numpy.ndarray
-        Array of wear start indices for the day.
-    day_wear_stops : numpy.ndarray
-        Array of wear stop indices for the day
-    """
-    day_start, day_stop = int(day_start), int(day_stop)
-    # get the portion of wear times for the day
-    starts_subset = starts[(starts >= day_start) & (starts < day_stop)]
-    stops_subset = stops[(stops > day_start) & (stops <= day_stop)]
-
-    if starts_subset.size == 0 and stops_subset.size == 0:
-        if stops[nonzero(starts <= day_start)[0][-1]] >= day_stop:
-            return array([day_start]), array([day_stop])
-        else:
-            return array([0]), array([0])
-    if starts_subset.size == 0 and stops_subset.size == 1:
-        starts_subset = array([day_start])
-    if starts_subset.size == 1 and stops_subset.size == 0:
-        stops_subset = array([day_stop])
-
-    if starts_subset[0] > stops_subset[0]:
-        starts_subset = insert(starts_subset, 0, day_start)
-    if starts_subset[-1] > stops_subset[-1]:
-        stops_subset = append(stops_subset, day_stop)
-
-    assert starts_subset.size == stops_subset.size, "bout starts and stops do not match"
-
-    return starts_subset, stops_subset
-
-
 def _get_level_starts_stops(mask):
     """
     Get the start and stop indices for a mask.
