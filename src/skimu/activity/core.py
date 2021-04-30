@@ -134,9 +134,9 @@ class MVPActivityClassification(_BaseProcess):
         else:
             self.day_key = tuple(day_window)
 
-    def predict(self, time=None, accel=None, *, wear=None, **kwargs):
+    def predict(self, time=None, accel=None, *, fs=None, wear=None, **kwargs):
         """
-        predict(time, accel, *, wear=None)
+        predict(time, accel, *, fs=None, wear=None)
 
         Compute the time spent in different activity levels.
 
@@ -147,6 +147,9 @@ class MVPActivityClassification(_BaseProcess):
         accel : numpy.ndarray
             (N, 3) array of accelerations measured by centrally mounted lumbar device, in
             units of 'g'
+        fs : {None, float}, optional
+            Sampling frequency in Hz. If None will be computed from the first 5000 samples of
+            `time`.
         wear : {None, list}, optional
             List of length-2 lists of wear-time ([start, stop]). Default is None, which uses the
             whole recording as wear time.
@@ -158,9 +161,8 @@ class MVPActivityClassification(_BaseProcess):
         """
         super().predict(time=time, accel=accel, wear=wear, **kwargs)
 
-        # longer than it needs to be really, but due to weird timesamps for some devices
-        # using this for now
-        fs = 1 / mean(diff(time))
+        if fs is None:
+            fs = 1 / mean(diff(time[:5000]))
 
         nwlen = int(self.wlen * fs)
         epm = int(60 / self.wlen)  # epochs per minute
