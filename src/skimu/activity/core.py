@@ -159,7 +159,7 @@ class MVPActivityClassification(_BaseProcess):
         activity_res : dict
             Computed activity level metrics.
         """
-        super().predict(time=time, accel=accel, wear=wear, **kwargs)
+        super().predict(time=time, accel=accel, fs=fs, wear=wear, **kwargs)
 
         if fs is None:
             fs = 1 / mean(diff(time[:5000]))
