@@ -479,32 +479,3 @@ def get_intensity_gradient(ig_values, counts):
     slope, intercept, rval, *_ = linregress(lx, ly)
 
     return slope, intercept, rval**2
-
-
-def _get_level_starts_stops(mask):
-    """
-    Get the start and stop indices for a mask.
-
-    Parameters
-    ----------
-    mask : numpy.ndarray
-        Boolean numpy array.
-
-    Returns
-    -------
-    starts : numpy.ndarray
-        Starts of `True` value blocks in `mask`.
-    stops : numpy.ndarray
-        Stops of `True` value blocks in `mask`.
-    """
-    delta = diff(mask.astype("int"))
-
-    starts = nonzero(delta == 1)[0] + 1
-    stops = nonzero(delta == -1)[0] + 1
-
-    if starts[0] > stops[0]:
-        starts = insert(starts, 0, 0)
-    if stops[-1] < starts[-1]:
-        stops = append(stops, mask.size)
-
-    return starts, stops
