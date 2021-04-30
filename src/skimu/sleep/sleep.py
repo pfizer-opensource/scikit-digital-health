@@ -412,8 +412,8 @@ class Sleep(_BaseProcess):
 
             # set the sleep start and end values from the predictions indexed into original data
             to_start = int(tso_start * fs / goal_fs) + int(start * fs / goal_fs)
-            sleep_idx[iday, 0] = int(nonzero(pred_during_tso)[0][0] * 60 * fs) + to_start
-            sleep_idx[iday, 1] = int(nonzero(pred_during_tso)[0][-1] * 60 * fs) + to_start
+            sleep_idx[iday, 0] = int(nonzero(pred_during_tso)[0][0] * 60 * fs) + to_start  # sleep
+            sleep_idx[iday, 1] = int(nonzero(pred_during_tso)[0][-1] * 60 * fs) + to_start  # wake
 
             # plotting
             self._plot_sleep_wear_predictions(
