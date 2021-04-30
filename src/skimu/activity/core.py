@@ -26,17 +26,13 @@ class MVPActivityClassification(_BaseProcess):
     short_wlen : int, optional
         Short window length in seconds, used for the initial computation acceleration metrics.
         Default is 5 seconds. Must be a factor of 60 seconds.
-    bout_len1 : int, optional
-        Activity bout length 1, in minutes. Default is 1 minutes.
-    bout_len2 : int, optional
-        Activity bout length 2, in minutes. Default is 5 minutes.
-    bout_len3 : int, optional
-        Activity bout length 3, in minutes. Default is 10 minutes.
+    bout_lens : iterable, optional
+        Activity bout lengths. Default is (1, 5, 10).
     bout_criteria : float, optional
         Value between 0 and 1 for how much of a bout must be above the specified threshold. Default
         is 0.8
     bout_metric : {1, 2, 3, 4, 5}, optional
-        How a bout of MVPA is computed. Default is 1. See notes for descriptions of each method.
+        How a bout of MVPA is computed. Default is 4. See notes for descriptions of each method.
     closed_bout : bool, optional
         If True then count breaks in a bout towards the bout duration. If False then only count
         time spent above the threshold towards the bout duration. Only used if `bout_metric=1`.
@@ -90,8 +86,8 @@ class MVPActivityClassification(_BaseProcess):
         no. 6, pp. 781–790, Mar. 2014, doi: 10.1093/aje/kwt330.
     """
     def __init__(
-            self, short_wlen=5, bout_len1=1, bout_len2=5, bout_len3=10, bout_criteria=0.8,
-            bout_metric=1, closed_bout=False, min_wear_time=10, cutpoints="migueles_wrist_adult",
+            self, short_wlen=5, bout_lens=(1, 5, 10), bout_criteria=0.8,
+            bout_metric=4, closed_bout=False, min_wear_time=10, cutpoints="migueles_wrist_adult",
             day_window=(0, 24)
     ):
         if (60 % short_wlen) != 0:
@@ -100,18 +96,14 @@ class MVPActivityClassification(_BaseProcess):
             warn(f"`short_wlen` changed to {short_wlen} to be a factor of 60.")
         else:
             short_wlen = int(short_wlen)
-        bout_len1 = int(bout_len1)
-        bout_len2 = int(bout_len2)
-        bout_len3 = int(bout_len3)
+        bout_lens = [int(i) for i in bout_lens]
         min_wear_time = int(min_wear_time)
         if isinstance(cutpoints, str):
             cutpoints = _base_cutpoints.get(cutpoints, _base_cutpoints["migueles_wrist_adult"])
 
         super().__init__(
             short_wlen=short_wlen,
-            bout_len1=bout_len1,
-            bout_len2=bout_len2,
-            bout_len3=bout_len3,
+            bout_lens=bout_lens,
             bout_criteria=bout_criteria,
             bout_metric=bout_metric,
             closed_bout=closed_bout,
@@ -120,9 +112,7 @@ class MVPActivityClassification(_BaseProcess):
         )
 
         self.wlen = short_wlen
-        self.blen1 = bout_len1
-        self.blen2 = bout_len2
-        self.blen3 = bout_len3
+        self.blens = bout_lens
         self.boutcrit = bout_criteria
         self.boutmetric = bout_metric
         self.closedbout = closed_bout
@@ -198,10 +188,7 @@ class MVPActivityClassification(_BaseProcess):
             "MVPA 5sec Epochs",
             "MVPA 1min Epochs",
             "MVPA 5min Epochs",
-            f"MVPA {self.blen1}min Bouts",
-            f"MVPA {self.blen2}min Bouts",
-            f"MVPA {self.blen3}min Bouts"
-        ]
+        ] + [f"MVPA {i}min Bouts" for i in self.blens]
         ig_keys = [
             "IG Gradient",
             "IG Intercept",
@@ -256,21 +243,12 @@ class MVPActivityClassification(_BaseProcess):
                 tmp = moving_mean(accel_metric, 5 * epm, 5 * epm)
                 res["MVPA 5min Epochs"][-1] += sum(tmp >= self.cutpoints["light"]) * 5  # in minutes
 
-                # total time in bout1 minute bouts
-                res[f"MVPA {self.blen1}min Bouts"][-1] += get_activity_bouts(
-                    accel_metric, self.cutpoints["light"], self.wlen, self.blen1, self.boutcrit,
-                    self.closedbout, self.boutmetric
-                )
-                # total time in bout2 minute bouts
-                res[f"MVPA {self.blen2}min Bouts"][-1] += get_activity_bouts(
-                    accel_metric, self.cutpoints["light"], self.wlen, self.blen2, self.boutcrit,
-                    self.closedbout, self.boutmetric
-                )
-                # total time in bout3 minute bouts
-                res[f"MVPA {self.blen3}min Bouts"][-1] += get_activity_bouts(
-                    accel_metric, self.cutpoints["light"], self.wlen, self.blen3, self.boutcrit,
-                    self.closedbout, self.boutmetric
-                )
+                # total MVPA time in <bout_len> minute bouts
+                for bout_len in self.blens:
+                    res[f"MVPA {bout_len}min Bouts"][-1] += get_activity_bouts(
+                        accel_metric, self.cutpoints["light"], self.wlen, bout_len, self.boutcrit,
+                        self.closedbout, self.boutmetric
+                    )
 
                 # intensity gradient. Density = false to return counts
                 hist += histogram(accel_metric, bins=iglevels, density=False)[0]
