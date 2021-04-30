@@ -14,6 +14,7 @@ from scipy.stats import linregress
 
 from skimu.base import _BaseProcess
 from skimu.utility import moving_mean
+from skimu.utility.internal import get_day_wear_intersection
 from skimu.activity.cutpoints import _base_cutpoints
 
 
