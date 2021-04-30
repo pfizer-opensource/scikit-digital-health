@@ -6,6 +6,7 @@ Pfizer DMTI 2021
 """
 from datetime import datetime
 from warnings import warn
+from itertools import product as iter_product
 
 from numpy import nonzero, array, insert, append, mean, diff, sum, zeros, abs, argmin, argmax, \
     maximum, int_, floor, ceil, histogram, log, nan, around
@@ -177,6 +178,9 @@ class MVPActivityClassification(_BaseProcess):
             )
             days = [[0, accel.shape[0] - 1]]
 
+        # check if sleep data is provided
+        sleep = kwargs.get("sleep", None)
+
         general_keys = [
             "Date",
             "Weekday",
@@ -185,16 +189,22 @@ class MVPActivityClassification(_BaseProcess):
             "N wear hours"
         ]
         mvpa_keys = [
-            "MVPA 5sec Epochs",
-            "MVPA 1min Epochs",
-            "MVPA 5min Epochs",
-        ] + [f"MVPA {i}min Bouts" for i in self.blens]
-        ig_keys = [
-            "IG Gradient",
-            "IG Intercept",
-            "IG R-squared"
+            ("MM", "MVPA", "5sec", "epoch"),
+            ("MM", "MVPA", "1min", "epoch"),
+            ("MM", "MVPA", "5min", "epoch"),
+            ("WS", "MVPA", "5sec", "epoch"),
+            ("WS", "MVPA", "1min", "epoch"),
+            ("WS", "MVPA", "5min", "epoch"),
         ]
-        res = {i: [] for i in general_keys + mvpa_keys + ig_keys}
+
+        # MM: midnight -> midnight    WS: wake -> sleep
+        windows = ["MM", "WS"]
+        activity_levels = ["MVPA", "sed", "light", "mod", "vig"]
+        prod_keys = list(iter_product(windows, activity_levels, self.blens))
+
+        ig_keys = ["IG Gradient", "IG Intercept", "IG R-squared"]
+
+        res = {i: [] for i in general_keys + ig_keys + mvpa_keys + prod_keys}
 
         for iday, day_idx in enumerate(days):
             # populate the results dictionary
