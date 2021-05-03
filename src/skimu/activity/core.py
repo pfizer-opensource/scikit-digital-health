@@ -18,6 +18,15 @@ from skimu.utility.internal import get_day_index_intersection
 from skimu.activity.cutpoints import _base_cutpoints
 
 
+def _check_if_none(var, lgr, msg_if_none, i1, i2):
+    if var is None:
+        lgr.info(msg_if_none)
+        start, stop = array([i1]), array([i2])
+    else:
+        start, stop = var[:, 0], var[:, 1]
+    return start, stop
+
+
 class MVPActivityClassification(_BaseProcess):
     """
     Classify accelerometer data into different activity levels as a proxy for assessing physical
@@ -153,6 +162,9 @@ class MVPActivityClassification(_BaseProcess):
         """
         super().predict(time=time, accel=accel, fs=fs, wear=wear, **kwargs)
 
+        # ========================================================================================
+        # SETUP / INITIALIZATION
+        # ========================================================================================
         if fs is None:
             fs = 1 / mean(diff(time[:5000]))
 
@@ -162,14 +174,8 @@ class MVPActivityClassification(_BaseProcess):
         iglevels = array([i for i in range(0, 4001, 25)] + [8000]) / 1000  # default from rowlands
         igvals = (iglevels[1:] + iglevels[:-1]) / 2
 
-        if wear is None:
-            self.logger.info(f"[{self!s}] Wear detection not provided. Assuming 100% wear time.")
-            wear_starts = array([0])
-            wear_stops = array([time.size])
-        else:
-            tmp = array(wear).astype("int")  # make sure it can broadcast correctly
-            wear_starts = tmp[:, 0]
-            wear_stops = tmp[:, 1]
+        wear_none_msg = f"[{self!s}] Wear detection not provided. Assuming 100% wear time."
+        wear_starts, wear_stops = _check_if_none(wear, self.logger, wear_none_msg, 0, time.size)
 
         # check if windows exist for days
         days = kwargs.get(self._days, {}).get(self.day_key, None)
@@ -177,18 +183,12 @@ class MVPActivityClassification(_BaseProcess):
             warn(
                 f"Day indices for {self.day_key} (base, period) not found. No day separation used"
             )
-            days = [[0, accel.shape[0] - 1]]
+            days = [[0, time.size]]
 
         # check if sleep data is provided
         sleep = kwargs.get("sleep", None)
-        if sleep is None:
-            self.logger.info(f"[{self!s}] No sleep information found. Not computing metrics "
-                             f"during only awake time.")
-            sleep_starts = array([0])
-            sleep_stops = array([time.size])
-        else:
-            sleep_starts = sleep[:, 0]
-            sleep_stops = sleep[:, 1]
+        slp_msg = f"[{self!s}] No sleep information found. Only computing full day metrics."
+        sleep_starts, sleep_stops = _check_if_none(sleep, self.logger, slp_msg, 0, time.size)
 
         general_keys = [
             "Date",
@@ -214,7 +214,7 @@ class MVPActivityClassification(_BaseProcess):
 
         ig_keys = ["IG Gradient", "IG Intercept", "IG R-squared"]
 
-        res = {i: [] for i in general_keys + ig_keys + mvpa_keys + prod_keys}
+        res = {i: full() for i in general_keys + ig_keys + mvpa_keys + prod_keys}
 
         for iday, day_idx in enumerate(days):
             # populate the results dictionary
