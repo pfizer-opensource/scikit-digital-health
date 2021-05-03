@@ -121,7 +121,11 @@ class MVPActivityClassification(_BaseProcess):
         bout_lens = [int(i) for i in bout_lens]
         min_wear_time = int(min_wear_time)
         if isinstance(cutpoints, str):
-            cutpoints = _base_cutpoints.get(cutpoints, _base_cutpoints["migueles_wrist_adult"])
+            cutpoints_ = _base_cutpoints.get(cutpoints, None)
+            if cutpoints_ is None:
+                warn(f"Specified cutpoints [{cutpoints}] not found. Using `migueles_wrist_adult`.")
+                cutpoints_ = _base_cutpoints["migueles_wrist_adult"]
+
 
         super().__init__(
             short_wlen=short_wlen,
@@ -130,7 +134,7 @@ class MVPActivityClassification(_BaseProcess):
             bout_metric=bout_metric,
             closed_bout=closed_bout,
             min_wear_time=min_wear_time,
-            cutpoints=cutpoints
+            cutpoints=cutpoints_
         )
 
         self.wlen = short_wlen
@@ -139,7 +143,7 @@ class MVPActivityClassification(_BaseProcess):
         self.boutmetric = bout_metric
         self.closedbout = closed_bout
         self.min_wear = min_wear_time
-        self.cutpoints = cutpoints
+        self.cutpoints = cutpoints_
 
         if day_window is None:
             self.day_key = (-1, -1)
