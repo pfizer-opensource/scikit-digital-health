@@ -9,7 +9,7 @@ from warnings import warn
 from itertools import product as iter_product
 
 from numpy import nonzero, array, insert, append, mean, diff, sum, zeros, abs, argmin, argmax, \
-    maximum, int_, floor, ceil, histogram, log, nan, around, argsort
+    maximum, int_, floor, ceil, histogram, log, nan, around, argsort, full
 from scipy.stats import linregress
 
 from skimu.base import _BaseProcess
@@ -190,43 +190,30 @@ class MVPActivityClassification(_BaseProcess):
         slp_msg = f"[{self!s}] No sleep information found. Only computing full day metrics."
         sleep_starts, sleep_stops = _check_if_none(sleep, self.logger, slp_msg, 0, time.size)
 
-        general_keys = [
-            "Date",
-            "Weekday",
-            "Day N",
-            "N hours",
-            "N wear hours",
-            "N wear awake hours"
-        ]
-        mvpa_keys = [
-            ("MM", "MVPA", "5sec", "epoch"),
-            ("MM", "MVPA", "1min", "epoch"),
-            ("MM", "MVPA", "5min", "epoch"),
-            ("ExS", "MVPA", "5sec", "epoch"),
-            ("ExS", "MVPA", "1min", "epoch"),
-            ("ExS", "MVPA", "5min", "epoch"),
-        ]
+        general_str_keys = ["Date", "Weekday"]
+        general_int_keys = ["Day N", "N Hours", "N wear hours", "N wear awake hours"]
 
         # MM: midnight -> midnight    ExS: Exclude Sleep
         windows = ["MM", "ExS"]
         activity_levels = ["MVPA", "sed", "light", "mod", "vig"]
-        prod_keys = list(iter_product(windows, activity_levels, self.blens))
 
-        ig_keys = ["IG Gradient", "IG Intercept", "IG R-squared"]
+        lvl_keys = iter_product(windows, activity_levels, self.blens, ["bout"])
+        mvpa_keys = iter_product(windows, ["MVPA"], ["5sec", "1min", "5min"], ["epoch"])
+        ig_keys = iter_product(windows, ["IG"], ["gradient", "intercept", "R-squared"])
 
-        res = {i: full() for i in general_keys + ig_keys + mvpa_keys + prod_keys}
+        res = {i: full(len(days), "", dtype="object") for i in general_str_keys}
+        res.update({i: full(len(days), -1, dtype="int") for i in general_int_keys})
+        res.update({i: full(len(days), nan, dtype="float") for i in mvpa_keys})
+        res.update({i: full(len(days), nan, dtype="float") for i in lvl_keys})
+        res.update({i: full(len(days), nan, dtype="float") for i in ig_keys})
 
         for iday, day_idx in enumerate(days):
-            # populate the results dictionary
-            for k in general_keys + ig_keys:
-                res[k].append(nan)
-
             day_start, day_stop = day_idx
 
-            res["Date"][-1] = datetime.utcfromtimestamp(time[day_start + 5]).strftime("%Y-%m-%d")
-            res["Weekday"][-1] = datetime.utcfromtimestamp(time[day_start + 5]).strftime("%A")
-            res["Day N"][-1] = iday
-            res["N hours"][-1] = around((time[day_stop - 1] - time[day_start]) / 3600, 1)
+            res["Date"][iday] = datetime.utcfromtimestamp(time[day_start + 5]).strftime("%Y-%m-%d")
+            res["Weekday"][iday] = datetime.utcfromtimestamp(time[day_start + 5]).strftime("%A")
+            res["Day N"][iday] = iday + 1
+            res["N hours"][iday] = around((time[day_stop - 1] - time[day_start]) / 3600, 1)
 
             # get the intersection of wear time and day
             day_wear_starts, day_wear_stops = get_day_index_intersection(
@@ -242,17 +229,12 @@ class MVPActivityClassification(_BaseProcess):
             )
 
             # less wear time than minimum
-            res["N wear hours"][-1] = around(sum(day_wear_stops - day_wear_starts) / fs / 3600, 1)
-            res["N wear awake hours"][-1] = around(
+            res["N wear hours"][iday] = around(sum(day_wear_stops - day_wear_starts) / fs / 3600, 1)
+            res["N wear awake hours"][iday] = around(
                 sum(day_wear_wake_stops - day_wear_wake_starts) / fs / 3600, 1
             )
-            if res["N wear hours"][-1] < self.min_wear:
-                for k in mvpa_keys:
-                    res[k].append(nan)
+            if res["N wear hours"][iday] < self.min_wear:
                 continue  # skip day
-            else:
-                for k in mvpa_keys:
-                    res[k].append(0.0)
 
             # intensity gradient should be done on the whole days worth of data
             hist = zeros(iglevels.size - 1)
@@ -287,9 +269,10 @@ class MVPActivityClassification(_BaseProcess):
 
             # intensity gradient computation per day
             hist *= (self.wlen / 60)
-            res["IG Gradient"][-1], \
-                res["IG Intercept"][-1], \
-                res["IG R-squared"][-1] = get_intensity_gradient(igvals, hist)
+            ig_res = get_intensity_gradient(igvals, hist)
+            res[("MM", "IG", "gradient")][iday] = ig_res[0]
+            res[("MM", "IG", "intercept")][iday] = ig_res[1]
+            res[("MM", "IG", "R-squared")][iday] = ig_res[2]
 
         kwargs.update({self._time: time, self._acc: accel})
 
