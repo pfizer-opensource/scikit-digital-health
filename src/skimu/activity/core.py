@@ -190,6 +190,9 @@ class MVPActivityClassification(_BaseProcess):
         slp_msg = f"[{self!s}] No sleep information found. Only computing full day metrics."
         sleep_starts, sleep_stops = _check_if_none(sleep, self.logger, slp_msg, 0, time.size)
 
+        # ========================================================================================
+        # SETUP RESULTS KEYS/ENDPOINTS
+        # ========================================================================================
         general_str_keys = ["Date", "Weekday"]
         general_int_keys = ["Day N", "N Hours", "N wear hours", "N wear awake hours"]
 
@@ -207,6 +210,9 @@ class MVPActivityClassification(_BaseProcess):
         res.update({i: full(len(days), nan, dtype="float") for i in lvl_keys})
         res.update({i: full(len(days), nan, dtype="float") for i in ig_keys})
 
+        # ========================================================================================
+        # PROCESSING
+        # ========================================================================================
         for iday, day_idx in enumerate(days):
             day_start, day_stop = day_idx
 
