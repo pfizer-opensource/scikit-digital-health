@@ -29,9 +29,9 @@ class TestGetDayIndexIntersection:
         3: np.array([2300, 3000])
     }
     stops = {
-        1: np.array([2900, 4000]),
+        1: np.array([2900, 3900]),
         2: np.array([2900, 3800]),
-        3: np.array([2900, 4000])
+        3: np.array([2900, 3900])
     }
 
     so_starts = {  # sleep only
