@@ -14,7 +14,7 @@ from scipy.stats import linregress
 
 from skimu.base import _BaseProcess
 from skimu.utility import moving_mean
-from skimu.utility.internal import get_day_wear_intersection
+from skimu.utility.internal import get_day_index_intersection
 from skimu.activity.cutpoints import _base_cutpoints
 
 
@@ -181,25 +181,34 @@ class MVPActivityClassification(_BaseProcess):
 
         # check if sleep data is provided
         sleep = kwargs.get("sleep", None)
+        if sleep is None:
+            self.logger.info(f"[{self!s}] No sleep information found. Not computing metrics "
+                             f"during only awake time.")
+            sleep_starts = array([0])
+            sleep_stops = array([time.size])
+        else:
+            sleep_starts = sleep[:, 0]
+            sleep_stops = sleep[:, 1]
 
         general_keys = [
             "Date",
             "Weekday",
             "Day N",
             "N hours",
-            "N wear hours"
+            "N wear hours",
+            "N wear awake hours"
         ]
         mvpa_keys = [
             ("MM", "MVPA", "5sec", "epoch"),
             ("MM", "MVPA", "1min", "epoch"),
             ("MM", "MVPA", "5min", "epoch"),
-            ("WS", "MVPA", "5sec", "epoch"),
-            ("WS", "MVPA", "1min", "epoch"),
-            ("WS", "MVPA", "5min", "epoch"),
+            ("ExS", "MVPA", "5sec", "epoch"),
+            ("ExS", "MVPA", "1min", "epoch"),
+            ("ExS", "MVPA", "5min", "epoch"),
         ]
 
-        # MM: midnight -> midnight    WS: wake -> sleep
-        windows = ["MM", "WS"]
+        # MM: midnight -> midnight    ExS: Exclude Sleep
+        windows = ["MM", "ExS"]
         activity_levels = ["MVPA", "sed", "light", "mod", "vig"]
         prod_keys = list(iter_product(windows, activity_levels, self.blens))
 
@@ -212,19 +221,31 @@ class MVPActivityClassification(_BaseProcess):
             for k in general_keys + ig_keys:
                 res[k].append(nan)
 
-            start, stop = day_idx
+            day_start, day_stop = day_idx
 
-            res["Date"][-1] = datetime.utcfromtimestamp(time[start + 5]).strftime("%Y-%m-%d")
-            res["Weekday"][-1] = datetime.utcfromtimestamp(time[start + 5]).strftime("%A")
+            res["Date"][-1] = datetime.utcfromtimestamp(time[day_start + 5]).strftime("%Y-%m-%d")
+            res["Weekday"][-1] = datetime.utcfromtimestamp(time[day_start + 5]).strftime("%A")
             res["Day N"][-1] = iday
-            res["N hours"][-1] = around((time[stop - 1] - time[start]) / 3600, 1)
+            res["N hours"][-1] = around((time[day_stop - 1] - time[day_start]) / 3600, 1)
 
             # get the intersection of wear time and day
-            day_wear_starts, day_wear_stops = get_day_wear_intersection(
-                wear_starts, wear_stops, start, stop)
+            day_wear_starts, day_wear_stops = get_day_index_intersection(
+                wear_starts, wear_stops, True, day_start, day_stop
+            )
+            # get the intersection of wear time, wake time, and day
+            day_wear_wake_starts, day_wear_wake_stops = get_day_index_intersection(
+                (wear_starts, sleep_starts),
+                (wear_stops, sleep_stops),
+                (True, False),
+                day_start,
+                day_stop
+            )
 
             # less wear time than minimum
             res["N wear hours"][-1] = around(sum(day_wear_stops - day_wear_starts) / fs / 3600, 1)
+            res["N wear awake hours"][-1] = around(
+                sum(day_wear_wake_stops - day_wear_wake_starts) / fs / 3600, 1
+            )
             if res["N wear hours"][-1] < self.min_wear:
                 for k in mvpa_keys:
                     res[k].append(nan)
@@ -237,7 +258,6 @@ class MVPActivityClassification(_BaseProcess):
             hist = zeros(iglevels.size - 1)
 
             for dwstart, dwstop in zip(day_wear_starts, day_wear_stops):
-                hours = (dwstop - dwstart) / fs / 3600
                 # compute the metric for the acceleration
                 accel_metric = self.cutpoints["metric"](
                     accel[dwstart:dwstop], nwlen, fs,
@@ -246,13 +266,14 @@ class MVPActivityClassification(_BaseProcess):
 
                 # MVPA
                 # total time of `wlen` epochs in minutes
-                res["MVPA 5sec Epochs"][-1] += sum(accel_metric >= self.cutpoints["light"]) / epm
+                res[("MM", "MVPA", "5sec", "epoch")][-1] += sum(
+                    accel_metric >= self.cutpoints["light"]) / epm
                 # total time of 1 minute epochs
                 tmp = moving_mean(accel_metric, epm, epm)
-                res["MVPA 1min Epochs"][-1] += sum(tmp >= self.cutpoints["light"])  # in minutes
+                res[("MM", "MVPA", "1min", "epoch")][-1] += sum(tmp >= self.cutpoints["light"])
                 # total time in 5 minute epochs
                 tmp = moving_mean(accel_metric, 5 * epm, 5 * epm)
-                res["MVPA 5min Epochs"][-1] += sum(tmp >= self.cutpoints["light"]) * 5  # in minutes
+                res[("MM", "MVPA", "5min", "epoch")][-1] += sum(tmp >= self.cutpoints["light"]) * 5
 
                 # total MVPA time in <bout_len> minute bouts
                 for bout_len in self.blens:
