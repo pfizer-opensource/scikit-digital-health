@@ -4,72 +4,55 @@ from skimu.utility.internal import rle, get_day_index_intersection
 
 
 class TestGetDayIndexIntersection:
-    day_start = 2000
-    day_stop = 4000
+    def test(self, day_ends, sleep_ends, wear_ends, true_intersect_ends):
+        day_start, day_stop = day_ends
+        sleep_starts, sleep_stops = sleep_ends
+        wear_starts, wear_stops = wear_ends
+        true_starts, true_stops = true_intersect_ends
 
-    # treat sleep as exclusionary
-    sleep_starts = {
-        1: np.array([200, 1200, 2200, 4200]),
-        2: np.array([200, 1800, 3800]),
-        3: np.array([200, 1500, 4200])
-    }
-    sleep_stops = {
-        1: np.array([800, 1800, 2800, 5000]),
-        2: np.array([800, 2500, 4400]),
-        3: np.array([200, 1900, 5000])
-    }
-
-    wear_starts = np.array([0, 2300, 3000])
-    wear_stops = np.array([1800, 2900, 3900])
-
-    # solutions
-    starts = {
-        1: np.array([2800, 3000]),
-        2: np.array([2500, 3000]),
-        3: np.array([2300, 3000])
-    }
-    stops = {
-        1: np.array([2900, 3900]),
-        2: np.array([2900, 3800]),
-        3: np.array([2900, 3900])
-    }
-
-    so_starts = {  # sleep only
-        1: np.array([2000, 2800]),
-        2: np.array([2500]),
-        3: np.array([2000])
-    }
-    so_stops = {
-        1: np.array([2200, 4000]),
-        2: np.array([3800]),
-        3: np.array([4000])
-    }
-
-    def test(self):
         for i in range(1, 4):
             p_starts, p_stops = get_day_index_intersection(
-                (self.sleep_starts[i], self.wear_starts),
-                (self.sleep_stops[i], self.wear_stops),
+                (sleep_starts[i], wear_starts),
+                (sleep_stops[i], wear_stops),
                 (False, True),
-                self.day_start,
-                self.day_stop
+                day_start,
+                day_stop
             )
 
-            assert np.allclose(p_starts, self.starts[i])
-            assert np.allclose(p_stops, self.stops[i])
+            assert np.allclose(p_starts, true_starts[i])
+            assert np.allclose(p_stops, true_stops[i])
 
-    def test_sleep_only(self):
+    def test_sleep_only(self, day_ends, sleep_ends, true_sleep_only_ends):
+        day_start, day_stop = day_ends
+        sleep_starts, sleep_stops = sleep_ends
+        true_starts, true_stops = true_sleep_only_ends
+
         for i in range(1, 4):
             p_starts, p_stops = get_day_index_intersection(
-                self.sleep_starts[i],
-                self.sleep_stops[i],
+                sleep_starts[i],
+                sleep_stops[i],
                 False,
-                self.day_start,
-                self.day_stop
+                day_start,
+                day_stop
             )
 
-            assert np.allclose(p_starts, self.so_starts[i])
-            assert np.allclose(p_stops, self.so_stops[i])
+            assert np.allclose(p_starts, true_starts[i])
+            assert np.allclose(p_stops, true_stops[i])
+
+    def test_wear_only(self, day_ends, wear_ends):
+        day_start, day_stop = day_ends
+        wear_starts, wear_stops = wear_ends
+
+        p_starts, p_stops = get_day_index_intersection(
+            wear_starts,
+            wear_stops,
+            True,
+            day_start,
+            day_stop
+        )
+
+        assert np.allclose(p_starts, wear_starts[1:])
+        assert np.allclose(p_stops, wear_stops[1:])
 
 
 class TestRLE:
