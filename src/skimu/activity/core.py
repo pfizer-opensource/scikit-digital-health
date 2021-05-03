@@ -231,13 +231,17 @@ class MVPActivityClassification(_BaseProcess):
 
             # get the intersection of wear time and day
             day_wear_starts, day_wear_stops = get_day_index_intersection(
-                wear_starts, wear_stops, True, day_start, day_stop
+                wear_starts,
+                wear_stops,
+                True,  # include wear time
+                day_start,
+                day_stop
             )
             # get the intersection of wear time, wake time, and day
             day_wear_wake_starts, day_wear_wake_stops = get_day_index_intersection(
                 (wear_starts, sleep_starts),
                 (wear_stops, sleep_stops),
-                (True, False),
+                (True, False),  # include wear time, exclude sleeping time
                 day_start,
                 day_stop
             )
