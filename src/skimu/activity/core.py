@@ -252,7 +252,7 @@ class MVPActivityClassification(_BaseProcess):
                 sum(day_wear_wake_stops - day_wear_wake_starts) / fs / 3600, 1
             )
             if res["N wear hours"][iday] < self.min_wear:
-                continue  # skip day
+                continue  # skip day if less than minimum specified hours of wear time
 
             # intensity gradient is on whole day, accumulate over each wear bout for whole day
             hist = zeros(iglevels.size - 1)
@@ -301,6 +301,15 @@ class MVPActivityClassification(_BaseProcess):
             return res
 
 
+def get_activity_metrics_across_indexing():
+    """
+    Compute the activity metrics for different ways of indexing a day into bouts
+    Returns
+    -------
+
+    """
+    # compute the desired acceleration metric
+    acc_metric =
 def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, boutmetric=1):
     """
     Get the number of bouts of activity level based on several criteria.
