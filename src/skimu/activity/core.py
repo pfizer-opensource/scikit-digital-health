@@ -27,6 +27,17 @@ def _check_if_none(var, lgr, msg_if_none, i1, i2):
     return start, stop
 
 
+def _update_date_results(results, timestamps, day_n, day_start_idx, day_stop_idx):
+    day_date = datetime.utcfromtimestamp(timestamps[day_start_idx] + 5)
+    results["Date"][day_n] = day_date.strftime("%Y-%m-%d")
+    results["Weekday"][day_n] = day_date.strftime("%A")
+    results["Day N"][day_n] = day_n + 1
+    results["N hours"][day_n] = around(
+        (timestamps[day_stop_idx - 1] - timestamps[day_start_idx]) / 3600,
+        1
+    )
+
+
 class MVPActivityClassification(_BaseProcess):
     """
     Classify accelerometer data into different activity levels as a proxy for assessing physical
@@ -216,10 +227,7 @@ class MVPActivityClassification(_BaseProcess):
         for iday, day_idx in enumerate(days):
             day_start, day_stop = day_idx
 
-            res["Date"][iday] = datetime.utcfromtimestamp(time[day_start + 5]).strftime("%Y-%m-%d")
-            res["Weekday"][iday] = datetime.utcfromtimestamp(time[day_start + 5]).strftime("%A")
-            res["Day N"][iday] = iday + 1
-            res["N hours"][iday] = around((time[day_stop - 1] - time[day_start]) / 3600, 1)
+            _update_date_results(res, time, iday, day_start, day_stop)
 
             # get the intersection of wear time and day
             day_wear_starts, day_wear_stops = get_day_index_intersection(
