@@ -29,9 +29,20 @@ class TestGetDayIndexIntersection:
         3: np.array([2300, 3000])
     }
     stops = {
-    1: np.array([2900, 4000]),
-    2: np.array([2900, 3800]),
-    3: np.array([2900, 4000])
+        1: np.array([2900, 4000]),
+        2: np.array([2900, 3800]),
+        3: np.array([2900, 4000])
+    }
+
+    so_starts = {  # sleep only
+        1: np.array([2000, 2800]),
+        2: np.array([2500]),
+        3: np.array([2000])
+    }
+    so_stops = {
+        1: np.array([2200, 4000]),
+        2: np.array([3800]),
+        3: np.array([4000])
     }
 
     def test(self):
@@ -46,6 +57,19 @@ class TestGetDayIndexIntersection:
 
             assert np.allclose(p_starts, self.starts[i])
             assert np.allclose(p_stops, self.stops[i])
+
+    def test_sleep_only(self):
+        for i in range(1, 4):
+            p_starts, p_stops = get_day_index_intersection(
+                self.sleep_starts[i],
+                self.sleep_stops[i],
+                False,
+                self.day_start,
+                self.day_stop
+            )
+
+            assert np.allclose(p_starts, self.so_starts[i])
+            assert np.allclose(p_stops, self.so_stops[i])
 
 
 class TestRLE:
