@@ -5,7 +5,78 @@ Lukas Adamowicz
 Pfizer DMTI 2021
 """
 from numpy import asarray, nonzero, insert, append, arange, interp, zeros, around, diff, float_,\
-    int_
+    int_, ndarray, full, minimum, maximum
+
+
+def get_day_index_intersection(starts, stops, for_inclusion, day_start, day_stop):
+    """
+    Get the intersection between day start and stop indices and various start and stop indices
+    that may or may not happen during the day, and are not necessarily for inclusion.
+
+    Parameters
+    ----------
+    starts : numpy.ndarray, tuple
+        Single ndarray or tuple of ndarrays indicating the starts of events to either include or
+        exclude from during the day.
+    stops : numpy.ndarray, tuple
+    Single ndarray or tuple of ndarrays indicating the stops of events to either include or
+        exclude from during the day.
+    for_inclusion : bool, tuple
+        Single or tuple of booleans indicating if the corresponding start & stop indices are
+        for inclusion or not.
+    day_start : int
+        Day start index.
+    day_stop : int
+        Day stop index.
+
+    Returns
+    -------
+    valid_starts : numpy.ndarray
+        Intersection of overlapping day and event start indices that are valid/usable.
+    valid_stops : numpy.ndarray
+        Intersection of overlapping day and event stop indices that are valid/usable.
+    """
+    day_start, day_stop = int(day_start), int(day_stop)
+
+    # make a common format instead of having to deal with different formats later
+    if isinstance(starts, ndarray):
+        starts = (starts,)
+    if isinstance(stops, ndarray):
+        stops = (stops,)
+
+    if len(starts) != len(stops):
+        raise ValueError("Number of start arrays does not match number of stop arrays.")
+    if isinstance(for_inclusion, bool):
+        for_inclusion = (for_inclusion,) * len(starts)
+
+    # first pass, just use boolean array and RLE
+    barray = full(day_stop - day_start, True, dtype=bool)
+
+    for start_, stop_, fe in zip(starts, stops, for_inclusion):
+        start = maximum(start_ - day_start, 0)
+        stop = minimum(stop_ - day_start, day_stop - day_start)
+
+        for i1, i2 in zip(start, stop):
+            barray[i1:i2] &= fe
+
+    lengths, starts, vals = rle(barray)
+
+    """
+    # get the subset that intersect with the day indices. make a list so its mutable
+    starts_subset = list(i[i >= day_start] & (i < day_stop) for i in starts)
+    stops_subset = list(i[i > day_start] & (i <= day_stop) for i in starts)
+
+    # handle edge cases
+    for i in range(len(starts_subset)):
+        if starts_subset[i].size == (stops_subset[i].size - 1):
+            starts_subset[i] = insert(starts_subset[i], 0, day_start)
+        if (starts_subset[i].size - 1) == stops_subset[i].size:
+            stops_subset[i] = append(stops_subset[i], day_stop)
+    """
+    valid_starts = starts[vals]
+    valid_stops = valid_starts + lengths[vals]
+
+    return valid_starts, valid_stops
 
 
 def get_day_wear_intersection(starts, stops, day_start, day_stop):
