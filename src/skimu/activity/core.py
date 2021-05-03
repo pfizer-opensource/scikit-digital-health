@@ -9,7 +9,7 @@ from warnings import warn
 from itertools import product as iter_product
 
 from numpy import nonzero, array, insert, append, mean, diff, sum, zeros, abs, argmin, argmax, \
-    maximum, int_, floor, ceil, histogram, log, nan, around
+    maximum, int_, floor, ceil, histogram, log, nan, around, argsort
 from scipy.stats import linregress
 
 from skimu.base import _BaseProcess
@@ -479,3 +479,60 @@ def get_intensity_gradient(ig_values, counts):
     slope, intercept, rval, *_ = linregress(lx, ly)
 
     return slope, intercept, rval**2
+
+
+def get_day_sleep_intersection(day_start, day_stop, sleep):
+    """
+    Get the end of sleep and start of sleep for a day given the day start and stop indices.
+
+    Parameters
+    ----------
+    day_start : int
+        Index of the day start.
+    day_stop : int
+        Index of the day stop.
+    sleep : numpy.ndarray
+        Array of sleep start and stop indices. (N, 2) shape, where [:, 0] is the index for sleep
+        starts, and [:, 1] is the index for sleep stops
+
+    Returns
+    -------
+    day_wake_start : int
+        Index of when the day starts and subject is awake.
+    day_wake_stop : int
+        Index of when the day ends and the subject is asleep.
+    """
+    if sleep is None:
+        return None, None
+
+    wake_changes = []
+    wake_states = []
+
+    mask = (sleep[:, 1] < day_stop) & (sleep[:, 1] > day_start)
+    wake_changes.extend(sleep[mask, 1].to_list())
+    wake_states.extend(["start"] * mask.sum())
+
+    mask = (sleep[:, 0] < day_stop) & (sleep[:, 0] > day_start)
+    wake_changes.extend(sleep[mask, 0].to_list())
+    wake_states.extend(["stop"] * mask.sum())
+
+    if wake_changes == []:
+        return
+
+    idx = argsort(wake_changes)
+
+    wake_changes = array(wake_changes)[idx]
+    wake_states = array(wake_states)[idx]
+
+    if wake_states[0] == "stop":
+        wake_changes = insert(wake_changes, 0, day_start)
+        wake_states = insert(wake_states, 0, "start")
+
+    if wake_states[-1] == "start":
+        wake_changes = append(wake_changes, day_stop)
+        wake_states = append(wake_states, "stop")
+
+    # now pattern should always be [start][stop]...
+
+
+
