@@ -5,7 +5,7 @@ Lukas Adamowicz
 Pfizer DMTI 2021
 """
 from numpy import asarray, nonzero, insert, append, arange, interp, zeros, around, diff, float_,\
-    int_, ndarray, full, minimum, maximum
+    int_, ndarray, concatenate, minimum, maximum, roll
 
 
 def get_day_index_intersection(starts, stops, for_inclusion, day_start, day_stop):
@@ -49,34 +49,48 @@ def get_day_index_intersection(starts, stops, for_inclusion, day_start, day_stop
     if isinstance(for_inclusion, bool):
         for_inclusion = (for_inclusion,) * len(starts)
 
-    # first pass, just use boolean array and RLE
-    barray = full(day_stop - day_start, True, dtype=bool)
+    # get the subset that intersect the day in a roundabout way
+    starts_tmp = list(
+        minimum(maximum(i - day_start, 0), day_stop - day_start) for i in starts
+    )
+    stops_tmp = list(
+        minimum(maximum(i - day_start, 0), day_stop - day_start) for i in stops
+    )
+    starts_subset, stops_subset = [], []
+    for start, stop, fi in zip(starts_tmp, stops_tmp, for_inclusion):
+        if fi:  # flip everything to being an "exclude" window
+            tmp = roll(start, -1)
+            tmp[-1] = day_stop - day_start
 
-    for start_, stop_, fe in zip(starts, stops, for_inclusion):
-        start = maximum(start_ - day_start, 0)
-        stop = minimum(stop_ - day_start, day_stop - day_start)
+            starts_subset.append(stop[stop != tmp])
+            stops_subset.append(tmp[stop != tmp])
+        else:
+            starts_subset.append(start[start != stop])
+            stops_subset.append(stop[start != stop])
 
-        for i1, i2 in zip(start, stop):
-            barray[i1:i2] &= fe
+    # get overlap
+    all_starts = concatenate(starts_subset)
+    all_stops = concatenate(stops_subset)
 
-    lengths, starts, vals = rle(barray)
+    valid_starts, valid_stops = [0], [day_stop - day_start]
 
-    """
-    # get the subset that intersect with the day indices. make a list so its mutable
-    starts_subset = list(i[i >= day_start] & (i < day_stop) for i in starts)
-    stops_subset = list(i[i > day_start] & (i <= day_stop) for i in starts)
+    for start, stop in zip(all_starts, all_stops):
+        cond1 = [i <= start <= j for i, j in zip(valid_starts, valid_stops)]
+        cond2 = [i <= stop <= j for i, j in zip(valid_starts, valid_stops)]
 
-    # handle edge cases
-    for i in range(len(starts_subset)):
-        if starts_subset[i].size == (stops_subset[i].size - 1):
-            starts_subset[i] = insert(starts_subset[i], 0, day_start)
-        if (starts_subset[i].size - 1) == stops_subset[i].size:
-            stops_subset[i] = append(stops_subset[i], day_stop)
-    """
-    valid_starts = starts[vals] + day_start
-    valid_stops = valid_starts + lengths[vals]
+        for i, (c1, c2) in enumerate(zip(cond1, cond2)):
+            if c1 and c2:
+                valid_starts.insert(i + 1, stop)  # valid_starts[i] = [valid_starts[i], stop]
+                valid_stops.insert(i, start)  # valid_stops[i] = [start, valid_stops[i]]
+            elif c1:
+                valid_stops[i] = start
+            elif c2:
+                valid_starts[i] = stop
 
-    return valid_starts, valid_stops
+    valid_starts = asarray(valid_starts) + day_start
+    valid_stops = asarray(valid_stops) + day_start
+
+    return valid_starts[valid_starts != valid_stops], valid_stops[valid_starts != valid_stops]
 
 
 def get_day_wear_intersection(starts, stops, day_start, day_stop):
