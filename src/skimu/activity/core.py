@@ -226,7 +226,7 @@ class MVPActivityClassification(_BaseProcess):
         # ========================================================================================
         for iday, day_idx in enumerate(days):
             day_start, day_stop = day_idx
-
+            # update the results dictionary with date strings, # of hours, etc
             _update_date_results(res, time, iday, day_start, day_stop)
 
             # get the intersection of wear time and day
@@ -254,9 +254,10 @@ class MVPActivityClassification(_BaseProcess):
             if res["N wear hours"][iday] < self.min_wear:
                 continue  # skip day
 
-            # intensity gradient should be done on the whole days worth of data
+            # intensity gradient is on whole day, accumulate over each wear bout for whole day
             hist = zeros(iglevels.size - 1)
 
+            # iterate over the blocks of wear time during the day
             for dwstart, dwstop in zip(day_wear_starts, day_wear_stops):
                 # compute the metric for the acceleration
                 accel_metric = self.cutpoints["metric"](
