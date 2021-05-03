@@ -1,3 +1,4 @@
+import pytest
 import numpy as np
 
 from skimu.utility.internal import rle, get_day_index_intersection
@@ -53,6 +54,19 @@ class TestGetDayIndexIntersection:
 
         assert np.allclose(p_starts, wear_starts[1:])
         assert np.allclose(p_stops, wear_stops[1:])
+
+    def test_mismatch_length_error(self, day_ends, wear_ends):
+        day_start, day_stop = day_ends
+        wear_starts, wear_stops = wear_ends
+
+        with pytest.raises(ValueError):
+            p_starts, p_stops = get_day_index_intersection(
+                (wear_starts, np.array([1, 2, 3])),
+                wear_stops,
+                True,
+                day_start,
+                day_stop
+            )
 
 
 class TestRLE:
