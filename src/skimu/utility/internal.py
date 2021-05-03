@@ -73,7 +73,7 @@ def get_day_index_intersection(starts, stops, for_inclusion, day_start, day_stop
         if (starts_subset[i].size - 1) == stops_subset[i].size:
             stops_subset[i] = append(stops_subset[i], day_stop)
     """
-    valid_starts = starts[vals]
+    valid_starts = starts[vals] + day_start
     valid_stops = valid_starts + lengths[vals]
 
     return valid_starts, valid_stops
