@@ -7,7 +7,8 @@ Pfizer DMTI 2021
 from numpy import min, max, percentile, zeros, bool_, pad
 
 from skimu.utility import moving_mean, moving_median, moving_sd
-from skimu.sleep.utility import *
+from skimu.sleep.utility import compute_z_angle, compute_absolute_difference, drop_min_blocks, \
+    arg_longest_bout
 
 
 def get_total_sleep_opportunity(
@@ -29,9 +30,9 @@ def get_total_sleep_opportunity(
     temperature : numpy.ndarray
         (N, 3) array of temperature values in celsius.
     wear_starts : {numpy.ndarray, None}
-        Indices for the starts of wear-time. Note that while `time` and `accel` should be the values
-        for one day, `wear_starts` is likely indexed to the whole data series. This offset can
-        be adjusted by `idx_start`. If indexing only into the one day, `idx_start` should be 0.
+        Indices for the starts of wear-time. Note that while `time` and `accel` should be the
+        values for one day, `wear_starts` is likely indexed to the whole data series. This offset
+        can be adjusted by `idx_start`. If indexing only into the one day, `idx_start` should be 0.
         If None, will compute wear internally.
     wear_stops : {numpy.ndarray, None}
         Indices for the stops of wear-time. Note that while `time` and `accel` should be the values
@@ -123,7 +124,13 @@ def get_total_sleep_opportunity(
 
     # drop rest blocks less than minimum allowed rest length
     # even though rolling 5min, the underlying windows are 5s, so 12 * minutes => number of samples
-    tso = drop_min_blocks(tso, 12 * min_rest_block, drop_value=1, replace_value=0, skip_bounds=True)
+    tso = drop_min_blocks(
+        tso,
+        12 * min_rest_block,
+        drop_value=1,
+        replace_value=0,
+        skip_bounds=True
+    )
     # drop active blocks less than maximum allowed active length
     tso = drop_min_blocks(tso, 12 * max_act_break, drop_value=0, replace_value=1, skip_bounds=True)
 
@@ -146,7 +153,8 @@ def get_total_sleep_opportunity(
 
 def compute_tso_threshold(arr, min_td=0.1, max_td=0.5):
     """
-    Computes the daily threshold value separating rest periods from active periods for the TSO detection algorithm.
+    Computes the daily threshold value separating rest periods from active periods for the TSO
+    detection algorithm.
 
     Parameters
     ----------

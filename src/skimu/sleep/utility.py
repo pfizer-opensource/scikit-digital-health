@@ -95,7 +95,8 @@ def compute_z_angle(acc):
 
 def compute_absolute_difference(arr):
     """
-    Computes the absolute difference between an array and itself shifted by 1 sample along the first axis.
+    Computes the absolute difference between an array and itself shifted by 1 sample along the
+    first axis.
 
     Parameters
     ----------

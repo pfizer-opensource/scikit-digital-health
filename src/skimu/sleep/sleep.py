@@ -23,7 +23,7 @@ from skimu.utility.internal import get_day_wear_intersection, apply_downsample, 
 from skimu.sleep.tso import get_total_sleep_opportunity
 from skimu.sleep.utility import compute_activity_index
 from skimu.sleep.sleep_classification import compute_sleep_predictions
-from skimu.sleep.endpoints import *
+from skimu.sleep import endpoints
 
 
 def _get_date(epoch_ts, day_start_hour):
@@ -51,8 +51,8 @@ def _get_date(epoch_ts, day_start_hour):
     10:00, the day returned will be the day *before*, as this would correspond to when the window
     would have started provided the data. This matches the dates schema for the rest of the data.
     """
-    # add 15 seconds to make sure any rounding effects for the hour dont adversely effect the result
-    # of the comparison
+    # add 15 seconds to make sure any rounding effects for the hour dont adversely effect the
+    # result of the comparison
     start_dt = datetime.utcfromtimestamp(epoch_ts + 15)
 
     if start_dt.hour < day_start_hour:
@@ -119,39 +119,43 @@ class Sleep(_BaseProcess):
 
     References
     ----------
-    .. [1] van Hees V, Fang Z, Zhao J, Heywood J, Mirkes E, Sabia S, Migueles J (2019). GGIR: Raw Accelerometer Data Analysis.
-        doi: 10.5281/zenodo.1051064, R package version 1.9-1, https://CRAN.R-project.org/package=GGIR.
-    .. [2] van Hees V, Fang Z, Langford J, Assah F, Mohammad Mirkes A, da Silva I, Trenell M, White T, Wareham N,
-        Brage S (2014). 'Autocalibration of accelerometer data or free-living physical activity assessment using local gravity and
-        temperature: an evaluation on four continents.' Journal of Applied Physiology, 117(7), 738-744.
-        doi: 10.1152/japplphysiol.00421.2014, https://www.physiology.org/doi/10.1152/japplphysiol.00421.2014
-    .. [3] van Hees V, Sabia S, Anderson K, Denton S, Oliver J, Catt M, Abell J, Kivimaki M, Trenell M, Singh-Maoux A (2015).
-        'A Novel, Open Access Method to Assess Sleep Duration Using a Wrist-Worn Accelerometer.' PloS One, 10(11).
-        doi: 10.1371/journal.pone.0142533, http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0142533.
-    .. [4] Cole, R.J., Kripke, D.F., Gruen, W.'., Mullaney, D.J., & Gillin, J.C. (1992). Automatic sleep/wake identification
-        from wrist activity. Sleep, 15 5, 461-9.
-    .. [5] Bai J, Di C, Xiao L, Evenson KR, LaCroix AZ, Crainiceanu CM, et al. (2016) An Activity Index for Raw Accelerometry
-        Data and Its Comparison with Other Activity Metrics. PLoS ONE 11(8): e0160644.
-        https://doi.org/10.1371/journal.pone.0160644
+    .. [1] van Hees V, Fang Z, Zhao J, Heywood J, Mirkes E, Sabia S, Migueles J (2019). GGIR: Raw
+        Accelerometer Data Analysis. doi: 10.5281/zenodo.1051064, R package version 1.9-1,
+        https://CRAN.R-project.org/package=GGIR.
+    .. [2] van Hees V, Fang Z, Langford J, Assah F, Mohammad Mirkes A, da Silva I, Trenell M,
+        White T, Wareham N, Brage S (2014). 'Autocalibration of accelerometer data or free-living
+        physical activity assessment using local gravity and temperature: an evaluation on four
+        continents.' Journal of Applied Physiology, 117(7), 738-744.
+        doi: 10.1152/japplphysiol.00421.2014,
+        https://www.physiology.org/doi/10.1152/japplphysiol.00421.2014
+    .. [3] van Hees V, Sabia S, Anderson K, Denton S, Oliver J, Catt M, Abell J, Kivimaki M,
+        Trenell M, Singh-Maoux A (2015). 'A Novel, Open Access Method to Assess Sleep Duration
+        Using a Wrist-Worn Accelerometer.' PloS One, 10(11). doi: 10.1371/journal.pone.0142533,
+        http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0142533.
+    .. [4] Cole, R.J., Kripke, D.F., Gruen, W.'., Mullaney, D.J., & Gillin, J.C. (1992). Automatic
+        sleep/wake identification from wrist activity. Sleep, 15 5, 461-9.
+    .. [5] Bai J, Di C, Xiao L, Evenson KR, LaCroix AZ, Crainiceanu CM, et al. (2016) An Activity
+        Index for Raw Accelerometry Data and Its Comparison with Other Activity Metrics. PLoS ONE
+        11(8): e0160644. https://doi.org/10.1371/journal.pone.0160644
     """
     _params = [
         # normal metrics
-        TotalSleepTime,
-        PercentTimeAsleep,
-        NumberWakeBouts,
-        SleepOnsetLatency,
-        WakeAfterSleepOnset,
+        endpoints.TotalSleepTime,
+        endpoints.PercentTimeAsleep,
+        endpoints.NumberWakeBouts,
+        endpoints.SleepOnsetLatency,
+        endpoints.WakeAfterSleepOnset,
         # fragmentation metrics
-        AverageSleepDuration,
-        AverageWakeDuration,
-        SleepWakeTransitionProbability,
-        WakeSleepTransitionProbability,
-        SleepGiniIndex,
-        WakeGiniIndex,
-        SleepAverageHazard,
-        WakeAverageHazard,
-        SleepPowerLawDistribution,
-        WakePowerLawDistribution
+        endpoints.AverageSleepDuration,
+        endpoints.AverageWakeDuration,
+        endpoints.SleepWakeTransitionProbability,
+        endpoints.WakeSleepTransitionProbability,
+        endpoints.SleepGiniIndex,
+        endpoints.WakeGiniIndex,
+        endpoints.SleepAverageHazard,
+        endpoints.WakeAverageHazard,
+        endpoints.SleepPowerLawDistribution,
+        endpoints.WakePowerLawDistribution
     ]
 
     def __init__(
@@ -263,12 +267,12 @@ class Sleep(_BaseProcess):
         >>> sleep.add_metrics(NewSleepMetric)
         """
         if isinstance(metrics, Iterable):
-            if all(isinstance(i(), SleepMetric) for i in metrics):
+            if all(isinstance(i(), endpoints.SleepMetric) for i in metrics):
                 self._params.extend(metrics)
             else:
                 raise ValueError("Not all objects are `SleepMetric`s.")
         else:
-            if isinstance(metrics(), SleepMetric):
+            if isinstance(metrics(), endpoints.SleepMetric):
                 self._params.append(metrics)
             else:
                 raise ValueError(f"Metric {metrics!r} is not a `SleepMetric`.")
@@ -297,7 +301,14 @@ class Sleep(_BaseProcess):
             Dictionary containing (N, 2) arrays of start and stop indices for individual days.
             Must have the key
         """
-        super().predict(time=time, accel=accel, temperature=temperature, fs=fs, wear=wear, **kwargs)
+        super().predict(
+            time=time,
+            accel=accel,
+            temperature=temperature,
+            fs=fs,
+            wear=wear,
+            **kwargs
+        )
 
         if fs is None:
             fs = 1 / mean(diff(time[:5000]))
@@ -450,7 +461,10 @@ class Sleep(_BaseProcess):
     def _setup_day_plot(self, iday, source_file, date_str, start_dt):
         if self.f is not None:
             f, ax = plt.subplots(
-                nrows=4, figsize=(12, 6), sharex=True, gridspec_kw={'height_ratios': [1, 1, 1, 0.5]}
+                nrows=4,
+                figsize=(12, 6),
+                sharex=True,
+                gridspec_kw={'height_ratios': [1, 1, 1, 0.5]}
             )
 
             f.suptitle(f"Visual Report: {Path(source_file).name}\nDay: {iday}\nDate: {date_str}")
@@ -500,7 +514,11 @@ class Sleep(_BaseProcess):
             hx = mlines.Line2D([], [], color="C0", label="X", lw=0.5)
             hy = mlines.Line2D([], [], color="C1", label="Y", lw=0.5)
             hz = mlines.Line2D([], [], color="C2", label="Z", lw=0.5)
-            self.ax[-1][0].legend(handles=[hx, hy, hz], bbox_to_anchor=(0, 0.5), loc="center right")
+            self.ax[-1][0].legend(
+                handles=[hx, hy, hz],
+                bbox_to_anchor=(0, 0.5),
+                loc="center right"
+            )
 
     def _plot_activity_index(self, index):
         """
