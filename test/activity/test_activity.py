@@ -15,7 +15,7 @@ from skimu.read import ReadBin
 from skimu.preprocessing import CalibrateAccelerometer
 from skimu.preprocessing import DetectWear
 from skimu.activity import MVPActivityClassification
-from skimu.activity.metrics import metric_enmo
+from skimu.sleep import Sleep
 
 
 class TestGetActivityBouts:
@@ -27,7 +27,8 @@ class TestGetActivityBouts:
 
         mvpa_time = get_activity_bouts(
             sample_acc_metric,
-            mvpa_thresh=0.1,
+            lower_thresh=0.1,
+            upper_thresh=1e5,
             wlen=5,
             boutdur=boutdur,
             boutcrit=0.8,
@@ -45,7 +46,8 @@ class TestGetActivityBouts:
 
         mvpa_time = get_activity_bouts(
             sample_acc_metric,
-            mvpa_thresh=0.1,
+            lower_thresh=0.1,
+            upper_thresh=1e5,
             wlen=5,
             boutdur=boutdur,
             boutcrit=0.8,
@@ -60,13 +62,14 @@ class TestGetActivityBouts:
 class TestMVPActivityClassification:
     def test(self):
         # pipe = Pipeline()
-        # pipe.add(ReadBin(base=0, period=24))
+        # pipe.add(ReadBin(bases=[0, 12], periods=[24, 24]))
         # pipe.add(CalibrateAccelerometer())
+        # pipe.add(Sleep())
         # pipe.add(DetectWear())
         # pipe.add(
         #     MVPActivityClassification(
         #         bout_metric=4,
-        #         cutpoints={"metric": metric_enmo, "light": 0.1, "kwargs": {"take_abs": False, "trim_zero": True}}
+        #         cutpoints="migueles_wrist_adult"
         #     ),
         #     save_results=True,
         #     save_name="/Users/lukasadamowicz/Downloads/STRYDE/skimu_results/activity_results.csv"
