@@ -126,7 +126,6 @@ class MVPActivityClassification(_BaseProcess):
                 warn(f"Specified cutpoints [{cutpoints}] not found. Using `migueles_wrist_adult`.")
                 cutpoints_ = _base_cutpoints["migueles_wrist_adult"]
 
-
         super().__init__(
             short_wlen=short_wlen,
             bout_lens=bout_lens,
@@ -216,7 +215,7 @@ class MVPActivityClassification(_BaseProcess):
         activity_levels = ["MVPA", "sed", "light", "mod", "vig"]
 
         lvl_keys = iter_product(windows, activity_levels, self.blens, ["bout"])
-        mvpa_keys = iter_product(windows, ["MVPA"], ["5sec", "1min", "5min"], ["epoch"])
+        mvpa_keys = iter_product(windows, ["MVPA"], [f"{self.wlen}sec", "1min", "5min"], ["epoch"])
         ig_keys = iter_product(windows, ["IG"], ["gradient", "intercept", "R-squared"])
 
         res = {i: full(len(days), "", dtype="object") for i in general_str_keys}
@@ -304,17 +303,51 @@ class MVPActivityClassification(_BaseProcess):
         else:
             return res
 
+    def _get_activity_metrics_across_indexing(self, res, wtype, accel, fs, day_n, starts, stops, wlen, epoch_per_min, ig_levels):
+        """
+        Compute the activity metrics for different ways of indexing a day into bouts
+        Returns
+        -------
 
-def get_activity_metrics_across_indexing():
-    """
-    Compute the activity metrics for different ways of indexing a day into bouts
-    Returns
-    -------
+        """
+        hist = zeros(ig_levels.size - 1)
 
-    """
-    # compute the desired acceleration metric
-    acc_metric =
-def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, boutmetric=1):
+        for start, stop in zip(starts, stops):
+            # compute the desired acceleration metric
+            acc_metric = self.cutpoints["metric"](accel[start:stop], wlen, fs, **self.cutpoints["kwargs"])
+
+            # MVPA
+            # total time of 5sec epochs in minutes
+            key = f"{int(60 / epoch_per_min)}sec"
+            res[(wtype, "MVPA", key, "epoch")][day_n] += sum(acc_metric >= self.cutpoints["light"]) / epoch_per_min
+
+            # total time in 1 minute epochs
+            tmp = moving_mean(acc_metric, epoch_per_min, epoch_per_min)
+            res[(wtype, "MVPA", "1min", "epoch")][day_n] += sum(tmp >= self.cutpoints["light"])
+
+            # total time in 5 minute epochs
+            tmp = moving_mean(acc_metric, epoch_per_min, epoch_per_min)
+            res[(wtype, "MVPA"), "5min", "epoch"][day_n] += sum(tmp >= self.cutpoints["light"]) * 5
+
+            # total MVPA in <bout_len> minute bouts
+            for bout_len in self.blens:
+                key = (wtype, "MVPA", bout_len, "bout")
+                res[key][day_n] += get_activity_bouts(
+                    acc_metric,
+                    self.cutpoints["light"],
+                    1e5,
+                    self.wlen,
+                    bout_len,
+                    self.boutcrit,
+                    self.closedbout,
+                    self.boutmetric
+                )
+
+            # histogram for intensity gradient. Density = false to return counts
+            hist += histogram(acc_metric, bins=ig_levels, density=False)[0]
+
+
+def get_activity_bouts(accm, lower_thresh, upper_thresh, wlen, boutdur, boutcrit, closedbout, boutmetric=1):
     """
     Get the number of bouts of activity level based on several criteria.
 
@@ -322,8 +355,10 @@ def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, b
     ----------
     accm : numpy.ndarray
         Acceleration metric.
-    mvpa_thresh : float
-        Threshold for determining moderate/vigorous physical activity.
+    lower_thresh : float
+        Lower threshold for the activity level.
+    upper_thresh : float
+        Upper threshold for the activity level.
     wlen : int
         Number of seconds in the base epoch
     boutdur : int
@@ -362,7 +397,7 @@ def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, b
     time_in_bout = 0
 
     if boutmetric == 1:
-        x = (accm > mvpa_thresh).astype(int_)
+        x = ((accm >= lower_thresh) & (accm < upper_thresh)).astype(int_)
         p = nonzero(x)[0]
         i_mvpa = 0
         while i_mvpa < p.size:
@@ -384,7 +419,7 @@ def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, b
                 jump = 1
             i_mvpa += jump
     elif boutmetric == 2:
-        x = (accm > mvpa_thresh).astype(int_)
+        x = ((accm >= lower_thresh) & (accm < upper_thresh)).astype(int_)
         xt = zeros(x.size, dtype=int_)
         p = nonzero(x)[0]
 
@@ -404,7 +439,7 @@ def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, b
         x[xt == 2] = 1
         time_in_bout += sum(x) * (wlen / 60)  # in minutes
     elif boutmetric == 3:
-        x = (accm > mvpa_thresh).astype(int_)
+        x = ((accm >= lower_thresh) & (accm < upper_thresh)).astype(int_)
         xt = x * 1  # not a view
 
         # look for breaks larger than 1 minute
@@ -424,7 +459,7 @@ def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, b
         x[xt == 2] = 1
         time_in_bout += sum(x) * (wlen / 60)
     elif boutmetric == 4:
-        x = (accm > mvpa_thresh).astype(int_)
+        x = ((accm >= lower_thresh) & (accm < upper_thresh)).astype(int_)
         xt = x * 1  # not a view
         # look for breaks longer than 1 minute
         lookforbreaks = zeros(x.size)
@@ -452,7 +487,7 @@ def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, b
         x[xt == 2] = 1
         time_in_bout += sum(x) * (wlen / 60)
     elif boutmetric == 5:
-        x = (accm > mvpa_thresh).astype(int_)
+        x = ((accm >= lower_thresh) & (accm < upper_thresh)).astype(int_)
         xt = x * 1  # not a view
         # look for breaks longer than 1 minute
         lookforbreaks = zeros(x.size)
