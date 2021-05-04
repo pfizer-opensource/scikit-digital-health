@@ -117,8 +117,14 @@ class MVPActivityClassification(_BaseProcess):
     ig_res = ["gradient", "intercept", "R-squared"]
 
     def __init__(
-            self, short_wlen=5, bout_lens=(1, 5, 10), bout_criteria=0.8,
-            bout_metric=4, closed_bout=False, min_wear_time=10, cutpoints="migueles_wrist_adult",
+            self,
+            short_wlen=5,
+            bout_lens=(1, 5, 10),
+            bout_criteria=0.8,
+            bout_metric=4,
+            closed_bout=False,
+            min_wear_time=10,
+            cutpoints="migueles_wrist_adult",
             day_window=(0, 24)
     ):
         # make sure that the short_wlen is a factor of 60, and if not send it to nearest factor
@@ -379,7 +385,8 @@ class MVPActivityClassification(_BaseProcess):
 
                     results[key][day_n] += get_activity_bouts(
                         acc_metric,
-                        l_thresh, u_thresh,
+                        l_thresh,
+                        u_thresh,
                         self.wlen,
                         bout_len,
                         self.boutcrit,
