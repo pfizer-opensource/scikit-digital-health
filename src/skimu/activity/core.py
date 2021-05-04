@@ -361,6 +361,9 @@ class MVPActivityClassification(_BaseProcess):
 
         # initialize the values here from nan to 0.  Do this here because missing data should
         # remain as "nan".
+        for epoch_len in [f"{self.wlen}sec"] + self.epoch_lens:
+            key = f"{wtype}_MVPA_{epoch_len}_epoch"
+            results[key][day_n] = 0.0
         for bout_len in self.blens:
             for level in self.activity_levels:
                 key = f"{wtype}_{level}_{bout_len}min_bout"
