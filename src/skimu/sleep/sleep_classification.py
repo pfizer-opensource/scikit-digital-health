@@ -53,19 +53,4 @@ def compute_sleep_predictions(act_index, sf=0.243):
     mask = (changes >= 10) & (changes < (predictions.size - 10)) & (dt <= 6) & vals
     for start, dur in zip(changes[mask], dt[mask]):
         predictions[start:start + dur] = 0
-
-    """
-    sleep_bin = 0
-    start_ind = 0
-    for t in range(10, predictions.size - 10):
-        if predictions[t]:
-            sleep_bin += 1
-            if sleep_bin == 1:
-                start_ind = t
-        else:
-            if 0 < sleep_bin <= 6:
-                if sum(predictions[start_ind - 10:start_ind]) == 10 and sum(predictions[t:t+10]) == 10:
-                    predictions[start_ind:t] = True
-            sleep_bin = 0
-    """
     return predictions
