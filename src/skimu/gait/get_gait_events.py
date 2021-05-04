@@ -10,7 +10,7 @@ from scipy.integrate import cumtrapz
 from pywt import cwt
 
 from skimu.utility import correct_accelerometer_orientation
-from skimu.gait.gait_metrics import gait_metrics
+from skimu.gait.gait_endpoints import gait_endpoints
 
 
 def get_gait_events(
@@ -60,7 +60,7 @@ def get_gait_events(
     # correct acceleration orientation if set
     if corr_accel_orient:
         # determine AP axis
-        ac = gait_metrics._autocovariancefunction(
+        ac = gait_endpoints._autocovariancefunction(
             accel,
             min(accel.shape[0] - 1, 1000),
             biased=True

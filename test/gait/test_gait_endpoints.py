@@ -7,19 +7,16 @@ Lukas Adamowicz
 import pytest
 import numpy as np
 from numpy import nan
-import h5py
 
-from ..base_conftest import *
-
-from skimu.gait.gait_metrics import *
-from skimu.gait.gait_metrics import gait_metrics
-from skimu.gait.gait_metrics.gait_metrics import _autocovariancefunction, _autocovariance
+from skimu.gait.gait_endpoints import *
+from skimu.gait.gait_endpoints import gait_endpoints
+from skimu.gait.gait_endpoints.gait_endpoints import _autocovariancefunction, _autocovariance
 
 
 class TestEventMetricGetOffset:
     def test_error(self):
         with pytest.raises(ValueError):
-            gait_metrics.EventMetric._get_mask({}, 3)
+            gait_endpoints.GaitEventEndpoint._get_mask({}, 3)
 
 
 class TestACF:
@@ -48,7 +45,7 @@ class TestAutocovariance:
         assert np.isnan(_autocovariance(y, 0, 314, y.size+1, biased=True))
 
 
-class BaseTestMetric:
+class BaseTestEndpoint:
     @classmethod
     def setup_class(cls):
         cls.metric = None
@@ -104,7 +101,7 @@ gait = {
 """
 
 
-class TestStrideTime(BaseTestMetric):
+class TestStrideTime(BaseTestEndpoint):
     @classmethod
     def setup_class(cls):
         super().setup_class()
@@ -115,7 +112,7 @@ class TestStrideTime(BaseTestMetric):
         cls.res_bout1 = np.array([52, 51, 49, nan, nan]) / 50
 
 
-class TestStanceTime(BaseTestMetric):
+class TestStanceTime(BaseTestEndpoint):
     @classmethod
     def setup_class(cls):
         super().setup_class()
@@ -126,7 +123,7 @@ class TestStanceTime(BaseTestMetric):
         cls.res_bout1 = np.array([30, 30, 28, 29, 29]) / 50
 
 
-class TestSwingTime(BaseTestMetric):
+class TestSwingTime(BaseTestEndpoint):
     @classmethod
     def setup_class(cls):
         super().setup_class()
@@ -137,7 +134,7 @@ class TestSwingTime(BaseTestMetric):
         cls.res_bout1 = np.array([22, 21, 21, nan, nan]) / 50
 
 
-class TestStepTime(BaseTestMetric):
+class TestStepTime(BaseTestEndpoint):
     @classmethod
     def setup_class(cls):
         super().setup_class()
@@ -148,7 +145,7 @@ class TestStepTime(BaseTestMetric):
         cls.res_bout1 = np.array([25, 27, 24, 25, nan]) / 50
 
 
-class TestInitialDoubleSupport(BaseTestMetric):
+class TestInitialDoubleSupport(BaseTestEndpoint):
     @classmethod
     def setup_class(cls):
         super().setup_class()
@@ -159,7 +156,7 @@ class TestInitialDoubleSupport(BaseTestMetric):
         cls.res_bout1 = np.array([5, 6, 6, 4, 5]) / 50
 
 
-class TestTerminalDoubleSupport(BaseTestMetric):
+class TestTerminalDoubleSupport(BaseTestEndpoint):
     @classmethod
     def setup_class(cls):
         super().setup_class()
@@ -170,7 +167,7 @@ class TestTerminalDoubleSupport(BaseTestMetric):
         cls.res_bout1 = np.array([6, 6, 4, 5, nan]) / 50
 
 
-class TestDoubleSupport(BaseTestMetric):
+class TestDoubleSupport(BaseTestEndpoint):
     @classmethod
     def setup_class(cls):
         super().setup_class()
@@ -181,7 +178,7 @@ class TestDoubleSupport(BaseTestMetric):
         cls.res_bout1 = np.array([11, 12, 10, 9, nan]) / 50
 
 
-class TestSingleSupport(BaseTestMetric):
+class TestSingleSupport(BaseTestEndpoint):
     @classmethod
     def setup_class(cls):
         super().setup_class()
@@ -192,7 +189,7 @@ class TestSingleSupport(BaseTestMetric):
         cls.res_bout1 = np.array([20, 21, 18, 21, nan]) / 50
 
 
-class TestStepLength(BaseTestMetric):
+class TestStepLength(BaseTestEndpoint):
     @classmethod
     def setup_class(cls):
         super().setup_class()
@@ -211,7 +208,7 @@ class TestStepLength(BaseTestMetric):
         assert np.isnan(sample_gait[self.metric.k_][:10]).sum() == 10
 
 
-class TestStrideLength(BaseTestMetric):
+class TestStrideLength(BaseTestEndpoint):
     @classmethod
     def setup_class(cls):
         super().setup_class()
@@ -233,7 +230,7 @@ class TestStrideLength(BaseTestMetric):
         assert np.isnan(sample_gait[self.metric.k_][:10]).sum() == 10
 
 
-class TestGaitSpeed(BaseTestMetric):
+class TestGaitSpeed(BaseTestEndpoint):
     @classmethod
     def setup_class(cls):
         super().setup_class()
@@ -258,7 +255,7 @@ class TestGaitSpeed(BaseTestMetric):
         assert np.isnan(sample_gait[self.metric.k_][:10]).sum() == 10
 
 
-class TestCadence(BaseTestMetric):
+class TestCadence(BaseTestEndpoint):
     @classmethod
     def setup_class(cls):
         super().setup_class()
@@ -270,7 +267,7 @@ class TestCadence(BaseTestMetric):
 
 
 # TODO should probably check actual values here not just through running Gait
-class TestIntraStrideCovarianceV(BaseTestMetric):
+class TestIntraStrideCovarianceV(BaseTestEndpoint):
     @classmethod
     def setup_class(cls):
         super().setup_class()
@@ -281,7 +278,7 @@ class TestIntraStrideCovarianceV(BaseTestMetric):
 
 
 # TODO should probably check actual values here not just through running Gait
-class TestIntraStepCovarianceV(BaseTestMetric):
+class TestIntraStepCovarianceV(BaseTestEndpoint):
     @classmethod
     def setup_class(cls):
         super().setup_class()
@@ -291,7 +288,7 @@ class TestIntraStepCovarianceV(BaseTestMetric):
 
 
 # TODO should probably check actual values here not just through running Gait
-class TestHarmonicRatioV(BaseTestMetric):
+class TestHarmonicRatioV(BaseTestEndpoint):
     @classmethod
     def setup_class(cls):
         super().setup_class()
@@ -321,7 +318,7 @@ class TestHarmonicRatioV(BaseTestMetric):
 
 
 # TODO should probably check actual values here not just through running Gait
-class TestStrideSPARC(BaseTestMetric):
+class TestStrideSPARC(BaseTestEndpoint):
     @classmethod
     def setup_class(cls):
         super().setup_class()
@@ -331,7 +328,7 @@ class TestStrideSPARC(BaseTestMetric):
 
 
 # TODO should probably check actual values here not just through running Gait
-class TestPhaseCoordinationIndex(BaseTestMetric):
+class TestPhaseCoordinationIndex(BaseTestEndpoint):
     @classmethod
     def setup_class(cls):
         super().setup_class()
@@ -343,7 +340,7 @@ class TestPhaseCoordinationIndex(BaseTestMetric):
 
 
 # TODO should probably check actual values here not just through running Gait
-class TestGaitSymmetryIndex(BaseTestMetric):
+class TestGaitSymmetryIndex(BaseTestEndpoint):
     @classmethod
     def setup_class(cls):
         super().setup_class()
@@ -361,7 +358,7 @@ class TestGaitSymmetryIndex(BaseTestMetric):
 
 
 # TODO should probably check actual values here not just through running Gait
-class TestStrideRegularityV(BaseTestMetric):
+class TestStrideRegularityV(BaseTestEndpoint):
     @classmethod
     def setup_class(cls):
         super().setup_class()
@@ -385,7 +382,7 @@ class TestStrideRegularityV(BaseTestMetric):
 
 
 # TODO should probably check actual values here not just through running Gait
-class TestStepRegularityV(BaseTestMetric):
+class TestStepRegularityV(BaseTestEndpoint):
     @classmethod
     def setup_class(cls):
         super().setup_class()
@@ -414,7 +411,7 @@ class TestStepRegularityV(BaseTestMetric):
 
 
 # TODO should probably check actual values here not just through running Gait
-class TestAutocovarianceSymmetryV(BaseTestMetric):
+class TestAutocovarianceSymmetryV(BaseTestEndpoint):
     @classmethod
     def setup_class(cls):
         super().setup_class()
@@ -426,7 +423,7 @@ class TestAutocovarianceSymmetryV(BaseTestMetric):
 
 
 # TODO should probably check actual values here not just through running Gait
-class TestRegularityIndexV(BaseTestMetric):
+class TestRegularityIndexV(BaseTestEndpoint):
     @classmethod
     def setup_class(cls):
         super().setup_class()

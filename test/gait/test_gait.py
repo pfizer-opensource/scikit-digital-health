@@ -15,7 +15,7 @@ from skimu.gait.get_gait_classification import get_gait_classification_lgbm, Dim
 from skimu.gait.get_gait_bouts import get_gait_bouts
 from skimu.gait.get_gait_events import get_gait_events
 from skimu.gait.get_strides import get_strides
-from skimu.gait import gait_metrics
+from skimu.gait import gait_endpoints
 
 
 class TestGetGaitClassificationLGBM:
@@ -270,20 +270,20 @@ class TestGait(BaseProcessTester):
         g = Gait()
         g._params = []  # reset for easy testing
 
-        g.add_metrics([gait_metrics.StrideTime, gait_metrics.StepTime])
-        g.add_metrics(gait_metrics.PhaseCoordinationIndex)
+        g.add_endpoints([gait_endpoints.StrideTime, gait_endpoints.StepTime])
+        g.add_endpoints(gait_endpoints.PhaseCoordinationIndex)
 
         assert g._params == [
-            gait_metrics.StrideTime,
-            gait_metrics.StepTime,
-            gait_metrics.PhaseCoordinationIndex
+            gait_endpoints.StrideTime,
+            gait_endpoints.StepTime,
+            gait_endpoints.PhaseCoordinationIndex
         ]
 
     def test_add_metrics_error(self):
         g = Gait()
 
         with pytest.raises(ValueError):
-            g.add_metrics([list, Gait])
+            g.add_endpoints([list, Gait])
 
         with pytest.raises(ValueError):
-            g.add_metrics(Gait)
+            g.add_endpoints(Gait)
