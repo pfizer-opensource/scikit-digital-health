@@ -25,7 +25,7 @@ def get_level_thresholds(level, cutpoints):
     elif level.lower() in ["vig", "vigorous"]:
         return cutpoints["moderate"], 1e5
     elif level.lower() == "mvpa":
-        return
+        return cutpoints["light"], 1e5
     else:
         raise ValueError(f"Activity level label [{level}] not recognized.")
 
