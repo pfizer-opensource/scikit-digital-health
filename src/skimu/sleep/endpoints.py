@@ -13,7 +13,7 @@ from numpy import around, nonzero, diff, argmax, sum, mean, log, unique, argsort
 from skimu.sleep.utility import gini
 
 __all__ = [
-    "SleepMetric",
+    "SleepEndpoint",
     "TotalSleepTime", "PercentTimeAsleep", "NumberWakeBouts", "SleepOnsetLatency",
     "WakeAfterSleepOnset", "AverageSleepDuration", "AverageWakeDuration",
     "SleepWakeTransitionProbability", "WakeSleepTransitionProbability", "SleepGiniIndex",
@@ -22,7 +22,7 @@ __all__ = [
 ]
 
 
-class SleepMetric(ABC):
+class SleepEndpoint(ABC):
     def __str__(self):
         return self.name
 
@@ -52,7 +52,7 @@ class SleepMetric(ABC):
         pass
 
 
-class TotalSleepTime(SleepMetric):
+class TotalSleepTime(SleepEndpoint):
     """
     Compute the total time spent asleep from 1 minute epoch sleep predictions.
     """
@@ -76,7 +76,7 @@ class TotalSleepTime(SleepMetric):
         return sum(sleep_predictions)
 
 
-class PercentTimeAsleep(SleepMetric):
+class PercentTimeAsleep(SleepEndpoint):
     """
     Compute the percent time spent asleep from 1 minute epoch sleep predictions.
     """
@@ -101,7 +101,7 @@ class PercentTimeAsleep(SleepMetric):
         return around(pta, decimals=3)
 
 
-class NumberWakeBouts(SleepMetric):
+class NumberWakeBouts(SleepEndpoint):
     """
     Compute the number of waking bouts during the total sleep opportunity, excluding the
     first wake before sleep, and last wake bout after sleep.
@@ -127,7 +127,7 @@ class NumberWakeBouts(SleepMetric):
         return maximum(nonzero(diff(sleep_predictions.astype(int_)) == -1)[0].size - 1, 0)
 
 
-class SleepOnsetLatency(SleepMetric):
+class SleepOnsetLatency(SleepEndpoint):
     """
     Compute the amount of time before the first sleep period in minutes.
     """
@@ -153,7 +153,7 @@ class SleepOnsetLatency(SleepMetric):
         return argmax(sleep_predictions)  # samples = minutes
 
 
-class WakeAfterSleepOnset(SleepMetric):
+class WakeAfterSleepOnset(SleepEndpoint):
     """
     Compute the number of minutes awake after the first period of sleep, excluding the last
     wake period after sleep.
@@ -182,7 +182,7 @@ class WakeAfterSleepOnset(SleepMetric):
         return waso
 
 
-class AverageSleepDuration(SleepMetric):
+class AverageSleepDuration(SleepEndpoint):
     r"""
     Compute the average duration of a sleep bout.
 
@@ -224,7 +224,7 @@ class AverageSleepDuration(SleepMetric):
         return mean(sleep_lengths)
 
 
-class AverageWakeDuration(SleepMetric):
+class AverageWakeDuration(SleepEndpoint):
     r"""
     Compute the average duration of wake bouts during sleep.
 
@@ -265,7 +265,7 @@ class AverageWakeDuration(SleepMetric):
         return mean(wake_lengths)
 
 
-class SleepWakeTransitionProbability(SleepMetric):
+class SleepWakeTransitionProbability(SleepEndpoint):
     r"""
     Compute the probability of transitioning from sleep state to awake state
 
@@ -314,7 +314,7 @@ class SleepWakeTransitionProbability(SleepMetric):
         return 1 / mean(sleep_lengths)
 
 
-class WakeSleepTransitionProbability(SleepMetric):
+class WakeSleepTransitionProbability(SleepEndpoint):
     r"""
     Compute the probability of transitioning from awake state to sleep state.
 
@@ -363,7 +363,7 @@ class WakeSleepTransitionProbability(SleepMetric):
         return 1 / mean(wake_lengths)
 
 
-class SleepGiniIndex(SleepMetric):
+class SleepGiniIndex(SleepEndpoint):
     r"""
     Compute the normalized variability of the sleep bouts, also known as the Gini Index from
     economics.
@@ -405,7 +405,7 @@ class SleepGiniIndex(SleepMetric):
         return gini(sleep_lengths, w=None, corr=True)
 
 
-class WakeGiniIndex(SleepMetric):
+class WakeGiniIndex(SleepEndpoint):
     r"""
     Compute the normalized variability of the awake bouts, also known as the Gini Index from
     economics.
@@ -447,7 +447,7 @@ class WakeGiniIndex(SleepMetric):
         return gini(wake_lengths, w=None, corr=True)
 
 
-class SleepAverageHazard(SleepMetric):
+class SleepAverageHazard(SleepEndpoint):
     r"""
     Compute the average hazard summary of the hazard function as a function of the sleep bout
     duration. The average hazard represents a summary of the frequency of transitioning from
@@ -509,7 +509,7 @@ class SleepAverageHazard(SleepMetric):
         return sum(h_i) / u_sl.size
 
 
-class WakeAverageHazard(SleepMetric):
+class WakeAverageHazard(SleepEndpoint):
     r"""
     Compute the average hazard summary of the hazard function as a function of the awake bout
     duration. The average hazard represents a summary of the frequency of transitioning from
@@ -571,7 +571,7 @@ class WakeAverageHazard(SleepMetric):
         return sum(h_i) / u_al.size
 
 
-class SleepPowerLawDistribution(SleepMetric):
+class SleepPowerLawDistribution(SleepEndpoint):
     r"""
     Compute the scaling factor for a power law distribution over the sleep bouts lengths.
 
@@ -624,7 +624,7 @@ class SleepPowerLawDistribution(SleepMetric):
         return 1 + sleep_lengths.size / sum(log(sleep_lengths / (sleep_lengths.min() - 0.5)))
 
 
-class WakePowerLawDistribution(SleepMetric):
+class WakePowerLawDistribution(SleepEndpoint):
     r"""
     Compute the scaling factor for a power law distribution over the awake bouts lengths.
 

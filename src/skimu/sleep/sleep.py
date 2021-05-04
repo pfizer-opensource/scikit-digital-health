@@ -256,8 +256,8 @@ class Sleep(_BaseProcess):
 
         Examples
         --------
-        >>> from skimu.sleep.endpoints import SleepMetric
-        >>> class NewSleepMetric(SleepMetric):
+        >>> from skimu.sleep.endpoints import SleepEndpoint
+        >>> class NewSleepMetric(SleepEndpoint):
         >>>     def __init__(self):
         >>>         super().__init__("metric name", __name__)  # __name__ remains unchanged
         >>>     def predict(self, **kwargs):
@@ -267,12 +267,12 @@ class Sleep(_BaseProcess):
         >>> sleep.add_metrics(NewSleepMetric)
         """
         if isinstance(metrics, Iterable):
-            if all(isinstance(i(), endpoints.SleepMetric) for i in metrics):
+            if all(isinstance(i(), endpoints.SleepEndpoint) for i in metrics):
                 self._params.extend(metrics)
             else:
                 raise ValueError("Not all objects are `SleepMetric`s.")
         else:
-            if isinstance(metrics(), endpoints.SleepMetric):
+            if isinstance(metrics(), endpoints.SleepEndpoint):
                 self._params.append(metrics)
             else:
                 raise ValueError(f"Metric {metrics!r} is not a `SleepMetric`.")
