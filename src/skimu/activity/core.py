@@ -115,19 +115,25 @@ class MVPActivityClassification(_BaseProcess):
             bout_metric=4, closed_bout=False, min_wear_time=10, cutpoints="migueles_wrist_adult",
             day_window=(0, 24)
     ):
+        # make sure that the short_wlen is a factor of 60, and if not send it to nearest factor
         if (60 % short_wlen) != 0:
             tmp = [1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30]
             short_wlen = tmp[argmin(abs(array(tmp) - short_wlen))]
             warn(f"`short_wlen` changed to {short_wlen} to be a factor of 60.")
         else:
             short_wlen = int(short_wlen)
+        # make sure bout lengths are in whole minutes
         bout_lens = [int(i) for i in bout_lens]
+        # make sure the minimum wear time is in whole hours
         min_wear_time = int(min_wear_time)
+        # get the cutpoints if using provided cutpoints, or return the dictionary
         if isinstance(cutpoints, str):
             cutpoints_ = _base_cutpoints.get(cutpoints, None)
             if cutpoints_ is None:
                 warn(f"Specified cutpoints [{cutpoints}] not found. Using `migueles_wrist_adult`.")
                 cutpoints_ = _base_cutpoints["migueles_wrist_adult"]
+        else:
+            cutpoints_ = cutpoints
 
         super().__init__(
             short_wlen=short_wlen,
@@ -257,6 +263,7 @@ class MVPActivityClassification(_BaseProcess):
                 iday,
                 day_wear_starts,
                 day_wear_starts,
+                nwlen,
                 epm,
                 iglevels,
                 igvals
@@ -285,6 +292,7 @@ class MVPActivityClassification(_BaseProcess):
                     iday,
                     day_wear_wake_starts,
                     day_wear_wake_starts,
+                    nwlen,
                     epm,
                     iglevels,
                     igvals
@@ -297,32 +305,60 @@ class MVPActivityClassification(_BaseProcess):
         else:
             return res
 
-    def _get_activity_metrics_across_indexing(self, res, wtype, accel, fs, day_n, starts, stops, epoch_per_min, ig_levels, ig_vals):
+    def _get_activity_metrics_across_indexing(
+            self, results, wtype, accel, fs, day_n, starts, stops, n_wlen, epoch_per_min,
+            ig_levels, ig_vals):
         """
-        Compute the activity metrics for different ways of indexing a day into bouts.
+        Compute the activity endpoints.
 
-        Returns
-        -------
-
+        Parameters
+        ----------
+        results : dict
+            Results dictionary.
+        wtype : {"MM", "ExS"}
+            Window type being computed. Must match what is in `results` keys.
+        accel : numpy.ndarray
+            Acceleration data.
+        fs : float
+            Sampling frequency in Hz.
+        day_n : int
+            The day number/index.
+        starts : numpy.ndarray
+            Index of the starts during `day_n` of valid blocks of acceleration to use in computing
+            endpoints.
+        stops : numpy.ndarray
+            Index of the stops during `day_n` of valid blocks of acceleration to use in
+            computing endpoints.
+        n_wlen : int
+            Number of samples in `self.wlen` seconds.
+        epoch_per_min : int
+            Number of epochs (result of accel metric computation) per minute.
+        ig_levels : numpy.ndarray
+            Intensity gradient bin edges.
+        ig_vals : numpy.ndarray
+            Intensity gradient bin midpoints.
         """
         hist = zeros(ig_levels.size - 1)
 
         for start, stop in zip(starts, stops):
             # compute the desired acceleration metric
-            acc_metric = self.cutpoints["metric"](accel[start:stop], self.wlen, fs, **self.cutpoints["kwargs"])
+            acc_metric = self.cutpoints["metric"](
+                accel[start:stop], n_wlen, fs, **self.cutpoints["kwargs"])
 
             # MVPA
             # total time of 5sec epochs in minutes
-            key = f"{self.wlen}sec"
-            res[(wtype, "MVPA", key, "epoch")][day_n] += sum(acc_metric >= self.cutpoints["light"]) / epoch_per_min
+            key = (wtype, "MVPA", f"{self.wlen}sec", "epoch")
+            results[key][day_n] += sum(acc_metric >= self.cutpoints["light"]) / epoch_per_min
 
             # total time in 1 minute epochs
+            key = (wtype, "MVPA", "1min", "epoch")
             tmp = moving_mean(acc_metric, epoch_per_min, epoch_per_min)
-            res[(wtype, "MVPA", "1min", "epoch")][day_n] += sum(tmp >= self.cutpoints["light"])
+            results[key][day_n] += sum(tmp >= self.cutpoints["light"])
 
             # total time in 5 minute epochs
-            tmp = moving_mean(acc_metric, epoch_per_min, epoch_per_min)
-            res[(wtype, "MVPA"), "5min", "epoch"][day_n] += sum(tmp >= self.cutpoints["light"]) * 5
+            key = (wtype, "MVPA", "5min", "epoch")
+            tmp = moving_mean(acc_metric, 5 * epoch_per_min, 5 * epoch_per_min)
+            results[key][day_n] += sum(tmp >= self.cutpoints["light"]) * 5
 
             # total MVPA in <bout_len> minute bouts
             for bout_len in self.blens:
@@ -331,7 +367,7 @@ class MVPActivityClassification(_BaseProcess):
                     l_thresh, u_thresh = get_level_thresholds(level, self.cutpoints)
                     key = (wtype, level, bout_len, "bout")
 
-                    res[key][day_n] += get_activity_bouts(
+                    results[key][day_n] += get_activity_bouts(
                         acc_metric,
                         l_thresh, u_thresh,
                         self.wlen,
@@ -348,12 +384,13 @@ class MVPActivityClassification(_BaseProcess):
         hist *= (self.wlen / 60)  # convert from sample counts to minutes
         ig_res = get_intensity_gradient(ig_vals, hist)
 
-        res[(wtype, "IG", "gradient")][day_n] = ig_res[0]
-        res[(wtype, "IG", "intercept")][day_n] = ig_res[1]
-        res[(wtype, "IG", "R-squared")][day_n] = ig_res[2]
+        results[(wtype, "IG", "gradient")][day_n] = ig_res[0]
+        results[(wtype, "IG", "intercept")][day_n] = ig_res[1]
+        results[(wtype, "IG", "R-squared")][day_n] = ig_res[2]
 
 
-def get_activity_bouts(accm, lower_thresh, upper_thresh, wlen, boutdur, boutcrit, closedbout, boutmetric=1):
+def get_activity_bouts(
+        accm, lower_thresh, upper_thresh, wlen, boutdur, boutcrit, closedbout, boutmetric=1):
     """
     Get the number of bouts of activity level based on several criteria.
 
@@ -556,60 +593,3 @@ def get_intensity_gradient(ig_values, counts):
     slope, intercept, rval, *_ = linregress(lx, ly)
 
     return slope, intercept, rval**2
-
-
-def get_day_sleep_intersection(day_start, day_stop, sleep):
-    """
-    Get the end of sleep and start of sleep for a day given the day start and stop indices.
-
-    Parameters
-    ----------
-    day_start : int
-        Index of the day start.
-    day_stop : int
-        Index of the day stop.
-    sleep : numpy.ndarray
-        Array of sleep start and stop indices. (N, 2) shape, where [:, 0] is the index for sleep
-        starts, and [:, 1] is the index for sleep stops
-
-    Returns
-    -------
-    day_wake_start : int
-        Index of when the day starts and subject is awake.
-    day_wake_stop : int
-        Index of when the day ends and the subject is asleep.
-    """
-    if sleep is None:
-        return None, None
-
-    wake_changes = []
-    wake_states = []
-
-    mask = (sleep[:, 1] < day_stop) & (sleep[:, 1] > day_start)
-    wake_changes.extend(sleep[mask, 1].to_list())
-    wake_states.extend(["start"] * mask.sum())
-
-    mask = (sleep[:, 0] < day_stop) & (sleep[:, 0] > day_start)
-    wake_changes.extend(sleep[mask, 0].to_list())
-    wake_states.extend(["stop"] * mask.sum())
-
-    if wake_changes == []:
-        return
-
-    idx = argsort(wake_changes)
-
-    wake_changes = array(wake_changes)[idx]
-    wake_states = array(wake_states)[idx]
-
-    if wake_states[0] == "stop":
-        wake_changes = insert(wake_changes, 0, day_start)
-        wake_states = insert(wake_states, 0, "start")
-
-    if wake_states[-1] == "start":
-        wake_changes = append(wake_changes, day_stop)
-        wake_states = append(wake_states, "stop")
-
-    # now pattern should always be [start][stop]...
-
-
-
