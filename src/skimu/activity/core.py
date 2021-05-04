@@ -9,7 +9,7 @@ from warnings import warn
 from itertools import product as iter_product
 
 from numpy import nonzero, array, mean, diff, sum, zeros, abs, argmin, argmax, maximum, int_, \
-    floor, ceil, histogram, log, nan, around, full
+    floor, ceil, histogram, log, nan, around, full, nanmax
 from scipy.stats import linregress
 
 from skimu.base import _BaseProcess
@@ -51,6 +51,9 @@ class MVPActivityClassification(_BaseProcess):
     short_wlen : int, optional
         Short window length in seconds, used for the initial computation acceleration metrics.
         Default is 5 seconds. Must be a factor of 60 seconds.
+    max_accel_lens : iterable, optional
+        Windows to compute the maximum mean acceleration metric over, in minutes. Default is
+        (6, 15, 60).
     bout_lens : iterable, optional
         Activity bout lengths. Default is (1, 5, 10).
     bout_criteria : float, optional
@@ -119,6 +122,7 @@ class MVPActivityClassification(_BaseProcess):
     def __init__(
             self,
             short_wlen=5,
+            max_accel_lens=(6, 15, 60),
             bout_lens=(1, 5, 10),
             bout_criteria=0.8,
             bout_metric=4,
@@ -134,6 +138,8 @@ class MVPActivityClassification(_BaseProcess):
             warn(f"`short_wlen` changed to {short_wlen} to be a factor of 60.")
         else:
             short_wlen = int(short_wlen)
+        # make sure max accel windows are in whole minutes
+        max_accel_lens = [int(i) for i in max_accel_lens]
         # make sure bout lengths are in whole minutes
         bout_lens = [int(i) for i in bout_lens]
         # make sure the minimum wear time is in whole hours
@@ -149,6 +155,7 @@ class MVPActivityClassification(_BaseProcess):
 
         super().__init__(
             short_wlen=short_wlen,
+            max_accel_lens=max_accel_lens,
             bout_lens=bout_lens,
             bout_criteria=bout_criteria,
             bout_metric=bout_metric,
@@ -158,6 +165,7 @@ class MVPActivityClassification(_BaseProcess):
         )
 
         self.wlen = short_wlen
+        self.max_acc_lens = max_accel_lens
         self.blens = bout_lens
         self.boutcrit = bout_criteria
         self.boutmetric = bout_metric
@@ -234,6 +242,7 @@ class MVPActivityClassification(_BaseProcess):
         blen_keys = [f"{i}min" for i in self.blens]
         epoch_lens = [f"{self.wlen}sec"] + self.epoch_lens
 
+        mx_acc_keys = [f"{i}_max_{j}min_acc" for i in self.windows for j in self.max_acc_lens]
         lvl_keys = [
             "_".join(i) for i in iter_product(
                 self.windows, self.activity_levels, blen_keys, ["bout"]
@@ -248,9 +257,10 @@ class MVPActivityClassification(_BaseProcess):
 
         res = {i: full(len(days), "", dtype="object") for i in general_str_keys}
         res.update({i: full(len(days), -1, dtype="int") for i in general_int_keys})
+        res.update({i: full(len(days), nan, dtype="float") for i in mx_acc_keys})
+        res.update({i: full(len(days), nan, dtype="float") for i in ig_keys})
         res.update({i: full(len(days), nan, dtype="float") for i in mvpa_keys})
         res.update({i: full(len(days), nan, dtype="float") for i in lvl_keys})
-        res.update({i: full(len(days), nan, dtype="float") for i in ig_keys})
 
         # ========================================================================================
         # PROCESSING
@@ -373,6 +383,19 @@ class MVPActivityClassification(_BaseProcess):
             # compute the desired acceleration metric
             acc_metric = self.cutpoints["metric"](
                 accel[start:stop], n_wlen, fs, **self.cutpoints["kwargs"])
+
+            # maximum acceleration over windows
+            try:
+                for mx_acc_win in self.max_acc_lens:
+                    n = mx_acc_win * epoch_per_min
+                    tmp_max = moving_mean(acc_metric, n, n).max()
+
+                    key = f"{wtype}_max_{mx_acc_win}min_acc"
+                    results[key][day_n] = nanmax([tmp_max, results[key][day_n]])
+            except ValueError:
+                # if we can't do one we won't be able to do the later ones either with longer
+                # window lengths
+                pass
 
             # MVPA
             # total time of 5sec epochs in minutes
