@@ -8,8 +8,8 @@ from datetime import datetime
 from warnings import warn
 from itertools import product as iter_product
 
-from numpy import nonzero, array, insert, append, mean, diff, sum, zeros, abs, argmin, argmax, \
-    maximum, int_, floor, ceil, histogram, log, nan, around, argsort, full
+from numpy import nonzero, array, mean, diff, sum, zeros, abs, argmin, argmax, maximum, int_, \
+    floor, ceil, histogram, log, nan, around, full
 from scipy.stats import linregress
 
 from skimu.base import _BaseProcess
