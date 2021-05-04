@@ -15,8 +15,8 @@ from skimu.gait.get_gait_classification import get_gait_classification_lgbm, Dim
 from skimu.gait.get_gait_bouts import get_gait_bouts
 from skimu.gait.get_gait_events import get_gait_events
 from skimu.gait.get_strides import get_strides
-from skimu.gait.gait_metrics import gait_metrics
-from skimu.gait.gait_metrics import EventMetric, BoutMetric
+from skimu.gait.gait_endpoints import gait_endpoints
+from skimu.gait.gait_endpoints import GaitEventEndpoint, GaitBoutEndpoint
 
 
 class LowFrequencyError(Exception):
@@ -73,8 +73,8 @@ def get_downsampled_data(time, accel, gait_pred, fs, goal_fs, days, downsample):
 
 class Gait(_BaseProcess):
     """
-    Process IMU data to extract metrics of gait. Detect gait, extract gait events (heel-strikes,
-    toe-offs), and compute gait metrics from inertial data collected from a lumbar mounted
+    Process IMU data to extract endpoints of gait. Detect gait, extract gait events (heel-strikes,
+    toe-offs), and compute gait endpoints from inertial data collected from a lumbar mounted
     wearable inertial measurement unit
 
     Parameters
@@ -161,30 +161,30 @@ class Gait(_BaseProcess):
     """
     # gait parameters
     _params = [
-        # event level metrics
-        gait_metrics.StrideTime,
-        gait_metrics.StanceTime,
-        gait_metrics.SwingTime,
-        gait_metrics.StepTime,
-        gait_metrics.InitialDoubleSupport,
-        gait_metrics.TerminalDoubleSupport,
-        gait_metrics.DoubleSupport,
-        gait_metrics.SingleSupport,
-        gait_metrics.StepLength,
-        gait_metrics.StrideLength,
-        gait_metrics.GaitSpeed,
-        gait_metrics.Cadence,
-        gait_metrics.IntraStepCovarianceV,
-        gait_metrics.IntraStrideCovarianceV,
-        gait_metrics.HarmonicRatioV,
-        gait_metrics.StrideSPARC,
-        # bout level metrics
-        gait_metrics.PhaseCoordinationIndex,
-        gait_metrics.GaitSymmetryIndex,
-        gait_metrics.StepRegularityV,
-        gait_metrics.StrideRegularityV,
-        gait_metrics.AutocovarianceSymmetryV,
-        gait_metrics.RegularityIndexV
+        # event level endpoints
+        gait_endpoints.StrideTime,
+        gait_endpoints.StanceTime,
+        gait_endpoints.SwingTime,
+        gait_endpoints.StepTime,
+        gait_endpoints.InitialDoubleSupport,
+        gait_endpoints.TerminalDoubleSupport,
+        gait_endpoints.DoubleSupport,
+        gait_endpoints.SingleSupport,
+        gait_endpoints.StepLength,
+        gait_endpoints.StrideLength,
+        gait_endpoints.GaitSpeed,
+        gait_endpoints.Cadence,
+        gait_endpoints.IntraStepCovarianceV,
+        gait_endpoints.IntraStrideCovarianceV,
+        gait_endpoints.HarmonicRatioV,
+        gait_endpoints.StrideSPARC,
+        # bout level endpoints
+        gait_endpoints.PhaseCoordinationIndex,
+        gait_endpoints.GaitSymmetryIndex,
+        gait_endpoints.StepRegularityV,
+        gait_endpoints.StrideRegularityV,
+        gait_endpoints.AutocovarianceSymmetryV,
+        gait_endpoints.RegularityIndexV
     ]
 
     def __init__(
@@ -248,48 +248,51 @@ class Gait(_BaseProcess):
                 f['bout stops'] = stops
         self._save_classifier_fn = fn
 
-    def add_metrics(self, metrics):
+    def add_endpoints(self, endpoints):
         """
-        Add metrics to be computed
+        Add endpoints to be computed
 
         Parameters
         ----------
-        metrics : {Iterable, callable}
-            Either an iterable of EventMetric or BoutMetric references or an individual
-            EventMetric/BoutMetric reference to be added to the list of metrics to be computed
+        endpoints : {Iterable, callable}
+            Either an iterable of GaitEventEndpoint or GaitBoutEndpoint references or an individual
+            GaitEventEndpoint/GaitBoutEndpoint reference to be added to the list of endpoints to be
+            computed.
 
         Examples
         --------
-        >>> class NewGaitMetric(gait_metrics.EventMetric):
+        >>> class NewGaitEndpoint(gait_endpoints.GaitEventEndpoint):
         >>>     pass
         >>>
         >>> gait = Gait()
-        >>> gait.add_metrics(NewGaitMetric)
+        >>> gait.add_endpoints(NewGaitEndpoint)
 
-        >>> class NewGaitMetric(gait_metrics.EventMetric):
+        >>> class NewGaitEndpoint(gait_endpoints.GaitEventEndpoint):
         >>>     pass
-        >>> class NewGaitMetric2(gait_metrics.BoutMetric):
+        >>> class NewGaitEndpoint2(gait_endpoints.GaitEventEndpoint):
         >>>     pass
         >>>
         >>> gait = Gait()
-        >>> gait.add_metrics([NewGaitMetric, NewGaitMetric2])
+        >>> gait.add_endpoints([NewGaitEndpoint, NewGaitEndpoint2])
         """
-        if isinstance(metrics, Iterable):
-            if all(isinstance(i(), (EventMetric, BoutMetric)) for i in metrics):
-                self._params.extend(metrics)
+        if isinstance(endpoints, Iterable):
+            if all(isinstance(i(), (GaitEventEndpoint, GaitBoutEndpoint)) for i in endpoints):
+                self._params.extend(endpoints)
             else:
-                raise ValueError("Not all objects are EventMetric or BoutMetric")
+                raise ValueError("Not all objects are GaitEventEndpoints or GaitBoutEndpoints.")
         else:
-            if isinstance(metrics(), (EventMetric, BoutMetric)):
-                self._params.append(metrics)
+            if isinstance(endpoints(), (GaitEventEndpoint, GaitBoutEndpoint)):
+                self._params.append(endpoints)
             else:
-                raise ValueError(f'Metric {metrics!r} is not a EventMetric or BoutMetric')
+                raise ValueError(
+                    f"Endpoint {endpoints!r} is not a GaitEventEndpoints or GaitBoutEndpoints"
+                )
 
     def predict(self, time=None, accel=None, *, gyro=None, height=None, gait_pred=None, **kwargs):
         """
         predict(time, accel, *, gyro=None, height=None, gait_pred=None, day_ends={})
 
-        Get the gait events and metrics from a time series signal
+        Get the gait events and endpoints from a time series signal
 
         Parameters
         ----------
@@ -305,7 +308,7 @@ class Gait(_BaseProcess):
         height : float, optional
             Either height (False) or leg length (True) of the subject who wore the inertial
             measurement device, in meters, depending on `leg_length`. If not provided,
-            spatial metrics will not be computed
+            spatial endpoints will not be computed
         gait_pred : {any, numpy.ndarray}, optional
             (N, ) array of boolean predictions of gait, or any value that is not None. If not an
             ndarray but not None, the entire recording will be taken as gait. If not provided
@@ -318,8 +321,8 @@ class Gait(_BaseProcess):
         Returns
         -------
         gait_results : dict
-            The computed gait metrics. For a list of metrics and their definitions, see
-            :ref:`event-level-gait-metrics` and :ref:`bout-level-gait-metrics`.
+            The computed gait endpoints. For a list of endpoints and their definitions, see
+            :ref:`event-level-gait-endpoints` and :ref:`bout-level-gait-endpoints`.
 
         Raises
         ------
@@ -331,7 +334,7 @@ class Gait(_BaseProcess):
         )
 
         if height is None:
-            warn("height not provided, not computing spatial metrics", UserWarning)
+            warn("height not provided, not computing spatial endpoints", UserWarning)
             leg_length = None
         else:
             # height factor is set to 1 if providing leg length
@@ -343,7 +346,7 @@ class Gait(_BaseProcess):
             raise LowFrequencyError(f"Frequency ({fs:.2f}Hz) is too low (<20Hz).")
         if fs < (50.0 * 0.985):  # 1.5% margin
             warn("Frequency is less than 50Hz. Downsampling to 20Hz. Note that this may effect "
-                 "gait metric results values", UserWarning)
+                 "gait endpoints results values", UserWarning)
 
         # downsample acceleration
         goal_fs = 50 if fs > (50 * 0.985) else 20
@@ -370,7 +373,7 @@ class Gait(_BaseProcess):
                 'IC', 'FC', 'FC opp foot', 'valid cycle', 'delta h'
             ]
         }
-        # aux dictionary for storing values for computing gait metrics
+        # aux dictionary for storing values for computing gait endpoints
         gait_aux = {
             i: [] for i in
             ['vert axis', 'accel', 'vert velocity', 'vert position', 'inertial data i']
@@ -410,13 +413,13 @@ class Gait(_BaseProcess):
                     self.loading_factor
                 )
 
-                # add inertial data to the aux dict for use in gait metric calculation
+                # add inertial data to the aux dict for use in gait endpoints calculation
                 gait_aux['accel'].append(accel_ds[bout, :])
                 # add the index for the corresponding accel/velocity/position
                 gait_aux['inertial data i'].extend([len(gait_aux['accel']) - 1] * strides_in_bout)
                 gait_aux['vert axis'].extend([v_axis] * strides_in_bout)
 
-                # save some default per bout metrics
+                # save some default per bout endpoints
                 gait['Bout N'].extend([ibout + 1] * strides_in_bout)
                 gait['Bout Starts'].extend([time_ds[bout.start]] * strides_in_bout)
                 gait['Bout Duration'].extend(
@@ -438,7 +441,7 @@ class Gait(_BaseProcess):
         gait_aux['inertial data i'] = asarray(gait_aux['inertial data i'])
         gait_aux['vert axis'] = asarray(gait_aux['vert axis'])
 
-        # loop over metrics and compute
+        # loop over endpoints and compute
         for param in self._params:
             param().predict(goal_fs, leg_length, gait, gait_aux)
 

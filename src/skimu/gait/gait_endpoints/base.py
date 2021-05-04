@@ -1,5 +1,5 @@
 """
-Base gait metrics class
+Base gait endpoints class
 
 Lukas Adamowicz
 2020, Pfizer DMTI
@@ -18,7 +18,7 @@ def basic_asymmetry(f):
     return run_basic_asymmetry
 
 
-class BoutMetric:
+class GaitBoutEndpoint:
     def __str__(self):
         return self.name
 
@@ -27,14 +27,14 @@ class BoutMetric:
 
     def __init__(self, name, logname, depends=None):
         """
-        Bout level metric base class
+        Bout level endpoint base class
 
         Parameters
         ----------
         name : str
-            Name of the metric
+            Name of the endpoint
         depends : Iterable
-            Any other metrics that are required to be computed beforehand
+            Any other endpoints that are required to be computed beforehand
         """
         self.name = name
         self.logger = logging.getLogger(logname)
@@ -44,7 +44,7 @@ class BoutMetric:
 
     def predict(self, fs, leg_length, gait, gait_aux):
         """
-        Predict the bout level gait metric
+        Predict the bout level gait endpoint
 
         Parameters
         ----------
@@ -53,7 +53,7 @@ class BoutMetric:
         leg_length : {None, float}
             Leg length in meters
         gait : dict
-            Dictionary of gait items and results. Modified in place to add the metric being
+            Dictionary of gait items and results. Modified in place to add the endpoint being
             calculated
         gait_aux : dict
             Dictionary of acceleration, velocity, and position data for bouts, and the mapping
@@ -68,7 +68,7 @@ class BoutMetric:
         self._predict(fs, leg_length, gait, gait_aux)
 
 
-class EventMetric:
+class GaitEventEndpoint:
     def __str__(self):
         return self.name
 
@@ -77,12 +77,12 @@ class EventMetric:
 
     def __init__(self, name, logname, depends=None):
         """
-        Gait metric base class
+        Gait endpoint base class
 
         Parameters
         ----------
         name : str
-            Name of the metric
+            Name of the endpoint
         """
         self.name = name
         self.logger = logging.getLogger(logname)
@@ -101,7 +101,7 @@ class EventMetric:
 
     def predict(self, fs, leg_length, gait, gait_aux):
         """
-        Predict the gait event-level metric
+        Predict the gait event-level endpoint
 
         Parameters
         ----------
@@ -110,7 +110,7 @@ class EventMetric:
         leg_length : {None, float}
             Leg length in meters
         gait : dict
-            Dictionary of gait items and results. Modified in place to add the metric being
+            Dictionary of gait items and results. Modified in place to add the endpoint being
             calculated
         gait_aux : dict
             Dictionary of acceleration, velocity, and position data for bouts, and the mapping

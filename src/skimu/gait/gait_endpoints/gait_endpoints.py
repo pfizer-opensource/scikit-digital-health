@@ -1,5 +1,5 @@
 """
-Gait event-level and bout-level metric definitions
+Gait event-level and bout-level endpoint definitions
 
 Lukas Adamowicz
 2020, Pfizer DMTI
@@ -35,7 +35,7 @@ from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt, find_peaks
 
 
-from skimu.gait.gait_metrics.base import EventMetric, BoutMetric, basic_asymmetry
+from skimu.gait.gait_endpoints.base import GaitEventEndpoint, GaitBoutEndpoint, basic_asymmetry
 from skimu.features.lib.extensions.smoothness import SPARC
 
 
@@ -89,9 +89,9 @@ def _autocovariance(x, i1, i2, i3, biased=False):
 
 
 # ===========================================================
-#     GAIT EVENT-LEVEL METRICS
+#     GAIT EVENT-LEVEL ENDPOINTS
 # ===========================================================
-class StrideTime(EventMetric):
+class StrideTime(GaitEventEndpoint):
     """
     The time to complete 1 full gait cycle for 1 foot. Defined as heel-strike (initial contact) to
     heel-strike for the same foot. A basic asymmetry measure is also computed as the difference
@@ -106,7 +106,7 @@ class StrideTime(EventMetric):
         gait[self.k_][mask] = (gait['IC'][mask_ofst] - gait['IC'][mask]) / fs
 
 
-class StanceTime(EventMetric):
+class StanceTime(GaitEventEndpoint):
     """
     The time during a stride in which the foot is on the ground. Defined as heel-strike
     (initial contact) to toe-off (final contact) for a foot. A basic asymmetry measure is also
@@ -120,7 +120,7 @@ class StanceTime(EventMetric):
         gait[self.k_] = (gait['FC'] - gait['IC']) / fs
 
 
-class SwingTime(EventMetric):
+class SwingTime(GaitEventEndpoint):
     """
     The time during which the foot is off the ground. Defined as toe-off (final contact) to
     heel-strike (initial contact) of the same foot. A basic asymmetry measure is also computed as
@@ -135,7 +135,7 @@ class SwingTime(EventMetric):
         gait[self.k_][mask] = (gait['IC'][mask_ofst] - gait['FC'][mask]) / fs
 
 
-class StepTime(EventMetric):
+class StepTime(GaitEventEndpoint):
     """
     The duration from heel-strike (initial contact) to heel-strike of the opposite foot. A basic
     asymmetry measure is also computed as the difference between sequential step times of opposite
@@ -150,7 +150,7 @@ class StepTime(EventMetric):
         gait[self.k_][mask] = (gait['IC'][mask_ofst] - gait['IC'][mask]) / fs
 
 
-class InitialDoubleSupport(EventMetric):
+class InitialDoubleSupport(GaitEventEndpoint):
     """
     The time immediately following heel strike during which the opposite foot is still on the
     ground. Defined as heel-strike (initial contact) to toe-off (final contact) of the opposite
@@ -165,7 +165,7 @@ class InitialDoubleSupport(EventMetric):
         gait[self.k_] = (gait['FC opp foot'] - gait['IC']) / fs
 
 
-class TerminalDoubleSupport(EventMetric):
+class TerminalDoubleSupport(GaitEventEndpoint):
     """
     The time immediately before toe-off (final contact) in which the opposite foot has contacted
     the ground. Defined as heel-strike (initial contact) of the opposite foot to toe-off of the
@@ -181,7 +181,7 @@ class TerminalDoubleSupport(EventMetric):
         gait[self.k_][mask] = (gait['FC opp foot'][mask_ofst] - gait['IC'][mask_ofst]) / fs
 
 
-class DoubleSupport(EventMetric):
+class DoubleSupport(GaitEventEndpoint):
     """
     The combined initial and terminal double support times. It is the total time during a stride
     that the current and opposite foot are in contact with the ground. A basic asymmetry measure
@@ -198,7 +198,7 @@ class DoubleSupport(EventMetric):
                         + gait['PARAM:terminal double support']
 
 
-class SingleSupport(EventMetric):
+class SingleSupport(GaitEventEndpoint):
     """
     The time during a stride that only the current foot is in contact with the ground. Defined as
     opposite foot toe-off (final contact) to opposite foot heel-strike (initial contact). A basic
@@ -214,7 +214,7 @@ class SingleSupport(EventMetric):
         gait[self.k_][mask] = (gait['IC'][mask_ofst] - gait['FC opp foot'][mask]) / fs
 
 
-class StepLength(EventMetric):
+class StepLength(GaitEventEndpoint):
     """
     The distance traveled during a step (heel-strike to opposite foot heel-strike). A basic
     asymmetry measure is also computed as the difference between sequential step lengths of
@@ -247,7 +247,7 @@ class StepLength(EventMetric):
             self._predict_init(gait, True, None)  # don't generate masks
 
 
-class StrideLength(EventMetric):
+class StrideLength(GaitEventEndpoint):
     r"""
     The distance traveled during a stride (heel-strike to current foot heel-strike). A basic
     asymmetry measure is also computed as the difference between sequential stride lengths of
@@ -281,7 +281,7 @@ class StrideLength(EventMetric):
                             + gait['PARAM:step length'][mask]
 
 
-class GaitSpeed(EventMetric):
+class GaitSpeed(GaitEventEndpoint):
     """
     How fast distance is being traveled. Defined as the stride length divided by the
     stride duration, in m/s. A basic asymmetry measure is also computed as the difference between
@@ -298,7 +298,7 @@ class GaitSpeed(EventMetric):
             self._predict_init(gait, True, None)  # don't generate masks
 
 
-class Cadence(EventMetric):
+class Cadence(GaitEventEndpoint):
     """
     The number of steps taken in 1 minute. Computed per step as 60.0s divided by the step time.
     """
@@ -309,7 +309,7 @@ class Cadence(EventMetric):
         gait[self.k_] = 60.0 / gait['PARAM:step time']
 
 
-class IntraStrideCovarianceV(EventMetric):
+class IntraStrideCovarianceV(GaitEventEndpoint):
     """
     The autocovariance of vertical acceleration of 1 stride with lag equal to the stride duration.
     In other words, it is how similar the vertical acceleration signal is from one stride to the
@@ -343,7 +343,7 @@ class IntraStrideCovarianceV(EventMetric):
             )
 
 
-class IntraStepCovarianceV(EventMetric):
+class IntraStepCovarianceV(GaitEventEndpoint):
     """
     The autocovariance of vertical acceleration of 1 step with lag equal to the step duration. In
     other words, it is how similar the acceleration signal is from one step to the next for only
@@ -376,7 +376,7 @@ class IntraStepCovarianceV(EventMetric):
             )
 
 
-class HarmonicRatioV(EventMetric):
+class HarmonicRatioV(GaitEventEndpoint):
     r"""
     Symmetry measure of the 2 steps that occur during each stride. It attempts to capture this
     relationship by looking at the frequency components for steps and strides and creating a ratio
@@ -443,7 +443,7 @@ class HarmonicRatioV(EventMetric):
             gait[self.k_][idx] = sum(F[ix_stridef[1::2]]) / sum(F[ix_stridef[::2]])
 
 
-class StrideSPARC(EventMetric):
+class StrideSPARC(GaitEventEndpoint):
     r"""
     Assessment of the smoothness of the acceleration signal during a stride. SPARC is the
     spectral arc length, which is a measure of how smooth a signal is. Higher values (smaller
@@ -482,9 +482,9 @@ class StrideSPARC(EventMetric):
 
 
 # ===========================================================
-#     GAIT BOUT-LEVEL METRICS
+#     GAIT BOUT-LEVEL ENDPOINTS
 # ===========================================================
-class PhaseCoordinationIndex(BoutMetric):
+class PhaseCoordinationIndex(GaitBoutEndpoint):
     r"""
     Assessment of the symmetry between steps during straight overground gait.
     Computed for an entire bout, it is a measure of the deviation from symmetrical steps (ie half a
@@ -542,7 +542,7 @@ class PhaseCoordinationIndex(BoutMetric):
         gait[self.k_] = pci[gait_aux['inertial data i']]
 
 
-class GaitSymmetryIndex(BoutMetric):
+class GaitSymmetryIndex(GaitBoutEndpoint):
     r"""
     Assessment of the symmetry between steps during straight overground gait. It is computed for
     an entire bout. Values closer to 1 indicate higher symmetry, while values close to 0 indicate
@@ -551,7 +551,7 @@ class GaitSymmetryIndex(BoutMetric):
     Notes
     -----
     If the minimum gait window time is less than 4.5 seconds, there may be issues with this
-    metric for those with slow gait (those with stride lengths approaching the minimum gait
+    endpoint for those with slow gait (those with stride lengths approaching the minimum gait
     window time).
 
     GSI is computed using the biased autocovariance of the acceleration after being filtered
@@ -625,7 +625,7 @@ class GaitSymmetryIndex(BoutMetric):
         gait[self.k_] = gsi[gait_aux['inertial data i']]
 
 
-class StepRegularityV(BoutMetric):
+class StepRegularityV(GaitBoutEndpoint):
     """
     The autocovariance at a lag time of 1 step for the vertical acceleration. Computed for an
     entire bout of gait, it is a measure of the average symmetry of sequential steps during
@@ -635,7 +635,7 @@ class StepRegularityV(BoutMetric):
     Notes
     -----
     If the minimum gait window time is less than 4.5 seconds, there may be issues with this
-    metric for those with slow gait (those with stride lengths approaching the minimum gait
+    endpoint for those with slow gait (those with stride lengths approaching the minimum gait
     window time).
 
     Step regularity is the value of the autocovariance function at a lag equal to the time
@@ -683,7 +683,7 @@ class StepRegularityV(BoutMetric):
         gait[self.k_] = stepreg[gait_aux['inertial data i']]
 
 
-class StrideRegularityV(BoutMetric):
+class StrideRegularityV(GaitBoutEndpoint):
     """
     Autocovariance at a lag time of 1 stride for the vertical acceleration. Computed for an
     entire bout of gait, it is a measure of the average symmetry of sequential stride during
@@ -693,7 +693,7 @@ class StrideRegularityV(BoutMetric):
     Notes
     -----
     If the minimum gait window time is less than 4.5 seconds, there may be issues with this
-    metric for those with slow gait (those with stride lengths approaching the minimum gait
+    endpoint for those with slow gait (those with stride lengths approaching the minimum gait
     window time).
 
     Stride regularity is the value of the autocovariance function at a lag equal to the time
@@ -741,16 +741,16 @@ class StrideRegularityV(BoutMetric):
         gait[self.k_] = stridereg[gait_aux['inertial data i']]
 
 
-class AutocovarianceSymmetryV(BoutMetric):
+class AutocovarianceSymmetryV(GaitBoutEndpoint):
     """
     The absolute difference between stride and step regularity for the vertical axis.
     It quantifies the level of symmetry between the stride and step regularity and provide an
-    overall metric of symmetry for the gait bout
+    overall endpoint of symmetry for the gait bout
 
     Notes
     -----
     If the minimum gait window time is less than 4.5 seconds, there may be issues with this
-    metric for those with slow gait (those with stride lengths approaching the minimum gait
+    endpoint for those with slow gait (those with stride lengths approaching the minimum gait
     window time).
 
     References
@@ -770,9 +770,9 @@ class AutocovarianceSymmetryV(BoutMetric):
         )
 
 
-class RegularityIndexV(BoutMetric):
+class RegularityIndexV(GaitBoutEndpoint):
     r"""
-    The combination of both step and stride regularity into one metric. The goal is to provide an
+    The combination of both step and stride regularity into one endpoint. The goal is to provide an
     assessment of the regularity for consecutive steps and strides, for the vertical axis
     acceleration. Values closer to 1 indicate high levels of symmetry between left and right steps.
 
@@ -788,7 +788,7 @@ class RegularityIndexV(BoutMetric):
     The Regularity Index term came from [1]_, where it was defined without the subtraction from 1.
     However, the definition from [2]_ (under the term "symmetry") keeps the values in the same
     range as others (including step/stride regularity), aiding in ease of interpretation.
-    "Regularity Index" however serves to eliminate confusion given other metrics already labeled
+    "Regularity Index" however serves to eliminate confusion given other endpoints already labeled
     with "symmetry" in the name.
 
     References
