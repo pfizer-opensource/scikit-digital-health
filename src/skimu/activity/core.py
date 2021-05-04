@@ -279,7 +279,10 @@ class MVPActivityClassification(_BaseProcess):
                 day_stop
             )
             # save wear time and check if there is less wear time than minimum
-            res["N wear hours"][iday] = around(sum(day_wear_stops - day_wear_starts) / fs / 3600, 1)
+            res["N wear hours"][iday] = around(
+                sum(day_wear_stops - day_wear_starts) / fs / 3600,
+                1
+            )
             if res["N wear hours"][iday] < self.min_wear:
                 continue  # skip day if less than minimum specified hours of wear time
 

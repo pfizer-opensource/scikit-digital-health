@@ -65,7 +65,8 @@ the following:
 - ``"migueles_wrist_adult"`` [7]_ **these are the default cutpoints used**
 
 The thresholds have been automatically scaled to the average values, and can be used with any
-length windows (though most originally use 1s windows), and use the appropriate acceleration metric.
+length windows (though most originally use 1s windows), and use the appropriate acceleration
+metric.
 
 .. _Using Custom Cutpoints:
 
@@ -113,7 +114,8 @@ References
     Exercise, vol. 46, no. 9, pp. 1816–1824, Sep. 2014, doi: 10.1249/MSS.0000000000000289.
 .. [6] M. Hildebrand, B. H. Hansen, V. T. van Hees, and U. Ekelund, “Evaluation of raw
     acceleration sedentary thresholds in children and adults,” Scandinavian Journal of Medicine &
-    Science in Sports, vol. 27, no. 12, pp. 1814–1823, 2017, doi: https://doi.org/10.1111/sms.12795.
+    Science in Sports, vol. 27, no. 12, pp. 1814–1823, 2017,
+    doi: https://doi.org/10.1111/sms.12795.
 .. [7] J. H. Migueles et al., “Comparability of accelerometer signal aggregation metrics across
     placements and dominant wrist cut points for the assessment of physical activity in adults,”
     Scientific Reports, vol. 9, no. 1, Art. no. 1, Dec. 2019, doi: 10.1038/s41598-019-54267-y.

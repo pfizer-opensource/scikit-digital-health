@@ -140,7 +140,7 @@ def metric_hfen(accel, wlen, fs, low_cutoff=0.2, trim_zero=True, **kwargs):
         (N, ) array of high-pass filtered and euclidean normed accelerations.
     """
     sos = butter(4, 2 * low_cutoff / fs, btype='high', output='sos')
-    
+
     if trim_zero:
         return moving_mean(maximum(norm(sosfiltfilt(sos, accel, axis=0), axis=1), 0), wlen, wlen)
     else:
@@ -176,7 +176,7 @@ def metric_hfenplus(accel, wlen, fs, cutoff=0.2, trim_zero=True, **kwargs):
 
     acc_high = norm(sosfiltfilt(sos_high, accel, axis=0), axis=1)
     acc_low = norm(sosfiltfilt(sos_low, accel, axis=0), axis=1)
-    
+
     if trim_zero:
         return moving_mean(maximum(acc_high + acc_low - 1, 0), wlen, wlen)
     else:

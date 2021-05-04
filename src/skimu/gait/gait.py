@@ -355,7 +355,10 @@ class Gait(_BaseProcess):
         # day separation
         days = kwargs.get(self._days, {}).get(self.day_key, None)
         if days is None:
-            warn(f"Day indices for {self.day_key} (base, period) not found. No day separation used")
+            warn(
+                f"Day indices for {self.day_key} (base, period) not found. No day separation used",
+                UserWarning
+            )
             days = [[0, accel.shape[0] - 1]]
 
         time_ds, accel_ds, gait_pred_ds, days = get_downsampled_data(
