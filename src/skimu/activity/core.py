@@ -110,6 +110,12 @@ class MVPActivityClassification(_BaseProcess):
         physical activity: the role of sociodemographic factors,” Am J Epidemiol, vol. 179,
         no. 6, pp. 781–790, Mar. 2014, doi: 10.1093/aje/kwt330.
     """
+    # MM: midnight -> midnight    ExS: Exclude Sleep
+    windows = ["MM", "ExS"]
+    activity_levels = ["MVPA", "sed", "light", "mod", "vig"]
+    epoch_lens = ["1min", "5min"]
+    ig_res = ["gradient", "intercept", "R-squared"]
+
     def __init__(
             self, short_wlen=5, bout_lens=(1, 5, 10), bout_criteria=0.8,
             bout_metric=4, closed_bout=False, min_wear_time=10, cutpoints="migueles_wrist_adult",
@@ -217,15 +223,21 @@ class MVPActivityClassification(_BaseProcess):
         # SETUP RESULTS KEYS/ENDPOINTS
         # ========================================================================================
         general_str_keys = ["Date", "Weekday"]
-        general_int_keys = ["Day N", "N Hours", "N wear hours", "N wear awake hours"]
+        general_int_keys = ["Day N", "N hours", "N wear hours", "N wear awake hours"]
 
-        # MM: midnight -> midnight    ExS: Exclude Sleep
-        windows = ["MM", "ExS"]
-        activity_levels = ["MVPA", "sed", "light", "mod", "vig"]
+        epoch_lens = [f"{self.wlen}sec"] + self.epoch_lens
 
-        lvl_keys = iter_product(windows, activity_levels, self.blens, ["bout"])
-        mvpa_keys = iter_product(windows, ["MVPA"], [f"{self.wlen}sec", "1min", "5min"], ["epoch"])
-        ig_keys = iter_product(windows, ["IG"], ["gradient", "intercept", "R-squared"])
+        lvl_keys = [
+            "_".join(i) for i in iter_product(
+                self.windows, self.activity_levels, self.blens, ["bout"]
+            )
+        ]
+        mvpa_keys = [
+            "_".join(i) for i in iter_product(self.windows, ["MVPA"], epoch_lens, ["epoch"])
+        ]
+        ig_keys = [
+            "_".join(i) for i in iter_product(self.windows, ["IG"], self.ig_res)
+        ]
 
         res = {i: full(len(days), "", dtype="object") for i in general_str_keys}
         res.update({i: full(len(days), -1, dtype="int") for i in general_int_keys})
@@ -347,25 +359,23 @@ class MVPActivityClassification(_BaseProcess):
 
             # MVPA
             # total time of 5sec epochs in minutes
-            key = (wtype, "MVPA", f"{self.wlen}sec", "epoch")
+            key = f"{wtype}_MVPA_{self.wlen}sec_epoch"
             results[key][day_n] += sum(acc_metric >= self.cutpoints["light"]) / epoch_per_min
 
             # total time in 1 minute epochs
-            key = (wtype, "MVPA", "1min", "epoch")
             tmp = moving_mean(acc_metric, epoch_per_min, epoch_per_min)
-            results[key][day_n] += sum(tmp >= self.cutpoints["light"])
+            results[f"{wtype}_MVPA_1min_epoch"][day_n] += sum(tmp >= self.cutpoints["light"])
 
             # total time in 5 minute epochs
-            key = (wtype, "MVPA", "5min", "epoch")
             tmp = moving_mean(acc_metric, 5 * epoch_per_min, 5 * epoch_per_min)
-            results[key][day_n] += sum(tmp >= self.cutpoints["light"]) * 5
+            results[f"{wtype}_MVPA_5min_epoch"][day_n] += sum(tmp >= self.cutpoints["light"]) * 5
 
             # total MVPA in <bout_len> minute bouts
             for bout_len in self.blens:
                 # compute the activity metrics in bouts for the various activity levels
-                for level in ["MVPA", "sed", "light", "mod", "vig"]:
+                for level in self.activity_levels:
                     l_thresh, u_thresh = get_level_thresholds(level, self.cutpoints)
-                    key = (wtype, level, bout_len, "bout")
+                    key = f"{wtype}_{level}_{bout_len}_bout"
 
                     results[key][day_n] += get_activity_bouts(
                         acc_metric,
@@ -384,9 +394,9 @@ class MVPActivityClassification(_BaseProcess):
         hist *= (self.wlen / 60)  # convert from sample counts to minutes
         ig_res = get_intensity_gradient(ig_vals, hist)
 
-        results[(wtype, "IG", "gradient")][day_n] = ig_res[0]
-        results[(wtype, "IG", "intercept")][day_n] = ig_res[1]
-        results[(wtype, "IG", "R-squared")][day_n] = ig_res[2]
+        results[f"{wtype}_IG_gradient"][day_n] = ig_res[0]
+        results[f"{wtype}_IG_intercept"][day_n] = ig_res[1]
+        results[f"{wtype}_IG_R-squared"][day_n] = ig_res[2]
 
 
 def get_activity_bouts(
