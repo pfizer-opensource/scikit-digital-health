@@ -15,6 +15,20 @@ def get_available_cutpoints():
     print(_base_cutpoints.keys())
 
 
+def get_level_thresholds(level, cutpoints):
+    if level.lower() in ["sed", "sedentary"]:
+        return -1e5, cutpoints["sedentary"]
+    elif level.lower() == "light":
+        return cutpoints["sedentary"], cutpoints["light"]
+    elif level.lower() in ["mod", "moderate"]:
+        return cutpoints["light"], cutpoints["moderate"]
+    elif level.lower() in ["vig", "vigorous"]:
+        return cutpoints["moderate"], 1e5
+    elif level.lower() == "mvpa":
+        return
+    else:
+        raise ValueError(f"Activity level label [{level}] not recognized.")
+
 # ==========================================================
 # Activity cutpoints
 _base_cutpoints = {}
