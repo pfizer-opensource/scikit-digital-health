@@ -231,11 +231,12 @@ class MVPActivityClassification(_BaseProcess):
         general_str_keys = ["Date", "Weekday"]
         general_int_keys = ["Day N", "N hours", "N wear hours", "N wear awake hours"]
 
+        blen_keys = [f"{i}min" for i in self.blens]
         epoch_lens = [f"{self.wlen}sec"] + self.epoch_lens
 
         lvl_keys = [
             "_".join(i) for i in iter_product(
-                self.windows, self.activity_levels, self.blens, ["bout"]
+                self.windows, self.activity_levels, blen_keys, ["bout"]
             )
         ]
         mvpa_keys = [
@@ -381,7 +382,7 @@ class MVPActivityClassification(_BaseProcess):
                 # compute the activity metrics in bouts for the various activity levels
                 for level in self.activity_levels:
                     l_thresh, u_thresh = get_level_thresholds(level, self.cutpoints)
-                    key = f"{wtype}_{level}_{bout_len}_bout"
+                    key = f"{wtype}_{level}_{bout_len}min_bout"
 
                     results[key][day_n] += get_activity_bouts(
                         acc_metric,
