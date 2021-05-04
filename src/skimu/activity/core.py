@@ -15,7 +15,7 @@ from scipy.stats import linregress
 from skimu.base import _BaseProcess
 from skimu.utility import moving_mean
 from skimu.utility.internal import get_day_index_intersection
-from skimu.activity.cutpoints import _base_cutpoints
+from skimu.activity.cutpoints import _base_cutpoints, get_level_thresholds
 
 
 def _check_if_none(var, lgr, msg_if_none, i1, i2):
@@ -257,44 +257,20 @@ class MVPActivityClassification(_BaseProcess):
             if res["N wear hours"][iday] < self.min_wear:
                 continue  # skip day if less than minimum specified hours of wear time
 
-            # intensity gradient is on whole day, accumulate over each wear bout for whole day
-            hist = zeros(iglevels.size - 1)
+            # compute activity endpoints for the midnight -> midnight windows
+            self._get_activity_metrics_across_indexing(
+                res,
+                "MM",
+                accel,
+                fs,
+                iday,
+                day_wear_starts,
+                day_wear_starts,
+                epm,
+                iglevels,
+                igvals
+            )
 
-            # iterate over the blocks of wear time during the day
-            for dwstart, dwstop in zip(day_wear_starts, day_wear_stops):
-                # compute the metric for the acceleration
-                accel_metric = self.cutpoints["metric"](
-                    accel[dwstart:dwstop], nwlen, fs,
-                    **self.cutpoints["kwargs"]
-                )
-
-                # MVPA
-                # total time of `wlen` epochs in minutes
-                res[("MM", "MVPA", "5sec", "epoch")][-1] += sum(
-                    accel_metric >= self.cutpoints["light"]) / epm
-                # total time of 1 minute epochs
-                tmp = moving_mean(accel_metric, epm, epm)
-                res[("MM", "MVPA", "1min", "epoch")][-1] += sum(tmp >= self.cutpoints["light"])
-                # total time in 5 minute epochs
-                tmp = moving_mean(accel_metric, 5 * epm, 5 * epm)
-                res[("MM", "MVPA", "5min", "epoch")][-1] += sum(tmp >= self.cutpoints["light"]) * 5
-
-                # total MVPA time in <bout_len> minute bouts
-                for bout_len in self.blens:
-                    res[f"MVPA {bout_len}min Bouts"][-1] += get_activity_bouts(
-                        accel_metric, self.cutpoints["light"], self.wlen, bout_len, self.boutcrit,
-                        self.closedbout, self.boutmetric
-                    )
-
-                # intensity gradient. Density = false to return counts
-                hist += histogram(accel_metric, bins=iglevels, density=False)[0]
-
-            # intensity gradient computation per day
-            hist *= (self.wlen / 60)
-            ig_res = get_intensity_gradient(igvals, hist)
-            res[("MM", "IG", "gradient")][iday] = ig_res[0]
-            res[("MM", "IG", "intercept")][iday] = ig_res[1]
-            res[("MM", "IG", "R-squared")][iday] = ig_res[2]
 
         kwargs.update({self._time: time, self._acc: accel})
 
@@ -303,9 +279,10 @@ class MVPActivityClassification(_BaseProcess):
         else:
             return res
 
-    def _get_activity_metrics_across_indexing(self, res, wtype, accel, fs, day_n, starts, stops, wlen, epoch_per_min, ig_levels):
+    def _get_activity_metrics_across_indexing(self, res, wtype, accel, fs, day_n, starts, stops, epoch_per_min, ig_levels, ig_vals):
         """
-        Compute the activity metrics for different ways of indexing a day into bouts
+        Compute the activity metrics for different ways of indexing a day into bouts.
+
         Returns
         -------
 
@@ -314,11 +291,11 @@ class MVPActivityClassification(_BaseProcess):
 
         for start, stop in zip(starts, stops):
             # compute the desired acceleration metric
-            acc_metric = self.cutpoints["metric"](accel[start:stop], wlen, fs, **self.cutpoints["kwargs"])
+            acc_metric = self.cutpoints["metric"](accel[start:stop], self.wlen, fs, **self.cutpoints["kwargs"])
 
             # MVPA
             # total time of 5sec epochs in minutes
-            key = f"{int(60 / epoch_per_min)}sec"
+            key = f"{self.wlen}sec"
             res[(wtype, "MVPA", key, "epoch")][day_n] += sum(acc_metric >= self.cutpoints["light"]) / epoch_per_min
 
             # total time in 1 minute epochs
@@ -331,20 +308,31 @@ class MVPActivityClassification(_BaseProcess):
 
             # total MVPA in <bout_len> minute bouts
             for bout_len in self.blens:
-                key = (wtype, "MVPA", bout_len, "bout")
-                res[key][day_n] += get_activity_bouts(
-                    acc_metric,
-                    self.cutpoints["light"],
-                    1e5,
-                    self.wlen,
-                    bout_len,
-                    self.boutcrit,
-                    self.closedbout,
-                    self.boutmetric
-                )
+                # compute the activity metrics in bouts for the various activity levels
+                for level in ["MVPA", "sed", "light", "mod", "vig"]:
+                    l_thresh, u_thresh = get_level_thresholds(level, self.cutpoints)
+                    key = (wtype, level, bout_len, "bout")
+
+                    res[key][day_n] += get_activity_bouts(
+                        acc_metric,
+                        l_thresh, u_thresh,
+                        self.wlen,
+                        bout_len,
+                        self.boutcrit,
+                        self.closedbout,
+                        self.boutmetric
+                    )
 
             # histogram for intensity gradient. Density = false to return counts
             hist += histogram(acc_metric, bins=ig_levels, density=False)[0]
+
+        # intensity gradient computation per day
+        hist *= (self.wlen / 60)  # convert from sample counts to minutes
+        ig_res = get_intensity_gradient(ig_vals, hist)
+
+        res[(wtype, "IG", "gradient")][day_n] = ig_res[0]
+        res[(wtype, "IG", "intercept")][day_n] = ig_res[1]
+        res[(wtype, "IG", "R-squared")][day_n] = ig_res[2]
 
 
 def get_activity_bouts(accm, lower_thresh, upper_thresh, wlen, boutdur, boutcrit, closedbout, boutmetric=1):
