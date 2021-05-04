@@ -21,7 +21,10 @@ from skimu.activity.cutpoints import _base_cutpoints, get_level_thresholds
 def _check_if_none(var, lgr, msg_if_none, i1, i2):
     if var is None:
         lgr.info(msg_if_none)
-        start, stop = array([i1]), array([i2])
+        if i1 is None or i2 is None:
+            return None, None
+        else:
+            start, stop = array([i1]), array([i2])
     else:
         start, stop = var[:, 0], var[:, 1]
     return start, stop
@@ -202,7 +205,7 @@ class MVPActivityClassification(_BaseProcess):
         # check if sleep data is provided
         sleep = kwargs.get("sleep", None)
         slp_msg = f"[{self!s}] No sleep information found. Only computing full day metrics."
-        sleep_starts, sleep_stops = _check_if_none(sleep, self.logger, slp_msg, 0, time.size)
+        sleep_starts, sleep_stops = _check_if_none(sleep, self.logger, slp_msg, None, None)
 
         # ========================================================================================
         # SETUP RESULTS KEYS/ENDPOINTS
@@ -240,20 +243,8 @@ class MVPActivityClassification(_BaseProcess):
                 day_start,
                 day_stop
             )
-            # get the intersection of wear time, wake time, and day
-            day_wear_wake_starts, day_wear_wake_stops = get_day_index_intersection(
-                (wear_starts, sleep_starts),
-                (wear_stops, sleep_stops),
-                (True, False),  # include wear time, exclude sleeping time
-                day_start,
-                day_stop
-            )
-
-            # less wear time than minimum
+            # save wear time and check if there is less wear time than minimum
             res["N wear hours"][iday] = around(sum(day_wear_stops - day_wear_starts) / fs / 3600, 1)
-            res["N wear awake hours"][iday] = around(
-                sum(day_wear_wake_stops - day_wear_wake_starts) / fs / 3600, 1
-            )
             if res["N wear hours"][iday] < self.min_wear:
                 continue  # skip day if less than minimum specified hours of wear time
 
@@ -271,6 +262,33 @@ class MVPActivityClassification(_BaseProcess):
                 igvals
             )
 
+            # get the intersection of wear time, wake time, and day if sleep was provided
+            if sleep_starts is not None and sleep_stops is not None:
+                day_wear_wake_starts, day_wear_wake_stops = get_day_index_intersection(
+                    (wear_starts, sleep_starts),
+                    (wear_stops, sleep_stops),
+                    (True, False),  # include wear time, exclude sleeping time
+                    day_start,
+                    day_stop
+                )
+
+                res["N wear awake hours"][iday] = around(
+                    sum(day_wear_wake_stops - day_wear_wake_starts) / fs / 3600, 1
+                )
+
+                # compute activity endpoints for the midnight -> midnight windows, EXCLUDING sleep
+                self._get_activity_metrics_across_indexing(
+                    res,
+                    "ExS",
+                    accel,
+                    fs,
+                    iday,
+                    day_wear_wake_starts,
+                    day_wear_wake_starts,
+                    epm,
+                    iglevels,
+                    igvals
+                )
 
         kwargs.update({self._time: time, self._acc: accel})
 
