@@ -41,7 +41,7 @@ def _update_date_results(results, timestamps, day_n, day_start_idx, day_stop_idx
     )
 
 
-class MVPActivityClassification(_BaseProcess):
+class ActivityLevelClassification(_BaseProcess):
     """
     Classify accelerometer data into different activity levels as a proxy for assessing physical
     activity energy expenditure (PAEE). Levels are sedentary, light, moderate, and vigorous.
