@@ -359,6 +359,13 @@ class MVPActivityClassification(_BaseProcess):
         """
         hist = zeros(ig_levels.size - 1)
 
+        # initialize the values here from nan to 0.  Do this here because missing data should
+        # remain as "nan".
+        for bout_len in self.blens:
+            for level in self.activity_levels:
+                key = f"{wtype}_{level}_{bout_len}min_bout"
+                results[key][day_n] = 0.0
+
         for start, stop in zip(starts, stops):
             # compute the desired acceleration metric
             acc_metric = self.cutpoints["metric"](
