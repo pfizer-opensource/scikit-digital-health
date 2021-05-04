@@ -418,7 +418,15 @@ class MVPActivityClassification(_BaseProcess):
 
 
 def get_activity_bouts(
-        accm, lower_thresh, upper_thresh, wlen, boutdur, boutcrit, closedbout, boutmetric=1):
+    accm,
+    lower_thresh,
+    upper_thresh,
+    wlen,
+    boutdur,
+    boutcrit,
+    closedbout,
+    boutmetric=1
+):
     """
     Get the number of bouts of activity level based on several criteria.
 
