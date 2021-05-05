@@ -42,6 +42,7 @@ PyObject * moving_mean(PyObject *NPY_UNUSED(self), PyObject *args){
     PyArrayObject *rmean = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
 
     if (!rmean){
+        free(rdims);  /* make sure it gets freed */
         Py_XDECREF(data);
         Py_XDECREF(rmean);
         return NULL;
@@ -102,6 +103,7 @@ PyObject * moving_sd(PyObject *NPY_UNUSED(self), PyObject *args){
                   *rmean = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
 
     if ((!rmean) || (!rsd)){
+        free(rdims);  /* make sure it gets freed */
         Py_XDECREF(data);
         Py_XDECREF(rmean);
         Py_XDECREF(rsd);
@@ -173,6 +175,7 @@ PyObject * moving_skewness(PyObject *NPY_UNUSED(self), PyObject *args){
                   *rskew = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
 
     if ((!rmean) || (!rsd) || (!rskew)){
+        free(rdims);  /* make sure it gets freed */
         Py_XDECREF(data);
         Py_XDECREF(rskew);
         Py_XDECREF(rsd);
@@ -250,6 +253,7 @@ PyObject * moving_kurtosis(PyObject *NPY_UNUSED(self), PyObject *args){
                   *rkurt = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
 
     if (!rmean || !rsd || !rskew || !rkurt){
+        free(rdims);  /* make sure it gets freed */
         Py_XDECREF(data);
         Py_XDECREF(rkurt);
         Py_XDECREF(rskew);
