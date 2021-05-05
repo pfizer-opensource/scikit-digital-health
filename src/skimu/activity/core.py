@@ -563,17 +563,22 @@ class ActivityLevelClassification(_BaseProcess):
             )
 
         acc_level = zeros(acc_metric.size, dtype="int")
-        for i, lvl in enumerate(["sed", "light", "mod", "vig"]):
+        acc_level_text = full(acc_level.size, "", dtype="<U10")
+        for i, lvl in enumerate(["sedentary", "light", "moderate", "vigorous"]):
             lthresh, uthresh = get_level_thresholds(lvl, self.cutpoints)
 
-            acc_level[(acc_metric >= uthresh) & (acc_metric < uthresh)] = i
+            acc_level[(acc_metric >= lthresh) & (acc_metric < uthresh)] = i
+            acc_level_text[(acc_metric >= lthresh) & (acc_metric < uthresh)] = lvl
 
         f.add_trace(
             go.Scattergl(
                 x=x[:acc_level.size],
                 y=acc_level,
                 mode="lines",
-                name="Accel. Level"
+                name="Accel. Level",
+                line={"color": "black", "width": 1},
+                text=acc_level_text,
+                hoverinfo="text"
             ),
             row=3,
             col=1
