@@ -13,7 +13,7 @@ class TestSleep:
     def test(self):
         # file = "/Users/lukasadamowicz/Documents/Packages/sleeppy/sleeppy/test/test_data/demo.bin"
         # # file = "/Users/lukasadamowicz/Downloads/STEPP_QC/0074_GNACTV_LeftWrist.bin"
-        # file = "/Users/lukasadamowicz/Downloads/SQUAD_acc_0000_nonsensitive_20200101_100706184018_left_2.bin"
+        # file = "/Users/lukasadamowicz/Downloads/STRYDE/stryde/100111980001_GNACTV_LeftWrist.bin"
         #
         # slp = Sleep(
         #     start_buffer=0,
@@ -29,14 +29,14 @@ class TestSleep:
         #     downsample=True,
         #     day_window=(12, 24)
         # )
-        # slp.setup_plotting("test.pdf")
+        # slp.setup_plotting("/Users/lukasadamowicz/Downloads/STRYDE/skimu_results/sleep_plot.pdf")
         #
         # p = Pipeline()
         # p.add(ReadBin(bases=[12], periods=[24]))
         # p.add(
         #     slp,
         #     save_results=True,
-        #     save_name="sleep_results.csv"
+        #     save_name="/Users/lukasadamowicz/Downloads/STRYDE/skimu_results/sleep_results.csv"
         # )
         #
         # p.run(file=file)
