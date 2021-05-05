@@ -198,7 +198,7 @@ class ActivityLevelClassification(_BaseProcess):
 
         Parameters
         ----------
-        save_file : str
+        save_name : str
             The file name to save the resulting plot to. Extension will be set to PDF. There
             are formatting options as well for dynamically generated names. See Notes
 
@@ -322,7 +322,7 @@ class ActivityLevelClassification(_BaseProcess):
             # PLOTTING. handle here before returning for minimal wear hours, etc
             self._plot_day_accel(
                 iday, source_file, fs, accel[day_start:day_stop], res["Date"][-1], start_dt)
-            self._plot_day_wear(fs, day_wear_starts, day_wear_stops, start_dt, day_start, day_stop)
+            self._plot_day_wear(fs, day_wear_starts, day_wear_stops, start_dt, day_start)
 
             # save wear time and check if there is less wear time than minimum
             res["N wear hours"][iday] = around(
@@ -586,27 +586,31 @@ class ActivityLevelClassification(_BaseProcess):
         f.update_yaxes(title="Wear/Sleep", row=4, col=1)
         f.update_xaxes(title="Day Hour", row=4, col=1)
 
-    def _plot_day_wear(self, fs, day_wear_starts, day_wear_stops, start_dt, day_start, day_stop):
+    def _plot_day_wear(self, fs, day_wear_starts, day_wear_stops, start_dt, day_start):
         if self.f is None:
             return
         start_hr = start_dt.hour + start_dt.minute / 60 + start_dt.second / 3600
 
+        wear = []
         for s, e in zip(day_wear_starts - day_start, day_wear_stops - day_start):
             # convert to hours
             sh = s / (fs * 3600) + start_hr
             eh = e / (fs * 3600) + start_hr
 
-            self.f[-1].add_trace(
-                go.Scattergl(
-                    x=[sh, eh],
-                    y=[2, 2],
-                    mode="lines",
-                    name="Wear",
-                    line={"width": 4}
-                ),
-                row=4,
-                col=1
-            )
+            wear.extend([sh, eh, None])  # add None so gaps dont get connected
+
+        self.f[-1].add_trace(
+            go.Scattergl(
+                x=wear,
+                y=[2] * len(wear),
+                mode="lines",
+                name="Wear",
+                legendgroup="wear",
+                line={"width": 4}
+            ),
+            row=4,
+            col=1
+        )
 
         self.f[-1].update_yaxes(range=[0.75, 2.25], row=4, col=1)
 
@@ -624,22 +628,26 @@ class ActivityLevelClassification(_BaseProcess):
             day_stop
         )
 
+        sleep = []
         for s, e in zip(day_sleep_starts - day_start, day_sleep_stops - day_start):
             # convert to hours
             sh = s / (fs * 3600) + start_hr
             eh = e / (fs * 3600) + start_hr
 
-            self.f[-1].add_trace(
-                go.Scattergl(
-                    x=[sh, eh],
-                    y=[1, 1],
-                    mode="lines",
-                    name="Sleep",
-                    line={"width": 4}
-                ),
-                row=4,
-                col=1
-            )
+            sleep.extend([sh, eh, None])  # add none so it doesn't get connected
+
+        self.f[-1].add_trace(
+            go.Scattergl(
+                x=sleep,
+                y=[1] * len(sleep),
+                mode="lines",
+                name="Sleep",
+                legendgroup="sleep",
+                line={"width": 4}
+            ),
+            row=4,
+            col=1
+        )
 
     def _finalize_plots(self):
         if self.f is None:
