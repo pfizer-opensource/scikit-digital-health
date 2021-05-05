@@ -530,6 +530,7 @@ class ActivityLevelClassification(_BaseProcess):
                     y=accel[::n60, i],
                     mode="lines",
                     name=axname,
+                    line={"width": 1}
                 ),
                 row=1,
                 col=1
