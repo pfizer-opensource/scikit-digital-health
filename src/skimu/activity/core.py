@@ -323,6 +323,8 @@ class ActivityLevelClassification(_BaseProcess):
             self._plot_day_accel(
                 iday, source_file, fs, accel[day_start:day_stop], res["Date"][iday], start_dt)
             self._plot_day_wear(fs, day_wear_starts, day_wear_stops, start_dt, day_start)
+            # plotting sleep if it exists
+            self._plot_day_sleep(fs, sleep_starts, sleep_stops, day_start, day_stop, start_dt)
 
             # save wear time and check if there is less wear time than minimum
             res["N wear hours"][iday] = around(
@@ -375,9 +377,6 @@ class ActivityLevelClassification(_BaseProcess):
                     iglevels,
                     igvals
                 )
-
-                # plotting sleep if it exists
-                self._plot_day_sleep(fs, sleep_starts, sleep_stops, day_start, day_stop, start_dt)
 
         # finalize plots
         self._finalize_plots()
@@ -615,7 +614,7 @@ class ActivityLevelClassification(_BaseProcess):
         self.f[-1].update_yaxes(range=[0.75, 2.25], row=4, col=1)
 
     def _plot_day_sleep(self, fs, sleep_starts, sleep_stops, day_start, day_stop, start_dt):
-        if self.f is None:
+        if self.f is None or sleep_starts is None or sleep_stops is None:
             return
 
         start_hr = start_dt.hour + start_dt.minute / 60 + start_dt.second / 3600
