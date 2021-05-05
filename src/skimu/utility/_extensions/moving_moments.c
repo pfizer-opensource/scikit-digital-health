@@ -34,7 +34,7 @@ PyObject * moving_mean(PyObject *NPY_UNUSED(self), PyObject *args){
     // get the number of dimensions, and the shape
     int ndim = PyArray_NDIM(data);
     npy_intp *ddims = PyArray_DIMS(data);
-    npy_intp *rdims = (npy_intp *)malloc(ndim * sizeof(npy_intp));
+    npy_intp *rdims = (npy_intp *)malloc(ndim * sizeof(ddims));
     if (!rdims)
     {
         Py_XDECREF(data);
@@ -103,7 +103,7 @@ PyObject * moving_sd(PyObject *NPY_UNUSED(self), PyObject *args){
     // get the number of dimensions, and the shape
     int ndim = PyArray_NDIM(data);
     npy_intp *ddims = PyArray_DIMS(data);
-    npy_intp *rdims = (npy_intp *)malloc(ndim * sizeof(npy_intp));
+    npy_intp *rdims = (npy_intp *)malloc(ndim * sizeof(ddims));
     if (!rdims)
     {
         Py_XDECREF(data);
@@ -187,7 +187,7 @@ PyObject * moving_skewness(PyObject *NPY_UNUSED(self), PyObject *args){
     // get the number of dimensions, and the shape
     int ndim = PyArray_NDIM(data);
     npy_intp *ddims = PyArray_DIMS(data);
-    npy_intp *rdims = (npy_intp *)malloc(ndim * sizeof(npy_intp));
+    npy_intp *rdims = (npy_intp *)malloc(ndim * sizeof(ddims));
     if (!rdims)
     {
         Py_XDECREF(data);
@@ -276,7 +276,7 @@ PyObject * moving_kurtosis(PyObject *NPY_UNUSED(self), PyObject *args){
     // get the number of dimensions, and the shape
     int ndim = PyArray_NDIM(data);
     npy_intp *ddims = PyArray_DIMS(data);
-    npy_intp *rdims = (npy_intp *)malloc(ndim * sizeof(npy_intp));
+    npy_intp *rdims = (npy_intp *)malloc(ndim * sizeof(ddims));
     if (!rdims)
     {
         Py_XDECREF(data);
