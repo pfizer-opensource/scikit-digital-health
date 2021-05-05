@@ -322,7 +322,7 @@ class ActivityLevelClassification(_BaseProcess):
             # PLOTTING. handle here before returning for minimal wear hours, etc
             self._plot_day_accel(
                 iday, source_file, fs, accel[day_start:day_stop], res["Date"][-1], start_dt)
-            self._plot_day_wear(fs, day_wear_starts, day_wear_stops, start_dt)
+            self._plot_day_wear(fs, day_wear_starts, day_wear_stops, start_dt, day_start, day_stop)
 
             # save wear time and check if there is less wear time than minimum
             res["N wear hours"][iday] = around(
@@ -511,6 +511,8 @@ class ActivityLevelClassification(_BaseProcess):
             f.update_xaxes(row=i, col=1, showgrid=False, showticklabels=False, zeroline=False)
             f.update_yaxes(row=i, col=1, showgrid=False, showticklabels=False, zeroline=False)
 
+        # update last one so we can see the hour labels
+        f.update_xaxes(row=4, col=1, showticklabels=True)
         self.f.append(f)
 
         start_hr = start_dt.hour + start_dt.minute / 60 + start_dt.second / 3600
@@ -581,14 +583,15 @@ class ActivityLevelClassification(_BaseProcess):
         f.update_yaxes(title="Accel.", row=1, col=1)
         f.update_yaxes(title="Accel. Metric", row=2, col=1)
         f.update_yaxes(title="Accel. Level", row=3, col=1)
+        f.update_yaxes(title="Wear/Sleep", row=4, col=1)
         f.update_xaxes(title="Day Hour", row=4, col=1)
 
-    def _plot_day_wear(self, fs, day_wear_starts, day_wear_stops, start_dt):
+    def _plot_day_wear(self, fs, day_wear_starts, day_wear_stops, start_dt, day_start, day_stop):
         if self.f is None:
             return
         start_hr = start_dt.hour + start_dt.minute / 60 + start_dt.second / 3600
 
-        for s, e in zip(day_wear_starts, day_wear_stops):
+        for s, e in zip(day_wear_starts - day_start, day_wear_stops - day_start):
             # convert to hours
             sh = s / (fs * 3600) + start_hr
             eh = e / (fs * 3600) + start_hr
@@ -621,7 +624,7 @@ class ActivityLevelClassification(_BaseProcess):
             day_stop
         )
 
-        for s, e in zip(day_sleep_starts, day_sleep_stops):
+        for s, e in zip(day_sleep_starts - day_start, day_sleep_stops - day_start):
             # convert to hours
             sh = s / (fs * 3600) + start_hr
             eh = e / (fs * 3600) + start_hr
@@ -645,7 +648,7 @@ class ActivityLevelClassification(_BaseProcess):
         date = datetime.today().strftime("%Y%m%d")
         form_fname = self.plot_fname.format(date=date, name=self._name, file=self._file_name)
 
-        with open(form_fname, "a") as fid:
+        with open(form_fname, "w") as fid:
             for fig in self.f:
                 fid.write(fig.to_html(full_html=False, include_plotlyjs="cdn"))
 
