@@ -578,6 +578,11 @@ class ActivityLevelClassification(_BaseProcess):
             col=1
         )
 
+        f.update_yaxes(title="Accel.", row=1, col=1)
+        f.update_yaxes(title="Accel. Metric", row=2, col=1)
+        f.update_yaxes(title="Accel. Level", row=3, col=1)
+        f.update_xaxes(title="Day Hour", row=4, col=1)
+
     def _plot_day_wear(self, fs, day_wear_starts, day_wear_stops, start_dt):
         if self.f is None:
             return
@@ -600,7 +605,7 @@ class ActivityLevelClassification(_BaseProcess):
                 col=1
             )
 
-        self.f[-1].update_layout(yaxis_range=[0.75, 2.25], row=4, col=1)
+        self.f[-1].update_yaxes(range=[0.75, 2.25], row=4, col=1)
 
     def _plot_day_sleep(self, fs, sleep_starts, sleep_stops, day_start, day_stop, start_dt):
         if self.f is None:
