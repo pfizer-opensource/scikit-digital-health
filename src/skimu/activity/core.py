@@ -605,7 +605,7 @@ class ActivityLevelClassification(_BaseProcess):
                 mode="lines",
                 name="Wear",
                 legendgroup="wear",
-                line={"width": 4}
+                line={"width": 8}
             ),
             row=4,
             col=1
@@ -642,7 +642,7 @@ class ActivityLevelClassification(_BaseProcess):
                 mode="lines",
                 name="Sleep",
                 legendgroup="sleep",
-                line={"width": 4}
+                line={"width": 8}
             ),
             row=4,
             col=1
