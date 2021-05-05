@@ -4,12 +4,13 @@ Activity level classification based on accelerometer data
 Lukas Adamowicz
 Pfizer DMTI 2021
 """
-from datetime import datetime
+from datetime import datetime, timedelta
 from warnings import warn
 from itertools import product as iter_product
+from pathlib import Path
 
 from numpy import nonzero, array, mean, diff, sum, zeros, abs, argmin, argmax, maximum, int_, \
-    floor, ceil, histogram, log, nan, around, full, nanmax
+    floor, ceil, histogram, log, nan, around, full, nanmax, arange
 from scipy.stats import linregress
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -32,15 +33,21 @@ def _check_if_none(var, lgr, msg_if_none, i1, i2):
     return start, stop
 
 
-def _update_date_results(results, timestamps, day_n, day_start_idx, day_stop_idx):
-    day_date = datetime.utcfromtimestamp(timestamps[day_start_idx] + 5)
-    results["Date"][day_n] = day_date.strftime("%Y-%m-%d")
-    results["Weekday"][day_n] = day_date.strftime("%A")
+def _update_date_results(results, time, day_n, day_start_idx, day_stop_idx, day_start_hour):
+    # add 15 seconds to make sure any rounding effects for the hour don't adversely effect
+    # the result of the comparison
+    start_dt = datetime.utcfromtimestamp(time[day_start_idx])
+
+    window_start_dt = start_dt + timedelta(seconds=15)
+    if start_dt.hour < day_start_hour:
+        window_start_dt -= timedelta(days=1)
+
+    results["Date"][day_n] = start_dt.strftime("%Y-%m-%d")
+    results["Weekday"][day_n] = start_dt.strftime("%A")
     results["Day N"][day_n] = day_n + 1
-    results["N hours"][day_n] = around(
-        (timestamps[day_stop_idx - 1] - timestamps[day_start_idx]) / 3600,
-        1
-    )
+    results["N hours"][day_n] = around((time[day_stop_idx - 1] - time[day_start_idx]) / 3600, 1)
+
+    return start_dt
 
 
 class ActivityLevelClassification(_BaseProcess):
@@ -265,7 +272,6 @@ class ActivityLevelClassification(_BaseProcess):
 
         # SETUP PLOTTING
         source_file = kwargs.get("file", "Source Not Available")
-        self._initialize_plot(source_file=source_file)
 
         # ========================================================================================
         # SETUP RESULTS KEYS/ENDPOINTS
@@ -302,7 +308,7 @@ class ActivityLevelClassification(_BaseProcess):
         for iday, day_idx in enumerate(days):
             day_start, day_stop = day_idx
             # update the results dictionary with date strings, # of hours, etc
-            _update_date_results(res, time, iday, day_start, day_stop)
+            start_dt = _update_date_results(res, time, iday, day_start, day_stop)
 
             # get the intersection of wear time and day
             day_wear_starts, day_wear_stops = get_day_index_intersection(
@@ -312,6 +318,12 @@ class ActivityLevelClassification(_BaseProcess):
                 day_start,
                 day_stop
             )
+
+            # PLOTTING. handle here before returning for minimal wear hours, etc
+            self._plot_day_accel(
+                iday, source_file, fs, accel[day_start:day_stop], res["Date"][-1], start_dt)
+            self._plot_day_wear(fs, day_wear_starts, day_wear_stops, start_dt)
+
             # save wear time and check if there is less wear time than minimum
             res["N wear hours"][iday] = around(
                 sum(day_wear_stops - day_wear_starts) / fs / 3600,
@@ -363,6 +375,12 @@ class ActivityLevelClassification(_BaseProcess):
                     iglevels,
                     igvals
                 )
+
+                # plotting sleep if it exists
+                self._plot_day_sleep(fs, sleep_starts, sleep_stops, day_start, day_stop, start_dt)
+
+        # finalize plots
+        self._finalize_plots()
 
         kwargs.update({self._time: time, self._acc: accel})
 
@@ -476,7 +494,10 @@ class ActivityLevelClassification(_BaseProcess):
         results[f"{wtype}_IG_intercept"][day_n] = ig_res[1]
         results[f"{wtype}_IG_R-squared"][day_n] = ig_res[2]
 
-    def _initialize_plot(self):
+    def _plot_day_accel(self, day_n, source_file, fs, accel, date_str, start_dt):
+        if self.f is None:
+            return
+
         f = make_subplots(
             nrows=4,
             ncols=1,
@@ -495,14 +516,17 @@ class ActivityLevelClassification(_BaseProcess):
 
         self.f.append(f)
 
-
-    def _plot_day_accel(self, day_n, source_file, fs, accel, date_str, start_dt, ):
         start_hr = start_dt.hour + start_dt.minute / 60 + start_dt.second / 3600
         x = self._t60 + start_hr
         n60 = int(fs * 60)
 
+        sfile_name = Path(source_file).name
+        f.update_layout(
+            title=f"Activity Visual Report: {sfile_name}\nDay: {day_n}\nDate: {date_str}"
+        )
+
         for i, axname in enumerate(["accel x", "accel y", "accel z"]):
-            self.f[-1].add_trace(
+            f.add_trace(
                 go.Scattergl(
                     x=x[:int(ceil(accel.shape[0] / n60))],
                     y=accel[::n60, i],
@@ -516,7 +540,7 @@ class ActivityLevelClassification(_BaseProcess):
         # compute the metric over 1 minute intervals
         acc_metric = self.cutpoints["metric"](accel, n60, **self.cutpoints["kwargs"])
 
-        self.f[-1].add_trace(
+        f.add_trace(
             go.Scattergl(
                 x=x[:acc_metric.size],
                 y=acc_metric,
@@ -528,12 +552,12 @@ class ActivityLevelClassification(_BaseProcess):
         )
 
         for thresh in ["sedentary", "light", "moderate"]:
-            self.f[-1].add_trace(
+            f.add_trace(
                 go.Scattergl(
                     x=[x[0], x[acc_metric.size]],
-                    y=[self.cutpoints["sedentary"]] * 2,
+                    y=[self.cutpoints[thresh]] * 2,
                     mode="lines",
-                    name="sedentary",
+                    name=thresh,
                     line={"color": "black", "dash": "dash", "width": 1}
                 ),
                 row=2,
@@ -546,7 +570,7 @@ class ActivityLevelClassification(_BaseProcess):
 
             acc_level[(acc_metric >= uthresh) & (acc_metric < uthresh)] = i
 
-        self.f[-1].add_trace(
+        f.add_trace(
             go.Scattergl(
                 x=x[:acc_level.size],
                 y=acc_level,
@@ -557,6 +581,71 @@ class ActivityLevelClassification(_BaseProcess):
             col=1
         )
 
+    def _plot_day_wear(self, fs, day_wear_starts, day_wear_stops, start_dt):
+        if self.f is None:
+            return
+        start_hr = start_dt.hour + start_dt.minute / 60 + start_dt.second / 3600
+
+        for s, e in zip(day_wear_starts, day_wear_stops):
+            # convert to hours
+            sh = s / (fs * 3600) + start_hr
+            eh = e / (fs * 3600) + start_hr
+
+            self.f[-1].add_trace(
+                go.Scattergl(
+                    x=[sh, eh],
+                    y=[2, 2],
+                    mode="lines",
+                    name="Wear",
+                    line={"width": 4}
+                ),
+                row=4,
+                col=1
+            )
+
+        self.f[-1].update_layout(yaxis_range=[0.75, 2.25], row=4, col=1)
+
+    def _plot_day_sleep(self, fs, sleep_starts, sleep_stops, day_start, day_stop, start_dt):
+        if self.f is None:
+            return
+
+        start_hr = start_dt.hour + start_dt.minute / 60 + start_dt.second / 3600
+        # get day-sleep intersection
+        day_sleep_starts, day_sleep_stops = get_day_index_intersection(
+            sleep_starts,
+            sleep_stops,
+            True,
+            day_start,
+            day_stop
+        )
+
+        for s, e in zip(day_sleep_starts, day_sleep_stops):
+            # convert to hours
+            sh = s / (fs * 3600) + start_hr
+            eh = e / (fs * 3600) + start_hr
+
+            self.f[-1].add_trace(
+                go.Scattergl(
+                    x=[sh, eh],
+                    y=[1, 1],
+                    mode="lines",
+                    name="Sleep",
+                    line={"width": 4}
+                ),
+                row=4,
+                col=1
+            )
+
+    def _finalize_plots(self):
+        if self.f is None:
+            return
+
+        date = datetime.today().strftime("%Y%m%d")
+        form_fname = self.plot_fname.format(date=date, name=self._name, file=self._file_name)
+
+        with open(form_fname, "a") as fid:
+            for fig in self.f:
+                fid.write(fig.to_html(full_html=False, include_plotlyjs="cdn"))
 
 
 def get_activity_bouts(
