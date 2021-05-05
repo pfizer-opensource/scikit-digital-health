@@ -14,7 +14,7 @@ from skimu import Pipeline
 from skimu.read import ReadBin
 from skimu.preprocessing import CalibrateAccelerometer
 from skimu.preprocessing import DetectWear
-from skimu.activity import MVPActivityClassification
+from skimu.activity import ActivityLevelClassification
 from skimu.sleep import Sleep
 
 
@@ -66,11 +66,15 @@ class TestMVPActivityClassification:
         # pipe.add(CalibrateAccelerometer())
         # pipe.add(Sleep())
         # pipe.add(DetectWear())
-        # pipe.add(
-        #     MVPActivityClassification(
+        #
+        # act = ActivityLevelClassification(
         #         bout_metric=4,
         #         cutpoints="migueles_wrist_adult"
-        #     ),
+        #     )
+        # act.setup_plotting("/Users/lukasadamowicz/Downloads/STRYDE/skimu_results/activity_plot.html")
+        #
+        # pipe.add(
+        #     act,
         #     save_results=True,
         #     save_name="/Users/lukasadamowicz/Downloads/STRYDE/skimu_results/activity_results.csv"
         # )
