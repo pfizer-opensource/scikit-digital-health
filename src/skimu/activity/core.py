@@ -499,13 +499,10 @@ class ActivityLevelClassification(_BaseProcess):
             return
 
         f = make_subplots(
-            nrows=4,
-            ncols=1,
+            rows=4,
+            cols=1,
             row_heights=[1, 1, 1, 0.5],
-            specs=[
-                [{"type": "scatter"}],
-                [{"type": "scatter"}]
-            ],
+            specs=[[{"type": "scatter"}]] * 4,
             shared_xaxes=True,
             vertical_spacing=0.
         )
