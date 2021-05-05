@@ -10,7 +10,7 @@ Pipeline activity processing
 .. autosummary::
     :toctree: generated/
 
-    MVPActivityClassification
+    ActivityLevelClassification
 
 .. _accelerometer-metrics:
 
@@ -77,7 +77,7 @@ as follows:
 
 .. code-block:: python
 
-    from skimu.activity import MVPActivityClassification
+    from skimu.activity import ActivityLevelClassification
     from skimu.utility import rolling_mean
 
     def metric_fn(accel, wlen, \*args, \*\*kwargs):
@@ -93,7 +93,7 @@ as follows:
         "moderate": moderate_max  # max value for moderate (min value for vigorous)
     }
 
-    mvpa = MVPActivityClassification(cutpoints=custom_cutpoints)
+    mvpa = ActivityLevelClassification(cutpoints=custom_cutpoints)
 
 References
 ----------
@@ -121,9 +121,9 @@ References
     Scientific Reports, vol. 9, no. 1, Art. no. 1, Dec. 2019, doi: 10.1038/s41598-019-54267-y.
 
 """
-from skimu.activity.core import MVPActivityClassification
+from skimu.activity.core import ActivityLevelClassification
 from skimu.activity.metrics import *
 from skimu.activity import metrics
 from skimu.activity.cutpoints import get_available_cutpoints
 
-__all__ = ["MVPActivityClassification", "metrics", "get_available_cutpoints"] + metrics.__all__
+__all__ = ["ActivityLevelClassification", "metrics", "get_available_cutpoints"] + metrics.__all__
