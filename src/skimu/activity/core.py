@@ -11,6 +11,8 @@ from itertools import product as iter_product
 from numpy import nonzero, array, mean, diff, sum, zeros, abs, argmin, argmax, maximum, int_, \
     floor, ceil, histogram, log, nan, around, full, nanmax
 from scipy.stats import linregress
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 from skimu.base import _BaseProcess
 from skimu.utility import moving_mean
@@ -178,6 +180,34 @@ class ActivityLevelClassification(_BaseProcess):
         else:
             self.day_key = tuple(day_window)
 
+        # enable plotting as a public method
+        self.setup_plotting = self._setup_plotting
+        self._update_buttons = []
+        self._t60 = None  # for storing plotting x values
+
+    def _setup_plotting(self, save_name):
+        """
+        Setup sleep specific plotting
+
+        Parameters
+        ----------
+        save_file : str
+            The file name to save the resulting plot to. Extension will be set to PDF. There
+            are formatting options as well for dynamically generated names. See Notes
+
+        Notes
+        -----
+        Available format variables available:
+
+        - date: todays date expressed in yyyymmdd format.
+        - name: process name.
+        - file: file name used in the pipeline, or "" if not found.
+        """
+        self.plot_fname = save_name
+
+        self.f = []
+        self._t60 = arange(0, 24.1, 1 / 60)
+
     def predict(self, time=None, accel=None, *, fs=None, wear=None, **kwargs):
         """
         predict(time, accel, *, fs=None, wear=None)
@@ -232,6 +262,10 @@ class ActivityLevelClassification(_BaseProcess):
         sleep = kwargs.get("sleep", None)
         slp_msg = f"[{self!s}] No sleep information found. Only computing full day metrics."
         sleep_starts, sleep_stops = _check_if_none(sleep, self.logger, slp_msg, None, None)
+
+        # SETUP PLOTTING
+        source_file = kwargs.get("file", "Source Not Available")
+        self._initialize_plot(source_file=source_file)
 
         # ========================================================================================
         # SETUP RESULTS KEYS/ENDPOINTS
@@ -441,6 +475,88 @@ class ActivityLevelClassification(_BaseProcess):
         results[f"{wtype}_IG_gradient"][day_n] = ig_res[0]
         results[f"{wtype}_IG_intercept"][day_n] = ig_res[1]
         results[f"{wtype}_IG_R-squared"][day_n] = ig_res[2]
+
+    def _initialize_plot(self):
+        f = make_subplots(
+            nrows=4,
+            ncols=1,
+            row_heights=[1, 1, 1, 0.5],
+            specs=[
+                [{"type": "scatter"}],
+                [{"type": "scatter"}]
+            ],
+            shared_xaxes=True,
+            vertical_spacing=0.
+        )
+
+        for i in range(1, 5):
+            f.update_xaxes(row=i, col=1, showgrid=False, showticklabels=False, zeroline=False)
+            f.update_yaxes(row=i, col=1, showgrid=False, showticklabels=False, zeroline=False)
+
+        self.f.append(f)
+
+
+    def _plot_day_accel(self, day_n, source_file, fs, accel, date_str, start_dt, ):
+        start_hr = start_dt.hour + start_dt.minute / 60 + start_dt.second / 3600
+        x = self._t60 + start_hr
+        n60 = int(fs * 60)
+
+        for i, axname in enumerate(["accel x", "accel y", "accel z"]):
+            self.f[-1].add_trace(
+                go.Scattergl(
+                    x=x[:int(ceil(accel.shape[0] / n60))],
+                    y=accel[::n60, i],
+                    mode="lines",
+                    name=axname,
+                ),
+                row=1,
+                col=1
+            )
+
+        # compute the metric over 1 minute intervals
+        acc_metric = self.cutpoints["metric"](accel, n60, **self.cutpoints["kwargs"])
+
+        self.f[-1].add_trace(
+            go.Scattergl(
+                x=x[:acc_metric.size],
+                y=acc_metric,
+                mode="lines",
+                name=self.cutpoints["metric"].__name__,  # get the name of the metric
+            ),
+            row=2,
+            col=1
+        )
+
+        for thresh in ["sedentary", "light", "moderate"]:
+            self.f[-1].add_trace(
+                go.Scattergl(
+                    x=[x[0], x[acc_metric.size]],
+                    y=[self.cutpoints["sedentary"]] * 2,
+                    mode="lines",
+                    name="sedentary",
+                    line={"color": "black", "dash": "dash", "width": 1}
+                ),
+                row=2,
+                col=1
+            )
+
+        acc_level = zeros(acc_metric.size, dtype="int")
+        for i, lvl in enumerate(["sed", "light", "mod", "vig"]):
+            lthresh, uthresh = get_level_thresholds(lvl, self.cutpoints)
+
+            acc_level[(acc_metric >= uthresh) & (acc_metric < uthresh)] = i
+
+        self.f[-1].add_trace(
+            go.Scattergl(
+                x=x[:acc_level.size],
+                y=acc_level,
+                mode="lines",
+                name="Accel. Level"
+            ),
+            row=3,
+            col=1
+        )
+
 
 
 def get_activity_bouts(
