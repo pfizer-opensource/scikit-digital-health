@@ -467,7 +467,9 @@ class Sleep(_BaseProcess):
                 gridspec_kw={'height_ratios': [1, 1, 1, 0.5]}
             )
 
-            f.suptitle(f"Visual Report: {Path(source_file).name}\nDay: {iday}\nDate: {date_str}")
+            f.suptitle(
+                f"Sleep Visual Report: {Path(source_file).name}\nDay: {iday}\nDate: {date_str}"
+            )
 
             for x in ax:
                 x.grid(False)
