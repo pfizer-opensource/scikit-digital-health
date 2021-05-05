@@ -321,7 +321,7 @@ class ActivityLevelClassification(_BaseProcess):
 
             # PLOTTING. handle here before returning for minimal wear hours, etc
             self._plot_day_accel(
-                iday, source_file, fs, accel[day_start:day_stop], res["Date"][-1], start_dt)
+                iday, source_file, fs, accel[day_start:day_stop], res["Date"][iday], start_dt)
             self._plot_day_wear(fs, day_wear_starts, day_wear_stops, start_dt, day_start)
 
             # save wear time and check if there is less wear time than minimum
@@ -521,7 +521,7 @@ class ActivityLevelClassification(_BaseProcess):
 
         sfile_name = Path(source_file).name
         f.update_layout(
-            title=f"Activity Visual Report: {sfile_name}\nDay: {day_n}\nDate: {date_str}"
+            title=f"Activity Visual Report: {sfile_name}<br>Day: {day_n}<br>Date: {date_str}"
         )
 
         for i, axname in enumerate(["accel x", "accel y", "accel z"]):
@@ -584,7 +584,7 @@ class ActivityLevelClassification(_BaseProcess):
         f.update_yaxes(title="Accel. Metric", row=2, col=1)
         f.update_yaxes(title="Accel. Level", row=3, col=1)
         f.update_yaxes(title="Wear/Sleep", row=4, col=1)
-        f.update_xaxes(title="Day Hour", row=4, col=1)
+        f.update_xaxes(title="Day Hour", range=self.day_key, row=4, col=1)
 
     def _plot_day_wear(self, fs, day_wear_starts, day_wear_stops, start_dt, day_start):
         if self.f is None:
