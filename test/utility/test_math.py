@@ -89,6 +89,14 @@ class BaseTestRolling:
             with pytest.raises(ValueError):
                 self.function(x, *args, axis=-1)
 
+    @pytest.mark.segfault
+    @pytest.mark.parametrize("skip", (1, 2, 7, 150, 300))
+    def test_segfault(self, skip):
+        x = np.random.random(10000)
+
+        for i in range(1000):
+            pred = self.function(x, 150, skip)
+
 
 class TestRollingMean(BaseTestRolling):
     # need staticmethod so it doesn't think that self is the first argument
