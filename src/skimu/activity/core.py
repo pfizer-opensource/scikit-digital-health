@@ -308,7 +308,7 @@ class ActivityLevelClassification(_BaseProcess):
         for iday, day_idx in enumerate(days):
             day_start, day_stop = day_idx
             # update the results dictionary with date strings, # of hours, etc
-            start_dt = _update_date_results(res, time, iday, day_start, day_stop)
+            start_dt = _update_date_results(res, time, iday, day_start, day_stop, self.day_key[0])
 
             # get the intersection of wear time and day
             day_wear_starts, day_wear_stops = get_day_index_intersection(
