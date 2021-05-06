@@ -277,7 +277,8 @@ class ActivityLevelClassification(_BaseProcess):
         # SETUP RESULTS KEYS/ENDPOINTS
         # ========================================================================================
         general_str_keys = ["Date", "Weekday"]
-        general_int_keys = ["Day N", "N hours", "N wear hours", "N wear awake hours"]
+        general_int_keys = ["Day N"]
+        general_float_keys = ["N hours", "N wear hours", "N wear awake hours"]
 
         blen_keys = [f"{i}min" for i in self.blens]
         epoch_lens = [f"{self.wlen}sec"] + self.epoch_lens
@@ -297,6 +298,7 @@ class ActivityLevelClassification(_BaseProcess):
 
         res = {i: full(len(days), "", dtype="object") for i in general_str_keys}
         res.update({i: full(len(days), -1, dtype="int") for i in general_int_keys})
+        res.update({i: full(len(days), nan, dtype="float") for i in general_int_keys})
         res.update({i: full(len(days), nan, dtype="float") for i in mx_acc_keys})
         res.update({i: full(len(days), nan, dtype="float") for i in ig_keys})
         res.update({i: full(len(days), nan, dtype="float") for i in mvpa_keys})
