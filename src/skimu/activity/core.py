@@ -54,6 +54,7 @@ class ActivityLevelClassification(_BaseProcess):
     """
     Classify accelerometer data into different activity levels as a proxy for assessing physical
     activity energy expenditure (PAEE). Levels are sedentary, light, moderate, and vigorous.
+    If provided, sleep time will always be excluded from the activity level classification.
 
     Parameters
     ----------
@@ -122,8 +123,6 @@ class ActivityLevelClassification(_BaseProcess):
         physical activity: the role of sociodemographic factors,” Am J Epidemiol, vol. 179,
         no. 6, pp. 781–790, Mar. 2014, doi: 10.1093/aje/kwt330.
     """
-    # MM: midnight -> midnight    ExS: Exclude Sleep
-    windows = ["MM", "ExS"]
     activity_levels = ["MVPA", "sed", "light", "mod", "vig"]
     epoch_lens = ["1min", "5min"]
     ig_res = ["gradient", "intercept", "R-squared"]
