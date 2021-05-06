@@ -549,19 +549,53 @@ class ActivityLevelClassification(_BaseProcess):
             row=2,
             col=1
         )
-
-        for thresh in ["sedentary", "light", "moderate"]:
+        # do this in reverse order so that the legend top down reads the same order as the lines
+        for thresh in ["moderate", "light", "sedentary"]:
             f.add_trace(
                 go.Scattergl(
-                    x=[x[0], x[acc_metric.size]],
+                    x=self.day_key,
                     y=[self.cutpoints[thresh]] * 2,
                     mode="lines",
-                    name=thresh,
+                    showlegend=False,
                     line={"color": "black", "dash": "dash", "width": 1}
                 ),
                 row=2,
                 col=1
             )
+
+        # labeling the thresholds
+        f.add_annotation(
+            text=u"vigorous \u2191",
+            x=0, y=self.cutpoints["moderate"],
+            bgcolor="rgba(0.8, 0.8, 0.8, 1)",
+            showarrow=False,
+            xref="x2 domain", xanchor="left",
+            yref="y2", yanchor="bottom", yshift=1
+        )
+        f.add_annotation(
+            text="moderate",
+            x=0, y=self.cutpoints["moderate"],
+            bgcolor="rgba(0.8, 0.8, 0.8, 1)",
+            showarrow=False,
+            xref="x2 domain", xanchor="left",
+            yref="y2", yanchor="top", yshift=-1
+        )
+        f.add_annotation(
+            text="light",
+            x=0, y=self.cutpoints["light"],
+            bgcolor="rgba(0.8, 0.8, 0.8, 1)",
+            showarrow=False,
+            xref="x2 domain", xanchor="left",
+            yref="y2", yanchor="top", yshift=-1
+        )
+        f.add_annotation(
+            text="sedentary",
+            x=0, y=self.cutpoints["sedentary"],
+            bgcolor="rgba(0.8, 0.8, 0.8, 1)",
+            showarrow=False,
+            xref="x2 domain", xanchor="left",
+            yref="y2", yanchor="top", yshift=-1
+        )
 
         acc_level = zeros(acc_metric.size, dtype="int")
         acc_level_text = full(acc_level.size, "", dtype="<U10")
