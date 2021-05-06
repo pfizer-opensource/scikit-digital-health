@@ -298,7 +298,7 @@ class ActivityLevelClassification(_BaseProcess):
 
         res = {i: full(len(days), "", dtype="object") for i in general_str_keys}
         res.update({i: full(len(days), -1, dtype="int") for i in general_int_keys})
-        res.update({i: full(len(days), nan, dtype="float") for i in general_int_keys})
+        res.update({i: full(len(days), nan, dtype="float") for i in general_float_keys})
         res.update({i: full(len(days), nan, dtype="float") for i in mx_acc_keys})
         res.update({i: full(len(days), nan, dtype="float") for i in ig_keys})
         res.update({i: full(len(days), nan, dtype="float") for i in mvpa_keys})
