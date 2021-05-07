@@ -8,14 +8,14 @@ from skimu.read.get_window_start_stop import get_window_start_stop
 
 
 @pytest.mark.parametrize(
-    'days_type',
+    "days_type",
     (
-        '24hr',
-        'full first, full last',
-        'full first, partial last',
-        'partial first, full last',
-        'partial first, partial last'
-    )
+        "24hr",
+        "full first, full last",
+        "full first, partial last",
+        "partial first, full last",
+        "partial first, partial last",
+    ),
 )
 def test_get_window_start_stop(days_type, windowing_data):
     w_input, w_output = windowing_data(days_type)
@@ -32,12 +32,9 @@ class TestReadAx3CWA(BaseProcessTester):
         super().setup_class()
 
         # override specific necessary attributes
-        cls.sample_data_file = resolve_data_path('ax3_data.h5', 'read')
-        cls.truth_data_file = resolve_data_path('ax3_data.h5', 'read')
-        cls.truth_data_keys = [
-            'time',
-            'accel'
-        ]
+        cls.sample_data_file = resolve_data_path("ax3_data.h5", "read")
+        cls.truth_data_file = resolve_data_path("ax3_data.h5", "read")
+        cls.truth_data_keys = ["time", "accel"]
         cls.process = ReadCWA(bases=None, periods=None)
 
         cls.atol_time = 5e-5
@@ -59,7 +56,9 @@ class TestReadAx3CWA(BaseProcessTester):
         with pytest.warns(UserWarning):
             ReadCWA(bases=8, periods=None)
 
-    @pytest.mark.parametrize(('base', 'period'), ((-1, 12), (0, 25), (8, 30), (24, 12), (8, -12)))
+    @pytest.mark.parametrize(
+        ("base", "period"), ((-1, 12), (0, 25), (8, 30), (24, 12), (8, -12))
+    )
     def test_window_bounds_error(self, base, period):
         with pytest.raises(ValueError):
             ReadCWA(bases=base, periods=period)
@@ -67,7 +66,7 @@ class TestReadAx3CWA(BaseProcessTester):
     def test_extension_warning_not_exist(self):
         with pytest.warns(UserWarning):
             with pytest.raises(FileNotFoundError):
-                ReadCWA().predict('test.bin')
+                ReadCWA().predict("test.bin")
 
 
 class TestReadAx6CWA(BaseProcessTester):
@@ -76,13 +75,9 @@ class TestReadAx6CWA(BaseProcessTester):
         super().setup_class()
 
         # override specific necessary attributes
-        cls.sample_data_file = resolve_data_path('ax6_data.h5', 'read')
-        cls.truth_data_file = resolve_data_path('ax6_data.h5', 'read')
-        cls.truth_data_keys = [
-            'time',
-            'accel',
-            'gyro'
-        ]
+        cls.sample_data_file = resolve_data_path("ax6_data.h5", "read")
+        cls.truth_data_file = resolve_data_path("ax6_data.h5", "read")
+        cls.truth_data_keys = ["time", "accel", "gyro"]
         cls.process = ReadCWA(bases=8, periods=12)
 
         cls.atol_time = 5e-5
@@ -95,19 +90,16 @@ class TestReadBin(BaseProcessTester):
         super().setup_class()
 
         # override specific necessary attributes
-        cls.sample_data_file = resolve_data_path('gnactv_data.h5', 'read')
-        cls.truth_data_file = resolve_data_path('gnactv_data.h5', 'read')
-        cls.truth_data_keys = [
-            'time',
-            'accel',
-            'day_ends',
-            'temperature'
-        ]
+        cls.sample_data_file = resolve_data_path("gnactv_data.h5", "read")
+        cls.truth_data_file = resolve_data_path("gnactv_data.h5", "read")
+        cls.truth_data_keys = ["time", "accel", "day_ends", "temperature"]
 
         cls.test_results = False
         cls.process = ReadBin(bases=8, periods=12)
 
-        cls.atol = 5e-5  # this is for accel, because GeneActiv csv file values are truncated
+        cls.atol = (
+            5e-5  # this is for accel, because GeneActiv csv file values are truncated
+        )
 
     def test_none_file(self):
         with pytest.raises(ValueError):
@@ -126,7 +118,9 @@ class TestReadBin(BaseProcessTester):
         with pytest.warns(UserWarning):
             ReadBin(bases=8, periods=None)
 
-    @pytest.mark.parametrize(('base', 'period'), ((-1, 12), (0, 25), (8, 30), (24, 12), (8, -12)))
+    @pytest.mark.parametrize(
+        ("base", "period"), ((-1, 12), (0, 25), (8, 30), (24, 12), (8, -12))
+    )
     def test_window_bounds_error(self, base, period):
         with pytest.raises(ValueError):
             ReadBin(bases=base, periods=period)
@@ -134,7 +128,7 @@ class TestReadBin(BaseProcessTester):
     def test_extension_warning(self):
         with pytest.warns(UserWarning):
             with pytest.raises(OSError):
-                ReadBin().predict('test.random')
+                ReadBin().predict("test.random")
 
 
 # TODO: find an old version file to test on
@@ -144,13 +138,9 @@ class TestReadGT3X(BaseProcessTester):
         super().setup_class()
 
         # override specific necessary attributes
-        cls.sample_data_file = resolve_data_path('gt3x_data.h5', 'read')
-        cls.truth_data_file = resolve_data_path('gt3x_data.h5', 'read')
-        cls.truth_data_keys = [
-            'time',
-            'accel',
-            'day_ends'
-        ]
+        cls.sample_data_file = resolve_data_path("gt3x_data.h5", "read")
+        cls.truth_data_file = resolve_data_path("gt3x_data.h5", "read")
+        cls.truth_data_keys = ["time", "accel", "day_ends"]
 
         cls.test_results = False
         cls.process = ReadGT3X(base=9, period=2)
@@ -172,7 +162,9 @@ class TestReadGT3X(BaseProcessTester):
         with pytest.warns(UserWarning):
             ReadGT3X(base=8, period=None)
 
-    @pytest.mark.parametrize(('base', 'period'), ((-1, 12), (0, 25), (8, 30), (24, 12), (8, -12)))
+    @pytest.mark.parametrize(
+        ("base", "period"), ((-1, 12), (0, 25), (8, 30), (24, 12), (8, -12))
+    )
     def test_window_bounds_error(self, base, period):
         with pytest.raises(ValueError):
             ReadGT3X(base=base, period=period)
@@ -180,4 +172,4 @@ class TestReadGT3X(BaseProcessTester):
     def test_extension_warning(self):
         with pytest.warns(UserWarning):
             with pytest.raises(OSError):
-                ReadGT3X().predict('test.random')
+                ReadGT3X().predict("test.random")

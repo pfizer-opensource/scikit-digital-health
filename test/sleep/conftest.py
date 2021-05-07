@@ -10,6 +10,7 @@ def tso_dummy_data():
     Makes dummy sleep data. Default is 24hrs at 20hz. Sleep window from 10pm to 8am.
     Temperature set at 27deg C.
     """
+
     def get_data(freq):
         np.random.seed(0)
 
@@ -36,12 +37,43 @@ def tso_dummy_data():
         temp[:] = 27.0
 
         return (time, accel, temp, lux), (sleep_start, sleep_end)
+
     return get_data
 
 
 @fixture(scope="module")
 def dummy_sleep_predictions():
     return np.array(
-            [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0,
-             0]
-        )
+        [
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+        ]
+    )

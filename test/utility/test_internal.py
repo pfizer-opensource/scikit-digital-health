@@ -17,7 +17,7 @@ class TestGetDayIndexIntersection:
                 (sleep_stops[i], wear_stops),
                 (False, True),
                 day_start,
-                day_stop
+                day_stop,
             )
 
             assert np.allclose(p_starts, true_starts[i])
@@ -30,11 +30,7 @@ class TestGetDayIndexIntersection:
 
         for i in range(1, 4):
             p_starts, p_stops = get_day_index_intersection(
-                sleep_starts[i],
-                sleep_stops[i],
-                False,
-                day_start,
-                day_stop
+                sleep_starts[i], sleep_stops[i], False, day_start, day_stop
             )
 
             assert np.allclose(p_starts, true_starts[i])
@@ -45,11 +41,7 @@ class TestGetDayIndexIntersection:
         wear_starts, wear_stops = wear_ends
 
         p_starts, p_stops = get_day_index_intersection(
-            wear_starts,
-            wear_stops,
-            True,
-            day_start,
-            day_stop
+            wear_starts, wear_stops, True, day_start, day_stop
         )
 
         assert np.allclose(p_starts, wear_starts[1:])
@@ -65,7 +57,7 @@ class TestGetDayIndexIntersection:
                 wear_stops,
                 True,
                 day_start,
-                day_stop
+                day_stop,
             )
 
 

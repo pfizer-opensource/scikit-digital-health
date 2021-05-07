@@ -61,11 +61,11 @@ class BaseTestRolling:
     @pytest.mark.parametrize(
         ("in_shape", "out_shape", "kwargs"),
         (
-                ((5, 500), (5, 21), {"w_len": 100, "skip": 20, "axis": -1}),
-                ((500, 5), (21, 5), {"w_len": 100, "skip": 20, "axis": 0}),
-                ((500,), (21,), {"w_len": 100, "skip": 20}),
-                ((3, 10, 3187), (3, 10, 3015), {"w_len": 173, "skip": 1, "axis": -1}),
-        )
+            ((5, 500), (5, 21), {"w_len": 100, "skip": 20, "axis": -1}),
+            ((500, 5), (21, 5), {"w_len": 100, "skip": 20, "axis": 0}),
+            ((500,), (21,), {"w_len": 100, "skip": 20}),
+            ((3, 10, 3187), (3, 10, 3015), {"w_len": 173, "skip": 1, "axis": -1}),
+        ),
     )
     def test_in_out_shapes(self, in_shape, out_shape, kwargs):
         x = np.random.random(in_shape)
@@ -124,7 +124,7 @@ class TestRollingKurtosis(BaseTestRolling):
         {"bias": True, "fisher": True, "nan_policy": "propagate"},
         {"bias": True},
         {"ddof": 1},
-        {}
+        {},
     )
 
 
@@ -141,7 +141,7 @@ class TestRollingMedian(BaseTestRolling):
         truth = self.truth_function(xw, axis=-1, **self.truth_kw)
         pred = self.function(x, 150, skip, pad=True)
 
-        N = ((x.size - 150) // skip + 1)
+        N = (x.size - 150) // skip + 1
 
         assert np.allclose(pred[:N], truth)
         assert np.all(np.isnan(pred[N:]))

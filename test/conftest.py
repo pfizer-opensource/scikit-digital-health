@@ -6,7 +6,7 @@ def pytest_addoption(parser):
         "--run_segfault",
         action="store_true",
         default=False,
-        help="run segfault tests for extensions"
+        help="run segfault tests for extensions",
     )
 
 

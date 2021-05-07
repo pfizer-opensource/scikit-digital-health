@@ -23,7 +23,9 @@ class TestGetActivityBouts:
         "boutdur,boutmetric", [[i, j] for i in range(1, 3) for j in range(1, 6)]
     )
     def test_no_mvpa_at_ends(self, boutdur, boutmetric, get_sample_activity_bout_data1):
-        sample_acc_metric, mvpa_time_true = get_sample_activity_bout_data1(boutmetric, boutdur)
+        sample_acc_metric, mvpa_time_true = get_sample_activity_bout_data1(
+            boutmetric, boutdur
+        )
 
         mvpa_time = get_activity_bouts(
             sample_acc_metric,
@@ -33,7 +35,7 @@ class TestGetActivityBouts:
             boutdur=boutdur,
             boutcrit=0.8,
             closedbout=False,
-            boutmetric=boutmetric
+            boutmetric=boutmetric,
         )
 
         assert isclose(mvpa_time, mvpa_time_true)
@@ -42,7 +44,9 @@ class TestGetActivityBouts:
         "boutdur,boutmetric", [[i, j] for i in range(1, 3) for j in range(1, 6)]
     )
     def test_mvpa_at_ends(self, boutdur, boutmetric, get_sample_activity_bout_data2):
-        sample_acc_metric, mvpa_time_true = get_sample_activity_bout_data2(boutmetric, boutdur)
+        sample_acc_metric, mvpa_time_true = get_sample_activity_bout_data2(
+            boutmetric, boutdur
+        )
 
         mvpa_time = get_activity_bouts(
             sample_acc_metric,
@@ -52,7 +56,7 @@ class TestGetActivityBouts:
             boutdur=boutdur,
             boutcrit=0.8,
             closedbout=False,
-            boutmetric=boutmetric
+            boutmetric=boutmetric,
         )
 
         assert isclose(mvpa_time, mvpa_time_true)

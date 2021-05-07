@@ -10,7 +10,10 @@ from numpy import nan
 
 from skimu.gait.gait_endpoints import *
 from skimu.gait.gait_endpoints import gait_endpoints
-from skimu.gait.gait_endpoints.gait_endpoints import _autocovariancefunction, _autocovariance
+from skimu.gait.gait_endpoints.gait_endpoints import (
+    _autocovariancefunction,
+    _autocovariance,
+)
 
 
 class TestEventMetricGetOffset:
@@ -27,13 +30,13 @@ class TestACF:
 
 class TestAutocovariance:
     def test_unbiased(self):
-        x = np.arange(0, 2*np.pi, 0.01)
+        x = np.arange(0, 2 * np.pi, 0.01)
         y = np.sin(2 * x)
 
         assert _autocovariance(y, 0, 314, 628, biased=False) > 0.99
 
     def test_biased(self):
-        x = np.arange(0, 2*np.pi, 0.01)
+        x = np.arange(0, 2 * np.pi, 0.01)
         y = np.sin(2 * x)
 
         assert 0.49 < _autocovariance(y, 0, 314, 628, biased=True) < 0.50
@@ -42,7 +45,7 @@ class TestAutocovariance:
         x = np.arange(0, 2 * np.pi, 0.01)
         y = np.sin(2 * x)
 
-        assert np.isnan(_autocovariance(y, 0, 314, y.size+1, biased=True))
+        assert np.isnan(_autocovariance(y, 0, 314, y.size + 1, biased=True))
 
 
 class BaseTestEndpoint:
@@ -62,26 +65,31 @@ class BaseTestEndpoint:
 
         if self.event_metric:
             assert np.allclose(
-                sample_gait[self.metric.k_][:5], sample_gait[self.metric.k_][5:10],
-                equal_nan=True
+                sample_gait[self.metric.k_][:5],
+                sample_gait[self.metric.k_][5:10],
+                equal_nan=True,
             )
         else:
-            assert all(sample_gait[self.metric.k_][:10] == sample_gait[self.metric.k_][0])
+            assert all(
+                sample_gait[self.metric.k_][:10] == sample_gait[self.metric.k_][0]
+            )
 
         if self.res_bout1 is not None:
-            assert np.allclose(sample_gait[self.metric.k_][:5], self.res_bout1, equal_nan=True)
+            assert np.allclose(
+                sample_gait[self.metric.k_][:5], self.res_bout1, equal_nan=True
+            )
 
     def test_no_rerun(self, sample_gait, sample_gait_aux):
         self.metric.predict(50, 1.0, sample_gait, sample_gait_aux)
 
         res = sample_gait[self.metric.k_] * 1  # prevent views
 
-        sample_gait['IC'][0] -= 1
-        sample_gait['FC'][3] += 1
-        sample_gait['delta h'][2] += 0.0015
+        sample_gait["IC"][0] -= 1
+        sample_gait["FC"][3] += 1
+        sample_gait["delta h"][2] += 0.0015
 
-        sample_gait_aux['accel'][0][:5] *= 0.85
-        sample_gait_aux['accel'][1][:5] *= 1.08
+        sample_gait_aux["accel"][0][:5] *= 0.85
+        sample_gait_aux["accel"][1][:5] *= 1.08
 
         self.metric.predict(50, 1.0, sample_gait, sample_gait_aux)
 
@@ -199,11 +207,11 @@ class TestStepLength(BaseTestEndpoint):
         cls.num_nan = 1
         cls.res_bout1 = 2 * np.sqrt(
             2 * np.array([0.05, 0.055, 0.05, 0.045, nan])
-            - np.array([0.05, 0.055, 0.05, 0.045, nan])**2
+            - np.array([0.05, 0.055, 0.05, 0.045, nan]) ** 2
         )
 
     def test_no_leg_length(self, sample_gait):
-        self.metric.predict(1/50, None, sample_gait, None)
+        self.metric.predict(1 / 50, None, sample_gait, None)
 
         assert np.isnan(sample_gait[self.metric.k_][:10]).sum() == 10
 
@@ -219,13 +227,13 @@ class TestStrideLength(BaseTestEndpoint):
 
         tmp = 2 * np.sqrt(
             2 * np.array([0.05, 0.055, 0.05, 0.045, nan])
-            - np.array([0.05, 0.055, 0.05, 0.045, nan])**2
+            - np.array([0.05, 0.055, 0.05, 0.045, nan]) ** 2
         )
         cls.res_bout1 = tmp
         cls.res_bout1[:-1] += tmp[1:]
 
     def test_no_leg_length(self, sample_gait):
-        self.metric.predict(1/50, None, sample_gait, None)
+        self.metric.predict(1 / 50, None, sample_gait, None)
 
         assert np.isnan(sample_gait[self.metric.k_][:10]).sum() == 10
 
@@ -241,7 +249,7 @@ class TestGaitSpeed(BaseTestEndpoint):
 
         tmp_l = 2 * np.sqrt(
             2 * np.array([0.05, 0.055, 0.05, 0.045, nan])
-            - np.array([0.05, 0.055, 0.05, 0.045, nan])**2
+            - np.array([0.05, 0.055, 0.05, 0.045, nan]) ** 2
         )
         tmp_t = np.array([52, 51, 49, nan, nan]) / 50
 
@@ -250,7 +258,7 @@ class TestGaitSpeed(BaseTestEndpoint):
         cls.res_bout1 /= tmp_t
 
     def test_no_leg_length(self, sample_gait):
-        self.metric.predict(1/50, None, sample_gait, None)
+        self.metric.predict(1 / 50, None, sample_gait, None)
 
         assert np.isnan(sample_gait[self.metric.k_][:10]).sum() == 10
 
@@ -302,19 +310,31 @@ class TestHarmonicRatioV(BaseTestEndpoint):
         assert np.isnan(sample_gait[self.metric.k_][:10]).sum() == 2 * self.num_nan
 
         assert len(caplog.records) == 2  # should be 2 loggings
-        assert any(['use of less than 20 harmonics' in i.message for i in caplog.records])
-        assert any(['too few harmonics in frequency range' in i.message for i in caplog.records])
+        assert any(
+            ["use of less than 20 harmonics" in i.message for i in caplog.records]
+        )
+        assert any(
+            [
+                "too few harmonics in frequency range" in i.message
+                for i in caplog.records
+            ]
+        )
 
         if self.event_metric:
             assert np.allclose(
-                sample_gait[self.metric.k_][:5], sample_gait[self.metric.k_][5:10],
-                equal_nan=True
+                sample_gait[self.metric.k_][:5],
+                sample_gait[self.metric.k_][5:10],
+                equal_nan=True,
             )
         else:
-            assert all(sample_gait[self.metric.k_][:10] == sample_gait[self.metric.k_][0])
+            assert all(
+                sample_gait[self.metric.k_][:10] == sample_gait[self.metric.k_][0]
+            )
 
         if self.res_bout1 is not None:
-            assert np.allclose(sample_gait[self.metric.k_][:5], self.res_bout1, equal_nan=True)
+            assert np.allclose(
+                sample_gait[self.metric.k_][:5], self.res_bout1, equal_nan=True
+            )
 
 
 # TODO should probably check actual values here not just through running Gait
@@ -395,7 +415,7 @@ class TestStepRegularityV(BaseTestEndpoint):
     def test_nan_bout(self, sample_gait_nan_bout, sample_gait_aux_nan_bout, caplog):
         for k in sample_gait_nan_bout:
             sample_gait_nan_bout[k] = sample_gait_nan_bout[k][:-1]
-        for k in [i for i in sample_gait_aux_nan_bout if 'acc' not in i]:
+        for k in [i for i in sample_gait_aux_nan_bout if "acc" not in i]:
             sample_gait_aux_nan_bout[k] = sample_gait_aux_nan_bout[k][:-1]
 
         self.metric.predict(50, 1.0, sample_gait_nan_bout, sample_gait_aux_nan_bout)

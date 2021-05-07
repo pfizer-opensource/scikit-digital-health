@@ -73,7 +73,7 @@ class TestPermutationEntropy(BaseTestFeature):
 class TestDominantFrequency(BaseTestFeature):
     feature = DominantFrequency(padlevel=0, low_cutoff=0.0, high_cutoff=12.0)
 
-    @pytest.mark.parametrize('fs_', ([5], 'a', (10,)))
+    @pytest.mark.parametrize("fs_", ([5], "a", (10,)))
     def test_fs_error(self, fs_):
         with pytest.raises((TypeError, ValueError)):
             self.feature.compute(None, fs_)
@@ -114,11 +114,11 @@ class TestJerkMetric(BaseTestFeature):
 
 
 class TestDimensionlessJerk(BaseTestFeature):
-    feature = DimensionlessJerk(log=True, signal_type='acceleration')
+    feature = DimensionlessJerk(log=True, signal_type="acceleration")
 
     def test_signal_type_error(self):
         with pytest.raises(ValueError):
-            dj = DimensionlessJerk(log=True, signal_type='random signal')
+            dj = DimensionlessJerk(log=True, signal_type="random signal")
 
 
 class TestSPARC(BaseTestFeature):
@@ -148,8 +148,8 @@ class TestLinearSlope(BaseTestFeature):
 
 # WAVELET FEATURES
 class TestDetailPower(BaseTestFeature):
-    feature = DetailPower(wavelet='coif4', freq_band=[1.0, 3.0])
+    feature = DetailPower(wavelet="coif4", freq_band=[1.0, 3.0])
 
 
 class TestDetailPowerRatio(BaseTestFeature):
-    feature = DetailPowerRatio(wavelet='coif4', freq_band=[1.0, 3.0])
+    feature = DetailPowerRatio(wavelet="coif4", freq_band=[1.0, 3.0])
