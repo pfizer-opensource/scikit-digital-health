@@ -37,8 +37,8 @@ jobs:
         #   HOMEBREW_NO_AUTO_UPDATE=1 brew install libomp
         # fi
       shell: bash
-    - name: Install libzip
-      run: sudo apt-get install libzip-dev -y
+    - name: Install libzip and GSL
+      run: sudo apt-get install libzip-dev gsl-bin libgsl0-dev -y
     - name: Install skimu
       run: |
         # if macOS, make sure to set the environment variables so that it can find gfortran-9
