@@ -6,7 +6,6 @@ Pfizer DMTI 2021
 """
 from datetime import datetime, timedelta
 from warnings import warn
-from itertools import product as iter_product
 from pathlib import Path
 
 from numpy import (
