@@ -14,8 +14,14 @@ from skimu.gait.gait_endpoints import gait_endpoints
 
 
 def get_gait_events(
-        accel, fs, ts, orig_scale, filter_order, filter_cutoff,
-        corr_accel_orient, use_optimal_scale
+    accel,
+    fs,
+    ts,
+    orig_scale,
+    filter_order,
+    filter_cutoff,
+    corr_accel_orient,
+    use_optimal_scale,
 ):
     """
     Get the bouts of gait from the acceleration during a gait bout
@@ -61,9 +67,7 @@ def get_gait_events(
     if corr_accel_orient:
         # determine AP axis
         ac = gait_endpoints._autocovariancefunction(
-            accel,
-            min(accel.shape[0] - 1, 1000),
-            biased=True
+            accel, min(accel.shape[0] - 1, 1000), biased=True
         )
         ap_axis = argsort(corrcoef(ac.T)[v_axis])[-2]  # last is autocorrelation
 
@@ -73,7 +77,7 @@ def get_gait_events(
 
     # low-pass filter
     if fs > (2 * filter_cutoff):
-        sos = butter(filter_order, 2 * filter_cutoff / fs, btype='low', output='sos')
+        sos = butter(filter_order, 2 * filter_cutoff / fs, btype="low", output="sos")
         filt_vert_accel = sosfiltfilt(sos, vert_accel)
     else:
         filt_vert_accel = vert_accel * 1  # make sure a copy and not a view
@@ -83,7 +87,7 @@ def get_gait_events(
 
     # if using optimal scale relationship, get the optimal scale
     if use_optimal_scale:
-        coef_scale_original, _ = cwt(vert_velocity, orig_scale, 'gaus1')
+        coef_scale_original, _ = cwt(vert_velocity, orig_scale, "gaus1")
         F = abs(fft.rfft(coef_scale_original[0]))
         # compute an estimate of step frequency
         step_freq = argmax(F) / vert_velocity.size * fs
@@ -91,13 +95,15 @@ def get_gait_events(
         # IC scale: -10 * sf + 56
         # FC scale: -52 * sf + 131
         # TODO verify the FC scale equation. This is not in the paper but is a guess from the graph
-        scale1 = min(max(round((-10 * step_freq + 56) * (fs / 250)), 1), 90)  # orig fs = 250Hz
+        scale1 = min(
+            max(round((-10 * step_freq + 56) * (fs / 250)), 1), 90
+        )  # orig fs = 250Hz
         scale2 = min(max(round((-52 * step_freq + 131) * (fs / 250)), 1), 90)
         # range is set to 1 <-> 90
     else:
         scale1 = scale2 = orig_scale
 
-    coef1, _ = cwt(vert_velocity, [scale1, scale2], 'gaus1')
+    coef1, _ = cwt(vert_velocity, [scale1, scale2], "gaus1")
     """
     Find the local minima in the signal. This should technically always require using
     the negative signal in "find_peaks", however the way PyWavelets computes the
@@ -107,7 +113,7 @@ def get_gait_events(
     """
     init_contact, *_ = find_peaks(-va_sign * coef1[0], height=0.5 * std(coef1[0]))
 
-    coef2, _ = cwt(coef1[1], scale2, 'gaus1')
+    coef2, _ = cwt(coef1[1], scale2, "gaus1")
     """
     Peaks are the final contact points
     Same issue as above

@@ -4,8 +4,24 @@ Internal utility functions that don't necessarily need to be exposed in the publ
 Lukas Adamowicz
 Pfizer DMTI 2021
 """
-from numpy import asarray, nonzero, insert, append, arange, interp, zeros, around, diff, float_,\
-    int_, ndarray, concatenate, minimum, maximum, roll
+from numpy import (
+    asarray,
+    nonzero,
+    insert,
+    append,
+    arange,
+    interp,
+    zeros,
+    around,
+    diff,
+    float_,
+    int_,
+    ndarray,
+    concatenate,
+    minimum,
+    maximum,
+    roll,
+)
 
 
 def get_day_index_intersection(starts, stops, for_inclusion, day_start, day_stop):
@@ -50,12 +66,8 @@ def get_day_index_intersection(starts, stops, for_inclusion, day_start, day_stop
         for_inclusion = (for_inclusion,) * len(starts)
 
     # get the subset that intersect the day in a roundabout way
-    starts_tmp = list(
-        minimum(maximum(i, day_start), day_stop) for i in starts
-    )
-    stops_tmp = list(
-        minimum(maximum(i, day_start), day_stop) for i in stops
-    )
+    starts_tmp = list(minimum(maximum(i, day_start), day_stop) for i in starts)
+    stops_tmp = list(minimum(maximum(i, day_start), day_stop) for i in stops)
     starts_subset, stops_subset = [], []
     for start, stop, fi in zip(starts_tmp, stops_tmp, for_inclusion):
         if fi:  # flip everything to being an "exclude" window
@@ -80,7 +92,9 @@ def get_day_index_intersection(starts, stops, for_inclusion, day_start, day_stop
 
         for i, (c1, c2) in enumerate(zip(cond1, cond2)):
             if c1 and c2:
-                valid_starts.insert(i + 1, stop)  # valid_starts[i] = [valid_starts[i], stop]
+                valid_starts.insert(
+                    i + 1, stop
+                )  # valid_starts[i] = [valid_starts[i], stop]
                 valid_stops.insert(i, start)  # valid_stops[i] = [start, valid_stops[i]]
             elif c1:
                 valid_stops[i] = start
@@ -90,7 +104,10 @@ def get_day_index_intersection(starts, stops, for_inclusion, day_start, day_stop
     valid_starts = asarray(valid_starts)
     valid_stops = asarray(valid_stops)
 
-    return valid_starts[valid_starts != valid_stops], valid_stops[valid_starts != valid_stops]
+    return (
+        valid_starts[valid_starts != valid_stops],
+        valid_stops[valid_starts != valid_stops],
+    )
 
 
 def get_day_wear_intersection(starts, stops, day_start, day_stop):
@@ -189,18 +206,18 @@ def apply_downsample(goal_fs, time, data=(), indices=()):
             indices_ds += (None,)
         elif idx.ndim == 1:
             indices_ds += (
-                around(
-                    interp(time[idx], time_ds, arange(time_ds.size))
-                ).astype(int_),
+                around(interp(time[idx], time_ds, arange(time_ds.size))).astype(int_),
             )
         elif idx.ndim == 2:
             indices_ds += (zeros(idx.shape, dtype=int_),)
             for i in range(idx.shape[1]):
                 indices_ds[-1][:, i] = around(
-                    interp(time[idx[:, i]], time_ds, arange(time_ds.size))  # cast to int on insert
+                    interp(
+                        time[idx[:, i]], time_ds, arange(time_ds.size)
+                    )  # cast to int on insert
                 )
 
-    ret = (time_ds, )
+    ret = (time_ds,)
     if data_ds != ():
         ret += (data_ds,)
     if indices_ds != ():

@@ -13,10 +13,12 @@ from skimu.features.lib import moments
 from skimu.features.lib.wavelet import *
 from skimu.features.lib import wavelet
 
-__all__ = entropy.__all__ \
-    + smoothness.__all__ \
-    + statistics.__all__ \
-    + frequency.__all__ \
-    + misc.__all__ \
-    + moments.__all__ \
+__all__ = (
+    entropy.__all__
+    + smoothness.__all__
+    + statistics.__all__
+    + frequency.__all__
+    + misc.__all__
+    + moments.__all__
     + wavelet.__all__
+)

@@ -96,12 +96,20 @@ def correct_accelerometer_orientation(accel, v_axis=None, ap_axis=None):
 
     co_accel = zeros_like(accel)
     # correct ap axis acceleration
-    co_accel[:, ap_axis] = accel[:, ap_axis] * c_theta_a - v_sign * accel[:, v_axis] * s_theta_a
+    co_accel[:, ap_axis] = (
+        accel[:, ap_axis] * c_theta_a - v_sign * accel[:, v_axis] * s_theta_a
+    )
     # provisional correction for vertical axis
-    co_accel[:, v_axis] = v_sign * accel[:, ap_axis] * s_theta_a + accel[:, v_axis] * c_theta_a
+    co_accel[:, v_axis] = (
+        v_sign * accel[:, ap_axis] * s_theta_a + accel[:, v_axis] * c_theta_a
+    )
     # correct ml axis acceleration
-    co_accel[:, ml_axis] = accel[:, ml_axis] * c_theta_m - v_sign * co_accel[:, v_axis] * s_theta_m
+    co_accel[:, ml_axis] = (
+        accel[:, ml_axis] * c_theta_m - v_sign * co_accel[:, v_axis] * s_theta_m
+    )
     # final correction for vertical axis
-    co_accel[:, v_axis] = v_sign * accel[:, ml_axis] * s_theta_m + co_accel[:, v_axis] * c_theta_m
+    co_accel[:, v_axis] = (
+        v_sign * accel[:, ml_axis] * s_theta_m + co_accel[:, v_axis] * c_theta_m
+    )
 
     return co_accel

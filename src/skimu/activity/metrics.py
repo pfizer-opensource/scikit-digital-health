@@ -12,8 +12,13 @@ from skimu.utility import moving_mean
 
 
 __all__ = [
-    "metric_anglez", "metric_en", "metric_enmo", "metric_bfen", "metric_hfen", "metric_hfenplus",
-    "metric_mad"
+    "metric_anglez",
+    "metric_en",
+    "metric_enmo",
+    "metric_bfen",
+    "metric_hfen",
+    "metric_hfenplus",
+    "metric_mad",
 ]
 
 
@@ -33,7 +38,9 @@ def metric_anglez(accel, wlen, *args, **kwargs):
     anglez : numpy.ndarray
         (N, ) array of angles between accelerometer z axis and horizontal plane in degrees.
     """
-    anglez = arctan(accel[:, 2] / sqrt(accel[:, 0]**2 + accel[:, 1]**2)) * (180 / pi)
+    anglez = arctan(accel[:, 2] / sqrt(accel[:, 0] ** 2 + accel[:, 1] ** 2)) * (
+        180 / pi
+    )
     return moving_mean(anglez, wlen, wlen)
 
 
@@ -86,7 +93,9 @@ def metric_enmo(accel, wlen, *args, take_abs=False, trim_zero=True, **kwargs):
         return moving_mean(enmo, wlen, wlen)
 
 
-def metric_bfen(accel, wlen, fs, low_cutoff=0.2, high_cutoff=15, trim_zero=True, **kwargs):
+def metric_bfen(
+    accel, wlen, fs, low_cutoff=0.2, high_cutoff=15, trim_zero=True, **kwargs
+):
     """
     Compute the band-pass filtered euclidean norm.
 
@@ -110,9 +119,13 @@ def metric_bfen(accel, wlen, fs, low_cutoff=0.2, high_cutoff=15, trim_zero=True,
     bfen : numpy.ndarray
         (N, ) array of band-pass filtered and euclidean normed accelerations.
     """
-    sos = butter(4, [2 * low_cutoff / fs, 2 * high_cutoff / fs], btype='bandpass', output='sos')
+    sos = butter(
+        4, [2 * low_cutoff / fs, 2 * high_cutoff / fs], btype="bandpass", output="sos"
+    )
     if trim_zero:
-        return moving_mean(maximum(norm(sosfiltfilt(sos, accel, axis=0), axis=1), 0), wlen, wlen)
+        return moving_mean(
+            maximum(norm(sosfiltfilt(sos, accel, axis=0), axis=1), 0), wlen, wlen
+        )
     else:
         return moving_mean(norm(sosfiltfilt(sos, accel, axis=0), axis=1), wlen, wlen)
 
@@ -139,10 +152,12 @@ def metric_hfen(accel, wlen, fs, low_cutoff=0.2, trim_zero=True, **kwargs):
     hfen : numpy.ndarray
         (N, ) array of high-pass filtered and euclidean normed accelerations.
     """
-    sos = butter(4, 2 * low_cutoff / fs, btype='high', output='sos')
+    sos = butter(4, 2 * low_cutoff / fs, btype="high", output="sos")
 
     if trim_zero:
-        return moving_mean(maximum(norm(sosfiltfilt(sos, accel, axis=0), axis=1), 0), wlen, wlen)
+        return moving_mean(
+            maximum(norm(sosfiltfilt(sos, accel, axis=0), axis=1), 0), wlen, wlen
+        )
     else:
         return moving_mean(norm(sosfiltfilt(sos, accel, axis=0), axis=1), wlen, wlen)
 
@@ -202,5 +217,5 @@ def metric_mad(accel, wlen, *args, **kwargs):
     acc_norm = norm(accel, axis=1)
     r_avg = repeat(moving_mean(acc_norm, wlen, wlen), wlen)
 
-    mad = moving_mean(abs(acc_norm[:r_avg.size] - r_avg), wlen, wlen)
+    mad = moving_mean(abs(acc_norm[: r_avg.size] - r_avg), wlen, wlen)
     return mad

@@ -39,7 +39,7 @@ _base_cutpoints["esliger_lwrist_adult"] = {
     "kwargs": {"take_abs": True},
     "sedentary": 217 / 80 / 60,  # paper at 80hz, summed for each minute long window
     "light": 644 / 80 / 60,
-    "moderate": 1810 / 80 / 60
+    "moderate": 1810 / 80 / 60,
 }
 
 _base_cutpoints["esliger_rwirst_adult"] = {
@@ -47,7 +47,7 @@ _base_cutpoints["esliger_rwirst_adult"] = {
     "kwargs": {"take_abs": True},
     "sedentary": 386 / 80 / 60,  # paper at 80hz, summed for each 1min window
     "light": 439 / 80 / 60,
-    "moderate": 2098 / 80 / 60
+    "moderate": 2098 / 80 / 60,
 }
 
 _base_cutpoints["esliger_lumbar_adult"] = {
@@ -55,7 +55,7 @@ _base_cutpoints["esliger_lumbar_adult"] = {
     "kwargs": {"take_abs": True},
     "sedentary": 77 / 80 / 60,  # paper at 80hz, summed for each 1min window
     "light": 219 / 80 / 60,
-    "moderate": 2056 / 80 / 60
+    "moderate": 2056 / 80 / 60,
 }
 
 _base_cutpoints["schaefer_ndomwrist_child6-11"] = {
@@ -63,7 +63,7 @@ _base_cutpoints["schaefer_ndomwrist_child6-11"] = {
     "kwargs": {"low_cutoff": 0.2, "high_cutoff": 15, "trim_zero": False},
     "sedentary": 0.190,
     "light": 0.314,
-    "moderate": 0.998
+    "moderate": 0.998,
 }
 
 _base_cutpoints["phillips_rwrist_child8-14"] = {
@@ -71,7 +71,7 @@ _base_cutpoints["phillips_rwrist_child8-14"] = {
     "kwargs": {"take_abs": True},
     "sedentary": 6 / 80,  # paper at 80hz, summed for each 1s window
     "light": 21 / 80,
-    "moderate": 56 / 80
+    "moderate": 56 / 80,
 }
 
 _base_cutpoints["phillips_lwrist_child8-14"] = {
@@ -79,7 +79,7 @@ _base_cutpoints["phillips_lwrist_child8-14"] = {
     "kwargs": {"take_abs": True},
     "sedentary": 7 / 80,
     "light": 19 / 80,
-    "moderate": 60 / 80
+    "moderate": 60 / 80,
 }
 
 _base_cutpoints["phillips_hip_child8-14"] = {
@@ -87,14 +87,14 @@ _base_cutpoints["phillips_hip_child8-14"] = {
     "kwargs": {"take_abs": True},
     "sedentary": 3 / 80,
     "light": 16 / 80,
-    "moderate": 51 / 80
+    "moderate": 51 / 80,
 }
 
 _base_cutpoints["vaha-ypya_hip_adult"] = {
     "metric": metrics.metric_mad,
     "kwargs": {},
     "light": 0.091,  # originally presented in mg
-    "moderate": 0.414
+    "moderate": 0.414,
 }
 
 _base_cutpoints["hildebrand_hip_adult_actigraph"] = {
@@ -102,7 +102,7 @@ _base_cutpoints["hildebrand_hip_adult_actigraph"] = {
     "kwargs": {"take_abs": False, "trim_zero": True},
     "sedentary": 0.0474,
     "light": 0.0691,
-    "moderate": 0.2587
+    "moderate": 0.2587,
 }
 
 _base_cutpoints["hildebrand_hip_adult_geneactv"] = {
@@ -110,7 +110,7 @@ _base_cutpoints["hildebrand_hip_adult_geneactv"] = {
     "kwargs": {"take_abs": False, "trim_zero": True},
     "sedentary": 0.0469,
     "light": 0.0687,
-    "moderate": 0.2668
+    "moderate": 0.2668,
 }
 
 _base_cutpoints["hildebrand_wrist_adult_actigraph"] = {
@@ -118,7 +118,7 @@ _base_cutpoints["hildebrand_wrist_adult_actigraph"] = {
     "kwargs": {"take_abs": False, "trim_zero": True},
     "sedentary": 0.0448,
     "light": 0.1006,
-    "moderate": 0.4288
+    "moderate": 0.4288,
 }
 
 _base_cutpoints["hildebrand_wrist_adult_geneactiv"] = {
@@ -126,7 +126,7 @@ _base_cutpoints["hildebrand_wrist_adult_geneactiv"] = {
     "kwargs": {"take_abs": False, "trim_zero": True},
     "sedentary": 0.0458,
     "light": 0.0932,
-    "moderate": 0.4183
+    "moderate": 0.4183,
 }
 
 _base_cutpoints["hildebrand_hip_child7-11_actigraph"] = {
@@ -134,7 +134,7 @@ _base_cutpoints["hildebrand_hip_child7-11_actigraph"] = {
     "kwargs": {"take_abs": False, "trim_zero": True},
     "sedentary": 0.0633,
     "light": 0.1426,
-    "moderate": 0.4646
+    "moderate": 0.4646,
 }
 
 _base_cutpoints["hildebrand_hip_child7-11_geneactiv"] = {
@@ -142,7 +142,7 @@ _base_cutpoints["hildebrand_hip_child7-11_geneactiv"] = {
     "kwargs": {"take_abs": False, "trim_zero": True},
     "sedentary": 0.0641,
     "light": 0.1528,
-    "moderate": 0.5143
+    "moderate": 0.5143,
 }
 
 _base_cutpoints["hildebrand_wrist_child7-11_actigraph"] = {
@@ -150,7 +150,7 @@ _base_cutpoints["hildebrand_wrist_child7-11_actigraph"] = {
     "kwargs": {"take_abs": False, "trim_zero": True},
     "sedentary": 0.0356,
     "light": 0.2014,
-    "moderate": 0.707
+    "moderate": 0.707,
 }
 
 _base_cutpoints["hildebrand_wrist_child7-11_geneactiv"] = {
@@ -158,7 +158,7 @@ _base_cutpoints["hildebrand_wrist_child7-11_geneactiv"] = {
     "kwargs": {"take_abs": False, "trim_zero": True},
     "sedentary": 0.0563,
     "light": 0.1916,
-    "moderate": 0.6958
+    "moderate": 0.6958,
 }
 
 _base_cutpoints["migueles_wrist_adult"] = {
@@ -166,5 +166,5 @@ _base_cutpoints["migueles_wrist_adult"] = {
     "kwargs": {"take_abs": False, "trim_zero": True},
     "sedentary": 0.050,
     "light": 0.110,
-    "moderate": 0.440
+    "moderate": 0.440,
 }

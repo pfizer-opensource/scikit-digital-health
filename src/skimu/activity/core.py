@@ -9,8 +9,29 @@ from warnings import warn
 from itertools import product as iter_product
 from pathlib import Path
 
-from numpy import nonzero, array, mean, diff, sum, zeros, abs, argmin, argmax, maximum, int_, \
-    floor, ceil, histogram, log, nan, around, full, nanmax, arange, max
+from numpy import (
+    nonzero,
+    array,
+    mean,
+    diff,
+    sum,
+    zeros,
+    abs,
+    argmin,
+    argmax,
+    maximum,
+    int_,
+    floor,
+    ceil,
+    histogram,
+    log,
+    nan,
+    around,
+    full,
+    nanmax,
+    arange,
+    max,
+)
 from scipy.stats import linregress
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -33,7 +54,9 @@ def _check_if_none(var, lgr, msg_if_none, i1, i2):
     return start, stop
 
 
-def _update_date_results(results, time, day_n, day_start_idx, day_stop_idx, day_start_hour):
+def _update_date_results(
+    results, time, day_n, day_start_idx, day_stop_idx, day_start_hour
+):
     # add 15 seconds to make sure any rounding effects for the hour don't adversely effect
     # the result of the comparison
     start_dt = datetime.utcfromtimestamp(time[day_start_idx])
@@ -45,7 +68,9 @@ def _update_date_results(results, time, day_n, day_start_idx, day_stop_idx, day_
     results["Date"][day_n] = start_dt.strftime("%Y-%m-%d")
     results["Weekday"][day_n] = start_dt.strftime("%A")
     results["Day N"][day_n] = day_n + 1
-    results["N hours"][day_n] = around((time[day_stop_idx - 1] - time[day_start_idx]) / 3600, 1)
+    results["N hours"][day_n] = around(
+        (time[day_stop_idx - 1] - time[day_start_idx]) / 3600, 1
+    )
 
     return start_dt
 
@@ -123,6 +148,7 @@ class ActivityLevelClassification(_BaseProcess):
         physical activity: the role of sociodemographic factors,” Am J Epidemiol, vol. 179,
         no. 6, pp. 781–790, Mar. 2014, doi: 10.1093/aje/kwt330.
     """
+
     act_levels = ["MVPA", "sed", "light", "mod", "vig"]
     _max_acc_str = "Max acc {w}min blocks gs"
     _ig_keys = ["IG", "IG intercept", "IG R-squared"]
@@ -131,16 +157,16 @@ class ActivityLevelClassification(_BaseProcess):
     _bout_str = "{L} {w}min bout mins"
 
     def __init__(
-            self,
-            short_wlen=5,
-            max_accel_lens=(6, 15, 60),
-            bout_lens=(1, 5, 10),
-            bout_criteria=0.8,
-            bout_metric=4,
-            closed_bout=False,
-            min_wear_time=10,
-            cutpoints="migueles_wrist_adult",
-            day_window=(0, 24)
+        self,
+        short_wlen=5,
+        max_accel_lens=(6, 15, 60),
+        bout_lens=(1, 5, 10),
+        bout_criteria=0.8,
+        bout_metric=4,
+        closed_bout=False,
+        min_wear_time=10,
+        cutpoints="migueles_wrist_adult",
+        day_window=(0, 24),
     ):
         # make sure that the short_wlen is a factor of 60, and if not send it to nearest factor
         if (60 % short_wlen) != 0:
@@ -159,7 +185,9 @@ class ActivityLevelClassification(_BaseProcess):
         if isinstance(cutpoints, str):
             cutpoints_ = _base_cutpoints.get(cutpoints, None)
             if cutpoints_ is None:
-                warn(f"Specified cutpoints [{cutpoints}] not found. Using `migueles_wrist_adult`.")
+                warn(
+                    f"Specified cutpoints [{cutpoints}] not found. Using `migueles_wrist_adult`."
+                )
                 cutpoints_ = _base_cutpoints["migueles_wrist_adult"]
         else:
             cutpoints_ = cutpoints
@@ -172,7 +200,7 @@ class ActivityLevelClassification(_BaseProcess):
             bout_metric=bout_metric,
             closed_bout=closed_bout,
             min_wear_time=min_wear_time,
-            cutpoints=cutpoints_
+            cutpoints=cutpoints_,
         )
 
         self.wlen = short_wlen
@@ -253,11 +281,17 @@ class ActivityLevelClassification(_BaseProcess):
         nwlen = int(self.wlen * fs)
         epm = int(60 / self.wlen)  # epochs per minute
 
-        iglevels = array([i for i in range(0, 4001, 25)] + [8000]) / 1000  # default from rowlands
+        iglevels = (
+            array([i for i in range(0, 4001, 25)] + [8000]) / 1000
+        )  # default from rowlands
         igvals = (iglevels[1:] + iglevels[:-1]) / 2
 
-        wear_none_msg = f"[{self!s}] Wear detection not provided. Assuming 100% wear time."
-        wear_starts, wear_stops = _check_if_none(wear, self.logger, wear_none_msg, 0, time.size)
+        wear_none_msg = (
+            f"[{self!s}] Wear detection not provided. Assuming 100% wear time."
+        )
+        wear_starts, wear_stops = _check_if_none(
+            wear, self.logger, wear_none_msg, 0, time.size
+        )
 
         # check if windows exist for days
         days = kwargs.get(self._days, {}).get(self.day_key, None)
@@ -269,8 +303,12 @@ class ActivityLevelClassification(_BaseProcess):
 
         # check if sleep data is provided
         sleep = kwargs.get("sleep", None)
-        slp_msg = f"[{self!s}] No sleep information found. Only computing full day metrics."
-        sleep_starts, sleep_stops = _check_if_none(sleep, self.logger, slp_msg, None, None)
+        slp_msg = (
+            f"[{self!s}] No sleep information found. Only computing full day metrics."
+        )
+        sleep_starts, sleep_stops = _check_if_none(
+            sleep, self.logger, slp_msg, None, None
+        )
 
         # SETUP PLOTTING
         source_file = kwargs.get("file", "Source Not Available")
@@ -282,21 +320,25 @@ class ActivityLevelClassification(_BaseProcess):
         res_keys += [
             ("N hours", nan, "float"),
             ("N wear hours", nan, "float"),
-            ("N wear awake hours", nan, "float")
+            ("N wear awake hours", nan, "float"),
         ]
 
-        res_keys += [(self._max_acc_str.format(w=i), nan, "float") for i in self.max_acc_lens]
+        res_keys += [
+            (self._max_acc_str.format(w=i), nan, "float") for i in self.max_acc_lens
+        ]
         res_keys += [(i, nan, "float") for i in self._ig_keys]
         res_keys += [
-            (self._e_wake_str.format(L=i, w=self.wlen), nan, "float") for i in self.act_levels
+            (self._e_wake_str.format(L=i, w=self.wlen), nan, "float")
+            for i in self.act_levels
         ]
         res_keys += [
-            (self._e_sleep_str.format(L=i, w=self.wlen), nan, "float") for i in self.act_levels
+            (self._e_sleep_str.format(L=i, w=self.wlen), nan, "float")
+            for i in self.act_levels
         ]
         res_keys += [
-            (
-                self._bout_str.format(L=lvl, w=j), nan, "float"
-            ) for lvl in self.act_levels for j in self.blens
+            (self._bout_str.format(L=lvl, w=j), nan, "float")
+            for lvl in self.act_levels
+            for j in self.blens
         ]
 
         res = {i: full(len(days), j, dtype=k) for i, j, k in res_keys}
@@ -307,26 +349,34 @@ class ActivityLevelClassification(_BaseProcess):
         for iday, day_idx in enumerate(days):
             day_start, day_stop = day_idx
             # update the results dictionary with date strings, # of hours, etc
-            start_dt = _update_date_results(res, time, iday, day_start, day_stop, self.day_key[0])
+            start_dt = _update_date_results(
+                res, time, iday, day_start, day_stop, self.day_key[0]
+            )
 
             # get the intersection of wear time and day
             dwear_starts, dwear_stops = get_day_index_intersection(
-                wear_starts,
-                wear_stops,
-                True,  # include wear time
-                day_start,
-                day_stop
+                wear_starts, wear_stops, True, day_start, day_stop  # include wear time
             )
 
             # PLOTTING. handle here before returning for minimal wear hours, etc
             self._plot_day_accel(
-                iday, source_file, fs, accel[day_start:day_stop], res["Date"][iday], start_dt)
+                iday,
+                source_file,
+                fs,
+                accel[day_start:day_stop],
+                res["Date"][iday],
+                start_dt,
+            )
             self._plot_day_wear(fs, dwear_starts, dwear_stops, start_dt, day_start)
             # plotting sleep if it exists
-            self._plot_day_sleep(fs, sleep_starts, sleep_stops, day_start, day_stop, start_dt)
+            self._plot_day_sleep(
+                fs, sleep_starts, sleep_stops, day_start, day_stop, start_dt
+            )
 
             # save wear time and check if there is less wear time than minimum
-            res["N wear hours"][iday] = around(sum(dwear_stops - dwear_starts) / fs / 3600, 1)
+            res["N wear hours"][iday] = around(
+                sum(dwear_stops - dwear_starts) / fs / 3600, 1
+            )
             if res["N wear hours"][iday] < self.min_wear:
                 continue  # skip day if less than minimum specified hours of wear time
 
@@ -337,14 +387,14 @@ class ActivityLevelClassification(_BaseProcess):
                     (wear_stops, sleep_stops),
                     (True, False),  # include wear time, exclude sleeping time
                     day_start,
-                    day_stop
+                    day_stop,
                 )
                 sleep_wear_starts, sleep_wear_stops = get_day_index_intersection(
                     (wear_starts, sleep_starts),
                     (wear_stops, sleep_stops),
                     (True, True),  # now we want only sleep
                     day_start,
-                    day_stop
+                    day_stop,
                 )
 
                 res["N wear awake hours"][iday] = around(
@@ -364,18 +414,11 @@ class ActivityLevelClassification(_BaseProcess):
                 nwlen,
                 epm,
                 iglevels,
-                igvals
+                igvals,
             )
             # compute sleeping hours activity endpoints
             self._compute_sleep_activity_endpoints(
-                res,
-                accel,
-                fs,
-                iday,
-                sleep_wear_starts,
-                sleep_wear_stops,
-                nwlen,
-                epm
+                res, accel, fs, iday, sleep_wear_starts, sleep_wear_stops, nwlen, epm
             )
 
         # finalize plots
@@ -389,7 +432,7 @@ class ActivityLevelClassification(_BaseProcess):
             return res
 
     def _compute_awake_activity_endpoints(
-            self, results, accel, fs, day_n, starts, stops, n_wlen, epm, ig_levels, ig_vals
+        self, results, accel, fs, day_n, starts, stops, n_wlen, epm, ig_levels, ig_vals
     ):
         # allocate histogram for intensity gradient
         hist = zeros(ig_levels.size - 1)
@@ -429,7 +472,9 @@ class ActivityLevelClassification(_BaseProcess):
                 # total sum of epochs
                 lthresh, uthresh = get_level_thresholds(lvl, self.cutpoints)
                 key = self._e_wake_str.format(L=lvl, w=self.wlen)
-                results[key][day_n] += sum((acc_metric >= lthresh) & (acc_metric < uthresh)) / epm
+                results[key][day_n] += (
+                    sum((acc_metric >= lthresh) & (acc_metric < uthresh)) / epm
+                )
 
                 # time in bouts of specified input lengths
                 for bout_len in self.blens:
@@ -443,7 +488,7 @@ class ActivityLevelClassification(_BaseProcess):
                         bout_len,
                         self.boutcrit,
                         self.closedbout,
-                        self.boutmetric
+                        self.boutmetric,
                     )
 
             # histogram for intensity gradient. Density = false to return counts
@@ -458,7 +503,7 @@ class ActivityLevelClassification(_BaseProcess):
         results["IG R-squared"][day_n] = ig_res[2]
 
     def _compute_sleep_activity_endpoints(
-            self, results, accel, fs, day_n, starts, stops, n_wlen, epm
+        self, results, accel, fs, day_n, starts, stops, n_wlen, epm
     ):
         if starts is None or stops is None:
             return  # don't initialize/compute any values if there is no sleep data
@@ -477,7 +522,9 @@ class ActivityLevelClassification(_BaseProcess):
             for lvl in self.act_levels:
                 lthresh, uthresh = get_level_thresholds(lvl, self.cutpoints)
                 key = self._e_sleep_str.format(L=lvl, w=self.wlen)
-                results[key][day_n] += sum((acc_metric >= lthresh) & (acc_metric < uthresh)) / epm
+                results[key][day_n] += (
+                    sum((acc_metric >= lthresh) & (acc_metric < uthresh)) / epm
+                )
 
     def _plot_day_accel(self, day_n, source_file, fs, accel, date_str, start_dt):
         if self.f is None:
@@ -489,12 +536,16 @@ class ActivityLevelClassification(_BaseProcess):
             row_heights=[1, 1, 1, 0.5],
             specs=[[{"type": "scatter"}]] * 4,
             shared_xaxes=True,
-            vertical_spacing=0.
+            vertical_spacing=0.0,
         )
 
         for i in range(1, 5):
-            f.update_xaxes(row=i, col=1, showgrid=False, showticklabels=False, zeroline=False)
-            f.update_yaxes(row=i, col=1, showgrid=False, showticklabels=False, zeroline=False)
+            f.update_xaxes(
+                row=i, col=1, showgrid=False, showticklabels=False, zeroline=False
+            )
+            f.update_yaxes(
+                row=i, col=1, showgrid=False, showticklabels=False, zeroline=False
+            )
 
         # update last one so we can see the hour labels
         f.update_xaxes(row=4, col=1, showticklabels=True)
@@ -512,14 +563,14 @@ class ActivityLevelClassification(_BaseProcess):
         for i, axname in enumerate(["accel x", "accel y", "accel z"]):
             f.add_trace(
                 go.Scattergl(
-                    x=x[:int(ceil(accel.shape[0] / n60))],
+                    x=x[: int(ceil(accel.shape[0] / n60))],
                     y=accel[::n60, i],
                     mode="lines",
                     name=axname,
-                    line={"width": 1}
+                    line={"width": 1},
                 ),
                 row=1,
-                col=1
+                col=1,
             )
 
         # compute the metric over 1 minute intervals
@@ -527,13 +578,13 @@ class ActivityLevelClassification(_BaseProcess):
 
         f.add_trace(
             go.Scattergl(
-                x=x[:acc_metric.size],
+                x=x[: acc_metric.size],
                 y=acc_metric,
                 mode="lines",
                 name=self.cutpoints["metric"].__name__,  # get the name of the metric
             ),
             row=2,
-            col=1
+            col=1,
         )
         # do this in reverse order so that the legend top down reads the same order as the lines
         for thresh in ["moderate", "light", "sedentary"]:
@@ -543,44 +594,60 @@ class ActivityLevelClassification(_BaseProcess):
                     y=[self.cutpoints[thresh]] * 2,
                     mode="lines",
                     showlegend=False,
-                    line={"color": "black", "dash": "dash", "width": 1}
+                    line={"color": "black", "dash": "dash", "width": 1},
                 ),
                 row=2,
-                col=1
+                col=1,
             )
 
         # labeling the thresholds
         f.add_annotation(
-            text=u"vigorous \u2191",
-            x=0, y=self.cutpoints["moderate"],
+            text="vigorous \u2191",
+            x=0,
+            y=self.cutpoints["moderate"],
             bgcolor="rgba(0.8, 0.8, 0.8, 1)",
             showarrow=False,
-            xref="x2 domain", xanchor="left",
-            yref="y2", yanchor="bottom", yshift=1
+            xref="x2 domain",
+            xanchor="left",
+            yref="y2",
+            yanchor="bottom",
+            yshift=1,
         )
         f.add_annotation(
             text="moderate",
-            x=0, y=self.cutpoints["moderate"],
+            x=0,
+            y=self.cutpoints["moderate"],
             bgcolor="rgba(0.8, 0.8, 0.8, 1)",
             showarrow=False,
-            xref="x2 domain", xanchor="left",
-            yref="y2", yanchor="top", yshift=-1
+            xref="x2 domain",
+            xanchor="left",
+            yref="y2",
+            yanchor="top",
+            yshift=-1,
         )
         f.add_annotation(
             text="light",
-            x=0, y=self.cutpoints["light"],
+            x=0,
+            y=self.cutpoints["light"],
             bgcolor="rgba(0.8, 0.8, 0.8, 1)",
             showarrow=False,
-            xref="x2 domain", xanchor="left",
-            yref="y2", yanchor="top", yshift=-1
+            xref="x2 domain",
+            xanchor="left",
+            yref="y2",
+            yanchor="top",
+            yshift=-1,
         )
         f.add_annotation(
             text="sedentary",
-            x=0, y=self.cutpoints["sedentary"],
+            x=0,
+            y=self.cutpoints["sedentary"],
             bgcolor="rgba(0.8, 0.8, 0.8, 1)",
             showarrow=False,
-            xref="x2 domain", xanchor="left",
-            yref="y2", yanchor="top", yshift=-1
+            xref="x2 domain",
+            xanchor="left",
+            yref="y2",
+            yanchor="top",
+            yshift=-1,
         )
 
         acc_level = zeros(acc_metric.size, dtype="int")
@@ -593,16 +660,16 @@ class ActivityLevelClassification(_BaseProcess):
 
         f.add_trace(
             go.Scattergl(
-                x=x[:acc_level.size],
+                x=x[: acc_level.size],
                 y=acc_level,
                 mode="lines",
                 name="Accel. Level",
                 line={"color": "black", "width": 1},
                 text=acc_level_text,
-                hoverinfo="text"
+                hoverinfo="text",
             ),
             row=3,
-            col=1
+            col=1,
         )
 
         f.update_yaxes(title="Accel.", row=1, col=1)
@@ -631,26 +698,24 @@ class ActivityLevelClassification(_BaseProcess):
                 mode="lines",
                 name="Wear",
                 legendgroup="wear",
-                line={"width": 8}
+                line={"width": 8},
             ),
             row=4,
-            col=1
+            col=1,
         )
 
         self.f[-1].update_yaxes(range=[0.75, 2.25], row=4, col=1)
 
-    def _plot_day_sleep(self, fs, sleep_starts, sleep_stops, day_start, day_stop, start_dt):
+    def _plot_day_sleep(
+        self, fs, sleep_starts, sleep_stops, day_start, day_stop, start_dt
+    ):
         if self.f is None or sleep_starts is None or sleep_stops is None:
             return
 
         start_hr = start_dt.hour + start_dt.minute / 60 + start_dt.second / 3600
         # get day-sleep intersection
         day_sleep_starts, day_sleep_stops = get_day_index_intersection(
-            sleep_starts,
-            sleep_stops,
-            True,
-            day_start,
-            day_stop
+            sleep_starts, sleep_stops, True, day_start, day_stop
         )
 
         sleep = []
@@ -668,10 +733,10 @@ class ActivityLevelClassification(_BaseProcess):
                 mode="lines",
                 name="Sleep",
                 legendgroup="sleep",
-                line={"width": 8}
+                line={"width": 8},
             ),
             row=4,
-            col=1
+            col=1,
         )
 
     def _finalize_plots(self):
@@ -679,7 +744,9 @@ class ActivityLevelClassification(_BaseProcess):
             return
 
         date = datetime.today().strftime("%Y%m%d")
-        form_fname = self.plot_fname.format(date=date, name=self._name, file=self._file_name)
+        form_fname = self.plot_fname.format(
+            date=date, name=self._name, file=self._file_name
+        )
 
         with open(form_fname, "w") as fid:
             for fig in self.f:
@@ -687,14 +754,7 @@ class ActivityLevelClassification(_BaseProcess):
 
 
 def get_activity_bouts(
-    accm,
-    lower_thresh,
-    upper_thresh,
-    wlen,
-    boutdur,
-    boutcrit,
-    closedbout,
-    boutmetric=1
+    accm, lower_thresh, upper_thresh, wlen, boutdur, boutcrit, closedbout, boutmetric=1
 ):
     """
     Get the number of bouts of activity level based on several criteria.
@@ -753,7 +813,9 @@ def get_activity_bouts(
             end = start + nboutdur
             if end < x.size:
                 if sum(x[start:end]) > (nboutdur * boutcrit):
-                    while (sum(x[start:end]) > ((end - start) * boutcrit)) and (end < x.size):
+                    while (sum(x[start:end]) > ((end - start) * boutcrit)) and (
+                        end < x.size
+                    ):
                         end += 1
                     select = p[i_mvpa:][p[i_mvpa:] < end]
                     jump = maximum(select.size, 1)
@@ -776,8 +838,8 @@ def get_activity_bouts(
             start = p[i_mvpa]
             end = start + nboutdur
             if end < x.size:
-                if sum(x[start:end + 1]) > (nboutdur * boutcrit):
-                    xt[start:end + 1] = 2
+                if sum(x[start : end + 1]) > (nboutdur * boutcrit):
+                    xt[start : end + 1] = 2
                 else:
                     x[start] = 0
             else:
@@ -793,11 +855,13 @@ def get_activity_bouts(
         # look for breaks larger than 1 minute
         lookforbreaks = zeros(x.size)
         N = int(60 / wlen)
-        lookforbreaks[N // 2:-N // 2 + 1] = moving_mean(x, N, 1)
+        lookforbreaks[N // 2 : -N // 2 + 1] = moving_mean(x, N, 1)
         # insert negative numbers to prevent these minutes from being counted in bouts
         xt[lookforbreaks == 0] = -(60 / wlen) * nboutdur
         # in this way there will not be bout breaks lasting longer than 1 minute
-        rm = moving_mean(xt, nboutdur, 1)  # window determination can go back to left justified
+        rm = moving_mean(
+            xt, nboutdur, 1
+        )  # window determination can go back to left justified
 
         p = nonzero(rm > boutcrit)[0]
         for gi in range(nboutdur):
@@ -892,9 +956,11 @@ def get_intensity_gradient(ig_values, counts):
     r_squared : float
         R-squared value for the linear regression fit.
     """
-    lx = log(ig_values[counts > 0] * 1000)  # convert back to mg to match GGIR/existing work
+    lx = log(
+        ig_values[counts > 0] * 1000
+    )  # convert back to mg to match GGIR/existing work
     ly = log(counts[counts > 0])
 
     slope, intercept, rval, *_ = linregress(lx, ly)
 
-    return slope, intercept, rval**2
+    return slope, intercept, rval ** 2

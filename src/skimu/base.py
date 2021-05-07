@@ -14,13 +14,13 @@ from pandas import DataFrame
 class _BaseProcess:
     # names of the variables that are passed to predict
     # CHANGE IF predict/_predict call changes!
-    _file = 'file'
-    _time = 'time'
-    _acc = 'accel'
-    _gyro = 'gyro'
-    _mag = 'magnet'
-    _temp = 'temperature'
-    _days = 'day_ends'
+    _file = "file"
+    _time = "time"
+    _acc = "accel"
+    _gyro = "gyro"
+    _mag = "magnet"
+    _temp = "temperature"
+    _days = "day_ends"
 
     def __str__(self):
         return self._name
@@ -81,7 +81,7 @@ class _BaseProcess:
         - name: process name.
         - file: file name used in the pipeline, or "" if not found.
         """
-        date = dt_date.today().strftime('%Y%m%d')
+        date = dt_date.today().strftime("%Y%m%d")
 
         file_name = file_name.format(date=date, name=self._name, file=self._file_name)
 

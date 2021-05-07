@@ -6,8 +6,26 @@ Pfizer DMTI 2020
 """
 import datetime
 
-from numpy import array, zeros, ceil, around, mean, std, sum, abs, gradient, where, diff, insert, \
-    append, sign, median, arange, sqrt, log2
+from numpy import (
+    array,
+    zeros,
+    ceil,
+    around,
+    mean,
+    std,
+    sum,
+    abs,
+    gradient,
+    where,
+    diff,
+    insert,
+    append,
+    sign,
+    median,
+    arange,
+    sqrt,
+    log2,
+)
 from numpy.fft import fft
 from numpy.linalg import norm
 from numpy.lib import stride_tricks
@@ -36,16 +54,19 @@ def moving_stats(seq, window):
     pad : int
         Padding at beginning of the moving average and standard deviation
     """
+
     def rolling_window(x, wind):
-        if not x.flags['C_CONTIGUOUS']:  # pragma: no cover :: should never get here
-            raise ValueError("Data must be C-contiguous in order to window for moving statistics")
+        if not x.flags["C_CONTIGUOUS"]:  # pragma: no cover :: should never get here
+            raise ValueError(
+                "Data must be C-contiguous in order to window for moving statistics"
+            )
         shape = x.shape[:-1] + (x.shape[-1] - wind + 1, wind)
         strides = x.strides + (x.strides[-1],)
         return stride_tricks.as_strided(x, shape=shape, strides=strides)
 
     if seq.ndim != 1:
-        raise ValueError('seq must be 1D')
-    assert seq.flags['C_CONTIGUOUS'], 'seq must be C-contiguous'  # just in case
+        raise ValueError("seq must be 1D")
+    assert seq.flags["C_CONTIGUOUS"], "seq must be C-contiguous"  # just in case
 
     m_mn = zeros(seq.shape)
     m_st = zeros(seq.shape)
@@ -58,11 +79,11 @@ def moving_stats(seq, window):
 
     n = rw_seq.shape[0]
 
-    m_mn[pad:pad + n] = mean(rw_seq, axis=-1)
-    m_st[pad:pad + n] = std(rw_seq, axis=-1, ddof=1)
+    m_mn[pad : pad + n] = mean(rw_seq, axis=-1)
+    m_st[pad : pad + n] = std(rw_seq, axis=-1, ddof=1)
 
-    m_mn[:pad], m_mn[pad + n:] = m_mn[pad], m_mn[-pad]
-    m_st[:pad], m_st[pad + n:] = m_st[pad], m_st[-pad]
+    m_mn[:pad], m_mn[pad + n :] = m_mn[pad], m_mn[-pad]
+    m_st[:pad], m_st[pad + n :] = m_st[pad], m_st[-pad]
     return m_mn, m_st, pad
 
 
@@ -106,10 +127,10 @@ def get_stillness(filt_accel, dt, gravity, window, thresholds):
     jerk_rm, jerk_rsd, _ = moving_stats(jerk, n_window)
 
     # create the stillness masks
-    arm_mask = abs(acc_rm - gravity) < thresholds['accel moving avg']
-    arsd_mask = acc_rsd < thresholds['accel moving std']
-    jrm_mask = abs(jerk_rm) < thresholds['jerk moving avg']
-    jrsd_mask = jerk_rsd < thresholds['jerk moving std']
+    arm_mask = abs(acc_rm - gravity) < thresholds["accel moving avg"]
+    arsd_mask = acc_rsd < thresholds["accel moving std"]
+    jrm_mask = abs(jerk_rm) < thresholds["jerk moving avg"]
+    jrsd_mask = jerk_rsd < thresholds["jerk moving std"]
 
     still = arm_mask & arsd_mask & jrm_mask & jrsd_mask
     starts = where(diff(still.astype(int)) == 1)[0]
@@ -138,8 +159,16 @@ class Detector:
         ret += f"still_window={self.still_window!r})"
         return ret
 
-    def __init__(self, stillness_constraint=True, gravity=9.81, thresholds=None,
-                 gravity_pass_order=4, gravity_pass_cutoff=0.8, long_still=0.5, still_window=0.3):
+    def __init__(
+        self,
+        stillness_constraint=True,
+        gravity=9.81,
+        thresholds=None,
+        gravity_pass_order=4,
+        gravity_pass_cutoff=0.8,
+        long_still=0.5,
+        still_window=0.3,
+    ):
         """
         Method for detecting sit-to-stand transitions based on a series of heuristic signal
         processing rules.
@@ -189,14 +218,14 @@ class Detector:
         """
         # set the default thresholds
         self._default_thresholds = {
-            'stand displacement': 0.125,
-            'displacement factor': 0.75,
-            'transition velocity': 0.2,
-            'duration factor': 10,
-            'accel moving avg': 0.2,
-            'accel moving std': 0.1,
-            'jerk moving avg': 2.5,
-            'jerk moving std': 3
+            "stand displacement": 0.125,
+            "displacement factor": 0.75,
+            "transition velocity": 0.2,
+            "duration factor": 10,
+            "accel moving avg": 0.2,
+            "accel moving std": 0.1,
+            "jerk moving avg": 2.5,
+            "jerk moving std": 3,
         }
         # assign attributes
         self.stillness_constraint = stillness_constraint
@@ -225,7 +254,7 @@ class Detector:
         lstill_stops = stops[still_dt > self.long_still]
 
         # compute an estimate of the direction of gravity, assumed to be the vertical direction
-        sos = butter(self.grav_ord, 2 * self.grav_cut * dt, btype='low', output='sos')
+        sos = butter(self.grav_ord, 2 * self.grav_cut * dt, btype="low", output="sos")
         vert = sosfiltfilt(sos, raw_acc, axis=0, padlen=0)
         vert /= norm(vert, axis=1, keepdims=True)
 
@@ -236,7 +265,7 @@ class Detector:
         prev_int_start = -1  # keep track of integration regions
         prev_int_end = -1
 
-        n_prev = len(sts['STS Start'])  # previous number of transitions
+        n_prev = len(sts["STS Start"])  # previous number of transitions
 
         for ppk in power_peaks:
             try:  # look for the preceeding end of stillness
@@ -244,16 +273,22 @@ class Detector:
             except IndexError:
                 continue
             try:  # look for the next start of stillness
-                start_still, still_at_end = self._get_start_still(time, stops, lstill_starts, ppk)
+                start_still, still_at_end = self._get_start_still(
+                    time, stops, lstill_starts, ppk
+                )
             except IndexError:
-                start_still = int(ppk + (5 / dt))  # try to use a set time past the transition
+                start_still = int(
+                    ppk + (5 / dt)
+                )  # try to use a set time past the transition
                 still_at_end = False
 
             # INTEGRATE between the determined indices
             if (end_still < prev_int_start) or (start_still > prev_int_end):
                 # original subtracted gravity, however given how this is integrated this makes no
                 # difference to the end result
-                v_vel, v_pos = self._integrate(v_acc[end_still:start_still], dt, still_at_end)
+                v_vel, v_pos = self._integrate(
+                    v_acc[end_still:start_still], dt, still_at_end
+                )
 
                 # save integration region limits -- avoid extra processing if possible
                 prev_int_start = end_still
@@ -261,10 +296,12 @@ class Detector:
 
                 # get zero crossings
                 pos_zc = insert(where(diff(sign(v_vel)) > 0)[0], 0, 0) + end_still
-                neg_zc = append(where(diff(sign(v_vel)) < 0)[0], v_vel.size-1) + end_still
+                neg_zc = (
+                    append(where(diff(sign(v_vel)) < 0)[0], v_vel.size - 1) + end_still
+                )
 
             # maker sure the velocity is high enough to indicate a peak
-            if v_vel[ppk - prev_int_start] < self.thresh['transition velocity']:
+            if v_vel[ppk - prev_int_start] < self.thresh["transition velocity"]:
                 continue
 
             # transition start
@@ -298,19 +335,23 @@ class Detector:
             # check that the first half of the s2s is not too much longer than the second half
             dt_half_1 = time[ppk] - time[sts_start]
             dt_half_2 = time[sts_end] - time[ppk]
-            qc2 = dt_half_1 < (self.thresh['duration factor'] * dt_half_2)
+            qc2 = dt_half_1 < (self.thresh["duration factor"] * dt_half_2)
 
             # check that the start and end are not equal
             qc3 = t_start_i != t_end_i
 
             # check that there is enough displacement for an actual STS
-            qc4 = (v_pos[t_end_i] - v_pos[t_start_i]) > self.thresh['stand displacement']
+            qc4 = (v_pos[t_end_i] - v_pos[t_start_i]) > self.thresh[
+                "stand displacement"
+            ]
 
-            if not (qc1 & qc2 & qc3 & qc4):  # if not all checks are passed :: pragma: no cover
+            if not (
+                qc1 & qc2 & qc3 & qc4
+            ):  # if not all checks are passed :: pragma: no cover
                 continue
 
             # sit to stand assignment
-            if len(sts['STS Start']) == 0:
+            if len(sts["STS Start"]) == 0:
                 # compute s2s features
                 dur_ = time[sts_end] - time[sts_start]
                 mx_ = filt_acc[sts_start:sts_end].max()
@@ -323,15 +364,15 @@ class Detector:
                 sts["Time"].append(dtime.strftime("%H:%M:%S.%f"))
                 sts["Hour"].append(dtime.hour)
 
-                sts['STS Start'].append(time[sts_start])
-                sts['STS End'].append(time[sts_end])
-                sts['Duration'].append(dur_)
-                sts['Max. Accel.'].append(mx_)
-                sts['Min. Accel.'].append(mn_)
-                sts['SPARC'].append(sal_)
-                sts['Vertical Displacement'].append(vdisp_)
+                sts["STS Start"].append(time[sts_start])
+                sts["STS End"].append(time[sts_end])
+                sts["Duration"].append(dur_)
+                sts["Max. Accel."].append(mx_)
+                sts["Min. Accel."].append(mn_)
+                sts["SPARC"].append(sal_)
+                sts["Vertical Displacement"].append(vdisp_)
             else:
-                if (time[sts_start] - sts['STS Start'][-1]) > 0.4:
+                if (time[sts_start] - sts["STS Start"][-1]) > 0.4:
                     # compute s2s features
                     dur_ = time[sts_end] - time[sts_start]
                     mx_ = filt_acc[sts_start:sts_end].max()
@@ -344,18 +385,20 @@ class Detector:
                     sts["Time"].append(dtime.strftime("%H:%M:%S.%f"))
                     sts["Hour"].append(dtime.hour)
 
-                    sts['STS Start'].append(time[sts_start])
-                    sts['STS End'].append(time[sts_end])
-                    sts['Duration'].append(dur_)
-                    sts['Max. Accel.'].append(mx_)
-                    sts['Min. Accel.'].append(mn_)
-                    sts['SPARC'].append(sal_)
-                    sts['Vertical Displacement'].append(vdisp_)
+                    sts["STS Start"].append(time[sts_start])
+                    sts["STS End"].append(time[sts_end])
+                    sts["Duration"].append(dur_)
+                    sts["Max. Accel."].append(mx_)
+                    sts["Min. Accel."].append(mn_)
+                    sts["SPARC"].append(sal_)
+                    sts["Vertical Displacement"].append(vdisp_)
 
         # check to ensure no partial transitions
-        vdisp_ndarr = array(sts['Vertical Displacement'][n_prev:])
-        sts['Partial'].extend(
-            (vdisp_ndarr < (self.thresh['displacement factor'] * median(vdisp_ndarr))).tolist()
+        vdisp_ndarr = array(sts["Vertical Displacement"][n_prev:])
+        sts["Partial"].extend(
+            (
+                vdisp_ndarr < (self.thresh["displacement factor"] * median(vdisp_ndarr))
+            ).tolist()
         )
 
     @staticmethod
@@ -389,7 +432,9 @@ class Detector:
                 vel -= vel[0]  # reset the beginning back to 0
         else:
             vel_dr = cumtrapz(vert_accel, dx=dt, initial=0)
-            vel = vel_dr - (((vel_dr[-1] - vel_dr[0]) / (x[-1] - x[0])) * x)  # no intercept
+            vel = vel_dr - (
+                ((vel_dr[-1] - vel_dr[0]) / (x[-1] - x[0])) * x
+            )  # no intercept
 
         # integrate velocity to get position
         pos = cumtrapz(vel, dx=dt, initial=0)
@@ -403,7 +448,9 @@ class Detector:
                 raise IndexError
         else:
             end_still = lstill_stops[lstill_stops < peak][-1]
-            if (time[peak] - time[end_still]) > 30:  # don't want to integrate too far out
+            if (
+                time[peak] - time[end_still]
+            ) > 30:  # don't want to integrate too far out
                 raise IndexError
         return end_still
 
@@ -446,7 +493,7 @@ class Detector:
         padlevel, fc, amp_th = 4, 10.0, 0.05
 
         # number of zeros to be padded
-        nfft = int(2**(ceil(log2(len(x))) + padlevel))
+        nfft = int(2 ** (ceil(log2(len(x))) + padlevel))
 
         # frequency
         f = arange(0, fs, fs / nfft)
@@ -469,6 +516,8 @@ class Detector:
         Mf_sel = Mf_sel[fc_inx]
 
         # calculate the arc length
-        sal = -sum(sqrt((diff(f_sel) / (f_sel[-1] - f_sel[0]))**2 + diff(Mf_sel)**2))
+        sal = -sum(
+            sqrt((diff(f_sel) / (f_sel[-1] - f_sel[0])) ** 2 + diff(Mf_sel) ** 2)
+        )
 
         return sal

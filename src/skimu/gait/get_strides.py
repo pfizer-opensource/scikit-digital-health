@@ -8,7 +8,9 @@ from numpy import nan, array
 from scipy.integrate import cumtrapz
 
 
-def get_strides(gait, vert_accel, gait_index, ic, fc, ts, fs, max_stride_time, loading_factor):
+def get_strides(
+    gait, vert_accel, gait_index, ic, fc, ts, fs, max_stride_time, loading_factor
+):
     """
     Get the strides from detected gait initial and final contacts, with optimizations
 
@@ -64,9 +66,9 @@ def get_strides(gait, vert_accel, gait_index, ic, fc, ts, fs, max_stride_time, l
             continue  # skip this IC
 
         # if this point is reached, both optimizations passed
-        gait['IC'].append(ic[i])
-        gait['FC'].append(fc_forward[1])
-        gait['FC opp foot'].append(fc_forward[0])
+        gait["IC"].append(ic[i])
+        gait["FC"].append(fc_forward[1])
+        gait["FC opp foot"].append(fc_forward[0])
         gait_ic_times.append(ic_times[i])
         bout_n_steps += 1
 
@@ -74,25 +76,29 @@ def get_strides(gait, vert_accel, gait_index, ic, fc, ts, fs, max_stride_time, l
     gait_ic_times = array(gait_ic_times)
 
     if bout_n_steps > 2:
-        gait['valid cycle'].extend((gait_ic_times[2:] - gait_ic_times[:-2]) < max_stride_time)
-        gait['valid cycle'].extend([False] * 2)
+        gait["valid cycle"].extend(
+            (gait_ic_times[2:] - gait_ic_times[:-2]) < max_stride_time
+        )
+        gait["valid cycle"].extend([False] * 2)
     elif bout_n_steps > 0:
-        gait['valid cycle'].extend([False] * bout_n_steps)
+        gait["valid cycle"].extend([False] * bout_n_steps)
 
     for i in range(gait_index, gait_index + bout_n_steps - 1):
-        i1 = gait['IC'][i]
-        i2 = gait['IC'][i + 1]
+        i1 = gait["IC"][i]
+        i2 = gait["IC"][i + 1]
 
-        if gait['valid cycle'][i]:
+        if gait["valid cycle"][i]:
             vacc = vert_accel[i1:i2]
             vvel = cumtrapz(vacc, x=ts[i1:i2], initial=0)
             vpos = cumtrapz(vvel, x=ts[i1:i2], initial=0)
 
-            gait['delta h'].append((vpos.max() - vpos.min()) * 9.81)  # convert to meters
+            gait["delta h"].append(
+                (vpos.max() - vpos.min()) * 9.81
+            )  # convert to meters
         else:
-            gait['delta h'].append(nan)
+            gait["delta h"].append(nan)
 
     # make sure parameters here match the number of steps in gait
-    gait['delta h'].extend([nan] * min(1, bout_n_steps))
+    gait["delta h"].extend([nan] * min(1, bout_n_steps))
 
     return bout_n_steps

@@ -7,7 +7,7 @@ Pfizer DMTI 2020
 from skimu.features.core import Feature
 from skimu.features.lib import extensions
 
-__all__ = ['SignalEntropy', 'SampleEntropy', 'PermutationEntropy']
+__all__ = ["SignalEntropy", "SampleEntropy", "PermutationEntropy"]
 
 
 class SignalEntropy(Feature):
@@ -155,13 +155,12 @@ class PermutationEntropy(Feature):
     normalize : bool, optional
         Normalize the output between 0 and 1. Default is False.
     """
+
     __slots__ = ("order", "delay", "normalize")
 
     def __init__(self, order=3, delay=1, normalize=False):
         super(PermutationEntropy, self).__init__(
-            order=order,
-            delay=delay,
-            normalize=False
+            order=order, delay=delay, normalize=False
         )
         self.order = order
         self.delay = delay

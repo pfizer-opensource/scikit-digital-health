@@ -52,7 +52,7 @@ class ReadCWA(_BaseProcess):
         super().__init__(
             # kwargs
             bases=bases,
-            periods=periods
+            periods=periods,
         )
 
         if (bases is None) and (periods is None):
@@ -72,12 +72,16 @@ class ReadCWA(_BaseProcess):
                 bases = asarray(bases, dtype=int_)
                 periods = asarray(periods, dtype=int_)
 
-            if ((0 <= bases) & (bases <= 23)).all() and ((1 <= periods) & (periods <= 24)).all():
+            if ((0 <= bases) & (bases <= 23)).all() and (
+                (1 <= periods) & (periods <= 24)
+            ).all():
                 self.window = True
                 self.bases = bases
                 self.periods = periods
             else:
-                raise ValueError("Base must be in [0, 23] and period must be in [1, 23]")
+                raise ValueError(
+                    "Base must be in [0, 23] and period must be in [1, 23]"
+                )
 
     def predict(self, file=None, **kwargs):
         """
@@ -125,7 +129,9 @@ class ReadCWA(_BaseProcess):
         super().predict(file=file, **kwargs)
 
         # read the file
-        fs, imudata, ts, light, starts, stops = read_axivity(file, self.bases, self.periods)
+        fs, imudata, ts, light, starts, stops = read_axivity(
+            file, self.bases, self.periods
+        )
 
         num_axes = imudata.shape[1]
         gyr_axes = mag_axes = None
@@ -141,11 +147,7 @@ class ReadCWA(_BaseProcess):
         else:  # pragma: no cover :: not expected to reach here only if file is corrupt
             raise UnexpectedAxesError("Unexpected number of axes in the IMU data")
 
-        results = {
-            self._time: ts,
-            "file": file,
-            "fs": fs
-        }
+        results = {self._time: ts, "file": file, "fs": fs}
         if acc_axes is not None:
             results[self._acc] = imudata[:, acc_axes]
         if gyr_axes is not None:

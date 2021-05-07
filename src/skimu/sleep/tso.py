@@ -7,13 +7,29 @@ Pfizer DMTI 2021
 from numpy import min, max, percentile, zeros, bool_, pad
 
 from skimu.utility import moving_mean, moving_median, moving_sd
-from skimu.sleep.utility import compute_z_angle, compute_absolute_difference, drop_min_blocks, \
-    arg_longest_bout
+from skimu.sleep.utility import (
+    compute_z_angle,
+    compute_absolute_difference,
+    drop_min_blocks,
+    arg_longest_bout,
+)
 
 
 def get_total_sleep_opportunity(
-        fs, time, accel, temperature, wear_starts, wear_stops, min_rest_block, max_act_break,
-        min_angle_thresh, max_angle_thresh, int_wear_temp, int_wear_move, plot_fn, idx_start=0
+    fs,
+    time,
+    accel,
+    temperature,
+    wear_starts,
+    wear_stops,
+    min_rest_block,
+    max_act_break,
+    min_angle_thresh,
+    max_angle_thresh,
+    int_wear_temp,
+    int_wear_move,
+    plot_fn,
+    idx_start=0,
 ):
     """
     Compute the period of time in which sleep can occur for a given days worth of data. For this
@@ -89,16 +105,20 @@ def get_total_sleep_opportunity(
     dz_rm_rmd = moving_median(dz_rm, 12 * 5, skip=1, pad=False)
 
     # compute the TSO threshold
-    tso_thresh = compute_tso_threshold(dz_rm_rmd, min_td=min_angle_thresh, max_td=max_angle_thresh)
+    tso_thresh = compute_tso_threshold(
+        dz_rm_rmd, min_td=min_angle_thresh, max_td=max_angle_thresh
+    )
 
     # create the TSO mask (1 -> sleep opportunity, only happens during wear)
     tso = zeros(dz_rm_rmd.size, dtype=bool_)
     # block off external non-wear times, scale by 5s blocks
     for strt, stp in zip((wear_starts - idx_start) / n5, (wear_stops - idx_start) / n5):
-        tso[int(strt):int(stp)] = True
+        tso[int(strt) : int(stp)] = True
 
     # apply the threshold before any internal wear checking
-    tso &= dz_rm_rmd < tso_thresh  # now only blocks where there is no movement, and wear are left
+    tso &= (
+        dz_rm_rmd < tso_thresh
+    )  # now only blocks where there is no movement, and wear are left
 
     # check if we can compute wear internally
     if temperature is not None and int_wear_temp > 0.0:
@@ -117,7 +137,7 @@ def get_total_sleep_opportunity(
         move_nonwear = pad(
             (acc_rsd_30m < int_wear_move).any(axis=1),
             pad_width=(150, 150),
-            constant_values=False
+            constant_values=False,
         )
 
         tso[move_nonwear] = False
@@ -125,14 +145,12 @@ def get_total_sleep_opportunity(
     # drop rest blocks less than minimum allowed rest length
     # even though rolling 5min, the underlying windows are 5s, so 12 * minutes => number of samples
     tso = drop_min_blocks(
-        tso,
-        12 * min_rest_block,
-        drop_value=1,
-        replace_value=0,
-        skip_bounds=True
+        tso, 12 * min_rest_block, drop_value=1, replace_value=0, skip_bounds=True
     )
     # drop active blocks less than maximum allowed active length
-    tso = drop_min_blocks(tso, 12 * max_act_break, drop_value=0, replace_value=1, skip_bounds=True)
+    tso = drop_min_blocks(
+        tso, 12 * max_act_break, drop_value=0, replace_value=1, skip_bounds=True
+    )
 
     # get the indices of the longest bout
     arg_start, arg_end = arg_longest_bout(tso, 1)

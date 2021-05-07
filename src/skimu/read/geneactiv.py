@@ -48,7 +48,7 @@ class ReadBin(_BaseProcess):
         super().__init__(
             # kwargs
             bases=bases,
-            periods=periods
+            periods=periods,
         )
 
         if (bases is None) and (periods is None):
@@ -68,12 +68,16 @@ class ReadBin(_BaseProcess):
                 bases = asarray(bases, dtype=int_)
                 periods = asarray(periods, dtype=int_)
 
-            if ((0 <= bases) & (bases <= 23)).all() and ((1 <= periods) & (periods <= 24)).all():
+            if ((0 <= bases) & (bases <= 23)).all() and (
+                (1 <= periods) & (periods <= 24)
+            ).all():
                 self.window = True
                 self.bases = bases
                 self.periods = periods
             else:
-                raise ValueError("Base must be in [0, 23] and period must be in [1, 23]")
+                raise ValueError(
+                    "Base must be in [0, 23] and period must be in [1, 23]"
+                )
 
     def predict(self, file=None, **kwargs):
         """
@@ -118,9 +122,7 @@ class ReadBin(_BaseProcess):
 
         # read the file
         nmax, fs, acc, time, light, temp, starts, stops = read_geneactiv(
-            file,
-            self.bases,
-            self.periods
+            file, self.bases, self.periods
         )
 
         results = {
@@ -129,7 +131,7 @@ class ReadBin(_BaseProcess):
             self._temp: temp,
             "light": light,
             "fs": fs,
-            "file": file
+            "file": file,
         }
 
         if self.window:

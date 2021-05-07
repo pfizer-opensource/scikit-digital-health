@@ -43,5 +43,9 @@ from skimu.utility.windowing import compute_window_samples, get_windowed_view
 from skimu.utility import windowing
 
 
-__all__ = ["math", "windowing", "orientation"] + math.__all__ + windowing.__all__ \
-          + orientation.__all__
+__all__ = (
+    ["math", "windowing", "orientation"]
+    + math.__all__
+    + windowing.__all__
+    + orientation.__all__
+)

@@ -4,7 +4,18 @@ Wear detection algorithms
 Lukas Adamowicz
 Pfizer DMTI 2021
 """
-from numpy import mean, diff, sum, insert, append, nonzero, delete, concatenate, int_, full
+from numpy import (
+    mean,
+    diff,
+    sum,
+    insert,
+    append,
+    nonzero,
+    delete,
+    concatenate,
+    int_,
+    full,
+)
 
 from skimu.base import _BaseProcess
 from skimu.utility import moving_mean, moving_sd, get_windowed_view
@@ -78,6 +89,7 @@ class DetectWear(_BaseProcess):
     re-classified as non-wear. Wear periods at the end of the recording that are less than 3 hours
     that are preceded by 1 hour of non-wear are re-classified as non-wear.
     """
+
     def __init__(
         self,
         sd_crit=0.013,
@@ -87,7 +99,8 @@ class DetectWear(_BaseProcess):
         apply_setup_criteria=True,
         shipping_criteria=False,
         shipping_temperature=False,
-        window_length=60, window_skip=15
+        window_length=60,
+        window_skip=15,
     ):
         window_length = int(window_length)
         window_skip = int(window_skip)
@@ -107,7 +120,7 @@ class DetectWear(_BaseProcess):
             shipping_criteria=shipping_criteria,
             shipping_temperature=shipping_temperature,
             window_length=window_length,
-            window_skip=window_skip
+            window_skip=window_skip,
         )
 
         self.sd_crit = sd_crit
@@ -153,7 +166,10 @@ class DetectWear(_BaseProcess):
 
         # deal with temperature
         if temperature is None or self.temp_f < 1:
-            nonwear = sum((acc_rsd < self.sd_crit) & (acc_w_range < self.range_crit), axis=1) >= 2
+            nonwear = (
+                sum((acc_rsd < self.sd_crit) & (acc_w_range < self.range_crit), axis=1)
+                >= 2
+            )
         else:
             temp_rm = moving_mean(temperature, n_wlen, n_wskip)
 
@@ -174,7 +190,8 @@ class DetectWear(_BaseProcess):
 
         # flip to wear starts/stops now
         wear_starts, wear_stops = _modify_wear_times(
-            nonwear, self.wskip, self.apply_setup_crit, self.ship_crit)
+            nonwear, self.wskip, self.apply_setup_crit, self.ship_crit
+        )
 
         wear = concatenate((wear_starts, wear_stops)).reshape((2, -1)).T * n_wskip
 
@@ -216,9 +233,13 @@ def _modify_wear_times(nonwear, wskip, apply_setup_rule, shipping_crit):
 
     # always want to start and end with nonwear, as these blocks wont change
     if start_with_wear:
-        ch = insert(ch, 0, 0)  # extra 0 length nonwear period -> always start with nonwear
+        ch = insert(
+            ch, 0, 0
+        )  # extra 0 length nonwear period -> always start with nonwear
     if end_with_wear:
-        ch = append(ch, nonwear.size)  # extra 0 length wear period ->  always end with nonwear
+        ch = append(
+            ch, nonwear.size
+        )  # extra 0 length wear period ->  always end with nonwear
 
     # pattern is now always [NW][W][NW][W]...[W][NW][W][NW]
     for i in range(3):
@@ -238,22 +259,28 @@ def _modify_wear_times(nonwear, wskip, apply_setup_rule, shipping_crit):
         NOTE: shipping at the start is applied the opposite of shipping at the end, requiring
         a 1+ hour nonwear period following wear periods less than 3 hours
         """
-        ship_start = nonzero((w_times <= 3) & (ch[2:-1:2] <= (shipping_crit[0] * nph)))[0]
-        ship_end = nonzero((w_times <= 3) & (ch[1:-1:2] >= ch[-1] - (shipping_crit[1] * nph)))[0]
+        ship_start = nonzero((w_times <= 3) & (ch[2:-1:2] <= (shipping_crit[0] * nph)))[
+            0
+        ]
+        ship_end = nonzero(
+            (w_times <= 3) & (ch[1:-1:2] >= ch[-1] - (shipping_crit[1] * nph))
+        )[0]
 
         ship_start = ship_start[nw_times[ship_start + 1] >= 1]
         ship_end = ship_end[nw_times[ship_end] >= 1]
 
-        switch = concatenate((
-            pct_thresh6 * 2 + 1,  # start index
-            pct_thresh6 * 2 + 2,  # end index
-            pct_thresh3 * 2 + 1,  # start index
-            pct_thresh3 * 2 + 2,  # end index
-            ship_start * 2 + 1,
-            ship_start * 2 + 2,
-            ship_end * 2 + 1,
-            ship_end * 2 + 2
-        ))
+        switch = concatenate(
+            (
+                pct_thresh6 * 2 + 1,  # start index
+                pct_thresh6 * 2 + 2,  # end index
+                pct_thresh3 * 2 + 1,  # start index
+                pct_thresh3 * 2 + 2,  # end index
+                ship_start * 2 + 1,
+                ship_start * 2 + 2,
+                ship_end * 2 + 1,
+                ship_end * 2 + 2,
+            )
+        )
 
         ch = delete(ch, switch)
 

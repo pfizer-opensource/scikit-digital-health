@@ -15,6 +15,7 @@ def basic_asymmetry(f):
     def run_basic_asymmetry(self, *args, **kwargs):
         f(self, *args, **kwargs)
         self._predict_asymmetry(*args, **kwargs)
+
     return run_basic_asymmetry
 
 
@@ -38,7 +39,7 @@ class GaitBoutEndpoint:
         """
         self.name = name
         self.logger = logging.getLogger(logname)
-        self.k_ = f'BOUTPARAM:{self.name}'
+        self.k_ = f"BOUTPARAM:{self.name}"
 
         self._depends = depends
 
@@ -86,16 +87,16 @@ class GaitEventEndpoint:
         """
         self.name = name
         self.logger = logging.getLogger(logname)
-        self.k_ = f'PARAM:{self.name}'
+        self.k_ = f"PARAM:{self.name}"
 
         self._depends = depends
 
     @staticmethod
     def _get_mask(gait, offset):
         if offset not in [1, 2]:
-            raise ValueError('invalid offset')
-        mask = zeros(gait['IC'].size, dtype=bool_)
-        mask[:-offset] = (gait['Bout N'][offset:] - gait['Bout N'][:-offset]) == 0
+            raise ValueError("invalid offset")
+        mask = zeros(gait["IC"].size, dtype=bool_)
+        mask[:-offset] = (gait["Bout N"][offset:] - gait["Bout N"][:-offset]) == 0
 
         return mask
 
@@ -125,8 +126,8 @@ class GaitEventEndpoint:
         self._predict(fs, leg_length, gait, gait_aux)
 
     def _predict_asymmetry(self, dt, leg_length, gait, gait_aux):
-        asy_name = f'{self.k_} asymmetry'
-        gait[asy_name] = full(gait['IC'].size, nan, dtype=float_)
+        asy_name = f"{self.k_} asymmetry"
+        gait[asy_name] = full(gait["IC"].size, nan, dtype=float_)
 
         mask = self._get_mask(gait, 1)
         mask_ofst = roll(mask, 1)
@@ -135,7 +136,7 @@ class GaitEventEndpoint:
 
     def _predict_init(self, gait, init=True, offset=None):
         if init:
-            gait[self.k_] = full(gait['IC'].size, nan, dtype=float_)
+            gait[self.k_] = full(gait["IC"].size, nan, dtype=float_)
         if offset is not None:
             mask = self._get_mask(gait, offset)
             mask_ofst = roll(mask, offset)

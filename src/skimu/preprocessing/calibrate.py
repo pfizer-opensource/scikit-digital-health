@@ -6,8 +6,19 @@ Pfizer DMTI 2021
 """
 from warnings import warn
 
-from numpy import mean, diff, zeros, ones, abs, all as npall, around, Inf, vstack, minimum, \
-    concatenate
+from numpy import (
+    mean,
+    diff,
+    zeros,
+    ones,
+    abs,
+    all as npall,
+    around,
+    Inf,
+    vstack,
+    minimum,
+    concatenate,
+)
 from numpy.linalg import norm
 from sklearn.linear_model import LinearRegression
 
@@ -63,7 +74,10 @@ class CalibrateAccelerometer(_BaseProcess):
         Journal of Applied Physiology, vol. 117, no. 7, pp. 738–744, Aug. 2014,
         doi: 10.1152/japplphysiol.00421.2014.
     """
-    def __init__(self, sphere_crit=0.3, min_hours=72, sd_criteria=0.013, max_iter=1000, tol=1e-10):
+
+    def __init__(
+        self, sphere_crit=0.3, min_hours=72, sd_criteria=0.013, max_iter=1000, tol=1e-10
+    ):
         if min_hours % 12 != 0 or min_hours <= 0:
             min_hours = ((min_hours // 12) + 1) * 12
 
@@ -74,7 +88,7 @@ class CalibrateAccelerometer(_BaseProcess):
             min_hours=min_hours,
             sd_criteria=sd_criteria,
             max_iter=max_iter,
-            tol=tol
+            tol=tol,
         )
 
         self.sphere_crit = sphere_crit
@@ -123,15 +137,20 @@ class CalibrateAccelerometer(_BaseProcess):
         )
 
         # parameters
-        fs = 1 / mean(diff(time[1000:5000]))  # dont start at zero due to timestamp weirdness
+        fs = 1 / mean(
+            diff(time[1000:5000])
+        )  # dont start at zero due to timestamp weirdness
         n10 = int(10 * fs)  # samples in 10 seconds
         nh = int(self.min_hours * 3600 * fs)  # samples in min_hours
         n12h = int(12 * 3600 * fs)  # samples in 12 hours
 
         i_h = 0  # keep track of number of extra 12 hour blocks used
         if accel.shape[0] < nh:
-            warn(f"Less than {self.min_hours} hours of data ({accel.shape[0] / (fs * 3600)}. "
-                 f"No Calibration performed", UserWarning)
+            warn(
+                f"Less than {self.min_hours} hours of data ({accel.shape[0] / (fs * 3600)}. "
+                f"No Calibration performed",
+                UserWarning,
+            )
             kwargs.update({self._time: time, self._acc: accel, self._temp: temperature})
             return kwargs
 
@@ -139,29 +158,40 @@ class CalibrateAccelerometer(_BaseProcess):
         # use the Store object in order to save computation time
         store = Store(n10)
         while not finished:
-            store.acc_rsd = accel[:nh + i_h * n12h]
+            store.acc_rsd = accel[: nh + i_h * n12h]
             if temperature is not None:
-                store.tmp_rm = temperature[:nh + i_h * n12h]
+                store.tmp_rm = temperature[: nh + i_h * n12h]
             else:
                 store._tmp_rm = zeros(store._acc_rm.shape[0])
 
-            finished, offset, scale, temp_scale, temp_mean = self._do_iterative_closest_point_fit(
-                store)
+            (
+                finished,
+                offset,
+                scale,
+                temp_scale,
+                temp_mean,
+            ) = self._do_iterative_closest_point_fit(store)
 
             if not finished and (nh + i_h * n12h) > accel.shape[0]:
                 finished = True
-                warn(f"Recalibration not done with {self.min_hours + i_h * 12} hours due to "
-                     f"insufficient non-movement data available")
+                warn(
+                    f"Recalibration not done with {self.min_hours + i_h * 12} hours due to "
+                    f"insufficient non-movement data available"
+                )
             i_h += 1
 
         if apply:
             if temperature is None:
                 accel = (accel + offset) * scale
             else:
-                accel = (accel + offset) * scale + (temperature - temp_mean)[:, None] * temp_scale
+                accel = (accel + offset) * scale + (temperature - temp_mean)[
+                    :, None
+                ] * temp_scale
 
         # add the results to the returned values
-        kwargs.update({"offset": offset, "scale": scale, "temperature scale": temp_scale})
+        kwargs.update(
+            {"offset": offset, "scale": scale, "temperature scale": temp_scale}
+        )
 
         kwargs.update({self._time: time, self._acc: accel, self._temp: temperature})
         if self._in_pipeline:
@@ -198,8 +228,9 @@ class CalibrateAccelerometer(_BaseProcess):
         tmp_scale = zeros((1, 3))
 
         # get parts with no motion. <2 is to prevent clipped signals from being labeled
-        no_motion = (npall(store.acc_rsd < self.sd_crit, axis=1)
-                     & npall(abs(store.acc_rm) < 2, axis=1))
+        no_motion = npall(store.acc_rsd < self.sd_crit, axis=1) & npall(
+            abs(store.acc_rm) < 2, axis=1
+        )
         # nans are automatically excluded
 
         # trim to no motion only
@@ -216,8 +247,8 @@ class CalibrateAccelerometer(_BaseProcess):
 
         # check if the sphere is well populated
         tel = (
-                (acc_rm.min(axis=0) < -self.sphere_crit)
-                & (acc_rm.max(axis=0) > self.sphere_crit)
+            (acc_rm.min(axis=0) < -self.sphere_crit)
+            & (acc_rm.max(axis=0) > self.sphere_crit)
         ).sum()
 
         if tel != 3:
@@ -244,7 +275,9 @@ class CalibrateAccelerometer(_BaseProcess):
                 # be taken care of in the original mask. Division by zero should also
                 # not be happening during motionless data, where 1 value should always be close
                 # to 1
-                x_ = vstack((curr[:, k], tmp_rm[:, 0])).T  # don't need the ones in Python
+                x_ = vstack(
+                    (curr[:, k], tmp_rm[:, 0])
+                ).T  # don't need the ones in Python
                 LR.fit(x_, closest_point[:, k], sample_weight=weights)
 
                 offsetch[k] = LR.intercept_
@@ -257,12 +290,9 @@ class CalibrateAccelerometer(_BaseProcess):
             scale = scale * scalech
 
             res.append(
-                3 * mean(weights[:, None] * (curr - closest_point)**2 / weights.sum())
+                3 * mean(weights[:, None] * (curr - closest_point) ** 2 / weights.sum())
             )
-            weights = minimum(
-                1 / norm(curr - closest_point, axis=1),
-                100
-            )
+            weights = minimum(1 / norm(curr - closest_point, axis=1), 100)
 
             # tolerance condition during iteration
             if abs(res[niter] - res[niter - 1]) < self.tol:
@@ -281,6 +311,7 @@ class Store:
     """
     Class for storing moving SD and mean values for update
     """
+
     __slots__ = ("_acc_rsd", "_acc_rm", "_tmp_rm", "_n", "_nt", "wlen")
 
     def __init__(self, wlen):
@@ -300,14 +331,16 @@ class Store:
     def acc_rsd(self, value):
         if self._acc_rsd is None:
             self._acc_rsd, self._acc_rm = moving_sd(
-                value, self.wlen, self.wlen, axis=0, return_previous=True)
+                value, self.wlen, self.wlen, axis=0, return_previous=True
+            )
             self._n = int((value.shape[0] // self.wlen) * self.wlen)
         else:
             _rsd, _rm = moving_sd(
-                value[self._n:], self.wlen, self.wlen, axis=0, return_previous=True)
+                value[self._n :], self.wlen, self.wlen, axis=0, return_previous=True
+            )
             self._acc_rsd = concatenate((self._acc_rsd, _rsd), axis=0)
             self._acc_rm = concatenate((self._acc_rm, _rm), axis=0)
-            self._n += int((value[self._n:].shape[0] // self.wlen) * self.wlen)
+            self._n += int((value[self._n :].shape[0] // self.wlen) * self.wlen)
 
     @property
     def acc_rm(self):
@@ -323,6 +356,6 @@ class Store:
             self._tmp_rm = moving_mean(value, self.wlen, self.wlen)
             self._nt = int((value.shape[0] // self.wlen) * self.wlen)
         else:
-            _rm = moving_mean(value[self._nt:], self.wlen, self.wlen)
+            _rm = moving_mean(value[self._nt :], self.wlen, self.wlen)
             self._tmp_rm = concatenate((self._tmp_rm, _rm), axis=0)
-            self._nt += int((value[self._nt:].shape[0] // self.wlen) * self.wlen)
+            self._nt += int((value[self._nt :].shape[0] // self.wlen) * self.wlen)

@@ -138,6 +138,7 @@ class Sleep(_BaseProcess):
         Index for Raw Accelerometry Data and Its Comparison with Other Activity Metrics. PLoS ONE
         11(8): e0160644. https://doi.org/10.1371/journal.pone.0160644
     """
+
     _params = [
         # normal metrics
         endpoints.TotalSleepTime,
@@ -155,25 +156,25 @@ class Sleep(_BaseProcess):
         endpoints.SleepAverageHazard,
         endpoints.WakeAverageHazard,
         endpoints.SleepPowerLawDistribution,
-        endpoints.WakePowerLawDistribution
+        endpoints.WakePowerLawDistribution,
     ]
 
     def __init__(
-            self,
-            start_buffer=0,
-            stop_buffer=0,
-            internal_wear_temp_thresh=25.0,
-            internal_wear_move_thresh=0.001,
-            min_rest_block=30,
-            max_activity_break=60,
-            min_angle_thresh=0.1,
-            max_angle_thresh=1.0,
-            min_rest_period=None,
-            nonwear_move_thresh=None,
-            min_wear_time=0,
-            min_day_hours=6,
-            downsample=True,
-            day_window=(12, 24)
+        self,
+        start_buffer=0,
+        stop_buffer=0,
+        internal_wear_temp_thresh=25.0,
+        internal_wear_move_thresh=0.001,
+        min_rest_block=30,
+        max_activity_break=60,
+        min_angle_thresh=0.1,
+        max_angle_thresh=1.0,
+        min_rest_period=None,
+        nonwear_move_thresh=None,
+        min_wear_time=0,
+        min_day_hours=6,
+        downsample=True,
+        day_window=(12, 24),
     ):
         super().__init__(
             start_buffer=start_buffer,
@@ -189,7 +190,7 @@ class Sleep(_BaseProcess):
             min_wear_time=min_wear_time,
             min_day_hours=min_day_hours,
             downsample=downsample,
-            day_window=day_window
+            day_window=day_window,
         )
 
         self.window_size = 60
@@ -237,7 +238,9 @@ class Sleep(_BaseProcess):
         """
         # move this inside here so that it doesnt effect everything on load
         if gettrace() is None:  # only set if not debugging
-            matplotlib.use("PDF")  # non-interactive, dont want to be displaying plots constantly
+            matplotlib.use(
+                "PDF"
+            )  # non-interactive, dont want to be displaying plots constantly
         plt.style.use("ggplot")
 
         self.f = []  # need a plot for each day
@@ -277,7 +280,9 @@ class Sleep(_BaseProcess):
             else:
                 raise ValueError(f"Metric {metrics!r} is not a `SleepMetric`.")
 
-    def predict(self, time=None, accel=None, *, temperature=None, fs=None, wear=None, **kwargs):
+    def predict(
+        self, time=None, accel=None, *, temperature=None, fs=None, wear=None, **kwargs
+    ):
         """
         predict(time, accel, *, temperature=None, fs=None, wear=None, day_ends={})
 
@@ -302,12 +307,7 @@ class Sleep(_BaseProcess):
             Must have the key
         """
         super().predict(
-            time=time,
-            accel=accel,
-            temperature=temperature,
-            fs=fs,
-            wear=wear,
-            **kwargs
+            time=time, accel=accel, temperature=temperature, fs=fs, wear=wear, **kwargs
         )
 
         if fs is None:
@@ -316,15 +316,19 @@ class Sleep(_BaseProcess):
         # get the individual days
         days = kwargs.get(self._days, {}).get(self.day_key, None)
         if days is None:
-            raise ValueError(f"Day indices for {self.day_key} (base, period) not found.")
+            raise ValueError(
+                f"Day indices for {self.day_key} (base, period) not found."
+            )
 
         # get the wear time from previous steps
         if wear is None:
-            warn(f"[{self!s}] External wear detection not provided. Assuming 100% wear time.")
+            warn(
+                f"[{self!s}] External wear detection not provided. Assuming 100% wear time."
+            )
             wear = array([[0, time.size - 1]])
 
         # downsample if necessary
-        goal_fs = 20.
+        goal_fs = 20.0
         if fs != goal_fs and self.downsample:
             time_ds, (accel_ds, temp_ds), (days_ds, wear_ds) = apply_downsample(
                 goal_fs, time, data=(accel, temperature), indices=(days, wear)
@@ -340,8 +344,13 @@ class Sleep(_BaseProcess):
 
         # setup the storage for the sleep parameters
         sleep = {
-            i: [] for i in [
-                "Day N", "Date", "TSO Start Timestamp", "TSO Start", "TSO Duration"
+            i: []
+            for i in [
+                "Day N",
+                "Date",
+                "TSO Start Timestamp",
+                "TSO Start",
+                "TSO Duration",
             ]
         }
         # setup storage for sleep indices
@@ -358,7 +367,9 @@ class Sleep(_BaseProcess):
             start, stop = day_idx
 
             if ((stop - start) / (3600 * goal_fs)) < self.min_day_hrs:
-                self.logger.info(f"Day {iday} has less than {self.min_day_hrs} hours. Skipping")
+                self.logger.info(
+                    f"Day {iday} has less than {self.min_day_hrs} hours. Skipping"
+                )
                 continue
 
             # initialize all the sleep values for the day
@@ -368,7 +379,9 @@ class Sleep(_BaseProcess):
             sleep["Day N"][-1] = iday + 1
 
             # get the start timestamp and make sure its in the correct hour due to indexing
-            start_datetime, sleep["Date"][-1] = _get_date(time_ds[start], self.day_key[0])
+            start_datetime, sleep["Date"][-1] = _get_date(
+                time_ds[start], self.day_key[0]
+            )
 
             # plotting
             source_f = kwargs.get("file", self.plot_fname)
@@ -377,7 +390,8 @@ class Sleep(_BaseProcess):
 
             # get the starts and stops of wear during the day
             dw_starts, dw_stops = get_day_wear_intersection(
-                wear_ds[:, 0], wear_ds[:, 1], start, stop)
+                wear_ds[:, 0], wear_ds[:, 1], start, stop
+            )
 
             if (sum(dw_stops - dw_starts) / (3600 * goal_fs)) < self.min_wear_time:
                 self.logger.info(
@@ -401,7 +415,7 @@ class Sleep(_BaseProcess):
                 self.int_w_temp,
                 self.int_w_move,
                 self._plot_arm_angle,
-                idx_start=start
+                idx_start=start,
             )
 
             if tso[0] is None:
@@ -423,12 +437,21 @@ class Sleep(_BaseProcess):
 
             # set the sleep start and end values from the predictions indexed into original data
             to_start = int(tso_start * 60 * fs) + int(start * fs / goal_fs)
-            sleep_idx[iday, 0] = int(nonzero(pred_during_tso)[0][0] * 60 * fs) + to_start  # sleep
-            sleep_idx[iday, 1] = int(nonzero(pred_during_tso)[0][-1] * 60 * fs) + to_start  # wake
+            sleep_idx[iday, 0] = (
+                int(nonzero(pred_during_tso)[0][0] * 60 * fs) + to_start
+            )  # sleep
+            sleep_idx[iday, 1] = (
+                int(nonzero(pred_during_tso)[0][-1] * 60 * fs) + to_start
+            )  # wake
 
             # plotting
             self._plot_sleep_wear_predictions(
-                goal_fs, predictions, tso_start, tso_stop, dw_starts - start, dw_stops - start
+                goal_fs,
+                predictions,
+                tso_start,
+                tso_stop,
+                dw_starts - start,
+                dw_stops - start,
             )
 
             # results fill out
@@ -442,7 +465,7 @@ class Sleep(_BaseProcess):
                     sleep_predictions=pred_during_tso,
                     lengths=sw_lengths,
                     starts=sw_starts,
-                    values=sw_vals
+                    values=sw_vals,
                 )
 
             self._tabulate_results(sleep)
@@ -451,7 +474,13 @@ class Sleep(_BaseProcess):
         self._finalize_plots()
 
         kwargs.update(
-            {self._acc: accel, self._time: time, "fs": fs, "wear": wear, "sleep": sleep_idx}
+            {
+                self._acc: accel,
+                self._time: time,
+                "fs": fs,
+                "wear": wear,
+                "sleep": sleep_idx,
+            }
         )
         if self._in_pipeline:
             return kwargs, sleep
@@ -464,7 +493,7 @@ class Sleep(_BaseProcess):
                 nrows=4,
                 figsize=(12, 6),
                 sharex=True,
-                gridspec_kw={'height_ratios': [1, 1, 1, 0.5]}
+                gridspec_kw={"height_ratios": [1, 1, 1, 0.5]},
             )
 
             f.suptitle(
@@ -479,12 +508,12 @@ class Sleep(_BaseProcess):
                 x.spines["bottom"].set_visible(False)
 
                 x.tick_params(
-                    axis='both',
-                    which='both',  # both major and minor ticks are affected
+                    axis="both",
+                    which="both",  # both major and minor ticks are affected
                     bottom=False,  # ticks along the bottom edge are off
                     top=False,  # ticks along the top edge are off
                     right=False,
-                    left=False
+                    left=False,
                 )
 
                 x.set_yticks([])
@@ -509,17 +538,15 @@ class Sleep(_BaseProcess):
         accel : numpy.ndarray
         """
         if self.f is not None:
-            acc = accel[::int(fs * 60)]
+            acc = accel[:: int(fs * 60)]
 
-            self.ax[-1][0].plot(self.t60[:acc.shape[0]], acc, lw=0.5)
+            self.ax[-1][0].plot(self.t60[: acc.shape[0]], acc, lw=0.5)
 
             hx = mlines.Line2D([], [], color="C0", label="X", lw=0.5)
             hy = mlines.Line2D([], [], color="C1", label="Y", lw=0.5)
             hz = mlines.Line2D([], [], color="C2", label="Z", lw=0.5)
             self.ax[-1][0].legend(
-                handles=[hx, hy, hz],
-                bbox_to_anchor=(0, 0.5),
-                loc="center right"
+                handles=[hx, hy, hz], bbox_to_anchor=(0, 0.5), loc="center right"
             )
 
     def _plot_activity_index(self, index):
@@ -531,7 +558,9 @@ class Sleep(_BaseProcess):
         index : numpy.ndarray
         """
         if self.f is not None:
-            self.ax[-1][1].plot(self.t60[:index.size], index, lw=1, color="C3", label="Activity")
+            self.ax[-1][1].plot(
+                self.t60[: index.size], index, lw=1, color="C3", label="Activity"
+            )
 
             self.ax[-1][1].legend(bbox_to_anchor=(0, 0.5), loc="center right")
 
@@ -546,12 +575,14 @@ class Sleep(_BaseProcess):
         """
         if self.f is not None:
             aa = arm_angle[::12]  # resample to every minute
-            self.ax[-1][2].plot(self.t60[:aa.size], aa, color="C4", lw=1, label="Arm Angle")
+            self.ax[-1][2].plot(
+                self.t60[: aa.size], aa, color="C4", lw=1, label="Arm Angle"
+            )
 
             self.ax[-1][2].legend(bbox_to_anchor=(0, 0.5), loc="center right")
 
     def _plot_sleep_wear_predictions(
-            self, fs, slp, tso_start_i, tso_end_i, wear_starts, wear_stops
+        self, fs, slp, tso_start_i, tso_end_i, wear_starts, wear_stops
     ):
         """
         Plot the sleep predictions
@@ -574,7 +605,12 @@ class Sleep(_BaseProcess):
         if self.f is not None:
             # wear
             h1 = mlines.Line2D(
-                [], [], color="C0", label="Wear Prediction", lw=3, solid_capstyle="round"
+                [],
+                [],
+                color="C0",
+                label="Wear Prediction",
+                lw=3,
+                solid_capstyle="round",
             )
             for s, e in zip(wear_starts, wear_stops):
                 # convert to hours
@@ -584,14 +620,22 @@ class Sleep(_BaseProcess):
                     [sh, eh], [2, 2], color="C0", lw=3, solid_capstyle="round"
                 )
             # Sleep predictions
-            h2, = self.ax[-1][-1].plot(
-                self.t60[:slp.size], masked_where(slp == 1, slp) + 1, solid_capstyle="round", lw=3,
-                color="C1", label="Wake Predictions"
+            (h2,) = self.ax[-1][-1].plot(
+                self.t60[: slp.size],
+                masked_where(slp == 1, slp) + 1,
+                solid_capstyle="round",
+                lw=3,
+                color="C1",
+                label="Wake Predictions",
             )
             # Total sleep opportunity
-            h3, = self.ax[-1][-1].plot(
-                [self.t60[tso_start_i], self.t60[tso_end_i]], [0, 0], solid_capstyle="round",
-                lw=3, color="C2", label="Sleep Opportunity"
+            (h3,) = self.ax[-1][-1].plot(
+                [self.t60[tso_start_i], self.t60[tso_end_i]],
+                [0, 0],
+                solid_capstyle="round",
+                lw=3,
+                color="C2",
+                label="Sleep Opportunity",
             )
 
             self.ax[-1][-1].set_xlim([self.day_key[0], sum(self.day_key)])
@@ -612,19 +656,26 @@ class Sleep(_BaseProcess):
         Put some of the sleep results into a table on the visualization
         """
         keys = [
-            "total sleep time", "percent time asleep", "number of wake bouts",
-            "sleep onset latency", "wake after sleep onset"
+            "total sleep time",
+            "percent time asleep",
+            "number of wake bouts",
+            "sleep onset latency",
+            "wake after sleep onset",
         ]
         if self.f is not None:
-            self.ax[-1][0].table([[results[i][-1] for i in keys]], colLabels=keys, loc="top")
+            self.ax[-1][0].table(
+                [[results[i][-1] for i in keys]], colLabels=keys, loc="top"
+            )
 
     def _finalize_plots(self):
         """
         Finalize and save the plots for sleep
         """
         if self.f is not None:
-            date = dt_date.today().strftime('%Y%m%d')
-            form_fname = self.plot_fname.format(date=date, name=self._name, file=self._file_name)
+            date = dt_date.today().strftime("%Y%m%d")
+            form_fname = self.plot_fname.format(
+                date=date, name=self._name, file=self._file_name
+            )
             pp = PdfPages(Path(form_fname).with_suffix(".pdf"))
 
             for f in self.f:

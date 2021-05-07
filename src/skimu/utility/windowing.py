@@ -7,13 +7,14 @@ Pfizer DMTI 2020
 from numpy import require
 from numpy.lib.stride_tricks import as_strided
 
-__all__ = ['compute_window_samples', 'get_windowed_view']
+__all__ = ["compute_window_samples", "get_windowed_view"]
 
 
 class DimensionError(Exception):
     """
     Custom error for if the input signal has too many dimensions
     """
+
     pass
 
 
@@ -21,6 +22,7 @@ class ContiguityError(Exception):
     """
     Custom error for if the input signal is not C-contiguous
     """
+
     pass
 
 
@@ -122,22 +124,21 @@ def get_windowed_view(x, window_length, step_size, ensure_c_contiguity=False):
         2- or 3-D array of windows of the original data, of shape (..., L[, ...])
     """
     if not (x.ndim in [1, 2]):
-        raise DimensionError('Array cannot have more than 2 dimensions.')
+        raise DimensionError("Array cannot have more than 2 dimensions.")
 
     if ensure_c_contiguity:
-        x = require(x, requirements=['C'])
+        x = require(x, requirements=["C"])
     else:
-        if not x.flags['C_CONTIGUOUS']:
-            raise ContiguityError("Input array must be C-contiguous.  See numpy.ascontiguousarray")
+        if not x.flags["C_CONTIGUOUS"]:
+            raise ContiguityError(
+                "Input array must be C-contiguous.  See numpy.ascontiguousarray"
+            )
 
     if x.ndim == 1:
         nrows = ((x.size - window_length) // step_size) + 1
         n = x.strides[0]
         return as_strided(
-            x,
-            shape=(nrows, window_length),
-            strides=(step_size * n, n),
-            writeable=False
+            x, shape=(nrows, window_length), strides=(step_size * n, n), writeable=False
         )
 
     else:

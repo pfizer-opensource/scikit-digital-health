@@ -53,7 +53,8 @@ def get_gait_classification_lgbm(gait_pred, accel, fs):
             if gait_pred.size != accel.shape[0]:
                 raise DimensionMismatchError(
                     "Number of gait predictions (possibly downsampled) must match number of "
-                    "acceleration samples")
+                    "acceleration samples"
+                )
             bout_starts = where(diff(gait_pred.astype(int_)) == 1)[0] + 1
             bout_stops = where(diff(gait_pred.astype(int_)) == -1)[0] + 1
 
@@ -62,9 +63,11 @@ def get_gait_classification_lgbm(gait_pred, accel, fs):
             if gait_pred[-1]:
                 bout_stops = append(bout_stops, accel.shape[0])
         else:
-            bout_starts, bout_stops = array([0], dtype="int"), array([accel.shape[0]], dtype="int")
+            bout_starts, bout_stops = array([0], dtype="int"), array(
+                [accel.shape[0]], dtype="int"
+            )
     else:
-        suffix = '50hz' if fs == 50.0 else '20hz'
+        suffix = "50hz" if fs == 50.0 else "20hz"
 
         wlen = int(fs * 3)  # window length, 3 seconds
         wstep = wlen  # non-overlapping windows
@@ -72,7 +75,7 @@ def get_gait_classification_lgbm(gait_pred, accel, fs):
         # used to try to minimized false positives
 
         # band-pass filter
-        sos = butter(1, [2 * 0.25 / fs, 2 * 5 / fs], btype='band', output='sos')
+        sos = butter(1, [2 * 0.25 / fs, 2 * 5 / fs], btype="band", output="sos")
         accel_filt = ascontiguousarray(sosfiltfilt(sos, norm(accel, axis=1)))
 
         # window, data will already be in c-contiguous layout
@@ -80,7 +83,7 @@ def get_gait_classification_lgbm(gait_pred, accel, fs):
 
         # get the feature bank
         feat_bank = Bank()  # data is already windowed
-        feat_bank.load(_resolve_path('skimu.gait.model', 'final_features.json'))
+        feat_bank.load(_resolve_path("skimu.gait.model", "final_features.json"))
 
         # compute the features
         accel_feats = feat_bank.compute(accel_w, fs=fs, axis=1, index_axis=None)
@@ -88,14 +91,20 @@ def get_gait_classification_lgbm(gait_pred, accel, fs):
 
         # load the classification model
         lgb_file = str(
-            _resolve_path('skimu.gait.model', f'lgbm_gait_classifier_no-stairs_{suffix}.lgbm')
+            _resolve_path(
+                "skimu.gait.model", f"lgbm_gait_classifier_no-stairs_{suffix}.lgbm"
+            )
         )
         bst = lgb.Booster(model_file=lgb_file)
 
         # predict
-        gait_predictions = (bst.predict(accel_feats.T, raw_score=False) > thresh).astype(int_)
+        gait_predictions = (
+            bst.predict(accel_feats.T, raw_score=False) > thresh
+        ).astype(int_)
 
-        bout_starts = where(diff(gait_predictions) == 1)[0] + 1  # account for n-1 samples in diff
+        bout_starts = (
+            where(diff(gait_predictions) == 1)[0] + 1
+        )  # account for n-1 samples in diff
         bout_stops = where(diff(gait_predictions) == -1)[0] + 1
 
         if gait_predictions[0]:
@@ -103,10 +112,14 @@ def get_gait_classification_lgbm(gait_pred, accel, fs):
         if gait_predictions[-1]:
             bout_stops = append(bout_stops, gait_predictions.size)
 
-        assert bout_starts.size == bout_stops.size, "Starts and stops of bouts do not match"
+        assert (
+            bout_starts.size == bout_stops.size
+        ), "Starts and stops of bouts do not match"
 
         # convert to actual values that match up with data
         bout_starts *= wstep
-        bout_stops = bout_stops * wstep + (wlen - wstep)  # account for edges, if windows overlap
+        bout_stops = bout_stops * wstep + (
+            wlen - wstep
+        )  # account for edges, if windows overlap
 
     return bout_starts.astype("int"), bout_stops.astype("int")

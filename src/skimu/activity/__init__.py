@@ -126,4 +126,8 @@ from skimu.activity.metrics import *
 from skimu.activity import metrics
 from skimu.activity.cutpoints import get_available_cutpoints
 
-__all__ = ["ActivityLevelClassification", "metrics", "get_available_cutpoints"] + metrics.__all__
+__all__ = [
+    "ActivityLevelClassification",
+    "metrics",
+    "get_available_cutpoints",
+] + metrics.__all__

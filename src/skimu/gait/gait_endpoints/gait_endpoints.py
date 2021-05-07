@@ -29,21 +29,63 @@ stride length: step_length_i + step_length_i+1
 
 gait speed: stride_length / stride time
 """
-from numpy import zeros, nanmean, mean, nanstd, std, nanmedian, sum, sqrt, nan, nonzero, argmin, \
-    abs, round, float_, int_, fft, arange, isnan, maximum
+from numpy import (
+    zeros,
+    nanmean,
+    mean,
+    nanstd,
+    std,
+    nanmedian,
+    sum,
+    sqrt,
+    nan,
+    nonzero,
+    argmin,
+    abs,
+    round,
+    float_,
+    int_,
+    fft,
+    arange,
+    isnan,
+    maximum,
+)
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt, find_peaks
 
 
-from skimu.gait.gait_endpoints.base import GaitEventEndpoint, GaitBoutEndpoint, basic_asymmetry
+from skimu.gait.gait_endpoints.base import (
+    GaitEventEndpoint,
+    GaitBoutEndpoint,
+    basic_asymmetry,
+)
 from skimu.features.lib.extensions.smoothness import SPARC
 
 
-__all__ = ['StrideTime', 'StanceTime', 'SwingTime', 'StepTime', 'InitialDoubleSupport',
-           'TerminalDoubleSupport', 'DoubleSupport', 'SingleSupport', 'StepLength',
-           'StrideLength', 'GaitSpeed', 'Cadence', 'GaitSymmetryIndex', 'IntraStepCovarianceV',
-           'IntraStrideCovarianceV', 'HarmonicRatioV', 'StrideSPARC', 'PhaseCoordinationIndex',
-           'StepRegularityV', 'StrideRegularityV', 'AutocovarianceSymmetryV', 'RegularityIndexV']
+__all__ = [
+    "StrideTime",
+    "StanceTime",
+    "SwingTime",
+    "StepTime",
+    "InitialDoubleSupport",
+    "TerminalDoubleSupport",
+    "DoubleSupport",
+    "SingleSupport",
+    "StepLength",
+    "StrideLength",
+    "GaitSpeed",
+    "Cadence",
+    "GaitSymmetryIndex",
+    "IntraStepCovarianceV",
+    "IntraStrideCovarianceV",
+    "HarmonicRatioV",
+    "StrideSPARC",
+    "PhaseCoordinationIndex",
+    "StepRegularityV",
+    "StrideRegularityV",
+    "AutocovarianceSymmetryV",
+    "RegularityIndexV",
+]
 
 
 def _autocovariancefunction(x, max_lag, biased=False):
@@ -56,16 +98,18 @@ def _autocovariancefunction(x, max_lag, biased=False):
         ac = zeros((max_lag, x.shape[1]), dtype=float_)
         axis = 0
     else:
-        raise ValueError('Too many dimensions (>2) for x')
+        raise ValueError("Too many dimensions (>2) for x")
 
-    for i in range(min(max_lag, N-10)):
+    for i in range(min(max_lag, N - 10)):
         ac[i] = sum(
-            (x[:N-i] - mean(x[:N-i], axis=axis)) * (x[i:] - mean(x[i:], axis=axis)), axis=axis
+            (x[: N - i] - mean(x[: N - i], axis=axis))
+            * (x[i:] - mean(x[i:], axis=axis)),
+            axis=axis,
         )
         if biased:
-            ac[i] /= (N * std(x[:N-i], axis=axis) * std(x[i:], axis=axis))
+            ac[i] /= N * std(x[: N - i], axis=axis) * std(x[i:], axis=axis)
         else:
-            ac[i] /= ((N - i) * std(x[:N-i], axis=axis) * std(x[i:], axis=axis))
+            ac[i] /= (N - i) * std(x[: N - i], axis=axis) * std(x[i:], axis=axis)
 
     return ac
 
@@ -81,9 +125,9 @@ def _autocovariance(x, i1, i2, i3, biased=False):
 
     ac = sum((x[i1:i2] - m1) * (x[i2:i3] - m2))
     if biased:
-        ac /= (N * s1 * s2)
+        ac /= N * s1 * s2
     else:
-        ac /= ((N - m) * s1 * s2)
+        ac /= (N - m) * s1 * s2
 
     return ac
 
@@ -97,13 +141,14 @@ class StrideTime(GaitEventEndpoint):
     heel-strike for the same foot. A basic asymmetry measure is also computed as the difference
     between sequential stride times of opposite feet.
     """
+
     def __init__(self):
-        super().__init__('stride time', __name__)
+        super().__init__("stride time", __name__)
 
     @basic_asymmetry
     def _predict(self, fs, leg_length, gait, gait_aux):
         mask, mask_ofst = self._predict_init(gait, True, 2)
-        gait[self.k_][mask] = (gait['IC'][mask_ofst] - gait['IC'][mask]) / fs
+        gait[self.k_][mask] = (gait["IC"][mask_ofst] - gait["IC"][mask]) / fs
 
 
 class StanceTime(GaitEventEndpoint):
@@ -112,12 +157,13 @@ class StanceTime(GaitEventEndpoint):
     (initial contact) to toe-off (final contact) for a foot. A basic asymmetry measure is also
     computed as the difference between sequential stance times of opposite feet.
     """
+
     def __init__(self):
-        super().__init__('stance time', __name__)
+        super().__init__("stance time", __name__)
 
     @basic_asymmetry
     def _predict(self, fs, leg_length, gait, gait_aux):
-        gait[self.k_] = (gait['FC'] - gait['IC']) / fs
+        gait[self.k_] = (gait["FC"] - gait["IC"]) / fs
 
 
 class SwingTime(GaitEventEndpoint):
@@ -126,13 +172,14 @@ class SwingTime(GaitEventEndpoint):
     heel-strike (initial contact) of the same foot. A basic asymmetry measure is also computed as
     the difference between sequential swing times of opposite feet.
     """
+
     def __init__(self):
-        super().__init__('swing time', __name__)
+        super().__init__("swing time", __name__)
 
     @basic_asymmetry
     def _predict(self, fs, leg_length, gait, gait_aux):
         mask, mask_ofst = self._predict_init(gait, True, 2)
-        gait[self.k_][mask] = (gait['IC'][mask_ofst] - gait['FC'][mask]) / fs
+        gait[self.k_][mask] = (gait["IC"][mask_ofst] - gait["FC"][mask]) / fs
 
 
 class StepTime(GaitEventEndpoint):
@@ -141,13 +188,14 @@ class StepTime(GaitEventEndpoint):
     asymmetry measure is also computed as the difference between sequential step times of opposite
     feet.
     """
+
     def __init__(self):
-        super().__init__('step time', __name__)
+        super().__init__("step time", __name__)
 
     @basic_asymmetry
     def _predict(self, fs, leg_length, gait, gait_aux):
         mask, mask_ofst = self._predict_init(gait, True, 1)
-        gait[self.k_][mask] = (gait['IC'][mask_ofst] - gait['IC'][mask]) / fs
+        gait[self.k_][mask] = (gait["IC"][mask_ofst] - gait["IC"][mask]) / fs
 
 
 class InitialDoubleSupport(GaitEventEndpoint):
@@ -157,12 +205,13 @@ class InitialDoubleSupport(GaitEventEndpoint):
     foot. A basic asymmetry measure is also computed as the difference between sequential initial
     double support times of opposite feet.
     """
+
     def __init__(self):
-        super().__init__('initial double support', __name__)
+        super().__init__("initial double support", __name__)
 
     @basic_asymmetry
     def _predict(self, fs, leg_length, gait, gait_aux):
-        gait[self.k_] = (gait['FC opp foot'] - gait['IC']) / fs
+        gait[self.k_] = (gait["FC opp foot"] - gait["IC"]) / fs
 
 
 class TerminalDoubleSupport(GaitEventEndpoint):
@@ -172,13 +221,16 @@ class TerminalDoubleSupport(GaitEventEndpoint):
     current foot. A basic asymmetry measure is also computed as the difference between sequential
     terminal double support times of opposite feet.
     """
+
     def __init__(self):
-        super().__init__('terminal double support', __name__)
+        super().__init__("terminal double support", __name__)
 
     @basic_asymmetry
     def _predict(self, fs, leg_length, gait, gait_aux):
         mask, mask_ofst = self._predict_init(gait, True, 1)
-        gait[self.k_][mask] = (gait['FC opp foot'][mask_ofst] - gait['IC'][mask_ofst]) / fs
+        gait[self.k_][mask] = (
+            gait["FC opp foot"][mask_ofst] - gait["IC"][mask_ofst]
+        ) / fs
 
 
 class DoubleSupport(GaitEventEndpoint):
@@ -187,15 +239,19 @@ class DoubleSupport(GaitEventEndpoint):
     that the current and opposite foot are in contact with the ground. A basic asymmetry measure
     is also computed as the difference between sequential double support times of opposite feet.
     """
+
     def __init__(self):
         super().__init__(
-            'double support', __name__, depends=[InitialDoubleSupport, TerminalDoubleSupport]
+            "double support",
+            __name__,
+            depends=[InitialDoubleSupport, TerminalDoubleSupport],
         )
 
     @basic_asymmetry
     def _predict(self, fs, leg_length, gait, gait_aux):
-        gait[self.k_] = gait['PARAM:initial double support'] \
-                        + gait['PARAM:terminal double support']
+        gait[self.k_] = (
+            gait["PARAM:initial double support"] + gait["PARAM:terminal double support"]
+        )
 
 
 class SingleSupport(GaitEventEndpoint):
@@ -205,13 +261,14 @@ class SingleSupport(GaitEventEndpoint):
     asymmetry measure is also computed as the difference between sequential single support times
     of opposite feet.
     """
+
     def __init__(self):
-        super().__init__('single support', __name__)
+        super().__init__("single support", __name__)
 
     @basic_asymmetry
     def _predict(self, fs, leg_length, gait, gait_aux):
         mask, mask_ofst = self._predict_init(gait, True, 1)
-        gait[self.k_][mask] = (gait['IC'][mask_ofst] - gait['FC opp foot'][mask]) / fs
+        gait[self.k_][mask] = (gait["IC"][mask_ofst] - gait["FC opp foot"][mask]) / fs
 
 
 class StepLength(GaitEventEndpoint):
@@ -236,13 +293,16 @@ class StepLength(GaitEventEndpoint):
         trunk accelerations during human walking,” Gait & Posture, vol. 18, no. 2, pp. 1–10,
         Oct. 2003, doi: 10.1016/S0966-6362(02)00190-X.
     """
+
     def __init__(self):
-        super().__init__('step length', __name__)
+        super().__init__("step length", __name__)
 
     @basic_asymmetry
     def _predict(self, fs, leg_length, gait, gait_aux):
         if leg_length is not None:
-            gait[self.k_] = 2 * sqrt(2 * leg_length * gait['delta h'] - gait['delta h']**2)
+            gait[self.k_] = 2 * sqrt(
+                2 * leg_length * gait["delta h"] - gait["delta h"] ** 2
+            )
         else:
             self._predict_init(gait, True, None)  # don't generate masks
 
@@ -270,15 +330,17 @@ class StrideLength(GaitEventEndpoint):
         trunk accelerations during human walking,” Gait & Posture, vol. 18, no. 2, pp. 1–10,
         Oct. 2003, doi: 10.1016/S0966-6362(02)00190-X.
     """
+
     def __init__(self):
-        super().__init__('stride length', __name__, depends=[StepLength])
+        super().__init__("stride length", __name__, depends=[StepLength])
 
     @basic_asymmetry
     def _predict(self, fs, leg_length, gait, gait_aux):
         mask, mask_ofst = self._predict_init(gait, True, 1)
         if leg_length is not None:
-            gait[self.k_][mask] = gait['PARAM:step length'][mask_ofst] \
-                            + gait['PARAM:step length'][mask]
+            gait[self.k_][mask] = (
+                gait["PARAM:step length"][mask_ofst] + gait["PARAM:step length"][mask]
+            )
 
 
 class GaitSpeed(GaitEventEndpoint):
@@ -287,13 +349,14 @@ class GaitSpeed(GaitEventEndpoint):
     stride duration, in m/s. A basic asymmetry measure is also computed as the difference between
     sequential gait speeds of opposite feet.
     """
+
     def __init__(self):
-        super().__init__('gait speed', __name__, depends=[StrideLength, StrideTime])
+        super().__init__("gait speed", __name__, depends=[StrideLength, StrideTime])
 
     @basic_asymmetry
     def _predict(self, fs, leg_length, gait, gait_aux):
         if leg_length is not None:
-            gait[self.k_] = gait['PARAM:stride length'] / gait['PARAM:stride time']
+            gait[self.k_] = gait["PARAM:stride length"] / gait["PARAM:stride time"]
         else:
             self._predict_init(gait, True, None)  # don't generate masks
 
@@ -302,11 +365,12 @@ class Cadence(GaitEventEndpoint):
     """
     The number of steps taken in 1 minute. Computed per step as 60.0s divided by the step time.
     """
+
     def __init__(self):
-        super().__init__('cadence', __name__, depends=[StepTime])
+        super().__init__("cadence", __name__, depends=[StepTime])
 
     def _predict(self, fs, leg_length, gait, gait_aux):
-        gait[self.k_] = 60.0 / gait['PARAM:step time']
+        gait[self.k_] = 60.0 / gait["PARAM:step time"]
 
 
 class IntraStrideCovarianceV(GaitEventEndpoint):
@@ -325,21 +389,27 @@ class IntraStrideCovarianceV(GaitEventEndpoint):
         Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
         Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
     """
+
     def __init__(self):
-        super().__init__('intra-stride covariance - V', __name__)
+        super().__init__("intra-stride covariance - V", __name__)
 
     def _predict(self, fs, leg_length, gait, gait_aux):
         mask, mask_ofst = self._predict_init(gait, True, 2)
 
-        i1 = gait['IC'][mask]
-        i2 = gait['IC'][mask_ofst]
+        i1 = gait["IC"][mask]
+        i2 = gait["IC"][mask_ofst]
         i3 = i2 + (i2 - i1)
 
         for i, idx in enumerate(nonzero(mask)[0]):
             gait[self.k_][idx] = _autocovariance(
                 # index the accel, then the list of views, then the vertical axis
-                gait_aux['accel'][gait_aux['inertial data i'][idx]][:, gait_aux['vert axis'][idx]],
-                i1[i], i2[i], i3[i], biased=False
+                gait_aux["accel"][gait_aux["inertial data i"][idx]][
+                    :, gait_aux["vert axis"][idx]
+                ],
+                i1[i],
+                i2[i],
+                i3[i],
+                biased=False,
             )
 
 
@@ -359,20 +429,26 @@ class IntraStepCovarianceV(GaitEventEndpoint):
         Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
         Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
     """
+
     def __init__(self):
-        super().__init__('intra-step covariance - V', __name__)
+        super().__init__("intra-step covariance - V", __name__)
 
     def _predict(self, fs, leg_length, gait, gait_aux):
         mask, mask_ofst = self._predict_init(gait, True, 1)
 
-        i1 = gait['IC'][mask]
-        i2 = gait['IC'][mask_ofst]
+        i1 = gait["IC"][mask]
+        i2 = gait["IC"][mask_ofst]
         i3 = i2 + (i2 - i1)
 
         for i, idx in enumerate(nonzero(mask)[0]):
             gait[self.k_][idx] = _autocovariance(
-                gait_aux['accel'][gait_aux['inertial data i'][idx]][:, gait_aux['vert axis'][idx]],
-                i1[i], i2[i], i3[i], biased=False
+                gait_aux["accel"][gait_aux["inertial data i"][idx]][
+                    :, gait_aux["vert axis"][idx]
+                ],
+                i1[i],
+                i2[i],
+                i3[i],
+                biased=False,
             )
 
 
@@ -405,24 +481,30 @@ class HarmonicRatioV(GaitEventEndpoint):
     """
 
     def __init__(self):
-        super().__init__('harmonic ratio - V', __name__, depends=[StrideTime])
-        self._freq = fft.rfftfreq(1024)  # precompute the frequencies (still need to be scaled)
+        super().__init__("harmonic ratio - V", __name__, depends=[StrideTime])
+        self._freq = fft.rfftfreq(
+            1024
+        )  # precompute the frequencies (still need to be scaled)
         # TODO add check for stride frequency, if too low, bump this up higher?
         self._harmonics = arange(1, 21, dtype=int_)
 
     def _predict(self, fs, leg_length, gait, gait_aux):
         mask, mask_ofst = self._predict_init(gait, init=True, offset=2)
 
-        i1 = gait['IC'][mask]
-        i2 = gait['IC'][mask_ofst]
+        i1 = gait["IC"][mask]
+        i2 = gait["IC"][mask_ofst]
 
         for i, idx in enumerate(nonzero(mask)[0]):
-            va = gait_aux['vert axis'][idx]  # shorthand
-            F = abs(fft.rfft(
-                gait_aux['accel'][gait_aux['inertial data i'][idx]][i1[i]:i2[i], va],
-                n=1024
-            ))
-            stridef = 1 / gait['PARAM:stride time'][idx]  # current stride frequency
+            va = gait_aux["vert axis"][idx]  # shorthand
+            F = abs(
+                fft.rfft(
+                    gait_aux["accel"][gait_aux["inertial data i"][idx]][
+                        i1[i] : i2[i], va
+                    ],
+                    n=1024,
+                )
+            )
+            stridef = 1 / gait["PARAM:stride time"][idx]  # current stride frequency
             # get the indices for the first 20 harmonics
             ix_stridef = argmin(abs(self._freq * fs - stridef)) * self._harmonics
             if (ix_stridef < F.size).sum() <= 10:
@@ -437,7 +519,9 @@ class HarmonicRatioV(GaitEventEndpoint):
                     f"High stride frequency [{stridef:.2f}] results in use of less than 20 "
                     f"harmonics [{(ix_stridef < F.size).sum()}]."
                 )
-            ix_stridef = ix_stridef[ix_stridef < F.size]  # make sure not taking more than possible
+            ix_stridef = ix_stridef[
+                ix_stridef < F.size
+            ]  # make sure not taking more than possible
 
             # index 1 is harmonic 2 -> even harmonics / odd harmonics
             gait[self.k_][idx] = sum(F[ix_stridef[1::2]]) / sum(F[ix_stridef[::2]])
@@ -460,24 +544,25 @@ class StrideSPARC(GaitEventEndpoint):
         analysis of movement smoothness,” J NeuroEngineering Rehabil, vol. 12, no. 1, p. 112,
         Dec. 2015, doi: 10.1186/s12984-015-0090-9.
     """
+
     def __init__(self):
-        super().__init__('stride SPARC', __name__)
+        super().__init__("stride SPARC", __name__)
 
     def _predict(self, fs, leg_length, gait, gait_aux):
         mask, mask_ofst = self._predict_init(gait, True, offset=2)
 
-        i1 = gait['IC'][mask]
-        i2 = gait['IC'][mask_ofst]
+        i1 = gait["IC"][mask]
+        i2 = gait["IC"][mask_ofst]
 
         for i, idx in enumerate(nonzero(mask)[0]):
-            bout_i = gait_aux['inertial data i'][idx]
+            bout_i = gait_aux["inertial data i"][idx]
 
             gait[self.k_][idx] = SPARC(
-                norm(gait_aux['accel'][bout_i][i1[i]:i2[i], :], axis=1) - 1,
+                norm(gait_aux["accel"][bout_i][i1[i] : i2[i], :], axis=1) - 1,
                 fs,  # fsample
                 4,  # padlevel
                 10.0,  # fcut
-                0.05  # amplitude threshold
+                0.05,  # amplitude threshold
             )
 
 
@@ -524,22 +609,25 @@ class PhaseCoordinationIndex(GaitBoutEndpoint):
         Further Insights into Motor-Cognitive Links,” Parkinsons Dis, vol. 2015, 2015,
         doi: 10.1155/2015/547065.
     """
+
     def __init__(self):
-        super().__init__('phase coordination index', __name__, depends=[StrideTime, StepTime])
+        super().__init__(
+            "phase coordination index", __name__, depends=[StrideTime, StepTime]
+        )
 
     def _predict(self, fs, leg_length, gait, gait_aux):
-        pci = zeros(len(gait_aux['accel']), dtype=float_)
+        pci = zeros(len(gait_aux["accel"]), dtype=float_)
 
-        phase = gait['PARAM:step time'] / gait['PARAM:stride time']  # %, not degrees
-        for i in range(len(gait_aux['accel'])):
-            mask = gait_aux['inertial data i'] == i
+        phase = gait["PARAM:step time"] / gait["PARAM:stride time"]  # %, not degrees
+        for i in range(len(gait_aux["accel"])):
+            mask = gait_aux["inertial data i"] == i
 
             psi_abs = nanmean(abs(phase[mask] - 0.5))  # using % not degrees right now
             psi_cv = nanstd(phase[mask], ddof=1) / nanmean(phase[mask])
 
             pci[i] = 100 * (psi_cv + psi_abs / 0.5)
 
-        gait[self.k_] = pci[gait_aux['inertial data i']]
+        gait[self.k_] = pci[gait_aux["inertial data i"]]
 
 
 class GaitSymmetryIndex(GaitBoutEndpoint):
@@ -596,22 +684,28 @@ class GaitSymmetryIndex(GaitBoutEndpoint):
         parameters following stroke: a practical assessment,” Journal of Rehabilitation Research
         and Development, vol. 32, no. 1, pp. 25–31, Feb. 1995.
     """
+
     def __init__(self):
-        super().__init__('gait symmetry index', __name__, depends=[StrideTime])
+        super().__init__("gait symmetry index", __name__, depends=[StrideTime])
 
     def _predict(self, fs, leg_length, gait, gait_aux):
-        gsi = zeros(len(gait_aux['accel']), dtype=float_)
+        gsi = zeros(len(gait_aux["accel"]), dtype=float_)
 
         # setup acceleration filter
-        sos = butter(4, 2 * 10 / fs, btype='low', output='sos')
-        for i, acc in enumerate(gait_aux['accel']):
-            lag_ = nanmedian(gait['PARAM:stride time'][gait_aux['inertial data i'] == i]) * fs
+        sos = butter(4, 2 * 10 / fs, btype="low", output="sos")
+        for i, acc in enumerate(gait_aux["accel"]):
+            lag_ = (
+                nanmedian(gait["PARAM:stride time"][gait_aux["inertial data i"] == i])
+                * fs
+            )
             if isnan(lag_):  # if only nan values in the bout
                 gsi[i] = nan
                 continue
             lag = int(round(lag_))
             # GSI uses biased autocovariance
-            ac = _autocovariancefunction(sosfiltfilt(sos, acc, axis=0), int(4.5 * fs), biased=True)
+            ac = _autocovariancefunction(
+                sosfiltfilt(sos, acc, axis=0), int(4.5 * fs), biased=True
+            )
 
             # C_stride is the sum of 3 axes
             pks, _ = find_peaks(sum(ac, axis=1))
@@ -622,7 +716,7 @@ class GaitSymmetryIndex(GaitBoutEndpoint):
             # maximum ensures no sqrt of negative numbers
             gsi[i] = sqrt(sum(maximum(ac[idx], 0))) / sqrt(3)
 
-        gait[self.k_] = gsi[gait_aux['inertial data i']]
+        gait[self.k_] = gsi[gait_aux["inertial data i"]]
 
 
 class StepRegularityV(GaitBoutEndpoint):
@@ -656,19 +750,20 @@ class StepRegularityV(GaitBoutEndpoint):
         Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
         Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
     """
+
     def __init__(self):
-        super().__init__('step regularity - V', __name__, depends=[StepTime])
+        super().__init__("step regularity - V", __name__, depends=[StepTime])
 
     def _predict(self, fs, leg_length, gait, gait_aux):
-        stepreg = zeros(len(gait_aux['accel']), dtype=float_)
+        stepreg = zeros(len(gait_aux["accel"]), dtype=float_)
 
-        for i, acc in enumerate(gait_aux['accel']):
-            mask = gait_aux['inertial data i'] == i
+        for i, acc in enumerate(gait_aux["accel"]):
+            mask = gait_aux["inertial data i"] == i
             if mask.sum() == 0:
                 stepreg[i] = nan
                 continue
-            va = gait_aux['vert axis'][mask][0]
-            lag_ = nanmedian(gait['PARAM:step time'][mask]) * fs
+            va = gait_aux["vert axis"][mask][0]
+            lag_ = nanmedian(gait["PARAM:step time"][mask]) * fs
             if isnan(lag_):  # if only nan values in the bout
                 stepreg[i] = nan
                 continue
@@ -680,7 +775,7 @@ class StepRegularityV(GaitBoutEndpoint):
             stepreg[i] = acf[idx]
 
         # broadcast step regularity into gait for each step
-        gait[self.k_] = stepreg[gait_aux['inertial data i']]
+        gait[self.k_] = stepreg[gait_aux["inertial data i"]]
 
 
 class StrideRegularityV(GaitBoutEndpoint):
@@ -714,19 +809,20 @@ class StrideRegularityV(GaitBoutEndpoint):
         Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
         Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
     """
+
     def __init__(self):
-        super().__init__('stride regularity - V', __name__, depends=[StrideTime])
+        super().__init__("stride regularity - V", __name__, depends=[StrideTime])
 
     def _predict(self, fs, leg_length, gait, gait_aux):
-        stridereg = zeros(len(gait_aux['accel']), dtype=float_)
+        stridereg = zeros(len(gait_aux["accel"]), dtype=float_)
 
-        for i, acc in enumerate(gait_aux['accel']):
-            mask = gait_aux['inertial data i'] == i
+        for i, acc in enumerate(gait_aux["accel"]):
+            mask = gait_aux["inertial data i"] == i
             if mask.sum() == 0:
                 stridereg[i] = nan
                 continue
-            va = gait_aux['vert axis'][mask][0]
-            lag_ = nanmedian(gait['PARAM:stride time'][mask]) * fs
+            va = gait_aux["vert axis"][mask][0]
+            lag_ = nanmedian(gait["PARAM:stride time"][mask]) * fs
             if isnan(lag_):  # if only nan values in the bout
                 stridereg[i] = nan
                 continue
@@ -738,7 +834,7 @@ class StrideRegularityV(GaitBoutEndpoint):
             stridereg[i] = acf[idx]
 
         # broadcast step regularity into gait for each step
-        gait[self.k_] = stridereg[gait_aux['inertial data i']]
+        gait[self.k_] = stridereg[gait_aux["inertial data i"]]
 
 
 class AutocovarianceSymmetryV(GaitBoutEndpoint):
@@ -759,14 +855,18 @@ class AutocovarianceSymmetryV(GaitBoutEndpoint):
         Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
         Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
     """
+
     def __init__(self):
         super().__init__(
-            'autocovariance symmetry - V', __name__, depends=[StepRegularityV, StrideRegularityV]
+            "autocovariance symmetry - V",
+            __name__,
+            depends=[StepRegularityV, StrideRegularityV],
         )
 
     def _predict(self, fs, leg_length, gait, gait_aux):
         gait[self.k_] = abs(
-            gait['BOUTPARAM:step regularity - V'] - gait['BOUTPARAM:stride regularity - V']
+            gait["BOUTPARAM:step regularity - V"]
+            - gait["BOUTPARAM:stride regularity - V"]
         )
 
 
@@ -803,13 +903,18 @@ class RegularityIndexV(GaitBoutEndpoint):
 
 
     """
+
     def __init__(self):
         super().__init__(
-            'regularity index - V', __name__, depends=[StepRegularityV, StrideRegularityV]
+            "regularity index - V",
+            __name__,
+            depends=[StepRegularityV, StrideRegularityV],
         )
 
     def _predict(self, fs, leg_length, gait, gait_aux):
-        str_v = 'BOUTPARAM:stride regularity - V'
-        ste_v = 'BOUTPARAM:step regularity - V'
+        str_v = "BOUTPARAM:stride regularity - V"
+        ste_v = "BOUTPARAM:step regularity - V"
 
-        gait[self.k_] = 1 - (2 * abs(gait[str_v] - gait[ste_v]) / (gait[ste_v] + gait[str_v]))
+        gait[self.k_] = 1 - (
+            2 * abs(gait[str_v] - gait[ste_v]) / (gait[ste_v] + gait[str_v])
+        )
