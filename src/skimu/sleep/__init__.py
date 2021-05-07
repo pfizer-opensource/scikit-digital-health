@@ -14,7 +14,7 @@ Pipeline sleep processing
 
 .. _sleep-metrics:
 
-Sleep Metrics
+Sleep Endpoints
 -------------
 
 .. autosummary::

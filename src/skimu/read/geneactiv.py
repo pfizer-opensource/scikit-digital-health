@@ -9,8 +9,7 @@ from warnings import warn
 from numpy import vstack, asarray, int_
 
 from skimu.base import _BaseProcess
-from skimu.read.get_window_start_stop import get_window_start_stop
-from skimu.read._extensions import read_bin
+from skimu.read._extensions import read_geneactiv
 
 
 class ReadBin(_BaseProcess):
@@ -49,7 +48,7 @@ class ReadBin(_BaseProcess):
         super().__init__(
             # kwargs
             bases=bases,
-            periods=periods
+            periods=periods,
         )
 
         if (bases is None) and (periods is None):
@@ -69,12 +68,16 @@ class ReadBin(_BaseProcess):
                 bases = asarray(bases, dtype=int_)
                 periods = asarray(periods, dtype=int_)
 
-            if ((0 <= bases) & (bases <= 23)).all() and ((1 <= periods) & (periods <= 24)).all():
+            if ((0 <= bases) & (bases <= 23)).all() and (
+                (1 <= periods) & (periods <= 24)
+            ).all():
                 self.window = True
                 self.bases = bases
                 self.periods = periods
             else:
-                raise ValueError("Base must be in [0, 23] and period must be in [1, 23]")
+                raise ValueError(
+                    "Base must be in [0, 23] and period must be in [1, 23]"
+                )
 
     def predict(self, file=None, **kwargs):
         """
@@ -108,8 +111,6 @@ class ReadBin(_BaseProcess):
         - `temperature`: temperature [deg C]
         - `day_ends`: window indices
         """
-        super().predict(file=file, **kwargs)
-
         if file is None:
             raise ValueError("file must not be None")
         if not isinstance(file, str):
@@ -117,8 +118,12 @@ class ReadBin(_BaseProcess):
         if file[-3:] != "bin":
             warn("File extension is not expected '.bin'", UserWarning)
 
+        super().predict(file=file, **kwargs)
+
         # read the file
-        nmax, fs, acc, time, light, temp, starts, stops = read_bin(file, self.bases, self.periods)
+        nmax, fs, acc, time, light, temp, starts, stops = read_geneactiv(
+            file, self.bases, self.periods
+        )
 
         results = {
             self._time: time,
@@ -126,7 +131,7 @@ class ReadBin(_BaseProcess):
             self._temp: temp,
             "light": light,
             "fs": fs,
-            "file": file
+            "file": file,
         }
 
         if self.window:

@@ -13,21 +13,18 @@ class TestGetWindowedView:
 
     def test_c_cont_error(self):
         with pytest.raises(ContiguityError):
-            get_windowed_view(
-                asfortranarray(random.rand(10, 3)),
-                3, 3
-            )
+            get_windowed_view(asfortranarray(random.rand(10, 3)), 3, 3)
 
 
 class TestComputeWindowSamples:
     @pytest.mark.parametrize(
-        ('fs', 'L', 'S', 'res_l', 'res_s'),
+        ("fs", "L", "S", "res_l", "res_s"),
         (
-                (50.0, 3.0, 1.0, 150, 150),
-                (50.0, 1.5, 300, 75, 300),
-                (100.0, 2.5, 0.5, 250, 125),
-                (10.0, 3.0, 0.0001, 30, 1)
-        )
+            (50.0, 3.0, 1.0, 150, 150),
+            (50.0, 1.5, 300, 75, 300),
+            (100.0, 2.5, 0.5, 250, 125),
+            (10.0, 3.0, 0.0001, 30, 1),
+        ),
     )
     def test(self, fs, L, S, res_l, res_s):
         nl, ns = compute_window_samples(fs, L, S)

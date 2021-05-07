@@ -21,4 +21,4 @@ from skimu.read import geneactiv
 from skimu.read.actigraph import ReadGT3X
 from skimu.read import actigraph
 
-__all__ = ('ReadCWA', 'ReadBin', 'ReadGT3X', 'axivity', 'geneactiv', 'actigraph')
+__all__ = ("ReadCWA", "ReadBin", "ReadGT3X", "axivity", "geneactiv", "actigraph")

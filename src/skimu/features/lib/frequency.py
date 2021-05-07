@@ -7,8 +7,13 @@ Pfizer DMTI 2020
 from skimu.features.core import Feature
 from skimu.features.lib import extensions
 
-__all__ = ['DominantFrequency', 'DominantFrequencyValue', 'PowerSpectralSum', 'SpectralFlatness',
-           'SpectralEntropy']
+__all__ = [
+    "DominantFrequency",
+    "DominantFrequencyValue",
+    "PowerSpectralSum",
+    "SpectralFlatness",
+    "SpectralEntropy",
+]
 
 
 class DominantFrequency(Feature):
@@ -39,16 +44,14 @@ class DominantFrequency(Feature):
 
     def __init__(self, padlevel=2, low_cutoff=0.0, high_cutoff=5.0):
         super(DominantFrequency, self).__init__(
-            padlevel=padlevel,
-            low_cutoff=low_cutoff,
-            high_cutoff=high_cutoff
+            padlevel=padlevel, low_cutoff=low_cutoff, high_cutoff=high_cutoff
         )
 
         self.pad = padlevel
         self.low_cut = low_cutoff
         self.high_cut = high_cutoff
 
-    def compute(self, signal, fs=1., *, axis=-1):
+    def compute(self, signal, fs=1.0, *, axis=-1):
         """
         Compute the dominant frequency
 
@@ -68,7 +71,9 @@ class DominantFrequency(Feature):
             Computed dominant frequency.
         """
         x = super().compute(signal, fs, axis=axis)
-        return extensions.dominant_frequency(x, fs, self.pad, self.low_cut, self.high_cut)
+        return extensions.dominant_frequency(
+            x, fs, self.pad, self.low_cut, self.high_cut
+        )
 
 
 class DominantFrequencyValue(Feature):
@@ -98,16 +103,14 @@ class DominantFrequencyValue(Feature):
 
     def __init__(self, padlevel=2, low_cutoff=0.0, high_cutoff=5.0):
         super(DominantFrequencyValue, self).__init__(
-            padlevel=padlevel,
-            low_cutoff=low_cutoff,
-            high_cutoff=high_cutoff
+            padlevel=padlevel, low_cutoff=low_cutoff, high_cutoff=high_cutoff
         )
 
         self.pad = padlevel
         self.low_cut = low_cutoff
         self.high_cut = high_cutoff
 
-    def compute(self, signal, fs=1., *, axis=-1):
+    def compute(self, signal, fs=1.0, *, axis=-1):
         """
         Compute the dominant frequency value
 
@@ -127,7 +130,9 @@ class DominantFrequencyValue(Feature):
             Computed dominant frequency value.
         """
         x = super().compute(signal, fs, axis=axis)
-        return extensions.dominant_frequency_value(x, fs, self.pad, self.low_cut, self.high_cut)
+        return extensions.dominant_frequency_value(
+            x, fs, self.pad, self.low_cut, self.high_cut
+        )
 
 
 class PowerSpectralSum(Feature):
@@ -158,16 +163,14 @@ class PowerSpectralSum(Feature):
 
     def __init__(self, padlevel=2, low_cutoff=0.0, high_cutoff=5.0):
         super(PowerSpectralSum, self).__init__(
-            padlevel=padlevel,
-            low_cutoff=low_cutoff,
-            high_cutoff=high_cutoff
+            padlevel=padlevel, low_cutoff=low_cutoff, high_cutoff=high_cutoff
         )
 
         self.pad = padlevel
         self.low_cut = low_cutoff
         self.high_cut = high_cutoff
 
-    def compute(self, signal, fs=1., *, axis=-1):
+    def compute(self, signal, fs=1.0, *, axis=-1):
         """
         Compute the power spectral sum
 
@@ -187,7 +190,9 @@ class PowerSpectralSum(Feature):
             Computed power spectral sum.
         """
         x = super().compute(signal, fs, axis=axis)
-        return extensions.power_spectral_sum(x, fs, self.pad, self.low_cut, self.high_cut)
+        return extensions.power_spectral_sum(
+            x, fs, self.pad, self.low_cut, self.high_cut
+        )
 
 
 class SpectralFlatness(Feature):
@@ -220,16 +225,14 @@ class SpectralFlatness(Feature):
 
     def __init__(self, padlevel=2, low_cutoff=0.0, high_cutoff=5.0):
         super(SpectralFlatness, self).__init__(
-            padlevel=padlevel,
-            low_cutoff=low_cutoff,
-            high_cutoff=high_cutoff
+            padlevel=padlevel, low_cutoff=low_cutoff, high_cutoff=high_cutoff
         )
 
         self.pad = padlevel
         self.low_cut = low_cutoff
         self.high_cut = high_cutoff
 
-    def compute(self, signal, fs=1., *, axis=-1):
+    def compute(self, signal, fs=1.0, *, axis=-1):
         """
         Compute the spectral flatness
 
@@ -249,7 +252,9 @@ class SpectralFlatness(Feature):
             Computed spectral flatness.
         """
         x = super().compute(signal, fs, axis=axis)
-        return extensions.spectral_flatness(x, fs, self.pad, self.low_cut, self.high_cut)
+        return extensions.spectral_flatness(
+            x, fs, self.pad, self.low_cut, self.high_cut
+        )
 
 
 class SpectralEntropy(Feature):
@@ -280,16 +285,14 @@ class SpectralEntropy(Feature):
 
     def __init__(self, padlevel=2, low_cutoff=0.0, high_cutoff=5.0):
         super(SpectralEntropy, self).__init__(
-            padlevel=padlevel,
-            low_cutoff=low_cutoff,
-            high_cutoff=high_cutoff
+            padlevel=padlevel, low_cutoff=low_cutoff, high_cutoff=high_cutoff
         )
 
         self.pad = padlevel
         self.low_cut = low_cutoff
         self.high_cut = high_cutoff
 
-    def compute(self, signal, fs=1., *, axis=-1):
+    def compute(self, signal, fs=1.0, *, axis=-1):
         """
         Compute the spectral entropy
 

@@ -4,8 +4,110 @@ Internal utility functions that don't necessarily need to be exposed in the publ
 Lukas Adamowicz
 Pfizer DMTI 2021
 """
-from numpy import asarray, nonzero, insert, append, arange, interp, zeros, around, diff, float_,\
-    int_
+from numpy import (
+    asarray,
+    nonzero,
+    insert,
+    append,
+    arange,
+    interp,
+    zeros,
+    around,
+    diff,
+    float_,
+    int_,
+    ndarray,
+    concatenate,
+    minimum,
+    maximum,
+    roll,
+)
+
+
+def get_day_index_intersection(starts, stops, for_inclusion, day_start, day_stop):
+    """
+    Get the intersection between day start and stop indices and various start and stop indices
+    that may or may not happen during the day, and are not necessarily for inclusion.
+
+    Parameters
+    ----------
+    starts : numpy.ndarray, tuple
+        Single ndarray or tuple of ndarrays indicating the starts of events to either include or
+        exclude from during the day.
+    stops : numpy.ndarray, tuple
+    Single ndarray or tuple of ndarrays indicating the stops of events to either include or
+        exclude from during the day.
+    for_inclusion : bool, tuple
+        Single or tuple of booleans indicating if the corresponding start & stop indices are
+        for inclusion or not.
+    day_start : int
+        Day start index.
+    day_stop : int
+        Day stop index.
+
+    Returns
+    -------
+    valid_starts : numpy.ndarray
+        Intersection of overlapping day and event start indices that are valid/usable.
+    valid_stops : numpy.ndarray
+        Intersection of overlapping day and event stop indices that are valid/usable.
+    """
+    day_start, day_stop = int(day_start), int(day_stop)
+
+    # make a common format instead of having to deal with different formats later
+    if isinstance(starts, ndarray):
+        starts = (starts,)
+    if isinstance(stops, ndarray):
+        stops = (stops,)
+
+    if len(starts) != len(stops):
+        raise ValueError("Number of start arrays does not match number of stop arrays.")
+    if isinstance(for_inclusion, bool):
+        for_inclusion = (for_inclusion,) * len(starts)
+
+    # get the subset that intersect the day in a roundabout way
+    starts_tmp = list(minimum(maximum(i, day_start), day_stop) for i in starts)
+    stops_tmp = list(minimum(maximum(i, day_start), day_stop) for i in stops)
+    starts_subset, stops_subset = [], []
+    for start, stop, fi in zip(starts_tmp, stops_tmp, for_inclusion):
+        if fi:  # flip everything to being an "exclude" window
+            tmp = roll(start, -1)
+            tmp[-1] = day_stop
+
+            starts_subset.append(stop[stop != tmp])
+            stops_subset.append(tmp[stop != tmp])
+        else:
+            starts_subset.append(start[start != stop])
+            stops_subset.append(stop[start != stop])
+
+    # get overlap
+    all_starts = concatenate(starts_subset)
+    all_stops = concatenate(stops_subset)
+
+    valid_starts, valid_stops = [day_start], [day_stop]
+
+    for start, stop in zip(all_starts, all_stops):
+        cond1 = [i <= start <= j for i, j in zip(valid_starts, valid_stops)]
+        cond2 = [i <= stop <= j for i, j in zip(valid_starts, valid_stops)]
+
+        for i, (c1, c2) in enumerate(zip(cond1, cond2)):
+            if c1 and c2:
+                valid_starts.insert(
+                    i + 1, stop
+                )  # valid_starts[i] = [valid_starts[i], stop]
+                valid_stops.insert(i, start)  # valid_stops[i] = [start, valid_stops[i]]
+            elif c1:
+                valid_stops[i] = start
+            elif c2:
+                valid_starts[i] = stop
+
+    valid_starts = asarray(valid_starts)
+    valid_stops = asarray(valid_stops)
+
+    return (
+        valid_starts[valid_starts != valid_stops],
+        valid_stops[valid_starts != valid_stops],
+    )
 
 
 def get_day_wear_intersection(starts, stops, day_start, day_stop):
@@ -104,18 +206,18 @@ def apply_downsample(goal_fs, time, data=(), indices=()):
             indices_ds += (None,)
         elif idx.ndim == 1:
             indices_ds += (
-                around(
-                    interp(time[idx], time_ds, arange(time_ds.size))
-                ).astype(int_),
+                around(interp(time[idx], time_ds, arange(time_ds.size))).astype(int_),
             )
         elif idx.ndim == 2:
             indices_ds += (zeros(idx.shape, dtype=int_),)
             for i in range(idx.shape[1]):
                 indices_ds[-1][:, i] = around(
-                    interp(time[idx[:, i]], time_ds, arange(time_ds.size))  # cast to int on insert
+                    interp(
+                        time[idx[:, i]], time_ds, arange(time_ds.size)
+                    )  # cast to int on insert
                 )
 
-    ret = (time_ds, )
+    ret = (time_ds,)
     if data_ds != ():
         ret += (data_ds,)
     if indices_ds != ():

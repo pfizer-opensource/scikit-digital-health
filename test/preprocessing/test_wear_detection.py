@@ -11,10 +11,7 @@ from skimu.preprocessing.wear_detection import DetectWear, _modify_wear_times
 
 
 class TestWearDetection:
-    @pytest.mark.parametrize(
-        ("setup", "ship"),
-        ((False, [0, 0]), (True, [12, 12]))
-    )
+    @pytest.mark.parametrize(("setup", "ship"), ((False, [0, 0]), (True, [12, 12])))
     def test(self, setup, ship, accel_with_nonwear):
         dw = DetectWear(
             sd_crit=0.013,
@@ -22,7 +19,7 @@ class TestWearDetection:
             apply_setup_criteria=setup,
             shipping_criteria=ship,
             window_length=60,
-            window_skip=15
+            window_skip=15,
         )
 
         time, accel, wear = accel_with_nonwear(setup, ship)
@@ -34,15 +31,15 @@ class TestWearDetection:
     @pytest.mark.parametrize(
         ("case", "setup", "ship"),
         (
-                (1, False, [0, 0]),
-                (1, True, [12, 12]),
-                (2, False, [0, 0]),
-                (2, True, [12, 12]),
-                (3, False, [0, 0]),
-                (3, True, [12, 12]),
-                (4, False, [0, 0]),
-                (4, True, [12, 12])
-        )
+            (1, False, [0, 0]),
+            (1, True, [12, 12]),
+            (2, False, [0, 0]),
+            (2, True, [12, 12]),
+            (3, False, [0, 0]),
+            (3, True, [12, 12]),
+            (4, False, [0, 0]),
+            (4, True, [12, 12]),
+        ),
     )
     def test_wear_time_modifiction(self, case, setup, ship, simple_nonwear_data):
         wskip = 15  # minutes

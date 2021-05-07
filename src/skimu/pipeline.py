@@ -26,14 +26,15 @@ class Pipeline:
     is passed between steps. Has the ability to save results from processing steps as local files,
     as well as return the results in a dictionary following the processing.
     """
+
     def __str__(self):
         return "IMUAnalysisPipeline"
 
     def __repr__(self):
         ret = "["
         for proc in self._steps:
-            ret += f'\t{proc!r},\n'
-        ret = ret[:-2] + ']'
+            ret += f"\t{proc!r},\n"
+        ret = ret[:-2] + "]"
         return ret
 
     def __init__(self):
@@ -57,16 +58,16 @@ class Pipeline:
             pipe.append(
                 {
                     step._name: {
-                        "module": step.__class__.__module__.split('.', 1)[1],
+                        "module": step.__class__.__module__.split(".", 1)[1],
                         "Parameters": step._kw,
                         "save_result": step.pipe_save,
                         "save_name": step.pipe_fname,
-                        "plot_save_name": step.plot_fname
+                        "plot_save_name": step.plot_fname,
                     }
                 }
             )
 
-        with open(file, 'w') as f:
+        with open(file, "w") as f:
             json.dump(pipe, f)
 
     def load(self, file):
@@ -96,7 +97,7 @@ class Pipeline:
             except AttributeError:
                 warn(
                     f"Process (skimu.{mod}.{name}) not found. Not being added to pipeline",
-                    UserWarning
+                    UserWarning,
                 )
                 continue
 
@@ -104,11 +105,7 @@ class Pipeline:
             if plot_fname is not None:
                 proc._setup_plotting(plot_fname)
 
-            self.add(
-                proc,
-                save_results=save_result,
-                save_name=save_name
-            )
+            self.add(proc, save_results=save_result, save_name=save_name)
 
     def add(self, process, save_results=False, save_name="{date}_{name}_results.cv"):
         """
@@ -126,8 +123,10 @@ class Pipeline:
             :class:`Sit2Stand`). Default is "{date}_{name}_results.csv
         """
         if not isinstance(process, Process):
-            raise NotAProcessError("process is not a subclass of _BaseProcess, "
-                                   "cannot be added to the pipeline")
+            raise NotAProcessError(
+                "process is not a subclass of _BaseProcess, "
+                "cannot be added to the pipeline"
+            )
 
         self._steps += [process]
         # attach the save bool and save_name to the process
@@ -173,8 +172,7 @@ class Pipeline:
             kwargs, step_result = proc.predict(**kwargs)
             if proc.pipe_save:
                 proc.save_results(
-                    step_result if step_result is not None else kwargs,
-                    proc.pipe_fname
+                    step_result if step_result is not None else kwargs, proc.pipe_fname
                 )
             if step_result is not None:
                 results[proc._name] = step_result

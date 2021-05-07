@@ -9,7 +9,13 @@ from numpy import moveaxis, nan
 from skimu.utility import _extensions
 
 
-__all__ = ["moving_mean", "moving_sd", "moving_skewness", "moving_kurtosis", "moving_median"]
+__all__ = [
+    "moving_mean",
+    "moving_sd",
+    "moving_skewness",
+    "moving_kurtosis",
+    "moving_median",
+]
 
 
 def moving_mean(a, w_len, skip, axis=-1):
@@ -97,7 +103,9 @@ def moving_mean(a, w_len, skip, axis=-1):
 
     # check that there are enough samples
     if w_len > x.shape[-1]:
-        raise ValueError("Cannot have a window length larger than the computation axis.")
+        raise ValueError(
+            "Cannot have a window length larger than the computation axis."
+        )
 
     rmean = _extensions.moving_mean(x, w_len, skip)
 
@@ -198,7 +206,9 @@ def moving_sd(a, w_len, skip, axis=-1, return_previous=True):
 
     # check that there are enough samples
     if w_len > x.shape[-1]:
-        raise ValueError("Cannot have a window length larger than the computation axis.")
+        raise ValueError(
+            "Cannot have a window length larger than the computation axis."
+        )
 
     res = _extensions.moving_sd(x, w_len, skip, return_previous)
 
@@ -302,7 +312,9 @@ def moving_skewness(a, w_len, skip, axis=-1, return_previous=True):
 
     # check that there are enough samples
     if w_len > x.shape[-1]:
-        raise ValueError("Cannot have a window length larger than the computation axis.")
+        raise ValueError(
+            "Cannot have a window length larger than the computation axis."
+        )
 
     res = _extensions.moving_skewness(x, w_len, skip, return_previous)
 
@@ -409,7 +421,9 @@ def moving_kurtosis(a, w_len, skip, axis=-1, return_previous=True):
 
     # check that there are enough samples
     if w_len > x.shape[-1]:
-        raise ValueError("Cannot have a window length larger than the computation axis.")
+        raise ValueError(
+            "Cannot have a window length larger than the computation axis."
+        )
 
     res = _extensions.moving_kurtosis(x, w_len, skip, return_previous)
 
@@ -500,17 +514,19 @@ def moving_median(a, w_len, skip=1, pad=False, axis=-1):
 
     # check that there are enough samples
     if w_len > x.shape[-1]:
-        raise ValueError("Cannot have a window length larger than the computation axis.")
+        raise ValueError(
+            "Cannot have a window length larger than the computation axis."
+        )
 
     rmed = _extensions.moving_median(x, w_len)
 
     if isinstance(pad, bool):
         if pad:
-            rmed[..., -(w_len - 1):] = nan
+            rmed[..., -(w_len - 1) :] = nan
         else:
-            rmed = rmed[..., :-w_len + 1]
+            rmed = rmed[..., : -w_len + 1]
     else:
-        rmed[..., -(w_len - 1):] = pad
+        rmed[..., -(w_len - 1) :] = pad
 
     # move computation axis back to original place and return
     return moveaxis(rmed[..., ::skip], -1, axis)

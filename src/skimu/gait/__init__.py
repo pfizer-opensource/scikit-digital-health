@@ -12,10 +12,10 @@ Pipeline gait processing
 
     Gait
 
-.. _event-level-gait-metrics:
+.. _event-level-gait-endpoints:
 
-Event Level Gait Metrics
-------------------------
+Event Level Gait Endpoints
+--------------------------
 
 .. autosummary::
     :toctree: generated/
@@ -36,10 +36,10 @@ Event Level Gait Metrics
     IntraStrideCovarianceV
     HarmonicRatioV
 
-.. _bout-level-gait-metrics:
+.. _bout-level-gait-endpoints:
 
-Bout Level Gait Metrics
------------------------
+Bout Level Gait Endpoints
+-------------------------
 
 .. autosummary::
     :toctree: generated/
@@ -79,40 +79,40 @@ Per stride terminology:
 - Double Support: when both feet are in contact with the ground simultaneously
 - Single Support: when only 1 foot is in contact with the ground
 
-Adding Custom Gait Metrics
---------------------------
+Adding Custom Gait Endpoints
+----------------------------
 
-A modular system for computing gait metrics is employed to aid in the addition of custom gait
-metrics. Two base classes exist depending on what type of metric is being added:
+A modular system for computing gait endpoints is employed to aid in the addition of custom gait
+endpoints. Two base classes exist depending on what type of endpoint is being added:
 
-- `gait_metrics.EventMetric` for per- step/stride metrics
-- `gait_metrics.BoutMetric` for per-bout metrics
+- `gait_endpoints.GaitEventEndpoint` for per- step/stride endpoints
+- `gait_endpoints.GaitBoutEndpoint` for per-bout endpoints
 
-New metrics should be subclasses of either of these base classes, which provide some basic
+New endpoints should be subclasses of either of these base classes, which provide some basic
 functionality behind the scenes. The definition and initialization is very straight-forward
 
 .. code-block:: python
 
-    from skimu.gait.gait_metrics import EventMetric, basic_symmetry
+    from skimu.gait.gait_endspoints import GaitEventEndpoint, basic_symmetry
 
 
-    class NewMetric(EventMetric):
+    class NewEndpoint(GaitEventEndpoint):
         def __init__(self):
-            super().__init__('new metric', depends=[gait_metrics.StrideTime])
+            super().__init__('new endpoint', depends=[gait_endpoints.StrideTime])
 
 `__init__` should take no arguments, and its call to the super method has 1 required and 1
-optional argument: the name for the metric (this will appear in the output as "PARAM:{name}"
-or "BOUTPARAM:{name}" for bout metrics, and references to any other metrics it depends upon.
-In this case, the calculation of the new metric would reference the computed stride time.
+optional argument: the name for the endpoint (this will appear in the output as "PARAM:{name}"
+or "BOUTPARAM:{name}" for bout endpoints, and references to any other endpoints it depends upon.
+In this case, the calculation of the new endpoint would reference the computed stride time.
 
 To implement the feature computation, the `_predict` method should be defined
 
 .. code-block:: python
 
-    from skimu.gait.gait_metrics import EventMetric
+    from skimu.gait.gait_endpoints import GaitEventEndpoint
 
 
-    class NewMetric(EventMetric):
+    class NewEndpoint(GaitEventEndpoint):
         ...
         def _predict(self, dt, leg_length, gait, gait_aux):
             mask, mask_ofst= self._predict_init(gait, True, 1)
@@ -124,13 +124,13 @@ The arguments to the `_predict` method are as follows:
 
 - `dt`: sampling period in seconds
 - `leg_length`: leg length in meters, if provided to the `Gait` process. Otherwise `None`
-- `gait`: dictionary containing all the end result gait metrics. Where the newly metric will be
+- `gait`: dictionary containing all the end result gait endpoints. Where the newly endpoint will be
   stored as well. Not returned, just modified in place. Has several keys that are defined before
-  any metrics are calculated - `'IC'`, `'FC'`, `'FC opp foot'` and `'delta h'`
+  any endpoints are calculated - `'IC'`, `'FC'`, `'FC opp foot'` and `'delta h'`
 - `gait_aux`: dictionary containing the acceleration (3D, key: `'accel'`), vertical acceleration
   axis (`'vert axis'`), vertical velocity (`'vert velocity'`) and vertical position
   (`'vert position'`) for each bout of gait. Additionally contains a mapping from individual steps
-  to bouts (`'inertial data i'`), or from bouts to a non-unique value per step (see bout metric
+  to bouts (`'inertial data i'`), or from bouts to a non-unique value per step (see bout endpoint
   example)
 
 There are a few convenience functionalities, namely the `_predict_init` function, and the
@@ -142,33 +142,33 @@ There are a few convenience functionalities, namely the `_predict_init` function
    where `ofst` (third argument) is either `1` or `2`. They additionally account for steps that
    are not valid/at the end of bouts where values would be nonsensical.
 
-The `self.k_` attribute simply stores the full name of the metric for easy/shorthand access.
-Finally, if the custom metric has a basic symmetry value computed by subtracting sequential
-values, this can be quickly implemented by adding the decorator `gait_metrics.basic_symmetry`
+The `self.k_` attribute simply stores the full name of the endpoint for easy/shorthand access.
+Finally, if the custom endpoint has a basic symmetry value computed by subtracting sequential
+values, this can be quickly implemented by adding the decorator `gait_endpoints.basic_symmetry`
 above the `_predict` definition:
 
 .. code-block:: python
 
-    from skimu.gait.gait_metrics import EventMetric, basic_symmetry
+    from skimu.gait.gait_endpoints import GaitEventEndpoint, basic_symmetry
 
 
-    class NewMetric(EventMetric):
+    class NewEndpoint(GaitEventEndpoint):
         ...
         @basic_symmetry
         def _predict(self, dt, leg_length, gait, gait_aux):
             ...
 
 
-Below is a full example of a bout metric, with broadcasting from individual per-bout values to
+Below is a full example of a bout endpoint, with broadcasting from individual per-bout values to
 having repeating values for each step in the bout (since the `gait` dictionary is fundamentally
 defined on a per-event level):
 
 .. code-block:: python
 
-    from skimu.gait.gait_metrics import BoutMetric
+    from skimu.gait.gait_endpoints import GaitBoutEndpoint
 
 
-    class StepRegularityV(BoutMetric):
+    class StepRegularityV(GaitBoutEndpoint):
         def __init__(self):
             super().__init__('step regularity - V', depends=[StepTime])
 
@@ -191,6 +191,5 @@ defined on a per-event level):
 """
 from skimu.gait.gait import Gait
 from skimu.gait import gait
-from skimu.gait.gait_metrics import *
-from skimu.gait import gait_metrics
-from skimu.gait import train_classifier
+from skimu.gait.gait_endpoints import *
+from skimu.gait import gait_endpoints

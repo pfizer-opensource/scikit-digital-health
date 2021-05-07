@@ -10,7 +10,7 @@ import pywt
 from skimu.features.core import Feature
 
 
-__all__ = ['DetailPower', 'DetailPowerRatio']
+__all__ = ["DetailPower", "DetailPowerRatio"]
 
 
 class DetailPower(Feature):
@@ -29,10 +29,11 @@ class DetailPower(Feature):
     .. [1] Sekine, M. et al. "Classification of waist-acceleration signals in a continuous
         walking record." Medical Engineering & Physics. Vol. 22. Pp 285-291. 2000.
     """
-    __slots__ = ("wave", "f_band")
-    _wavelet_options = pywt.wavelist(kind='discrete')
 
-    def __init__(self, wavelet='coif4', freq_band=None):
+    __slots__ = ("wave", "f_band")
+    _wavelet_options = pywt.wavelist(kind="discrete")
+
+    def __init__(self, wavelet="coif4", freq_band=None):
         super().__init__(wavelet=wavelet, freq_band=freq_band)
 
         self.wave = wavelet
@@ -42,7 +43,7 @@ class DetailPower(Feature):
         else:
             self.f_band = [1.0, 3.0]
 
-    def compute(self, signal, fs=1., *, axis=-1):
+    def compute(self, signal, fs=1.0, *, axis=-1):
         """
         Compute the detail power
 
@@ -66,18 +67,18 @@ class DetailPower(Feature):
         # computation
         lvls = [
             int(ceil(log2(fs / self.f_band[0]))),  # maximum level needed
-            int(ceil(log2(fs / self.f_band[1])))  # minimum level to include in sum
+            int(ceil(log2(fs / self.f_band[1]))),  # minimum level to include in sum
         ]
 
         # TODO test effect of mode on result
-        cA, *cD = pywt.wavedec(x, self.wave, mode='symmetric', level=lvls[0], axis=-1)
+        cA, *cD = pywt.wavedec(x, self.wave, mode="symmetric", level=lvls[0], axis=-1)
 
         # set non necessary levels to 0
         for i in range(lvls[0] - lvls[1] + 1, lvls[0]):
-            cD[i][:] = 0.
+            cD[i][:] = 0.0
 
         # reconstruct and get negative->positive zero crossings
-        xr = pywt.waverec((cA,) + tuple(cD), self.wave, mode='symmetric', axis=-1)
+        xr = pywt.waverec((cA,) + tuple(cD), self.wave, mode="symmetric", axis=-1)
 
         N = sum(diff(sign(xr), axis=-1) > 0, axis=-1).astype(float)
         # ensure no 0 values to prevent divide by 0
@@ -90,7 +91,7 @@ class DetailPower(Feature):
 
         result = zeros(rshape)
         for i in range(lvls[0] - lvls[1] + 1):
-            result += sum(cD[i]**2, axis=-1)
+            result += sum(cD[i] ** 2, axis=-1)
         return result / N
 
 
@@ -118,10 +119,11 @@ class DetailPowerRatio(Feature):
     .. [1] Sekine, M. et al. "Classification of waist-acceleration signals in a continuous
         walking record." Medical Engineering & Physics. Vol. 22. Pp 285-291. 2000.
     """
-    __slots__ = ("wave", "f_band")
-    _wavelet_options = pywt.wavelist(kind='discrete')
 
-    def __init__(self, wavelet='coif4', freq_band=None):
+    __slots__ = ("wave", "f_band")
+    _wavelet_options = pywt.wavelist(kind="discrete")
+
+    def __init__(self, wavelet="coif4", freq_band=None):
         super().__init__(wavelet=wavelet, freq_band=freq_band)
 
         self.wave = wavelet
@@ -131,7 +133,7 @@ class DetailPowerRatio(Feature):
         else:
             self.f_band = [1.0, 10.0]
 
-    def compute(self, signal, fs=1., *, axis=-1):
+    def compute(self, signal, fs=1.0, *, axis=-1):
         """
         Compute the detail power ratio
 
@@ -155,14 +157,14 @@ class DetailPowerRatio(Feature):
         # compute the required levels
         lvls = [
             int(ceil(log2(fs / self.f_band[0]))),  # maximum level needed
-            int(ceil(log2(fs / self.f_band[1])))  # minimum level to include in sum
+            int(ceil(log2(fs / self.f_band[1]))),  # minimum level to include in sum
         ]
 
         # TODO test effect of mode on result
-        cA, *cD = pywt.wavedec(x, self.wave, mode='symmetric', level=lvls[0], axis=-1)
+        cA, *cD = pywt.wavedec(x, self.wave, mode="symmetric", level=lvls[0], axis=-1)
 
         result = zeros(x.shape[:-1])
         for i in range(lvls[0] - lvls[1] + 1):
-            result += sum(cD[i]**2, axis=-1)
+            result += sum(cD[i] ** 2, axis=-1)
 
-        return result / sum(x**2, axis=-1)
+        return result / sum(x ** 2, axis=-1)

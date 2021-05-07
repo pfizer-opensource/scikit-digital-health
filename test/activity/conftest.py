@@ -38,6 +38,7 @@ def get_sample_activity_bout_data1():
                 ret += (22.75,)
 
         return ret
+
     return get_data
 
 
@@ -82,4 +83,5 @@ def get_sample_activity_bout_data2():
                 ret += (19.916666666666,)
 
         return ret
+
     return get_data

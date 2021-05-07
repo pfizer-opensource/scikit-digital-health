@@ -4,39 +4,97 @@ Activity level classification based on accelerometer data
 Lukas Adamowicz
 Pfizer DMTI 2021
 """
-from datetime import datetime
+from datetime import datetime, timedelta
 from warnings import warn
+from pathlib import Path
 
-from numpy import nonzero, array, insert, append, mean, diff, sum, zeros, abs, argmin, argmax, \
-    maximum, int_, floor, ceil, histogram, log, nan, around
+from numpy import (
+    nonzero,
+    array,
+    mean,
+    diff,
+    sum,
+    zeros,
+    abs,
+    argmin,
+    argmax,
+    maximum,
+    int_,
+    floor,
+    ceil,
+    histogram,
+    log,
+    nan,
+    around,
+    full,
+    nanmax,
+    arange,
+    max,
+)
 from scipy.stats import linregress
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 from skimu.base import _BaseProcess
 from skimu.utility import moving_mean
-from skimu.activity.cutpoints import _base_cutpoints
+from skimu.utility.internal import get_day_index_intersection
+from skimu.activity.cutpoints import _base_cutpoints, get_level_thresholds
 
 
-class MVPActivityClassification(_BaseProcess):
+def _check_if_none(var, lgr, msg_if_none, i1, i2):
+    if var is None:
+        lgr.info(msg_if_none)
+        if i1 is None or i2 is None:
+            return None, None
+        else:
+            start, stop = array([i1]), array([i2])
+    else:
+        start, stop = var[:, 0], var[:, 1]
+    return start, stop
+
+
+def _update_date_results(
+    results, time, day_n, day_start_idx, day_stop_idx, day_start_hour
+):
+    # add 15 seconds to make sure any rounding effects for the hour don't adversely effect
+    # the result of the comparison
+    start_dt = datetime.utcfromtimestamp(time[day_start_idx])
+
+    window_start_dt = start_dt + timedelta(seconds=15)
+    if start_dt.hour < day_start_hour:
+        window_start_dt -= timedelta(days=1)
+
+    results["Date"][day_n] = start_dt.strftime("%Y-%m-%d")
+    results["Weekday"][day_n] = start_dt.strftime("%A")
+    results["Day N"][day_n] = day_n + 1
+    results["N hours"][day_n] = around(
+        (time[day_stop_idx - 1] - time[day_start_idx]) / 3600, 1
+    )
+
+    return start_dt
+
+
+class ActivityLevelClassification(_BaseProcess):
     """
     Classify accelerometer data into different activity levels as a proxy for assessing physical
     activity energy expenditure (PAEE). Levels are sedentary, light, moderate, and vigorous.
+    If provided, sleep time will always be excluded from the activity level classification.
 
     Parameters
     ----------
     short_wlen : int, optional
         Short window length in seconds, used for the initial computation acceleration metrics.
         Default is 5 seconds. Must be a factor of 60 seconds.
-    bout_len1 : int, optional
-        Activity bout length 1, in minutes. Default is 1 minutes.
-    bout_len2 : int, optional
-        Activity bout length 2, in minutes. Default is 5 minutes.
-    bout_len3 : int, optional
-        Activity bout length 3, in minutes. Default is 10 minutes.
+    max_accel_lens : iterable, optional
+        Windows to compute the maximum mean acceleration metric over, in minutes. Default is
+        (6, 15, 60).
+    bout_lens : iterable, optional
+        Activity bout lengths. Default is (1, 5, 10).
     bout_criteria : float, optional
         Value between 0 and 1 for how much of a bout must be above the specified threshold. Default
         is 0.8
     bout_metric : {1, 2, 3, 4, 5}, optional
-        How a bout of MVPA is computed. Default is 1. See notes for descriptions of each method.
+        How a bout of MVPA is computed. Default is 4. See notes for descriptions of each method.
     closed_bout : bool, optional
         If True then count breaks in a bout towards the bout duration. If False then only count
         time spent above the threshold towards the bout duration. Only used if `bout_metric=1`.
@@ -89,54 +147,106 @@ class MVPActivityClassification(_BaseProcess):
         physical activity: the role of sociodemographic factors,” Am J Epidemiol, vol. 179,
         no. 6, pp. 781–790, Mar. 2014, doi: 10.1093/aje/kwt330.
     """
+
+    act_levels = ["MVPA", "sed", "light", "mod", "vig"]
+    _max_acc_str = "Max acc {w}min blocks gs"
+    _ig_keys = ["IG", "IG intercept", "IG R-squared"]
+    _e_wake_str = "{L} {w}s epoch wake mins"
+    _e_sleep_str = "{L} {w}s epoch sleep mins"
+    _bout_str = "{L} {w}min bout mins"
+
     def __init__(
-            self, short_wlen=5, bout_len1=1, bout_len2=5, bout_len3=10, bout_criteria=0.8,
-            bout_metric=1, closed_bout=False, min_wear_time=10, cutpoints="migueles_wrist_adult",
-            day_window=(0, 24)
+        self,
+        short_wlen=5,
+        max_accel_lens=(6, 15, 60),
+        bout_lens=(1, 5, 10),
+        bout_criteria=0.8,
+        bout_metric=4,
+        closed_bout=False,
+        min_wear_time=10,
+        cutpoints="migueles_wrist_adult",
+        day_window=(0, 24),
     ):
+        # make sure that the short_wlen is a factor of 60, and if not send it to nearest factor
         if (60 % short_wlen) != 0:
             tmp = [1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30]
             short_wlen = tmp[argmin(abs(array(tmp) - short_wlen))]
             warn(f"`short_wlen` changed to {short_wlen} to be a factor of 60.")
         else:
             short_wlen = int(short_wlen)
-        bout_len1 = int(bout_len1)
-        bout_len2 = int(bout_len2)
-        bout_len3 = int(bout_len3)
+        # make sure max accel windows are in whole minutes
+        max_accel_lens = [int(i) for i in max_accel_lens]
+        # make sure bout lengths are in whole minutes
+        bout_lens = [int(i) for i in bout_lens]
+        # make sure the minimum wear time is in whole hours
         min_wear_time = int(min_wear_time)
+        # get the cutpoints if using provided cutpoints, or return the dictionary
         if isinstance(cutpoints, str):
-            cutpoints = _base_cutpoints.get(cutpoints, _base_cutpoints["migueles_wrist_adult"])
+            cutpoints_ = _base_cutpoints.get(cutpoints, None)
+            if cutpoints_ is None:
+                warn(
+                    f"Specified cutpoints [{cutpoints}] not found. Using `migueles_wrist_adult`."
+                )
+                cutpoints_ = _base_cutpoints["migueles_wrist_adult"]
+        else:
+            cutpoints_ = cutpoints
 
         super().__init__(
             short_wlen=short_wlen,
-            bout_len1=bout_len1,
-            bout_len2=bout_len2,
-            bout_len3=bout_len3,
+            max_accel_lens=max_accel_lens,
+            bout_lens=bout_lens,
             bout_criteria=bout_criteria,
             bout_metric=bout_metric,
             closed_bout=closed_bout,
             min_wear_time=min_wear_time,
-            cutpoints=cutpoints
+            cutpoints=cutpoints_,
         )
 
         self.wlen = short_wlen
-        self.blen1 = bout_len1
-        self.blen2 = bout_len2
-        self.blen3 = bout_len3
+        self.max_acc_lens = max_accel_lens
+        self.blens = bout_lens
         self.boutcrit = bout_criteria
         self.boutmetric = bout_metric
         self.closedbout = closed_bout
         self.min_wear = min_wear_time
-        self.cutpoints = cutpoints
+        self.cutpoints = cutpoints_
 
         if day_window is None:
             self.day_key = (-1, -1)
         else:
             self.day_key = tuple(day_window)
 
-    def predict(self, time=None, accel=None, *, wear=None, **kwargs):
+        # enable plotting as a public method
+        self.setup_plotting = self._setup_plotting
+        self._update_buttons = []
+        self._t60 = None  # for storing plotting x values
+
+    def _setup_plotting(self, save_name):
         """
-        predict(time, accel, *, wear=None)
+        Setup sleep specific plotting
+
+        Parameters
+        ----------
+        save_name : str
+            The file name to save the resulting plot to. Extension will be set to PDF. There
+            are formatting options as well for dynamically generated names. See Notes
+
+        Notes
+        -----
+        Available format variables available:
+
+        - date: todays date expressed in yyyymmdd format.
+        - name: process name.
+        - file: file name used in the pipeline, or "" if not found.
+        """
+        self.plot_fname = save_name
+
+        self.f = []
+        self._t60 = arange(0, 24.1, 1 / 60)
+
+    def predict(self, time=None, accel=None, *, fs=None, wear=None, **kwargs):
+        """
+        predict(time, accel, *, fs=None, wear=None)
 
         Compute the time spent in different activity levels.
 
@@ -147,6 +257,9 @@ class MVPActivityClassification(_BaseProcess):
         accel : numpy.ndarray
             (N, 3) array of accelerations measured by centrally mounted lumbar device, in
             units of 'g'
+        fs : {None, float}, optional
+            Sampling frequency in Hz. If None will be computed from the first 5000 samples of
+            `time`.
         wear : {None, list}, optional
             List of length-2 lists of wear-time ([start, stop]). Default is None, which uses the
             whole recording as wear time.
@@ -156,26 +269,28 @@ class MVPActivityClassification(_BaseProcess):
         activity_res : dict
             Computed activity level metrics.
         """
-        super().predict(time=time, accel=accel, wear=wear, **kwargs)
+        super().predict(time=time, accel=accel, fs=fs, wear=wear, **kwargs)
 
-        # longer than it needs to be really, but due to weird timesamps for some devices
-        # using this for now
-        fs = 1 / mean(diff(time))
+        # ========================================================================================
+        # SETUP / INITIALIZATION
+        # ========================================================================================
+        if fs is None:
+            fs = 1 / mean(diff(time[:5000]))
 
         nwlen = int(self.wlen * fs)
         epm = int(60 / self.wlen)  # epochs per minute
 
-        iglevels = array([i for i in range(0, 4001, 25)] + [8000]) / 1000  # default from rowlands
+        iglevels = (
+            array([i for i in range(0, 4001, 25)] + [8000]) / 1000
+        )  # default from rowlands
         igvals = (iglevels[1:] + iglevels[:-1]) / 2
 
-        if wear is None:
-            self.logger.info(f"[{self!s}] Wear detection not provided. Assuming 100% wear time.")
-            wear_starts = array([0])
-            wear_stops = array([time.size])
-        else:
-            tmp = array(wear).astype("int")  # make sure it can broadcast correctly
-            wear_starts = tmp[:, 0]
-            wear_stops = tmp[:, 1]
+        wear_none_msg = (
+            f"[{self!s}] Wear detection not provided. Assuming 100% wear time."
+        )
+        wear_starts, wear_stops = _check_if_none(
+            wear, self.logger, wear_none_msg, 0, time.size
+        )
 
         # check if windows exist for days
         days = kwargs.get(self._days, {}).get(self.day_key, None)
@@ -183,101 +298,130 @@ class MVPActivityClassification(_BaseProcess):
             warn(
                 f"Day indices for {self.day_key} (base, period) not found. No day separation used"
             )
-            days = [[0, accel.shape[0] - 1]]
+            days = [[0, time.size]]
 
-        general_keys = [
-            "Date",
-            "Weekday",
-            "Day N",
-            "N hours",
-            "N wear hours"
-        ]
-        mvpa_keys = [
-            "MVPA 5sec Epochs",
-            "MVPA 1min Epochs",
-            "MVPA 5min Epochs",
-            f"MVPA {self.blen1}min Bouts",
-            f"MVPA {self.blen2}min Bouts",
-            f"MVPA {self.blen3}min Bouts"
-        ]
-        ig_keys = [
-            "IG Gradient",
-            "IG Intercept",
-            "IG R-squared"
-        ]
-        res = {i: [] for i in general_keys + mvpa_keys + ig_keys}
+        # check if sleep data is provided
+        sleep = kwargs.get("sleep", None)
+        slp_msg = (
+            f"[{self!s}] No sleep information found. Only computing full day metrics."
+        )
+        sleep_starts, sleep_stops = _check_if_none(
+            sleep, self.logger, slp_msg, None, None
+        )
 
+        # SETUP PLOTTING
+        source_file = kwargs.get("file", "Source Not Available")
+
+        # ========================================================================================
+        # SETUP RESULTS KEYS/ENDPOINTS
+        # ========================================================================================
+        res_keys = [("Date", "", "U11"), ("Weekday", "", "U11"), ("Day N", -1, "int")]
+        res_keys += [
+            ("N hours", nan, "float"),
+            ("N wear hours", nan, "float"),
+            ("N wear awake hours", nan, "float"),
+        ]
+
+        res_keys += [
+            (self._max_acc_str.format(w=i), nan, "float") for i in self.max_acc_lens
+        ]
+        res_keys += [(i, nan, "float") for i in self._ig_keys]
+        res_keys += [
+            (self._e_wake_str.format(L=i, w=self.wlen), nan, "float")
+            for i in self.act_levels
+        ]
+        res_keys += [
+            (self._e_sleep_str.format(L=i, w=self.wlen), nan, "float")
+            for i in self.act_levels
+        ]
+        res_keys += [
+            (self._bout_str.format(L=lvl, w=j), nan, "float")
+            for lvl in self.act_levels
+            for j in self.blens
+        ]
+
+        res = {i: full(len(days), j, dtype=k) for i, j, k in res_keys}
+
+        # ========================================================================================
+        # PROCESSING
+        # ========================================================================================
         for iday, day_idx in enumerate(days):
-            # populate the results dictionary
-            for k in general_keys + ig_keys:
-                res[k].append(nan)
-
-            start, stop = day_idx
-
-            res["Date"][-1] = datetime.utcfromtimestamp(time[start + 5]).strftime("%Y-%m-%d")
-            res["Weekday"][-1] = datetime.utcfromtimestamp(time[start + 5]).strftime("%A")
-            res["Day N"][-1] = iday
-            res["N hours"][-1] = around((time[stop - 1] - time[start]) / 3600, 1)
+            day_start, day_stop = day_idx
+            # update the results dictionary with date strings, # of hours, etc
+            start_dt = _update_date_results(
+                res, time, iday, day_start, day_stop, self.day_key[0]
+            )
 
             # get the intersection of wear time and day
-            day_wear_starts, day_wear_stops = get_day_wear_intersection(
-                wear_starts, wear_stops, start, stop)
+            dwear_starts, dwear_stops = get_day_index_intersection(
+                wear_starts, wear_stops, True, day_start, day_stop  # include wear time
+            )
 
-            # less wear time than minimum
-            res["N wear hours"][-1] = around(sum(day_wear_stops - day_wear_starts) / fs / 3600, 1)
-            if res["N wear hours"][-1] < self.min_wear:
-                for k in mvpa_keys:
-                    res[k].append(nan)
-                continue  # skip day
+            # PLOTTING. handle here before returning for minimal wear hours, etc
+            self._plot_day_accel(
+                iday,
+                source_file,
+                fs,
+                accel[day_start:day_stop],
+                res["Date"][iday],
+                start_dt,
+            )
+            self._plot_day_wear(fs, dwear_starts, dwear_stops, start_dt, day_start)
+            # plotting sleep if it exists
+            self._plot_day_sleep(
+                fs, sleep_starts, sleep_stops, day_start, day_stop, start_dt
+            )
+
+            # save wear time and check if there is less wear time than minimum
+            res["N wear hours"][iday] = around(
+                sum(dwear_stops - dwear_starts) / fs / 3600, 1
+            )
+            if res["N wear hours"][iday] < self.min_wear:
+                continue  # skip day if less than minimum specified hours of wear time
+
+            # if there is sleep data, add it to the intersection of indices
+            if sleep_starts is not None and sleep_stops is not None:
+                dwear_starts, dwear_stops = get_day_index_intersection(
+                    (wear_starts, sleep_starts),
+                    (wear_stops, sleep_stops),
+                    (True, False),  # include wear time, exclude sleeping time
+                    day_start,
+                    day_stop,
+                )
+                sleep_wear_starts, sleep_wear_stops = get_day_index_intersection(
+                    (wear_starts, sleep_starts),
+                    (wear_stops, sleep_stops),
+                    (True, True),  # now we want only sleep
+                    day_start,
+                    day_stop,
+                )
+
+                res["N wear awake hours"][iday] = around(
+                    sum(dwear_starts - dwear_starts) / fs / 3600, 1
+                )
             else:
-                for k in mvpa_keys:
-                    res[k].append(0.0)
+                sleep_wear_starts = sleep_wear_stops = None
 
-            # intensity gradient should be done on the whole days worth of data
-            hist = zeros(iglevels.size - 1)
+            # compute waking hours activity endpoints
+            self._compute_awake_activity_endpoints(
+                res,
+                accel,
+                fs,
+                iday,
+                dwear_starts,
+                dwear_stops,
+                nwlen,
+                epm,
+                iglevels,
+                igvals,
+            )
+            # compute sleeping hours activity endpoints
+            self._compute_sleep_activity_endpoints(
+                res, accel, fs, iday, sleep_wear_starts, sleep_wear_stops, nwlen, epm
+            )
 
-            for dwstart, dwstop in zip(day_wear_starts, day_wear_stops):
-                hours = (dwstop - dwstart) / fs / 3600
-                # compute the metric for the acceleration
-                accel_metric = self.cutpoints["metric"](
-                    accel[dwstart:dwstop], nwlen, fs,
-                    **self.cutpoints["kwargs"]
-                )
-
-                # MVPA
-                # total time of `wlen` epochs in minutes
-                res["MVPA 5sec Epochs"][-1] += sum(accel_metric >= self.cutpoints["light"]) / epm
-                # total time of 1 minute epochs
-                tmp = moving_mean(accel_metric, epm, epm)
-                res["MVPA 1min Epochs"][-1] += sum(tmp >= self.cutpoints["light"])  # in minutes
-                # total time in 5 minute epochs
-                tmp = moving_mean(accel_metric, 5 * epm, 5 * epm)
-                res["MVPA 5min Epochs"][-1] += sum(tmp >= self.cutpoints["light"]) * 5  # in minutes
-
-                # total time in bout1 minute bouts
-                res[f"MVPA {self.blen1}min Bouts"][-1] += get_activity_bouts(
-                    accel_metric, self.cutpoints["light"], self.wlen, self.blen1, self.boutcrit,
-                    self.closedbout, self.boutmetric
-                )
-                # total time in bout2 minute bouts
-                res[f"MVPA {self.blen2}min Bouts"][-1] += get_activity_bouts(
-                    accel_metric, self.cutpoints["light"], self.wlen, self.blen2, self.boutcrit,
-                    self.closedbout, self.boutmetric
-                )
-                # total time in bout3 minute bouts
-                res[f"MVPA {self.blen3}min Bouts"][-1] += get_activity_bouts(
-                    accel_metric, self.cutpoints["light"], self.wlen, self.blen3, self.boutcrit,
-                    self.closedbout, self.boutmetric
-                )
-
-                # intensity gradient. Density = false to return counts
-                hist += histogram(accel_metric, bins=iglevels, density=False)[0]
-
-            # intensity gradient computation per day
-            hist *= (self.wlen / 60)
-            res["IG Gradient"][-1], \
-                res["IG Intercept"][-1], \
-                res["IG R-squared"][-1] = get_intensity_gradient(igvals, hist)
+        # finalize plots
+        self._finalize_plots()
 
         kwargs.update({self._time: time, self._acc: accel})
 
@@ -286,8 +430,331 @@ class MVPActivityClassification(_BaseProcess):
         else:
             return res
 
+    def _compute_awake_activity_endpoints(
+        self, results, accel, fs, day_n, starts, stops, n_wlen, epm, ig_levels, ig_vals
+    ):
+        # allocate histogram for intensity gradient
+        hist = zeros(ig_levels.size - 1)
 
-def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, boutmetric=1):
+        # initialize values from nan to 0.0. Do this here because days with less than minimum
+        # hours should have nan values
+        for w in self.max_acc_lens:
+            results[self._max_acc_str.format(w=w)][day_n] = 0.0
+        for lvl in self.act_levels:
+            key = self._e_wake_str.format(L=lvl, w=self.wlen)
+            results[key][day_n] = 0.0
+
+            for w in self.blens:
+                key = self._bout_str.format(L=lvl, w=w)
+                results[key][day_n] = 0.0
+
+        for start, stop in zip(starts, stops):
+            # compute the desired acceleration metric
+            acc_metric = self.cutpoints["metric"](
+                accel[start:stop], n_wlen, fs, **self.cutpoints["kwargs"]
+            )
+
+            # maximum acceleration over windows
+            try:
+                for max_acc_w in self.max_acc_lens:
+                    n = max_acc_w * epm
+                    tmp_max = max(moving_mean(acc_metric, n, n))
+
+                    key = self._max_acc_str.format(w=max_acc_w)
+                    results[key][day_n] = nanmax([tmp_max, results[key][day_n]])
+            except ValueError:
+                # if the window length is too long for this block of data
+                pass
+
+            # activity levels
+            for lvl in self.act_levels:
+                # total sum of epochs
+                lthresh, uthresh = get_level_thresholds(lvl, self.cutpoints)
+                key = self._e_wake_str.format(L=lvl, w=self.wlen)
+                results[key][day_n] += (
+                    sum((acc_metric >= lthresh) & (acc_metric < uthresh)) / epm
+                )
+
+                # time in bouts of specified input lengths
+                for bout_len in self.blens:
+                    key = self._bout_str.format(L=lvl, w=bout_len)
+
+                    results[key][day_n] += get_activity_bouts(
+                        acc_metric,
+                        lthresh,
+                        uthresh,
+                        self.wlen,
+                        bout_len,
+                        self.boutcrit,
+                        self.closedbout,
+                        self.boutmetric,
+                    )
+
+            # histogram for intensity gradient. Density = false to return counts
+            hist += histogram(acc_metric, bins=ig_levels, density=False)[0]
+
+        # intensity gradient computation per day
+        hist /= epm  # epm = 60 / self.wlen -> hist *= (self.wlen / 60)
+        ig_res = get_intensity_gradient(ig_vals, hist)
+
+        results["IG"][day_n] = ig_res[0]
+        results["IG intercept"][day_n] = ig_res[1]
+        results["IG R-squared"][day_n] = ig_res[2]
+
+    def _compute_sleep_activity_endpoints(
+        self, results, accel, fs, day_n, starts, stops, n_wlen, epm
+    ):
+        if starts is None or stops is None:
+            return  # don't initialize/compute any values if there is no sleep data
+
+        # initialize values from nan to 0.0. Do this here because days with less than minimum
+        # hours should have nan values
+        for lvl in self.act_levels:
+            key = self._e_sleep_str.format(L=lvl, w=self.wlen)
+            results[key][day_n] = 0.0
+
+        for start, stop in zip(starts, stops):
+            acc_metric = self.cutpoints["metric"](
+                accel[start:stop], n_wlen, fs, **self.cutpoints["kwargs"]
+            )
+
+            for lvl in self.act_levels:
+                lthresh, uthresh = get_level_thresholds(lvl, self.cutpoints)
+                key = self._e_sleep_str.format(L=lvl, w=self.wlen)
+                results[key][day_n] += (
+                    sum((acc_metric >= lthresh) & (acc_metric < uthresh)) / epm
+                )
+
+    def _plot_day_accel(self, day_n, source_file, fs, accel, date_str, start_dt):
+        if self.f is None:
+            return
+
+        f = make_subplots(
+            rows=4,
+            cols=1,
+            row_heights=[1, 1, 1, 0.5],
+            specs=[[{"type": "scatter"}]] * 4,
+            shared_xaxes=True,
+            vertical_spacing=0.0,
+        )
+
+        for i in range(1, 5):
+            f.update_xaxes(
+                row=i, col=1, showgrid=False, showticklabels=False, zeroline=False
+            )
+            f.update_yaxes(
+                row=i, col=1, showgrid=False, showticklabels=False, zeroline=False
+            )
+
+        # update last one so we can see the hour labels
+        f.update_xaxes(row=4, col=1, showticklabels=True)
+        self.f.append(f)
+
+        start_hr = start_dt.hour + start_dt.minute / 60 + start_dt.second / 3600
+        x = self._t60 + start_hr
+        n60 = int(fs * 60)
+
+        sfile_name = Path(source_file).name
+        f.update_layout(
+            title=f"Activity Visual Report: {sfile_name}<br>Day: {day_n}<br>Date: {date_str}"
+        )
+
+        for i, axname in enumerate(["accel x", "accel y", "accel z"]):
+            f.add_trace(
+                go.Scattergl(
+                    x=x[: int(ceil(accel.shape[0] / n60))],
+                    y=accel[::n60, i],
+                    mode="lines",
+                    name=axname,
+                    line={"width": 1},
+                ),
+                row=1,
+                col=1,
+            )
+
+        # compute the metric over 1 minute intervals
+        acc_metric = self.cutpoints["metric"](accel, n60, **self.cutpoints["kwargs"])
+
+        f.add_trace(
+            go.Scattergl(
+                x=x[: acc_metric.size],
+                y=acc_metric,
+                mode="lines",
+                name=self.cutpoints["metric"].__name__,  # get the name of the metric
+            ),
+            row=2,
+            col=1,
+        )
+        # do this in reverse order so that the legend top down reads the same order as the lines
+        for thresh in ["moderate", "light", "sedentary"]:
+            f.add_trace(
+                go.Scattergl(
+                    x=self.day_key,
+                    y=[self.cutpoints[thresh]] * 2,
+                    mode="lines",
+                    showlegend=False,
+                    line={"color": "black", "dash": "dash", "width": 1},
+                ),
+                row=2,
+                col=1,
+            )
+
+        # labeling the thresholds
+        f.add_annotation(
+            text="vigorous \u2191",
+            x=0,
+            y=self.cutpoints["moderate"],
+            bgcolor="rgba(0.8, 0.8, 0.8, 1)",
+            showarrow=False,
+            xref="x2 domain",
+            xanchor="left",
+            yref="y2",
+            yanchor="bottom",
+            yshift=1,
+        )
+        f.add_annotation(
+            text="moderate",
+            x=0,
+            y=self.cutpoints["moderate"],
+            bgcolor="rgba(0.8, 0.8, 0.8, 1)",
+            showarrow=False,
+            xref="x2 domain",
+            xanchor="left",
+            yref="y2",
+            yanchor="top",
+            yshift=-1,
+        )
+        f.add_annotation(
+            text="light",
+            x=0,
+            y=self.cutpoints["light"],
+            bgcolor="rgba(0.8, 0.8, 0.8, 1)",
+            showarrow=False,
+            xref="x2 domain",
+            xanchor="left",
+            yref="y2",
+            yanchor="top",
+            yshift=-1,
+        )
+        f.add_annotation(
+            text="sedentary",
+            x=0,
+            y=self.cutpoints["sedentary"],
+            bgcolor="rgba(0.8, 0.8, 0.8, 1)",
+            showarrow=False,
+            xref="x2 domain",
+            xanchor="left",
+            yref="y2",
+            yanchor="top",
+            yshift=-1,
+        )
+
+        acc_level = zeros(acc_metric.size, dtype="int")
+        acc_level_text = full(acc_level.size, "", dtype="<U10")
+        for i, lvl in enumerate(["sedentary", "light", "moderate", "vigorous"]):
+            lthresh, uthresh = get_level_thresholds(lvl, self.cutpoints)
+
+            acc_level[(acc_metric >= lthresh) & (acc_metric < uthresh)] = i
+            acc_level_text[(acc_metric >= lthresh) & (acc_metric < uthresh)] = lvl
+
+        f.add_trace(
+            go.Scattergl(
+                x=x[: acc_level.size],
+                y=acc_level,
+                mode="lines",
+                name="Accel. Level",
+                line={"color": "black", "width": 1},
+                text=acc_level_text,
+                hoverinfo="text",
+            ),
+            row=3,
+            col=1,
+        )
+
+        f.update_yaxes(title="Accel.", row=1, col=1)
+        f.update_yaxes(title="Accel. Metric", row=2, col=1)
+        f.update_yaxes(title="Accel. Level", row=3, col=1)
+        f.update_yaxes(title="Wear/Sleep", row=4, col=1)
+        f.update_xaxes(title="Day Hour", range=self.day_key, row=4, col=1)
+
+    def _plot_day_wear(self, fs, day_wear_starts, day_wear_stops, start_dt, day_start):
+        if self.f is None:
+            return
+        start_hr = start_dt.hour + start_dt.minute / 60 + start_dt.second / 3600
+
+        wear = []
+        for s, e in zip(day_wear_starts - day_start, day_wear_stops - day_start):
+            # convert to hours
+            sh = s / (fs * 3600) + start_hr
+            eh = e / (fs * 3600) + start_hr
+
+            wear.extend([sh, eh, None])  # add None so gaps dont get connected
+
+        self.f[-1].add_trace(
+            go.Scattergl(
+                x=wear,
+                y=[2] * len(wear),
+                mode="lines",
+                name="Wear",
+                legendgroup="wear",
+                line={"width": 8},
+            ),
+            row=4,
+            col=1,
+        )
+
+        self.f[-1].update_yaxes(range=[0.75, 2.25], row=4, col=1)
+
+    def _plot_day_sleep(
+        self, fs, sleep_starts, sleep_stops, day_start, day_stop, start_dt
+    ):
+        if self.f is None or sleep_starts is None or sleep_stops is None:
+            return
+
+        start_hr = start_dt.hour + start_dt.minute / 60 + start_dt.second / 3600
+        # get day-sleep intersection
+        day_sleep_starts, day_sleep_stops = get_day_index_intersection(
+            sleep_starts, sleep_stops, True, day_start, day_stop
+        )
+
+        sleep = []
+        for s, e in zip(day_sleep_starts - day_start, day_sleep_stops - day_start):
+            # convert to hours
+            sh = s / (fs * 3600) + start_hr
+            eh = e / (fs * 3600) + start_hr
+
+            sleep.extend([sh, eh, None])  # add none so it doesn't get connected
+
+        self.f[-1].add_trace(
+            go.Scattergl(
+                x=sleep,
+                y=[1] * len(sleep),
+                mode="lines",
+                name="Sleep",
+                legendgroup="sleep",
+                line={"width": 8},
+            ),
+            row=4,
+            col=1,
+        )
+
+    def _finalize_plots(self):
+        if self.f is None:
+            return
+
+        date = datetime.today().strftime("%Y%m%d")
+        form_fname = self.plot_fname.format(
+            date=date, name=self._name, file=self._file_name
+        )
+
+        with open(form_fname, "w") as fid:
+            for fig in self.f:
+                fid.write(fig.to_html(full_html=False, include_plotlyjs="cdn"))
+
+
+def get_activity_bouts(
+    accm, lower_thresh, upper_thresh, wlen, boutdur, boutcrit, closedbout, boutmetric=1
+):
     """
     Get the number of bouts of activity level based on several criteria.
 
@@ -295,8 +762,10 @@ def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, b
     ----------
     accm : numpy.ndarray
         Acceleration metric.
-    mvpa_thresh : float
-        Threshold for determining moderate/vigorous physical activity.
+    lower_thresh : float
+        Lower threshold for the activity level.
+    upper_thresh : float
+        Upper threshold for the activity level.
     wlen : int
         Number of seconds in the base epoch
     boutdur : int
@@ -335,7 +804,7 @@ def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, b
     time_in_bout = 0
 
     if boutmetric == 1:
-        x = (accm > mvpa_thresh).astype(int_)
+        x = ((accm >= lower_thresh) & (accm < upper_thresh)).astype(int_)
         p = nonzero(x)[0]
         i_mvpa = 0
         while i_mvpa < p.size:
@@ -343,7 +812,9 @@ def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, b
             end = start + nboutdur
             if end < x.size:
                 if sum(x[start:end]) > (nboutdur * boutcrit):
-                    while (sum(x[start:end]) > ((end - start) * boutcrit)) and (end < x.size):
+                    while (sum(x[start:end]) > ((end - start) * boutcrit)) and (
+                        end < x.size
+                    ):
                         end += 1
                     select = p[i_mvpa:][p[i_mvpa:] < end]
                     jump = maximum(select.size, 1)
@@ -357,7 +828,7 @@ def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, b
                 jump = 1
             i_mvpa += jump
     elif boutmetric == 2:
-        x = (accm > mvpa_thresh).astype(int_)
+        x = ((accm >= lower_thresh) & (accm < upper_thresh)).astype(int_)
         xt = zeros(x.size, dtype=int_)
         p = nonzero(x)[0]
 
@@ -366,8 +837,8 @@ def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, b
             start = p[i_mvpa]
             end = start + nboutdur
             if end < x.size:
-                if sum(x[start:end + 1]) > (nboutdur * boutcrit):
-                    xt[start:end + 1] = 2
+                if sum(x[start : end + 1]) > (nboutdur * boutcrit):
+                    xt[start : end + 1] = 2
                 else:
                     x[start] = 0
             else:
@@ -377,17 +848,19 @@ def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, b
         x[xt == 2] = 1
         time_in_bout += sum(x) * (wlen / 60)  # in minutes
     elif boutmetric == 3:
-        x = (accm > mvpa_thresh).astype(int_)
+        x = ((accm >= lower_thresh) & (accm < upper_thresh)).astype(int_)
         xt = x * 1  # not a view
 
         # look for breaks larger than 1 minute
         lookforbreaks = zeros(x.size)
         N = int(60 / wlen)
-        lookforbreaks[N // 2:-N // 2 + 1] = moving_mean(x, N, 1)
+        lookforbreaks[N // 2 : -N // 2 + 1] = moving_mean(x, N, 1)
         # insert negative numbers to prevent these minutes from being counted in bouts
         xt[lookforbreaks == 0] = -(60 / wlen) * nboutdur
         # in this way there will not be bout breaks lasting longer than 1 minute
-        rm = moving_mean(xt, nboutdur, 1)  # window determination can go back to left justified
+        rm = moving_mean(
+            xt, nboutdur, 1
+        )  # window determination can go back to left justified
 
         p = nonzero(rm > boutcrit)[0]
         for gi in range(nboutdur):
@@ -397,7 +870,7 @@ def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, b
         x[xt == 2] = 1
         time_in_bout += sum(x) * (wlen / 60)
     elif boutmetric == 4:
-        x = (accm > mvpa_thresh).astype(int_)
+        x = ((accm >= lower_thresh) & (accm < upper_thresh)).astype(int_)
         xt = x * 1  # not a view
         # look for breaks longer than 1 minute
         lookforbreaks = zeros(x.size)
@@ -425,7 +898,7 @@ def get_activity_bouts(accm, mvpa_thresh, wlen, boutdur, boutcrit, closedbout, b
         x[xt == 2] = 1
         time_in_bout += sum(x) * (wlen / 60)
     elif boutmetric == 5:
-        x = (accm > mvpa_thresh).astype(int_)
+        x = ((accm >= lower_thresh) & (accm < upper_thresh)).astype(int_)
         xt = x * 1  # not a view
         # look for breaks longer than 1 minute
         lookforbreaks = zeros(x.size)
@@ -482,85 +955,11 @@ def get_intensity_gradient(ig_values, counts):
     r_squared : float
         R-squared value for the linear regression fit.
     """
-    lx = log(ig_values[counts > 0] * 1000)  # convert back to mg to match GGIR/existing work
+    lx = log(
+        ig_values[counts > 0] * 1000
+    )  # convert back to mg to match GGIR/existing work
     ly = log(counts[counts > 0])
 
     slope, intercept, rval, *_ = linregress(lx, ly)
 
-    return slope, intercept, rval**2
-
-
-def get_day_wear_intersection(starts, stops, day_start, day_stop):
-    """
-    Get the intersection between wear times and day starts/stops.
-
-    Parameters
-    ----------
-    starts : numpy.ndarray
-        Array of integer indices where gait bouts start.
-    stops : numpy.ndarray
-        Array of integer indices where gait bouts stop.
-    day_start : int
-        Index of the day start.
-    day_stop : int
-        Index of the day stop.
-
-    Returns
-    -------
-    day_wear_starts : numpy.ndarray
-        Array of wear start indices for the day.
-    day_wear_stops : numpy.ndarray
-        Array of wear stop indices for the day
-    """
-    day_start, day_stop = int(day_start), int(day_stop)
-    # get the portion of wear times for the day
-    starts_subset = starts[(starts >= day_start) & (starts < day_stop)]
-    stops_subset = stops[(stops > day_start) & (stops <= day_stop)]
-
-    if starts_subset.size == 0 and stops_subset.size == 0:
-        if stops[nonzero(starts <= day_start)[0][-1]] >= day_stop:
-            return array([day_start]), array([day_stop])
-        else:
-            return array([0]), array([0])
-    if starts_subset.size == 0 and stops_subset.size == 1:
-        starts_subset = array([day_start])
-    if starts_subset.size == 1 and stops_subset.size == 0:
-        stops_subset = array([day_stop])
-
-    if starts_subset[0] > stops_subset[0]:
-        starts_subset = insert(starts_subset, 0, day_start)
-    if starts_subset[-1] > stops_subset[-1]:
-        stops_subset = append(stops_subset, day_stop)
-
-    assert starts_subset.size == stops_subset.size, "bout starts and stops do not match"
-
-    return starts_subset, stops_subset
-
-
-def _get_level_starts_stops(mask):
-    """
-    Get the start and stop indices for a mask.
-
-    Parameters
-    ----------
-    mask : numpy.ndarray
-        Boolean numpy array.
-
-    Returns
-    -------
-    starts : numpy.ndarray
-        Starts of `True` value blocks in `mask`.
-    stops : numpy.ndarray
-        Stops of `True` value blocks in `mask`.
-    """
-    delta = diff(mask.astype("int"))
-
-    starts = nonzero(delta == 1)[0] + 1
-    stops = nonzero(delta == -1)[0] + 1
-
-    if starts[0] > stops[0]:
-        starts = insert(starts, 0, 0)
-    if stops[-1] < starts[-1]:
-        stops = append(stops, mask.size)
-
-    return starts, stops
+    return slope, intercept, rval ** 2

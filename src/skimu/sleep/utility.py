@@ -4,8 +4,30 @@ Utility functions required for sleep metric generation
 Yiorgos Christakis
 Pfizer DMTI 2021
 """
-from numpy import any, arctan, pi, roll, abs, argmax, diff, nonzero, insert, sqrt, pad, \
-    int_, append, argsort, sort, cumsum, sum, float_, minimum, mean, var, ascontiguousarray
+from numpy import (
+    any,
+    arctan,
+    pi,
+    roll,
+    abs,
+    argmax,
+    diff,
+    nonzero,
+    insert,
+    sqrt,
+    pad,
+    int_,
+    append,
+    argsort,
+    sort,
+    cumsum,
+    sum,
+    float_,
+    minimum,
+    mean,
+    var,
+    ascontiguousarray,
+)
 from scipy.signal import butter, sosfiltfilt
 
 from skimu.utility import get_windowed_view
@@ -13,8 +35,12 @@ from skimu.utility import moving_mean, moving_sd, moving_median
 from skimu.utility.internal import rle
 
 __all__ = [
-    "compute_z_angle", "compute_absolute_difference", "drop_min_blocks", "arg_longest_bout",
-    "gini", "compute_activity_index"
+    "compute_z_angle",
+    "compute_absolute_difference",
+    "drop_min_blocks",
+    "arg_longest_bout",
+    "gini",
+    "compute_activity_index",
 ]
 
 
@@ -95,7 +121,8 @@ def compute_z_angle(acc):
 
 def compute_absolute_difference(arr):
     """
-    Computes the absolute difference between an array and itself shifted by 1 sample along the first axis.
+    Computes the absolute difference between an array and itself shifted by 1 sample along the
+    first axis.
 
     Parameters
     ----------
@@ -140,7 +167,7 @@ def drop_min_blocks(arr, min_block_size, drop_value, replace_value, skip_bounds=
         if skip_bounds and (ctr == 1 or ctr == n):
             continue
         if val == drop_value and length < min_block_size:
-            arr[start: start + length] = replace_value
+            arr[start : start + length] = replace_value
     return arr
 
 
@@ -196,9 +223,9 @@ def gini(x, w=None, corr=True):
         -python/48999797#48999797
     """
     if x.size == 0:
-        return 0.
+        return 0.0
     elif x.size == 1:
-        return 1.
+        return 1.0
 
     # The rest of the code requires numpy arrays.
     if w is not None:
@@ -208,7 +235,7 @@ def gini(x, w=None, corr=True):
         # Force float dtype to avoid overflows
         cumw = cumsum(sorted_w, dtype=float_)
         cumxw = cumsum(sorted_x * sorted_w, dtype=float_)
-        g = (sum(cumxw[1:] * cumw[:-1] - cumxw[:-1] * cumw[1:]) / (cumxw[-1] * cumw[-1]))
+        g = sum(cumxw[1:] * cumw[:-1] - cumxw[:-1] * cumw[1:]) / (cumxw[-1] * cumw[-1])
         if corr:
             return g * x.size / (x.size - 1)
         else:

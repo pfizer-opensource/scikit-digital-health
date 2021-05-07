@@ -123,6 +123,7 @@ class Bank:
     Examples
     --------
     """
+
     __slots__ = ("_feats", "_indices")
 
     def __str__(self):
@@ -164,7 +165,10 @@ class Bank:
         """
         if isinstance(features, Feature):
             if features in self:
-                warn(f"Feature {features!s} already in the Bank, will be duplicated.", UserWarning)
+                warn(
+                    f"Feature {features!s} already in the Bank, will be duplicated.",
+                    UserWarning,
+                )
             self._indices.append(partial_index_check(index))
             self._feats.append(features)
         elif all([isinstance(i, Feature) for i in features]):
@@ -187,12 +191,7 @@ class Bank:
         for i, ft in enumerate(self._feats):
             idx = "Ellipsis" if self._indices[i] is Ellipsis else self._indices[i]
             out.append(
-                {
-                    ft.__class__.__name__: {
-                        "Parameters": ft._params,
-                        "Index": idx
-                    }
-                }
+                {ft.__class__.__name__: {"Parameters": ft._params, "Index": idx}}
             )
 
         with open(file, "w") as f:
@@ -223,7 +222,9 @@ class Bank:
             # add it to the feature bank
             self.add(getattr(lib, name)(**params), index=index)
 
-    def compute(self, signal, fs=1., *, axis=-1, index_axis=None, indices=None, columns=None):
+    def compute(
+        self, signal, fs=1.0, *, axis=-1, index_axis=None, indices=None, columns=None
+    ):
         """
         Compute the specified features for the given signal
 
@@ -294,7 +295,9 @@ class Bank:
 
         feat_i = 0  # keep track of where in the feature array we are
         for i, ft in enumerate(self._feats):
-            feats[feat_i:feat_i + n_feats[i]] = ft.compute(x[indices[i]], fs=fs, axis=-1)
+            feats[feat_i : feat_i + n_feats[i]] = ft.compute(
+                x[indices[i]], fs=fs, axis=-1
+            )
 
             feat_i += n_feats[i]
 
@@ -311,6 +314,7 @@ class Feature(ABC):
     """
     Base feature class
     """
+
     def __str__(self):
         return self.__class__.__name__
 
@@ -338,7 +342,7 @@ class Feature(ABC):
         self._params = params
 
     @abstractmethod
-    def compute(self, signal, fs=1., *, axis=-1):
+    def compute(self, signal, fs=1.0, *, axis=-1):
         """
         Compute the signal feature.
 

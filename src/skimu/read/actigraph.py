@@ -44,11 +44,12 @@ class ReadGT3X(_BaseProcess):
     >>> reader.predict('example.gt3x')
     {'accel': ..., 'time': ..., 'day_ends': [130, 13950, ...], ...}
     """
+
     def __init__(self, base=None, period=None):
         super().__init__(
             # kwargs
             base=base,
-            period=None
+            period=None,
         )
 
         if (base is None) and (period is None):
@@ -66,7 +67,9 @@ class ReadGT3X(_BaseProcess):
                 self.base = base
                 self.period = period
             else:
-                raise ValueError("Base must be in [0, 23] and period must be in [1, 23]")
+                raise ValueError(
+                    "Base must be in [0, 23] and period must be in [1, 23]"
+                )
 
     def predict(self, file=None, **kwargs):
         """
@@ -99,8 +102,6 @@ class ReadGT3X(_BaseProcess):
         - `lux`: light readings. Note that this will not be returned if the data is not valid
         - `day_ends`: window indices
         """
-        super().predict(file=file, **kwargs)
-
         if file is None:
             raise ValueError("file must not be None")
         if not isinstance(file, str):
@@ -108,16 +109,14 @@ class ReadGT3X(_BaseProcess):
         if file[-4:] != "gt3x":
             warn("File extension is not expected '.gt3x'", UserWarning)
 
+        super().predict(file=file, **kwargs)
+
         time, accel, lux, index, N = read_gt3x(file, self.base, self.period)
 
-        results = {
-            self._time: time[:N],
-            self._acc: accel[:N],
-            "file": file
-        }
+        results = {self._time: time[:N], self._acc: accel[:N], "file": file}
 
         if not all(lux == 0.0):
-            results['light'] = lux[:N]
+            results["light"] = lux[:N]
 
         if self.window:
             day_starts, day_stops = get_window_start_stop(index, N)

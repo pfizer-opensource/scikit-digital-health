@@ -9,7 +9,7 @@ from numpy import log as nplog, abs
 from skimu.features.core import Feature
 from skimu.features.lib import extensions
 
-__all__ = ['JerkMetric', 'DimensionlessJerk', 'SPARC']
+__all__ = ["JerkMetric", "DimensionlessJerk", "SPARC"]
 
 
 class JerkMetric(Feature):
@@ -35,7 +35,7 @@ class JerkMetric(Feature):
     def __init__(self):
         super(JerkMetric, self).__init__()
 
-    def compute(self, signal, fs=1., *, axis=-1):
+    def compute(self, signal, fs=1.0, *, axis=-1):
         """
         Compute the jerk metric
 
@@ -104,17 +104,14 @@ class DimensionlessJerk(Feature):
         DJ_{log} = -ln\left(\frac{\hat{J}_{type}}{s_{type}}\right)
     """
     __slots__ = ("log", "i_type")
-    _signal_type_options = ['velocity', 'acceleration', 'jerk']
+    _signal_type_options = ["velocity", "acceleration", "jerk"]
 
-    def __init__(self, log=False, signal_type='acceleration'):
-        super(DimensionlessJerk, self).__init__(
-            log=log,
-            signal_type=signal_type
-        )
+    def __init__(self, log=False, signal_type="acceleration"):
+        super(DimensionlessJerk, self).__init__(log=log, signal_type=signal_type)
 
         self.log = log
 
-        t_map = {'velocity': 1, 'acceleration': 2, 'jerk': 3}
+        t_map = {"velocity": 1, "acceleration": 2, "jerk": 3}
         try:
             self.i_type = t_map[signal_type]
         except KeyError:
@@ -173,20 +170,19 @@ class SPARC(Feature):
         Dec. 2015, doi: 10.1186/s12984-015-0090-9.
 
     """
+
     __slots__ = ("padlevel", "fc", "amp_thresh")
 
     def __init__(self, padlevel=4, fc=10.0, amplitude_threshold=0.05):
         super(SPARC, self).__init__(
-            padlevel=padlevel,
-            fc=fc,
-            amplitude_threshold=amplitude_threshold
+            padlevel=padlevel, fc=fc, amplitude_threshold=amplitude_threshold
         )
 
         self.padlevel = padlevel
         self.fc = fc
         self.amp_thresh = amplitude_threshold
 
-    def compute(self, signal, fs=1., *, axis=-1):
+    def compute(self, signal, fs=1.0, *, axis=-1):
         """
         compute(signal, fs, *, columns=None, windowed=False)
 

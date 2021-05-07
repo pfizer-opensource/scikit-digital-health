@@ -7,22 +7,46 @@ Pfizer DMTI 2019-2021
 from abc import ABC, abstractmethod
 import logging
 
-from numpy import around, nonzero, diff, argmax, sum, mean, log, unique, argsort, cumsum, insert, \
-    int_, maximum, nan
+from numpy import (
+    around,
+    nonzero,
+    diff,
+    argmax,
+    sum,
+    mean,
+    log,
+    unique,
+    argsort,
+    cumsum,
+    insert,
+    int_,
+    maximum,
+    nan,
+)
 
 from skimu.sleep.utility import gini
 
 __all__ = [
-    "SleepMetric",
-    "TotalSleepTime", "PercentTimeAsleep", "NumberWakeBouts", "SleepOnsetLatency",
-    "WakeAfterSleepOnset", "AverageSleepDuration", "AverageWakeDuration",
-    "SleepWakeTransitionProbability", "WakeSleepTransitionProbability", "SleepGiniIndex",
-    "WakeGiniIndex", "SleepAverageHazard", "WakeAverageHazard", "SleepPowerLawDistribution",
-    "WakePowerLawDistribution"
+    "SleepEndpoint",
+    "TotalSleepTime",
+    "PercentTimeAsleep",
+    "NumberWakeBouts",
+    "SleepOnsetLatency",
+    "WakeAfterSleepOnset",
+    "AverageSleepDuration",
+    "AverageWakeDuration",
+    "SleepWakeTransitionProbability",
+    "WakeSleepTransitionProbability",
+    "SleepGiniIndex",
+    "WakeGiniIndex",
+    "SleepAverageHazard",
+    "WakeAverageHazard",
+    "SleepPowerLawDistribution",
+    "WakePowerLawDistribution",
 ]
 
 
-class SleepMetric(ABC):
+class SleepEndpoint(ABC):
     def __str__(self):
         return self.name
 
@@ -52,10 +76,11 @@ class SleepMetric(ABC):
         pass
 
 
-class TotalSleepTime(SleepMetric):
+class TotalSleepTime(SleepEndpoint):
     """
     Compute the total time spent asleep from 1 minute epoch sleep predictions.
     """
+
     def __init__(self):
         super().__init__("total sleep time", __name__)
 
@@ -76,10 +101,11 @@ class TotalSleepTime(SleepMetric):
         return sum(sleep_predictions)
 
 
-class PercentTimeAsleep(SleepMetric):
+class PercentTimeAsleep(SleepEndpoint):
     """
     Compute the percent time spent asleep from 1 minute epoch sleep predictions.
     """
+
     def __init__(self):
         super().__init__("percent time asleep", __name__)
 
@@ -101,11 +127,12 @@ class PercentTimeAsleep(SleepMetric):
         return around(pta, decimals=3)
 
 
-class NumberWakeBouts(SleepMetric):
+class NumberWakeBouts(SleepEndpoint):
     """
     Compute the number of waking bouts during the total sleep opportunity, excluding the
     first wake before sleep, and last wake bout after sleep.
     """
+
     def __init__(self):
         super().__init__("number of wake bouts", __name__)
 
@@ -124,13 +151,16 @@ class NumberWakeBouts(SleepMetric):
             Number of waking bouts.
         """
         # -1 to exclude the last wakeup
-        return maximum(nonzero(diff(sleep_predictions.astype(int_)) == -1)[0].size - 1, 0)
+        return maximum(
+            nonzero(diff(sleep_predictions.astype(int_)) == -1)[0].size - 1, 0
+        )
 
 
-class SleepOnsetLatency(SleepMetric):
+class SleepOnsetLatency(SleepEndpoint):
     """
     Compute the amount of time before the first sleep period in minutes.
     """
+
     def __init__(self):
         super(SleepOnsetLatency, self).__init__("sleep onset latency", __name__)
 
@@ -153,11 +183,12 @@ class SleepOnsetLatency(SleepMetric):
         return argmax(sleep_predictions)  # samples = minutes
 
 
-class WakeAfterSleepOnset(SleepMetric):
+class WakeAfterSleepOnset(SleepEndpoint):
     """
     Compute the number of minutes awake after the first period of sleep, excluding the last
     wake period after sleep.
     """
+
     def __init__(self):
         super(WakeAfterSleepOnset, self).__init__("wake after sleep onset", __name__)
 
@@ -178,11 +209,13 @@ class WakeAfterSleepOnset(SleepMetric):
         if not sleep_predictions.any():
             return nan  # if never fell asleep then metric should be undefined
         first_epoch, last_epoch = nonzero(sleep_predictions)[0][[0, -1]]
-        waso = (last_epoch - first_epoch) - sum(sleep_predictions[first_epoch:last_epoch])
+        waso = (last_epoch - first_epoch) - sum(
+            sleep_predictions[first_epoch:last_epoch]
+        )
         return waso
 
 
-class AverageSleepDuration(SleepMetric):
+class AverageSleepDuration(SleepEndpoint):
     r"""
     Compute the average duration of a sleep bout.
 
@@ -196,6 +229,7 @@ class AverageSleepDuration(SleepMetric):
     -----
     Higher values indicate longer bouts of sleep.
     """
+
     def __init__(self):
         super(AverageSleepDuration, self).__init__("average sleep duration", __name__)
 
@@ -219,12 +253,12 @@ class AverageSleepDuration(SleepMetric):
         """
         sleep_lengths = lengths[values == 1]
         if sleep_lengths.size == 0:
-            return 0.
+            return 0.0
 
         return mean(sleep_lengths)
 
 
-class AverageWakeDuration(SleepMetric):
+class AverageWakeDuration(SleepEndpoint):
     r"""
     Compute the average duration of wake bouts during sleep.
 
@@ -238,6 +272,7 @@ class AverageWakeDuration(SleepMetric):
     -----
     Higher values indicate longer bouts of wakefulness.
     """
+
     def __init__(self):
         super(AverageWakeDuration, self).__init__("average wake duration", __name__)
 
@@ -260,12 +295,12 @@ class AverageWakeDuration(SleepMetric):
         """
         wake_lengths = lengths[values == 0]
         if wake_lengths.size == 0:
-            return 0.
+            return 0.0
 
         return mean(wake_lengths)
 
 
-class SleepWakeTransitionProbability(SleepMetric):
+class SleepWakeTransitionProbability(SleepEndpoint):
     r"""
     Compute the probability of transitioning from sleep state to awake state
 
@@ -286,10 +321,10 @@ class SleepWakeTransitionProbability(SleepMetric):
 
     where :math:`\mu_{sleep}` is the mean sleep bout time.
     """
+
     def __init__(self):
         super(SleepWakeTransitionProbability, self).__init__(
-            "sleep wake transition probability",
-            __name__
+            "sleep wake transition probability", __name__
         )
 
     def predict(self, lengths, starts, values, **kwargs):
@@ -314,7 +349,7 @@ class SleepWakeTransitionProbability(SleepMetric):
         return 1 / mean(sleep_lengths)
 
 
-class WakeSleepTransitionProbability(SleepMetric):
+class WakeSleepTransitionProbability(SleepEndpoint):
     r"""
     Compute the probability of transitioning from awake state to sleep state.
 
@@ -335,10 +370,10 @@ class WakeSleepTransitionProbability(SleepMetric):
 
     where :math:`\mu_{awake}` is the mean awake bout time.
     """
+
     def __init__(self):
         super(WakeSleepTransitionProbability, self).__init__(
-            "wake sleep transition probability",
-            __name__
+            "wake sleep transition probability", __name__
         )
 
     def predict(self, lengths, starts, values, **kwargs):
@@ -363,7 +398,7 @@ class WakeSleepTransitionProbability(SleepMetric):
         return 1 / mean(wake_lengths)
 
 
-class SleepGiniIndex(SleepMetric):
+class SleepGiniIndex(SleepEndpoint):
     r"""
     Compute the normalized variability of the sleep bouts, also known as the Gini Index from
     economics.
@@ -380,6 +415,7 @@ class SleepGiniIndex(SleepMetric):
     time accumulating due to a small number of longer bouts, whereas values near 0 indicate all
     bouts contribute more equally to the total time.
     """
+
     def __init__(self):
         super(SleepGiniIndex, self).__init__("sleep gini index", __name__)
 
@@ -405,7 +441,7 @@ class SleepGiniIndex(SleepMetric):
         return gini(sleep_lengths, w=None, corr=True)
 
 
-class WakeGiniIndex(SleepMetric):
+class WakeGiniIndex(SleepEndpoint):
     r"""
     Compute the normalized variability of the awake bouts, also known as the Gini Index from
     economics.
@@ -422,6 +458,7 @@ class WakeGiniIndex(SleepMetric):
     time accumulating due to a small number of longer bouts, whereas values near 0 indicate all
     bouts contribute more equally to the total time.
     """
+
     def __init__(self):
         super(WakeGiniIndex, self).__init__("wake gini index", __name__)
 
@@ -447,7 +484,7 @@ class WakeGiniIndex(SleepMetric):
         return gini(wake_lengths, w=None, corr=True)
 
 
-class SleepAverageHazard(SleepMetric):
+class SleepAverageHazard(SleepEndpoint):
     r"""
     Compute the average hazard summary of the hazard function as a function of the sleep bout
     duration. The average hazard represents a summary of the frequency of transitioning from
@@ -476,6 +513,7 @@ class SleepAverageHazard(SleepMetric):
     length :math:`t_n_i`, and :math:`t\in D` indicates all bouts up to the maximum length
     (:math:`D`).
     """
+
     def __init__(self):
         super(SleepAverageHazard, self).__init__("sleep average hazard", __name__)
 
@@ -509,7 +547,7 @@ class SleepAverageHazard(SleepMetric):
         return sum(h_i) / u_sl.size
 
 
-class WakeAverageHazard(SleepMetric):
+class WakeAverageHazard(SleepEndpoint):
     r"""
     Compute the average hazard summary of the hazard function as a function of the awake bout
     duration. The average hazard represents a summary of the frequency of transitioning from
@@ -538,6 +576,7 @@ class WakeAverageHazard(SleepMetric):
     length :math:`t_n_i`, and :math:`t\in D` indicates all bouts up to the maximum length
         (:math:`D`).
     """
+
     def __init__(self):
         super(WakeAverageHazard, self).__init__("wake average hazard", __name__)
 
@@ -571,7 +610,7 @@ class WakeAverageHazard(SleepMetric):
         return sum(h_i) / u_al.size
 
 
-class SleepPowerLawDistribution(SleepMetric):
+class SleepPowerLawDistribution(SleepEndpoint):
     r"""
     Compute the scaling factor for a power law distribution over the sleep bouts lengths.
 
@@ -593,10 +632,10 @@ class SleepPowerLawDistribution(SleepMetric):
     where :math:`n_{sleep}` is the number of sleep bouts, :math:`t_i` is the duration of the
     :math:`ith` sleep bout, and :math:`min(t)` is the length of the shortest sleep bout.
     """
+
     def __init__(self):
         super(SleepPowerLawDistribution, self).__init__(
-            "sleep power law distribution",
-            __name__
+            "sleep power law distribution", __name__
         )
 
     def predict(self, lengths, starts, values, **kwargs):
@@ -619,12 +658,14 @@ class SleepPowerLawDistribution(SleepMetric):
         sleep_lengths = lengths[values == 1]
 
         if sleep_lengths.size == 0:
-            return 1.
+            return 1.0
 
-        return 1 + sleep_lengths.size / sum(log(sleep_lengths / (sleep_lengths.min() - 0.5)))
+        return 1 + sleep_lengths.size / sum(
+            log(sleep_lengths / (sleep_lengths.min() - 0.5))
+        )
 
 
-class WakePowerLawDistribution(SleepMetric):
+class WakePowerLawDistribution(SleepEndpoint):
     r"""
     Compute the scaling factor for a power law distribution over the awake bouts lengths.
 
@@ -646,10 +687,10 @@ class WakePowerLawDistribution(SleepMetric):
     where :math:`n_{awake}` is the number of awake bouts, :math:`t_i` is the duration of the
     :math:`ith` awake bout, and :math:`min(t)` is the length of the shortest awake bout.
     """
+
     def __init__(self):
         super(WakePowerLawDistribution, self).__init__(
-            "wake power law distribution",
-            __name__
+            "wake power law distribution", __name__
         )
 
     def predict(self, lengths, starts, values, **kwargs):
@@ -672,6 +713,8 @@ class WakePowerLawDistribution(SleepMetric):
         wake_lengths = lengths[values == 0]
 
         if wake_lengths.size == 0:
-            return 1.
+            return 1.0
 
-        return 1 + wake_lengths.size / sum(log(wake_lengths / (wake_lengths.min() - 0.5)))
+        return 1 + wake_lengths.size / sum(
+            log(wake_lengths / (wake_lengths.min() - 0.5))
+        )

@@ -13,7 +13,7 @@ from skimu.sleep.utility import get_weartime
 
 class TestGetWearTime:
     def test(self):
-        fs = 50.
+        fs = 50.0
 
         rng = np.random.default_rng(seed=10)
         x = rng.normal(loc=[0, 0, 1], scale=2, size=(int(4 * 3600 * fs), 3))
@@ -23,18 +23,14 @@ class TestGetWearTime:
         n2 = n1 + int(3600 * fs)
 
         x[n1:n2] = [0, 0, 1]
-        t[n1:n2] = 22.
+        t[n1:n2] = 22.0
         rmd = moving_median(x, 250, 1, pad=False, axis=0)
 
-        wt = get_weartime(
-            rmd,
-            t,
-            fs,
-            0.001,
-            25.
-        )
+        wt = get_weartime(rmd, t, fs, 0.001, 25.0)
 
-        assert np.isclose((wt[0][1] - wt[1][0]) / fs, 1800, atol=10)  # 10 second tolerance
+        assert np.isclose(
+            (wt[0][1] - wt[1][0]) / fs, 1800, atol=10
+        )  # 10 second tolerance
 
 
 class TestComputeZAngle:
@@ -161,7 +157,9 @@ class TestArgLongestBout:
         assert out == (15, 20)
 
     def test_2_same_length(self):
-        arr = np.array([0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 0, 0])
+        arr = np.array(
+            [0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 0, 0]
+        )
         out = arg_longest_bout(arr, 1)
 
         expected = 1, 4
@@ -174,6 +172,7 @@ class TestGini:
     https://stackoverflow.com/questions/48999542/more-efficient-weighted-gini-coefficient-in-
     python/48999797#48999797
     """
+
     def test1(self):
         x = np.array([1, 1, 1, 1, 1000])
 
@@ -185,15 +184,17 @@ class TestGini:
         w = np.array([4, 2, 2, 10, 1])
 
         assert np.isclose(np.around(gini(x, w=w, corr=False), 4), 0.2553)
-        assert np.isclose(np.around(gini(x, w=w, corr=True), 4), np.around(0.2553 * 5 / 4, 4))
+        assert np.isclose(
+            np.around(gini(x, w=w, corr=True), 4), np.around(0.2553 * 5 / 4, 4)
+        )
 
 
 class TestComputeActivityIndex:
     def test(self):
         rng = np.random.default_rng(seed=5)
         x = np.arange(120 * 3, dtype=np.float_).reshape((-1, 3))
-        x += rng.normal(loc=0., scale=0.5, size=x.shape)
+        x += rng.normal(loc=0.0, scale=0.5, size=x.shape)
 
-        res = compute_activity_index(1., x, hp_cut=1e-3)
+        res = compute_activity_index(1.0, x, hp_cut=1e-3)
 
         assert np.allclose(res, np.array([0.4047359, 0.45388503]))

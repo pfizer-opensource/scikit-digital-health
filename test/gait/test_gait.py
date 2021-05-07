@@ -11,11 +11,14 @@ from ..base_conftest import *
 
 from skimu.gait import Gait
 from skimu.gait.gait import LowFrequencyError
-from skimu.gait.get_gait_classification import get_gait_classification_lgbm, DimensionMismatchError
+from skimu.gait.get_gait_classification import (
+    get_gait_classification_lgbm,
+    DimensionMismatchError,
+)
 from skimu.gait.get_gait_bouts import get_gait_bouts
 from skimu.gait.get_gait_events import get_gait_events
 from skimu.gait.get_strides import get_strides
-from skimu.gait import gait_metrics
+from skimu.gait import gait_endpoints
 
 
 class TestGetGaitClassificationLGBM:
@@ -42,7 +45,7 @@ class TestGetGaitClassificationLGBM:
         with pytest.raises(DimensionMismatchError):
             get_gait_classification_lgbm(random.rand(50) > 0.5, accel, fs)
 
-    @pytest.mark.parametrize('pred', (True, False, 1, -135098135, 1.513e-600))
+    @pytest.mark.parametrize("pred", (True, False, 1, -135098135, 1.513e-600))
     def test_pred_single_input(self, pred, get_sample_accel):
         starts, stops = get_gait_classification_lgbm(pred, random.rand(500), 32.125)
 
@@ -67,7 +70,7 @@ class TestGetGaitClassificationLGBM:
 
 
 class TestGetGaitBouts:
-    @pytest.mark.parametrize('case', (1, 2, 3, 4))
+    @pytest.mark.parametrize("case", (1, 2, 3, 4))
     def test(self, get_bgait_samples_truth, case):
         starts, stops, time, max_sep, min_time, bouts = get_bgait_samples_truth(case)
 
@@ -79,7 +82,7 @@ class TestGetGaitBouts:
 
 
 class TestGetGaitEvents:
-    @pytest.mark.parametrize('sign', (1, -1))
+    @pytest.mark.parametrize("sign", (1, -1))
     def test_50hz(self, sign, get_sample_bout_accel, get_contact_truth):
         accel, time, axis, acc_sign = get_sample_bout_accel(50.0)
         ic_truth, fc_truth = get_contact_truth(50.0)  # index starts at 1 for this
@@ -98,15 +101,17 @@ class TestGetGaitEvents:
             accel * sign_arr,  # rotation of 180 degrees around an axis
             50.0,
             time,
-            o_scale, 4, 20.0,
+            o_scale,
+            4,
+            20.0,
             False,  # corr_accel_orient
-            False  # use_optimal_scale
+            False,  # use_optimal_scale
         )
 
         assert allclose(ic, ic_truth)
         assert allclose(fc, fc_truth)
 
-    @pytest.mark.parametrize('sign', (1, -1))
+    @pytest.mark.parametrize("sign", (1, -1))
     def test_20hz(self, sign, get_sample_bout_accel, get_contact_truth):
         accel, time, axis, acc_sign = get_sample_bout_accel(20)
         ic_truth, fc_truth = get_contact_truth(20)  # index starts at 1 for this
@@ -125,9 +130,11 @@ class TestGetGaitEvents:
             accel * sign_arr,  # rotation of 180 degrees around an axis
             20.0,
             time,
-            o_scale, 4, 20.0,
+            o_scale,
+            4,
+            20.0,
             False,  # corr_accel_orient
-            False  # use_optimal_scale
+            False,  # use_optimal_scale
         )
 
         assert allclose(ic, ic_truth)
@@ -139,7 +146,7 @@ class TestGetGaitStrides:
         accel, time, axis, acc_sign = get_sample_bout_accel(50.0)
         ic, fc = get_contact_truth(50.0)
 
-        keys = ['IC', 'FC', 'FC opp foot', 'valid cycle', 'delta h']
+        keys = ["IC", "FC", "FC opp foot", "valid cycle", "delta h"]
         gait_truth = get_strides_truth(50.0, keys)
 
         gait = {i: [] for i in keys}
@@ -153,7 +160,7 @@ class TestGetGaitStrides:
         accel, time, axis, acc_sign = get_sample_bout_accel(20.0)
         ic, fc = get_contact_truth(20.0)
 
-        keys = ['IC', 'FC', 'FC opp foot', 'valid cycle', 'delta h']
+        keys = ["IC", "FC", "FC opp foot", "valid cycle", "delta h"]
         gait_truth = get_strides_truth(20.0, keys)
 
         gait = {i: [] for i in keys}
@@ -164,20 +171,22 @@ class TestGetGaitStrides:
             assert allclose(gait[k], gait_truth[k], equal_nan=True)
 
     def test_short_bout(self):
-        time = arange(0, 10, 1/25)  # 25hz sample
+        time = arange(0, 10, 1 / 25)  # 25hz sample
         ic = array([10, 23])
         fc = array([12, 25, 37])
 
-        gait = {i: [] for i in ['IC', 'FC', 'FC opp foot', 'valid cycle', 'delta h']}
+        gait = {i: [] for i in ["IC", "FC", "FC opp foot", "valid cycle", "delta h"]}
 
-        bsteps = get_strides(gait, random.rand(time.size), 0, ic, fc, time, 25.0, 2.25, 0.2)
+        bsteps = get_strides(
+            gait, random.rand(time.size), 0, ic, fc, time, 25.0, 2.25, 0.2
+        )
 
         assert bsteps == 2
-        assert allclose(gait['IC'], ic)
-        assert allclose(gait['FC'], fc[1:])
-        assert allclose(gait['FC opp foot'], fc[:-1])
-        assert all([not i for i in gait['valid cycle']])
-        assert all([isnan(i) for i in gait['delta h']])
+        assert allclose(gait["IC"], ic)
+        assert allclose(gait["FC"], fc[1:])
+        assert allclose(gait["FC opp foot"], fc[:-1])
+        assert all([not i for i in gait["valid cycle"]])
+        assert all([isnan(i) for i in gait["delta h"]])
 
 
 class TestGait(BaseProcessTester):
@@ -186,37 +195,35 @@ class TestGait(BaseProcessTester):
         super().setup_class()
 
         # override necessary attributes
-        cls.sample_data_file = resolve_data_path('gait_data.h5', 'gait')
-        cls.truth_data_file = resolve_data_path('gait_data.h5', 'gait')
+        cls.sample_data_file = resolve_data_path("gait_data.h5", "gait")
+        cls.truth_data_file = resolve_data_path("gait_data.h5", "gait")
         cls.truth_suffix = None
         cls.truth_data_keys = [
-            'delta h',
-            'PARAM:stride time',
-            'PARAM:stance time',
-            'PARAM:swing time',
-            'PARAM:step time',
-            'PARAM:initial double support',
-            'PARAM:terminal double support',
-            'PARAM:double support',
-            'PARAM:single support',
-            'PARAM:step length',
-            'PARAM:stride length',
-            'PARAM:gait speed',
-            'PARAM:cadence',
-            'PARAM:intra-step covariance - V',
-            'PARAM:intra-stride covariance - V',
-            'PARAM:harmonic ratio - V',
-            'PARAM:stride SPARC',
-            'BOUTPARAM:phase coordination index',
-            'BOUTPARAM:gait symmetry index',
-            'BOUTPARAM:step regularity - V',
-            'BOUTPARAM:stride regularity - V',
-            'BOUTPARAM:autocovariance symmetry - V',
-            'BOUTPARAM:regularity index - V'
+            "delta h",
+            "PARAM:stride time",
+            "PARAM:stance time",
+            "PARAM:swing time",
+            "PARAM:step time",
+            "PARAM:initial double support",
+            "PARAM:terminal double support",
+            "PARAM:double support",
+            "PARAM:single support",
+            "PARAM:step length",
+            "PARAM:stride length",
+            "PARAM:gait speed",
+            "PARAM:cadence",
+            "PARAM:intra-step covariance - V",
+            "PARAM:intra-stride covariance - V",
+            "PARAM:harmonic ratio - V",
+            "PARAM:stride SPARC",
+            "BOUTPARAM:phase coordination index",
+            "BOUTPARAM:gait symmetry index",
+            "BOUTPARAM:step regularity - V",
+            "BOUTPARAM:stride regularity - V",
+            "BOUTPARAM:autocovariance symmetry - V",
+            "BOUTPARAM:regularity index - V",
         ]
-        cls.sample_data_keys.extend([
-            'height'
-        ])
+        cls.sample_data_keys.extend(["height"])
 
         cls.process = Gait(
             correct_accel_orient=False,
@@ -228,7 +235,7 @@ class TestGait(BaseProcessTester):
             height_factor=0.53,
             prov_leg_length=False,
             filter_order=4,
-            filter_cutoff=20.0
+            filter_cutoff=20.0,
         )
 
     def test_leg_length_factor(self):
@@ -237,31 +244,22 @@ class TestGait(BaseProcessTester):
         assert g.height_factor == 1.0
 
     def test_leg_length_warning(self, get_sample_data):
-        data = get_sample_data(
-            self.sample_data_file,
-            self.sample_data_keys
-        )
-        data['height'] = None
+        data = get_sample_data(self.sample_data_file, self.sample_data_keys)
+        data["height"] = None
 
         with pytest.warns(UserWarning):
             self.process.predict(**data)
 
     def test_sample_rate_error(self, get_sample_data):
-        data = get_sample_data(
-            self.sample_data_file,
-            self.sample_data_keys
-        )
-        data['time'] = arange(0, 300, 0.5)
+        data = get_sample_data(self.sample_data_file, self.sample_data_keys)
+        data["time"] = arange(0, 300, 0.5)
 
         with pytest.raises(LowFrequencyError):
             self.process.predict(**data)
 
     def test_gait_predictions_error(self, get_sample_data):
-        data = get_sample_data(
-            self.sample_data_file,
-            self.sample_data_keys
-        )
-        data['gait_pred'] = arange(0, 1, 0.1)
+        data = get_sample_data(self.sample_data_file, self.sample_data_keys)
+        data["gait_pred"] = arange(0, 1, 0.1)
 
         with pytest.raises(DimensionMismatchError):
             self.process.predict(**data)
@@ -270,20 +268,20 @@ class TestGait(BaseProcessTester):
         g = Gait()
         g._params = []  # reset for easy testing
 
-        g.add_metrics([gait_metrics.StrideTime, gait_metrics.StepTime])
-        g.add_metrics(gait_metrics.PhaseCoordinationIndex)
+        g.add_endpoints([gait_endpoints.StrideTime, gait_endpoints.StepTime])
+        g.add_endpoints(gait_endpoints.PhaseCoordinationIndex)
 
         assert g._params == [
-            gait_metrics.StrideTime,
-            gait_metrics.StepTime,
-            gait_metrics.PhaseCoordinationIndex
+            gait_endpoints.StrideTime,
+            gait_endpoints.StepTime,
+            gait_endpoints.PhaseCoordinationIndex,
         ]
 
     def test_add_metrics_error(self):
         g = Gait()
 
         with pytest.raises(ValueError):
-            g.add_metrics([list, Gait])
+            g.add_endpoints([list, Gait])
 
         with pytest.raises(ValueError):
-            g.add_metrics(Gait)
+            g.add_endpoints(Gait)

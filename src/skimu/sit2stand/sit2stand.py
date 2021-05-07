@@ -6,7 +6,17 @@ Pfizer DMTI 2020
 """
 from warnings import warn
 
-from numpy import array, sum, mean, std, around, arange, nonzero, diff, ascontiguousarray
+from numpy import (
+    array,
+    sum,
+    mean,
+    std,
+    around,
+    arange,
+    nonzero,
+    diff,
+    ascontiguousarray,
+)
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt, find_peaks
 from pywt import cwt, scale2frequency
@@ -96,23 +106,24 @@ class Sit2Stand(_BaseProcess):
     """
 
     def __init__(
-            self, *,
-            stillness_constraint=True,
-            gravity=9.81,
-            thresholds=None,
-            long_still=0.5,
-            still_window=0.3,
-            gravity_pass_order=4,
-            gravity_pass_cutoff=0.8,
-            continuous_wavelet="gaus1",
-            power_band=None,
-            power_peak_kw=None,
-            power_std_height=True,
-            power_std_trim=0,
-            lowpass_order=4,
-            lowpass_cutoff=5,
-            reconstruction_window=0.25,
-            day_window=(0, 24)
+        self,
+        *,
+        stillness_constraint=True,
+        gravity=9.81,
+        thresholds=None,
+        long_still=0.5,
+        still_window=0.3,
+        gravity_pass_order=4,
+        gravity_pass_cutoff=0.8,
+        continuous_wavelet="gaus1",
+        power_band=None,
+        power_peak_kw=None,
+        power_std_height=True,
+        power_std_trim=0,
+        lowpass_order=4,
+        lowpass_cutoff=5,
+        reconstruction_window=0.25,
+        day_window=(0, 24),
     ):
         super().__init__(
             # kwarg saving
@@ -131,7 +142,7 @@ class Sit2Stand(_BaseProcess):
             lowpass_order=lowpass_order,
             lowpass_cutoff=lowpass_cutoff,
             reconstruction_window=reconstruction_window,
-            day_window=day_window
+            day_window=day_window,
         )
 
         # FILTER PARAMETERS
@@ -166,7 +177,7 @@ class Sit2Stand(_BaseProcess):
             gravity_pass_order=gravity_pass_order,
             gravity_pass_cutoff=gravity_pass_cutoff,
             long_still=long_still,
-            still_window=still_window
+            still_window=still_window,
         )
 
         if day_window is None:
@@ -222,7 +233,7 @@ class Sit2Stand(_BaseProcess):
             "Min. Accel.": [],
             "SPARC": [],
             "Vertical Displacement": [],
-            "Partial": []
+            "Partial": [],
         }
 
         for iday, day_idx in enumerate(days):
@@ -231,7 +242,9 @@ class Sit2Stand(_BaseProcess):
             # compute the magnitude of the acceleration
             m_acc = norm(accel[start:stop, :], axis=1)
             # filtered acceleration
-            f_acc = ascontiguousarray(sosfiltfilt(sos, m_acc, padtype="odd", padlen=None))
+            f_acc = ascontiguousarray(
+                sosfiltfilt(sos, m_acc, padtype="odd", padlen=None)
+            )
 
             # reconstructed acceleration
             n_window = int(around(self.rwindow / dt))
@@ -239,7 +252,10 @@ class Sit2Stand(_BaseProcess):
 
             # get the frequencies first to limit computation necessary
             freqs = scale2frequency(self.cwave, arange(1, 65)) / dt
-            f_mask = nonzero((freqs <= self.power_end_f) & (freqs >= self.power_start_f))[0] + 1
+            f_mask = (
+                nonzero((freqs <= self.power_end_f) & (freqs >= self.power_start_f))[0]
+                + 1
+            )
 
             # CWT power peak detection
             coefs, freq = cwt(r_acc, f_mask, self.cwave, sampling_period=dt)
@@ -251,21 +267,19 @@ class Sit2Stand(_BaseProcess):
             if self.std_height:
                 trim = int(self.std_trim / dt)
                 self.power_peak_kw["height"] = std(
-                    power[trim:-trim] if trim != 0 else power, ddof=1)
+                    power[trim:-trim] if trim != 0 else power, ddof=1
+                )
 
             power_peaks, _ = find_peaks(power, **self.power_peak_kw)
 
             self.detector.predict(
-                sts,
-                dt,
-                time[start:stop],
-                accel[start:stop, :],
-                f_acc,
-                power_peaks
+                sts, dt, time[start:stop], accel[start:stop, :], f_acc, power_peaks
             )
 
             # fill out the day information
-            sts["Day Number"].extend([iday + 1] * (len(sts["Date"]) - len(sts["Day Number"])))
+            sts["Day Number"].extend(
+                [iday + 1] * (len(sts["Date"]) - len(sts["Day Number"]))
+            )
 
         # get rid of the partial transitions
         partial = array(sts["Partial"])

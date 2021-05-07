@@ -9,13 +9,14 @@ from numpy import max, min, quantile, mean, std
 from skimu.features.core import Feature
 from skimu.features.lib import extensions
 
-__all__ = ['Range', 'IQR', 'RMS', 'Autocorrelation', 'LinearSlope']
+__all__ = ["Range", "IQR", "RMS", "Autocorrelation", "LinearSlope"]
 
 
 class Range(Feature):
     """
     The difference between the maximum and minimum value.
     """
+
     __slots__ = ()
 
     def __init__(self):
@@ -48,6 +49,7 @@ class IQR(Feature):
     """
     The difference between the 75th percentile and 25th percentile of the values.
     """
+
     __slots__ = ()
 
     def __init__(self):
@@ -80,6 +82,7 @@ class RMS(Feature):
     """
     The root mean square value of the signal
     """
+
     __slots__ = ()
 
     def __init__(self):
@@ -119,13 +122,11 @@ class Autocorrelation(Feature):
     normalize : bool, optional
         Normalize the result using the mean/std. deviation. Default is True
     """
+
     __slots__ = ("lag", "normalize")
 
     def __init__(self, lag=1, normalize=True):
-        super(Autocorrelation, self).__init__(
-            lag=lag,
-            normalize=normalize
-        )
+        super(Autocorrelation, self).__init__(lag=lag, normalize=normalize)
 
         self.lag = lag
         self.normalize = normalize
@@ -157,12 +158,13 @@ class LinearSlope(Feature):
     """
     The slope from linear regression of the signal
     """
+
     __slots__ = ()
 
     def __init__(self):
         super(LinearSlope, self).__init__()
 
-    def compute(self, signal, fs=1., *, axis=-1):
+    def compute(self, signal, fs=1.0, *, axis=-1):
         """
         Compute the linear regression slope
 

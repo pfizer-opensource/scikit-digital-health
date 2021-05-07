@@ -36,5 +36,5 @@ __all__ = [
     "preprocessing",
     "features",
     "utility",
-    "__skimu_version__"
+    "__skimu_version__",
 ]

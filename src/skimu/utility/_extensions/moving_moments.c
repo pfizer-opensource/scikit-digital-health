@@ -17,39 +17,49 @@ PyObject * moving_mean(PyObject *NPY_UNUSED(self), PyObject *args){
     PyObject *x_;
     long wlen, skip;
 
-    if (!PyArg_ParseTuple(args, "Oll:moving_mean", &x_, &wlen, &skip)) return NULL;
+    if (!PyArg_ParseTuple(args, "Oll:moving_mean", &x_, &wlen, &skip))
+        return NULL;
 
     PyArrayObject *data = (PyArrayObject *)PyArray_FromAny(
-        x_, PyArray_DescrFromType(NPY_DOUBLE), 1, 0,
-        NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_CARRAY_RO, NULL
+        x_,
+        PyArray_DescrFromType(NPY_DOUBLE),
+        1,
+        0,
+        NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_CARRAY_RO,
+        NULL
     );
-    if (!data) return NULL;
+    if (!data)
+        return NULL;
 
     // get the number of dimensions, and the shape
     int ndim = PyArray_NDIM(data);
     npy_intp *ddims = PyArray_DIMS(data);
-    npy_intp *rdims = (npy_intp *)malloc(ndim * sizeof(npy_intp));
-    if (!rdims){
+    npy_intp *rdims = (npy_intp *)malloc(ndim * sizeof(ddims));
+    if (!rdims)
+    {
         Py_XDECREF(data);
         return NULL;
     }
     // create return shape
-    for (int i = 0; i < (ndim - 1); ++i){
+    for (int i = 0; i < (ndim - 1); ++i)
+    {
         rdims[i] = ddims[i];
     }
     rdims[ndim-1] = (ddims[ndim-1] - wlen) / skip + 1;  // dimension of the roll
 
     PyArrayObject *rmean = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
 
-    if (!rmean){
+    if (!rmean)
+    {
+        free(rdims);  /* make sure it gets freed */
         Py_XDECREF(data);
         Py_XDECREF(rmean);
         return NULL;
     }
 
     // data pointers
-    double *dptr = (double *)PyArray_DATA(data),
-           *rmean_ptr = (double *)PyArray_DATA(rmean);
+    double *dptr = (double *)PyArray_DATA(data);
+    double *rmean_ptr = (double *)PyArray_DATA(rmean);
     // for iterating over the data
     long stride = ddims[ndim-1];  // stride to get to the next computation "column"
     long res_stride = rdims[ndim-1];  // stride to get to the next results "column"
@@ -58,7 +68,8 @@ PyObject * moving_mean(PyObject *NPY_UNUSED(self), PyObject *args){
     // has to be freed down here since its used by res_stride
     free(rdims);
 
-    for (int i = 0; i < nrepeats; ++i){
+    for (int i = 0; i < nrepeats; ++i)
+    {
         moving_moments_1(&stride, dptr, &wlen, &skip, rmean_ptr);
         dptr += stride;
         rmean_ptr += res_stride;
@@ -67,7 +78,6 @@ PyObject * moving_mean(PyObject *NPY_UNUSED(self), PyObject *args){
     Py_XDECREF(data);
 
     return (PyObject *)rmean;
-
 }
 
 
@@ -76,32 +86,42 @@ PyObject * moving_sd(PyObject *NPY_UNUSED(self), PyObject *args){
     long wlen, skip;
     int return_others;
 
-    if (!PyArg_ParseTuple(args, "Ollp:moving_sd", &x_, &wlen, &skip, &return_others)) return NULL;
+    if (!PyArg_ParseTuple(args, "Ollp:moving_sd", &x_, &wlen, &skip, &return_others))
+        return NULL;
 
     PyArrayObject *data = (PyArrayObject *)PyArray_FromAny(
-        x_, PyArray_DescrFromType(NPY_DOUBLE), 1, 0,
-        NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_CARRAY_RO, NULL
+        x_,
+        PyArray_DescrFromType(NPY_DOUBLE),
+        1,
+        0,
+        NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_CARRAY_RO,
+        NULL
     );
-    if (!data) return NULL;
+    if (!data)
+        return NULL;
 
     // get the number of dimensions, and the shape
     int ndim = PyArray_NDIM(data);
     npy_intp *ddims = PyArray_DIMS(data);
-    npy_intp *rdims = (npy_intp *)malloc(ndim * sizeof(npy_intp));
-    if (!rdims){
+    npy_intp *rdims = (npy_intp *)malloc(ndim * sizeof(ddims));
+    if (!rdims)
+    {
         Py_XDECREF(data);
         return NULL;
     }
     // create return shape
-    for (int i = 0; i < (ndim - 1); ++i){
+    for (int i = 0; i < (ndim - 1); ++i)
+    {
         rdims[i] = ddims[i];
     }
     rdims[ndim-1] = (ddims[ndim-1] - wlen) / skip + 1;  // dimension of the roll
 
-    PyArrayObject *rsd   = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0),
-                  *rmean = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
+    PyArrayObject *rsd   = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
+    PyArrayObject *rmean = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
 
-    if ((!rmean) || (!rsd)){
+    if ((!rmean) || (!rsd))
+    {
+        free(rdims);  /* make sure it gets freed */
         Py_XDECREF(data);
         Py_XDECREF(rmean);
         Py_XDECREF(rsd);
@@ -109,9 +129,9 @@ PyObject * moving_sd(PyObject *NPY_UNUSED(self), PyObject *args){
     }
 
     // data pointers
-    double *dptr      = (double *)PyArray_DATA(data),
-           *rmean_ptr = (double *)PyArray_DATA(rmean),
-           *rsd_ptr   = (double *)PyArray_DATA(rsd);
+    double *dptr      = (double *)PyArray_DATA(data);
+    double *rmean_ptr = (double *)PyArray_DATA(rmean);
+    double *rsd_ptr   = (double *)PyArray_DATA(rsd);
     // for iterating over the data
     long stride = ddims[ndim-1];  // stride to get to the next computation "column"
     long res_stride = rdims[ndim-1];  // stride to get to the next results "column"
@@ -119,7 +139,8 @@ PyObject * moving_sd(PyObject *NPY_UNUSED(self), PyObject *args){
     // has to be freed down here since its used by res_stride
     free(rdims);
 
-    for (int i = 0; i < nrepeats; ++i){
+    for (int i = 0; i < nrepeats; ++i)
+    {
         moving_moments_2(&stride, dptr, &wlen, &skip, rmean_ptr, rsd_ptr);
         dptr += stride;
         rmean_ptr += res_stride;
@@ -128,13 +149,16 @@ PyObject * moving_sd(PyObject *NPY_UNUSED(self), PyObject *args){
     
     Py_XDECREF(data);
 
-    if (return_others){
+    if (return_others)
+    {
         return Py_BuildValue(
             "NN",  /* dont want to increase ref count */
             (PyObject *)rsd,
             (PyObject *)rmean
         );
-    } else {
+    }
+    else
+    {
         Py_XDECREF(rmean);
         return (PyObject *)rsd;
     }
@@ -146,33 +170,43 @@ PyObject * moving_skewness(PyObject *NPY_UNUSED(self), PyObject *args){
     long wlen, skip;
     int return_others;
 
-    if (!PyArg_ParseTuple(args, "Ollp:moving_skewness", &x_, &wlen, &skip, &return_others)) return NULL;
+    if (!PyArg_ParseTuple(args, "Ollp:moving_skewness", &x_, &wlen, &skip, &return_others))
+        return NULL;
 
     PyArrayObject *data = (PyArrayObject *)PyArray_FromAny(
-        x_, PyArray_DescrFromType(NPY_DOUBLE), 1, 0,
-        NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_CARRAY_RO, NULL
+        x_,
+        PyArray_DescrFromType(NPY_DOUBLE),
+        1,
+        0,
+        NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_CARRAY_RO,
+        NULL
     );
-    if (!data) return NULL;
+    if (!data)
+        return NULL;
 
     // get the number of dimensions, and the shape
     int ndim = PyArray_NDIM(data);
     npy_intp *ddims = PyArray_DIMS(data);
-    npy_intp *rdims = (npy_intp *)malloc(ndim * sizeof(npy_intp));
-    if (!rdims){
+    npy_intp *rdims = (npy_intp *)malloc(ndim * sizeof(ddims));
+    if (!rdims)
+    {
         Py_XDECREF(data);
         return NULL;
     }
     // create return shape
-    for (int i = 0; i < (ndim - 1); ++i){
+    for (int i = 0; i < (ndim - 1); ++i)
+    {
         rdims[i] = ddims[i];
     }
     rdims[ndim-1] = (ddims[ndim-1] - wlen) / skip + 1;  // dimension of the roll
 
-    PyArrayObject *rsd   = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0),
-                  *rmean = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0),
-                  *rskew = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
+    PyArrayObject *rsd   = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
+    PyArrayObject *rmean = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
+    PyArrayObject *rskew = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
 
-    if ((!rmean) || (!rsd) || (!rskew)){
+    if ((!rmean) || (!rsd) || (!rskew))
+    {
+        free(rdims);  /* make sure it gets freed */
         Py_XDECREF(data);
         Py_XDECREF(rskew);
         Py_XDECREF(rsd);
@@ -181,10 +215,10 @@ PyObject * moving_skewness(PyObject *NPY_UNUSED(self), PyObject *args){
     }
 
     // data pointers
-    double *dptr      = (double *)PyArray_DATA(data),
-           *rmean_ptr = (double *)PyArray_DATA(rmean),
-           *rsd_ptr   = (double *)PyArray_DATA(rsd),
-           *rskew_ptr = (double *)PyArray_DATA(rskew);
+    double *dptr      = (double *)PyArray_DATA(data);
+    double *rmean_ptr = (double *)PyArray_DATA(rmean);
+    double *rsd_ptr   = (double *)PyArray_DATA(rsd);
+    double *rskew_ptr = (double *)PyArray_DATA(rskew);
     // for iterating over the data
     long stride = ddims[ndim-1];  // stride to get to the next computation "column"
     long res_stride = rdims[ndim-1];  // stride to get to the next results "column"
@@ -192,7 +226,8 @@ PyObject * moving_skewness(PyObject *NPY_UNUSED(self), PyObject *args){
     // has to be freed down here since its used by res_stride
     free(rdims);
 
-    for (int i = 0; i < nrepeats; ++i){
+    for (int i = 0; i < nrepeats; ++i)
+    {
         moving_moments_3(&stride, dptr, &wlen, &skip, rmean_ptr, rsd_ptr, rskew_ptr);
         dptr += stride;
         rmean_ptr += res_stride;
@@ -202,14 +237,17 @@ PyObject * moving_skewness(PyObject *NPY_UNUSED(self), PyObject *args){
     
     Py_XDECREF(data);
 
-    if (return_others){
+    if (return_others)
+    {
         return Py_BuildValue(
             "NNN",  /* dont want to increase ref count */
             (PyObject *)rskew,
             (PyObject *)rsd,
             (PyObject *)rmean
         );
-    } else {
+    }
+    else
+    {
         Py_XDECREF(rmean);
         Py_XDECREF(rsd);
         return (PyObject *)rskew;
@@ -222,34 +260,43 @@ PyObject * moving_kurtosis(PyObject *NPY_UNUSED(self), PyObject *args){
     long wlen, skip;
     int return_others;
 
-    if (!PyArg_ParseTuple(args, "Ollp:moving_kurtosis", &x_, &wlen, &skip, &return_others)) return NULL;
+    if (!PyArg_ParseTuple(args, "Ollp:moving_kurtosis", &x_, &wlen, &skip, &return_others))
+        return NULL;
 
     PyArrayObject *data = (PyArrayObject *)PyArray_FromAny(
-        x_, PyArray_DescrFromType(NPY_DOUBLE), 1, 0,
-        NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_CARRAY_RO, NULL
+        x_,
+        PyArray_DescrFromType(NPY_DOUBLE),
+        1,
+        0,
+        NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_CARRAY_RO,
+        NULL
     );
     if (!data) return NULL;
 
     // get the number of dimensions, and the shape
     int ndim = PyArray_NDIM(data);
     npy_intp *ddims = PyArray_DIMS(data);
-    npy_intp *rdims = (npy_intp *)malloc(ndim * sizeof(npy_intp));
-    if (!rdims){
+    npy_intp *rdims = (npy_intp *)malloc(ndim * sizeof(ddims));
+    if (!rdims)
+    {
         Py_XDECREF(data);
         return NULL;
     }
     // create return shape
-    for (int i = 0; i < (ndim - 1); ++i){
+    for (int i = 0; i < (ndim - 1); ++i)
+    {
         rdims[i] = ddims[i];
     }
     rdims[ndim-1] = (ddims[ndim-1] - wlen) / skip + 1;  // dimension of the roll
 
-    PyArrayObject *rsd   = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0),
-                  *rmean = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0),
-                  *rskew = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0),
-                  *rkurt = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
+    PyArrayObject *rsd   = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
+    PyArrayObject *rmean = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
+    PyArrayObject *rskew = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
+    PyArrayObject *rkurt = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
 
-    if (!rmean || !rsd || !rskew || !rkurt){
+    if (!rmean || !rsd || !rskew || !rkurt)
+    {
+        free(rdims);  /* make sure it gets freed */
         Py_XDECREF(data);
         Py_XDECREF(rkurt);
         Py_XDECREF(rskew);
@@ -259,11 +306,11 @@ PyObject * moving_kurtosis(PyObject *NPY_UNUSED(self), PyObject *args){
     }
 
     // data pointers
-    double *dptr      = (double *)PyArray_DATA(data),
-           *rmean_ptr = (double *)PyArray_DATA(rmean),
-           *rsd_ptr   = (double *)PyArray_DATA(rsd),
-           *rskew_ptr = (double *)PyArray_DATA(rskew),
-           *rkurt_ptr = (double *)PyArray_DATA(rkurt);
+    double *dptr      = (double *)PyArray_DATA(data);
+    double *rmean_ptr = (double *)PyArray_DATA(rmean);
+    double *rsd_ptr   = (double *)PyArray_DATA(rsd);
+    double *rskew_ptr = (double *)PyArray_DATA(rskew);
+    double *rkurt_ptr = (double *)PyArray_DATA(rkurt);
     // for iterating over the data
     long stride = ddims[ndim-1];  // stride to get to the next computation "column"
     long res_stride = rdims[ndim-1];  // stride to get to the next results "column"
@@ -271,7 +318,8 @@ PyObject * moving_kurtosis(PyObject *NPY_UNUSED(self), PyObject *args){
     // has to be freed down here since its used by res_stride
     free(rdims);
 
-    for (int i = 0; i < nrepeats; ++i){
+    for (int i = 0; i < nrepeats; ++i)
+    {
         moving_moments_4(&stride, dptr, &wlen, &skip, rmean_ptr, rsd_ptr, rskew_ptr, rkurt_ptr);
         dptr += stride;
         rmean_ptr += res_stride;
@@ -282,7 +330,8 @@ PyObject * moving_kurtosis(PyObject *NPY_UNUSED(self), PyObject *args){
     
     Py_XDECREF(data);
 
-    if (return_others){
+    if (return_others)
+    {
         return Py_BuildValue(
             "NNNN",  /* dont want to increase ref count */
             (PyObject *)rkurt,
@@ -290,7 +339,9 @@ PyObject * moving_kurtosis(PyObject *NPY_UNUSED(self), PyObject *args){
             (PyObject *)rsd,
             (PyObject *)rmean
         );
-    } else {
+    }
+    else
+    {
         Py_XDECREF(rmean);
         Py_XDECREF(rsd);
         Py_XDECREF(rskew);
