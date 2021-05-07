@@ -10,7 +10,7 @@ from itertools import product as iter_product
 from pathlib import Path
 
 from numpy import nonzero, array, mean, diff, sum, zeros, abs, argmin, argmax, maximum, int_, \
-    floor, ceil, histogram, log, nan, around, full, nanmax, arange
+    floor, ceil, histogram, log, nan, around, full, nanmax, arange, max
 from scipy.stats import linregress
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -123,9 +123,12 @@ class ActivityLevelClassification(_BaseProcess):
         physical activity: the role of sociodemographic factors,” Am J Epidemiol, vol. 179,
         no. 6, pp. 781–790, Mar. 2014, doi: 10.1093/aje/kwt330.
     """
-    activity_levels = ["MVPA", "sed", "light", "mod", "vig"]
-    epoch_lens = ["1min", "5min"]
-    ig_res = ["gradient", "intercept", "R-squared"]
+    act_levels = ["MVPA", "sed", "light", "mod", "vig"]
+    _max_acc_str = "Max acc {w}min blocks gs"
+    _ig_keys = ["IG", "IG intercept", "IG R-squared"]
+    _e_wake_str = "{L} {w}s epoch wake mins"
+    _e_sleep_str = "{L} {w}s epoch sleep mins"
+    _bout_str = "{L} {w}min bout mins"
 
     def __init__(
             self,
@@ -275,33 +278,28 @@ class ActivityLevelClassification(_BaseProcess):
         # ========================================================================================
         # SETUP RESULTS KEYS/ENDPOINTS
         # ========================================================================================
-        general_str_keys = ["Date", "Weekday"]
-        general_int_keys = ["Day N"]
-        general_float_keys = ["N hours", "N wear hours", "N wear awake hours"]
-
-        blen_keys = [f"{i}min" for i in self.blens]
-        epoch_lens = [f"{self.wlen}sec"] + self.epoch_lens
-
-        mx_acc_keys = [f"{i}_max_{j}min_acc" for i in self.windows for j in self.max_acc_lens]
-        lvl_keys = [
-            "_".join(i) for i in iter_product(
-                self.windows, self.activity_levels, blen_keys, ["bout"]
-            )
-        ]
-        mvpa_keys = [
-            "_".join(i) for i in iter_product(self.windows, ["MVPA"], epoch_lens, ["epoch"])
-        ]
-        ig_keys = [
-            "_".join(i) for i in iter_product(self.windows, ["IG"], self.ig_res)
+        res_keys = [("Date", "", "U11"), ("Weekday", "", "U11"), ("Day N", -1, "int")]
+        res_keys += [
+            ("N hours", nan, "float"),
+            ("N wear hours", nan, "float"),
+            ("N wear awake hours", nan, "float")
         ]
 
-        res = {i: full(len(days), "", dtype="object") for i in general_str_keys}
-        res.update({i: full(len(days), -1, dtype="int") for i in general_int_keys})
-        res.update({i: full(len(days), nan, dtype="float") for i in general_float_keys})
-        res.update({i: full(len(days), nan, dtype="float") for i in mx_acc_keys})
-        res.update({i: full(len(days), nan, dtype="float") for i in ig_keys})
-        res.update({i: full(len(days), nan, dtype="float") for i in mvpa_keys})
-        res.update({i: full(len(days), nan, dtype="float") for i in lvl_keys})
+        res_keys += [(self._max_acc_str.format(w=i), nan, "float") for i in self.max_acc_lens]
+        res_keys += [(i, nan, "float") for i in self._ig_keys]
+        res_keys += [
+            (self._e_wake_str.format(L=i, w=self.wlen), nan, "float") for i in self.act_levels
+        ]
+        res_keys += [
+            (self._e_sleep_str.format(L=i, w=self.wlen), nan, "float") for i in self.act_levels
+        ]
+        res_keys += [
+            (
+                self._bout_str.format(L=lvl, w=j), nan, "float"
+            ) for lvl in self.act_levels for j in self.blens
+        ]
+
+        res = {i: full(len(days), j, dtype=k) for i, j, k in res_keys}
 
         # ========================================================================================
         # PROCESSING
@@ -312,7 +310,7 @@ class ActivityLevelClassification(_BaseProcess):
             start_dt = _update_date_results(res, time, iday, day_start, day_stop, self.day_key[0])
 
             # get the intersection of wear time and day
-            day_wear_starts, day_wear_stops = get_day_index_intersection(
+            dwear_starts, dwear_stops = get_day_index_intersection(
                 wear_starts,
                 wear_stops,
                 True,  # include wear time
@@ -323,61 +321,62 @@ class ActivityLevelClassification(_BaseProcess):
             # PLOTTING. handle here before returning for minimal wear hours, etc
             self._plot_day_accel(
                 iday, source_file, fs, accel[day_start:day_stop], res["Date"][iday], start_dt)
-            self._plot_day_wear(fs, day_wear_starts, day_wear_stops, start_dt, day_start)
+            self._plot_day_wear(fs, dwear_starts, dwear_stops, start_dt, day_start)
             # plotting sleep if it exists
             self._plot_day_sleep(fs, sleep_starts, sleep_stops, day_start, day_stop, start_dt)
 
             # save wear time and check if there is less wear time than minimum
-            res["N wear hours"][iday] = around(
-                sum(day_wear_stops - day_wear_starts) / fs / 3600,
-                1
-            )
+            res["N wear hours"][iday] = around(sum(dwear_stops - dwear_starts) / fs / 3600, 1)
             if res["N wear hours"][iday] < self.min_wear:
                 continue  # skip day if less than minimum specified hours of wear time
 
-            # compute activity endpoints for the midnight -> midnight windows
-            self._get_activity_metrics_across_indexing(
-                res,
-                "MM",
-                accel,
-                fs,
-                iday,
-                day_wear_starts,
-                day_wear_stops,
-                nwlen,
-                epm,
-                iglevels,
-                igvals
-            )
-
-            # get the intersection of wear time, wake time, and day if sleep was provided
+            # if there is sleep data, add it to the intersection of indices
             if sleep_starts is not None and sleep_stops is not None:
-                day_wear_wake_starts, day_wear_wake_stops = get_day_index_intersection(
+                dwear_starts, dwear_stops = get_day_index_intersection(
                     (wear_starts, sleep_starts),
                     (wear_stops, sleep_stops),
                     (True, False),  # include wear time, exclude sleeping time
                     day_start,
                     day_stop
                 )
+                sleep_wear_starts, sleep_wear_stops = get_day_index_intersection(
+                    (wear_starts, sleep_starts),
+                    (wear_stops, sleep_stops),
+                    (True, True),  # now we want only sleep
+                    day_start,
+                    day_stop
+                )
 
                 res["N wear awake hours"][iday] = around(
-                    sum(day_wear_wake_stops - day_wear_wake_starts) / fs / 3600, 1
+                    sum(dwear_starts - dwear_starts) / fs / 3600, 1
                 )
+            else:
+                sleep_wear_starts = sleep_wear_stops = None
 
-                # compute activity endpoints for the midnight -> midnight windows, EXCLUDING sleep
-                self._get_activity_metrics_across_indexing(
-                    res,
-                    "ExS",
-                    accel,
-                    fs,
-                    iday,
-                    day_wear_wake_starts,
-                    day_wear_wake_stops,
-                    nwlen,
-                    epm,
-                    iglevels,
-                    igvals
-                )
+            # compute waking hours activity endpoints
+            self._compute_awake_activity_endpoints(
+                res,
+                accel,
+                fs,
+                iday,
+                dwear_starts,
+                dwear_stops,
+                nwlen,
+                epm,
+                iglevels,
+                igvals
+            )
+            # compute sleeping hours activity endpoints
+            self._compute_sleep_activity_endpoints(
+                res,
+                accel,
+                fs,
+                iday,
+                sleep_wear_starts,
+                sleep_wear_stops,
+                nwlen,
+                epm
+            )
 
         # finalize plots
         self._finalize_plots()
@@ -389,93 +388,57 @@ class ActivityLevelClassification(_BaseProcess):
         else:
             return res
 
-    def _get_activity_metrics_across_indexing(
-            self, results, wtype, accel, fs, day_n, starts, stops, n_wlen, epoch_per_min,
-            ig_levels, ig_vals):
-        """
-        Compute the activity endpoints.
-
-        Parameters
-        ----------
-        results : dict
-            Results dictionary.
-        wtype : {"MM", "ExS"}
-            Window type being computed. Must match what is in `results` keys.
-        accel : numpy.ndarray
-            Acceleration data.
-        fs : float
-            Sampling frequency in Hz.
-        day_n : int
-            The day number/index.
-        starts : numpy.ndarray
-            Index of the starts during `day_n` of valid blocks of acceleration to use in computing
-            endpoints.
-        stops : numpy.ndarray
-            Index of the stops during `day_n` of valid blocks of acceleration to use in
-            computing endpoints.
-        n_wlen : int
-            Number of samples in `self.wlen` seconds.
-        epoch_per_min : int
-            Number of epochs (result of accel metric computation) per minute.
-        ig_levels : numpy.ndarray
-            Intensity gradient bin edges.
-        ig_vals : numpy.ndarray
-            Intensity gradient bin midpoints.
-        """
+    def _compute_awake_activity_endpoints(
+            self, results, accel, fs, day_n, starts, stops, n_wlen, epm, ig_levels, ig_vals
+    ):
+        # allocate histogram for intensity gradient
         hist = zeros(ig_levels.size - 1)
 
-        # initialize the values here from nan to 0.  Do this here because missing data should
-        # remain as "nan".
-        for epoch_len in [f"{self.wlen}sec"] + self.epoch_lens:
-            key = f"{wtype}_MVPA_{epoch_len}_epoch"
+        # initialize values from nan to 0.0. Do this here because days with less than minimum
+        # hours should have nan values
+        for w in self.max_acc_lens:
+            results[self._max_acc_str.format(w=w)][day_n] = 0.0
+        for lvl in self.act_levels:
+            key = self._e_wake_str.format(L=lvl, w=self.wlen)
             results[key][day_n] = 0.0
-        for bout_len in self.blens:
-            for level in self.activity_levels:
-                key = f"{wtype}_{level}_{bout_len}min_bout"
+
+            for w in self.blens:
+                key = self._bout_str.format(L=lvl, w=w)
                 results[key][day_n] = 0.0
 
         for start, stop in zip(starts, stops):
             # compute the desired acceleration metric
             acc_metric = self.cutpoints["metric"](
-                accel[start:stop], n_wlen, fs, **self.cutpoints["kwargs"])
+                accel[start:stop], n_wlen, fs, **self.cutpoints["kwargs"]
+            )
 
             # maximum acceleration over windows
             try:
-                for mx_acc_win in self.max_acc_lens:
-                    n = mx_acc_win * epoch_per_min
-                    tmp_max = moving_mean(acc_metric, n, n).max()
+                for max_acc_w in self.max_acc_lens:
+                    n = max_acc_w * epm
+                    tmp_max = max(moving_mean(acc_metric, n, n))
 
-                    key = f"{wtype}_max_{mx_acc_win}min_acc"
+                    key = self._max_acc_str.format(w=max_acc_w)
                     results[key][day_n] = nanmax([tmp_max, results[key][day_n]])
             except ValueError:
-                # if we can't do one we won't be able to do the later ones either with longer
-                # window lengths
+                # if the window length is too long for this block of data
                 pass
 
-            # MVPA
-            # total time of 5sec epochs in minutes
-            key = f"{wtype}_MVPA_{self.wlen}sec_epoch"
-            results[key][day_n] += sum(acc_metric >= self.cutpoints["light"]) / epoch_per_min
+            # activity levels
+            for lvl in self.act_levels:
+                # total sum of epochs
+                lthresh, uthresh = get_level_thresholds(lvl, self.cutpoints)
+                key = self._e_wake_str.format(L=lvl, w=self.wlen)
+                results[key][day_n] += sum((acc_metric >= lthresh) & (acc_metric < uthresh)) / epm
 
-            # total time in 1 minute epochs
-            tmp = moving_mean(acc_metric, epoch_per_min, epoch_per_min)
-            results[f"{wtype}_MVPA_1min_epoch"][day_n] += sum(tmp >= self.cutpoints["light"])
-
-            # total time in 5 minute epochs
-            tmp = moving_mean(acc_metric, 5 * epoch_per_min, 5 * epoch_per_min)
-            results[f"{wtype}_MVPA_5min_epoch"][day_n] += sum(tmp >= self.cutpoints["light"]) * 5
-
-            # total MVPA in <bout_len> minute bouts
-            for bout_len in self.blens:
-                # compute the activity metrics in bouts for the various activity levels
-                for level in self.activity_levels:
-                    l_thresh, u_thresh = get_level_thresholds(level, self.cutpoints)
-                    key = f"{wtype}_{level}_{bout_len}min_bout"
+                # time in bouts of specified input lengths
+                for bout_len in self.blens:
+                    key = self._bout_str.format(L=lvl, w=bout_len)
 
                     results[key][day_n] += get_activity_bouts(
                         acc_metric,
-                        l_thresh,
-                        u_thresh,
+                        lthresh,
+                        uthresh,
                         self.wlen,
                         bout_len,
                         self.boutcrit,
@@ -487,12 +450,34 @@ class ActivityLevelClassification(_BaseProcess):
             hist += histogram(acc_metric, bins=ig_levels, density=False)[0]
 
         # intensity gradient computation per day
-        hist *= (self.wlen / 60)  # convert from sample counts to minutes
+        hist /= epm  # epm = 60 / self.wlen -> hist *= (self.wlen / 60)
         ig_res = get_intensity_gradient(ig_vals, hist)
 
-        results[f"{wtype}_IG_gradient"][day_n] = ig_res[0]
-        results[f"{wtype}_IG_intercept"][day_n] = ig_res[1]
-        results[f"{wtype}_IG_R-squared"][day_n] = ig_res[2]
+        results["IG"][day_n] = ig_res[0]
+        results["IG intercept"][day_n] = ig_res[1]
+        results["IG R-squared"][day_n] = ig_res[2]
+
+    def _compute_sleep_activity_endpoints(
+            self, results, accel, fs, day_n, starts, stops, n_wlen, epm
+    ):
+        if starts is None or stops is None:
+            return  # don't initialize/compute any values if there is no sleep data
+
+        # initialize values from nan to 0.0. Do this here because days with less than minimum
+        # hours should have nan values
+        for lvl in self.act_levels:
+            key = self._e_sleep_str.format(L=lvl, w=self.wlen)
+            results[key][day_n] = 0.0
+
+        for start, stop in zip(starts, stops):
+            acc_metric = self.cutpoints["metric"](
+                accel[start:stop], n_wlen, fs, **self.cutpoints["kwargs"]
+            )
+
+            for lvl in self.act_levels:
+                lthresh, uthresh = get_level_thresholds(lvl, self.cutpoints)
+                key = self._e_sleep_str.format(L=lvl, w=self.wlen)
+                results[key][day_n] += sum((acc_metric >= lthresh) & (acc_metric < uthresh)) / epm
 
     def _plot_day_accel(self, day_n, source_file, fs, accel, date_str, start_dt):
         if self.f is None:
