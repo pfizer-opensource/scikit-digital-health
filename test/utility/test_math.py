@@ -15,6 +15,10 @@ from skimu.utility.math import (
 
 
 class BaseMovingStatsTester:
+    function = staticmethod(lambda x: None)
+    truth_function = staticmethod(lambda x: None)
+    truth_kw = {}
+
     @pytest.mark.parametrize("skip", (1, 2, 7, 150, 300))
     def test(self, skip, np_rng):
         x = np_rng.random(2000)
