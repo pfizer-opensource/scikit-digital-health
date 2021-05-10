@@ -92,6 +92,14 @@ class BaseMovingStatsTester:
         with pytest.raises(ValueError):
             self.function(x, *args, axis=-1)
 
+    @pytest.mark.segfault
+    def test_segfault(self, np_rng):
+        x = np_rng.random(2000)
+
+        for i in range(2000):
+            self.function(x, 150, 3)
+            self.function(x, 150, 151)
+
 
 class TestMovingMean(BaseMovingStatsTester):
     function = staticmethod(moving_mean)
