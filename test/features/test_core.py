@@ -31,12 +31,11 @@ def test_partial_index_check():
         partial_index_check("test")
     with pytest.raises(IndexError):
         partial_index_check(13513.0)
+    with pytest.raises(IndexError):
+        partial_index_check(get_n_feats)
 
     assert isinstance(partial_index_check(None), type(...))
     assert partial_index_check([0, 2]) == [0, 2]
-
-    with pytest.raises(IndexError):
-        partial_index_check(get_n_feats)
 
 
 class TestNormalizeIndices:
