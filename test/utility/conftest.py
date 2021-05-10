@@ -121,10 +121,14 @@ def dummy_acc(np_rng):
 
 
 @pytest.fixture(scope="class")
-def dummy_idx():
-    return np.array([0, 20, 113, 265, 481])
+def dummy_idx_1d():
+    # original and truth value
+    return np.array([0, 20, 113, 265, 481]), np.array([0, 4, 23, 53, 96])
 
 
 @pytest.fixture(scope="class")
-def dummy_idx_ds():
-    return np.array([0, 4, 23, 53, 96])
+def dummy_idx_2d():
+    # original and truth value
+    orig = np.array([[0, 20], [113, 265], [481, 499]])
+    truth = np.array([[0, 4], [23, 53], [96, 99]])
+    return orig, truth
