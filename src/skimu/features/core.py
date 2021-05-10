@@ -47,8 +47,6 @@ def normalize_indices(nfeat, index):
         return [index] * nfeat
     elif isinstance(index, Sequence):  # able to be indexed
         return [partial_index_check(i) for i in index]
-    else:
-        raise IndexError("Index not understood")
 
 
 def normalize_axes(ndim, axis, ind_axis):
