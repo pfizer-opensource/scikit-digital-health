@@ -9,6 +9,7 @@ from skimu.features.core import (
     Feature,
     ArrayConversionError,
 )
+from skimu.features.lib.moments import Mean, StdDev, Skewness, Kurtosis
 
 
 @pytest.mark.parametrize(
@@ -82,3 +83,57 @@ class TestNormalizeAxes:
     def test_same_axis(self):
         with pytest.raises(ValueError):
             normalize_axes(3, 1, 1)
+
+
+class TestBank:
+    def setup(self):
+        pass
+
+    def test_dunder_methods(self):
+        bank = Bank()
+        bank.add([Mean(), StdDev(), Skewness()])
+
+        # contains
+        assert Mean() in bank
+        assert StdDev() in bank
+        assert Skewness() in bank
+        assert Kurtosis() not in bank
+
+        # length
+        assert len(bank) == 3
+
+    def test_add(self):
+        bank = Bank()
+
+        bank.add(Mean(), [0, 2])
+
+        assert bank._feats == [Mean()]
+        assert bank._indices == [[0, 2]]
+
+        bank.add([StdDev(), Skewness()], [[0, 2], 1])
+
+        assert bank._feats == [Mean(), StdDev(), Skewness()]
+        assert bank._indices == [[0, 2], [0, 2], 1]
+
+        with pytest.warns(UserWarning):
+            bank.add(Mean())
+        with pytest.warns(UserWarning):
+            bank.add([Skewness(), Kurtosis()])
+
+    def test_save(self, temp_bank_file):
+        bank = Bank()
+        bank.add([Mean(), StdDev(), Skewness()], [..., [0, 2], 1])
+
+        bank.save(temp_bank_file)
+
+    def test_load(self, temp_bank_file):
+        bank = Bank()
+        bank.load(temp_bank_file)
+
+        assert bank._feats == [Mean(), StdDev(), Skewness()]
+        assert bank._indices == [..., [0, 2], 1]
+
+        bank2 = Bank(temp_bank_file)
+
+        assert bank2._feats == [Mean(), StdDev(), Skewness()]
+        assert bank2._indices == [..., [0, 2], 1]
