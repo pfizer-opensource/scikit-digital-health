@@ -60,7 +60,7 @@ def normalize_axes(ndim, axis, ind_axis):
     Normalize input axes to be positive/correct for how the swapping has to work
     """
     if axis == ind_axis:
-        raise IndexError("axis and index_axis cannot be the same")
+        raise ValueError("axis and index_axis cannot be the same")
 
     if ndim == 1:
         return 0, None
