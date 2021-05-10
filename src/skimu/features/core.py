@@ -4,7 +4,7 @@ Lukas Adamowicz
 Pfizer DMTI 2020
 """
 from abc import ABC, abstractmethod
-from collections.abc import Iterator, Sequence
+from collections.abc import Iterable, Sequence
 import json
 from warnings import warn
 
@@ -22,7 +22,7 @@ class ArrayConversionError(Exception):
 def get_n_feats(size, index):
     if isinstance(index, int):
         return 1
-    elif isinstance(index, (Iterator, Sequence)):
+    elif isinstance(index, Iterable, Sequence):
         return len(index)
     elif isinstance(index, slice):
         return len(range(*index.indices(size)))
@@ -31,22 +31,26 @@ def get_n_feats(size, index):
 
 
 def partial_index_check(index):
-    if not isinstance(index, (int, Iterator, Sequence, slice)) or isinstance is not None:
-        raise IndexError(f"Index type ({type(index)} not understood.")
     if index is None:
         index = ...
+
+    if not isinstance(index, (int, Iterable, type(...), slice)):
+        raise IndexError(f"Index type ({type(index)}) not understood.")
+
     return index
 
 
 def normalize_indices(nfeat, index):
     if index is None:
         return [...] * nfeat
-    elif not isinstance(index, (Iterator, Sequence)):  # slice, single integer, etc
+    elif not isinstance(index, Iterable):  # slice, single integer, etc
         return [partial_index_check(index)] * nfeat
     elif all([isinstance(i, int) for i in index]):  # iterable of ints
         return [index] * nfeat
     elif isinstance(index, Sequence):  # able to be indexed
         return [partial_index_check(i) for i in index]
+    else:
+        return IndexError(f"Index type ({type(index)}) not understood.")
 
 
 def normalize_axes(ndim, axis, ind_axis):
