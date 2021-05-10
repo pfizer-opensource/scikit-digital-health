@@ -1,10 +1,5 @@
-from collections import Iterable
-
 import pytest
 import numpy as np
-from numpy import cos, sin
-
-from skimu.utility.windowing import get_windowed_view
 
 
 @pytest.fixture(scope="module")
@@ -15,13 +10,13 @@ def get_rotation_matrix():
         beta : rotation around y axis - tait-bryan
         gamma : rotation around x axis - tair-bryan
         """
-        ca = cos(alpha)
-        cb = cos(beta)
-        cy = cos(gamma)
+        ca = np.cos(alpha)
+        cb = np.cos(beta)
+        cy = np.cos(gamma)
 
-        sa = sin(alpha)
-        sb = sin(beta)
-        sy = sin(gamma)
+        sa = np.sin(alpha)
+        sb = np.sin(beta)
+        sy = np.sin(gamma)
 
         r = np.zeros((3, 3))
         r[0, 0] = ca * cb
@@ -50,3 +45,86 @@ def dummy_rotated_accel(np_rng, get_rotation_matrix):
     x_rot = (r @ x.T).T
 
     return x, x_rot
+
+
+@pytest.fixture(scope="module")
+def day_ends():
+    return 2000, 4000
+
+
+@pytest.fixture(scope="module")
+def sleep_ends():
+    # treat sleep as exclusionary
+    sleep_starts = {
+        1: np.array([200, 1200, 2200, 4200]),
+        2: np.array([200, 1800, 3800]),
+        3: np.array([200, 1500, 4200]),
+    }
+    sleep_stops = {
+        1: np.array([800, 1800, 2800, 5000]),
+        2: np.array([800, 2500, 4400]),
+        3: np.array([200, 1900, 5000]),
+    }
+    return sleep_starts, sleep_stops
+
+
+@pytest.fixture(scope="module")
+def wear_ends():
+    wear_starts = np.array([0, 2300, 3000])
+    wear_stops = np.array([1800, 2900, 3900])
+    return wear_starts, wear_stops
+
+
+@pytest.fixture(scope="module")
+def true_intersect_ends():
+    starts = {
+        1: np.array([2800, 3000]),
+        2: np.array([2500, 3000]),
+        3: np.array([2300, 3000]),
+    }
+    stops = {
+        1: np.array([2900, 3900]),
+        2: np.array([2900, 3800]),
+        3: np.array([2900, 3900]),
+    }
+    return starts, stops
+
+
+@pytest.fixture(scope="module")
+def true_sleep_only_ends():
+    starts = {1: np.array([2000, 2800]), 2: np.array([2500]), 3: np.array([2000])}
+    stops = {1: np.array([2200, 4000]), 2: np.array([3800]), 3: np.array([4000])}
+    return starts, stops
+
+
+@pytest.fixture(scope="class")
+def rle_arr():
+    return [0] * 5 + [1] * 3 + [0] * 4 + [1] * 7 + [0] * 2 + [1] * 6 + [0] * 1
+
+
+@pytest.fixture(scope="class")
+def rle_truth():
+    lens = np.asarray([5, 3, 4, 7, 2, 6, 1])
+    indices = np.asarray([0, 5, 8, 12, 19, 21, 27])
+    vals = np.asarray([0, 1, 0, 1, 0, 1, 0])
+    return lens, indices, vals
+
+
+@pytest.fixture(scope="class")
+def dummy_time():
+    return np.arange(0, 10, 0.02)  # 50 hz, 500 samples
+
+
+@pytest.fixture(scope="class")
+def dummy_acc(np_rng):
+    return np_rng.random((500, 3))
+
+
+@pytest.fixture(scope="class")
+def dummy_idx():
+    return np.array([0, 20, 113, 265, 481])
+
+
+@pytest.fixture(scope="class")
+def dummy_idx_ds():
+    return np.array([0, 4, 23, 53, 96])
