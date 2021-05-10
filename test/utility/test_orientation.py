@@ -14,13 +14,13 @@ class TestCorrectAccelerometerOrientation:
         assert mean(abs(x_corr - x_orig)) < 0.1 * mean(abs(x_rot - x_orig))
 
     def test_vaxis_range_error(self):
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError):
             correct_accelerometer_orientation(None, 4, None)
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError):
             correct_accelerometer_orientation(None, -1, None)
 
     def test_apaxis_range_error(self):
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError):
             correct_accelerometer_orientation(None, 2, 4)
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError):
             correct_accelerometer_orientation(None, 2, -1)
