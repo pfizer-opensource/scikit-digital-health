@@ -47,9 +47,12 @@ class BaseMovingStatsTester:
                 truth.append(tf(xw, axis=1, **tkw))
 
             pred = self.function(x, 150, skip, axis=0)
+            pred1 = self.function(x, 150, skip, axis=0, return_previous=False)
 
             for p, t in zip(pred, truth):
                 assert allclose(p, t)
+
+            assert allclose(pred1, truth[0])
         else:
             truth = self.truth_function(xw, axis=1, **self.truth_kw)
 
