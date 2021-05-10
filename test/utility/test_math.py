@@ -1,4 +1,4 @@
-from collections import Iterable
+from collections.abc import Iterable
 
 import pytest
 from numpy import allclose, mean, std, median, all, isnan
