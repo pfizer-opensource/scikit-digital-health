@@ -1,4 +1,5 @@
 import pytest
+from numpy.random import default_rng
 
 
 def pytest_addoption(parser):
@@ -22,3 +23,8 @@ def pytest_collection_modifyitems(config, items):
     for item in items:
         if "segfault" in item.keywords:
             item.add_marker(skip_segfault)
+
+
+@pytest.fixture(scope="package")
+def np_rng():
+    return default_rng()
