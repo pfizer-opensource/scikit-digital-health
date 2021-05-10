@@ -134,8 +134,11 @@ class TestMovingMedian(BaseMovingStatsTester):
 
         truth = self.truth_function(xw, axis=-1, **self.truth_kw)
         pred = self.function(x, 150, skip, pad=True)
+        pred1 = self.function(x, 150, skip, pad=999.)
 
         n = (x.size - 150) // skip + 1
 
         assert allclose(pred[:n], truth)
         assert all(isnan(pred[n:]))
+
+        assert allclose(pred1[n:], 999.)
