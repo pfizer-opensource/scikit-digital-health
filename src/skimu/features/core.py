@@ -31,8 +31,8 @@ def get_n_feats(size, index):
 
 
 def partial_index_check(index):
-    if isinstance(index, str) or isinstance(index, float):
-        raise IndexError("Indices cannot be strings or floats.")
+    if not isinstance(index, int) or isinstance is not None:
+        raise IndexError(f"Index type ({type(index)} not understood.")
     if index is None:
         index = ...
     return index
