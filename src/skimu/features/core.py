@@ -34,7 +34,7 @@ def partial_index_check(index):
     if index is None:
         index = ...
 
-    if not isinstance(index, (int, Iterator, type(...), slice)):
+    if not isinstance(index, (int, Iterator, Sequence, type(...), slice)):
         raise IndexError(f"Index type ({type(index)}) not understood.")
 
     return index
