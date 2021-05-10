@@ -31,7 +31,7 @@ def get_n_feats(size, index):
 
 
 def partial_index_check(index):
-    if not isinstance(index, int) or isinstance is not None:
+    if not isinstance(index, (int, Iterator, Sequence, slice)) or isinstance is not None:
         raise IndexError(f"Index type ({type(index)} not understood.")
     if index is None:
         index = ...
