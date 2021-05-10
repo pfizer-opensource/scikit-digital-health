@@ -85,7 +85,7 @@ def correct_accelerometer_orientation(accel, v_axis=None, ap_axis=None):
     if ap_axis is None:
         ap_axis, ml_axis = [i for i in range(3) if i != v_axis]
     else:
-        if not (0 <= v_axis < 3):
+        if not (0 <= ap_axis < 3):
             raise ValueError("ap_axis must be in {0, 1, 2}")
         ml_axis = [i for i in range(3) if i not in [v_axis, ap_axis]][0]
 
