@@ -4,7 +4,7 @@ Lukas Adamowicz
 Pfizer DMTI 2020
 """
 from abc import ABC, abstractmethod
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterator, Sequence
 import json
 from warnings import warn
 
@@ -22,7 +22,7 @@ class ArrayConversionError(Exception):
 def get_n_feats(size, index):
     if isinstance(index, int):
         return 1
-    elif isinstance(index, Iterable, Sequence):
+    elif isinstance(index, (Iterator, Sequence)):
         return len(index)
     elif isinstance(index, slice):
         return len(range(*index.indices(size)))
@@ -34,7 +34,7 @@ def partial_index_check(index):
     if index is None:
         index = ...
 
-    if not isinstance(index, (int, Iterable, type(...), slice)):
+    if not isinstance(index, (int, Iterator, type(...), slice)):
         raise IndexError(f"Index type ({type(index)}) not understood.")
 
     return index
@@ -43,7 +43,7 @@ def partial_index_check(index):
 def normalize_indices(nfeat, index):
     if index is None:
         return [...] * nfeat
-    elif not isinstance(index, Iterable):  # slice, single integer, etc
+    elif not isinstance(index, Iterator):  # slice, single integer, etc
         return [partial_index_check(index)] * nfeat
     elif all([isinstance(i, int) for i in index]):  # iterable of ints
         return [index] * nfeat
