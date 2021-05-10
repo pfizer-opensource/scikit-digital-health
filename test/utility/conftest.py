@@ -1,6 +1,10 @@
+from collections import Iterable
+
 import pytest
 import numpy as np
 from numpy import cos, sin
+
+from skimu.utility.windowing import get_windowed_view
 
 
 @pytest.fixture(scope="module")
