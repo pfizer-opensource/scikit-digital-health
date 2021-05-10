@@ -51,7 +51,7 @@ def normalize_indices(nfeat, index):
         return [index] * nfeat
     elif isinstance(index, Sequence):  # able to be indexed
         return [partial_index_check(i) for i in index]
-    else:
+    else:  # pragma: no cover
         return IndexError(f"Index type ({type(index)}) not understood.")
 
 
