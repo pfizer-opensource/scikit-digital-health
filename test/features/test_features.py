@@ -1,4 +1,4 @@
-from numpy import zeros, allclose, array
+from numpy import zeros, allclose, isclose
 
 from skimu.features.lib import (
     Mean,
@@ -6,6 +6,11 @@ from skimu.features.lib import (
     StdDev,
     Skewness,
     Kurtosis,
+    DominantFrequency,
+    DominantFrequencyValue,
+    PowerSpectralSum,
+    SpectralFlatness,
+    SpectralEntropy,
 )
 
 
@@ -37,17 +42,104 @@ def test_StdDev(get_linear_accel):
     assert allclose(res, 0.25, atol=0.02)
 
 
-def test_Skewness(get_cubic_accel):
-    x = get_cubic_accel(2., 1., 1., 1., 0.)
+def test_Skewness(get_cubic_signal):
+    x = get_cubic_signal(2., 1., 1., 1., 0.)
 
     res = Skewness().compute(x)
 
     assert allclose(res, 1.0, rtol=0.01)
 
 
-def test_Kurtosis(get_cubic_accel):
-    x = get_cubic_accel(2., 1., 1., 1., 0.)
+def test_Kurtosis(get_cubic_signal):
+    x = get_cubic_signal(2., 1., 1., 1., 0.)
 
     res = Kurtosis().compute(x)
 
     assert allclose(res, -0.1897956, rtol=1e-5)
+
+
+def test_DominantFrequency(get_sin_signal):
+    fs, x = get_sin_signal([1.0, 0.5], [1.0, 5.0], 0.0)
+
+    df_low = DominantFrequency(padlevel=2, low_cutoff=0.0, high_cutoff=2.5)
+    df_high = DominantFrequency(padlevel=2, low_cutoff=2.5, high_cutoff=15.)
+    df_all = DominantFrequency(padlevel=2, low_cutoff=0.0, high_cutoff=15.0)
+
+    res_low = df_low.compute(x, fs=fs)
+    res_high = df_high.compute(x, fs=fs)
+    res_all = df_all.compute(x, fs=fs)
+
+    assert isclose(res_low, res_all)  # 1.0Hz peak has higher amplitude
+    assert isclose(res_low, 1.0, atol=0.03)  # short signal, won't be exact
+    assert isclose(res_high, 5.0, atol=0.03)  # short signal, won't be exact
+
+
+def test_DominantFrequencyValue(get_sin_signal):
+    fs, x = get_sin_signal([1.0, 0.5], [1.0, 5.0], 0.0)
+
+    # use 1024 samples for the FFT (pad = 1 -> *2)
+    df_low = DominantFrequencyValue(padlevel=1, low_cutoff=0.0, high_cutoff=2.5)
+    df_high = DominantFrequencyValue(padlevel=1, low_cutoff=2.5, high_cutoff=15.)
+    df_all = DominantFrequencyValue(padlevel=1, low_cutoff=0.0, high_cutoff=15.0)
+
+    res_low = df_low.compute(x, fs=fs)
+    res_high = df_high.compute(x, fs=fs)
+    res_all = df_all.compute(x, fs=fs)
+
+    # values are somewhat close, but with padding there is some noise in the
+    # transform
+    assert isclose(res_low, res_high, atol=0.05)
+    assert isclose(res_low, 0.5, atol=0.03)
+    assert isclose(res_all, 0.4, atol=0.03)
+
+
+def test_PowerSpectralSum(get_sin_signal):
+    fs, x = get_sin_signal([1.0, 0.5], [1.0, 5.0], 0.0)
+
+    df_low = PowerSpectralSum(padlevel=1, low_cutoff=0.0, high_cutoff=2.5)
+    df_high = PowerSpectralSum(padlevel=1, low_cutoff=2.5, high_cutoff=15.)
+    df_all = PowerSpectralSum(padlevel=1, low_cutoff=0.0, high_cutoff=15.0)
+
+    res_low = df_low.compute(x, fs=fs)
+    res_high = df_high.compute(x, fs=fs)
+    res_all = df_all.compute(x, fs=fs)
+
+    # values are somewhat close, but with padding there is some noise in the
+    # transform
+    assert isclose(res_low, res_high, atol=0.01)
+    # as the values should be singular spikes, almost all values lie within
+    # a +-0.5 hz window, but there is noise
+    assert isclose(res_low, 1.0, atol=0.03)
+    assert isclose(res_all, 0.8, atol=0.03)
+
+
+def test_SpectralFlatness(get_sin_signal):
+    fs, x = get_sin_signal([1.0, 0.5], [1.0, 5.0], 0.0)
+
+    df_low = SpectralFlatness(padlevel=0, low_cutoff=0.0, high_cutoff=2.5)
+    df_high = SpectralFlatness(padlevel=0, low_cutoff=2.5, high_cutoff=15.)
+    df_all = SpectralFlatness(padlevel=0, low_cutoff=0.0, high_cutoff=15.0)
+
+    res_low = df_low.compute(x, fs=fs)
+    res_high = df_high.compute(x, fs=fs)
+    res_all = df_all.compute(x, fs=fs)
+
+    assert isclose(res_low, -22.0, atol=0.01)
+    assert isclose(res_high, -21.0, atol=0.01)
+    assert isclose(res_all, -25.0, atol=0.2)
+
+
+def test_SpectralEntropy(get_sin_signal):
+    fs, x = get_sin_signal([1.0, 0.5], [1.0, 5.0], 0.0)
+
+    df_low = SpectralEntropy(padlevel=1, low_cutoff=0.0, high_cutoff=2.5)
+    df_high = SpectralEntropy(padlevel=1, low_cutoff=2.5, high_cutoff=15.)
+    df_all = SpectralEntropy(padlevel=1, low_cutoff=0.0, high_cutoff=15.0)
+
+    res_low = df_low.compute(x, fs=fs)
+    res_high = df_high.compute(x, fs=fs)
+    res_all = df_all.compute(x, fs=fs)
+
+    assert isclose(res_low, 0.45, atol=0.01)
+    assert isclose(res_high, 0.30, atol=0.01)
+    assert isclose(res_all, 0.40, atol=0.02)
