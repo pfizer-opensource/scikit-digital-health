@@ -1,4 +1,4 @@
-from numpy import zeros, allclose, isclose
+from numpy import zeros, allclose, isclose, sqrt
 
 from skimu.features.lib import (
     Mean,
@@ -11,6 +11,11 @@ from skimu.features.lib import (
     PowerSpectralSum,
     SpectralFlatness,
     SpectralEntropy,
+    Range,
+    IQR,
+    RMS,
+    Autocorrelation,
+    LinearSlope,
 )
 
 
@@ -143,3 +148,37 @@ def test_SpectralEntropy(get_sin_signal):
     assert isclose(res_low, 0.45, atol=0.01)
     assert isclose(res_high, 0.30, atol=0.01)
     assert isclose(res_all, 0.40, atol=0.02)
+
+
+def test_Range(get_sin_signal):
+    fs, x = get_sin_signal(1.25, 1.0, scale=0.0)
+
+    assert isclose(Range().compute(x), 1.25 * 2)
+
+
+def test_IQR(get_sin_signal):
+    fs, x = get_sin_signal(1.25, 1.0, scale=0.0)
+
+    assert isclose(IQR().compute(x), 1.739, atol=2e-4)
+
+
+def test_RMS(get_sin_signal):
+    fs, x = get_sin_signal(1.0, 1.0, scale=0.0)
+
+    assert isclose(RMS().compute(x), sqrt(2) / 2, atol=1e-3)
+
+
+def test_Autocorrelation(get_sin_signal):
+    fs, x = get_sin_signal([1.0, 0.5], [1.0, 6.0], scale=0.0)
+
+    res_1 = Autocorrelation(lag=1, normalize=True).compute(x)
+    res_2 = Autocorrelation(lag=int(fs), normalize=True).compute(x)
+
+    assert isclose(res_1, 1.0, atol=0.02)  # should be slightly off
+    assert isclose(res_2, 1.0, atol=0.003)
+
+
+def test_LinearSlope(get_cubic_signal):
+    x = get_cubic_signal(0.0, 0.0, 1.375, -13.138, 0.0)
+
+    assert isclose(LinearSlope().compute(x, 100.), 1.375)
