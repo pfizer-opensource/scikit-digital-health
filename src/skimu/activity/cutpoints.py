@@ -20,7 +20,8 @@ def get_available_cutpoints(name=None):
         the available cutpoint options.
     """
     if name is None:
-        print(_base_cutpoints.keys())
+        for k in _base_cutpoints:
+            print(k)
     else:
         cuts = _base_cutpoints[name]
 
