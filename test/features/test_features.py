@@ -1,4 +1,4 @@
-from numpy import zeros, allclose, isclose, sqrt
+from numpy import zeros, allclose, isclose, sqrt, diff, sum, std, abs
 
 from skimu.features.lib import (
     Mean,
@@ -16,6 +16,9 @@ from skimu.features.lib import (
     RMS,
     Autocorrelation,
     LinearSlope,
+    ComplexityInvariantDistance,
+    RangeCountPercentage,
+    RatioBeyondRSigma,
 )
 
 
@@ -182,3 +185,31 @@ def test_LinearSlope(get_cubic_signal):
     x = get_cubic_signal(0.0, 0.0, 1.375, -13.138, 0.0)
 
     assert isclose(LinearSlope().compute(x, 100.), 1.375)
+
+
+def test_ComplexityInvariantDistance(get_sin_signal):
+    fs, x = get_sin_signal(1.0, 2.0, scale=0.0)
+
+    res = ComplexityInvariantDistance(normalize=False).compute(x)
+    truth = sqrt(sum(diff(x)**2))
+
+    assert isclose(res, truth)
+
+
+def test_RangeCountPercentage(get_sin_signal):
+    fs, x = get_sin_signal(2.0, 0.2, 0.0)  # 1 cycle
+
+    res = RangeCountPercentage(range_min=0.0, range_max=3.0).compute(x)
+
+    # half the signal is above 0, but because it ends 1 sample short of 0.0
+    # for second cycle, the value is 1 sample over half
+    assert isclose(res, 0.502)
+
+
+def test_RatioBeyondRSigma(get_sin_signal):
+    fs, x = get_sin_signal(2.0, 0.2, 0.0)  # 1 cycle
+
+    res = RatioBeyondRSigma(r=1.0).compute(x)
+    truth = sum(abs(x) >= std(x, ddof=1)) / x.size
+
+    assert isclose(res, truth)
