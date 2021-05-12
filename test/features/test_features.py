@@ -22,6 +22,9 @@ from skimu.features.lib import (
     SignalEntropy,
     SampleEntropy,
     PermutationEntropy,
+    JerkMetric,
+    DimensionlessJerk,
+    SPARC,
 )
 
 
@@ -240,3 +243,33 @@ def test_PermutationEntropy(get_sin_signal):
     res = PermutationEntropy(order=3, delay=1, normalize=True).compute(x)
 
     assert isclose(res, 0.40145)
+
+
+def test_JerkMetric(get_sin_signal):
+    fs, x = get_sin_signal(2.0, 1.0, 0.0)
+
+    res = JerkMetric().compute(x, fs=fs)
+
+    assert isclose(res, 0.136485)
+
+
+def test_DimensionlessJerk(get_sin_signal):
+    fs, x = get_sin_signal(2.0, 1.0, 0.0)
+
+    res = DimensionlessJerk(log=True, signal_type="acceleration").compute(x)
+
+    assert isclose(res, -6.19715)
+
+
+def test_SPARC(get_sin_signal):
+    fs, x = get_sin_signal(2.0, 0.4, 0.0)
+
+    res = SPARC(padlevel=0, fc=10.0, amplitude_threshold=0.05).compute(x, fs=fs)
+
+    assert isclose(res, -1.372184)
+
+    fs, x = get_sin_signal(1.0, 1.0, 0.05)
+
+    res2 = SPARC(padlevel=0, fc=10., amplitude_threshold=0.05).compute(x, fs)
+
+    assert res2 < res
