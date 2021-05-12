@@ -118,7 +118,9 @@ class DetailPowerRatio(Feature):
     In the original paper [1]_, the result is multiplied by 100 to obtain a
     percentage. This final multiplication is not included in order to obtain
     results that have a scale that closer matches the typical 0-1 (or -1 to 1)
-    scale for machine learning features.
+    scale for machine learning features. NOTE that this does not mean that
+    the values will be in this range - since the scaling factor
+    is the original acceleration and not the wavelet detail values.
 
     References
     ----------
