@@ -27,8 +27,8 @@ class SignalEntropy(Feature):
         bin_{min} = x_{min} - \frac{\delta}{2}
         bin_{max} = x_{max} + \frac{\delta}{2}
 
-    where :math:`N` is the number of samples in the signal. Note that the data is standardized
-    before computing (using mean and standard deviation).
+    where :math:`N` is the number of samples in the signal. Note that the data
+    is standardized before computing (using mean and standard deviation).
 
     With the histogram, then the estimate of the entropy is computed per
 
@@ -46,7 +46,7 @@ class SignalEntropy(Feature):
     References
     ----------
     .. [1] Wallis, Kenneth. "A note on the calculation of entropy from histograms". 2006.
-    https://warwick.ac.uk/fac/soc/economics/staff/academic/wallis/publications/entropy.pdf
+        https://warwick.ac.uk/fac/soc/economics/staff/academic/wallis/publications/entropy.pdf
     """
     __slots__ = ()
 
