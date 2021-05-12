@@ -1,3 +1,4 @@
+import pytest
 from numpy import zeros, allclose, isclose, sqrt, diff, sum, std, abs
 
 from skimu.features.lib import (
@@ -255,12 +256,17 @@ def test_JerkMetric(get_sin_signal):
     assert isclose(res, 0.136485)
 
 
-def test_DimensionlessJerk(get_sin_signal):
-    fs, x = get_sin_signal(2.0, 1.0, 0.0)
+class TestDimensionlessJerk:
+    def test(self, get_sin_signal):
+        fs, x = get_sin_signal(2.0, 1.0, 0.0)
 
-    res = DimensionlessJerk(log=True, signal_type="acceleration").compute(x)
+        res = DimensionlessJerk(log=True, signal_type="acceleration").compute(x)
 
-    assert isclose(res, -6.19715)
+        assert isclose(res, -6.19715)
+
+    def test_signal_type_error(self):
+        with pytest.raises(ValueError):
+            DimensionlessJerk(signal_type="test")
 
 
 def test_SPARC(get_sin_signal):
