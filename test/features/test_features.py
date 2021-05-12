@@ -25,6 +25,8 @@ from skimu.features.lib import (
     JerkMetric,
     DimensionlessJerk,
     SPARC,
+    DetailPower,
+    DetailPowerRatio,
 )
 
 
@@ -273,3 +275,28 @@ def test_SPARC(get_sin_signal):
     res2 = SPARC(padlevel=0, fc=10., amplitude_threshold=0.05).compute(x, fs)
 
     assert res2 < res
+
+
+def test_DetailPower(get_sin_signal):
+    fs, x = get_sin_signal([2.0, 0.5], [1.5, 5.], 0.0)
+
+    # default band is 1-3
+    res_low = DetailPower(wavelet="coif4", freq_band=None).compute(x, fs=fs)
+    res_high = DetailPower(wavelet="coif4", freq_band=[2.5, 15.]).compute(x, fs=fs)
+    res_all = DetailPower(wavelet="coif4", freq_band=[0.0001, 15.]).compute(x, fs=fs)
+
+    assert res_high < res_all
+    assert res_low < res_all
+
+
+def test_DetailPowerRatio(get_sin_signal):
+    fs, x = get_sin_signal([2.0, 0.5], [1.5, 5.], 0.0)
+
+    # default band is 1-3
+    res_low = DetailPowerRatio(wavelet="coif4", freq_band=None).compute(x, fs=fs)
+    res_high = DetailPowerRatio(wavelet="coif4", freq_band=[2.5, 15.]).compute(x, fs=fs)
+    res_all = DetailPowerRatio(wavelet="coif4", freq_band=[0.0001, 15.]).compute(x, fs=fs)
+
+    assert isclose(res_high, res_low, atol=0.03)
+    assert res_high < res_all
+    assert res_low < res_all
