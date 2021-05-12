@@ -15,19 +15,6 @@ def temp_bank_file():
 
 
 @pytest.fixture(scope="module")
-def get_linear_accel(np_rng):
-    def get_la(scale):
-        x = zeros((3, 500))
-        x[2] = 1
-
-        x += scale * np_rng.standard_normal((3, 500))
-
-        return x
-
-    return get_la
-
-
-@pytest.fixture(scope="module")
 def get_cubic_signal(np_rng):
     def get_sig(a, b, c, d, scale):
         x = arange(0, 5, 0.01)

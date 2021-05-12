@@ -1,4 +1,5 @@
 import pytest
+from numpy import zeros
 from numpy.random import default_rng
 
 
@@ -28,3 +29,16 @@ def pytest_collection_modifyitems(config, items):
 @pytest.fixture(scope="package")
 def np_rng():
     return default_rng()
+
+
+@pytest.fixture(scope="module")
+def get_linear_accel(np_rng):
+    def get_la(scale):
+        x = zeros((3, 500))
+        x[2] = 1
+
+        x += scale * np_rng.standard_normal((3, 500))
+
+        return x
+
+    return get_la
