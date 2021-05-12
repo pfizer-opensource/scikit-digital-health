@@ -1,3 +1,4 @@
+import pytest
 from numpy import isclose, allclose
 
 from skimu.activity.cutpoints import (
@@ -14,6 +15,7 @@ def test_get_level_thresholds():
     light_range = get_level_thresholds("light", cuts)
     mod_range = get_level_thresholds("mod", cuts)
     vig_range = get_level_thresholds("vig", cuts)
+    mvpa_range = get_level_thresholds("mvpa", cuts)
 
     assert sed_range[0] < 0.0
     assert isclose(sed_range[1], 0.050)
@@ -24,6 +26,12 @@ def test_get_level_thresholds():
 
     assert isclose(vig_range[0], 0.440)
     assert vig_range[1] > 16  # 16g is a large cutoff for accels
+
+    assert isclose(mvpa_range[0], 0.110)
+    assert mvpa_range[1] > 16
+
+    with pytest.raises(ValueError):
+        get_level_thresholds("bad level", cuts)
 
 
 def test_get_available_cutpoints(capsys):
