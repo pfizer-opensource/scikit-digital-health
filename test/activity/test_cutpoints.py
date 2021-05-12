@@ -30,5 +30,22 @@ def test_get_available_cutpoints(capsys):
     get_available_cutpoints(name=None)
 
     out = capsys.readouterr().out
+    # check that a few of the values are all present
+    to_check = [
+        "esliger_lwrist_adult",
+        "phillips_lwrist_child8-14",
+        "vaha-ypya_hip_adult",
+        "hildebrand_wrist_adult_geneactiv",
+        "migueles_wrist_adult",
+    ]
+    assert all([f"{i}\n" in out for i in to_check])
 
-    assert True
+    get_available_cutpoints("migueles_wrist_adult")
+
+    out2 = capsys.readouterr().out
+
+    assert "metric_enmo" in out2
+    assert "sedentary range" in out2
+    assert "light range" in out2
+    assert "moderate range" in out2
+    assert "vigorous range" in out2
