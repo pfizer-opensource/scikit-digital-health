@@ -64,8 +64,8 @@ def _update_date_results(
     if start_dt.hour < day_start_hour:
         window_start_dt -= timedelta(days=1)
 
-    results["Date"][day_n] = start_dt.strftime("%Y-%m-%d")
-    results["Weekday"][day_n] = start_dt.strftime("%A")
+    results["Date"][day_n] = window_start_dt.strftime("%Y-%m-%d")
+    results["Weekday"][day_n] = window_start_dt.strftime("%A")
     results["Day N"][day_n] = day_n + 1
     results["N hours"][day_n] = around(
         (time[day_stop_idx - 1] - time[day_start_idx]) / 3600, 1
