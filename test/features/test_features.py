@@ -19,6 +19,9 @@ from skimu.features.lib import (
     ComplexityInvariantDistance,
     RangeCountPercentage,
     RatioBeyondRSigma,
+    SignalEntropy,
+    SampleEntropy,
+    PermutationEntropy,
 )
 
 
@@ -213,3 +216,27 @@ def test_RatioBeyondRSigma(get_sin_signal):
     truth = sum(abs(x) >= std(x, ddof=1)) / x.size
 
     assert isclose(res, truth)
+
+
+def test_SignalEntropy(get_sin_signal):
+    fs, x = get_sin_signal(1.0, 0.2, 0.0)  # 1 cycle
+
+    res = SignalEntropy().compute(x)
+
+    assert isclose(res, 0.256269)
+
+
+def test_SampleEntropy(get_sin_signal):
+    fs, x = get_sin_signal(1.0, 1.0, 0.0)
+
+    res = SampleEntropy(m=4, r=1.0).compute(x)
+
+    assert isclose(res, 0.0216848)
+
+
+def test_PermutationEntropy(get_sin_signal):
+    fs, x = get_sin_signal(1.0, 0.2, 0.0)
+
+    res = PermutationEntropy(order=3, delay=1, normalize=True).compute(x)
+
+    assert isclose(res, 0.40145)
