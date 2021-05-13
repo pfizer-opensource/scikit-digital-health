@@ -200,6 +200,7 @@ class ActivityLevelClassification(_BaseProcess):
             closed_bout=closed_bout,
             min_wear_time=min_wear_time,
             cutpoints=cutpoints_,
+            day_window=day_window,
         )
 
         self.wlen = short_wlen
