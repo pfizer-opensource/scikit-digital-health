@@ -35,37 +35,23 @@ class DimensionMismatchError(Exception):
     pass
 
 
-def get_gait_classification_lgbm(gait_pred, accel, fs):
+def get_gait_classification_lgbm(gait_starts, gait_stops, accel, fs):
     """
     Get classification of windows of accelerometer data using the LightGBM classifier
 
     Parameters
     ----------
-    gait_pred : {None, numpy.ndarray, bool}
-        Provided gait predictions
+    gait_starts : {None, numpy.ndarray}
+        Provided gait start indices.
+    gait_stops : {None, numpy.ndarray}
+        Provided gait stop indices.
     accel : numpy.ndarray
         (N, 3) array of acceleration values, in units of "g"
     fs : float
         Sampling frequency for the data
     """
-    if gait_pred is not None:
-        if isinstance(gait_pred, ndarray):
-            if gait_pred.size != accel.shape[0]:
-                raise DimensionMismatchError(
-                    "Number of gait predictions (possibly downsampled) must match number of "
-                    "acceleration samples"
-                )
-            bout_starts = where(diff(gait_pred.astype(int_)) == 1)[0] + 1
-            bout_stops = where(diff(gait_pred.astype(int_)) == -1)[0] + 1
-
-            if gait_pred[0]:
-                bout_starts = insert(bout_starts, 0, 0)
-            if gait_pred[-1]:
-                bout_stops = append(bout_stops, accel.shape[0])
-        else:
-            bout_starts, bout_stops = array([0], dtype="int"), array(
-                [accel.shape[0]], dtype="int"
-            )
+    if gait_starts is not None and gait_stops is not None:
+        return gait_starts, gait_stops
     else:
         suffix = "50hz" if fs == 50.0 else "20hz"
 
