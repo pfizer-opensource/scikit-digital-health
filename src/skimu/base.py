@@ -107,7 +107,7 @@ class _BaseProcess:
 
         # TODO if the accel/time requirement for some things changes then this
         # will need to change as well
-        n = kwargs.get(self._acc, kwargs.get(self._time)).shape[0]
+        n = kwargs.get(self._acc, kwargs.get(self._time)).shape[0] - 1
 
         days = kwargs.get(self._days, {}).get(self.day_key, None)
         msg = f"[{self!s}] Day indices [{self.day_key}] not found. No day split used."
