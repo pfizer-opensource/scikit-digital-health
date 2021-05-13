@@ -159,7 +159,7 @@ contains
             ierr = AX_READ_E_MISMATCH_N_AXES
             return
         end if
-        if ((finfo%axes == 3) .and. ((finfo%count /= 80) .or. (finfo%count /= 120))) then
+        if ((finfo%axes == 3) .and. ((finfo%count /= 80) .and. (finfo%count /= 120))) then
             ierr = AX_READ_E_INVALID_BLOCK_SAMPLES
             return
         else if ((finfo%axes == 6) .and. (finfo%count /= 40)) then
@@ -171,7 +171,7 @@ contains
         end if
 
         ! sampling frequency
-        finfo%frequency = 3200._c_double / shiftl(1, 15_c_int8_t - iand(hdr%samplingRate, z'0f'))
+        finfo%frequency = 3200. / shiftl(1, 15 - iand(hdr%samplingRate, z'0f'))
     end subroutine
 
     ! =============================================================================================
