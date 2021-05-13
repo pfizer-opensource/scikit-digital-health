@@ -199,7 +199,7 @@ static PyObject *read_axivity(PyObject *NPY_UNUSED(self), PyObject *args)
 
     return Py_BuildValue(
         "fNNNNN",  /* need to use N to not increment reference counter */
-        info.frequency,
+        PyLong_FromLong(info.frequency),
         (PyObject *)imudata,
         (PyObject *)time,
         (PyObject *)light,
