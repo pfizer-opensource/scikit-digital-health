@@ -32,7 +32,7 @@ class TestFeatureBank:
     def test_same_axis_error(self):
         bank = self.test_add()
 
-        with pytest.raises(IndexError):
+        with pytest.raises(ValueError):
             bank.compute([1, 2, 3, 4, 5, 6, 7], axis=0, index_axis=0)
 
     @pytest.mark.parametrize("indices", ("135", 5.13513))
