@@ -8,10 +8,10 @@ from collections.abc import Iterable
 from warnings import warn
 
 import h5py
-from numpy import mean, diff, asarray, sum
+from numpy import mean, diff, asarray, sum, ndarray
 
 from skimu.base import _BaseProcess
-from skimu.utility.internal import apply_downsample
+from skimu.utility.internal import apply_downsample, rle
 
 from skimu.gait.get_gait_classification import (
     get_gait_classification_lgbm,
@@ -252,6 +252,42 @@ class Gait(_BaseProcess):
                     f"GaitBoutEndpoints"
                 )
 
+    @staticmethod
+    def _handle_input_gait_predictions(gait_pred, n_exp):
+        """
+        Handle gait predictions and broadcast to the correct type for the
+        rest of the predict functionality.
+
+        Parameters
+        ----------
+        gait_pred : {any, numpy.ndarray}, optional
+            (N, ) array of boolean predictions of gait, or any value that is not
+            None. If not an ndarray but not None, the entire recording will be
+            taken as gait. If not provided (or None), gait classification will
+            be performed on the acceleration data.
+        n_exp : int
+            Number of expected samples.
+
+        Returns
+        -------
+        gait_pred_corr : numpy.ndarray
+            Array of gait start and stop values shape(N, 2).
+        """
+        if gait_pred is None:
+            return None, None
+        elif isinstance(gait_pred, ndarray):
+            if gait_pred.size != n_exp:
+                raise ValueError("gait_pred shape does not match time & accel")
+            lengths, starts, vals = rle(gait_pred.astype(int))
+
+            bout_starts = starts[vals == 1]
+            bout_stops = bout_starts + lengths[vals == 1]
+        else:
+            bout_starts = asarray([0])
+            bout_stops = asarray([n_exp - 1])
+
+        return bout_starts, bout_stops
+
     def predict(
         self, time=None, accel=None, *, fs=None, height=None, gait_pred=None, **kwargs
     ):
@@ -325,17 +361,19 @@ class Gait(_BaseProcess):
                 UserWarning,
             )
 
-        # downsample acceleration
-        goal_fs = 50.0 if fs >= 50.0 else 20.
+        # handle gait_pred input types
+        gait_starts, gait_stops = self._handle_input_gait_predictions(gait_pred, time.size)
 
+        goal_fs = 50.0 if fs >= 50.0 else 20.
         if fs != goal_fs:
-            time_ds, (accel_ds,), (gait_pred_ds, day_starts_ds, day_stops_ds) = apply_downsample(
-                goal_fs, time, (accel,), (gait_pred, *self.day_idx)
+            time_ds, (accel_ds,), (gait_starts_ds, gait_stops_ds, day_starts_ds, day_stops_ds) = apply_downsample(
+                goal_fs, time, (accel,), (gait_starts, gait_stops, *self.day_idx)
             )
         else:
             time_ds = time
             accel_ds = accel
-            gait_pred_ds = gait_pred
+            gait_starts_ds = gait_starts
+            gait_stops_ds = gait_stops
             day_starts_ds, day_stops_ds = self.day_idx
 
         # original scale. Compute outside loop since stays the same
@@ -374,7 +412,7 @@ class Gait(_BaseProcess):
 
         # get the gait classification if necessary
         gbout_starts, gbout_stops = get_gait_classification_lgbm(
-            gait_pred_ds, accel_ds, goal_fs
+            gait_starts_ds, gait_stops_ds, accel_ds, goal_fs
         )
         self._save_classifier_fn(time_ds, gbout_starts, gbout_stops)
 
