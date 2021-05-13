@@ -96,7 +96,7 @@ class _BaseProcess:
 
         return start, stop
 
-    def predict(self, *args, **kwargs):
+    def predict(self, expect_days, expect_wear, *args, **kwargs):
         """
         Intended to be overwritten in the subclass. Should still be called
         with super.
@@ -105,17 +105,19 @@ class _BaseProcess:
         # save the filename for saving reference
         self._file_name = Path(kwargs.get("file", "")).stem
 
-        # TODO if the accel/time requirement for some things changes then this
-        # will need to change as well
-        n = kwargs.get(self._acc, kwargs.get(self._time)).shape[0] - 1
+        if expect_days:
+            n = kwargs.get(self._acc, kwargs.get(self._time)).shape[0] - 1
 
-        days = kwargs.get(self._days, {}).get(self.day_key, None)
-        msg = f"[{self!s}] Day indices [{self.day_key}] not found. No day split used."
-        self.day_idx = self._check_if_idx_none(days, msg, 0, n)
+            days = kwargs.get(self._days, {}).get(self.day_key, None)
+            msg = f"[{self!s}] Day indices [{self.day_key}] not found. No day split used."
+            self.day_idx = self._check_if_idx_none(days, msg, 0, n)
 
-        wear = kwargs.get("wear", None)
-        msg = f"[{self!s}] Wear detection not provided. Assuming 100% wear time."
-        self.wear_idx = self._check_if_idx_none(wear, msg, 0, n)
+        if expect_wear:
+            n = kwargs.get(self._acc, kwargs.get(self._time)).shape[0] - 1
+
+            wear = kwargs.get("wear", None)
+            msg = f"[{self!s}] Wear detection not provided. Assuming 100% wear time."
+            self.wear_idx = self._check_if_idx_none(wear, msg, 0, n)
 
     def save_results(self, results, file_name):
         """
