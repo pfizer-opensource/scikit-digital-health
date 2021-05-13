@@ -1,7 +1,9 @@
 import datetime as dt
 
+import pytest
 from numpy import array, allclose
 
+from skimu.activity.cutpoints import _base_cutpoints
 from skimu.activity.core import (
     _check_if_none,
     _update_date_results,
@@ -107,6 +109,17 @@ class TestActivityLevelClassification:
         # make sure wlen gets sent to factor of 60
         swlen_opts = [(4, 4), (7, 6), (14, 15), (58, 30)]
         for wlen in swlen_opts:
-            a = ActivityLevelClassification(short_wlen=wlen[0])
+            if wlen[0] != wlen[1]:
+                with pytest.warns(UserWarning):
+                    a = ActivityLevelClassification(short_wlen=wlen[0])
+            else:
+                a = ActivityLevelClassification(short_wlen=wlen[0])
+
             assert a.wlen == wlen[1]
 
+        # check that default cutpoints are set if not provided
+        with pytest.warns(UserWarning):
+            a = ActivityLevelClassification(cutpoints="test")
+
+        # dont have name so make sure that the values are correct
+        assert a.cutpoints == _base_cutpoints["migueles_wrist_adult"]
