@@ -212,14 +212,6 @@ class Sit2Stand(_BaseProcess):
         # setup filter
         sos = butter(self.lp_ord, 2 * self.lp_cut * dt, btype="low", output="sos")
 
-        # check if windows exist for days
-        days = kwargs.get(self._days, {}).get(self.day_key, None)
-        if days is None:
-            warn(
-                f"Day indices for {self.day_key} (base, period) not found. No day separation used"
-            )
-            days = [[0, accel.shape[0] - 1]]
-
         # results storage
         sts = {
             "Date": [],
@@ -236,7 +228,7 @@ class Sit2Stand(_BaseProcess):
             "Partial": [],
         }
 
-        for iday, day_idx in enumerate(days):
+        for iday, day_idx in enumerate(zip(*self.day_idx)):
             start, stop = day_idx
 
             # compute the magnitude of the acceleration

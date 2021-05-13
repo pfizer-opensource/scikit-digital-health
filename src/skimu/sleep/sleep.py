@@ -337,8 +337,8 @@ class Sleep(_BaseProcess):
         # downsample if necessary
         goal_fs = 20.0
         if fs != goal_fs and self.downsample:
-            time_ds, (accel_ds, temp_ds), (days_ds, wear_ds) = apply_downsample(
-                goal_fs, time, data=(accel, temperature), indices=(days, wear)
+            time_ds, (accel_ds, temp_ds), (day_starts_ds, day_stops_ds, wear_starts_ds, wear_stops_ds) = apply_downsample(
+                goal_fs, time, data=(accel, temperature), indices=(*self.day_idx, *self.wear_idx)
             )
 
         else:
@@ -346,8 +346,8 @@ class Sleep(_BaseProcess):
             time_ds = time
             accel_ds = accel
             temp_ds = temperature
-            days_ds = days
-            wear_ds = wear
+            day_starts_ds, day_stops_ds = self.day_idx
+            wear_starts_ds, wear_stops_ds = self.wear_idx
 
         # setup the storage for the sleep parameters
         sleep = {
@@ -361,7 +361,7 @@ class Sleep(_BaseProcess):
             ]
         }
         # setup storage for sleep indices
-        sleep_idx = full(days_ds.shape, -1, dtype=int_)
+        sleep_idx = full((day_starts_ds.size, 2), -1, dtype=int_)
 
         # iterate over the parameters, initialize them, and put their names into sleep
         init_params = []
@@ -370,9 +370,7 @@ class Sleep(_BaseProcess):
             sleep[init_params[-1].name] = []
 
         # iterate over the days
-        for iday, day_idx in enumerate(days_ds):
-            start, stop = day_idx
-
+        for iday, (start, stop) in enumerate(zip(day_starts_ds, day_stops_ds)):
             if ((stop - start) / (3600 * goal_fs)) < self.min_day_hrs:
                 self.logger.info(
                     f"Day {iday} has less than {self.min_day_hrs} hours. Skipping"
@@ -397,7 +395,7 @@ class Sleep(_BaseProcess):
 
             # get the starts and stops of wear during the day
             dw_starts, dw_stops = get_day_wear_intersection(
-                wear_ds[:, 0], wear_ds[:, 1], start, stop
+                wear_starts_ds, wear_stops_ds, start, stop
             )
 
             if (sum(dw_stops - dw_starts) / (3600 * goal_fs)) < self.min_wear_time:
