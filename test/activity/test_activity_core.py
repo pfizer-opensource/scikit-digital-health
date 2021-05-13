@@ -100,3 +100,13 @@ class Test_update_date_results:
         assert res["Weekday"][0] == "Monday"
         assert res["Day N"][0] == 1
         assert res["N hours"][0] == 4.0
+
+
+class TestActivityLevelClassification:
+    def test_init(self):
+        # make sure wlen gets sent to factor of 60
+        swlen_opts = [(4, 4), (7, 6), (14, 15), (58, 30)]
+        for wlen in swlen_opts:
+            a = ActivityLevelClassification(short_wlen=wlen[0])
+            assert a.wlen == wlen[1]
+
