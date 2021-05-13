@@ -256,7 +256,7 @@ class TestGait(BaseProcessTester):
         data = get_sample_data(self.sample_data_file, self.sample_data_keys)
         data["gait_pred"] = arange(0, 1, 0.1)
 
-        with pytest.raises(DimensionMismatchError):
+        with pytest.raises(ValueError):
             self.process.predict(**data)
 
     def test_add_metrics(self):
