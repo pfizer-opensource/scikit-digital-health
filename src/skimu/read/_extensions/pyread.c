@@ -110,6 +110,19 @@ static PyObject *read_axivity(PyObject *NPY_UNUSED(self), PyObject *args)
     /* read the header */
     axivity_read_header(&flen, file, &info, &ierr);
 
+    if (ierr != AX_READ_E_NONE)
+    {
+        axivity_close(&info);
+
+        free(winfo.i_start);
+        free(winfo.i_stop);
+        Py_XDECREF(bases);
+        Py_XDECREF(periods);
+
+        axivity_set_error_message(ierr);
+        return NULL;
+    }
+
     if ((info.nblocks == -1) || (info.axes == -1) || (info.count == -1))
     {
         axivity_close(&info);
@@ -198,8 +211,8 @@ static PyObject *read_axivity(PyObject *NPY_UNUSED(self), PyObject *args)
     }
 
     return Py_BuildValue(
-        "fNNNNN",  /* need to use N to not increment reference counter */
-        PyLong_FromLong(info.frequency),
+        "dNNNNN",  /* need to use N to not increment reference counter */
+        info.frequency,
         (PyObject *)imudata,
         (PyObject *)time,
         (PyObject *)light,
