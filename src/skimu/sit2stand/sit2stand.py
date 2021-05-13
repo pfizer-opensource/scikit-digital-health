@@ -202,7 +202,7 @@ class Sit2Stand(_BaseProcess):
             days. Dictionary keys are in the format "{base}, {period}". If not provided, or the
             key specified by `day_window` is not found, no day-based windowing will be done.
         """
-        super().predict(time=time, accel=accel, **kwargs)
+        super().predict(expect_days=True, expect_wear=False, time=time, accel=accel, **kwargs)
 
         # FILTERING
         # ======================================================

@@ -307,7 +307,14 @@ class Sleep(_BaseProcess):
             Must have the key
         """
         super().predict(
-            time=time, accel=accel, temperature=temperature, fs=fs, wear=wear, **kwargs
+            expect_days=True,
+            expect_wear=True,
+            time=time,
+            accel=accel,
+            temperature=temperature,
+            fs=fs,
+            wear=wear,
+            **kwargs
         )
 
         if fs is None:

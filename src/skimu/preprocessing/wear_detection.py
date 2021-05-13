@@ -143,13 +143,23 @@ class DetectWear(_BaseProcess):
             (N, ) array of unix timestamps (in seconds) since 1970-01-01.
         accel : numpy.ndarray
             (N, 3) array of measured acceleration values in units of g.
+        temperature : numpy.ndarray
+            (N,) array of measured temperature values during recording in deg C.
 
         Returns
         -------
         results : dictionary
-            Dictionary of inputs, plus the key `wear` which is an array-like (N, 2) indicating
-            the start and stop indices of wear.
+            Dictionary of inputs, plus the key `wear` which is an array-like (N, 2)
+            indicating the start and stop indices of wear.
         """
+        super().predict(
+            expect_days=False,
+            expect_wear=False,
+            time=time,
+            accel=accel,
+            temperature=temperature,
+            **kwargs
+        )
         # dont start at zero due to timestamp weirdness with some devices
         fs = 1 / mean(diff(time[1000:5000]))
         n_wlen = int(self.wlen * 60 * fs)  # samples in wlen minutes

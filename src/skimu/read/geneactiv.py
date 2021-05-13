@@ -118,7 +118,7 @@ class ReadBin(_BaseProcess):
         if file[-3:] != "bin":
             warn("File extension is not expected '.bin'", UserWarning)
 
-        super().predict(file=file, **kwargs)
+        super().predict(expect_days=False, expect_wear=False, file=file, **kwargs)
 
         # read the file
         nmax, fs, acc, time, light, temp, starts, stops = read_geneactiv(
