@@ -8,24 +8,13 @@ from collections.abc import Iterable
 from warnings import warn
 
 import h5py
-from numpy import (
-    mean,
-    diff,
-    arange,
-    zeros,
-    interp,
-    float_,
-    abs,
-    asarray,
-    sum,
-    argmin,
-    ndarray,
-)
+from numpy import mean, diff, asarray, sum
 
 from skimu.base import _BaseProcess
+from skimu.utility.internal import apply_downsample
+
 from skimu.gait.get_gait_classification import (
     get_gait_classification_lgbm,
-    DimensionMismatchError,
 )
 from skimu.gait.get_gait_bouts import get_gait_bouts
 from skimu.gait.get_gait_events import get_gait_events
@@ -36,59 +25,6 @@ from skimu.gait.gait_endpoints import GaitEventEndpoint, GaitBoutEndpoint
 
 class LowFrequencyError(Exception):
     pass
-
-
-def get_downsampled_data(time, accel, gait_pred, fs, goal_fs, days, downsample):
-    """
-    Get the downsampled data from input data
-
-    Parameters
-    ----------
-    time
-    accel
-    gait_pred
-    goal_fs
-    downsample
-    kw
-
-    Returns
-    -------
-    time_ds
-    accel_ds
-    gait_pred_ds
-    days
-    """
-    if downsample:
-        _days = asarray(days)
-        time_ds = arange(time[0], time[-1], 1 / goal_fs)
-        accel_ds = zeros((time_ds.size, 3), dtype=float_)
-        for i in range(3):
-            accel_ds[:, i] = interp(time_ds, time, accel[:, i])
-
-        if isinstance(gait_pred, ndarray):
-            if gait_pred.size != accel.shape[0]:
-                raise DimensionMismatchError(
-                    "Number of gait predictions must match number of acceleration samples"
-                )
-            gait_pred_ds = interp(time_ds, time, gait_pred)
-        else:
-            gait_pred_ds = gait_pred
-
-        days = zeros(asarray(_days).shape)
-        for i, day_idx in enumerate(_days):
-            i_guess = (day_idx * goal_fs / fs).astype(int) - 1000
-            i_guess[i_guess < 0] = 0
-            days[i, 0] = argmin(
-                abs(time_ds[i_guess[0] : i_guess[0] + 2000] - time[day_idx[0]])
-            )
-            days[i, 1] = argmin(
-                abs(time_ds[i_guess[1] : i_guess[1] + 2000] - time[day_idx[1]])
-            )
-            days[i] += i_guess  # make sure to add the starting index back in
-
-        return time_ds, accel_ds, gait_pred_ds, days
-    else:
-        return time, accel, gait_pred, days
 
 
 class Gait(_BaseProcess):
@@ -312,14 +248,15 @@ class Gait(_BaseProcess):
                 self._params.append(endpoints)
             else:
                 raise ValueError(
-                    f"Endpoint {endpoints!r} is not a GaitEventEndpoints or GaitBoutEndpoints"
+                    f"Endpoint {endpoints!r} is not a GaitEventEndpoints or "
+                    f"GaitBoutEndpoints"
                 )
 
     def predict(
-        self, time=None, accel=None, *, gyro=None, height=None, gait_pred=None, **kwargs
+        self, time=None, accel=None, *, fs=None, height=None, gait_pred=None, **kwargs
     ):
         """
-        predict(time, accel, *, gyro=None, height=None, gait_pred=None, day_ends={})
+        predict(time, accel, *, fs=None, height=None, gait_pred=None, day_ends={})
 
         Get the gait events and endpoints from a time series signal
 
@@ -328,30 +265,31 @@ class Gait(_BaseProcess):
         time : numpy.ndarray
             (N, ) array of unix timestamps, in seconds
         accel : numpy.ndarray
-            (N, 3) array of accelerations measured by centrally mounted lumbar device, in
-            units of 'g'
-        gyro : numpy.ndarray, optional
-            (N, 3) array of angular velocities measured by the same centrally mounted lumbar
-            device, in units of 'deg/s'. Only optionally used if provided. Main functionality
-            is to allow distinguishing step sides.
+            (N, 3) array of accelerations measured by centrally mounted lumbar
+            device, in units of 'g'
+        fs : float, optional
+            Sampling frequency in Hz of the accelerometer data.
         height : float, optional
-            Either height (False) or leg length (True) of the subject who wore the inertial
-            measurement device, in meters, depending on `leg_length`. If not provided,
-            spatial endpoints will not be computed
+            Either height (False) or leg length (True) of the subject who wore
+            the inertial measurement device, in meters, depending on `leg_length`.
+            If not provided, spatial endpoints will not be computed.
         gait_pred : {any, numpy.ndarray}, optional
-            (N, ) array of boolean predictions of gait, or any value that is not None. If not an
-            ndarray but not None, the entire recording will be taken as gait. If not provided
-            (or None), gait classification will be performed on the acceleration data.
+            (N, ) array of boolean predictions of gait, or any value that is not
+            None. If not an ndarray but not None, the entire recording will be
+            taken as gait. If not provided (or None), gait classification will
+            be performed on the acceleration data.
         day_ends : dict, optional
-            Optional dictionary containing (N, 2) arrays of start and stop indices for invididual
-            days. Dictionary keys are in the format ({base}, {period}). If not provided, or the
-            key specified by `day_window` is not found, no day-based windowing will be done.
+            Optional dictionary containing (N, 2) arrays of start and stop
+            indices for invididual days. Dictionary keys are in the format
+            ({base}, {period}). If not provided, or the key specified by `day_window`
+            is not found, no day-based windowing will be done.
 
         Returns
         -------
         gait_results : dict
-            The computed gait endpoints. For a list of endpoints and their definitions, see
-            :ref:`event-level-gait-endpoints` and :ref:`bout-level-gait-endpoints`.
+            The computed gait endpoints. For a list of endpoints and their
+            definitions, see :ref:`event-level-gait-endpoints` and
+            :ref:`bout-level-gait-endpoints`.
 
         Raises
         ------
@@ -359,9 +297,11 @@ class Gait(_BaseProcess):
             If the sampling frequency is less than 20Hz
         """
         super().predict(
+            expect_days=True,
+            expect_wear=False,  # currently not using wear
             time=time,
             accel=accel,
-            gyro=gyro,
+            fs=fs,
             height=height,
             gait_pred=gait_pred,
             **kwargs,
@@ -375,32 +315,28 @@ class Gait(_BaseProcess):
             leg_length = self.height_factor * height
 
         # compute fs/delta t
-        fs = 1 / mean(diff(time))
+        fs = 1 / mean(diff(time)) if fs is None else fs
         if fs <= 20.0:
             raise LowFrequencyError(f"Frequency ({fs:.2f}Hz) is too low (<20Hz).")
-        if fs < (50.0 * 0.985):  # 1.5% margin
+        if fs < 50:
             warn(
-                "Frequency is less than 50Hz. Downsampling to 20Hz. Note that this may effect "
-                "gait endpoints results values",
+                "Frequency is less than 50Hz. Downsampling to 20Hz. Note that "
+                "this may effect gait endpoints results values",
                 UserWarning,
             )
 
         # downsample acceleration
-        goal_fs = 50 if fs > (50 * 0.985) else 20
-        downsample = False if ((0.985 * goal_fs) < fs < (1.015 * goal_fs)) else True
+        goal_fs = 50.0 if fs >= 50.0 else 20.
 
-        # day separation
-        days = kwargs.get(self._days, {}).get(self.day_key, None)
-        if days is None:
-            warn(
-                f"Day indices for {self.day_key} (base, period) not found. No day separation used",
-                UserWarning,
+        if fs != goal_fs:
+            time_ds, (accel_ds,), (gait_pred_ds, day_starts_ds, day_stops_ds) = apply_downsample(
+                goal_fs, time, (accel,), (gait_pred, *self.day_idx)
             )
-            days = [[0, accel.shape[0] - 1]]
-
-        time_ds, accel_ds, gait_pred_ds, days = get_downsampled_data(
-            time, accel, gait_pred, fs, goal_fs, days, downsample
-        )
+        else:
+            time_ds = time
+            accel_ds = accel
+            gait_pred_ds = gait_pred
+            day_starts_ds, day_stops_ds = self.day_idx
 
         # original scale. Compute outside loop since stays the same
         # 1.25 comes from original paper, corresponds to desired frequency
@@ -444,8 +380,7 @@ class Gait(_BaseProcess):
 
         gait_i = 0  # keep track of where everything is in the loops
 
-        for iday, day_idx in enumerate(days):
-            start, stop = day_idx
+        for iday, (start, stop) in enumerate(zip(day_starts_ds, day_stops_ds)):
 
             # GET GAIT BOUTS
             # ==============
@@ -534,7 +469,7 @@ class Gait(_BaseProcess):
         gait.pop("valid cycle", None)
 
         kwargs.update(
-            {self._acc: accel, self._time: time, self._gyro: gyro, "height": height}
+            {self._acc: accel, self._time: time, "fs": fs, "height": height}
         )
         if self._in_pipeline:
             return kwargs, gait
