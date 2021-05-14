@@ -431,14 +431,17 @@ class ActivityLevelClassification(_BaseProcess):
         else:
             return res
 
-    def _compute_awake_activity_endpoints(
-        self, results, accel, fs, day_n, starts, stops, n_wlen, epm, ig_levels, ig_vals
-    ):
-        # allocate histogram for intensity gradient
-        hist = zeros(ig_levels.size - 1)
+    def _initialize_awake_values(self, results, day_n):
+        """
+        Initialize wake results values to 0.0 so they can be added to.
 
-        # initialize values from nan to 0.0. Do this here because days with less than minimum
-        # hours should have nan values
+        Parameters
+        ----------
+        results : dict
+            Dictionary of results values
+        day_n : int
+            Day index value
+        """
         for w in self.max_acc_lens:
             results[self._max_acc_str.format(w=w)][day_n] = 0.0
         for lvl in self.act_levels:
@@ -448,6 +451,16 @@ class ActivityLevelClassification(_BaseProcess):
             for w in self.blens:
                 key = self._bout_str.format(L=lvl, w=w)
                 results[key][day_n] = 0.0
+
+    def _compute_awake_activity_endpoints(
+        self, results, accel, fs, day_n, starts, stops, n_wlen, epm, ig_levels, ig_vals
+    ):
+        # allocate histogram for intensity gradient
+        hist = zeros(ig_levels.size - 1)
+
+        # initialize values from nan to 0.0. Do this here because days with less than minimum
+        # hours should have nan values
+        self._initialize_awake_values(results, day_n)
 
         for start, stop in zip(starts, stops):
             # compute the desired acceleration metric
