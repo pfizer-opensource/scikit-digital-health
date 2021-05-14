@@ -230,7 +230,7 @@ class ActivityBoutMinutes(ActivityEndpoint):
         self.closed_bout = closed_bout
         self.bout_metric = bout_metric
 
-    def compute(self, starts, stops, fs, wlen, cutpoints, acc_metric_unw, acc_metric):
+    def compute(self, starts, stops, fs, wlen, cutpoints, acc_metric):
         """
         Compute the number of total minutes spent in an activity level.
 
@@ -246,8 +246,6 @@ class ActivityBoutMinutes(ActivityEndpoint):
             Window length of the windowed acceleration metric, in seconds.
         cutpoints : dict
             Dictionary of cutpoints.
-        acc_metric_unw : numpy.ndarray
-            Unwindowed/meaned acceleration metric.
         acc_metric : numpy.ndarray
             Acceleration metric that has already been windowed and had the
             moving mean computed on for windows of the short window length
@@ -258,26 +256,30 @@ class ActivityBoutMinutes(ActivityEndpoint):
         level_mins : float
             Number of minutes spent in the specified activity level.
         """
-        lthresh, uthresh = get_level_thresholds(self.level, cutpoints)
         n = int(fs * wlen)
-
         w_starts = (starts / n).astype(int)
         w_stops = (stops / n).astype(int)
 
-        val = 0.0
-        for start, stop in zip(w_starts, w_stops):
-            val += get_activity_bouts(
-                acc_metric[start:stop],
-                lthresh,
-                uthresh,
-                wlen,
-                self.bout_len,
-                self.bout_crit,
-                self.closed_bout,
-                self.bout_metric,
-            )
+        res = ()
+        for level in ["MVPA", "sedentary", "light", "moderate", "vigorous"]:
+            lthresh, uthresh = get_level_thresholds(level, cutpoints)
 
-        return val
+            val = 0.0
+            for start, stop in zip(w_starts, w_stops):
+                val += get_activity_bouts(
+                    acc_metric[start:stop],
+                    lthresh,
+                    uthresh,
+                    wlen,
+                    self.bout_len,
+                    self.bout_crit,
+                    self.closed_bout,
+                    self.bout_metric,
+                )
+
+            res += (val,)
+
+        return res, self.res_names
 
 
 class ActivityEpochMinutes(ActivityEndpoint):
@@ -312,14 +314,16 @@ class ActivityEpochMinutes(ActivityEndpoint):
         physical activity: the role of sociodemographic factors,” Am J Epidemiol, vol. 179,
         no. 6, pp. 781–790, Mar. 2014, doi: 10.1093/aje/kwt330.
     """
-    def __init__(self, level="MVPA", day_part="wake"):
-        if level.lower not in ["mvpa", "sedentary", "light", "moderate", "vigorous"]:
-            raise ValueError("level not recognized.")
+    def __init__(self, day_part="wake"):
         if day_part not in ["wake", "sleep"]:
             raise ValueError("day_part must be one of {'wake', 'sleep'}.")
 
-        super().__init__(f"{level} epoch {day_part} mins", __name__)
-        self.level = level
+        super().__init__(
+            (
+                f"MVPA epoch {day_part} mins",
+            ),
+            __name__,
+        )
 
     def compute(self, starts, stops, fs, wlen, cutpoints, acc_metric_unw, acc_metric):
         """
