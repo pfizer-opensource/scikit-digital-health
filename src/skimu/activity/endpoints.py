@@ -208,17 +208,23 @@ class ActivityBoutMinutes(ActivityEndpoint):
         physical activity: the role of sociodemographic factors,” Am J Epidemiol, vol. 179,
         no. 6, pp. 781–790, Mar. 2014, doi: 10.1093/aje/kwt330.
     """
-    def __init__(self, level="MVPA", bout_length=5, bout_criteria=0.8, closed_bout=False, bout_metric=4):
-        if level.lower not in ["mvpa", "sedentary", "light", "moderate", "vigorous"]:
-            raise ValueError("level not recognized.")
+    def __init__(self, bout_length=5, bout_criteria=0.8, closed_bout=False, bout_metric=4, **kwargs):
         bout_length = max([int(bout_length), 1])
         bout_criteria = min(max([0.0, bout_criteria]), 1.0)
         if bout_metric not in range(1, 6):
             raise ValueError("bout_metric must be in {1, 2, 3, 4, 5}.")
 
-        super().__init__(f"{level} {bout_length}min bout mins", __name__)
+        super().__init__(
+            (
+                f"MVPA {bout_length}min bout mins",
+                f"Sedentary {bout_length}min bout mins",
+                f"Light {bout_length}min bout mins",
+                f"Moderate {bout_length}min bout mins",
+                f"Vigorous {bout_length}min bout mins",
+            ),
+            __name__,
+        )
 
-        self.level = level
         self.bout_len = bout_length
         self.bout_crit = bout_criteria
         self.closed_bout = closed_bout
