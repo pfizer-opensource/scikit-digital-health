@@ -6,7 +6,8 @@ Pfizer DMTI 2021
 """
 import logging
 
-from numpy import max, sum, array, zeros, histogram
+from numpy import max, sum, array, zeros, histogram, log
+from scipy.stats import linregress
 
 from skimu.utility import moving_mean
 from skimu.activity.cutpoints import get_level_thresholds
@@ -19,8 +20,8 @@ class ActivityEndpoint:
 
     Parameters
     ----------
-    name : str
-        Name of the endpoint.
+    res_names : tuple of str
+        Results names/keys.
     logname : str
         Name of the logger to get
     """
@@ -30,7 +31,8 @@ class ActivityEndpoint:
     def __repr__(self):
         return self.name
 
-    def __init__(self, logname):
+    def __init__(self, res_names, logname):
+        self.res_names = res_names
         self.name = self.__class__.__name__
         self.logger = logging.getLogger(logname)
 
@@ -39,7 +41,7 @@ class ActivityEndpoint:
 
 
 class ActivityIntensityGradient(ActivityEndpoint):
-    """
+    r"""
     Compute the intensity gradient - a measure of the drop-off in increasing
     activity level.
 
@@ -67,8 +69,15 @@ class ActivityIntensityGradient(ActivityEndpoint):
         Science in Sports & Exercise, vol. 50, no. 6, pp. 1323–1332, Jun. 2018,
         doi: 10.1249/MSS.0000000000001561.
     """
-    def __init__(self):
-        super().__init__(__name__)
+    def __init__(self, **kwargs):
+        super().__init__(
+            (
+                "Intensity Gradient",
+                "IG intercept",
+                "IG r-sq",
+            ),
+            __name__,
+        )
 
         self.ig_levels = None
         self.ig_vals = None
@@ -93,8 +102,8 @@ class ActivityIntensityGradient(ActivityEndpoint):
         # levels to get from accel should be in g
         self.ig_levels /= 1000
 
-    def compute(self, starts, stops, fs, wlen, cutpoints, acc_metric_unw, acc_metric):
-        r"""
+    def compute(self, starts, stops, fs, wlen, cutpoints, acc_metric):
+        """
         Compute the number of total minutes spent in an activity level.
 
         Parameters
@@ -109,8 +118,6 @@ class ActivityIntensityGradient(ActivityEndpoint):
             Window length of the windowed acceleration metric, in seconds.
         cutpoints : dict
             Dictionary of cutpoints.
-        acc_metric_unw : numpy.ndarray
-            Unwindowed/meaned acceleration metric.
         acc_metric : numpy.ndarray
             Acceleration metric that has already been windowed and had the
             moving mean computed on for windows of the short window length
@@ -118,8 +125,10 @@ class ActivityIntensityGradient(ActivityEndpoint):
 
         Returns
         -------
-        ig : float
-            The intensity gradient.
+        (ig, ig_itcpt, ig_rsq) : tuple of floats
+            The intensity gradient parameters, slope, intercept, and :math:`r^2`.
+        names : tuple of strings
+            Names of the values.
         """
         hist = zeros(self.ig_vals.size)
         n = int(fs * wlen)
@@ -129,6 +138,16 @@ class ActivityIntensityGradient(ActivityEndpoint):
 
         for start, stop in zip(w_starts, w_stops):
             hist += histogram(acc_metric[start:stop], bins=self.ig_levels, density=False)[0]
+
+        hist /= int(60 / wlen)  # get minutes in each bin
+
+        # get natural log of bin midpoints and accel minutes
+        lx = log(self.ig_vals[hist > 0])
+        ly = log(hist[hist > 0])
+
+        slope, intercept, rval, *_ = linregress(lx, ly)
+
+        return (slope, intercept, rval**2), self.res_names
 
 
 class ActivityBoutMinutes(ActivityEndpoint):
