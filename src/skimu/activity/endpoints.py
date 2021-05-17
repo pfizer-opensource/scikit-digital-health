@@ -14,6 +14,15 @@ from skimu.activity.cutpoints import get_level_thresholds
 from skimu.activity.core import get_activity_bouts
 
 
+__all__ = [
+    "ActivityEndpoint",
+    "ActivityIntensityGradient",
+    "ActivityBoutMinutes",
+    "ActivityEpochMinutes",
+    "MaximumAcceleration"
+]
+
+
 class ActivityEndpoint:
     """
     Activity endpoint base class.
@@ -45,6 +54,16 @@ class ActivityIntensityGradient(ActivityEndpoint):
     Compute the intensity gradient - a measure of the drop-off in increasing
     activity level.
 
+    Parameters
+    ----------
+    width : int
+            Bin width for the histogram bins, in milli-g. Default is 25mg (0.025g).
+    max1 : int
+        Maximum value of normal bin widths, in milli-g. Default is 4000mg (4g).
+        This value is inclusive on the end.
+    max2 : int
+        Maximum second value of the last bin, in milli-g. Default is 16000mg (8g).
+
     Notes
     -----
     The intensity gradient calculation is a way of assessing the profile
@@ -69,7 +88,7 @@ class ActivityIntensityGradient(ActivityEndpoint):
         Science in Sports & Exercise, vol. 50, no. 6, pp. 1323–1332, Jun. 2018,
         doi: 10.1249/MSS.0000000000001561.
     """
-    def __init__(self, **kwargs):
+    def __init__(self, width=25, max1=4000, max2=16000, **kwargs):
         super().__init__(
             (
                 "Intensity Gradient",
@@ -79,23 +98,6 @@ class ActivityIntensityGradient(ActivityEndpoint):
             __name__,
         )
 
-        self.ig_levels = None
-        self.ig_vals = None
-
-        self.set_bin_values()  # to defaults
-
-    def set_bin_values(self, width=25, max1=4000, max2=16000):
-        """
-        Parameters
-        ----------
-        width : int
-            Bin width for the histogram bins, in milli-g. Default is 25mg (0.025g).
-        max1 : int
-            Maximum value of normal bin widths, in milli-g. Default is 4000mg (4g).
-            This value is inclusive on the end.
-        max2 : int
-            Maximum second value of the last bin, in milli-g. Default is 16000mg (8g).
-        """
         self.ig_levels = array([i for i in range(0, max1 + 1, width)] + [max2])
         self.ig_vals = (self.ig_levels[1:] + self.ig_levels[:-1]) / 2
         # store ig_vals in milli-g to match existing work, but the actual
@@ -174,39 +176,45 @@ class ActivityBoutMinutes(ActivityEndpoint):
 
     Notes
     -----
-    While the `bout_metric` methods all should yield fairly similar results, there are subtle
-    differences in how the results are computed:
+    While the `bout_metric` methods all should yield fairly similar results,
+    there are subtle differences in how the results are computed:
 
-    1. MVPA bout definition from [2]_ and [3]_. Here the algorithm looks for `bout_len` minute
-       windows in which more than `bout_criteria` percent of the epochs are above the MVPA
-       threshold (above the "light" activity threshold) and then counts the entire window as mvpa.
-       The motivation for this definition was as follows: A person who spends 10 minutes in MVPA
-       with a 2 minute break in the middle is equally active as a person who spends 8 minutes in
-       MVPA without taking a break. Therefore, both should be counted equal.
-    2. Look for groups of epochs with a value above the MVPA threshold that span a time
-       window of at least `bout_len` minutes in which more than `bout_criteria` percent of the
-       epochs are above the threshold. Motivation: not counting breaks towards MVPA may simplify
-       interpretation and still counts the two persons in the above example as each others equal.
-    3. Use a sliding window across the data to test `bout_criteria` per window and do not allow
-       for breaks larger than 1 minute, and with fraction of time larger than the `bout_criteria`
-       threshold.
-    4. Same as 3, but also requires the first and last epoch to meet the threshold criteria.
-    5. Same as 4, but now looks for breaks larger than a minute such that 1 minute breaks
-       are allowed, and the fraction of time that meets the threshold should be equal
-       or greater than the `bout_criteria` threshold.
+    1. MVPA bout definition from [2]_ and [3]_. Here the algorithm looks for
+        `bout_len` minute windows in which more than `bout_criteria` percent of
+        the epochs are above the MVPA threshold (above the "light" activity threshold)
+        and then counts the entire window as mvpa. The motivation for this
+        definition was as follows: A person who spends 10 minutes in MVPA with
+        a 2 minute break in the middle is equally active as a person who spends
+        8 minutes in MVPA without taking a break. Therefore, both should be
+        counted equal.
+    2. Look for groups of epochs with a value above the MVPA threshold that span
+        a time window of at least `bout_len` minutes in which more than
+        `bout_criteria` percent of the epochs are above the threshold. Motivation:
+        not counting breaks towards MVPA may simplify interpretation and still
+        counts the two persons in the above example as each others equal.
+    3. Use a sliding window across the data to test `bout_criteria` per window
+        and do not allow for breaks larger than 1 minute, and with fraction of
+        time larger than the `bout_criteria` threshold.
+    4. Same as 3, but also requires the first and last epoch to meet the
+        threshold criteria.
+    5. Same as 4, but now looks for breaks larger than a minute such that 1
+        minute breaks are allowed, and the fraction of time that meets the
+        threshold should be equal or greater than the `bout_criteria` threshold.
 
     References
     ----------
-    .. [1] J. H. Migueles et al., “Comparability of accelerometer signal aggregation metrics
-        across placements and dominant wrist cut points for the assessment of physical activity in
-        adults,” Scientific Reports, vol. 9, no. 1, Art. no. 1, Dec. 2019,
-        doi: 10.1038/s41598-019-54267-y.
-    .. [2] I. C. da Silva et al., “Physical activity levels in three Brazilian birth cohorts as
-        assessed with raw triaxial wrist accelerometry,” International Journal of Epidemiology,
-        vol. 43, no. 6, pp. 1959–1968, Dec. 2014, doi: 10.1093/ije/dyu203.
-    .. [3] S. Sabia et al., “Association between questionnaire- and accelerometer-assessed
-        physical activity: the role of sociodemographic factors,” Am J Epidemiol, vol. 179,
-        no. 6, pp. 781–790, Mar. 2014, doi: 10.1093/aje/kwt330.
+    .. [1] J. H. Migueles et al., “Comparability of accelerometer signal
+        aggregation metrics across placements and dominant wrist cut points for
+        the assessment of physical activity in adults,” Scientific Reports,
+        vol. 9, no. 1, Art. no. 1, Dec. 2019, doi: 10.1038/s41598-019-54267-y.
+    .. [2] I. C. da Silva et al., “Physical activity levels in three Brazilian
+        birth cohorts as assessed with raw triaxial wrist accelerometry,”
+        International Journal of Epidemiology, vol. 43, no. 6, pp. 1959–1968,
+        Dec. 2014, doi: 10.1093/ije/dyu203.
+    .. [3] S. Sabia et al., “Association between questionnaire- and
+        accelerometer-assessed physical activity: the role of sociodemographic
+        factors,” Am J Epidemiol, vol. 179, no. 6, pp. 781–790, Mar. 2014,
+        doi: 10.1093/aje/kwt330.
     """
     def __init__(self, bout_length=5, bout_criteria=0.8, closed_bout=False, bout_metric=4, **kwargs):
         bout_length = max([int(bout_length), 1])
@@ -253,8 +261,10 @@ class ActivityBoutMinutes(ActivityEndpoint):
 
         Returns
         -------
-        level_mins : float
-            Number of minutes spent in the specified activity level.
+        (MVPA_mins, sed_mins, light_mins, mod_mins, vig_mins) : tuple of floats
+            Number of minutes spent in bouts at the specified activity level.
+        key_names : tuple of str
+            Names of the endpoints
         """
         n = int(fs * wlen)
         w_starts = (starts / n).astype(int)
@@ -314,13 +324,17 @@ class ActivityEpochMinutes(ActivityEndpoint):
         physical activity: the role of sociodemographic factors,” Am J Epidemiol, vol. 179,
         no. 6, pp. 781–790, Mar. 2014, doi: 10.1093/aje/kwt330.
     """
-    def __init__(self, day_part="wake"):
+    def __init__(self, day_part="wake", **kwargs):
         if day_part not in ["wake", "sleep"]:
             raise ValueError("day_part must be one of {'wake', 'sleep'}.")
 
         super().__init__(
             (
                 f"MVPA epoch {day_part} mins",
+                f"Sedentary epoch {day_part} mins",
+                f"Light epoch {day_part} mins",
+                f"Moderate epoch {day_part} mins",
+                f"Vigorous epoch {day_part} mins",
             ),
             __name__,
         )
@@ -350,21 +364,30 @@ class ActivityEpochMinutes(ActivityEndpoint):
 
         Returns
         -------
-        level_mins : float
+        (MVPA_mins, sed_mins, light_mins, mod_mins, vig_mins) : tuple of floats
             Number of minutes spent in the specified activity level.
+        key_names : tuple of strs
+            Names of the endpoints.
         """
-        lthresh, uthresh = get_level_thresholds(self.level, cutpoints)
+
         epm = int(60 / wlen)
         n = int(fs * wlen)
 
         w_starts = (starts / n).astype(int)
         w_stops = (stops / n).astype(int)
 
-        val = 0.0
-        for start, stop in zip(w_starts, w_stops):
-            val += sum((acc_metric[start:stop] >= lthresh) & (acc_metric[start:stop] < uthresh)) / epm
+        res = ()
+        for level in ["MVPA", "sedentary", "light", "moderate", "vigorous"]:
+            lthresh, uthresh = get_level_thresholds(level, cutpoints)
 
-        return val / epm
+            val = 0.0
+
+            for start, stop in zip(w_starts, w_stops):
+                val += sum((acc_metric[start:stop] >= lthresh) & (acc_metric[start:stop] < uthresh)) / epm
+
+            res += (val,)
+
+        return res, self.res_names
 
 
 class MaximumAcceleration(ActivityEndpoint):
@@ -382,9 +405,12 @@ class MaximumAcceleration(ActivityEndpoint):
     This is computed by taking the moving of the acceleration with windows
     of length `block_min` and finding the window with the maximum mean value.
     """
-    def __init__(self, block_min=15):
+    def __init__(self, block_min=15, **kwargs):
         block_min = int(block_min)
-        super().__init__(f"Max acc {block_min}min blocks gs", __name__)
+        super().__init__(
+            (f"Max acc {block_min}min blocks gs",),
+            __name__
+        )
 
         self.block_min = block_min
 
@@ -409,8 +435,10 @@ class MaximumAcceleration(ActivityEndpoint):
 
         Returns
         -------
-        max_acc : float
+        (max_acc,) : tuple of float
             Maximum acceleration window mean, in units of g.
+        key_names : tuple of str
+            Endpoint names
         """
         super().compute()
 
@@ -420,5 +448,5 @@ class MaximumAcceleration(ActivityEndpoint):
             res = max(moving_mean(acc_metric_unw[s:e], nw, nw))
             max_acc = max([res, max_acc])
 
-        return max_acc
+        return (max_acc,), self.res_names
 
