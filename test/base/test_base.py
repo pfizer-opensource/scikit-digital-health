@@ -1,4 +1,8 @@
+from tempfile import TemporaryDirectory
+from pathlib import Path
+
 from numpy import array, allclose
+
 from skimu.base import _BaseProcess
 
 
@@ -54,3 +58,18 @@ class Test_BaseProcess:
         assert "Entering _BaseProcess processing with call _BaseProcess()" in bp.logger.msgs
         assert "[_BaseProcess] Day indices [(-1, -1)] not found. No day split used." in bp.logger.msgs
 
+    def test_save_results(self):
+        bp = _BaseProcess()
+
+        bp.predict(expect_wear=False, expect_days=False, file="test_file.infile")
+
+        with TemporaryDirectory() as tdir:
+            tdir = Path(tdir)
+
+            fname = tdir / "{file}__{name}.out"
+
+            bp.save_results({"a": [1, 2, 3]}, str(fname))
+
+            files = [i.name for i in tdir.glob("*")]
+
+        assert "test_file___BaseProcess.out" in files
