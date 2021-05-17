@@ -13,9 +13,56 @@ from skimu.gait import Gait
 class TestProcess(_BaseProcess):
     def __init__(self, kw1=1):
         super().__init__(kw1=kw1)
+        self.kw1 = kw1
+
+    def predict(self, *args, **kwargs):
+        self.logger.info(f"kw1={self.kw1}")
+
+        return {"kw1": self.kw1}, {"kw1": self.kw1}
+
+
+class TestProcess2(_BaseProcess):
+    def __init__(self, kwa=5):
+        super().__init__(kwa=kwa)
+        self.kwa = kwa
+
+    def predict(self, *args, **kwargs):
+        self.logger.info(f"kwa={self.kwa}")
+
+        return {"kwa": self.kwa}, {"kwa": self.kwa}
 
 
 class TestPipeline:
+    @staticmethod
+    def setup_lgr():
+        class Lgr:
+            msgs = []
+
+            def info(self, msg):
+                self.msgs.append(msg)
+
+        return Lgr()
+
+    def test_run(self):
+        p = Pipeline()
+
+        tp1 = TestProcess(kw1=1)
+        tp1.logger = self.setup_lgr()
+        tp2 = TestProcess2(kwa=5)
+        tp2.logger = self.setup_lgr()
+
+        p.add(tp1)
+        p.add(tp2)
+
+        res = p.run()
+
+        assert "kw1=1" in tp1.logger.msgs
+        assert "kwa=5" in tp2.logger.msgs
+
+        exp_res = {"TestProcess": {"kw1": 1}, "TestProcess2": {"kwa": 5}}
+
+        assert res == exp_res
+
     def test_str_repr(self):
         p = Pipeline()
 
