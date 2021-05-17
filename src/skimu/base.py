@@ -36,6 +36,12 @@ class _BaseProcess:
 
         return ret
 
+    def __eq__(self, other):
+        if isinstance(other, type(self)):
+            return self._kw == other._kw
+        else:
+            return False
+
     def __init__(self, **kwargs):
         """
         Intended to be subclassed
