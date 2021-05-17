@@ -116,7 +116,40 @@ class TestPipeline:
 
         assert res == exp
 
-    def test_load(self):
+    def test_load_through_init(self):
+        exp = [
+            {
+                "Gait": {
+                    "module": "gait.gait",
+                    "Parameters": {},
+                    "save_result": False,
+                    "save_name": "gait_results.csv",
+                    "plot_save_name": None
+                }
+            },
+            {
+                "TestProcess": {
+                    "module": "test.testmodule",
+                    "Parameters": {},
+                    "save_result": False,
+                    "save_name": "test_save.csv",
+                    "plot_save_name": None
+                }
+            }
+        ]
+
+        with TemporaryDirectory() as tdir:
+            fname = Path(tdir) / "file.json"
+
+            with fname.open(mode="w") as f:
+                json.dump(exp, f)
+
+            with pytest.warns(UserWarning):
+                p = Pipeline(str(fname))
+
+        assert p._steps == [Gait()]
+
+    def test_load_function(self):
         exp = [
             {
                 "Gait": {
