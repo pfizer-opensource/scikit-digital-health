@@ -274,21 +274,6 @@ class ActivityLevelClassification(_BaseProcess):
         )  # default from rowlands
         igvals = (iglevels[1:] + iglevels[:-1]) / 2
 
-        wear_none_msg = (
-            f"[{self!s}] Wear detection not provided. Assuming 100% wear time."
-        )
-        wear_starts, wear_stops = self._check_if_idx_none(
-            wear, wear_none_msg, 0, time.size
-        )
-
-        # check if windows exist for days
-        days = kwargs.get(self._days, {}).get(self.day_key, None)
-        if days is None:
-            warn(
-                f"Day indices for {self.day_key} (base, period) not found. No day separation used"
-            )
-            days = [[0, time.size]]
-
         # check if sleep data is provided
         sleep = kwargs.get("sleep", None)
         slp_msg = (
@@ -297,9 +282,6 @@ class ActivityLevelClassification(_BaseProcess):
         sleep_starts, sleep_stops = self._check_if_idx_none(
             sleep, slp_msg, None, None
         )
-
-        # SETUP PLOTTING
-        source_file = kwargs.get("file", "Source Not Available")
 
         # ========================================================================================
         # SETUP RESULTS KEYS/ENDPOINTS
@@ -329,12 +311,12 @@ class ActivityLevelClassification(_BaseProcess):
             for j in self.blens
         ]
 
-        res = {i: full(len(days), j, dtype=k) for i, j, k in res_keys}
+        res = {i: full(len(self.day_idx[0]), j, dtype=k) for i, j, k in res_keys}
 
         # ========================================================================================
         # PROCESSING
         # ========================================================================================
-        for iday, day_idx in enumerate(days):
+        for iday, day_idx in enumerate(zip(*self.day_idx)):
             day_start, day_stop = day_idx
             # update the results dictionary with date strings, # of hours, etc
             start_dt = _update_date_results(
@@ -343,13 +325,12 @@ class ActivityLevelClassification(_BaseProcess):
 
             # get the intersection of wear time and day
             dwear_starts, dwear_stops = get_day_index_intersection(
-                wear_starts, wear_stops, True, day_start, day_stop  # include wear time
+                *self.wear_idx, True, day_start, day_stop  # include wear time
             )
 
             # PLOTTING. handle here before returning for minimal wear hours, etc
             self._plot_day_accel(
                 iday,
-                source_file,
                 fs,
                 accel[day_start:day_stop],
                 res["Date"][iday],
@@ -371,15 +352,15 @@ class ActivityLevelClassification(_BaseProcess):
             # if there is sleep data, add it to the intersection of indices
             if sleep_starts is not None and sleep_stops is not None:
                 dwear_starts, dwear_stops = get_day_index_intersection(
-                    (wear_starts, sleep_starts),
-                    (wear_stops, sleep_stops),
+                    (self.wear_idx[0], sleep_starts),
+                    (self.wear_idx[1], sleep_stops),
                     (True, False),  # include wear time, exclude sleeping time
                     day_start,
                     day_stop,
                 )
                 sleep_wear_starts, sleep_wear_stops = get_day_index_intersection(
-                    (wear_starts, sleep_starts),
-                    (wear_stops, sleep_stops),
+                    (self.wear_idx[0], sleep_starts),
+                    (self.wear_idx[1], sleep_stops),
                     (True, True),  # now we want only sleep
                     day_start,
                     day_stop,
@@ -527,7 +508,7 @@ class ActivityLevelClassification(_BaseProcess):
                     sum((acc_metric >= lthresh) & (acc_metric < uthresh)) / epm
                 )
 
-    def _plot_day_accel(self, day_n, source_file, fs, accel, date_str, start_dt):
+    def _plot_day_accel(self, day_n, fs, accel, date_str, start_dt):
         if self.f is None:
             return
 
@@ -556,7 +537,7 @@ class ActivityLevelClassification(_BaseProcess):
         x = self._t60 + start_hr
         n60 = int(fs * 60)
 
-        sfile_name = Path(source_file).name
+        sfile_name = Path(self._file_name).name
         f.update_layout(
             title=f"Activity Visual Report: {sfile_name}<br>Day: {day_n}<br>Date: {date_str}"
         )
