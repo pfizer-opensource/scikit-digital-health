@@ -107,7 +107,7 @@ class Pipeline:
 
             self.add(proc, save_results=save_result, save_name=save_name)
 
-    def add(self, process, save_results=False, save_name="{date}_{name}_results.cv"):
+    def add(self, process, save_results=False, save_name="{date}_{name}_results.csv"):
         """
         Add a processing step to the pipeline
 
