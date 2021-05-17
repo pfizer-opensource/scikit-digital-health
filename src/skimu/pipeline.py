@@ -25,6 +25,12 @@ class Pipeline:
     Pipeline class that can have multiple steps that are processed sequentially. Some of the output
     is passed between steps. Has the ability to save results from processing steps as local files,
     as well as return the results in a dictionary following the processing.
+
+    Parameters
+    ----------
+    file : {None, str}, optional
+        File path to load a pipeline from. Default is None, in which case no
+        file will be loaded.
     """
 
     def __str__(self):
@@ -37,12 +43,15 @@ class Pipeline:
         ret += "]"
         return ret
 
-    def __init__(self):
+    def __init__(self, file=None):
         self._steps = []
         self._save = []
         self._current = -1  # iteration tracking
 
         self.logger = logging.getLogger(__name__)
+
+        if file is not None:
+            self.load(file=file)
 
     def save(self, file):
         """
