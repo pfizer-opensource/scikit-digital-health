@@ -258,7 +258,15 @@ class ActivityLevelClassification(_BaseProcess):
         activity_res : dict
             Computed activity level metrics.
         """
-        super().predict(time=time, accel=accel, fs=fs, wear=wear, **kwargs)
+        super().predict(
+            expect_days=True,
+            expect_wear=True,
+            time=time,
+            accel=accel,
+            fs=fs,
+            wear=wear,
+            **kwargs
+        )
 
         # ========================================================================================
         # SETUP / INITIALIZATION
