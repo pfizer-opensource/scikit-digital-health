@@ -2,8 +2,11 @@ import json
 from tempfile import TemporaryDirectory
 from pathlib import Path
 
+import pytest
+
 from skimu.pipeline import Pipeline, NotAProcessError, ProcessNotFoundError
 from skimu.base import _BaseProcess
+from skimu.gait import Gait
 
 
 # temp class just for testing
@@ -37,13 +40,13 @@ class TestPipeline:
             fname = Path(tdir) / "file.json"
 
             p.save(str(fname))
-            with open(str(fname)) as f:
+            with fname.open() as f:
                 res = json.load(f)
 
         exp = [{
             "TestProcess": {
                 "module": "test.testmodule",
-                "Parameters": {"kw": 2},
+                "Parameters": {"kw1": 2},
                 "save_result": False,
                 "save_name": "{date}_{name}_results.csv",
                 "plot_save_name": None
@@ -51,3 +54,38 @@ class TestPipeline:
         }]
 
         assert res == exp
+
+    def test_load(self):
+        exp = [
+            {
+                "Gait": {
+                    "module": "gait.gait",
+                    "Parameters": {},
+                    "save_result": False,
+                    "save_name": "gait_results.csv",
+                    "plot_save_name": None
+                }
+            },
+            {
+                "TestProcess": {
+                    "module": "test.testmodule",
+                    "Parameters": {},
+                    "save_result": False,
+                    "save_name": "test_save.csv",
+                    "plot_save_name": None
+                }
+            }
+        ]
+
+        p = Pipeline()
+
+        with TemporaryDirectory() as tdir:
+            fname = Path(tdir) / "file.json"
+
+            with fname.open(mode="w") as f:
+                json.dump(exp, f)
+
+            with pytest.warns(UserWarning):
+                p.load(str(fname))
+
+        assert p._steps == [Gait()]
