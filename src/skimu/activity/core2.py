@@ -39,6 +39,7 @@ from skimu.base import _BaseProcess
 from skimu.utility import moving_mean
 from skimu.utility.internal import get_day_index_intersection
 from skimu.activity.cutpoints import _base_cutpoints, get_level_thresholds
+from skimu.activity import endpoints
 
 # default from rowlands
 IG_LEVELS = array([i for i in range(0, 4001, 25)] + [8000]) / 1000
@@ -208,12 +209,28 @@ class ActivityLevelClassification(_BaseProcess):
             day_window=day_window,
         )
 
+        # setup endpoints
+        self.epts = [
+            endpoints.ActivityIntensityGradient(width=25, max1=4000, max2=16000),
+            endpoints.ActivityEpochMinutes(day_part="wake")
+        ]
+        self.epts += [
+            endpoints.ActivityBoutMinutes(
+                bout_length=i,
+                bout_criteria=bout_criteria,
+                closed_bout=closed_bout,
+                bout_metric=bout_metric,
+            ) for i in bout_lens
+        ]
+        self.epts += [
+            endpoints.MaximumAcceleration(block_min=i) for i in max_accel_lens
+        ]
+
+        self.epts_sleep = [
+            endpoints.ActivityEpochMinutes(day_part="sleep")
+        ]
+
         self.wlen = short_wlen
-        self.max_acc_lens = max_accel_lens
-        self.blens = bout_lens
-        self.boutcrit = bout_criteria
-        self.boutmetric = bout_metric
-        self.closedbout = closed_bout
         self.min_wear = min_wear_time
         self.cutpoints = cutpoints_
 
@@ -226,6 +243,28 @@ class ActivityLevelClassification(_BaseProcess):
         self.setup_plotting = self._setup_plotting
         self._update_buttons = []
         self._t60 = None  # for storing plotting x values
+
+    def add_endpoints(self, endpoint, for_wake=True):
+        """
+        Add an endpoint for the results.
+
+        Parameters
+        ----------
+        endpoint : {skimu.activity.endpoint.ActivityEndpoint, Iterable}
+            Single ActivityEndpoint, or an iterable of endpoints, all initialized.
+        for_wake : bool, optional
+            If the endpoint is for wake time or sleep time. Default is True (wake time).
+        """
+        if isinstance(endpoint, endpoints.ActivityEndpoint):
+            endpoint = [endpoint]
+        else:
+            if not all([isinstance(i, endpoints.ActivityEndpoint) for i in endpoint]):
+                raise ValueError("All endpoints must be initialized subclasses of ActivityEndpoint")
+
+        if for_wake:
+            self.epts.extend(list(endpoint))
+        else:
+            self.epts_sleep.extend(list(endpoint))
 
     def _setup_plotting(self, save_name):
         """
@@ -333,3 +372,7 @@ class ActivityLevelClassification(_BaseProcess):
             # make sure there are enough hours for the endpoints
             if res["N wear hours"][iday] < self.min_wear:
                 continue
+
+            # compute the endpoints
+            for ept in self.epts:
+                res, keys = ept.compute(day_wear_starts, day_wear_stops)
