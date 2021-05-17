@@ -41,18 +41,6 @@ from skimu.utility.internal import get_day_index_intersection
 from skimu.activity.cutpoints import _base_cutpoints, get_level_thresholds
 
 
-def _check_if_none(var, lgr, msg_if_none, i1, i2):
-    if var is None:
-        lgr.info(msg_if_none)
-        if i1 is None or i2 is None:
-            return None, None
-        else:
-            start, stop = array([i1]), array([i2])
-    else:
-        start, stop = var[:, 0], var[:, 1]
-    return start, stop
-
-
 def _update_date_results(
     results, time, day_n, day_start_idx, day_stop_idx, day_start_hour
 ):
@@ -289,8 +277,8 @@ class ActivityLevelClassification(_BaseProcess):
         wear_none_msg = (
             f"[{self!s}] Wear detection not provided. Assuming 100% wear time."
         )
-        wear_starts, wear_stops = _check_if_none(
-            wear, self.logger, wear_none_msg, 0, time.size
+        wear_starts, wear_stops = self._check_if_idx_none(
+            wear, wear_none_msg, 0, time.size
         )
 
         # check if windows exist for days
@@ -306,8 +294,8 @@ class ActivityLevelClassification(_BaseProcess):
         slp_msg = (
             f"[{self!s}] No sleep information found. Only computing full day metrics."
         )
-        sleep_starts, sleep_stops = _check_if_none(
-            sleep, self.logger, slp_msg, None, None
+        sleep_starts, sleep_stops = self._check_if_idx_none(
+            sleep, slp_msg, None, None
         )
 
         # SETUP PLOTTING
