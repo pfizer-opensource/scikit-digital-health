@@ -5,47 +5,11 @@ from numpy import array, allclose
 
 from skimu.activity.cutpoints import _base_cutpoints
 from skimu.activity.core import (
-    _check_if_none,
     _update_date_results,
     ActivityLevelClassification,
     get_activity_bouts,
     get_intensity_gradient,
 )
-
-
-class Test_check_if_none:
-    @staticmethod
-    def setup_lgr():
-        class Lgr:
-            msgs = []
-
-            def info(self, msg):
-                self.msgs.append(msg)
-
-        return Lgr()
-
-    def test(self):
-        lgr = self.setup_lgr()
-
-        x = array([[0, 10], [15, 20]])
-
-        s, e = _check_if_none(x, lgr, "none msg", None, None)
-
-        assert allclose(s, [0, 15])
-        assert allclose(e, [10, 20])
-
-    def test_none(self):
-        lgr = self.setup_lgr()
-
-        s, e = _check_if_none(None, lgr, "none msg", 0, 10)
-        sn, en = _check_if_none(None, lgr, "none msg", None, 10)
-
-        assert "none msg" in lgr.msgs
-        assert s == 0
-        assert e == 10
-
-        assert sn is None
-        assert en is None
 
 
 class Test_update_date_results:
