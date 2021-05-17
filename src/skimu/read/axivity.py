@@ -126,7 +126,7 @@ class ReadCWA(_BaseProcess):
         if not Path(file).exists():
             raise FileNotFoundError(f"File [{file}] does not exist.")
 
-        super().predict(file=file, **kwargs)
+        super().predict(expect_days=False, expect_wear=False, file=file, **kwargs)
 
         # read the file
         fs, imudata, ts, light, starts, stops = read_axivity(

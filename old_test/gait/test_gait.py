@@ -25,7 +25,7 @@ class TestGetGaitClassificationLGBM:
     def test_50hz(self, get_sample_accel, get_gait_classification_truth):
         time, fs, accel = get_sample_accel(50.0)
 
-        starts, stops = get_gait_classification_lgbm(None, accel, fs)
+        starts, stops = get_gait_classification_lgbm(None, None, accel, fs)
         starts_truth, stops_truth = get_gait_classification_truth(50)
 
         assert allclose(starts, starts_truth)
@@ -34,39 +34,34 @@ class TestGetGaitClassificationLGBM:
     def test_20hz(self, get_sample_accel, get_gait_classification_truth):
         time, fs, accel = get_sample_accel(20.0)
 
-        starts, stops = get_gait_classification_lgbm(None, accel, fs)
+        starts, stops = get_gait_classification_lgbm(None, None, accel, fs)
         starts_truth, stops_truth = get_gait_classification_truth(20.0)
 
         assert allclose(starts, starts_truth)
         assert allclose(stops, stops_truth)
 
-    def test_pred_size_error(self, get_sample_accel):
-        _, fs, accel = get_sample_accel(50.0)
-        with pytest.raises(DimensionMismatchError):
-            get_gait_classification_lgbm(random.rand(50) > 0.5, accel, fs)
-
-    @pytest.mark.parametrize("pred", (True, False, 1, -135098135, 1.513e-600))
-    def test_pred_single_input(self, pred, get_sample_accel):
-        starts, stops = get_gait_classification_lgbm(pred, random.rand(500), 32.125)
-
-        assert starts.size == 1
-        assert starts[0] == 0
-        assert stops.size == 1
-        assert stops[0] == 500
-
-    def test_pred_array_input(self, get_sample_accel):
-        t, fs, accel = get_sample_accel(50.0)
-        pred = zeros(accel.shape[0], dtype="bool")
-
-        starts_truth = array([0, 500, 750, 950])
-        stops_truth = array([150, 575, 850, 1200])
-        for s, f in zip(starts_truth, stops_truth):
-            pred[s:f] = True
-
-        starts, stops = get_gait_classification_lgbm(pred, accel, fs)
-
-        assert allclose(starts, starts_truth)
-        assert allclose(stops, stops_truth)
+    # @pytest.mark.parametrize("pred", (True, False, 1, -135098135, 1.513e-600))
+    # def test_pred_single_input(self, pred, get_sample_accel):
+    #     starts, stops = get_gait_classification_lgbm(pred, random.rand(500), 32.125)
+    #
+    #     assert starts.size == 1
+    #     assert starts[0] == 0
+    #     assert stops.size == 1
+    #     assert stops[0] == 500
+    #
+    # def test_pred_array_input(self, get_sample_accel):
+    #     t, fs, accel = get_sample_accel(50.0)
+    #     pred = zeros(accel.shape[0], dtype="bool")
+    #
+    #     starts_truth = array([0, 500, 750, 950])
+    #     stops_truth = array([150, 575, 850, 1200])
+    #     for s, f in zip(starts_truth, stops_truth):
+    #         pred[s:f] = True
+    #
+    #     starts, stops = get_gait_classification_lgbm(pred, accel, fs)
+    #
+    #     assert allclose(starts, starts_truth)
+    #     assert allclose(stops, stops_truth)
 
 
 class TestGetGaitBouts:
@@ -261,7 +256,7 @@ class TestGait(BaseProcessTester):
         data = get_sample_data(self.sample_data_file, self.sample_data_keys)
         data["gait_pred"] = arange(0, 1, 0.1)
 
-        with pytest.raises(DimensionMismatchError):
+        with pytest.raises(ValueError):
             self.process.predict(**data)
 
     def test_add_metrics(self):

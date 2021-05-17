@@ -133,7 +133,13 @@ class CalibrateAccelerometer(_BaseProcess):
         calibration, and :math:`m_i` is the temperature scale for the *ith* axis.
         """
         super().predict(
-            time=time, accel=accel, apply=apply, temperature=temperature, **kwargs
+            expect_days=False,
+            expect_wear=False,
+            time=time,
+            accel=accel,
+            apply=apply,
+            temperature=temperature,
+            **kwargs
         )
 
         # parameters

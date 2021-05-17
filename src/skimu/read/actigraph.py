@@ -109,7 +109,7 @@ class ReadGT3X(_BaseProcess):
         if file[-4:] != "gt3x":
             warn("File extension is not expected '.gt3x'", UserWarning)
 
-        super().predict(file=file, **kwargs)
+        super().predict(expect_days=False, expect_wear=False, file=file, **kwargs)
 
         time, accel, lux, index, N = read_gt3x(file, self.base, self.period)
 
