@@ -34,7 +34,7 @@ class Pipeline:
         ret = "IMUAnalysisPipeline[\n"
         for proc in self._steps:
             ret += f"\t{proc!r},\n"
-        ret = ret + "\n]"
+        ret += "]"
         return ret
 
     def __init__(self):
