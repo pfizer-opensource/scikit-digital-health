@@ -31,10 +31,10 @@ class Pipeline:
         return "IMUAnalysisPipeline"
 
     def __repr__(self):
-        ret = "["
+        ret = "IMUAnalysisPipeline[\n"
         for proc in self._steps:
             ret += f"\t{proc!r},\n"
-        ret = ret[:-2] + "]"
+        ret = ret + "\n]"
         return ret
 
     def __init__(self):
