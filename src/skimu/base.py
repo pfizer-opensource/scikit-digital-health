@@ -30,7 +30,9 @@ class _BaseProcess:
         ret = f"{self._name}("
         for k in self._kw:
             ret += f"{k}={self._kw[k]!r}, "
-        ret = ret[:-2] + ")"
+        if ret[-1] != "(":
+            ret = ret[:-2]
+        ret += ")"
 
         return ret
 
