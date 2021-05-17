@@ -27,6 +27,20 @@ class TestPipeline:
         assert str(p) == "IMUAnalysisPipeline"
         assert repr(p) == "IMUAnalysisPipeline[\n\tTestProcess(kw1=2),\n\tTestProcess(kw1=1),\n]"
 
+    def test_add(self):
+        p = Pipeline()
+
+        tp = TestProcess(kw1=500)
+        p.add(tp, save_results=True, save_name="test_saver.csv")
+
+        assert p._steps == [TestProcess(kw1=500)]
+        assert tp._in_pipeline
+        assert tp.pipe_save
+        assert tp.pipe_fname == "test_saver.csv"
+
+        with pytest.raises(NotAProcessError):
+            p.add(list())
+
     def test_save(self):
         p = Pipeline()
 
