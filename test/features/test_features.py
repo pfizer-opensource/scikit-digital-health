@@ -56,7 +56,7 @@ def test_StdDev(get_linear_accel):
 
     # stddev should be approaching 0.25, but with only 500 samples, need to
     # allow more wiggle room
-    assert allclose(res, 0.25, atol=0.02)
+    assert allclose(res, 0.25, atol=0.03)
 
 
 def test_Skewness(get_cubic_signal):
