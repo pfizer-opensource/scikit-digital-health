@@ -26,7 +26,7 @@ def dummy_long_data():
     a /= np.linalg.norm(a, axis=1, keepdims=True)
 
     scale = np.array([1.07, 1.05, 0.991])
-    offset = np.array([5.2e-4, -3.8e-5, 1.9e6])
+    offset = np.array([5.2e-4, -3.8e-5, 1.9e-6])
 
     # correction: a' = (a + offset) * scale
     ap = a / scale - offset
