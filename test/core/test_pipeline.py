@@ -5,31 +5,7 @@ from pathlib import Path
 import pytest
 
 from skimu.pipeline import Pipeline, NotAProcessError, ProcessNotFoundError
-from skimu.base import _BaseProcess
 from skimu.gait import Gait
-
-
-# temp class just for testing
-class TestProcess(_BaseProcess):
-    def __init__(self, kw1=1):
-        super().__init__(kw1=kw1)
-        self.kw1 = kw1
-
-    def predict(self, *args, **kwargs):
-        self.logger.info(f"kw1={self.kw1}")
-
-        return {"kw1": self.kw1}, {"kw1": self.kw1}
-
-
-class TestProcess2(_BaseProcess):
-    def __init__(self, kwa=5):
-        super().__init__(kwa=kwa)
-        self.kwa = kwa
-
-    def predict(self, *args, **kwargs):
-        self.logger.info(f"kwa={self.kwa}")
-
-        return {"kwa": self.kwa}, {"kwa": self.kwa}
 
 
 class TestPipeline:
@@ -43,12 +19,12 @@ class TestPipeline:
 
         return Lgr()
 
-    def test_run(self):
+    def test_run(self, testprocess, testprocess2):
         p = Pipeline()
 
-        tp1 = TestProcess(kw1=1)
+        tp1 = testprocess(kw1=1)
         tp1.logger = self.setup_lgr()
-        tp2 = TestProcess2(kwa=5)
+        tp2 = testprocess2(kwa=5)
         tp2.logger = self.setup_lgr()
 
         p.add(tp1)
@@ -63,34 +39,34 @@ class TestPipeline:
 
         assert res == exp_res
 
-    def test_str_repr(self):
+    def test_str_repr(self, testprocess):
         p = Pipeline()
 
         assert repr(p) == "IMUAnalysisPipeline[\n]"
 
-        p.add(TestProcess(kw1=2))
-        p.add(TestProcess(kw1=1))
+        p.add(testprocess(kw1=2))
+        p.add(testprocess(kw1=1))
 
         assert str(p) == "IMUAnalysisPipeline"
         assert repr(p) == "IMUAnalysisPipeline[\n\tTestProcess(kw1=2),\n\tTestProcess(kw1=1),\n]"
 
-    def test_add(self):
+    def test_add(self, testprocess):
         p = Pipeline()
 
-        tp = TestProcess(kw1=500)
+        tp = testprocess(kw1=500)
         p.add(tp, save_file="test_saver.csv")
 
-        assert p._steps == [TestProcess(kw1=500)]
+        assert p._steps == [testprocess(kw1=500)]
         assert tp._in_pipeline
         assert tp.pipe_save_file == "test_saver.csv"
 
         with pytest.raises(NotAProcessError):
             p.add(list())
 
-    def test_save(self):
+    def test_save(self, testprocess):
         p = Pipeline()
 
-        tp = TestProcess(kw1=2)
+        tp = testprocess(kw1=2)
         # overwrite this for saving
         tp.__class__.__module__ = "skimu.test.testmodule"
 
