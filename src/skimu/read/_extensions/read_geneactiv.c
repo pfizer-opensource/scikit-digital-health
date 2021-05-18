@@ -153,7 +153,7 @@ int geneactiv_read_block(FILE *fp, Window_t *w_info, GN_Info_t *info, GN_Data_t 
         }
         memcpy(p, &data_str[i + 9], 3);  /* last value is light */
         t_ = strtol(p, NULL, 16);
-        data->light[Nps + jj] = (double)(t_ >> 2) * (info->lux / info->volts);
+        data->light[Nps + jj] = round((double)(t_ >> 2) * (info->lux / info->volts));
         ++jj;
     }
 
