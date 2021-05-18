@@ -69,9 +69,8 @@ class Pipeline:
                     step._name: {
                         "module": step.__class__.__module__.split(".", 1)[1],
                         "Parameters": step._kw,
-                        "save_result": step.pipe_save,
-                        "save_name": step.pipe_fname,
-                        "plot_save_name": step.plot_fname,
+                        "save_file": step.pipe_save_file,
+                        "plot_file": step.pipe_plot_file,
                     }
                 }
             )
@@ -97,9 +96,8 @@ class Pipeline:
             name = list(proc.keys())[0]
             mod = proc[name]["module"]
             params = proc[name]["Parameters"]
-            save_result = proc[name]["save_result"]
-            save_name = proc[name]["save_name"]
-            plot_fname = proc[name]["plot_save_name"]
+            save_file = proc[name]["save_file"]
+            plot_file = proc[name]["plot_file"]
 
             try:
                 process = attrgetter(f"{mod}.{name}")(skimu)
@@ -111,10 +109,8 @@ class Pipeline:
                 continue
 
             proc = process(**params)
-            if plot_fname is not None:
-                proc._setup_plotting(plot_fname)
 
-            self.add(proc, save_results=save_result, save_name=save_name)
+            self.add(proc, save_file=save_file, plot_file=plot_file)
 
     def add(self, process, save_file=None, plot_file=None):
         """
@@ -182,8 +178,8 @@ class Pipeline:
 
         # attach the save bool and save_name to the process
         process._in_pipeline = True
-        process.pipe_save = save_file is None
-        process.pipe_fname = save_file
+        process.pipe_save_file = save_file
+        process.pipe_plot_file = plot_file
 
         # setup plotting
         process._setup_plotting(plot_file)
@@ -226,9 +222,9 @@ class Pipeline:
 
         for proc in self:
             kwargs, step_result = proc.predict(**kwargs)
-            if proc.pipe_save:
+            if proc.pipe_save_file is not None:
                 proc.save_results(
-                    step_result if step_result is not None else kwargs, proc.pipe_fname
+                    step_result if step_result is not None else kwargs, proc.pipe_save_file
                 )
             if step_result is not None:
                 results[proc._name] = step_result
