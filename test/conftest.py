@@ -12,20 +12,31 @@ def pytest_addoption(parser):
         default=False,
         help="run segfault tests for extensions",
     )
+    parser.addoption(
+        "--run_slow",
+        action="store_true",
+        default=False,
+        help="run slow tests",
+    )
 
 
 def pytest_configure(config):
     config.addinivalue_line("markers", "segfault: mark test as segfault testing")
+    config.addinivalue_line("markers", "slow: mark test as slow")
 
 
 def pytest_collection_modifyitems(config, items):
-    if config.getoption("--run_segfault"):
-        # --run_segfault given in cli: do not skip segfault tests
-        return
-    skip_segfault = pytest.mark.skip(reason="need --run_segfault option to run")
-    for item in items:
-        if "segfault" in item.keywords:
-            item.add_marker(skip_segfault)
+    if not config.getoption("--run_segfault"):
+        skip_segfault = pytest.mark.skip(reason="need --run_segfault option to run")
+        for item in items:
+            if "segfault" in item.keywords:
+                item.add_marker(skip_segfault)
+
+    if not config.getoption("--run_slow"):
+        skip_slow = pytest.mark.skip(reason="need --run_slow option to run")
+        for item in items:
+            if "slow" in item.keywords:
+                item.add_marker(skip_slow)
 
 
 @pytest.fixture(scope="package")
