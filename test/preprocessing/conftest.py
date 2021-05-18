@@ -10,7 +10,7 @@ def dummy_long_data():
     # make about 15 hours of data
     t = np.arange(0, 15 * 3600, 1 / 50)
 
-    a = (rng.random((t.size, 3)) - 50.) * 0.7
+    a = (rng.random((t.size, 3)) - 0.5) * 0.7
     N3 = a.shape[0] // 3
     a[:N3, 0] = 1 + (rng.random(N3) - 0.5) * 0.15
     a[N3 : 2 * N3, 1] = 0.5 + (rng.random(N3) - 0.4) * 0.15
