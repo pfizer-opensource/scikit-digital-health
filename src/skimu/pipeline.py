@@ -116,7 +116,7 @@ class Pipeline:
 
             self.add(proc, save_results=save_result, save_name=save_name)
 
-    def add(self, process, save_results=False, save_name="{date}_{name}_results.csv"):
+    def add(self, process, save_file=None):
         """
         Add a processing step to the pipeline
 
@@ -124,12 +124,52 @@ class Pipeline:
         ----------
         process : Process
             Process class that forms the step to be run
-        save_results : bool
-            Whether or not to save the results of the process as a csv. Default is False.
-        save_name : str
-            Optionally formattable path for the save file. Ignored if `save_results` is False.
-            For options for the formatting, see any of the processes (e.g. :class:`Gait`,
-            :class:`Sit2Stand`). Default is "{date}_{name}_results.csv
+        save_file : {None, str}, optional
+            Optionally formattable path for the save file. If left/set to None,
+            the results will not be saved anywhere.
+
+        Notes
+        -----
+        Some of the avaible parameters are:
+
+        - date : the current date, expressed as YYYYMMDD.
+        - name : the name of the process doing the analysis.
+        - file : the name of the input file passed to the pipeline.
+
+        Note that if no file was passed in initially, then the `file` would be
+        an empty string. However, even if the first step of the pipeline is
+        not one that would use a `file` keyword, you can still specify it and
+        it will be ignored for everything but this parameter.
+
+        >>> p = Pipeline()
+        >>> p.add(Gait(), save_file="{file}_gait_results.csv")
+        >>> p.run(accel=accel, time=time)
+        No file was passed in, so the resulting output file would be
+        `_gait_results.csv`
+
+        However if the `p.run` call is now:
+
+        >>> p.run(accel=accel, time=time, file="example_file.txt")
+        then the output would be `example_file_gait_results.csv`.
+
+        Examples
+        --------
+        Add `Gait` and save the results to a fixed file name:
+
+        >>> from skimu.gait import Gait
+        >>> p = Pipeline()
+        >>> p.add(Gait(), save_results="gait_results.csv")
+
+        Add a binary file reader without saving the results and gait processing
+        with a variable file name:
+
+        >>> from skimu.read import ReadBin
+        >>> p = Pipeline()
+        >>> p.add(ReadBin(bases=0, periods=24), save_results=None)
+        >>> p.add(Gait(), save_results="{date}_{name}_results.csv")
+
+        If the date was, for example, May 18, 2021 then the results file would
+        be `20210518_Gait_results.csv`.
         """
         if not isinstance(process, Process):
             raise NotAProcessError(
@@ -140,8 +180,8 @@ class Pipeline:
         self._steps += [process]
         # attach the save bool and save_name to the process
         self._steps[-1]._in_pipeline = True
-        self._steps[-1].pipe_save = save_results
-        self._steps[-1].pipe_fname = save_name
+        self._steps[-1].pipe_save = save_file is None
+        self._steps[-1].pipe_fname = save_file
 
         # point the step logging disabled to the pipeline disabled
         self._steps[-1].logger.disabled = self.logger.disabled
