@@ -13,6 +13,24 @@ class Test_BaseProcess:
         assert str(bp) == "_BaseProcess"
         assert repr(bp) == "_BaseProcess(kw1=1, kw2='2')"
 
+    def test_eq(self, testprocess, testprocess2):
+        tp1_a = testprocess(kw1=1)
+        tp1_b = testprocess(kw1=2)
+        tp2_a = testprocess2(kwa=1)
+        tp2_b = testprocess2(kwa=2)
+
+        assert tp1_a == tp1_a
+        assert all([tp1_a != i for i in [tp1_b, tp2_a, tp2_b]])
+
+        assert tp1_b == tp1_b
+        assert all([tp1_b != i for i in [tp1_a, tp2_a, tp2_b]])
+
+        assert tp2_a == tp2_a
+        assert all([tp2_a != i for i in [tp1_a, tp1_b, tp2_b]])
+
+        assert tp2_b == tp2_b
+        assert all([tp2_b != i for i in [tp1_a, tp1_b, tp2_a]])
+
     @staticmethod
     def setup_lgr():
         class Lgr:
