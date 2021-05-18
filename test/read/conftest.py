@@ -9,11 +9,11 @@ def gnactv_file():
     cwd = Path.cwd().parts
 
     if cwd[-1] == "read":
-        return "data/gnactv_sample.bin"
+        return Path("data/gnactv_sample.bin")
     elif cwd[-1] == "test":
-        return "read/data/gnactv_sample.bin"
+        return Path("read/data/gnactv_sample.bin")
     elif cwd[-1] == "scikit-imu":
-        return "test/read/data/gnactv_sample.bin"
+        return Path("test/read/data/gnactv_sample.bin")
 
 
 @fixture
