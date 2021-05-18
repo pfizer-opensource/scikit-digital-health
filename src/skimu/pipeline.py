@@ -182,8 +182,7 @@ class Pipeline:
 
         # attach the save bool and save_name to the process
         process._in_pipeline = True
-        process.pipe_save = save_file is None
-        process.pipe_fname = save_file
+        process.pipe_save_file = save_file
 
         # setup plotting
         process._setup_plotting(plot_file)
