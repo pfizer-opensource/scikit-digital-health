@@ -8,7 +8,7 @@ def dummy_long_data():
     rng = np.random.default_rng(1357)
 
     # make about 15 hours of data
-    t = np.arange(0, 15 * 3600, 1 / 50)
+    t = np.arange(0, int(12.5 * 3600), 1 / 50)
 
     a = (rng.random((t.size, 3)) - 0.5) * 0.07
     N3 = a.shape[0] // 3
@@ -39,7 +39,7 @@ def dummy_temp_data():
     rng = np.random.default_rng(1357)
 
     # make about 15 hours of data
-    t = np.arange(0, 15 * 3600, 1 / 50)
+    t = np.arange(0, int(12.5 * 3600), 1 / 50)
 
     # simulate blocks of temperature (ie 1 temp value per block of IMU samples
     block_temp = sosfiltfilt(
