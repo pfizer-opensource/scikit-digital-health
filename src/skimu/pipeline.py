@@ -116,7 +116,7 @@ class Pipeline:
 
             self.add(proc, save_results=save_result, save_name=save_name)
 
-    def add(self, process, save_file=None):
+    def add(self, process, save_file=None, plot_file=None):
         """
         Add a processing step to the pipeline
 
@@ -127,10 +127,13 @@ class Pipeline:
         save_file : {None, str}, optional
             Optionally formattable path for the save file. If left/set to None,
             the results will not be saved anywhere.
+        plot_file : {None, str}, optional
+            Optionally formattable path for the output of plotting. If left/set
+            to None, the plot will not be generated and saved.
 
         Notes
         -----
-        Some of the avaible parameters are:
+        Some of the avaible parameters for results saving and plotting are:
 
         - date : the current date, expressed as YYYYMMDD.
         - name : the name of the process doing the analysis.
@@ -177,14 +180,18 @@ class Pipeline:
                 "cannot be added to the pipeline"
             )
 
-        self._steps += [process]
         # attach the save bool and save_name to the process
-        self._steps[-1]._in_pipeline = True
-        self._steps[-1].pipe_save = save_file is None
-        self._steps[-1].pipe_fname = save_file
+        process._in_pipeline = True
+        process.pipe_save = save_file is None
+        process.pipe_fname = save_file
+
+        # setup plotting
+        process._setup_plotting(plot_file)
 
         # point the step logging disabled to the pipeline disabled
-        self._steps[-1].logger.disabled = self.logger.disabled
+        process.logger.disabled = self.logger.disabled
+
+        self._steps += [process]
 
     def __iter__(self):
         return self
