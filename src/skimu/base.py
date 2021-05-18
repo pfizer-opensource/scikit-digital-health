@@ -55,6 +55,8 @@ class _BaseProcess:
         """
         self._name = self.__class__.__name__
         self._in_pipeline = False  # initialize to false.  Will be set by the pipeline
+        self.pipe_save_file = None  # initialize to None, will be set/used by pipeline
+        self.pip_plot_file = None  # will be set/used by Pipeline only
 
         self._kw = kwargs
 
