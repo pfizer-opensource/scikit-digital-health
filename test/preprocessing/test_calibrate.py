@@ -42,15 +42,18 @@ class TestCalibrateAccelerometer:
         assert allclose(cal_res["temperature scale"], true_temp_scale, atol=2e-4)
 
     def test_under_12h_data(self, np_rng):
-        t = arange(0, 3600 * 5, 1 / 50)
+        t = arange(0, 3600 * 1, 1 / 50)
         a = np_rng.random((t.size, 3))
 
         # minimum hours should get auto bumped to 12
         cal = CalibrateAccelerometer(min_hours=4)
         assert cal.min_hours == 12, "Hours not rounded up to multiple of 12"
 
-        with pytest.warns(UserWarning):
+        with pytest.warns(UserWarning) as record:
             cal.predict(t, a)
+
+        assert len(record) == 1  # only 1 warning before returning
+        assert "Less than 12 hours of data" in record[0].message.args[0]
 
     def test_all_motion(self, np_rng):
         t = arange(0, 3600 * 15, 1 / 50)
@@ -58,8 +61,11 @@ class TestCalibrateAccelerometer:
 
         cal = CalibrateAccelerometer(min_hours=12, sd_criteria=0.01)
 
-        with pytest.warns(UserWarning):
+        with pytest.warns(UserWarning) as record:
             cal.predict(t, a)
+
+        assert len(record) == 1
+        assert "insufficient non-movement data available" in record[0].message.args[0]
 
     def test_bad_sphere(self):
         """
@@ -70,5 +76,8 @@ class TestCalibrateAccelerometer:
 
         cal = CalibrateAccelerometer(min_hours=12)
 
-        with pytest.warns(UserWarning):
+        with pytest.warns(UserWarning) as record:
             cal.predict(t, a)
+
+        assert len(record) == 1
+        assert "insufficient non-movement data available" in record[0].message.args[0]
