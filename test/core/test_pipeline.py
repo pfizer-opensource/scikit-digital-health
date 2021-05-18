@@ -78,7 +78,7 @@ class TestPipeline:
         p = Pipeline()
 
         tp = TestProcess(kw1=500)
-        p.add(tp, save_results=True, save_name="test_saver.csv")
+        p.add(tp, save_file="test_saver.csv")
 
         assert p._steps == [TestProcess(kw1=500)]
         assert tp._in_pipeline
@@ -108,8 +108,7 @@ class TestPipeline:
             "TestProcess": {
                 "module": "test.testmodule",
                 "Parameters": {"kw1": 2},
-                "save_result": False,
-                "save_name": "{date}_{name}_results.csv",
+                "save_file": None,
                 "plot_save_name": None
             }
         }]
@@ -122,8 +121,7 @@ class TestPipeline:
                 "Gait": {
                     "module": "gait.gait",
                     "Parameters": {},
-                    "save_result": False,
-                    "save_name": "gait_results.csv",
+                    "save_file": "gait_results.csv",
                     "plot_save_name": None
                 }
             },
@@ -131,8 +129,7 @@ class TestPipeline:
                 "TestProcess": {
                     "module": "test.testmodule",
                     "Parameters": {},
-                    "save_result": False,
-                    "save_name": "test_save.csv",
+                    "save_file": None,
                     "plot_save_name": None
                 }
             }
@@ -155,8 +152,7 @@ class TestPipeline:
                 "Gait": {
                     "module": "gait.gait",
                     "Parameters": {},
-                    "save_result": False,
-                    "save_name": "gait_results.csv",
+                    "save_result": None,
                     "plot_save_name": None
                 }
             },
@@ -164,8 +160,7 @@ class TestPipeline:
                 "TestProcess": {
                     "module": "test.testmodule",
                     "Parameters": {},
-                    "save_result": False,
-                    "save_name": "test_save.csv",
+                    "save_result": None,
                     "plot_save_name": None
                 }
             }
