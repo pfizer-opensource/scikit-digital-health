@@ -82,8 +82,7 @@ class TestPipeline:
 
         assert p._steps == [TestProcess(kw1=500)]
         assert tp._in_pipeline
-        assert tp.pipe_save
-        assert tp.pipe_fname == "test_saver.csv"
+        assert tp.pipe_save_file == "test_saver.csv"
 
         with pytest.raises(NotAProcessError):
             p.add(list())
@@ -109,7 +108,7 @@ class TestPipeline:
                 "module": "test.testmodule",
                 "Parameters": {"kw1": 2},
                 "save_file": None,
-                "plot_save_name": None
+                "plot_file": None
             }
         }]
 
@@ -122,7 +121,7 @@ class TestPipeline:
                     "module": "gait.gait",
                     "Parameters": {},
                     "save_file": "gait_results.csv",
-                    "plot_save_name": None
+                    "plot_file": None
                 }
             },
             {
@@ -130,7 +129,7 @@ class TestPipeline:
                     "module": "test.testmodule",
                     "Parameters": {},
                     "save_file": None,
-                    "plot_save_name": None
+                    "plot_file": None
                 }
             }
         ]
@@ -152,16 +151,16 @@ class TestPipeline:
                 "Gait": {
                     "module": "gait.gait",
                     "Parameters": {},
-                    "save_result": None,
-                    "plot_save_name": None
+                    "save_file": None,
+                    "plot_file": None
                 }
             },
             {
                 "TestProcess": {
                     "module": "test.testmodule",
                     "Parameters": {},
-                    "save_result": None,
-                    "plot_save_name": None
+                    "save_file": None,
+                    "plot_file": None
                 }
             }
         ]
