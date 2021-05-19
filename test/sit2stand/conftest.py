@@ -1,5 +1,5 @@
 from pytest import fixture
-from numpy import ones
+from numpy import ones, arange
 
 
 @fixture
