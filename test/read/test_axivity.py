@@ -15,10 +15,11 @@ class TestReadBin:
             atol=5e-5
         )
 
-        for k in ["accel", "temperature", "light", "fs"]:
+        for k in ["accel", "temperature", "fs"]:
             # adjust tolerance - GeneActiv truth values from the CSV
             # were truncated by rounding
             assert allclose(res[k], ax3_truth[k], atol=5e-5)
 
         assert all([i in res["day_ends"] for i in ax3_truth["day_ends"]])
         assert allclose(res["day_ends"][(8, 12)], ax3_truth['day_ends'][(8, 12)])
+

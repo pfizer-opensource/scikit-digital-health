@@ -63,7 +63,7 @@ def ax3_truth():
     dat = load(path, allow_pickle=False)
 
     data = {
-        i: dat[i] for i in ['accel', 'time', 'temperature', 'light', 'fs']
+        i: dat[i] for i in ['accel', 'time', 'temperature', 'fs']
     }
     data["day_ends"] = {(8, 12): dat["day_ends_8_12"]}
 
