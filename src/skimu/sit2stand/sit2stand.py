@@ -247,7 +247,7 @@ class Sit2Stand(_BaseProcess):
 
             # reconstructed acceleration
             n_window = int(around(self.rwindow / dt))
-            r_acc, *_ = moving_stats(f_acc, n_window)
+            r_acc, *_ = pad_moving_sd(f_acc, n_window, 1)
 
             # get the frequencies first to limit computation necessary
             freqs = scale2frequency(self.cwave, arange(1, 65)) / dt
