@@ -178,7 +178,7 @@ contains
     ! axivity_read_block : read a single block (512 bytes) of data from an axivity file and 
     !   put the data into its respective storage arrays
     ! =============================================================================================
-    subroutine axivity_read_block(info, pos, imudata, timestamps, light, bases, periods, starts, &
+    subroutine axivity_read_block(info, pos, imudata, timestamps, temp, bases, periods, starts, &
         i_start, stops, i_stop, ierr) bind(C, name="axivity_read_block")
         type(FileInfo_t), intent(inout) :: info  ! file information storage structure
         ! position of the file to read from. should be a multiple of 512
@@ -187,7 +187,7 @@ contains
         real(c_double), intent(out) :: imudata(info%axes, info%count * (info%nblocks - 2))
         ! timestamp data array
         real(c_double), intent(out) :: timestamps(info%count * (info%nblocks - 2))
-        integer(c_long), intent(out) :: light(info%nblocks - 2)  ! light data array
+        real(c_double), intent(out) :: temp(info%count * (info%nblocks - 2))  ! light data array
         ! bases (starts) of windows in 24 hour format
         integer(c_long), intent(in) :: bases(info%Nwin)
         integer(c_long), intent(in) :: periods(info%Nwin)  ! periods (durations) of windows
@@ -201,6 +201,7 @@ contains
         ! local
         type(datapacket) :: pkt
         real(c_double) :: accelScale, gyroScale, magScale
+        real(c_double) :: block_temp
         integer(c_short) :: wordsum
         integer(c_int32_t) :: i1, i2
         integer(c_int16_t) :: rawData(info%axes, info%count), k, checksum
@@ -220,11 +221,14 @@ contains
         gyroScale = 2000._c_double  ! 32768 = 2000dps
         magScale = 16._c_double     ! 1uT = 16
         ! light is LS 10 bits, accel scale 3 msb, gyro scale next 3
-        light(pkt%sequenceID + 1) = iand(pkt%light, z"3ff")
+        ! light(pkt%sequenceID + 1) = iand(pkt%light, z"3ff")
         accelScale = real(2**(8 + iand(ishft(pkt%light, -13), z"07")), c_double)
         gyroScale = real(8000 / (2**iand(ishft(pkt%light, -10), z"07")), c_double)
 
         gyroScale = 32768. / gyroScale
+
+        ! get the temperature
+        block_temp = iand(pkt%temperature, z"3ff")
 
         ! check bytes per sample
         if (iand(pkt%numAxesBPS, z"0f") == 0) then
@@ -294,6 +298,9 @@ contains
 
         i1 = pkt%sequenceID * info%count + 1_c_int16_t
         i2 = i1 + info%count
+
+        ! set the temperature for the block, and convert to deg C
+        temp(i1:i2) = (block_temp - 171.0) / 3.142
 
         ! get the data into its final storage
         if (info%axes == 3) then
