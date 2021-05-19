@@ -59,7 +59,7 @@ typedef struct {
 
 typedef struct {
     double *imu;
-    long *light;
+    double *temp;
     double *ts;
     long *day_starts;
     long *day_stops;
