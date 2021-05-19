@@ -68,3 +68,36 @@ def ax3_truth():
     data["day_ends"] = {(8, 12): dat["day_ends_8_12"]}
 
     return data
+
+
+@fixture
+def ax6_file():
+    cwd = Path.cwd().parts
+
+    if cwd[-1] == "read":
+        return Path("data/ax6_sample.cwa")
+    elif cwd[-1] == "test":
+        return Path("read/data/ax6_sample.cwa")
+    elif cwd[-1] == "scikit-imu":
+        return Path("test/read/data/ax6_sample.cwa")
+
+
+@fixture
+def ax6_truth():
+    cwd = Path.cwd().parts
+
+    if cwd[-1] == "read":
+        path = "data/ax6_data.npz"
+    elif cwd[-1] == "test":
+        path = "read/data/ax6_data.npz"
+    elif cwd[-1] == "scikit-imu":
+        path = "test/read/data/ax6_data.npz"
+
+    dat = load(path, allow_pickle=False)
+
+    data = {
+        i: dat[i] for i in ['accel', 'time', 'gyro', 'temperature', 'fs']
+    }
+    data["day_ends"] = {(8, 12): dat["day_ends_8_12"]}
+
+    return data

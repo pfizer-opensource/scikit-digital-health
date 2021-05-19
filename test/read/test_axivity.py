@@ -4,8 +4,8 @@ from numpy import allclose, ndarray
 from skimu.read import ReadCWA
 
 
-class TestReadCWA:
-    def test(self, ax3_file, ax3_truth):
+class TestReadCwa:
+    def test_ax3(self, ax3_file, ax3_truth):
         res = ReadCWA(bases=8, periods=12).predict(ax3_file)
 
         # make sure it will catch small differences
@@ -22,6 +22,24 @@ class TestReadCWA:
 
         assert all([i in res["day_ends"] for i in ax3_truth["day_ends"]])
         assert allclose(res["day_ends"][(8, 12)], ax3_truth['day_ends'][(8, 12)])
+
+    def test_ax6(self, ax6_file, ax6_truth):
+        res = ReadCWA(bases=8, periods=12).predict(ax6_file)
+
+        # make sure it will catch small differences
+        assert allclose(
+            res["time"] - ax6_truth["time"][0],
+            ax6_truth["time"] - ax6_truth["time"][0],
+            atol=5e-5
+        )
+
+        for k in ["accel", "gyro", "temperature", "fs"]:
+            # adjust tolerance - GeneActiv truth values from the CSV
+            # were truncated by rounding
+            assert allclose(res[k], ax6_truth[k], atol=5e-5)
+
+        assert all([i in res["day_ends"] for i in ax6_truth["day_ends"]])
+        assert allclose(res["day_ends"][(8, 12)], ax6_truth['day_ends'][(8, 12)])
 
     def test_window_inputs(self):
         r = ReadCWA(bases=None, periods=None)
