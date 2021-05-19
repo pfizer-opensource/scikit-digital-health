@@ -20,16 +20,14 @@ from numpy import (
     append,
     sign,
     median,
-    arange,
-    sqrt,
-    log2,
+    arange
 )
-from numpy.fft import fft
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt, detrend
 from scipy.integrate import cumtrapz
 
 from skimu.utility import moving_sd
+from skimu.features.lib import extensions
 
 
 # utility methods
@@ -350,7 +348,13 @@ class Detector:
                 mx_ = filt_acc[sts_start:sts_end].max()
                 mn_ = filt_acc[sts_start:sts_end].min()
                 vdisp_ = v_pos[t_end_i] - v_pos[t_start_i]
-                sal_ = self.sparc(norm(raw_acc[sts_start:sts_end], axis=1), 1 / dt)
+                sal_ = extensions.SPARC(
+                    norm(raw_acc[sts_start:sts_end], axis=1),
+                    1 / dt,
+                    4,
+                    10.0,
+                    0.05,
+                )
 
                 dtime = datetime.datetime.utcfromtimestamp(time[sts_start])
                 sts["Date"].append(dtime.strftime("%Y-%m-%d"))
@@ -371,7 +375,13 @@ class Detector:
                     mx_ = filt_acc[sts_start:sts_end].max()
                     mn_ = filt_acc[sts_start:sts_end].min()
                     vdisp_ = v_pos[t_end_i] - v_pos[t_start_i]
-                    sal_ = self.sparc(norm(raw_acc[sts_start:sts_end], axis=1), 1 / dt)
+                    sal_ = extensions.SPARC(
+                        norm(raw_acc[sts_start:sts_end], axis=1),
+                        1 / dt,
+                        4,
+                        10.0,
+                        0.05,
+                    )
 
                     dtime = datetime.datetime.utcfromtimestamp(time[sts_start])
                     sts["Date"].append(dtime.strftime("%Y-%m-%d"))
@@ -455,62 +465,3 @@ class Detector:
         else:
             raise IndexError
         return start_still, still_at_end
-
-    @staticmethod
-    def sparc(x, fs):
-        """
-        SPectral ARC length metric for quantifying smoothness
-
-        Parameters
-        ----------
-        x : numpy.ndarray
-            Array containing the data to be analyzed for smoothness
-        fs : float
-            Sampling frequency
-
-        Returns
-        -------
-        sal : float
-            The spectral arc length estimate of the given data's smoothness
-        (f, Mf) : (numpy.ndarray, numpy.ndarray)
-            The frequency and the magnitude spectrum of the input data. This spectral is from 0
-            to the Nyquist frequency
-        (f_sel, Mf_sel) : (numpy.ndarray, numpy.ndarray)
-            The portion of the spectrum that is selected for calculating the spectral arc length
-
-        References
-        ----------
-        S. Balasubramanian, A. Melendez-Calderon, A. Roby-Brami, E. Burdet. "On the analysis of
-        movement smoothness." Journal of NeuroEngineering and Rehabilitation. 2015.
-        """
-        padlevel, fc, amp_th = 4, 10.0, 0.05
-
-        # number of zeros to be padded
-        nfft = int(2 ** (ceil(log2(len(x))) + padlevel))
-
-        # frequency
-        f = arange(0, fs, fs / nfft)
-        # normalized magnitude spectrum
-        Mf = abs(fft(x, nfft))
-        Mf = Mf / Mf.max()
-
-        # indices to choose only the spectrum withing the given cutoff frequency Fc
-        # NOTE: this is a low pass filtering operation to get rid of high frequency noise from
-        # affecting the next step (amplitude threshold based cutoff for arc length calculation
-        fc_inx = ((f <= fc) * 1).nonzero()
-        f_sel = f[fc_inx]
-        Mf_sel = Mf[fc_inx]
-
-        # choose the amplitude threshold based cutoff frequency. Index of the last point on the
-        # magnitude spectrum is greater than or equal to the amplitude threshold
-        inx = ((Mf_sel >= amp_th) * 1).nonzero()[0]
-        fc_inx = arange(inx[0], inx[-1] + 1)
-        f_sel = f_sel[fc_inx]
-        Mf_sel = Mf_sel[fc_inx]
-
-        # calculate the arc length
-        sal = -sum(
-            sqrt((diff(f_sel) / (f_sel[-1] - f_sel[0])) ** 2 + diff(Mf_sel) ** 2)
-        )
-
-        return sal
