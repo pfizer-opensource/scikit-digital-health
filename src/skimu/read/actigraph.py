@@ -120,7 +120,7 @@ class ReadGT3X(_BaseProcess):
 
         if self.window:
             day_starts, day_stops = get_window_start_stop(index, N)
-            results[self._days] = vstack((day_starts, day_stops)).T
+            results[self._days] = {(self.base, self.period): vstack((day_starts, day_stops)).T}
 
         kwargs.update(results)
         if self._in_pipeline:
