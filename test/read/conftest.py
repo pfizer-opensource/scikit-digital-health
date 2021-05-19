@@ -35,3 +35,36 @@ def gnactv_truth():
     data["day_ends"] = {(8, 12): dat["day_ends_8_12"]}
 
     return data
+
+
+@fixture
+def ax3_file():
+    cwd = Path.cwd().parts
+
+    if cwd[-1] == "read":
+        return Path("data/ax3_sample.cwa")
+    elif cwd[-1] == "test":
+        return Path("read/data/ax3_sample.cwa")
+    elif cwd[-1] == "scikit-imu":
+        return Path("test/read/data/ax3_sample.cwa")
+
+
+@fixture
+def ax3_truth():
+    cwd = Path.cwd().parts
+
+    if cwd[-1] == "read":
+        path = "data/ax3_data.npz"
+    elif cwd[-1] == "test":
+        path = "read/data/ax3_data.npz"
+    elif cwd[-1] == "scikit-imu":
+        path = "test/read/data/ax3_data.npz"
+
+    dat = load(path, allow_pickle=False)
+
+    data = {
+        i: dat[i] for i in ['accel', 'time', 'temperature', 'light', 'fs']
+    }
+    data["day_ends"] = {(8, 12): dat["day_ends_8_12"]}
+
+    return data
