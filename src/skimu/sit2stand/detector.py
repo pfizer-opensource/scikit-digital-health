@@ -72,33 +72,35 @@ def pad_moving_sd(x, wlen, skip):
 
 def get_stillness(filt_accel, dt, gravity, window, thresholds):
     """
-    Stillness determination based on filtered acceleration magnitude and jerk magnitude
+    Stillness determination based on filtered acceleration magnitude and jerk magnitude.
 
     Parameters
     ----------
     filt_accel : numpy.ndarray
-        1D array of filtered magnitude of acceleration data, units of m/s^2
+        1D array of filtered magnitude of acceleration data, units of m/s^2.
     dt : float
-        Sampling time, in seconds
+        Sampling time, in seconds,
     gravity : float
-        Gravitational acceleration in m/s^2, as measured by the sensor during motionless periods
+        Gravitational acceleration in m/s^2, as measured by the sensor during
+        motionless periods.
     window : float
         Moving statistics window length, in seconds
     thresholds : dict
         Dictionary of the 4 thresholds to be used - accel moving avg, accel moving std,
         jerk moving avg, and jerk moving std.
-        Acceleration average thresholds should be for difference from gravitional acceleration.
+        Acceleration average thresholds should be for difference from gravitional
+        acceleration.
 
     Returns
     -------
     still : numpy.ndarray
         (N, ) boolean array of stillness (True)
     starts : numpy.ndarray
-        (Q, ) array of indices where still periods start. Includes index 0 if still[0] is True.
-        Q < (N/2)
+        (Q, ) array of indices where still periods start. Includes index 0 if still[0]
+        is True. Q < (N/2)
     stops : numpy.ndarray
-        (Q, ) array of indices where still periods end. Includes index N-1 if still[-1] is True.
-        Q < (N/2)
+        (Q, ) array of indices where still periods end. Includes index N-1 if still[-1]
+        is True. Q < (N/2)
     """
     # compute the sample window length from the time value
     n_window = max(int(around(window / dt)), 2)
@@ -153,40 +155,42 @@ class Detector:
         still_window=0.3,
     ):
         """
-        Method for detecting sit-to-stand transitions based on a series of heuristic signal
-        processing rules.
+        Method for detecting sit-to-stand transitions based on a series of heuristic
+        signal processing rules.
 
         Parameters
         ----------
         stillness_constraint : bool, optional
-            Whether or not to impose the stillness constraint on the detected transitions.
-            Default is True.
+            Whether or not to impose the stillness constraint on the detected
+            transitions. Default is True.
         gravity : float, optional
-            Value of gravitational acceleration measured by the accelerometer when still.
-            Default is 9.81 m/s^2.
+            Value of gravitational acceleration measured by the accelerometer when
+            still. Default is 9.81 m/s^2.
         thresholds : dict, optional
             A dictionary of thresholds to change for stillness detection and transition
-            verification. See *Notes* for default values. Only values present will be used
-            over the defaults.
+            verification. See *Notes* for default values. Only values present will be
+            used over the defaults.
         gravity_pass_order : int, optional
-            Low-pass filter order for estimating the direction of gravity by low-pass filtering
-            the raw acceleration. Default is 4.
+            Low-pass filter order for estimating the direction of gravity by low-pass
+            filtering the raw acceleration. Default is 4.
         gravity_pass_cutoff : float, optional
             Low-pass filter frequency cutoff for estimating the direction of gravity.
             Default is 0.8Hz.
         long_still : float, optional
-            Length of time of stillness for it to be considered a long period of stillness.
-            Used to determine the integration window limits when available. Default is 0.5s
+            Length of time of stillness for it to be considered a long period of
+            stillness. Used to determine the integration window limits when available.
+            Default is 0.5s
         still_window : float, optional
-            Length of the moving window for calculating the moving statistics for determining
-            stillness. Default is 0.3s.
+            Length of the moving window for calculating the moving statistics for
+            determining stillness. Default is 0.3s.
 
         Notes
         -----
-        `stillness_constraint` determines whether or not a sit-to-stand transition is required to
-        start and the end of a still period in the data. This constraint is suggested for at-home
-        data. For processing clinic data, it is suggested to set this to `False`, especially if
-        processing a task where sit-to-stands are repeated in rapid succession.
+        `stillness_constraint` determines whether or not a sit-to-stand transition is
+        required to start and the end of a still period in the data. This constraint is
+        suggested for at-home data. For processing clinic data, it is suggested to set
+        this to `False`, especially if processing a task where sit-to-stands are
+        repeated in rapid succession.
 
         Default thresholds:
             - stand displacement: 0.125  :: min displacement for COM for a transfer (m)
@@ -198,6 +202,11 @@ class Detector:
             - jerk moving avg: 2.5       :: max moving average jerk to be considered still (m/s^3)
             - jerk moving std: 3         :: max moving std jerk to be considered still (m/s^3)
 
+        References
+        ----------
+        .. [1] L. Adamowicz et al., “Assessment of Sit-to-Stand Transfers during Daily
+            Life Using an Accelerometer on the Lower Back,” Sensors, vol. 20, no. 22,
+            Art. no. 22, Jan. 2020, doi: 10.3390/s20226618.
         """
         # set the default thresholds
         self._default_thresholds = {
@@ -236,7 +245,8 @@ class Detector:
         lstill_starts = starts[still_dt > self.long_still]
         lstill_stops = stops[still_dt > self.long_still]
 
-        # compute an estimate of the direction of gravity, assumed to be the vertical direction
+        # compute an estimate of the direction of gravity, assumed to be the
+        # vertical direction
         sos = butter(self.grav_ord, 2 * self.grav_cut * dt, btype="low", output="sos")
         vert = sosfiltfilt(sos, raw_acc, axis=0, padlen=0)
         vert /= norm(vert, axis=1, keepdims=True)
