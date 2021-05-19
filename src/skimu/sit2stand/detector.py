@@ -20,11 +20,8 @@ from numpy import (
     append,
     sign,
     median,
-    arange,
-    sqrt,
-    log2,
+    arange
 )
-from numpy.fft import fft
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt, detrend
 from scipy.integrate import cumtrapz
