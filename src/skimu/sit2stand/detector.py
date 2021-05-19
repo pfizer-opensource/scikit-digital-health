@@ -11,8 +11,6 @@ from numpy import (
     zeros,
     ceil,
     around,
-    mean,
-    std,
     sum,
     abs,
     gradient,
@@ -28,63 +26,48 @@ from numpy import (
 )
 from numpy.fft import fft
 from numpy.linalg import norm
-from numpy.lib import stride_tricks
 from scipy.signal import butter, sosfiltfilt, detrend
 from scipy.integrate import cumtrapz
 
+from skimu.utility import moving_sd
+
 
 # utility methods
-def moving_stats(seq, window):
+def pad_moving_sd(x, wlen, skip):
     """
     Compute the centered moving average and standard deviation.
 
     Parameters
     ----------
-    seq : numpy.ndarray
-        Data to take the moving average and standard deviation on.
-    window : int
-        Window size for the moving average/standard deviation.
+    x : numpy.ndarray
+        Datat to take the moving average and st. dev. on.
+    wlen : int
+        Window size in number of samples.
+    skip : int
+        Window start skip in samples.
 
     Returns
     -------
-    m_mn : numpy.ndarray
-        Moving average
-    m_st : numpy.ndarray
-        Moving standard deviation
+    m_mean : numpy.ndarray
+        Moving mean
+    m_std : numpy.ndarray
+        Moving standard deviation.
     pad : int
-        Padding at beginning of the moving average and standard deviation
+        Pading for the array.
     """
+    m_mn = zeros(x.size)
+    m_sd = zeros(x.size)
 
-    def rolling_window(x, wind):
-        if not x.flags["C_CONTIGUOUS"]:  # pragma: no cover :: should never get here
-            raise ValueError(
-                "Data must be C-contiguous in order to window for moving statistics"
-            )
-        shape = x.shape[:-1] + (x.shape[-1] - wind + 1, wind)
-        strides = x.strides + (x.strides[-1],)
-        return stride_tricks.as_strided(x, shape=shape, strides=strides)
+    wlen = max(wlen, 2)
+    pad = int(ceil(wlen / 2))
+    nr = x.size // skip - wlen + 1
 
-    if seq.ndim != 1:
-        raise ValueError("seq must be 1D")
-    assert seq.flags["C_CONTIGUOUS"], "seq must be C-contiguous"  # just in case
+    m_sd[pad:pad + nr], m_mn[pad:pad + nr] = moving_sd(x, wlen, skip, return_previous=True)
 
-    m_mn = zeros(seq.shape)
-    m_st = zeros(seq.shape)
+    m_mn[:pad], m_mn[pad + nr:] = m_mn[pad], m_mn[-pad]
+    m_sd[:pad], m_sd[pad + nr:] = m_sd[pad], m_sd[-pad]
 
-    if window < 2:
-        window = 2
-
-    pad = int(ceil(window / 2))
-    rw_seq = rolling_window(seq, window)
-
-    n = rw_seq.shape[0]
-
-    m_mn[pad : pad + n] = mean(rw_seq, axis=-1)
-    m_st[pad : pad + n] = std(rw_seq, axis=-1, ddof=1)
-
-    m_mn[:pad], m_mn[pad + n :] = m_mn[pad], m_mn[-pad]
-    m_st[:pad], m_st[pad + n :] = m_st[pad], m_st[-pad]
-    return m_mn, m_st, pad
+    return m_mn, m_sd, pad
 
 
 def get_stillness(filt_accel, dt, gravity, window, thresholds):
@@ -118,13 +101,13 @@ def get_stillness(filt_accel, dt, gravity, window, thresholds):
         Q < (N/2)
     """
     # compute the sample window length from the time value
-    n_window = int(around(window / dt))
-    # compute acceleration moving stats
-    acc_rm, acc_rsd, _ = moving_stats(filt_accel, n_window)
+    n_window = max(int(around(window / dt)), 2)
+    # compute acceleration moving stats. pad the output of the utility functions
+    acc_rm, acc_rsd, _ = pad_moving_sd(filt_accel, n_window, 1)
     # compute the jerk
     jerk = gradient(filt_accel, dt, edge_order=2)
     # compute the jerk moving stats
-    jerk_rm, jerk_rsd, _ = moving_stats(jerk, n_window)
+    jerk_rm, jerk_rsd, _ = pad_moving_sd(jerk, n_window, 1)
 
     # create the stillness masks
     arm_mask = abs(acc_rm - gravity) < thresholds["accel moving avg"]
