@@ -101,3 +101,36 @@ def ax6_truth():
     data["day_ends"] = {(8, 12): dat["day_ends_8_12"]}
 
     return data
+
+
+@fixture
+def gt3x_file():
+    cwd = Path.cwd().parts
+
+    if cwd[-1] == "read":
+        return Path("data/gt3x_sample.gt3x")
+    elif cwd[-1] == "test":
+        return Path("read/data/gt3x_sample.gt3x")
+    elif cwd[-1] == "scikit-imu":
+        return Path("test/read/data/gt3x_sample.gt3x")
+
+
+@fixture
+def gt3x_truth():
+    cwd = Path.cwd().parts
+
+    if cwd[-1] == "read":
+        path = "data/gt3x_data.npz"
+    elif cwd[-1] == "test":
+        path = "read/data/gt3x_data.npz"
+    elif cwd[-1] == "scikit-imu":
+        path = "test/read/data/gt3x_data.npz"
+
+    dat = load(path, allow_pickle=False)
+
+    data = {
+        i: dat[i] for i in ['accel', 'time']
+    }
+    data["day_ends"] = {(9, 2): dat["day_ends_9_2"]}
+
+    return data
