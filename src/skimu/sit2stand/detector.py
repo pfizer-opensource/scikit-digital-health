@@ -27,6 +27,7 @@ from scipy.signal import butter, sosfiltfilt, detrend
 from scipy.integrate import cumtrapz
 
 from skimu.utility import moving_sd
+from skimu.utility.internal import rle
 from skimu.features.lib import extensions
 
 
@@ -68,7 +69,7 @@ def pad_moving_sd(x, wlen, skip):
     return m_mn, m_sd, pad
 
 
-def get_stillness(filt_accel, dt, gravity, window, thresholds):
+def get_stillness(filt_accel, dt, gravity, window, long_still_time, thresholds):
     """
     Stillness determination based on filtered acceleration magnitude and jerk magnitude.
 
@@ -82,7 +83,9 @@ def get_stillness(filt_accel, dt, gravity, window, thresholds):
         Gravitational acceleration in m/s^2, as measured by the sensor during
         motionless periods.
     window : float
-        Moving statistics window length, in seconds
+        Moving statistics window length, in seconds.
+    long_still_time : float
+        Minimum time for stillness to be classified as a long still period.
     thresholds : dict
         Dictionary of the 4 thresholds to be used - accel moving avg, accel moving std,
         jerk moving avg, and jerk moving std.
@@ -99,6 +102,10 @@ def get_stillness(filt_accel, dt, gravity, window, thresholds):
     stops : numpy.ndarray
         (Q, ) array of indices where still periods end. Includes index N-1 if still[-1]
         is True. Q < (N/2)
+    long_starts : numpy.ndarray
+        (P, ) array of indices where long still periods start. P <= Q.
+    long_stops : numpy.ndarray
+        (P, ) array of indices where long still periods stop.
     """
     # compute the sample window length from the time value
     n_window = max(int(around(window / dt)), 2)
@@ -116,15 +123,17 @@ def get_stillness(filt_accel, dt, gravity, window, thresholds):
     jrsd_mask = jerk_rsd < thresholds["jerk moving std"]
 
     still = arm_mask & arsd_mask & jrm_mask & jrsd_mask
-    starts = where(diff(still.astype(int)) == 1)[0]
-    stops = where(diff(still.astype(int)) == -1)[0]
+    lengths, starts, vals = rle(still.astype(int))
 
-    if still[0]:
-        starts = insert(starts, 0, 0)
-    if still[-1]:
-        stops = append(stops, len(still) - 1)
+    starts = starts[vals == 1]
+    stops = starts + lengths[vals == 1]
 
-    return still, starts, stops
+    still_dt = (stops - starts) * dt
+
+    long_starts = starts[still_dt > long_still_time]
+    long_stops = stops[still_dt > long_still_time]
+
+    return still, starts, stops, long_starts, long_stops
 
 
 class Detector:
@@ -235,13 +244,9 @@ class Detector:
         raw_acc = raw_accel * self.grav
         filt_acc = filt_accel * self.grav
 
-        still, starts, stops = get_stillness(
-            filt_acc, dt, self.grav, self.still_window, self.thresh
+        still, starts, stops, lstill_starts, l_still_stops = get_stillness(
+            filt_acc, dt, self.grav, self.still_window, self.long_still, self.thresh
         )
-        still_dt = (stops - starts) * dt
-
-        lstill_starts = starts[still_dt > self.long_still]
-        lstill_stops = stops[still_dt > self.long_still]
 
         # compute an estimate of the direction of gravity, assumed to be the
         # vertical direction
