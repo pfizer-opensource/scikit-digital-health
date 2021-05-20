@@ -262,15 +262,10 @@ class Detector:
                 end_still = self._get_end_still(time, stops, lstill_stops, ppk)
             except IndexError:
                 continue
-            try:  # look for the next start of stillness
-                start_still, still_at_end = self._get_start_still(
-                    time, stops, lstill_starts, ppk
-                )
-            except IndexError:
-                start_still = int(
-                    ppk + (5 / dt)
-                )  # try to use a set time past the transition
-                still_at_end = False
+            # look for the next start of stillness
+            start_still, still_at_end = self._get_start_still(
+                dt, time, stops, lstill_starts, ppk
+            )
 
             # INTEGRATE between the determined indices
             if (end_still < prev_int_start) or (start_still > prev_int_end):
@@ -498,11 +493,19 @@ class Detector:
                 raise IndexError
         return end_still
 
-    def _get_start_still(self, time, still_starts, lstill_starts, peak):
-        still_at_end = False
-        start_still = lstill_starts[lstill_starts > peak][0]
-        if (time[start_still] - time[peak]) < 30:
-            still_at_end = True
-        else:
-            raise IndexError
+    def _get_start_still(self, dt, time, still_starts, lstill_starts, peak):
+        try:
+            start_still = lstill_starts[lstill_starts > peak][0]
+            if (time[start_still] - time[peak]) < 30:
+                still_at_end = True
+            else:
+                # try to use a set time past the transition
+                start_still = int(peak + (5 / dt))
+                still_at_end = False
+
+            return start_still, still_at_end
+        except IndexError:
+            start_still = int(peak + (5 / dt))
+            still_at_end = False
+
         return start_still, still_at_end
