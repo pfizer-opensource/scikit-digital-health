@@ -285,9 +285,9 @@ class Detector:
                 prev_int_end = start_still
 
                 # get zero crossings
-                pos_zc = insert(where(diff(sign(v_vel)) > 0)[0], 0, 0) + end_still
+                pos_zc = insert(where(diff(sign(v_vel)) > 0)[0] + 1, 0, 0) + end_still
                 neg_zc = (
-                    append(where(diff(sign(v_vel)) < 0)[0], v_vel.size - 1) + end_still
+                    append(where(diff(sign(v_vel)) < 0)[0] + 1, v_vel.size - 1) + end_still
                 )
 
             # maker sure the velocity is high enough to indicate a peak
@@ -437,11 +437,11 @@ class Detector:
         .. math:: \bar{a}_g(t) = \hat{v}_g(t) \cdot y_a(t)
         """
         sos = butter(self.grav_ord, 2 * self.grav_cut * dt, btype="low", output="sos")
-        vert = sosfiltfilt(sos, accel, axis=0, padlen=0)
-        vert /= norm(vert, axis=1, keepdims=True)
+        v_g = sosfiltfilt(sos, accel, axis=0, padlen=0)
+        v_g /= norm(v_g, axis=1, keepdims=True)
 
         # estimate of the vertical acceleration
-        v_acc = sum(vert * accel, axis=1)
+        v_acc = sum(v_g * accel, axis=1)
 
         return v_acc
 
