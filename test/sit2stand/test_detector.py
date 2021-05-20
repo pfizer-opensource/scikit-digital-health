@@ -22,17 +22,21 @@ def test_get_stillness(dummy_stillness_data):
         "jerk moving avg": 2.5,
         "jerk moving std": 3.0,
     }
-    still, starts, stops = get_stillness(
+    still, starts, stops, long_starts, long_stops = get_stillness(
         dummy_stillness_data * 9.81,
         1/20,
         9.81,
         0.25,
+        0.5,
         threshs,
     )
 
-    assert allclose(starts, 300 + 3)  # account for padding
-    assert allclose(stops, 400 - 3)  # account for padding
-    assert still.sum() == 100 - 3 - 3  # padding
+    assert allclose(starts, 300 + 4)  # account for padding
+    assert allclose(stops, 400 - 2)  # account for padding
+    assert still.sum() == 100 - 4 - 2  # padding
+
+    assert long_starts == starts  # 100 samples -> 5 seconds
+    assert long_stops == stops
 
 
 class TestDetector:
@@ -55,9 +59,13 @@ class TestDetector:
         pt = (c * t - sin(c * t)) / c**2
 
         v, p = Detector._integrate(a, dt, True)
+        v1, p1 = Detector._integrate(a, dt, False)
 
         assert allclose(v, vt, atol=1e-5)
         assert allclose(p, pt, atol=5e-5)
+
+        assert allclose(v1, v)
+        assert allclose(p1, p)
 
     def test__get_end_still(self):
         time = arange(0, 10, 0.01)
@@ -88,12 +96,73 @@ class TestDetector:
 
         d = Detector()
 
-        es, sae = d._get_start_still(time, array([125, 350]), array([125]), 100)
+        es, sae = d._get_start_still(0.01, time, array([125, 350]), array([125]), 100)
 
         assert es == 125
         assert sae
 
         time = arange(0, 40, 0.1)
-        with pytest.raises(IndexError):
-            d._get_start_still(time, array([370]), array([370]), 50)
+        peak = 50
+        es, sae = d._get_start_still(0.1, time, array([370]), array([370]), peak)
 
+        assert es == peak + 50  # peak plus 5 seconds
+        assert not sae
+
+        # testing the index error route
+        peak = 200
+        es, sae = d._get_start_still(0.1, time, array([150]), array([150]), peak)
+
+        assert es == peak + 50
+        assert not sae
+
+    def test__get_transition_start(self):
+        d = Detector(stillness_constraint=True)
+
+        start = d._get_transition_start(None, None, 50, None, None)
+        assert start == 50
+
+        d = Detector(stillness_constraint=False)
+
+        pos_zc = array([240])
+        stops = array([237])
+        start = d._get_transition_start(0.1, 250, None, pos_zc, stops)
+
+        assert start == 237  # stillness stop within [-0.5, 0.7] seconds of ZC
+
+        stops = array([232])
+        start = d._get_transition_start(0.1, 250, None, pos_zc, stops)
+
+        assert start == 240  # stillness stop too far away from ZC
+
+        # index error
+        start = d._get_transition_start(0.1, 250, None, array([260]), array([230]))
+
+        assert start is None
+
+    def test__is_transfer_valid(self):
+        d = Detector(
+            thresholds={
+                "duration factor": 4,
+                "stand displacement": 0.125
+            }
+        )
+
+        res = {"STS Start": []}
+        peak = 350
+        time = arange(0, 10, 0.01)
+        vp = 3 * time
+        sts_start = 300
+        sts_end = 525
+        prev_int_start = 0
+
+        valid, tsi, tei = d._is_transfer_valid(res, peak, time, vp, sts_start, sts_end, prev_int_start)
+
+        assert valid
+        assert tsi == sts_start
+        assert tei == sts_end
+
+        # with existing transition
+        res = {"STS Start": [2.7]}  # less than 0.4 away from time[300] = 3.0s
+
+        valid, *_ = d._is_transfer_valid(res, peak, time, vp, sts_start, sts_end, prev_int_start)
+        assert not valid
