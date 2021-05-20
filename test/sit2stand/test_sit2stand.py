@@ -75,13 +75,15 @@ class TestDetector:
                 det._get_end_still(t, np.array([150]), np.array([150]), 1950)
 
     @pytest.mark.parametrize("still", (True, False))
-    def test_get_start_still_error(self, still):
+    def test_get_start_still_over30(self, still):
         det = Detector(stillness_constraint=still)
 
         t = np.arange(0, 45, 1 / 50)
 
-        with pytest.raises(IndexError):
-            det._get_start_still(t, np.array([1950]), np.array([1950]), 150)
+        s, sae = det._get_start_still(0.02, t, np.array([1950]), np.array([1950]), 150)
+
+        assert s == 150 + 250
+        assert not sae
 
 
 class TestSit2StandStillness(BaseProcessTester):
