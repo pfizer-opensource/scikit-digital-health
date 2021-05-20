@@ -300,86 +300,36 @@ class Detector:
             except IndexError:  # pragma: no cover :: no data for this currently
                 continue
 
-            # QUALITY CHECKS
-            # ==============
-            t_start_i = sts_start - prev_int_start  # integrated value start index
-            t_end_i = sts_end - prev_int_start
-
-            # check that the STS time is not too long
-            qc1 = (time[sts_end] - time[sts_start]) < 4.5  # threshold from various lit
-
-            # check that the first half of the s2s is not too much longer than the second half
-            dt_half_1 = time[ppk] - time[sts_start]
-            dt_half_2 = time[sts_end] - time[ppk]
-            qc2 = dt_half_1 < (self.thresh["duration factor"] * dt_half_2)
-
-            # check that the start and end are not equal
-            qc3 = t_start_i != t_end_i
-
-            # check that there is enough displacement for an actual STS
-            qc4 = (v_pos[t_end_i] - v_pos[t_start_i]) > self.thresh[
-                "stand displacement"
-            ]
-
-            if not (
-                qc1 & qc2 & qc3 & qc4
-            ):  # if not all checks are passed :: pragma: no cover
+            # Run quality checks and if they pass add the transition to the results
+            valid_transfer, t_start_i, t_end_i = self._is_transfer_valid(sts, ppk, time, v_pos, sts_start, sts_end, prev_int_start)
+            if not valid_transfer:
                 continue
 
-            # sit to stand assignment
-            if len(sts["STS Start"]) == 0:
-                # compute s2s features
-                dur_ = time[sts_end] - time[sts_start]
-                mx_ = filt_acc[sts_start:sts_end].max()
-                mn_ = filt_acc[sts_start:sts_end].min()
-                vdisp_ = v_pos[t_end_i] - v_pos[t_start_i]
-                sal_ = extensions.SPARC(
-                    norm(raw_acc[sts_start:sts_end], axis=1),
-                    1 / dt,
-                    4,
-                    10.0,
-                    0.05,
-                )
+            # compute s2s features
+            dur_ = time[sts_end] - time[sts_start]
+            mx_ = filt_acc[sts_start:sts_end].max()
+            mn_ = filt_acc[sts_start:sts_end].min()
+            vdisp_ = v_pos[t_end_i] - v_pos[t_start_i]
+            sal_ = extensions.SPARC(
+                norm(raw_acc[sts_start:sts_end], axis=1),
+                1 / dt,
+                4,
+                10.0,
+                0.05,
+            )
 
-                dtime = datetime.datetime.utcfromtimestamp(time[sts_start])
-                sts["Date"].append(dtime.strftime("%Y-%m-%d"))
-                sts["Time"].append(dtime.strftime("%H:%M:%S.%f"))
-                sts["Hour"].append(dtime.hour)
+            dtime = datetime.datetime.utcfromtimestamp(time[sts_start])
+            sts["Date"].append(dtime.strftime("%Y-%m-%d"))
+            sts["Time"].append(dtime.strftime("%H:%M:%S.%f"))
+            sts["Hour"].append(dtime.hour)
 
-                sts["STS Start"].append(time[sts_start])
-                sts["STS End"].append(time[sts_end])
-                sts["Duration"].append(dur_)
-                sts["Max. Accel."].append(mx_)
-                sts["Min. Accel."].append(mn_)
-                sts["SPARC"].append(sal_)
-                sts["Vertical Displacement"].append(vdisp_)
-            else:
-                if (time[sts_start] - sts["STS Start"][-1]) > 0.4:
-                    # compute s2s features
-                    dur_ = time[sts_end] - time[sts_start]
-                    mx_ = filt_acc[sts_start:sts_end].max()
-                    mn_ = filt_acc[sts_start:sts_end].min()
-                    vdisp_ = v_pos[t_end_i] - v_pos[t_start_i]
-                    sal_ = extensions.SPARC(
-                        norm(raw_acc[sts_start:sts_end], axis=1),
-                        1 / dt,
-                        4,
-                        10.0,
-                        0.05,
-                    )
-
-                    dtime = datetime.datetime.utcfromtimestamp(time[sts_start])
-                    sts["Date"].append(dtime.strftime("%Y-%m-%d"))
-                    sts["Time"].append(dtime.strftime("%H:%M:%S.%f"))
-                    sts["Hour"].append(dtime.hour)
-
-                    sts["STS Start"].append(time[sts_start])
-                    sts["STS End"].append(time[sts_end])
-                    sts["Duration"].append(dur_)
-                    sts["Max. Accel."].append(mx_)
-                    sts["Min. Accel."].append(mn_)
-                    sts["SPARC"].append(sal_)
-                    sts["Vertical Displacement"].append(vdisp_)
+            sts["STS Start"].append(time[sts_start])
+            sts["STS End"].append(time[sts_end])
+            sts["Duration"].append(dur_)
+            sts["Max. Accel."].append(mx_)
+            sts["Min. Accel."].append(mn_)
+            sts["SPARC"].append(sal_)
+            sts["Vertical Displacement"].append(vdisp_)
 
         # check to ensure no partial transitions
         vdisp_ndarr = array(sts["Vertical Displacement"][n_prev:])
@@ -515,3 +465,55 @@ class Detector:
                 return None
 
         return sts_start
+
+    def _is_transfer_valid(
+            self, res, peak, time, vp, sts_start, sts_end, prev_int_start
+    ):
+        """
+        Check if the sit-to-stand transfer is a valid one.
+
+        Parameters
+        ----------
+        res : dict
+            Dictionary of sit-to-stand transfers.
+        peak : int
+            Peak index.
+        time : np.ndarray
+            Timestamps in seconds.
+        vp : numpy.ndarray
+            Vertical position array.
+        sts_start : int
+            Sit-to-stand transfer start index.
+        sts_end : int
+            Sit-to-stand transfer end index.
+        prev_int_start : int
+            Index of the integration start.
+
+        Returns
+        -------
+        valid_transition : bool
+            If the transition is valid.
+        """
+        if len(res["STS Start"]) > 0:
+            if (time[sts_start] - res["STS Start"][-1]) <= 0.4:
+                return False
+
+        # get the integrated value start index
+        t_start_i = sts_start - prev_int_start
+        t_end_i = sts_end - prev_int_start
+
+        # check that the STS time is not too long
+        qc1 = (time[sts_end] - time[sts_start]) < 4.5  # threshold from various lit
+
+        # check that first part of the s2s is not too much longer than the second part
+        dt_part_1 = time[peak] - time[sts_start]
+        dt_part_2 = time[sts_end] - time[peak]
+        qc2 = dt_part_1 < (self.thresh["duration factor"] * dt_part_2)
+
+        # check that the start and end are not equal
+        qc3 = t_start_i != t_end_i
+
+        # check that there is enough displacement for an actual STS
+        qc4 = (vp[t_end_i] - vp[t_start_i]) > self.thresh["stand displacement"]
+
+        return qc1 & qc2 & qc3 & qc4, t_start_i, t_end_i
