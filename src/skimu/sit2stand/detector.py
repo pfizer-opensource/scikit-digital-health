@@ -251,14 +251,14 @@ class Detector:
         # estimate of vertical acceleration
         v_acc = self._get_vertical_accel(dt, raw_acc)
 
-        # iterate over the power peaks (potentail s2s time points)
+        # iterate over the power peaks (potential s2s time points)
         prev_int_start = -1  # keep track of integration regions
         prev_int_end = -1
 
         n_prev = len(sts["STS Start"])  # previous number of transitions
 
         for ppk in power_peaks:
-            try:  # look for the preceeding end of stillness
+            try:  # look for the preceding end of stillness
                 end_still = self._get_end_still(time, stops, lstill_stops, ppk)
             except IndexError:
                 continue
