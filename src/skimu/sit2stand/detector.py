@@ -451,7 +451,7 @@ class Detector:
 
         return start_still, still_at_end
 
-    def _get_transition_start(self, dt, peak, end_still, pos_zc, stops):
+    def _get_transfer_start(self, dt, peak, end_still, pos_zc, stops):
         if self.stillness_constraint:
             sts_start = end_still
         else:
