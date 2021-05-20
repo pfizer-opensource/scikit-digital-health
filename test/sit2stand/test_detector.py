@@ -1,5 +1,5 @@
 import pytest
-from numpy import array, allclose, arange
+from numpy import array, allclose, arange, pi, sin, cos
 
 from skimu.sit2stand.detector import pad_moving_sd, get_stillness, Detector
 
@@ -45,6 +45,20 @@ class TestDetector:
             if k != "accel moving avg":
                 assert d.thresh[k] == d._default_thresholds[k]
 
+    def test__integrate(self):
+        dt = 0.01
+        c = 2 * pi * 0.2
+        t = arange(0, 5.001, dt)  # 501 samples
+        a = sin(c * t)
+
+        vt = (-cos(c * t) + 1) / c
+        pt = (c * t - sin(c * t)) / c**2
+
+        v, p = Detector._integrate(a, dt, True)
+
+        assert allclose(v, vt, atol=1e-5)
+        assert allclose(p, pt, atol=5e-5)
+
     def test__get_end_still(self):
         time = arange(0, 10, 0.01)
         # STILLNESS
@@ -81,5 +95,5 @@ class TestDetector:
 
         time = arange(0, 40, 0.1)
         with pytest.raises(IndexError):
-            es, sae = d._get_start_still(time, array([370]), array([370]), 50)
+            d._get_start_still(time, array([370]), array([370]), 50)
 
