@@ -496,7 +496,7 @@ class Detector:
         """
         if len(res["STS Start"]) > 0:
             if (time[sts_start] - res["STS Start"][-1]) <= 0.4:
-                return False
+                return False, None, None
 
         # get the integrated value start index
         t_start_i = sts_start - prev_int_start
