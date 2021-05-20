@@ -244,18 +244,12 @@ class Detector:
         raw_acc = raw_accel * self.grav
         filt_acc = filt_accel * self.grav
 
-        still, starts, stops, lstill_starts, l_still_stops = get_stillness(
+        still, starts, stops, lstill_starts, lstill_stops = get_stillness(
             filt_acc, dt, self.grav, self.still_window, self.long_still, self.thresh
         )
 
-        # compute an estimate of the direction of gravity, assumed to be the
-        # vertical direction
-        sos = butter(self.grav_ord, 2 * self.grav_cut * dt, btype="low", output="sos")
-        vert = sosfiltfilt(sos, raw_acc, axis=0, padlen=0)
-        vert /= norm(vert, axis=1, keepdims=True)
-
         # estimate of vertical acceleration
-        v_acc = sum(vert * raw_acc, axis=1)
+        v_acc = self._get_vertical_accel(dt, raw_acc)
 
         # iterate over the power peaks (potentail s2s time points)
         prev_int_start = -1  # keep track of integration regions
@@ -408,6 +402,48 @@ class Detector:
                 vdisp_ndarr < (self.thresh["displacement factor"] * median(vdisp_ndarr))
             ).tolist()
         )
+
+    def _get_vertical_accel(self, dt, accel):
+        r"""
+        Get an estimate of the vertical acceleration component.
+
+        Parameters
+        ----------
+        dt : float
+            Sampling period in seconds.
+        accel : numpy.ndarray
+            (N, 3) array of acceleration.
+
+        Returns
+        -------
+        vert_acc : numpy.ndarray
+            (N, ) array of the estimated acceleration in the vertical direction.
+
+        Notes
+        -----
+        First, an estimate of the vertical axis is found by using a strict
+        low-pass filter with a cutoff designed to only capture the direction
+        of the gravity vector. For example a cutoff might be 0.5Hz. The vertical
+        direction is then computed per:
+
+        .. math:: \hat{v}_g(t) = \frac{filter(y_a(t))}{||filter(y_t(t))||_2}
+
+        :math:`\hat{v}_g(t)` is the vertical (gravity) axis vector as a function of
+        time and :math:`y_a(t)` is the measured acceleration as a function of time.
+
+        The vertical component of acceleration can then be obtained as the
+        dot-product of the vertical axis and the acceleration per
+
+        .. math:: \bar{a}_g(t) = \hat{v}_g(t) \cdot y_a(t)
+        """
+        sos = butter(self.grav_ord, 2 * self.grav_cut * dt, btype="low", output="sos")
+        vert = sosfiltfilt(sos, accel, axis=0, padlen=0)
+        vert /= norm(vert, axis=1, keepdims=True)
+
+        # estimate of the vertical acceleration
+        v_acc = sum(vert * accel, axis=1)
+
+        return v_acc
 
     @staticmethod
     def _integrate(vert_accel, dt, still_at_end):
