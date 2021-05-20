@@ -290,18 +290,9 @@ class Detector:
                 continue
 
             # transition start
-            if self.stillness_constraint:
-                sts_start = end_still
-            else:
-                try:  # look for the previous positive zero crossing as the start
-                    sts_start = pos_zc[pos_zc < ppk][-1]
-                    p_still = stops[stops < ppk][-1]
-                    # possibly use the end of stillness if it is close enough
-                    if -0.5 < (dt * (p_still - sts_start)) < 0.7:
-                        sts_start = p_still
-                # TODO add data for tests that could address this one
-                except IndexError:  # pragma: no cover :: no data for this currently
-                    continue
+            sts_start = self._get_transition_start(dt, ppk, end_still, pos_zc, stops)
+            if sts_start is None:
+                continue
             # transition end
             try:
                 sts_end = neg_zc[neg_zc > ppk][0]
@@ -509,3 +500,18 @@ class Detector:
             still_at_end = False
 
         return start_still, still_at_end
+
+    def _get_transition_start(self, dt, peak, end_still, pos_zc, stops):
+        if self.stillness_constraint:
+            sts_start = end_still
+        else:
+            try:  # look for the previous positive zero crossing as the start
+                sts_start = pos_zc[pos_zc < peak][-1]
+                p_still = stops[stops < peak][-1]
+                # possibly use the end of stillness if it is close enough
+                if -0.5 < (dt * (p_still - sts_start)) < 0.7:
+                    sts_start = p_still
+            except IndexError:
+                return None
+
+        return sts_start
