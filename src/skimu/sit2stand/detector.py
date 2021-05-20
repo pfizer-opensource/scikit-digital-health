@@ -451,7 +451,7 @@ class Detector:
 
         return start_still, still_at_end
 
-    def _get_transition_start(self, dt, peak, end_still, pos_zc, stops):
+    def _get_transfer_start(self, dt, peak, end_still, pos_zc, stops):
         if self.stillness_constraint:
             sts_start = end_still
         else:
@@ -496,7 +496,7 @@ class Detector:
         """
         if len(res["STS Start"]) > 0:
             if (time[sts_start] - res["STS Start"][-1]) <= 0.4:
-                return False
+                return False, None, None
 
         # get the integrated value start index
         t_start_i = sts_start - prev_int_start
