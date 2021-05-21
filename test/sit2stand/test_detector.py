@@ -1,5 +1,5 @@
 import pytest
-from numpy import array, allclose, arange, pi, sin, cos
+from numpy import array, allclose, arange, pi, sin, cos, zeros
 
 from skimu.sit2stand.detector import pad_moving_sd, get_stillness, Detector
 
@@ -48,6 +48,16 @@ class TestDetector:
         for k in d._default_thresholds:
             if k != "accel moving avg":
                 assert d.thresh[k] == d._default_thresholds[k]
+
+    def test__get_vertical_accel(self, np_rng):
+        d = Detector(gravity_pass_order=4, gravity_pass_cutoff=0.5)
+
+        x = zeros((500, 3)) + np_rng.standard_normal((500, 3)) * 0.02
+        x[:, 2] += 1
+
+        vacc = d._get_vertical_accel(0.05, x)
+
+        assert allclose(vacc, x[:, 2], atol=5e-3)
 
     def test__integrate(self):
         dt = 0.01
