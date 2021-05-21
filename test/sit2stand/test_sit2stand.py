@@ -45,3 +45,27 @@ class TestSit2Stand:
 
         for k in stillness_truth:
             assert allclose(res[k], stillness_truth[k])
+
+    def test_displacement(self, s2s_input, displacement_truth):
+        s2s = Sit2Stand(
+            stillness_constraint=False,
+            gravity=9.81,
+            thresholds=None,
+            long_still=0.5,
+            still_window=0.3,
+            gravity_pass_order=4,
+            gravity_pass_cutoff=0.8,
+            continuous_wavelet="gaus1",
+            power_band=[0, 0.5],
+            power_peak_kw={"distance": 128},
+            power_std_height=True,
+            power_std_trim=0,
+            lowpass_order=4,
+            lowpass_cutoff=5,
+            reconstruction_window=0.25,
+        )
+
+        res = s2s.predict(time=s2s_input['time'], accel=s2s_input['accel'])
+
+        for k in displacement_truth:
+            assert allclose(res[k], displacement_truth[k])
