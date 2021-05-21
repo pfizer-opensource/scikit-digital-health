@@ -1,5 +1,6 @@
 import pytest
 from numpy import array, allclose, arange, pi, sin, cos, zeros
+from scipy.signal import butter, sosfiltfilt
 
 from skimu.sit2stand.detector import pad_moving_sd, get_stillness, Detector
 
@@ -40,6 +41,35 @@ def test_get_stillness(dummy_stillness_data):
 
 
 class TestDetector:
+    def test(self, np_rng):
+        t = arange(0, 10, 0.01)
+        x = zeros((5000, 3))
+        x[:, 2] += 1
+        x[2000:3000, 2] += 0.33 * t**(1/3) * sin(2 * pi * 0.1 * t)
+        x += np_rng.standard_normal(x.shape) * 0.03
+
+        sos = butter(4, 2 * 4 / 100, btype="low", output='sos')
+        xf = sosfiltfilt(sos, x, axis=0)
+
+        res = {
+            "Date": [],
+            "Day Number": [],
+            "Time": [],
+            "Hour": [],
+            "STS Start": [],
+            "STS End": [],
+            "Duration": [],
+            "Max. Accel.": [],
+            "Min. Accel.": [],
+            "SPARC": [],
+            "Vertical Displacement": [],
+            "Partial": [],
+        }
+
+        Detector().predict(res, 0.01, arange(0, 50, 0.01), x, xf, array([2500]))
+
+        assert True
+
     def test_update_thresh(self):
         d = Detector(thresholds={"accel moving avg": 0.5, "test": 100})
 
