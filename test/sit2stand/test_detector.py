@@ -1,5 +1,5 @@
 import pytest
-from numpy import array, allclose, arange, pi, sin, cos, zeros
+from numpy import array, allclose, arange, pi, sin, cos, zeros, isclose
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt
 
@@ -33,9 +33,9 @@ def test_get_stillness(dummy_stillness_data):
         threshs,
     )
 
-    assert allclose(starts, 300 + 4)  # account for padding
-    assert allclose(stops, 400 - 2)  # account for padding
-    assert still.sum() == 100 - 4 - 2  # padding
+    assert 300 <= starts[0] <= 304  # account for padding
+    assert 397 <= stops[0] <= 400  # account for padding
+    assert 94 <= still.sum() <= 100  # padding
 
     assert long_starts == starts  # 100 samples -> 5 seconds
     assert long_stops == stops
@@ -46,7 +46,7 @@ class TestDetector:
         t_ = arange(0, 10, 0.01)
         acc = zeros((5000, 3))
         acc[:, 2] += 1
-        acc[2000:3000, 2] += 0.33 * t_**(1/3) * sin(2 * pi * 0.1 * t_)
+        acc[2000:2500, 2] += (0.33 * t_**(1/3) * sin(2 * pi * 0.1 * t_))[::2]
         acc += np_rng.standard_normal(acc.shape) * 0.03
 
         sos = butter(4, 2 * 1.5 / 100, btype="low", output='sos')
@@ -68,9 +68,17 @@ class TestDetector:
         }
         acc_f = norm(acc, axis=1)
 
-        Detector().predict(res, 0.01, arange(0, 50, 0.01), acc, acc_f, array([2200]))
+        Detector().predict(res, 0.01, arange(0, 20, 0.004), acc, acc_f, array([2200]))
 
-        assert True
+        # 2 seconds, off due to detection of still periods, etc
+        assert isclose(res['Duration'][0], 1.92, atol=5e-2)
+        # large ranges due to random noise
+        assert isclose(res['Max. Accel.'][0], 14.2, atol=0.2)
+        assert isclose(res['Min. Accel.'][0], 3.4, atol=0.2)
+        assert isclose(res['SPARC'][0], -1.9, atol=0.2)
+        # this is off so much because of synthetic data
+        assert isclose(res['Vertical Displacement'][0], 20.4, atol=0.5)
+        assert not res['Partial'][0]
 
     def test_update_thresh(self):
         d = Detector(thresholds={"accel moving avg": 0.5, "test": 100})
