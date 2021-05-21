@@ -290,7 +290,7 @@ class Detector:
                 continue
 
             # transition start
-            sts_start = self._get_transition_start(dt, ppk, end_still, pos_zc, stops)
+            sts_start = self._get_transfer_start(dt, ppk, end_still, pos_zc, stops)
             if sts_start is None:
                 continue
             # transition end
