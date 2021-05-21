@@ -54,14 +54,14 @@ def pad_moving_sd(x, wlen, skip):
     pad : int
         Pading for the array.
     """
-    m_mn = zeros(x.size)
-    m_sd = zeros(x.size)
+    m_mn = zeros(x.shape)
+    m_sd = zeros(x.shape)
 
     wlen = max(wlen, 2)
     pad = int(ceil(wlen / 2))
     nr = x.size // skip - wlen + 1
 
-    m_sd[pad:pad + nr], m_mn[pad:pad + nr] = moving_sd(x, wlen, skip, return_previous=True)
+    m_sd[pad:pad + nr], m_mn[pad:pad + nr] = moving_sd(x, wlen, skip, axis=0, return_previous=True)
 
     m_mn[:pad], m_mn[pad + nr:] = m_mn[pad], m_mn[-pad]
     m_sd[:pad], m_sd[pad + nr:] = m_sd[pad], m_sd[-pad]
