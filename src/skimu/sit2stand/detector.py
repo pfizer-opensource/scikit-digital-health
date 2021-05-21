@@ -59,7 +59,7 @@ def pad_moving_sd(x, wlen, skip):
 
     wlen = max(wlen, 2)
     pad = int(ceil(wlen / 2))
-    nr = x.size // skip - wlen + 1
+    nr = x.shape[0] // skip - wlen + 1
 
     m_sd[pad:pad + nr], m_mn[pad:pad + nr] = moving_sd(x, wlen, skip, axis=0, return_previous=True)
 
