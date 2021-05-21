@@ -118,24 +118,24 @@ class TestDetector:
     def test__get_transition_start(self):
         d = Detector(stillness_constraint=True)
 
-        start = d._get_transition_start(None, None, 50, None, None)
+        start = d._get_transfer_start(None, None, 50, None, None)
         assert start == 50
 
         d = Detector(stillness_constraint=False)
 
         pos_zc = array([240])
         stops = array([237])
-        start = d._get_transition_start(0.1, 250, None, pos_zc, stops)
+        start = d._get_transfer_start(0.1, 250, None, pos_zc, stops)
 
         assert start == 237  # stillness stop within [-0.5, 0.7] seconds of ZC
 
         stops = array([232])
-        start = d._get_transition_start(0.1, 250, None, pos_zc, stops)
+        start = d._get_transfer_start(0.1, 250, None, pos_zc, stops)
 
         assert start == 240  # stillness stop too far away from ZC
 
         # index error
-        start = d._get_transition_start(0.1, 250, None, array([260]), array([230]))
+        start = d._get_transfer_start(0.1, 250, None, array([260]), array([230]))
 
         assert start is None
 
