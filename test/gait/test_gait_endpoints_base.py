@@ -4,7 +4,7 @@ from numpy import array, allclose, arange, nan, isnan
 from skimu.gait import gait_endpoints as endpoints
 
 
-class TestEventEndpoint1(endpoints.GaitEventEndpoint):
+class EventEndpoint1Test(endpoints.GaitEventEndpoint):
     def __init__(self):
         super().__init__("test event ept 1", __name__, depends=None)
 
@@ -12,24 +12,24 @@ class TestEventEndpoint1(endpoints.GaitEventEndpoint):
         print("inside event endpoint 1")
 
 
-class TestEventEndpoint2(endpoints.GaitEventEndpoint):
+class EventEndpoint2Test(endpoints.GaitEventEndpoint):
     def __init__(self):
-        super().__init__("test event ept 2", __name__, depends=[TestEventEndpoint1])
+        super().__init__("test event ept 2", __name__, depends=[EventEndpoint1Test])
 
     def _predict(self, *args, **kwargs):
         print("inside event endpoint 2")
 
 
-class TestBoutEndpoint1(endpoints.GaitBoutEndpoint):
+class BoutEndpoint1Test(endpoints.GaitBoutEndpoint):
     def __init__(self):
-        super().__init__("test bout ept 1", __name__, depends=[TestEventEndpoint2])
+        super().__init__("test bout ept 1", __name__, depends=[EventEndpoint2Test])
 
     def _predict(self, *args, **kwargs):
         print("inside bout endpoint 1")
 
 
 def test_depends(capsys):
-    tbe1 = TestBoutEndpoint1()
+    tbe1 = BoutEndpoint1Test()
 
     tbe1.predict(50., 1.8, {}, {})
 
@@ -41,7 +41,7 @@ def test_depends(capsys):
 
 class TestBoutEndpoint:
     def test_already_run(self, capsys):
-        tbe1 = TestBoutEndpoint1()
+        tbe1 = BoutEndpoint1Test()
         tbe1.predict(50., 1.8, {tbe1.k_: []}, {})
 
         record = capsys.readouterr().out
@@ -51,7 +51,7 @@ class TestBoutEndpoint:
 
 class TestEventEndpoint:
     def test_already_run(self, capsys):
-        tee1 = TestEventEndpoint1()
+        tee1 = EventEndpoint1Test()
         tee1.predict(50., 1.8, {tee1.k_: []}, {})
 
         record = capsys.readouterr().out
@@ -78,7 +78,7 @@ class TestEventEndpoint:
             "PARAM:test event ept 1": arange(1, 9)
         }
 
-        tee1 = TestEventEndpoint1()
+        tee1 = EventEndpoint1Test()
         tee1._predict_asymmetry(50., 1.8, gait, {})
 
         res = gait['PARAM:test event ept 1 asymmetry']
@@ -92,7 +92,7 @@ class TestEventEndpoint:
             "Bout N": array([1, 1, 1, 2, 2, 2, 2, 2])
         }
 
-        tee1 = TestEventEndpoint1()
+        tee1 = EventEndpoint1Test()
 
         m, mo = tee1._predict_init(gait, init=True, offset=1)
 
