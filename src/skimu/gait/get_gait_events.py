@@ -66,7 +66,7 @@ def get_gait_events(
     # correct acceleration orientation if set
     if corr_accel_orient:
         # determine AP axis
-        ac = gait_endpoints._autocovariancefunction(
+        ac = gait_endpoints._autocovariancefn(
             accel, min(accel.shape[0] - 1, 1000), biased=True
         )
         ap_axis = argsort(corrcoef(ac.T)[v_axis])[-2]  # last is autocorrelation
