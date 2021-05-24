@@ -13,6 +13,49 @@ from skimu.utility import correct_accelerometer_orientation
 from skimu.gait.gait_endpoints import gait_endpoints
 
 
+def get_cwt_scales(use_optimal_scale, vertical_velocity, original_scale, fs):
+    """
+    Get the CWT scales for the IC and FC events.
+
+    Parameters
+    ----------
+    use_optimal_scale : bool
+        Use the optimal scale based on step frequency.
+    vertical_velocity : numpy.ndarray
+        Vertical velocity, in units of "g".
+    original_scale : int
+        The original/default scale for the CWT.
+    fs : float
+        Sampling frequency, in Hz.
+
+    Returns
+    -------
+    scale1 : int
+        First scale for the CWT. For initial contact events.
+    scale2 : int
+        Second scale for the CWT. For final contact events.
+    """
+    if use_optimal_scale:
+        coef_scale_original, _ = cwt(vertical_velocity, original_scale, "gaus1")
+
+        F = abs(fft.rfft(coef_scale_original[0]))
+        # compute an estimate of the step frequency
+        step_freq = argmax(F) / vertical_velocity.size * fs
+
+        # IC scale: -10 * sf + 56
+        # FC scale: -52 * sf + 131
+        # TODO verify the FC scale equation. This it not in the paper but is a
+        #  guess from the graph
+        # original fs  was 250hz, hence the conversion
+        scale1 = min(max(round((-10 * step_freq + 56) * (fs / 250)), 1), 90)
+        scale2 = min(max(round((-52 * step_freq + 131) * (fs / 250)), 1), 90)
+        # scale range is between 1 and 90
+    else:
+        scale1 = scale2 = original_scale
+
+    return scale1, scale2
+
+
 def get_gait_events(
     accel,
     fs,
@@ -29,21 +72,21 @@ def get_gait_events(
     Parameters
     ----------
     accel : numpy.ndarray
-        (N, 3) array of acceleration during the gait bout
+        (N, 3) array of acceleration during the gait bout.
     fs : float
-        Sampling frequency for the acceleration
+        Sampling frequency for the acceleration.
     ts : numpy.ndarray
         Array of timestmaps (in seconds) corresponding to acceleration sampling times.
     orig_scale : int
-        Original scale for the CWT
+        Original scale for the CWT.
     filter_order : int
-        Low-pass filter order
+        Low-pass filter order.
     filter_cutoff : float
-        Low-pass filter cutoff in Hz
+        Low-pass filter cutoff in Hz.
     corr_accel_orient : bool
         Correct the accelerometer orientation.
     use_optimal_scale : bool
-        Use the optimal scale based on step frequency
+        Use the optimal scale based on step frequency.
 
     Returns
     -------
@@ -82,26 +125,11 @@ def get_gait_events(
     else:
         filt_vert_accel = vert_accel * 1  # make sure a copy and not a view
 
-    # first integrate the vertial accel to get velocity
+    # first integrate the vertical accel to get velocity
     vert_velocity = cumtrapz(filt_vert_accel, x=ts - ts[0], initial=0)
 
-    # if using optimal scale relationship, get the optimal scale
-    if use_optimal_scale:
-        coef_scale_original, _ = cwt(vert_velocity, orig_scale, "gaus1")
-        F = abs(fft.rfft(coef_scale_original[0]))
-        # compute an estimate of step frequency
-        step_freq = argmax(F) / vert_velocity.size * fs
-
-        # IC scale: -10 * sf + 56
-        # FC scale: -52 * sf + 131
-        # TODO verify the FC scale equation. This is not in the paper but is a guess from the graph
-        scale1 = min(
-            max(round((-10 * step_freq + 56) * (fs / 250)), 1), 90
-        )  # orig fs = 250Hz
-        scale2 = min(max(round((-52 * step_freq + 131) * (fs / 250)), 1), 90)
-        # range is set to 1 <-> 90
-    else:
-        scale1 = scale2 = orig_scale
+    # get the CWT scales
+    scale1, scale2 = get_cwt_scales(use_optimal_scale, vert_velocity, orig_scale, fs)
 
     coef1, _ = cwt(vert_velocity, [scale1, scale2], "gaus1")
     """
