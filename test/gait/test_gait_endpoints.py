@@ -1,3 +1,4 @@
+import pytest
 from numpy import allclose, isclose, zeros, arange, sin, pi, nan, array, sqrt, isnan
 
 from skimu.gait.gait_endpoints.gait_endpoints import (
@@ -268,7 +269,8 @@ def test_StrideSPARC(d_gait, d_gait_aux):
 
 def test_PhaseCoordinationIndex(d_gait, d_gait_aux):
     pci = PhaseCoordinationIndex()
-    pci.predict(50., None, d_gait, d_gait_aux)
+    with pytest.warns(RuntimeWarning):
+        pci.predict(50., None, d_gait, d_gait_aux)
 
     # 0 values since the phase mean - 0.5 is 0.0
     assert allclose(
