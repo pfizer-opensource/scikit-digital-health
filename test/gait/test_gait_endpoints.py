@@ -281,33 +281,47 @@ def test_PhaseCoordinationIndex(d_gait, d_gait_aux):
 
 
 def test_GaitSymmetryIndex(d_gait, d_gait_aux):
+    # set manually so one of the bouts doesnt have a median step time
+    d_gait['PARAM:stride time'] = array([nan, nan, nan, 2., 2., 2., nan, nan])
+
     gsi = GaitSymmetryIndex()
-    gsi.predict(50., None, d_gait, d_gait_aux)
+    with pytest.warns(RuntimeWarning):  # all nan slice
+        gsi.predict(50., None, d_gait, d_gait_aux)
 
     assert allclose(
         d_gait["BOUTPARAM:gait symmetry index"],
-        [0.86529957, 0.86529957, 0.86529957, 0.97467939, 0.97467939, 0.97467939, 0.97467939, 0.97467939],
+        [nan, nan, nan, 0.97467939, 0.97467939, 0.97467939, 0.97467939, 0.97467939],
         equal_nan=True
     )
 
 
 def test_StepRegularityV(d_gait, d_gait_aux):
+    # set manually so one of the bouts doesnt have a median step time
+    d_gait['PARAM:step time'] = array([nan, nan, nan, 1., 1., 1., 1., nan])
+
     srv = StepRegularityV()
-    srv.predict(50., None, d_gait, d_gait_aux)
+    with pytest.warns(RuntimeWarning):  # all nan slice
+        srv.predict(50., None, d_gait, d_gait_aux)
 
     assert allclose(
         d_gait['BOUTPARAM:step regularity - V'],
-        1.
+        [nan, nan, nan, 1., 1., 1., 1., 1.],
+        equal_nan=True
     )
 
 
 def test_StrideRegularityV(d_gait, d_gait_aux):
+    # set manually so one of the bouts doesnt have a median step time
+    d_gait['PARAM:stride time'] = array([nan, nan, nan, 2., 2., 2., nan, nan])
+
     srv = StrideRegularityV()
-    srv.predict(50., None, d_gait, d_gait_aux)
+    with pytest.warns(RuntimeWarning):  # all nan slice
+        srv.predict(50., None, d_gait, d_gait_aux)
 
     assert allclose(
         d_gait['BOUTPARAM:stride regularity - V'],
-        1.
+        [nan, nan, nan, 1., 1., 1., 1., 1.],
+        equal_nan=True
     )
 
 
