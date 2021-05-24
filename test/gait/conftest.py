@@ -24,8 +24,8 @@ def d_gait_aux():
     a[:, 2] = 0.25 * sin(2 * pi * 2.0 * t + pi / 2)  # 2hz, offset
 
     gait_aux = {
-        "accel": [a[:200], a],
-        "vert axis": [0] * 8,
+        "accel": [a[:199], a],
+        "vert axis": array([0] * 8),
         "inertial data i": array([0, 0, 0, 1, 1, 1, 1, 1])
     }
 

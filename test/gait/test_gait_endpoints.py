@@ -204,3 +204,128 @@ def test_Cadence(d_gait):
         [60., 60., nan, 60., 60., 60., 60., nan],
         equal_nan=True
     )
+
+
+def test_IntraStrideCovarianceV(d_gait, d_gait_aux):
+    iscv = IntraStrideCovarianceV()
+    iscv.predict(50., None, d_gait, d_gait_aux)
+
+    assert allclose(
+        d_gait['PARAM:intra-stride covariance - V'],
+        [nan, nan, nan, 1.0, 1.0, 1.0, nan, nan],
+        equal_nan=True
+    )
+
+
+def test_IntraStepCovarianceV(d_gait, d_gait_aux):
+    iscv = IntraStepCovarianceV()
+    iscv.predict(50., None, d_gait, d_gait_aux)
+
+    assert allclose(
+        d_gait['PARAM:intra-step covariance - V'],
+        [1.0, nan, nan, 1.0, 1.0, 1.0, 1.0, nan],
+        equal_nan=True
+    )
+
+
+def test_HarmonicRatioV(d_gait, d_gait_aux):
+    hrv = HarmonicRatioV()
+    hrv.predict(50., None, d_gait, d_gait_aux)
+    # get predicted values and reset d_gait for another run
+    pred = d_gait.pop("PARAM:harmonic ratio - V")
+
+    # values are somewhat weird because stride frequency is different than
+    # the frequency used to create the "acceleration" data
+    assert allclose(
+        pred,
+        [2.54304311, nan, nan, 2.54304311, 2.54304311, 2.54304311, nan, nan],
+        equal_nan=True
+    )
+
+    # <= 10 harmonics
+    hrv.predict(10., None, d_gait, d_gait_aux)
+    pred = d_gait.pop("PARAM:harmonic ratio - V")
+
+    assert isnan(pred).all()
+
+    # test with less than 20 harmonics
+    hrv.predict(15., None, d_gait, d_gait_aux)
+    pred = d_gait.pop("PARAM:harmonic ratio - V")
+
+    assert allclose(pred, [0.65066714, nan, nan, 0.65066714, 0.65066714, 0.65066714, nan, nan], equal_nan=True)
+
+
+def test_StrideSPARC(d_gait, d_gait_aux):
+    ss = StrideSPARC()
+    ss.predict(50., None, d_gait, d_gait_aux)
+
+    assert allclose(
+        d_gait['PARAM:stride SPARC'],
+        [-3.27853883, nan, nan, -3.27853883, -3.27853883, -3.27853883, nan, nan],
+        equal_nan=True
+    )
+
+
+def test_PhaseCoordinationIndex(d_gait, d_gait_aux):
+    pci = PhaseCoordinationIndex()
+    pci.predict(50., None, d_gait, d_gait_aux)
+
+    # 0 values since the phase mean - 0.5 is 0.0
+    assert allclose(
+        d_gait['BOUTPARAM:phase coordination index'],
+        [nan, nan, nan, 0., 0., 0., 0., 0.],
+        equal_nan=True
+    )
+
+
+def test_GaitSymmetryIndex(d_gait, d_gait_aux):
+    gsi = GaitSymmetryIndex()
+    gsi.predict(50., None, d_gait, d_gait_aux)
+
+    assert allclose(
+        d_gait["BOUTPARAM:gait symmetry index"],
+        [0.86529957, 0.86529957, 0.86529957, 0.97467939, 0.97467939, 0.97467939, 0.97467939, 0.97467939],
+        equal_nan=True
+    )
+
+
+def test_StepRegularityV(d_gait, d_gait_aux):
+    srv = StepRegularityV()
+    srv.predict(50., None, d_gait, d_gait_aux)
+
+    assert allclose(
+        d_gait['BOUTPARAM:step regularity - V'],
+        1.
+    )
+
+
+def test_StrideRegularityV(d_gait, d_gait_aux):
+    srv = StrideRegularityV()
+    srv.predict(50., None, d_gait, d_gait_aux)
+
+    assert allclose(
+        d_gait['BOUTPARAM:stride regularity - V'],
+        1.
+    )
+
+
+def test_AutocovarianceSymmetryV(d_gait, d_gait_aux):
+    acsv = AutocovarianceSymmetryV()
+    acsv.predict(50., None, d_gait, d_gait_aux)
+
+    # simple difference between stride and step regularity: 1 - 1 = 0
+    assert allclose(
+        d_gait['BOUTPARAM:autocovariance symmetry - V'],
+        0.
+    )
+
+
+def test_RegularityIndexV(d_gait, d_gait_aux):
+    riv = RegularityIndexV()
+    riv.predict(50., None, d_gait, d_gait_aux)
+
+    # 1 - 0 = 1
+    assert allclose(
+        d_gait['BOUTPARAM:regularity index - V'],
+        1.
+    )
