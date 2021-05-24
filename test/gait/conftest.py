@@ -18,14 +18,15 @@ def d_gait():
 def d_gait_aux():
     t = arange(0, 20, 0.02)  # 50hz
 
-    gait_aux = {
-        "accel": zeros((t.size, 3)),
-        "vert axis": 0,
-        "inertial data i": array([1, 1, 1, 2, 2, 2, 2, 2])
-    }
+    a = zeros((t.size, 3))
+    a[:, 0] = 1 + 0.75 * sin(2 * pi * 1.0 * t)  # 1Hz
+    a[:, 1] = 0.35 * sin(2 * pi * 1.0 * t)  # 1 hz
+    a[:, 2] = 0.25 * sin(2 * pi * 2.0 * t + pi / 2)  # 2hz, offset
 
-    gait_aux["accel"][:, 0] = 1 + 0.75 * sin(2 * pi * 1.0 * t)  # 1Hz
-    gait_aux["accel"][:, 1] = 0.35 * sin(2 * pi * 1.0 * t)  # 1 hz
-    gait_aux["accel"][:, 2] = 0.25 * sin(2 * pi * 2.0 * t + pi / 2)  # 2hz, offset
+    gait_aux = {
+        "accel": [a[:200], a],
+        "vert axis": [0] * 8,
+        "inertial data i": array([0, 0, 0, 1, 1, 1, 1, 1])
+    }
 
     return gait_aux
