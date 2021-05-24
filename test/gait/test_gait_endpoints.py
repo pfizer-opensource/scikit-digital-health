@@ -48,7 +48,7 @@ def test__autocovariancefn():
 def test_StrideTime(dummy_gait):
     st = StrideTime()
 
-    st.predict(10., 1.8, dummy_gait, {})
+    st.predict(50., 1.8, dummy_gait, {})
 
     assert allclose(
         dummy_gait['PARAM:stride time'],
@@ -60,7 +60,7 @@ def test_StrideTime(dummy_gait):
 def test_StanceTime(dummy_gait):
     st = StanceTime()
 
-    st.predict(10., 1.8, dummy_gait, {})
+    st.predict(50., 1.8, dummy_gait, {})
 
     assert allclose(
         dummy_gait['PARAM:stance time'],
@@ -71,7 +71,7 @@ def test_StanceTime(dummy_gait):
 def test_SwingTime(dummy_gait):
     st = SwingTime()
 
-    st.predict(10., 1.8, dummy_gait, {})
+    st.predict(50., 1.8, dummy_gait, {})
 
     assert allclose(
         dummy_gait["PARAM:swing time"],
@@ -82,7 +82,7 @@ def test_SwingTime(dummy_gait):
 
 def test_StepTime(dummy_gait):
     st = StepTime()
-    st.predict(10., 1.8, dummy_gait, {})
+    st.predict(50., 1.8, dummy_gait, {})
 
     assert allclose(
         dummy_gait['PARAM:step time'],
@@ -93,7 +93,7 @@ def test_StepTime(dummy_gait):
 
 def test_InitialDoubleSupport(dummy_gait):
     ids = InitialDoubleSupport()
-    ids.predict(10., 1.8, dummy_gait, {})
+    ids.predict(50., 1.8, dummy_gait, {})
 
     assert allclose(
         dummy_gait["PARAM:initial double support"],
@@ -103,7 +103,7 @@ def test_InitialDoubleSupport(dummy_gait):
 
 def test_TerminalDoubleSupport(dummy_gait):
     tds = TerminalDoubleSupport()
-    tds.predict(10., 1.8, dummy_gait, {})
+    tds.predict(50., 1.8, dummy_gait, {})
 
     assert allclose(
         dummy_gait["PARAM:terminal double support"],
@@ -114,7 +114,7 @@ def test_TerminalDoubleSupport(dummy_gait):
 
 def test_DoubleSupport(dummy_gait):
     ds = DoubleSupport()
-    ds.predict(10., 1.8, dummy_gait, {})
+    ds.predict(50., 1.8, dummy_gait, {})
 
     assert allclose(
         dummy_gait['PARAM:double support'],
@@ -125,7 +125,7 @@ def test_DoubleSupport(dummy_gait):
 
 def test_SingleSupport(dummy_gait):
     ss = SingleSupport()
-    ss.predict(10., 1.8, dummy_gait, {})
+    ss.predict(50., 1.8, dummy_gait, {})
 
     assert allclose(
         dummy_gait['PARAM:single support'],
@@ -136,7 +136,7 @@ def test_SingleSupport(dummy_gait):
 
 def test_StepLength(dummy_gait):
     sl = StepLength()
-    sl.predict(10., 1.8, dummy_gait, {})
+    sl.predict(50., 1.8, dummy_gait, {})
 
     exp = 2 * 1.8 * array([0.1, 0.2, 0.1, 0.2, 0.2, 0.2, 0.1, 0.1])
     exp -= array([0.01, 0.04, 0.01, 0.04, 0.04, 0.04, 0.01, 0.01])
@@ -146,14 +146,14 @@ def test_StepLength(dummy_gait):
     assert allclose(pred, exp)
 
     # test with no leg length provided
-    sl.predict(10., None, dummy_gait, {})
+    sl.predict(50., None, dummy_gait, {})
 
     assert isnan(dummy_gait['PARAM:step length']).all()
 
 
 def test_StrideLength(dummy_gait):
     sl = StrideLength()
-    sl.predict(10., 1.8, dummy_gait, {})
+    sl.predict(50., 1.8, dummy_gait, {})
 
     a = 2 * 1.8 * array([0.1, 0.2, 0.1, 0.2, 0.2, 0.2, 0.1, 0.1])
     a -= array([0.01, 0.04, 0.01, 0.04, 0.04, 0.04, 0.01, 0.01])
@@ -169,7 +169,7 @@ def test_StrideLength(dummy_gait):
     assert allclose(pred, exp, equal_nan=True)
 
     # test with no leg length provided
-    sl.predict(10., None, dummy_gait, {})
+    sl.predict(50., None, dummy_gait, {})
 
     assert isnan(dummy_gait['PARAM:stride length']).all()
 
@@ -186,18 +186,18 @@ def test_GaitSpeed(dummy_gait):
     exp /= array([2.0, nan, nan, 2.0, 2.0, 2.0, nan, nan])
 
     gs = GaitSpeed()
-    gs.predict(10., 1.8, dummy_gait, {})
+    gs.predict(50., 1.8, dummy_gait, {})
     pred = dummy_gait.pop('PARAM:gait speed')
 
     assert allclose(pred, exp, equal_nan=True)
 
-    gs.predict(10., None, dummy_gait, {})
+    gs.predict(50., None, dummy_gait, {})
     assert isnan(dummy_gait['PARAM:gait speed']).all()
 
 
 def test_Cadence(dummy_gait):
     c = Cadence()
-    c.predict(10., 1.8, dummy_gait, {})
+    c.predict(50., 1.8, dummy_gait, {})
 
     assert allclose(
         dummy_gait["PARAM:cadence"],
