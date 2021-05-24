@@ -106,6 +106,7 @@ def _autocovariancefn(x, max_lag, biased=False, axis=0):
 
     return moveaxis(ac, axis, -1)
 
+
 # ===========================================================
 #     GAIT EVENT-LEVEL ENDPOINTS
 # ===========================================================
