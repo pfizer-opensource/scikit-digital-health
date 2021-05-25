@@ -84,7 +84,7 @@ def get_bgait_samples_truth():  # boolean gait classification
     return get_stuff
 
 
-@fixture
+@fixture(scope="module")
 def gait_input_50():
     cwd = Path.cwd().parts
 
@@ -102,3 +102,17 @@ def gait_input_50():
     t50, (acc50,) = apply_downsample(50., t, (acc,), ())
 
     return t50, acc50
+
+
+@fixture
+def gait_res_50():
+    cwd = Path.cwd().parts
+
+    if cwd[-1] == "gait":
+        path = Path("data/gait_results.npz")
+    elif cwd[-1] == "test":
+        path = Path("gait/data/gait_results.npz")
+    elif cwd[-1] == "scikit-imu":
+        path = Path("test/gait/data/gait_results.npz")
+
+    return load(path)
