@@ -80,11 +80,13 @@ def correct_accelerometer_orientation(accel, v_axis=None, ap_axis=None):
     if v_axis is None:
         v_axis = argmax(abs(mean(accel, axis=0)))
     else:
-        assert v_axis < 3, "v_axis must be in {0, 1, 2}"
+        if not (0 <= v_axis < 3):
+            raise ValueError("v_axis must be in {0, 1, 2}")
     if ap_axis is None:
         ap_axis, ml_axis = [i for i in range(3) if i != v_axis]
     else:
-        assert ap_axis < 3, "ap_axis must be in {0, 1, 2}"
+        if not (0 <= ap_axis < 3):
+            raise ValueError("ap_axis must be in {0, 1, 2}")
         ml_axis = [i for i in range(3) if i not in [v_axis, ap_axis]][0]
 
     s_theta_a = mean(accel[:, ap_axis])

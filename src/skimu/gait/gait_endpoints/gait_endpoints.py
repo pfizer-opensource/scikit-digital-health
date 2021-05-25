@@ -32,9 +32,7 @@ gait speed: stride_length / stride time
 from numpy import (
     zeros,
     nanmean,
-    mean,
     nanstd,
-    std,
     nanmedian,
     sum,
     sqrt,
@@ -49,6 +47,8 @@ from numpy import (
     arange,
     isnan,
     maximum,
+    moveaxis,
+    ascontiguousarray,
 )
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt, find_peaks
@@ -59,6 +59,7 @@ from skimu.gait.gait_endpoints.base import (
     GaitBoutEndpoint,
     basic_asymmetry,
 )
+from skimu.features.lib.extensions.statistics import autocorrelation
 from skimu.features.lib.extensions.smoothness import SPARC
 
 
@@ -88,48 +89,22 @@ __all__ = [
 ]
 
 
-def _autocovariancefunction(x, max_lag, biased=False):
-    if x.ndim == 1:
-        N = x.size
-        ac = zeros(max_lag, dtype=float_)
-        axis = -1
-    elif x.ndim == 2:
-        N = x.shape[0]
-        ac = zeros((max_lag, x.shape[1]), dtype=float_)
-        axis = 0
-    else:
-        raise ValueError("Too many dimensions (>2) for x")
+def _autocovariancefn(x, max_lag, biased=False, axis=0):
+    y = ascontiguousarray(moveaxis(x, axis, -1))
 
-    for i in range(min(max_lag, N - 10)):
-        ac[i] = sum(
-            (x[: N - i] - mean(x[: N - i], axis=axis))
-            * (x[i:] - mean(x[i:], axis=axis)),
-            axis=axis,
-        )
-        if biased:
-            ac[i] /= N * std(x[: N - i], axis=axis) * std(x[i:], axis=axis)
-        else:
-            ac[i] /= (N - i) * std(x[: N - i], axis=axis) * std(x[i:], axis=axis)
+    shape = list(y.shape)
+    shape[-1] = max_lag
+    ac = zeros(shape, dtype=float_)
 
-    return ac
+    for i in range(min(max_lag, y.shape[-1] - 10)):
+        ac[..., i] = autocorrelation(y, i, True)
 
-
-def _autocovariance(x, i1, i2, i3, biased=False):
-    if i3 > x.size:
-        return nan
-
-    N = i3 - i1
-    m = i2 - i1
-    m1, s1 = mean(x[i1:i2]), std(x[i1:i2], ddof=1)
-    m2, s2 = mean(x[i2:i3]), std(x[i2:i3], ddof=1)
-
-    ac = sum((x[i1:i2] - m1) * (x[i2:i3] - m2))
+    # if biased make sure its divided by just y.shape, instead of
+    # y.shape - lag
     if biased:
-        ac /= N * s1 * s2
-    else:
-        ac /= (N - m) * s1 * s2
+        ac *= (y.shape[-1] - arange(0, max_lag)) / y.shape[-1]
 
-    return ac
+    return moveaxis(ac, axis, -1)
 
 
 # ===========================================================
@@ -401,16 +376,13 @@ class IntraStrideCovarianceV(GaitEventEndpoint):
         i3 = i2 + (i2 - i1)
 
         for i, idx in enumerate(nonzero(mask)[0]):
-            gait[self.k_][idx] = _autocovariance(
-                # index the accel, then the list of views, then the vertical axis
-                gait_aux["accel"][gait_aux["inertial data i"][idx]][
-                    :, gait_aux["vert axis"][idx]
-                ],
-                i1[i],
-                i2[i],
-                i3[i],
-                biased=False,
-            )
+            j_ = gait_aux["inertial data i"][idx]
+            x = gait_aux["accel"][j_][i1[i]:i3[i], gait_aux["vert axis"][idx]]
+
+            if (i3[i] - i1[i]) > x.size:
+                gait[self.k_][idx] = nan
+            else:
+                gait[self.k_][idx] = autocorrelation(x, i2[i] - i1[i], True)
 
 
 class IntraStepCovarianceV(GaitEventEndpoint):
@@ -441,15 +413,13 @@ class IntraStepCovarianceV(GaitEventEndpoint):
         i3 = i2 + (i2 - i1)
 
         for i, idx in enumerate(nonzero(mask)[0]):
-            gait[self.k_][idx] = _autocovariance(
-                gait_aux["accel"][gait_aux["inertial data i"][idx]][
-                    :, gait_aux["vert axis"][idx]
-                ],
-                i1[i],
-                i2[i],
-                i3[i],
-                biased=False,
-            )
+            j_ = gait_aux["inertial data i"][idx]
+            x = gait_aux["accel"][j_][i1[i]:i3[i], gait_aux["vert axis"][idx]]
+
+            if (i3[i] - i1[i]) > x.size:
+                gait[self.k_][idx] = nan
+            else:
+                gait[self.k_][idx] = autocorrelation(x, i2[i] - i1[i], True)
 
 
 class HarmonicRatioV(GaitEventEndpoint):
@@ -703,8 +673,8 @@ class GaitSymmetryIndex(GaitBoutEndpoint):
                 continue
             lag = int(round(lag_))
             # GSI uses biased autocovariance
-            ac = _autocovariancefunction(
-                sosfiltfilt(sos, acc, axis=0), int(4.5 * fs), biased=True
+            ac = _autocovariancefn(
+                sosfiltfilt(sos, acc, axis=0), int(4.5 * fs), biased=True, axis=0
             )
 
             # C_stride is the sum of 3 axes
@@ -768,7 +738,7 @@ class StepRegularityV(GaitBoutEndpoint):
                 stepreg[i] = nan
                 continue
             lag = int(round(lag_))
-            acf = _autocovariancefunction(acc[:, va], int(4.5 * fs))
+            acf = _autocovariancefn(acc[:, va], int(4.5 * fs), biased=False, axis=0)
             pks, _ = find_peaks(acf)
             idx = pks[argmin(abs(pks - lag))]
 
@@ -827,7 +797,7 @@ class StrideRegularityV(GaitBoutEndpoint):
                 stridereg[i] = nan
                 continue
             lag = int(round(lag_))
-            acf = _autocovariancefunction(acc[:, va], int(4.5 * fs))
+            acf = _autocovariancefn(acc[:, va], int(4.5 * fs), biased=False, axis=0)
             pks, _ = find_peaks(acf)
             idx = pks[argmin(abs(pks - lag))]
 

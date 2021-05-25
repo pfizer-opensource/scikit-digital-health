@@ -126,10 +126,10 @@ class ReadCWA(_BaseProcess):
         if not Path(file).exists():
             raise FileNotFoundError(f"File [{file}] does not exist.")
 
-        super().predict(file=file, **kwargs)
+        super().predict(expect_days=False, expect_wear=False, file=file, **kwargs)
 
         # read the file
-        fs, imudata, ts, light, starts, stops = read_axivity(
+        fs, imudata, ts, temperature, starts, stops = read_axivity(
             file, self.bases, self.periods
         )
 
@@ -147,7 +147,7 @@ class ReadCWA(_BaseProcess):
         else:  # pragma: no cover :: not expected to reach here only if file is corrupt
             raise UnexpectedAxesError("Unexpected number of axes in the IMU data")
 
-        results = {self._time: ts, "file": file, "fs": fs}
+        results = {self._time: ts, "file": file, "fs": fs, self._temp: temperature}
         if acc_axes is not None:
             results[self._acc] = imudata[:, acc_axes]
         if gyr_axes is not None:

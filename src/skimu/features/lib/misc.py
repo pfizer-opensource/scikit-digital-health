@@ -35,10 +35,11 @@ class ComplexityInvariantDistance(Feature):
         Parameters
         ----------
         signal : array-like
-            Array-like containing values to compute the complexity invariant distance for.
+            Array-like containing values to compute the complexity invariant
+            distance for.
         axis : int, optional
-            Axis along which the signal entropy will be computed. Ignored if `signal` is a
-            pandas.DataFrame. Default is last (-1).
+            Axis along which the signal entropy will be computed. Ignored if
+            `signal` is a pandas.DataFrame. Default is last (-1).
 
         Returns
         -------

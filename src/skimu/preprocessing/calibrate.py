@@ -97,7 +97,7 @@ class CalibrateAccelerometer(_BaseProcess):
         self.max_iter = max_iter
         self.tol = tol
 
-    def predict(self, time=None, accel=None, *, apply=True, temperature=None, **kwargs):
+    def predict(self, time=None, accel=None, *, fs=None, apply=True, temperature=None, **kwargs):
         r"""
         Run the calibration on the accelerometer data.
 
@@ -108,6 +108,9 @@ class CalibrateAccelerometer(_BaseProcess):
         accel : numpy.ndarray
             (N, 3) array of accelerations measured by centrally mounted lumbar device, in
             units of 'g'.
+        fs : float, optional
+            Sampling frequency in Hz. If not provided, it is calculated from the
+            timestamps.
         apply : bool, optional
             Apply the calibration to the acceleration. Default is True. Both cases return the
             scale, offset, and temperature scale in the return dictionary.
@@ -133,13 +136,19 @@ class CalibrateAccelerometer(_BaseProcess):
         calibration, and :math:`m_i` is the temperature scale for the *ith* axis.
         """
         super().predict(
-            time=time, accel=accel, apply=apply, temperature=temperature, **kwargs
+            expect_days=False,
+            expect_wear=False,
+            time=time,
+            accel=accel,
+            fs=fs,
+            apply=apply,
+            temperature=temperature,
+            **kwargs
         )
 
+        # calculate fs if necessary
+        fs = 1 / mean(diff(time)) if fs is None else fs
         # parameters
-        fs = 1 / mean(
-            diff(time[1000:5000])
-        )  # dont start at zero due to timestamp weirdness
         n10 = int(10 * fs)  # samples in 10 seconds
         nh = int(self.min_hours * 3600 * fs)  # samples in min_hours
         n12h = int(12 * 3600 * fs)  # samples in 12 hours

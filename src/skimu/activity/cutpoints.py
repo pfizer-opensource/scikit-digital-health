@@ -8,11 +8,30 @@ Pfizer DMTI
 from skimu.activity import metrics
 
 
-def get_available_cutpoints():
+def get_available_cutpoints(name=None):
     """
-    Print the available cutpoints for activity level segmentation.
+    Print the available cutpoints for activity level segmentation, or the
+    thresholds for a specific set of cutpoints.
+
+    Parameters
+    ----------
+    name : {None, str}, optional
+        The name of the cupoint values to print. If None, will print all
+        the available cutpoint options.
     """
-    print(_base_cutpoints.keys())
+    if name is None:
+        for k in _base_cutpoints:
+            print(k)
+    else:
+        cuts = _base_cutpoints[name]
+
+        print(f"{name}\n{'-' * 15}")
+        print(f"Metric: {cuts['metric'].__name__}")
+
+        for level in ["sedentary", "light", "moderate", "vigorous"]:
+            lthresh, uthresh = get_level_thresholds(level, cuts)
+
+            print(f"{level} range [g]: {lthresh:0.3f} -> {uthresh:0.3f}")
 
 
 def get_level_thresholds(level, cutpoints):

@@ -29,15 +29,15 @@ subroutine autocorr_1d(n, x, lag, normalize, ac) bind(C, name="autocorr_1d")
     ac = 0._c_double
     
     if (normalize == 1_c_int) then
-        call mean_sd_1d(n - lag, x(:n - lag - 1), mean1, std1)
+        call mean_sd_1d(n - lag, x(:n - lag), mean1, std1)
         call mean_sd_1d(n - lag, x(lag + 1:), mean2, std2)
         
         do i=1_c_long, n - lag
             ac = ac + (x(i) - mean1) * (x(i + lag) - mean2)
         end do
-        ac = ac / ((n - lag) * std1 * std2)
+        ac = ac / ((n - lag - 1) * std1 * std2)
     else
-        call mean_sd_1d(n - lag, x(:n - lag - 1), mean1, std1)
+        call mean_sd_1d(n - lag, x(:n - lag), mean1, std1)
         call mean_sd_1d(n - lag, x(lag + 1:), mean2, std2)
         
         do i=1_c_long, n - lag

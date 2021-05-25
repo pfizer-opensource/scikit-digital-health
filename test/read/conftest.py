@@ -1,39 +1,136 @@
+from pathlib import Path
+
 from pytest import fixture
-from numpy import zeros, array
+from numpy import load
 
 
 @fixture
-def windowing_data():
-    def get_data(case):
-        n_samp = 300
-        ind = zeros(50) - 600
+def gnactv_file():
+    cwd = Path.cwd().parts
 
-        if case == "24hr":
-            ind[[10, 17, 31, 43]] = [6, 15, 29, 44]
+    if cwd[-1] == "read":
+        return Path("data/gnactv_sample.bin")
+    elif cwd[-1] == "test":
+        return Path("read/data/gnactv_sample.bin")
+    elif cwd[-1] == "scikit-imu":
+        return Path("test/read/data/gnactv_sample.bin")
 
-            starts = array([0, 6, 15, 29, 44])
-            stops = array([6, 15, 29, 44, n_samp])
-        elif case == "full first, full last":
-            ind[[10, 17, 31, 43]] = [6, -15, 29, -44]
 
-            starts = array([6, 29])
-            stops = array([15, 44])
-        elif case == "full first, partial last":
-            ind[[10, 17, 31, 43, 47]] = [6, -15, 29, -44, 60]
+@fixture
+def gnactv_truth():
+    cwd = Path.cwd().parts
 
-            starts = array([6, 29, 60])
-            stops = array([15, 44, n_samp])
-        elif case == "partial first, full last":
-            ind[[10, 17, 31, 43, 47]] = [-6, 15, -29, 44, -80]
+    if cwd[-1] == "read":
+        path = "data/gnactv_data.npz"
+    elif cwd[-1] == "test":
+        path = "read/data/gnactv_data.npz"
+    elif cwd[-1] == "scikit-imu":
+        path = "test/read/data/gnactv_data.npz"
 
-            starts = array([0, 15, 44])
-            stops = array([6, 29, 80])
-        elif case == "partial first, partial last":
-            ind[[10, 17, 31, 43]] = [-6, 15, -29, 44]
+    dat = load(path, allow_pickle=False)
 
-            starts = array([0, 15, 44])
-            stops = array([6, 29, n_samp])
+    data = {
+        i: dat[i] for i in ['accel', 'time', 'temperature', 'light']
+    }
+    data["day_ends"] = {(8, 12): dat["day_ends_8_12"]}
 
-        return (ind, n_samp), (starts, stops)
+    return data
 
-    return get_data
+
+@fixture
+def ax3_file():
+    cwd = Path.cwd().parts
+
+    if cwd[-1] == "read":
+        return Path("data/ax3_sample.cwa")
+    elif cwd[-1] == "test":
+        return Path("read/data/ax3_sample.cwa")
+    elif cwd[-1] == "scikit-imu":
+        return Path("test/read/data/ax3_sample.cwa")
+
+
+@fixture
+def ax3_truth():
+    cwd = Path.cwd().parts
+
+    if cwd[-1] == "read":
+        path = "data/ax3_data.npz"
+    elif cwd[-1] == "test":
+        path = "read/data/ax3_data.npz"
+    elif cwd[-1] == "scikit-imu":
+        path = "test/read/data/ax3_data.npz"
+
+    dat = load(path, allow_pickle=False)
+
+    data = {
+        i: dat[i] for i in ['accel', 'time', 'temperature', 'fs']
+    }
+    data["day_ends"] = {(8, 12): dat["day_ends_8_12"]}
+
+    return data
+
+
+@fixture
+def ax6_file():
+    cwd = Path.cwd().parts
+
+    if cwd[-1] == "read":
+        return Path("data/ax6_sample.cwa")
+    elif cwd[-1] == "test":
+        return Path("read/data/ax6_sample.cwa")
+    elif cwd[-1] == "scikit-imu":
+        return Path("test/read/data/ax6_sample.cwa")
+
+
+@fixture
+def ax6_truth():
+    cwd = Path.cwd().parts
+
+    if cwd[-1] == "read":
+        path = "data/ax6_data.npz"
+    elif cwd[-1] == "test":
+        path = "read/data/ax6_data.npz"
+    elif cwd[-1] == "scikit-imu":
+        path = "test/read/data/ax6_data.npz"
+
+    dat = load(path, allow_pickle=False)
+
+    data = {
+        i: dat[i] for i in ['accel', 'time', 'gyro', 'temperature', 'fs']
+    }
+    data["day_ends"] = {(8, 12): dat["day_ends_8_12"]}
+
+    return data
+
+
+@fixture
+def gt3x_file():
+    cwd = Path.cwd().parts
+
+    if cwd[-1] == "read":
+        return Path("data/gt3x_sample.gt3x")
+    elif cwd[-1] == "test":
+        return Path("read/data/gt3x_sample.gt3x")
+    elif cwd[-1] == "scikit-imu":
+        return Path("test/read/data/gt3x_sample.gt3x")
+
+
+@fixture
+def gt3x_truth():
+    cwd = Path.cwd().parts
+
+    if cwd[-1] == "read":
+        path = "data/gt3x_data.npz"
+    elif cwd[-1] == "test":
+        path = "read/data/gt3x_data.npz"
+    elif cwd[-1] == "scikit-imu":
+        path = "test/read/data/gt3x_data.npz"
+
+    dat = load(path, allow_pickle=False)
+
+    data = {
+        i: dat[i] for i in ['accel', 'time']
+    }
+    data["day_ends"] = {(9, 2): dat["day_ends_9_2"]}
+
+    return data

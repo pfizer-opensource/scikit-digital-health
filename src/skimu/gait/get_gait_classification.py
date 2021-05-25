@@ -6,12 +6,13 @@ Pfizer DMTI 2020
 """
 from sys import version_info
 
-from numpy import ndarray, array, where, diff, insert, append, ascontiguousarray, int_
+from numpy import isclose, where, diff, insert, append, ascontiguousarray, int_
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt
 import lightgbm as lgb
 
 from skimu.utility import get_windowed_view
+from skimu.utility.internal import rle
 from skimu.features import Bank
 
 if version_info >= (3, 7):
@@ -35,38 +36,26 @@ class DimensionMismatchError(Exception):
     pass
 
 
-def get_gait_classification_lgbm(gait_pred, accel, fs):
+def get_gait_classification_lgbm(gait_starts, gait_stops, accel, fs):
     """
     Get classification of windows of accelerometer data using the LightGBM classifier
 
     Parameters
     ----------
-    gait_pred : {None, numpy.ndarray, bool}
-        Provided gait predictions
+    gait_starts : {None, numpy.ndarray}
+        Provided gait start indices.
+    gait_stops : {None, numpy.ndarray}
+        Provided gait stop indices.
     accel : numpy.ndarray
         (N, 3) array of acceleration values, in units of "g"
     fs : float
         Sampling frequency for the data
     """
-    if gait_pred is not None:
-        if isinstance(gait_pred, ndarray):
-            if gait_pred.size != accel.shape[0]:
-                raise DimensionMismatchError(
-                    "Number of gait predictions (possibly downsampled) must match number of "
-                    "acceleration samples"
-                )
-            bout_starts = where(diff(gait_pred.astype(int_)) == 1)[0] + 1
-            bout_stops = where(diff(gait_pred.astype(int_)) == -1)[0] + 1
-
-            if gait_pred[0]:
-                bout_starts = insert(bout_starts, 0, 0)
-            if gait_pred[-1]:
-                bout_stops = append(bout_stops, accel.shape[0])
-        else:
-            bout_starts, bout_stops = array([0], dtype="int"), array(
-                [accel.shape[0]], dtype="int"
-            )
+    if gait_starts is not None and gait_stops is not None:
+        return gait_starts, gait_stops
     else:
+        if not isclose(fs, 50.) and not isclose(fs, 20.):
+            raise ValueError("fs must be either 50hz or 20hz.")
         suffix = "50hz" if fs == 50.0 else "20hz"
 
         wlen = int(fs * 3)  # window length, 3 seconds
@@ -102,19 +91,9 @@ def get_gait_classification_lgbm(gait_pred, accel, fs):
             bst.predict(accel_feats.T, raw_score=False) > thresh
         ).astype(int_)
 
-        bout_starts = (
-            where(diff(gait_predictions) == 1)[0] + 1
-        )  # account for n-1 samples in diff
-        bout_stops = where(diff(gait_predictions) == -1)[0] + 1
-
-        if gait_predictions[0]:
-            bout_starts = insert(bout_starts, 0, 0)
-        if gait_predictions[-1]:
-            bout_stops = append(bout_stops, gait_predictions.size)
-
-        assert (
-            bout_starts.size == bout_stops.size
-        ), "Starts and stops of bouts do not match"
+        lengths, starts, vals = rle(gait_predictions)
+        bout_starts = starts[vals == 1]
+        bout_stops = bout_starts + lengths[vals == 1]
 
         # convert to actual values that match up with data
         bout_starts *= wstep

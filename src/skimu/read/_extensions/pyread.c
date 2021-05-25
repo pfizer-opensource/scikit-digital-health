@@ -110,6 +110,19 @@ static PyObject *read_axivity(PyObject *NPY_UNUSED(self), PyObject *args)
     /* read the header */
     axivity_read_header(&flen, file, &info, &ierr);
 
+    if (ierr != AX_READ_E_NONE)
+    {
+        axivity_close(&info);
+
+        free(winfo.i_start);
+        free(winfo.i_stop);
+        Py_XDECREF(bases);
+        Py_XDECREF(periods);
+
+        axivity_set_error_message(ierr);
+        return NULL;
+    }
+
     if ((info.nblocks == -1) || (info.axes == -1) || (info.count == -1))
     {
         axivity_close(&info);
@@ -130,12 +143,12 @@ static PyObject *read_axivity(PyObject *NPY_UNUSED(self), PyObject *args)
     /* DATA ARRAYS */
     PyArrayObject *imudata = (PyArrayObject *)PyArray_ZEROS(2, dim3, NPY_DOUBLE, 0);
     PyArrayObject *time  = (PyArrayObject *)PyArray_ZEROS(1, dim1, NPY_DOUBLE, 0);
-    PyArrayObject *light = (PyArrayObject *)PyArray_ZEROS(1, dim1, NPY_DOUBLE, 0);
+    PyArrayObject *temperature = (PyArrayObject *)PyArray_ZEROS(1, dim1, NPY_DOUBLE, 0);
 
     PyArrayObject *starts = (PyArrayObject *)PyArray_ZEROS(2, dim_idx, NPY_LONG, 0);
     PyArrayObject *stops  = (PyArrayObject *)PyArray_ZEROS(2, dim_idx, NPY_LONG, 0);
 
-    if (!imudata || !time || !light || !starts || !stops)
+    if (!imudata || !time || !temperature || !starts || !stops)
     {   
         axivity_close(&info);
 
@@ -144,7 +157,7 @@ static PyObject *read_axivity(PyObject *NPY_UNUSED(self), PyObject *args)
 
         Py_XDECREF(imudata);
         Py_XDECREF(time);
-        Py_XDECREF(light);
+        Py_XDECREF(temperature);
         Py_XDECREF(starts);
         Py_XDECREF(stops);
 
@@ -157,7 +170,7 @@ static PyObject *read_axivity(PyObject *NPY_UNUSED(self), PyObject *args)
     /* SET POINTERS */
     double *imu_p   = (double *)PyArray_DATA(imudata);
     double *ts_p    = (double *)PyArray_DATA(time);
-    long *light_p = (long *)PyArray_DATA(light);
+    double *temp_p = (double *)PyArray_DATA(temperature);
     long *starts_p = (long *)PyArray_DATA(starts);
     long *stops_p  = (long *)PyArray_DATA(stops);
 
@@ -166,7 +179,7 @@ static PyObject *read_axivity(PyObject *NPY_UNUSED(self), PyObject *args)
     for (int i=2; i < info.nblocks; ++i)
     {
         pos = 512 * i + 1;  /* +1 to account for fortran numbering */
-        axivity_read_block(&info, &pos, imu_p, ts_p, light_p, winfo.bases, winfo.periods,
+        axivity_read_block(&info, &pos, imu_p, ts_p, temp_p, winfo.bases, winfo.periods,
             starts_p, winfo.i_start, stops_p, winfo.i_stop, &ierr);
         
         if (ierr != 0)
@@ -189,7 +202,7 @@ static PyObject *read_axivity(PyObject *NPY_UNUSED(self), PyObject *args)
     {
         Py_XDECREF(imudata);
         Py_XDECREF(time);
-        Py_XDECREF(light);
+        Py_XDECREF(temperature);
         Py_XDECREF(starts);
         Py_XDECREF(stops);
 
@@ -198,11 +211,11 @@ static PyObject *read_axivity(PyObject *NPY_UNUSED(self), PyObject *args)
     }
 
     return Py_BuildValue(
-        "fNNNNN",  /* need to use N to not increment reference counter */
+        "dNNNNN",  /* need to use N to not increment reference counter */
         info.frequency,
         (PyObject *)imudata,
         (PyObject *)time,
-        (PyObject *)light,
+        (PyObject *)temperature,
         (PyObject *)starts,
         (PyObject *)stops
     );
@@ -397,7 +410,7 @@ static const char read_axivity__doc__[] = "read_axivity(file, bases, periods)\n"
 "   IMU data available. Shape is (N, 3/6/9). Order of types is [Gy]Ax[Mag]. Ax (accelerometer) is\n"
 "   required. Gy (gyroscope) and Mag (magnetometer) are optional.\n"
 "time : numpy.ndarray\n"
-"light : numpy.ndarray\n"
+"temperature : numpy.ndarray\n"
 "starts : numpy.ndarray\n"
 "stops : numpy.ndarray\n";
 

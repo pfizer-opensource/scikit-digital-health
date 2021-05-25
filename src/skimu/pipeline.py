@@ -25,24 +25,33 @@ class Pipeline:
     Pipeline class that can have multiple steps that are processed sequentially. Some of the output
     is passed between steps. Has the ability to save results from processing steps as local files,
     as well as return the results in a dictionary following the processing.
+
+    Parameters
+    ----------
+    file : {None, str}, optional
+        File path to load a pipeline from. Default is None, in which case no
+        file will be loaded.
     """
 
     def __str__(self):
         return "IMUAnalysisPipeline"
 
     def __repr__(self):
-        ret = "["
+        ret = "IMUAnalysisPipeline[\n"
         for proc in self._steps:
             ret += f"\t{proc!r},\n"
-        ret = ret[:-2] + "]"
+        ret += "]"
         return ret
 
-    def __init__(self):
+    def __init__(self, file=None):
         self._steps = []
         self._save = []
         self._current = -1  # iteration tracking
 
         self.logger = logging.getLogger(__name__)
+
+        if file is not None:
+            self.load(file=file)
 
     def save(self, file):
         """
@@ -60,9 +69,8 @@ class Pipeline:
                     step._name: {
                         "module": step.__class__.__module__.split(".", 1)[1],
                         "Parameters": step._kw,
-                        "save_result": step.pipe_save,
-                        "save_name": step.pipe_fname,
-                        "plot_save_name": step.plot_fname,
+                        "save_file": step.pipe_save_file,
+                        "plot_file": step.pipe_plot_file,
                     }
                 }
             )
@@ -88,9 +96,8 @@ class Pipeline:
             name = list(proc.keys())[0]
             mod = proc[name]["module"]
             params = proc[name]["Parameters"]
-            save_result = proc[name]["save_result"]
-            save_name = proc[name]["save_name"]
-            plot_fname = proc[name]["plot_save_name"]
+            save_file = proc[name]["save_file"]
+            plot_file = proc[name]["plot_file"]
 
             try:
                 process = attrgetter(f"{mod}.{name}")(skimu)
@@ -102,12 +109,10 @@ class Pipeline:
                 continue
 
             proc = process(**params)
-            if plot_fname is not None:
-                proc._setup_plotting(plot_fname)
 
-            self.add(proc, save_results=save_result, save_name=save_name)
+            self.add(proc, save_file=save_file, plot_file=plot_file)
 
-    def add(self, process, save_results=False, save_name="{date}_{name}_results.cv"):
+    def add(self, process, save_file=None, plot_file=None):
         """
         Add a processing step to the pipeline
 
@@ -115,12 +120,55 @@ class Pipeline:
         ----------
         process : Process
             Process class that forms the step to be run
-        save_results : bool
-            Whether or not to save the results of the process as a csv. Default is False.
-        save_name : str
-            Optionally formattable path for the save file. Ignored if `save_results` is False.
-            For options for the formatting, see any of the processes (e.g. :class:`Gait`,
-            :class:`Sit2Stand`). Default is "{date}_{name}_results.csv
+        save_file : {None, str}, optional
+            Optionally formattable path for the save file. If left/set to None,
+            the results will not be saved anywhere.
+        plot_file : {None, str}, optional
+            Optionally formattable path for the output of plotting. If left/set
+            to None, the plot will not be generated and saved.
+
+        Notes
+        -----
+        Some of the avaible parameters for results saving and plotting are:
+
+        - date : the current date, expressed as YYYYMMDD.
+        - name : the name of the process doing the analysis.
+        - file : the name of the input file passed to the pipeline.
+
+        Note that if no file was passed in initially, then the `file` would be
+        an empty string. However, even if the first step of the pipeline is
+        not one that would use a `file` keyword, you can still specify it and
+        it will be ignored for everything but this parameter.
+
+        >>> p = Pipeline()
+        >>> p.add(Gait(), save_file="{file}_gait_results.csv")
+        >>> p.run(accel=accel, time=time)
+        No file was passed in, so the resulting output file would be
+        `_gait_results.csv`
+
+        However if the `p.run` call is now:
+
+        >>> p.run(accel=accel, time=time, file="example_file.txt")
+        then the output would be `example_file_gait_results.csv`.
+
+        Examples
+        --------
+        Add `Gait` and save the results to a fixed file name:
+
+        >>> from skimu.gait import Gait
+        >>> p = Pipeline()
+        >>> p.add(Gait(), save_results="gait_results.csv")
+
+        Add a binary file reader without saving the results and gait processing
+        with a variable file name:
+
+        >>> from skimu.read import ReadBin
+        >>> p = Pipeline()
+        >>> p.add(ReadBin(bases=0, periods=24), save_results=None)
+        >>> p.add(Gait(), save_results="{date}_{name}_results.csv")
+
+        If the date was, for example, May 18, 2021 then the results file would
+        be `20210518_Gait_results.csv`.
         """
         if not isinstance(process, Process):
             raise NotAProcessError(
@@ -128,14 +176,18 @@ class Pipeline:
                 "cannot be added to the pipeline"
             )
 
-        self._steps += [process]
         # attach the save bool and save_name to the process
-        self._steps[-1]._in_pipeline = True
-        self._steps[-1].pipe_save = save_results
-        self._steps[-1].pipe_fname = save_name
+        process._in_pipeline = True
+        process.pipe_save_file = save_file
+        process.pipe_plot_file = plot_file
+
+        # setup plotting
+        process._setup_plotting(plot_file)
 
         # point the step logging disabled to the pipeline disabled
-        self._steps[-1].logger.disabled = self.logger.disabled
+        process.logger.disabled = self.logger.disabled
+
+        self._steps += [process]
 
     def __iter__(self):
         return self
@@ -170,9 +222,9 @@ class Pipeline:
 
         for proc in self:
             kwargs, step_result = proc.predict(**kwargs)
-            if proc.pipe_save:
+            if proc.pipe_save_file is not None:
                 proc.save_results(
-                    step_result if step_result is not None else kwargs, proc.pipe_fname
+                    step_result if step_result is not None else kwargs, proc.pipe_save_file
                 )
             if step_result is not None:
                 results[proc._name] = step_result

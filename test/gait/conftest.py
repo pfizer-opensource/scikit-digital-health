@@ -1,123 +1,57 @@
-from tempfile import TemporaryDirectory as TempDir
 from pathlib import Path
 
 from pytest import fixture
-import h5py
-import numpy as np
+from numpy import array, zeros, arange, sin, pi, load
 
-from ..base_conftest import *
-
-
-def _get_sample_accel(goal_fs):
-    path = resolve_data_path("gait_data.h5", "gait")
-    with h5py.File(path, "r") as f:
-        accel = f["accel"][()]
-        time = f["time"][()]
-
-    fs = 1 / np.mean(np.diff(time))
-
-    if fs > (1.015 * goal_fs):
-        t_ = np.arange(time[0], time[-1], 1 / goal_fs)
-        a_ = np.zeros((t_.size, 3))
-        for i in range(3):
-            a_[:, i] = np.interp(t_, time, accel[:, i])
-        fs_ = goal_fs
-    elif fs < (0.985 * goal_fs):
-        assert False, "Original FS too low for goal_fs, failing test"
-    else:
-        t_ = time
-        a_ = accel
-        fs_ = goal_fs
-
-    return t_, fs_, a_
+from skimu.utility.internal import apply_downsample
 
 
-@fixture(scope="module")
-def get_sample_accel():
-    return _get_sample_accel
+@fixture
+def d_gait():
+    gait = {
+        "IC": array([50, 100, 150, 200, 250, 300, 350, 400]),
+        "FC": array([110, 165, 210, 265, 310, 365, 415, 455]),
+        "FC opp foot": array([65, 110, 165, 210, 260, 315, 360, 405]),
+        "delta h": array([0.1, 0.2, 0.1, 0.2, 0.2, 0.2, 0.1, 0.1]),
+        "Bout N": array([1, 1, 1, 2, 2, 2, 2, 2])
+    }
+    return gait
 
 
-@fixture(scope="module")
-def get_sample_bout_accel():
-    def get_stuff(freq):
-        t, fs, accel = _get_sample_accel(freq)
+@fixture
+def d_gait_aux():
+    t = arange(0, 20, 0.02)  # 50hz
 
-        if freq == 50.0:
-            with h5py.File(resolve_data_path("gait_data.h5", "gait"), "r") as f:
-                starts = f["Truth"]["Gait Classification"]["gait_starts_50"][()]
-                stops = f["Truth"]["Gait Classification"]["gait_stops_50"][()]
+    a = zeros((t.size, 3))
+    a[:, 0] = 1 + 0.75 * sin(2 * pi * 1.0 * t)  # 1Hz
+    a[:, 1] = 0.35 * sin(2 * pi * 1.0 * t)  # 1 hz
+    a[:, 2] = 0.25 * sin(2 * pi * 2.0 * t + pi / 2)  # 2hz, offset
 
-            idx = np.argmax(stops - starts)
-            bout_acc = accel[starts[idx] : stops[idx], :]
-            bout_time = t[starts[idx] : stops[idx]]
-        elif freq == 20.0:
-            with h5py.File(resolve_data_path("gait_data.h5", "gait"), "r") as f:
-                starts = f["Truth"]["Gait Classification"]["gait_starts_20"][()]
-                stops = f["Truth"]["Gait Classification"]["gait_stops_20"][()]
+    gait_aux = {
+        "accel": [a[:199], a],
+        "vert axis": array([0] * 8),
+        "inertial data i": array([0, 0, 0, 1, 1, 1, 1, 1])
+    }
 
-            idx = np.argmax(stops - starts)
-            bout_acc = accel[starts[idx] : stops[idx], :]
-            bout_time = t[starts[idx] : stops[idx]]
-        else:
-            assert False, "Invalid frequency"
-
-        vaxis = np.argmax(np.abs(np.mean(bout_acc, axis=0)))
-        return bout_acc, bout_time, vaxis, np.sign(np.mean(bout_acc, axis=0)[vaxis])
-
-    return get_stuff
-
-
-@fixture(scope="module")
-def get_contact_truth():
-    def get_stuff(fs):
-        if fs == 50.0:
-            with h5py.File(resolve_data_path("gait_data.h5", "gait"), "r") as f:
-                ic = f["Truth"]["Gait Events"]["ic_50"][()]
-                fc = f["Truth"]["Gait Events"]["fc_50"][()]
-        elif fs == 20.0:
-            with h5py.File(resolve_data_path("gait_data.h5", "gait"), "r") as f:
-                ic = f["Truth"]["Gait Events"]["ic_20"][()]
-                fc = f["Truth"]["Gait Events"]["fc_20"][()]
-        else:
-            assert False, "Invalid frequency for gait event testing"
-        return ic, fc
-
-    return get_stuff
-
-
-@fixture(scope="module")
-def get_gait_classification_truth():
-    def get_stuff(freq):
-        if freq >= 50.0:
-            with h5py.File(resolve_data_path("gait_data.h5", "gait"), "r") as f:
-                starts = f["Truth"]["Gait Classification"]["gait_starts_50"][()]
-                stops = f["Truth"]["Gait Classification"]["gait_stops_50"][()]
-        else:
-            with h5py.File(resolve_data_path("gait_data.h5", "gait"), "r") as f:
-                starts = f["Truth"]["Gait Classification"]["gait_starts_20"][()]
-                stops = f["Truth"]["Gait Classification"]["gait_stops_20"][()]
-
-        return starts, stops
-
-    return get_stuff
+    return gait_aux
 
 
 @fixture(scope="module")
 def get_bgait_samples_truth():  # boolean gait classification
     def get_stuff(case):
-        starts = np.array([0, 150, 165, 200, 225, 400, 770, 990])
-        stops = np.array([90, 160, 180, 210, 240, 760, 780, 1000])
+        starts = array([0, 150, 165, 200, 225, 400, 770, 990])
+        stops = array([90, 160, 180, 210, 240, 760, 780, 1000])
 
         if case == 1:
             dt = 1 / 50
-            time = np.arange(0, 1000 * dt, dt)
+            time = arange(0, 1000 * dt, dt)
             n_max_sep = 25  # 0.5 seconds
             n_min_time = 75  # 1.5 seconds
 
             bouts = [slice(0, 90), slice(150, 240), slice(400, 780)]
         elif case == 2:
             dt = 1 / 100
-            time = np.arange(0, 1000 * dt, dt)
+            time = arange(0, 1000 * dt, dt)
             n_max_sep = 50  # 0.5 seconds
             n_min_time = 200  # 2 seconds
 
@@ -125,14 +59,14 @@ def get_bgait_samples_truth():  # boolean gait classification
 
         elif case == 3:
             dt = 1 / 50
-            time = np.arange(0, 1000 * dt, dt)
+            time = arange(0, 1000 * dt, dt)
             n_max_sep = 75  # 1.5 seconds
             n_min_time = 5  # 0.1 seconds
 
             bouts = [slice(0, 240), slice(400, 780), slice(990, 1000)]
         else:
             dt = 1 / 50
-            time = np.arange(0, 1000 * dt, dt)
+            time = arange(0, 1000 * dt, dt)
             n_max_sep = 6  # 0.12 seconds
             n_min_time = 5  # 0.1 seconds
 
@@ -151,166 +85,34 @@ def get_bgait_samples_truth():  # boolean gait classification
 
 
 @fixture(scope="module")
-def get_strides_truth():
-    def get_stuff(fs, keys):
-        gait = {}
-        if fs >= 50:
-            with h5py.File(resolve_data_path("gait_data.h5", "gait"), "r") as f:
-                for k in keys:
-                    gait[k] = f["Truth"]["Strides"][f"{k}_50"][()]
-        else:
-            with h5py.File(resolve_data_path("gait_data.h5", "gait"), "r") as f:
-                for k in keys:
-                    gait[k] = f["Truth"]["Strides"][f"{k}_20"][()]
+def gait_input_50():
+    cwd = Path.cwd().parts
 
-        return gait
+    if cwd[-1] == "gait":
+        path = Path("data/gait_input.npz")
+    elif cwd[-1] == "test":
+        path = Path("gait/data/gait_input.npz")
+    elif cwd[-1] == "scikit-imu":
+        path = Path("test/gait/data/gait_input.npz")
 
-    return get_stuff
+    data = load(path)
+    t = data['time']
+    acc = data['accel']
 
+    t50, (acc50,) = apply_downsample(50., t, (acc,), ())
 
-@fixture
-def sample_gait():
-    gait = {
-        "IC": np.array([10, 35, 62, 86, 111, 10, 35, 62, 86, 111, 5, 20, 25, 55, 80]),
-        "FC opp foot": np.array(
-            [15, 41, 68, 90, 116, 15, 41, 68, 90, 116, 10, 25, 28, 65, 90]
-        ),
-        "FC": np.array(
-            [40, 65, 90, 115, 140, 40, 65, 90, 115, 140, 35, 50, 55, 85, 110]
-        ),
-        "delta h": np.array(
-            [
-                0.05,
-                0.055,
-                0.05,
-                0.045,
-                np.nan,
-                0.05,
-                0.055,
-                0.05,
-                0.045,
-                np.nan,
-                0.05,
-                0.05,
-                0.05,
-                0.05,
-                np.nan,
-            ]
-        ),
-        "Bout N": np.array([1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3]),
-    }
-    return gait
-
-
-@fixture(scope="module")
-def sample_gait_aux():
-    def y(x):
-        return np.sin(np.pi * x / x.max()) + np.sin(5 * np.pi * x / x.max()) / (x + 1)
-
-    a = np.concatenate(
-        (
-            y(np.arange(25)),
-            y(np.arange(27)),
-            y(np.arange(24)),
-            y(np.arange(25)),
-            y(np.arange(25)),
-            y(np.arange(24)),
-            y(np.arange(24)),
-            y(np.arange(24)),
-            y(np.arange(24)),
-            y(np.arange(25)),
-            y(np.arange(27)),
-        )
-    ).reshape((-1, 1))
-
-    gait_aux = {
-        "accel": [a, a, a],
-        "inertial data i": np.array([0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2]),
-        "vert axis": np.array([0] * 15),
-    }
-
-    return gait_aux
+    return t50, acc50
 
 
 @fixture
-def sample_gait_nan_bout():
-    gait = {
-        "IC": np.array([10, 35, 62, 86, 111, 11, 35]),
-        "FC opp foot": np.array([15, 41, 68, 90, 116, 15, 41]),
-        "FC": np.array([40, 65, 90, 115, 140, 41, 65]),
-        "delta h": np.array([0.05, 0.055, 0.05, 0.045, np.nan, np.nan, np.nan]),
-        "Bout N": np.array([1, 1, 1, 1, 1, 2, 2]),
-    }
-    return gait
+def gait_res_50():
+    cwd = Path.cwd().parts
 
+    if cwd[-1] == "gait":
+        path = Path("data/gait_results.npz")
+    elif cwd[-1] == "test":
+        path = Path("gait/data/gait_results.npz")
+    elif cwd[-1] == "scikit-imu":
+        path = Path("test/gait/data/gait_results.npz")
 
-@fixture(scope="module")
-def sample_gait_aux_nan_bout():
-    def y(x):
-        return np.sin(np.pi * x / x.max()) + np.sin(5 * np.pi * x / x.max()) / (x + 1)
-
-    a = np.concatenate(
-        (
-            y(np.arange(25)),
-            y(np.arange(27)),
-            y(np.arange(24)),
-            y(np.arange(25)),
-            y(np.arange(25)),
-            y(np.arange(24)),
-            y(np.arange(24)),
-            y(np.arange(24)),
-            y(np.arange(24)),
-            y(np.arange(25)),
-            y(np.arange(27)),
-        )
-    ).reshape((-1, 1))
-
-    gait_aux = {
-        "accel": [a, a],
-        "inertial data i": np.array([0, 0, 0, 0, 0, 1, 1]),
-        "vert axis": np.array([0] * 7),
-    }
-
-    return gait_aux
-
-
-@fixture
-def sample_gait_no_bout():
-    gait = {
-        "IC": np.array([10, 35, 62, 86, 111, 11, 35]),
-        "FC opp foot": np.array([15, 41, 68, 90, 116, 15, 41]),
-        "FC": np.array([40, 65, 90, 115, 140, 41, 65]),
-        "delta h": np.array([0.05, 0.055, 0.05, 0.045, np.nan, np.nan, np.nan]),
-        "Bout N": np.array([1, 1, 1, 1, 1, 3, 3]),
-    }
-    return gait
-
-
-@fixture(scope="module")
-def sample_gait_aux_no_bout():
-    def y(x):
-        return np.sin(np.pi * x / x.max()) + np.sin(5 * np.pi * x / x.max()) / (x + 1)
-
-    a = np.concatenate(
-        (
-            y(np.arange(25)),
-            y(np.arange(27)),
-            y(np.arange(24)),
-            y(np.arange(25)),
-            y(np.arange(25)),
-            y(np.arange(24)),
-            y(np.arange(24)),
-            y(np.arange(24)),
-            y(np.arange(24)),
-            y(np.arange(25)),
-            y(np.arange(27)),
-        )
-    ).reshape((-1, 1))
-
-    gait_aux = {
-        "accel": [a, a, a],
-        "inertial data i": np.array([0, 0, 0, 0, 0, 2, 2]),
-        "vert axis": np.array([0] * 7),
-    }
-
-    return gait_aux
+    return load(path)

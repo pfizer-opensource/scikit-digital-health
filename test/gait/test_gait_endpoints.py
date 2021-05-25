@@ -1,454 +1,347 @@
-"""
-Testing of gait metrics
-
-Lukas Adamowicz
-2020, Pfizer DMTI
-"""
 import pytest
-import numpy as np
-from numpy import nan
+from numpy import allclose, isclose, zeros, arange, sin, pi, nan, array, sqrt, isnan
 
-from skimu.gait.gait_endpoints import *
-from skimu.gait.gait_endpoints import gait_endpoints
 from skimu.gait.gait_endpoints.gait_endpoints import (
-    _autocovariancefunction,
-    _autocovariance,
+    _autocovariancefn,
+    StrideTime,
+    StanceTime,
+    SwingTime,
+    StepTime,
+    InitialDoubleSupport,
+    TerminalDoubleSupport,
+    DoubleSupport,
+    SingleSupport,
+    StepLength,
+    StrideLength,
+    GaitSpeed,
+    Cadence,
+    GaitSymmetryIndex,
+    IntraStepCovarianceV,
+    IntraStrideCovarianceV,
+    HarmonicRatioV,
+    StrideSPARC,
+    PhaseCoordinationIndex,
+    StepRegularityV,
+    StrideRegularityV,
+    AutocovarianceSymmetryV,
+    RegularityIndexV,
 )
 
 
-class TestEventMetricGetOffset:
-    def test_error(self):
-        with pytest.raises(ValueError):
-            gait_endpoints.GaitEventEndpoint._get_mask({}, 3)
+def test__autocovariancefn():
+    t = arange(0, 10, 0.01)
 
+    x = zeros((2, 1000))
+    x[0] = sin(2 * pi * 1.0 * t)
+    x[1] = sin(2 * pi * 0.5 * t)
 
-class TestACF:
-    def test_dim_error(self):
-        with pytest.raises(ValueError):
-            _autocovariancefunction(np.random.rand(5, 3, 3), 3, True)
+    ac = _autocovariancefn(x, 500, biased=True, axis=1)
 
+    assert allclose(ac[:, 0], 1.0)
+    # match up every 200 samples
+    assert isclose(ac[0, 200], ac[1, 200])
+    assert isclose(ac[0, 400], ac[1, 400])
+    # offset every 100 samples
+    assert isclose(ac[0, 100], -ac[1, 100])
+    assert isclose(ac[0, 300], -ac[1, 300])
 
-class TestAutocovariance:
-    def test_unbiased(self):
-        x = np.arange(0, 2 * np.pi, 0.01)
-        y = np.sin(2 * x)
 
-        assert _autocovariance(y, 0, 314, 628, biased=False) > 0.99
+def test_StrideTime(d_gait):
+    st = StrideTime()
 
-    def test_biased(self):
-        x = np.arange(0, 2 * np.pi, 0.01)
-        y = np.sin(2 * x)
+    st.predict(50., 1.8, d_gait, {})
 
-        assert 0.49 < _autocovariance(y, 0, 314, 628, biased=True) < 0.50
+    assert allclose(
+        d_gait['PARAM:stride time'],
+        [2.0, nan, nan, 2.0, 2.0, 2.0, nan, nan],
+        equal_nan=True
+    )
 
-    def test_size_error(self):
-        x = np.arange(0, 2 * np.pi, 0.01)
-        y = np.sin(2 * x)
 
-        assert np.isnan(_autocovariance(y, 0, 314, y.size + 1, biased=True))
+def test_StanceTime(d_gait):
+    st = StanceTime()
 
+    st.predict(50., 1.8, d_gait, {})
 
-class BaseTestEndpoint:
-    @classmethod
-    def setup_class(cls):
-        cls.metric = None
+    assert allclose(
+        d_gait['PARAM:stance time'],
+        [1.2, 1.3, 1.2, 1.3, 1.2, 1.3, 1.3, 1.1]
+    )
 
-        cls.num_nan = 2
-        cls.res_bout1 = None
 
-        cls.event_metric = True
+def test_SwingTime(d_gait):
+    st = SwingTime()
 
-    def test(self, sample_gait, sample_gait_aux):
-        self.metric.predict(50, 1.0, sample_gait, sample_gait_aux)
+    st.predict(50., 1.8, d_gait, {})
 
-        assert np.isnan(sample_gait[self.metric.k_][:10]).sum() == 2 * self.num_nan
+    assert allclose(
+        d_gait["PARAM:swing time"],
+        [0.8, nan, nan, 0.7, 0.8, 0.7, nan, nan],
+        equal_nan=True
+    )
 
-        if self.event_metric:
-            assert np.allclose(
-                sample_gait[self.metric.k_][:5],
-                sample_gait[self.metric.k_][5:10],
-                equal_nan=True,
-            )
-        else:
-            assert all(
-                sample_gait[self.metric.k_][:10] == sample_gait[self.metric.k_][0]
-            )
 
-        if self.res_bout1 is not None:
-            assert np.allclose(
-                sample_gait[self.metric.k_][:5], self.res_bout1, equal_nan=True
-            )
+def test_StepTime(d_gait):
+    st = StepTime()
+    st.predict(50., 1.8, d_gait, {})
 
-    def test_no_rerun(self, sample_gait, sample_gait_aux):
-        self.metric.predict(50, 1.0, sample_gait, sample_gait_aux)
+    assert allclose(
+        d_gait['PARAM:step time'],
+        [1.0, 1.0, nan, 1., 1., 1., 1., nan],
+        equal_nan=True
+    )
 
-        res = sample_gait[self.metric.k_] * 1  # prevent views
 
-        sample_gait["IC"][0] -= 1
-        sample_gait["FC"][3] += 1
-        sample_gait["delta h"][2] += 0.0015
+def test_InitialDoubleSupport(d_gait):
+    ids = InitialDoubleSupport()
+    ids.predict(50., 1.8, d_gait, {})
 
-        sample_gait_aux["accel"][0][:5] *= 0.85
-        sample_gait_aux["accel"][1][:5] *= 1.08
+    assert allclose(
+        d_gait["PARAM:initial double support"],
+        [0.3, 0.2, 0.3, 0.2, 0.2, 0.3, 0.2, 0.1]
+    )
 
-        self.metric.predict(50, 1.0, sample_gait, sample_gait_aux)
 
-        # even though input has changed, the results should not because computation is not being
-        # re-run
-        assert np.allclose(res, sample_gait[self.metric.k_], equal_nan=True)
+def test_TerminalDoubleSupport(d_gait):
+    tds = TerminalDoubleSupport()
+    tds.predict(50., 1.8, d_gait, {})
 
+    assert allclose(
+        d_gait["PARAM:terminal double support"],
+        [0.2, 0.3, nan, 0.2, 0.3, 0.2, 0.1, nan],
+        equal_nan=True
+    )
 
-"""
-gait = {
-    'IC': np.tile(np.array([10, 35, 62, 86, 111]), 2),
-    'FC opp foot': np.tile(np.array([15, 41, 68, 90, 116]), 2),
-    'FC': np.tile(np.array([40, 65, 90, 115, 140]), 2),
-    'delta h': np.tile(np.array([0.05, 0.055, 0.05, 0.045, nan]), 2),
-    'Bout N': np.repeat([1, 2], 5)
-}
-"""
 
+def test_DoubleSupport(d_gait):
+    ds = DoubleSupport()
+    ds.predict(50., 1.8, d_gait, {})
 
-class TestStrideTime(BaseTestEndpoint):
-    @classmethod
-    def setup_class(cls):
-        super().setup_class()
+    assert allclose(
+        d_gait['PARAM:double support'],
+        [0.5, 0.5, nan, 0.4, 0.5, 0.5, 0.3, nan],
+        equal_nan=True
+    )
 
-        cls.metric = StrideTime()
 
-        cls.num_nan = 2
-        cls.res_bout1 = np.array([52, 51, 49, nan, nan]) / 50
+def test_SingleSupport(d_gait):
+    ss = SingleSupport()
+    ss.predict(50., 1.8, d_gait, {})
 
+    assert allclose(
+        d_gait['PARAM:single support'],
+        [0.7, 0.8, nan, 0.8, 0.8, 0.7, 0.8, nan],
+        equal_nan=True
+    )
 
-class TestStanceTime(BaseTestEndpoint):
-    @classmethod
-    def setup_class(cls):
-        super().setup_class()
 
-        cls.metric = StanceTime()
+def test_StepLength(d_gait):
+    sl = StepLength()
+    sl.predict(50., 1.8, d_gait, {})
 
-        cls.num_nan = 0
-        cls.res_bout1 = np.array([30, 30, 28, 29, 29]) / 50
+    exp = 2 * 1.8 * array([0.1, 0.2, 0.1, 0.2, 0.2, 0.2, 0.1, 0.1])
+    exp -= array([0.01, 0.04, 0.01, 0.04, 0.04, 0.04, 0.01, 0.01])
+    exp = 2 * sqrt(exp)
+    # get predicted values and reset dictionary for another test
+    pred = d_gait.pop("PARAM:step length")
+    assert allclose(pred, exp)
 
+    # test with no leg length provided
+    sl.predict(50., None, d_gait, {})
 
-class TestSwingTime(BaseTestEndpoint):
-    @classmethod
-    def setup_class(cls):
-        super().setup_class()
+    assert isnan(d_gait['PARAM:step length']).all()
 
-        cls.metric = SwingTime()
 
-        cls.num_nan = 2
-        cls.res_bout1 = np.array([22, 21, 21, nan, nan]) / 50
+def test_StrideLength(d_gait):
+    sl = StrideLength()
+    sl.predict(50., 1.8, d_gait, {})
 
+    a = 2 * 1.8 * array([0.1, 0.2, 0.1, 0.2, 0.2, 0.2, 0.1, 0.1])
+    a -= array([0.01, 0.04, 0.01, 0.04, 0.04, 0.04, 0.01, 0.01])
+    a = 2 * sqrt(a)
 
-class TestStepTime(BaseTestEndpoint):
-    @classmethod
-    def setup_class(cls):
-        super().setup_class()
+    exp = a
+    exp[0:2] += exp[1:3]
+    exp[3:-1] += exp[4:]
+    exp[[2, 7]] = nan
+    # get predicted values and reset dictionary for another test
+    pred = d_gait.pop("PARAM:stride length")
 
-        cls.metric = StepTime()
+    assert allclose(pred, exp, equal_nan=True)
 
-        cls.num_nan = 1
-        cls.res_bout1 = np.array([25, 27, 24, 25, nan]) / 50
+    # test with no leg length provided
+    sl.predict(50., None, d_gait, {})
 
+    assert isnan(d_gait['PARAM:stride length']).all()
 
-class TestInitialDoubleSupport(BaseTestEndpoint):
-    @classmethod
-    def setup_class(cls):
-        super().setup_class()
 
-        cls.metric = InitialDoubleSupport()
+def test_GaitSpeed(d_gait):
+    a = 2 * 1.8 * array([0.1, 0.2, 0.1, 0.2, 0.2, 0.2, 0.1, 0.1])
+    a -= array([0.01, 0.04, 0.01, 0.04, 0.04, 0.04, 0.01, 0.01])
+    a = 2 * sqrt(a)
 
-        cls.num_nan = 0
-        cls.res_bout1 = np.array([5, 6, 6, 4, 5]) / 50
+    exp = a
+    exp[0:2] += exp[1:3]
+    exp[3:-1] += exp[4:]
+    exp[[2, 7]] = nan
+    exp /= array([2.0, nan, nan, 2.0, 2.0, 2.0, nan, nan])
 
+    gs = GaitSpeed()
+    gs.predict(50., 1.8, d_gait, {})
+    pred = d_gait.pop('PARAM:gait speed')
 
-class TestTerminalDoubleSupport(BaseTestEndpoint):
-    @classmethod
-    def setup_class(cls):
-        super().setup_class()
+    assert allclose(pred, exp, equal_nan=True)
 
-        cls.metric = TerminalDoubleSupport()
+    gs.predict(50., None, d_gait, {})
+    assert isnan(d_gait['PARAM:gait speed']).all()
 
-        cls.num_nan = 1
-        cls.res_bout1 = np.array([6, 6, 4, 5, nan]) / 50
 
+def test_Cadence(d_gait):
+    c = Cadence()
+    c.predict(50., 1.8, d_gait, {})
 
-class TestDoubleSupport(BaseTestEndpoint):
-    @classmethod
-    def setup_class(cls):
-        super().setup_class()
+    assert allclose(
+        d_gait["PARAM:cadence"],
+        [60., 60., nan, 60., 60., 60., 60., nan],
+        equal_nan=True
+    )
 
-        cls.metric = DoubleSupport()
 
-        cls.num_nan = 1
-        cls.res_bout1 = np.array([11, 12, 10, 9, nan]) / 50
+def test_IntraStrideCovarianceV(d_gait, d_gait_aux):
+    iscv = IntraStrideCovarianceV()
+    iscv.predict(50., None, d_gait, d_gait_aux)
 
+    assert allclose(
+        d_gait['PARAM:intra-stride covariance - V'],
+        [nan, nan, nan, 1.0, 1.0, 1.0, nan, nan],
+        equal_nan=True
+    )
 
-class TestSingleSupport(BaseTestEndpoint):
-    @classmethod
-    def setup_class(cls):
-        super().setup_class()
 
-        cls.metric = SingleSupport()
+def test_IntraStepCovarianceV(d_gait, d_gait_aux):
+    iscv = IntraStepCovarianceV()
+    iscv.predict(50., None, d_gait, d_gait_aux)
 
-        cls.num_nan = 1
-        cls.res_bout1 = np.array([20, 21, 18, 21, nan]) / 50
+    assert allclose(
+        d_gait['PARAM:intra-step covariance - V'],
+        [1.0, nan, nan, 1.0, 1.0, 1.0, 1.0, nan],
+        equal_nan=True
+    )
 
 
-class TestStepLength(BaseTestEndpoint):
-    @classmethod
-    def setup_class(cls):
-        super().setup_class()
+def test_HarmonicRatioV(d_gait, d_gait_aux):
+    hrv = HarmonicRatioV()
+    hrv.predict(50., None, d_gait, d_gait_aux)
+    # get predicted values and reset d_gait for another run
+    pred = d_gait.pop("PARAM:harmonic ratio - V")
 
-        cls.metric = StepLength()
+    # values are somewhat weird because stride frequency is different than
+    # the frequency used to create the "acceleration" data
+    assert allclose(
+        pred,
+        [2.54304311, nan, nan, 2.54304311, 2.54304311, 2.54304311, nan, nan],
+        equal_nan=True
+    )
 
-        cls.num_nan = 1
-        cls.res_bout1 = 2 * np.sqrt(
-            2 * np.array([0.05, 0.055, 0.05, 0.045, nan])
-            - np.array([0.05, 0.055, 0.05, 0.045, nan]) ** 2
-        )
+    # <= 10 harmonics
+    hrv.predict(10., None, d_gait, d_gait_aux)
+    pred = d_gait.pop("PARAM:harmonic ratio - V")
 
-    def test_no_leg_length(self, sample_gait):
-        self.metric.predict(1 / 50, None, sample_gait, None)
+    assert isnan(pred).all()
 
-        assert np.isnan(sample_gait[self.metric.k_][:10]).sum() == 10
+    # test with less than 20 harmonics
+    hrv.predict(15., None, d_gait, d_gait_aux)
+    pred = d_gait.pop("PARAM:harmonic ratio - V")
 
+    assert allclose(pred, [0.65066714, nan, nan, 0.65066714, 0.65066714, 0.65066714, nan, nan], equal_nan=True)
 
-class TestStrideLength(BaseTestEndpoint):
-    @classmethod
-    def setup_class(cls):
-        super().setup_class()
 
-        cls.metric = StrideLength()
+def test_StrideSPARC(d_gait, d_gait_aux):
+    ss = StrideSPARC()
+    ss.predict(50., None, d_gait, d_gait_aux)
 
-        cls.num_nan = 2
+    assert allclose(
+        d_gait['PARAM:stride SPARC'],
+        [-3.27853883, nan, nan, -3.27853883, -3.27853883, -3.27853883, nan, nan],
+        equal_nan=True
+    )
 
-        tmp = 2 * np.sqrt(
-            2 * np.array([0.05, 0.055, 0.05, 0.045, nan])
-            - np.array([0.05, 0.055, 0.05, 0.045, nan]) ** 2
-        )
-        cls.res_bout1 = tmp
-        cls.res_bout1[:-1] += tmp[1:]
 
-    def test_no_leg_length(self, sample_gait):
-        self.metric.predict(1 / 50, None, sample_gait, None)
+def test_PhaseCoordinationIndex(d_gait, d_gait_aux):
+    pci = PhaseCoordinationIndex()
+    with pytest.warns(RuntimeWarning):
+        pci.predict(50., None, d_gait, d_gait_aux)
 
-        assert np.isnan(sample_gait[self.metric.k_][:10]).sum() == 10
+    # 0 values since the phase mean - 0.5 is 0.0
+    assert allclose(
+        d_gait['BOUTPARAM:phase coordination index'],
+        [nan, nan, nan, 0., 0., 0., 0., 0.],
+        equal_nan=True
+    )
 
 
-class TestGaitSpeed(BaseTestEndpoint):
-    @classmethod
-    def setup_class(cls):
-        super().setup_class()
+def test_GaitSymmetryIndex(d_gait, d_gait_aux):
+    # set manually so one of the bouts doesnt have a median step time
+    d_gait['PARAM:stride time'] = array([nan, nan, nan, 2., 2., 2., nan, nan])
 
-        cls.metric = GaitSpeed()
+    gsi = GaitSymmetryIndex()
+    with pytest.warns(RuntimeWarning):  # all nan slice
+        gsi.predict(50., None, d_gait, d_gait_aux)
 
-        cls.num_nan = 2
+    assert allclose(
+        d_gait["BOUTPARAM:gait symmetry index"],
+        [nan, nan, nan, 0.97467939, 0.97467939, 0.97467939, 0.97467939, 0.97467939],
+        equal_nan=True
+    )
 
-        tmp_l = 2 * np.sqrt(
-            2 * np.array([0.05, 0.055, 0.05, 0.045, nan])
-            - np.array([0.05, 0.055, 0.05, 0.045, nan]) ** 2
-        )
-        tmp_t = np.array([52, 51, 49, nan, nan]) / 50
 
-        cls.res_bout1 = tmp_l
-        cls.res_bout1[:-1] += tmp_l[1:]
-        cls.res_bout1 /= tmp_t
+def test_StepRegularityV(d_gait, d_gait_aux):
+    # set manually so one of the bouts doesnt have a median step time
+    d_gait['PARAM:step time'] = array([nan, nan, nan, 1., 1., 1., 1., nan])
 
-    def test_no_leg_length(self, sample_gait):
-        self.metric.predict(1 / 50, None, sample_gait, None)
+    srv = StepRegularityV()
+    with pytest.warns(RuntimeWarning):  # all nan slice
+        srv.predict(50., None, d_gait, d_gait_aux)
 
-        assert np.isnan(sample_gait[self.metric.k_][:10]).sum() == 10
+    assert allclose(
+        d_gait['BOUTPARAM:step regularity - V'],
+        [nan, nan, nan, 1., 1., 1., 1., 1.],
+        equal_nan=True
+    )
 
 
-class TestCadence(BaseTestEndpoint):
-    @classmethod
-    def setup_class(cls):
-        super().setup_class()
+def test_StrideRegularityV(d_gait, d_gait_aux):
+    # set manually so one of the bouts doesnt have a median step time
+    d_gait['PARAM:stride time'] = array([nan, nan, nan, 2., 2., 2., nan, nan])
 
-        cls.metric = Cadence()
+    srv = StrideRegularityV()
+    with pytest.warns(RuntimeWarning):  # all nan slice
+        srv.predict(50., None, d_gait, d_gait_aux)
 
-        cls.num_nan = 1
-        cls.res_bout1 = 60 * 50 / np.array([25, 27, 24, 25, nan])
+    assert allclose(
+        d_gait['BOUTPARAM:stride regularity - V'],
+        [nan, nan, nan, 1., 1., 1., 1., 1.],
+        equal_nan=True
+    )
 
 
-# TODO should probably check actual values here not just through running Gait
-class TestIntraStrideCovarianceV(BaseTestEndpoint):
-    @classmethod
-    def setup_class(cls):
-        super().setup_class()
+def test_AutocovarianceSymmetryV(d_gait, d_gait_aux):
+    acsv = AutocovarianceSymmetryV()
+    acsv.predict(50., None, d_gait, d_gait_aux)
 
-        cls.metric = IntraStrideCovarianceV()
+    # simple difference between stride and step regularity: 1 - 1 = 0
+    assert allclose(
+        d_gait['BOUTPARAM:autocovariance symmetry - V'],
+        0.
+    )
 
-        cls.num_nan = 2
 
+def test_RegularityIndexV(d_gait, d_gait_aux):
+    riv = RegularityIndexV()
+    riv.predict(50., None, d_gait, d_gait_aux)
 
-# TODO should probably check actual values here not just through running Gait
-class TestIntraStepCovarianceV(BaseTestEndpoint):
-    @classmethod
-    def setup_class(cls):
-        super().setup_class()
-
-        cls.metric = IntraStepCovarianceV()
-        cls.num_nan = 1
-
-
-# TODO should probably check actual values here not just through running Gait
-class TestHarmonicRatioV(BaseTestEndpoint):
-    @classmethod
-    def setup_class(cls):
-        super().setup_class()
-
-        cls.metric = HarmonicRatioV()
-        cls.num_nan = 2
-
-    def test(self, sample_gait, sample_gait_aux, caplog):
-        self.metric.predict(50, 1.0, sample_gait, sample_gait_aux)
-
-        assert np.isnan(sample_gait[self.metric.k_][:10]).sum() == 2 * self.num_nan
-
-        assert len(caplog.records) == 2  # should be 2 loggings
-        assert any(
-            ["use of less than 20 harmonics" in i.message for i in caplog.records]
-        )
-        assert any(
-            [
-                "too few harmonics in frequency range" in i.message
-                for i in caplog.records
-            ]
-        )
-
-        if self.event_metric:
-            assert np.allclose(
-                sample_gait[self.metric.k_][:5],
-                sample_gait[self.metric.k_][5:10],
-                equal_nan=True,
-            )
-        else:
-            assert all(
-                sample_gait[self.metric.k_][:10] == sample_gait[self.metric.k_][0]
-            )
-
-        if self.res_bout1 is not None:
-            assert np.allclose(
-                sample_gait[self.metric.k_][:5], self.res_bout1, equal_nan=True
-            )
-
-
-# TODO should probably check actual values here not just through running Gait
-class TestStrideSPARC(BaseTestEndpoint):
-    @classmethod
-    def setup_class(cls):
-        super().setup_class()
-
-        cls.metric = StrideSPARC()
-        cls.num_nan = 2
-
-
-# TODO should probably check actual values here not just through running Gait
-class TestPhaseCoordinationIndex(BaseTestEndpoint):
-    @classmethod
-    def setup_class(cls):
-        super().setup_class()
-
-        cls.metric = PhaseCoordinationIndex()
-        cls.num_nan = 0
-
-        cls.event_metric = False
-
-
-# TODO should probably check actual values here not just through running Gait
-class TestGaitSymmetryIndex(BaseTestEndpoint):
-    @classmethod
-    def setup_class(cls):
-        super().setup_class()
-
-        cls.metric = GaitSymmetryIndex()
-        cls.num_nan = 0
-
-        cls.event_metric = False
-
-    def test_nan_bout(self, sample_gait_nan_bout, sample_gait_aux_nan_bout):
-        self.metric.predict(50, 1.0, sample_gait_nan_bout, sample_gait_aux_nan_bout)
-
-        # last 2 values (2 values in the last bout) should be nan
-        assert np.isnan(sample_gait_nan_bout[self.metric.k_]).sum() == 2
-
-
-# TODO should probably check actual values here not just through running Gait
-class TestStrideRegularityV(BaseTestEndpoint):
-    @classmethod
-    def setup_class(cls):
-        super().setup_class()
-
-        cls.metric = StrideRegularityV()
-        cls.num_nan = 0
-
-        cls.event_metric = False
-
-    def test_nan_bout(self, sample_gait_nan_bout, sample_gait_aux_nan_bout, caplog):
-        self.metric.predict(50, 1.0, sample_gait_nan_bout, sample_gait_aux_nan_bout)
-
-        # last 2 values (2 values in the last bout) should be nan
-        assert np.isnan(sample_gait_nan_bout[self.metric.k_]).sum() == 2
-
-    def test_missing_bout(self, sample_gait_no_bout, sample_gait_aux_no_bout, caplog):
-        self.metric.predict(50, 1.0, sample_gait_no_bout, sample_gait_aux_no_bout)
-
-        # last 2 values (2 values in the last bout) should be nan
-        assert np.isnan(sample_gait_no_bout[self.metric.k_]).sum() == 2
-
-
-# TODO should probably check actual values here not just through running Gait
-class TestStepRegularityV(BaseTestEndpoint):
-    @classmethod
-    def setup_class(cls):
-        super().setup_class()
-
-        cls.metric = StepRegularityV()
-        cls.num_nan = 0
-
-        cls.event_metric = False
-
-    def test_nan_bout(self, sample_gait_nan_bout, sample_gait_aux_nan_bout, caplog):
-        for k in sample_gait_nan_bout:
-            sample_gait_nan_bout[k] = sample_gait_nan_bout[k][:-1]
-        for k in [i for i in sample_gait_aux_nan_bout if "acc" not in i]:
-            sample_gait_aux_nan_bout[k] = sample_gait_aux_nan_bout[k][:-1]
-
-        self.metric.predict(50, 1.0, sample_gait_nan_bout, sample_gait_aux_nan_bout)
-
-        # last 1 values (1 values in the last bout) should be nan
-        assert np.isnan(sample_gait_nan_bout[self.metric.k_]).sum() == 1
-
-    def test_missing_bout(self, sample_gait_no_bout, sample_gait_aux_no_bout, caplog):
-        self.metric.predict(50, 1.0, sample_gait_no_bout, sample_gait_aux_no_bout)
-
-        # last 2 values (2 values in the last bout) should be nan
-        assert np.isnan(sample_gait_no_bout[self.metric.k_]).sum() == 0
-
-
-# TODO should probably check actual values here not just through running Gait
-class TestAutocovarianceSymmetryV(BaseTestEndpoint):
-    @classmethod
-    def setup_class(cls):
-        super().setup_class()
-
-        cls.metric = AutocovarianceSymmetryV()
-        cls.num_nan = 0
-
-        cls.event_metric = False
-
-
-# TODO should probably check actual values here not just through running Gait
-class TestRegularityIndexV(BaseTestEndpoint):
-    @classmethod
-    def setup_class(cls):
-        super().setup_class()
-
-        cls.metric = RegularityIndexV()
-        cls.num_nan = 0
-
-        cls.event_metric = False
+    # 1 - 0 = 1
+    assert allclose(
+        d_gait['BOUTPARAM:regularity index - V'],
+        1.
+    )

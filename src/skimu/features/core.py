@@ -31,10 +31,14 @@ def get_n_feats(size, index):
 
 
 def partial_index_check(index):
-    if isinstance(index, str) or isinstance(index, float):
-        raise IndexError("Indices cannot be strings or floats.")
     if index is None:
         index = ...
+
+    if not isinstance(index, (int, Iterator, Sequence, type(...), slice)):
+        raise IndexError(f"Index type ({type(index)}) not understood.")
+    if isinstance(index, str):
+        raise IndexError("Index type (str) not understood.")
+
     return index
 
 
@@ -47,8 +51,8 @@ def normalize_indices(nfeat, index):
         return [index] * nfeat
     elif isinstance(index, Sequence):  # able to be indexed
         return [partial_index_check(i) for i in index]
-    else:
-        raise IndexError("Index not understood")
+    else:  # pragma: no cover
+        return IndexError(f"Index type ({type(index)}) not understood.")
 
 
 def normalize_axes(ndim, axis, ind_axis):
@@ -56,7 +60,7 @@ def normalize_axes(ndim, axis, ind_axis):
     Normalize input axes to be positive/correct for how the swapping has to work
     """
     if axis == ind_axis:
-        raise IndexError("axis and index_axis cannot be the same")
+        raise ValueError("axis and index_axis cannot be the same")
 
     if ndim == 1:
         return 0, None

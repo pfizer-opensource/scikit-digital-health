@@ -28,43 +28,41 @@ class DetectWear(_BaseProcess):
     Parameters
     ----------
     sd_crit : float, optional
-        Acceleration standard deviation threshold for determining non-wear. Default is 0.013, which
-        was observed for GeneActiv devices during motionless bench tests, and will likely depend
-        on the brand of accelerometer being used.
+        Acceleration standard deviation threshold for determining non-wear.
+        Default is 0.013, which was observed for GeneActiv devices during
+        motionless bench tests, and will likely depend on the brand of accelerometer
+        being used.
     range_crit : float, optional
-        Acceleration window range threshold for determining non-wear. Default is 0.067, which was
-        found for several GeneActiv accelerometers in a bench test as the 75th percentile
-        of the ranges over 60 minute windows.
-    temperature_crit : float, optional
-        Minimum temperature to indicate wear in Celsius. Default is 25 deg. C.
-    temperature_factor : int, optional
-        Factor by which to multiply boolean array of wear based on temperature. Default is 1.
-        Setting to 2 would result in temperature being able to indicate non-wear by itself. Setting
-        to 0 will disable using temperature for wear detection.
+        Acceleration window range threshold for determining non-wear. Default is
+        0.067, which was found for several GeneActiv accelerometers in a bench
+        test as the 75th percentile of the ranges over 60 minute windows.
     apply_setup_criteria : bool, optional
-        Apply criteria to the beginning of the recording to account for device setup. Default is
-        True.
+        Apply criteria to the beginning of the recording to account for device setup.
+        Default is True.
     shipping_criteria : {bool, int, list}, optional
-        Apply shipping criteria to the ends of the trial. Options are False (default, no criteria
-        applied), True (criteria applied to the first and last 24 hours), an integer (criteria
-        applied to the first and last `shipping_criteria` hours), or a length 2 list of
-        integers (criteria applied to the first `shipping_criteria[0]` hours and the last
-        `shipping_criteria[1]` hours).
+        Apply shipping criteria to the ends of the trial. Options are False (default,
+        no criteria applied), True (criteria applied to the first and last 24 hours),
+        an integer (criteria applied to the first and last `shipping_criteria` hours),
+        or a length 2 list of integers (criteria applied to the first
+        `shipping_criteria[0]` hours and the last `shipping_criteria[1]` hours).
     shipping_temperature : bool, optional
-        Apply the `shipping_criteria` rules to `temperature_factor`. For example, setting
-        to true would mean with `temperature_factor=2` that during the first and last 24 hours
-        (or specified times) the temperature could solely determine non-wear. Defautl is False.
+        Apply the `shipping_criteria` rules to `temperature_factor`. For example,
+        setting to true would mean with `temperature_factor=2` that during the first
+        and last 24 hours (or specified times) the temperature could solely determine
+        non-wear. Defautl is False.
     window_length : int, optional
         Number of minutes in a window used to determine non-wear. Default is 60 minutes.
     window_skip : int, optional
-        Number of minutes to skip between windows. Default is 15 minutes, which would result
-        in window overlaps of 45 minutes with the default 60 minute `window_length`.
+        Number of minutes to skip between windows. Default is 15 minutes, which would
+        result in window overlaps of 45 minutes with the default 60 minute
+        `window_length`.
 
     References
     ----------
-    .. [1] V. T. van Hees et al., “Separating Movement and Gravity Components in an Acceleration
-        Signal and Implications for the Assessment of Human Daily Physical Activity,” PLOS ONE,
-        vol. 8, no. 4, p. e61691, Apr. 2013, doi: 10.1371/journal.pone.0061691.
+    .. [1] V. T. van Hees et al., “Separating Movement and Gravity Components in
+        an Acceleration Signal and Implications for the Assessment of Human Daily
+        Physical Activity,” PLOS ONE, vol. 8, no. 4, p. e61691, Apr. 2013,
+        doi: 10.1371/journal.pone.0061691.
 
     Notes
     -----
@@ -73,29 +71,28 @@ class DetectWear(_BaseProcess):
     .. math::
 
         NW_{acc} = \sum_{i=\{x,y,z\}}[(a_{(sd, i)} < S) \& (a_{(range, i)} < R)]\\
-        NW = \left(NW_{acc} + (temp < T)F_t\right) >= 2
+        NW = NW_{acc} >= 2
 
-    where :math:`a_{sd}` is the acceleration standard deviation of a window, :math:`a_{range}` is
-    the range of acceleration of a window, :math:`S` is the `sd_crit`, :math:`R` is `range_crit`,
-    :math:`T` is `temperature_crit`, and :math:`F_t` is the `temperature_factor`.
+    where :math:`a_{sd}` is the acceleration standard deviation of a window,
+    :math:`a_{range}` is the range of acceleration of a window, :math:`S` is the
+    `sd_crit`, :math:`R` is `range_crit`.
 
-    _Setup Criteria_ is the rule that if the data starts with a period of non-wear of less than 3
-    hours followed by a non-wear period of any length, then that first block of wear is changed
-    to non-wear.
+    _Setup Criteria_ is the rule that if the data starts with a period of non-wear
+    of less than 3 hours followed by a non-wear period of any length, then that
+    first block of wear is changed to non-wear.
 
-    _Shipping Criteria_ is an additional rule that may help in cases where the device is being
-    shipped either to or from the participant (or both). Wear periods at the start of the recording
-    are filtered by those less than 3 hours that are followed by 1 hour of non-wear are
-    re-classified as non-wear. Wear periods at the end of the recording that are less than 3 hours
-    that are preceded by 1 hour of non-wear are re-classified as non-wear.
+    _Shipping Criteria_ is an additional rule that may help in cases where the device
+    is being shipped either to or from the participant (or both). Wear periods at the
+    start of the recording are filtered by those less than 3 hours that are followed
+    by 1 hour of non-wear are re-classified as non-wear. Wear periods at the end
+    of the recording that are less than 3 hours that are preceded by 1 hour of non-wear
+    are re-classified as non-wear.
     """
 
     def __init__(
         self,
         sd_crit=0.013,
         range_crit=0.067,
-        temperature_crit=25.0,
-        temperature_factor=1,
         apply_setup_criteria=True,
         shipping_criteria=False,
         shipping_temperature=False,
@@ -114,8 +111,6 @@ class DetectWear(_BaseProcess):
         super().__init__(
             sd_crit=sd_crit,
             range_crit=range_crit,
-            temperature_crit=temperature_crit,
-            temperature_factor=temperature_factor,
             apply_setup_criteria=apply_setup_criteria,
             shipping_criteria=shipping_criteria,
             shipping_temperature=shipping_temperature,
@@ -125,8 +120,6 @@ class DetectWear(_BaseProcess):
 
         self.sd_crit = sd_crit
         self.range_crit = range_crit
-        self.temp_crit = temperature_crit
-        self.temp_f = temperature_factor
         self.apply_setup_crit = apply_setup_criteria
         self.ship_crit = shipping_criteria
         self.ship_temp = shipping_temperature
@@ -143,50 +136,41 @@ class DetectWear(_BaseProcess):
             (N, ) array of unix timestamps (in seconds) since 1970-01-01.
         accel : numpy.ndarray
             (N, 3) array of measured acceleration values in units of g.
+        temperature : numpy.ndarray
+            (N,) array of measured temperature values during recording in deg C.
 
         Returns
         -------
         results : dictionary
-            Dictionary of inputs, plus the key `wear` which is an array-like (N, 2) indicating
-            the start and stop indices of wear.
+            Dictionary of inputs, plus the key `wear` which is an array-like (N, 2)
+            indicating the start and stop indices of wear.
         """
+        super().predict(
+            expect_days=False,
+            expect_wear=False,
+            time=time,
+            accel=accel,
+            temperature=temperature,
+            **kwargs
+        )
         # dont start at zero due to timestamp weirdness with some devices
         fs = 1 / mean(diff(time[1000:5000]))
         n_wlen = int(self.wlen * 60 * fs)  # samples in wlen minutes
         n_wskip = int(self.wskip * 60 * fs)  # samples in wskip minutes
 
         # note that while this block starts at 0, the method uses centered blocks, which
-        # means that the first block actually corresponds to a block starting 22.5 minutes into
-        # the recording
+        # means that the first block actually corresponds to a block starting
+        # 22.5 minutes into the recording
         acc_rsd = moving_sd(accel, n_wlen, n_wskip, axis=0, return_previous=False)
 
         # get the accelerometer range in each 60min window
         acc_w = get_windowed_view(accel, n_wlen, n_wskip)
         acc_w_range = acc_w.max(axis=1) - acc_w.min(axis=1)
 
-        # deal with temperature
-        if temperature is None or self.temp_f < 1:
-            nonwear = (
-                sum((acc_rsd < self.sd_crit) & (acc_w_range < self.range_crit), axis=1)
-                >= 2
-            )
-        else:
-            temp_rm = moving_mean(temperature, n_wlen, n_wskip)
-
-            if self.ship_temp:
-                ship_i1 = self.ship_crit[0] * int(60 / self.wskip)
-                ship_i2 = self.ship_crit[0] * int(60 / self.wskip)
-
-                temp_f = full(temp_rm.size, self.temp_f, dtype="int")
-                temp_f[ship_i1:-ship_i2] = 1
-            else:
-                temp_f = self.temp_f
-
-            nw_temp = (temp_rm < self.temp_crit).astype("int") * temp_f
-            nonwear = (
-                sum((acc_rsd < self.sd_crit) & (acc_w_range < self.range_crit), axis=1)
-                + nw_temp
-            ) >= 2
+        nonwear = (
+            sum((acc_rsd < self.sd_crit) & (acc_w_range < self.range_crit), axis=1)
+            >= 2
+        )
 
         # flip to wear starts/stops now
         wear_starts, wear_stops = _modify_wear_times(
@@ -256,8 +240,8 @@ def _modify_wear_times(nonwear, wskip, apply_setup_rule, shipping_crit):
 
         """
         shipping rules
-        NOTE: shipping at the start is applied the opposite of shipping at the end, requiring
-        a 1+ hour nonwear period following wear periods less than 3 hours
+        NOTE: shipping at the start is applied the opposite of shipping at the end, 
+        requiring a 1+ hour nonwear period following wear periods less than 3 hours
         """
         ship_start = nonzero((w_times <= 3) & (ch[2:-1:2] <= (shipping_crit[0] * nph)))[
             0

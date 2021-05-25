@@ -41,18 +41,6 @@ from skimu.utility.internal import get_day_index_intersection
 from skimu.activity.cutpoints import _base_cutpoints, get_level_thresholds
 
 
-def _check_if_none(var, lgr, msg_if_none, i1, i2):
-    if var is None:
-        lgr.info(msg_if_none)
-        if i1 is None or i2 is None:
-            return None, None
-        else:
-            start, stop = array([i1]), array([i2])
-    else:
-        start, stop = var[:, 0], var[:, 1]
-    return start, stop
-
-
 def _update_date_results(
     results, time, day_n, day_start_idx, day_stop_idx, day_start_hour
 ):
@@ -64,8 +52,8 @@ def _update_date_results(
     if start_dt.hour < day_start_hour:
         window_start_dt -= timedelta(days=1)
 
-    results["Date"][day_n] = start_dt.strftime("%Y-%m-%d")
-    results["Weekday"][day_n] = start_dt.strftime("%A")
+    results["Date"][day_n] = window_start_dt.strftime("%Y-%m-%d")
+    results["Weekday"][day_n] = window_start_dt.strftime("%A")
     results["Day N"][day_n] = day_n + 1
     results["N hours"][day_n] = around(
         (time[day_stop_idx - 1] - time[day_start_idx]) / 3600, 1
@@ -200,6 +188,7 @@ class ActivityLevelClassification(_BaseProcess):
             closed_bout=closed_bout,
             min_wear_time=min_wear_time,
             cutpoints=cutpoints_,
+            day_window=day_window,
         )
 
         self.wlen = short_wlen
@@ -269,7 +258,15 @@ class ActivityLevelClassification(_BaseProcess):
         activity_res : dict
             Computed activity level metrics.
         """
-        super().predict(time=time, accel=accel, fs=fs, wear=wear, **kwargs)
+        super().predict(
+            expect_days=True,
+            expect_wear=True,
+            time=time,
+            accel=accel,
+            fs=fs,
+            wear=wear,
+            **kwargs
+        )
 
         # ========================================================================================
         # SETUP / INITIALIZATION
@@ -285,32 +282,14 @@ class ActivityLevelClassification(_BaseProcess):
         )  # default from rowlands
         igvals = (iglevels[1:] + iglevels[:-1]) / 2
 
-        wear_none_msg = (
-            f"[{self!s}] Wear detection not provided. Assuming 100% wear time."
-        )
-        wear_starts, wear_stops = _check_if_none(
-            wear, self.logger, wear_none_msg, 0, time.size
-        )
-
-        # check if windows exist for days
-        days = kwargs.get(self._days, {}).get(self.day_key, None)
-        if days is None:
-            warn(
-                f"Day indices for {self.day_key} (base, period) not found. No day separation used"
-            )
-            days = [[0, time.size]]
-
         # check if sleep data is provided
         sleep = kwargs.get("sleep", None)
         slp_msg = (
             f"[{self!s}] No sleep information found. Only computing full day metrics."
         )
-        sleep_starts, sleep_stops = _check_if_none(
-            sleep, self.logger, slp_msg, None, None
+        sleep_starts, sleep_stops = self._check_if_idx_none(
+            sleep, slp_msg, None, None
         )
-
-        # SETUP PLOTTING
-        source_file = kwargs.get("file", "Source Not Available")
 
         # ========================================================================================
         # SETUP RESULTS KEYS/ENDPOINTS
@@ -340,12 +319,12 @@ class ActivityLevelClassification(_BaseProcess):
             for j in self.blens
         ]
 
-        res = {i: full(len(days), j, dtype=k) for i, j, k in res_keys}
+        res = {i: full(len(self.day_idx[0]), j, dtype=k) for i, j, k in res_keys}
 
         # ========================================================================================
         # PROCESSING
         # ========================================================================================
-        for iday, day_idx in enumerate(days):
+        for iday, day_idx in enumerate(zip(*self.day_idx)):
             day_start, day_stop = day_idx
             # update the results dictionary with date strings, # of hours, etc
             start_dt = _update_date_results(
@@ -354,13 +333,12 @@ class ActivityLevelClassification(_BaseProcess):
 
             # get the intersection of wear time and day
             dwear_starts, dwear_stops = get_day_index_intersection(
-                wear_starts, wear_stops, True, day_start, day_stop  # include wear time
+                *self.wear_idx, True, day_start, day_stop  # include wear time
             )
 
             # PLOTTING. handle here before returning for minimal wear hours, etc
             self._plot_day_accel(
                 iday,
-                source_file,
                 fs,
                 accel[day_start:day_stop],
                 res["Date"][iday],
@@ -382,15 +360,15 @@ class ActivityLevelClassification(_BaseProcess):
             # if there is sleep data, add it to the intersection of indices
             if sleep_starts is not None and sleep_stops is not None:
                 dwear_starts, dwear_stops = get_day_index_intersection(
-                    (wear_starts, sleep_starts),
-                    (wear_stops, sleep_stops),
+                    (self.wear_idx[0], sleep_starts),
+                    (self.wear_idx[1], sleep_stops),
                     (True, False),  # include wear time, exclude sleeping time
                     day_start,
                     day_stop,
                 )
                 sleep_wear_starts, sleep_wear_stops = get_day_index_intersection(
-                    (wear_starts, sleep_starts),
-                    (wear_stops, sleep_stops),
+                    (self.wear_idx[0], sleep_starts),
+                    (self.wear_idx[1], sleep_stops),
                     (True, True),  # now we want only sleep
                     day_start,
                     day_stop,
@@ -430,14 +408,17 @@ class ActivityLevelClassification(_BaseProcess):
         else:
             return res
 
-    def _compute_awake_activity_endpoints(
-        self, results, accel, fs, day_n, starts, stops, n_wlen, epm, ig_levels, ig_vals
-    ):
-        # allocate histogram for intensity gradient
-        hist = zeros(ig_levels.size - 1)
+    def _initialize_awake_values(self, results, day_n):
+        """
+        Initialize wake results values to 0.0 so they can be added to.
 
-        # initialize values from nan to 0.0. Do this here because days with less than minimum
-        # hours should have nan values
+        Parameters
+        ----------
+        results : dict
+            Dictionary of results values
+        day_n : int
+            Day index value
+        """
         for w in self.max_acc_lens:
             results[self._max_acc_str.format(w=w)][day_n] = 0.0
         for lvl in self.act_levels:
@@ -447,6 +428,16 @@ class ActivityLevelClassification(_BaseProcess):
             for w in self.blens:
                 key = self._bout_str.format(L=lvl, w=w)
                 results[key][day_n] = 0.0
+
+    def _compute_awake_activity_endpoints(
+        self, results, accel, fs, day_n, starts, stops, n_wlen, epm, ig_levels, ig_vals
+    ):
+        # allocate histogram for intensity gradient
+        hist = zeros(ig_levels.size - 1)
+
+        # initialize values from nan to 0.0. Do this here because days with less than minimum
+        # hours should have nan values
+        self._initialize_awake_values(results, day_n)
 
         for start, stop in zip(starts, stops):
             # compute the desired acceleration metric
@@ -525,7 +516,7 @@ class ActivityLevelClassification(_BaseProcess):
                     sum((acc_metric >= lthresh) & (acc_metric < uthresh)) / epm
                 )
 
-    def _plot_day_accel(self, day_n, source_file, fs, accel, date_str, start_dt):
+    def _plot_day_accel(self, day_n, fs, accel, date_str, start_dt):
         if self.f is None:
             return
 
@@ -554,7 +545,7 @@ class ActivityLevelClassification(_BaseProcess):
         x = self._t60 + start_hr
         n60 = int(fs * 60)
 
-        sfile_name = Path(source_file).name
+        sfile_name = Path(self._file_name).name
         f.update_layout(
             title=f"Activity Visual Report: {sfile_name}<br>Day: {day_n}<br>Date: {date_str}"
         )

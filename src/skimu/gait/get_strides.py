@@ -18,7 +18,7 @@ def get_strides(
     ----------
     gait : dictionary
         Dictionary of gait values needed for computation or the results
-    vert_accel numpy.ndarray
+    vert_accel : numpy.ndarray
         (N, ) array of vertial acceleration
     gait_index : int
         Where in the lists in `gait` the last bout left off

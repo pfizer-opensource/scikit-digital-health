@@ -1,11 +1,5 @@
-"""
-Unit tests for wear detection algorithms
-
-Lukas Adamowicz
-Pfizer DMTI 2021
-"""
 import pytest
-import numpy as np
+from numpy import allclose
 
 from skimu.preprocessing.wear_detection import DetectWear, _modify_wear_times
 
@@ -26,19 +20,19 @@ class TestWearDetection:
 
         res = dw.predict(time, accel)
 
-        assert np.allclose(res["wear"], wear)
+        assert allclose(res["wear"], wear)
 
     @pytest.mark.parametrize(
         ("case", "setup", "ship"),
         (
-            (1, False, [0, 0]),
-            (1, True, [12, 12]),
-            (2, False, [0, 0]),
-            (2, True, [12, 12]),
-            (3, False, [0, 0]),
-            (3, True, [12, 12]),
-            (4, False, [0, 0]),
-            (4, True, [12, 12]),
+                (1, False, [0, 0]),
+                (1, True, [12, 12]),
+                (2, False, [0, 0]),
+                (2, True, [12, 12]),
+                (3, False, [0, 0]),
+                (3, True, [12, 12]),
+                (4, False, [0, 0]),
+                (4, True, [12, 12]),
         ),
     )
     def test_wear_time_modifiction(self, case, setup, ship, simple_nonwear_data):
@@ -48,5 +42,5 @@ class TestWearDetection:
 
         starts, stops = _modify_wear_times(nonwear, wskip, setup, ship)
 
-        assert np.allclose(starts, true_wear[:, 0])
-        assert np.allclose(stops, true_wear[:, 1])
+        assert allclose(starts, true_wear[:, 0])
+        assert allclose(stops, true_wear[:, 1])

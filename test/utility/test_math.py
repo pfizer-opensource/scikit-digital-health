@@ -1,21 +1,27 @@
 from collections.abc import Iterable
 
 import pytest
-
-import numpy as np
+from numpy import allclose, mean, std, median, all, isnan
 from scipy.stats import skew, kurtosis
 
-from skimu.utility import get_windowed_view
-from skimu.utility.math import *
+from skimu.utility.windowing import get_windowed_view
+from skimu.utility.math import (
+    moving_mean,
+    moving_sd,
+    moving_skewness,
+    moving_kurtosis,
+    moving_median,
+)
 
 
-class BaseTestRolling:
+class BaseMovingStatsTester:
+    function = staticmethod(lambda x: None)
+    truth_function = staticmethod(lambda x: None)
+    truth_kw = {}
+
     @pytest.mark.parametrize("skip", (1, 2, 7, 150, 300))
-    def test(self, skip):
-        """
-        Test various skips since there are different optimizations for different skip values
-        """
-        x = np.random.random(100000)
+    def test(self, skip, np_rng):
+        x = np_rng.random(2000)
         xw = get_windowed_view(x, 150, skip)
 
         if isinstance(self.truth_function, Iterable):
@@ -26,20 +32,17 @@ class BaseTestRolling:
             pred = self.function(x, 150, skip)
 
             for p, t in zip(pred, truth):
-                assert np.allclose(p, t)
+                assert allclose(p, t)
         else:
             truth = self.truth_function(xw, axis=-1, **self.truth_kw)
 
             pred = self.function(x, 150, skip)
 
-            assert np.allclose(pred, truth)
+            assert allclose(pred, truth)
 
     @pytest.mark.parametrize("skip", (1, 2, 7, 150, 300))
-    def test_2d(self, skip):
-        """
-        Test various skips since there are different optimizations for different skip values
-        """
-        x = np.random.random((100000, 3))
+    def test_2d(self, skip, np_rng):
+        x = np_rng.random((2000, 3))
         xw = get_windowed_view(x, 150, skip)
 
         if isinstance(self.truth_function, Iterable):
@@ -48,15 +51,18 @@ class BaseTestRolling:
                 truth.append(tf(xw, axis=1, **tkw))
 
             pred = self.function(x, 150, skip, axis=0)
+            pred1 = self.function(x, 150, skip, axis=0, return_previous=False)
 
             for p, t in zip(pred, truth):
-                assert np.allclose(p, t)
+                assert allclose(p, t)
+
+            assert allclose(pred1, truth[0])
         else:
             truth = self.truth_function(xw, axis=1, **self.truth_kw)
 
             pred = self.function(x, 150, skip, axis=0)
 
-            assert np.allclose(pred, truth)
+            assert allclose(pred, truth)
 
     @pytest.mark.parametrize(
         ("in_shape", "out_shape", "kwargs"),
@@ -67,8 +73,8 @@ class BaseTestRolling:
             ((3, 10, 3187), (3, 10, 3015), {"w_len": 173, "skip": 1, "axis": -1}),
         ),
     )
-    def test_in_out_shapes(self, in_shape, out_shape, kwargs):
-        x = np.random.random(in_shape)
+    def test_in_out_shapes(self, in_shape, out_shape, kwargs, np_rng):
+        x = np_rng.random(in_shape)
         pred = self.function(x, **kwargs)
 
         if isinstance(pred, tuple):
@@ -77,71 +83,74 @@ class BaseTestRolling:
         else:
             assert pred.shape == out_shape
 
-    def test_window_length_shape_error(self):
-        x = np.random.random((5, 10))
+    def test_window_length_shape_error(self, np_rng):
+        x = np_rng.random((5, 10))
 
         with pytest.raises(ValueError):
             self.function(x, 11, 1, axis=-1)
 
-    def test_negative_error(self):
-        x = np.random.random((100, 300))
-        for args in (-1, 10), (10, -1), (-5, -5):
-            with pytest.raises(ValueError):
-                self.function(x, *args, axis=-1)
+    @pytest.mark.parametrize("args", ((-1, 10), (10, -1), (-5, -5)))
+    def test_negative_error(self, args, np_rng):
+        x = np_rng.random((100, 300))
+
+        with pytest.raises(ValueError):
+            self.function(x, *args, axis=-1)
 
     @pytest.mark.segfault
-    @pytest.mark.parametrize("skip", (1, 2, 7, 150, 300))
-    def test_segfault(self, skip):
-        x = np.random.random(10000)
+    def test_segfault(self, np_rng):
+        x = np_rng.random(2000)
 
-        for i in range(1000):
-            pred = self.function(x, 150, skip)
+        for i in range(2000):
+            self.function(x, 150, 3)
+            self.function(x, 150, 151)
 
 
-class TestRollingMean(BaseTestRolling):
-    # need staticmethod so it doesn't think that self is the first argument
+class TestMovingMean(BaseMovingStatsTester):
     function = staticmethod(moving_mean)
-    truth_function = staticmethod(np.mean)
+    truth_function = staticmethod(mean)
     truth_kw = {}
 
 
-class TestRollingSD(BaseTestRolling):
+class TestMovingSD(BaseMovingStatsTester):
     function = staticmethod(moving_sd)
-    truth_function = (np.std, np.mean)
+    truth_function = (std, mean)
     truth_kw = ({"ddof": 1}, {})
 
 
-class TestRollingSkewness(BaseTestRolling):
+class TestMovingSkewness(BaseMovingStatsTester):
     function = staticmethod(moving_skewness)
-    truth_function = (skew, np.std, np.mean)
+    truth_function = (skew, std, mean)
     truth_kw = ({"bias": True}, {"ddof": 1}, {})
 
 
-class TestRollingKurtosis(BaseTestRolling):
+class TestMovingKurtosis(BaseMovingStatsTester):
     function = staticmethod(moving_kurtosis)
-    truth_function = (kurtosis, skew, np.std, np.mean)
+    truth_function = (kurtosis, skew, std, mean)
     truth_kw = (
         {"bias": True, "fisher": True, "nan_policy": "propagate"},
         {"bias": True},
         {"ddof": 1},
-        {},
+        {}
     )
 
 
-class TestRollingMedian(BaseTestRolling):
+class TestMovingMedian(BaseMovingStatsTester):
     function = staticmethod(moving_median)
-    truth_function = staticmethod(np.median)
+    truth_function = staticmethod(median)
     truth_kw = {}
 
     @pytest.mark.parametrize("skip", (1, 2, 7, 150, 300))
-    def test_pad(self, skip):
-        x = np.random.random(100000)
+    def test_pad(self, skip, np_rng):
+        x = np_rng.random(2000)
         xw = get_windowed_view(x, 150, skip)
 
         truth = self.truth_function(xw, axis=-1, **self.truth_kw)
         pred = self.function(x, 150, skip, pad=True)
+        pred1 = self.function(x, 150, skip, pad=999.)
 
-        N = (x.size - 150) // skip + 1
+        n = (x.size - 150) // skip + 1
 
-        assert np.allclose(pred[:N], truth)
-        assert np.all(np.isnan(pred[N:]))
+        assert allclose(pred[:n], truth)
+        assert all(isnan(pred[n:]))
+
+        assert allclose(pred1[n:], 999.)

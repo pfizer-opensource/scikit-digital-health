@@ -20,14 +20,17 @@ class DetailPower(Feature):
     Parameters
     ----------
     wavelet : str
-        Wavelet to use. Options are the discrete wavelets in `PyWavelets`. Default is 'coif4'
+        Wavelet to use. Options are the discrete wavelets in `PyWavelets`.
+        Default is 'coif4'.
     freq_band : array_like
-        2-element array-like of the frequency band (Hz) to get the power in. Default is [1, 3]
+        2-element array-like of the frequency band (Hz) to get the power in.
+        Default is [1, 3].
 
     References
     ----------
-    .. [1] Sekine, M. et al. "Classification of waist-acceleration signals in a continuous
-        walking record." Medical Engineering & Physics. Vol. 22. Pp 285-291. 2000.
+    .. [1] Sekine, M. et al. "Classification of waist-acceleration signals in a
+        continuous walking record." Medical Engineering & Physics. Vol. 22.
+        Pp 285-291. 2000.
     """
 
     __slots__ = ("wave", "f_band")
@@ -54,8 +57,8 @@ class DetailPower(Feature):
         fs : float, optional
             Sampling frequency in Hz. If not provided, default is 1.0Hz.
         axis : int, optional
-            Axis along which the signal entropy will be computed. Ignored if `signal` is a
-            pandas.DataFrame. Default is last (-1).
+            Axis along which the signal entropy will be computed. Ignored if
+            `signal` is a pandas.DataFrame. Default is last (-1).
 
         Returns
         -------
@@ -97,27 +100,33 @@ class DetailPower(Feature):
 
 class DetailPowerRatio(Feature):
     """
-    The ratio of the power in the detail signals that span the specified frequency band. Uses
-    the discrete wavelet transform to break down the signal into constituent components at
-    different frequencies.
+    The ratio of the power in the detail signals that span the specified
+    frequency band. Uses the discrete wavelet transform to break down the
+    signal into constituent components at different frequencies.
 
     Parameters
     ----------
     wavelet : str
-        Wavelet to use. Options are the discrete wavelets in `PyWavelets`. Default is 'coif4'
+        Wavelet to use. Options are the discrete wavelets in `PyWavelets`.
+        Default is 'coif4'.
     freq_band : array_like
-        2-element array-like of the frequency band (Hz) to get the power in. Default is [1, 10]
+        2-element array-like of the frequency band (Hz) to get the power in.
+        Default is [1, 10].
 
     Notes
     -----
-    In the original paper [1]_, the result is multiplied by 100 to obtain a percentage. This
-    final multiplication is not included in order to obtain results that have a scale that
-    closer matches the typical 0-1 (or -1 to 1) scale for machine learning features.
+    In the original paper [1]_, the result is multiplied by 100 to obtain a
+    percentage. This final multiplication is not included in order to obtain
+    results that have a scale that closer matches the typical 0-1 (or -1 to 1)
+    scale for machine learning features. NOTE that this does not mean that
+    the values will be in this range - since the scaling factor
+    is the original acceleration and not the wavelet detail values.
 
     References
     ----------
-    .. [1] Sekine, M. et al. "Classification of waist-acceleration signals in a continuous
-        walking record." Medical Engineering & Physics. Vol. 22. Pp 285-291. 2000.
+    .. [1] Sekine, M. et al. "Classification of waist-acceleration signals in a
+        continuous walking record." Medical Engineering & Physics. Vol. 22.
+        Pp 285-291. 2000.
     """
 
     __slots__ = ("wave", "f_band")
