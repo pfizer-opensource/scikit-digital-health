@@ -320,7 +320,7 @@ class Sleep(_BaseProcess):
 
             for i, start in enumerate(self.sleep_aux["start time"]):
                 new_stem = file_name.stem + f"_per_minute_predictions_day_{i}"
-                file_name.with_stem(new_stem)
+                rest_file = file_name.with_stem(new_stem)
 
                 tso = self.sleep_aux["tso indices"][i]
 
@@ -328,9 +328,9 @@ class Sleep(_BaseProcess):
                 df["Rest"] = self.sleep_aux["rest predictions"][i]
                 df["Time"] = date_range(start, periods=df.shape[0], freq="1T")
                 df["TSO"] = False
-                df["TSO"][tso[0]:tso[1]] = True
+                df.loc[tso[0]:tso[1], "TSO"] = True
 
-                df.to_csv(file_name, index=False)
+                df.to_csv(rest_file, index=False)
 
     def predict(
         self, time=None, accel=None, *, temperature=None, fs=None, wear=None, **kwargs
