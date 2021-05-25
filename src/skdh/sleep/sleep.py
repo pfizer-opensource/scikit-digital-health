@@ -13,6 +13,7 @@ from datetime import date as dt_date
 
 from numpy import mean, diff, array, nan, sum, arange, nonzero, full, int_
 from numpy.ma import masked_where
+from pandas import DataFrame, date_range
 import matplotlib
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.lines as mlines
@@ -102,11 +103,13 @@ class Sleep(_BaseProcess):
         Minimum number of hours required to consider a day useable. Default is 6 hours.
     downsample : bool, optional
         Downsample to 20Hz. Default is True.
-    day_window : array-like
+    day_window : array-like, optional
         Two (2) element array-like of the base and period of the window to use for determining
         days. Default is (12, 24), which will look for days starting at 12 noon and lasting 24
         hours. This should only be changed if the data coming in is from someone who sleeps
         during the day, in which case (0, 24) makes the most sense.
+    save_per_minute_results : bool, optional
+        Save minute-by-minute predictions of rest for each day. Default is False.
 
     Notes
     -----
@@ -131,7 +134,7 @@ class Sleep(_BaseProcess):
     .. [3] van Hees V, Sabia S, Anderson K, Denton S, Oliver J, Catt M, Abell J, Kivimaki M,
         Trenell M, Singh-Maoux A (2015). 'A Novel, Open Access Method to Assess Sleep Duration
         Using a Wrist-Worn Accelerometer.' PloS One, 10(11). doi: 10.1371/journal.pone.0142533,
-        http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0142533.
+        https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0142533.
     .. [4] Cole, R.J., Kripke, D.F., Gruen, W.'., Mullaney, D.J., & Gillin, J.C. (1992). Automatic
         sleep/wake identification from wrist activity. Sleep, 15 5, 461-9.
     .. [5] Bai J, Di C, Xiao L, Evenson KR, LaCroix AZ, Crainiceanu CM, et al. (2016) An Activity
@@ -175,6 +178,7 @@ class Sleep(_BaseProcess):
         min_day_hours=6,
         downsample=True,
         day_window=(12, 24),
+        save_per_minute_results=False,
     ):
         super().__init__(
             start_buffer=start_buffer,
@@ -191,6 +195,7 @@ class Sleep(_BaseProcess):
             min_day_hours=min_day_hours,
             downsample=downsample,
             day_window=day_window,
+            save_per_minute_results=save_per_minute_results
         )
 
         self.window_size = 60
@@ -208,6 +213,10 @@ class Sleep(_BaseProcess):
         self.min_wear_time = min_wear_time
         self.min_day_hrs = min_day_hours
         self.downsample = downsample
+        self.save_pm = save_per_minute_results
+
+        # for storing sleep auxiliary data
+        self.sleep_aux = None
 
         if day_window is None:
             self.day_key = (-1, -1)
@@ -279,6 +288,47 @@ class Sleep(_BaseProcess):
                 self._params.append(metrics)
             else:
                 raise ValueError(f"Metric {metrics!r} is not a `SleepMetric`.")
+
+    def save_results(self, results, file_name):
+        """
+        Save the results of the processing pipeline to a csv file. Will also
+        save per minute rest/sleep predictions if `save_per_minute_results` was
+        set to `True`. The file name for per minute results is the same as the
+        sleep endpoints file with "_per_minute_predictions_day_<n>" added to the end.
+
+        Parameters
+        ----------
+        results : dict
+            Dictionary of results from the output of predict
+        file_name : str
+            File name. Can be optionally formatted (see Notes)
+
+        Notes
+        -----
+        Available format variables available:
+
+        - date: todays date expressed in yyyymmdd format.
+        - name: process name.
+        - file: file name used in the pipeline, or "" if not found.
+        """
+        file_name = super().save_results(results, file_name)
+
+        if self.save_pm:
+            file_name = Path(file_name)
+
+            for i, start in enumerate(self.sleep_aux["start time"]):
+                new_stem = file_name.stem + f"_per_minute_predictions_day_{i}"
+                file_name.with_stem(new_stem)
+
+                tso = self.sleep_aux["tso indices"][i]
+
+                df = DataFrame(columns=["Time", "Rest", "TSO"])
+                df["Rest"] = self.sleep_aux["rest predictions"][i]
+                df["Time"] = date_range(start, periods=df.shape[0], freq="1T")
+                df["TSO"] = False
+                df["TSO"][tso[0]:tso[1]] = True
+
+                df.to_csv(file_name, index=False)
 
     def predict(
         self, time=None, accel=None, *, temperature=None, fs=None, wear=None, **kwargs
@@ -360,14 +410,21 @@ class Sleep(_BaseProcess):
                 "TSO Duration",
             ]
         }
-        # setup storage for sleep indices
-        sleep_idx = full((day_starts_ds.size, 2), -1, dtype=int_)
 
         # iterate over the parameters, initialize them, and put their names into sleep
         init_params = []
         for param in self._params:
             init_params.append(param())
             sleep[init_params[-1].name] = []
+
+        # sleep aux storage if saving per minute results
+        if self.save_pm:
+            self.sleep_aux = {
+                "start time": [], "rest predictions": [], "tso indices": []
+            }
+
+        # setup storage for sleep indices
+        sleep_idx = full((day_starts_ds.size, 2), -1, dtype=int_)
 
         # iterate over the days
         for iday, (start, stop) in enumerate(zip(day_starts_ds, day_stops_ds)):
@@ -439,6 +496,9 @@ class Sleep(_BaseProcess):
             pred_during_tso = predictions[tso_start:tso_stop]
             # run length encoding for sleep metrics
             sw_lengths, sw_starts, sw_vals = rle(pred_during_tso)
+
+            # save the sleep per minute results if desired
+            self._store_sleep_aux(start_datetime, predictions, tso_start, tso_stop)
 
             # set the sleep start and end values from the predictions indexed into original data
             to_start = int(tso_start * 60 * fs) + int(start * fs / goal_fs)
@@ -689,3 +749,12 @@ class Sleep(_BaseProcess):
                 pp.savefig(f)
 
             pp.close()
+
+    def _store_sleep_aux(self, start_dt, predictions, tso_start, tso_stop):
+        """
+        Store the sleep predictions if desired.
+        """
+        if self.save_pm:
+            self.sleep_aux["start time"].append(start_dt)
+            self.sleep_aux["rest predictions"].append(predictions)
+            self.sleep_aux["tso indices"].append([tso_start, tso_stop])
