@@ -91,9 +91,9 @@ def gait_classification_input_50():
     if cwd[-1] == "gait":
         path = Path("data/gait_input.npz")
     elif cwd[-1] == "test":
-        path = Path("read/data/gait_input.npz")
+        path = Path("gait/data/gait_input.npz")
     elif cwd[-1] == "scikit-imu":
-        path = Path("test/read/data/gait_input.npz")
+        path = Path("test/gait/data/gait_input.npz")
 
     data = load(path)
     t = data['time']
