@@ -3,7 +3,7 @@ from numpy import array, allclose, arange, pi, sin, cos, zeros, isclose
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt
 
-from skimu.sit2stand.detector import pad_moving_sd, get_stillness, Detector
+from skdh.sit2stand.detector import pad_moving_sd, get_stillness, Detector
 
 
 def test_pad_moving_sd():
@@ -73,7 +73,7 @@ class TestDetector:
         # 2 seconds, off due to detection of still periods, etc
         assert isclose(res['Duration'][0], 1.92, atol=5e-2)
         # large ranges due to random noise
-        assert isclose(res['Max. Accel.'][0], 14.2, atol=0.2)
+        assert isclose(res['Max. Accel.'][0], 14.2, atol=0.3)
         assert isclose(res['Min. Accel.'][0], 3.4, atol=0.2)
         assert isclose(res['SPARC'][0], -1.9, atol=0.2)
         # this is off so much because of synthetic data

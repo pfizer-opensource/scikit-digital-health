@@ -1,7 +1,7 @@
 import numpy as np
 
-from skimu.sleep.utility import rle
-from skimu.sleep.endpoints import *
+from skdh.sleep.utility import rle
+from skdh.sleep.endpoints import *
 
 
 class _BaseTestEndpoint:

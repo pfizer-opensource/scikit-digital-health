@@ -1,7 +1,7 @@
 import pytest
 from numpy import isclose, allclose
 
-from skimu.activity.cutpoints import (
+from skdh.activity.cutpoints import (
     get_available_cutpoints,
     get_level_thresholds,
     _base_cutpoints,

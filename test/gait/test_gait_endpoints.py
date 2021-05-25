@@ -1,7 +1,7 @@
 import pytest
 from numpy import allclose, isclose, zeros, arange, sin, pi, nan, array, sqrt, isnan
 
-from skimu.gait.gait_endpoints.gait_endpoints import (
+from skdh.gait.gait_endpoints.gait_endpoints import (
     _autocovariancefn,
     StrideTime,
     StanceTime,

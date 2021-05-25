@@ -1,2 +1,2 @@
-.. automodule:: skimu.features
+.. automodule:: skdh.features
     :ignore-module-all:

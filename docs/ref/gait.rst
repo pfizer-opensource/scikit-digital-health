@@ -1,2 +1,2 @@
-.. automodule:: skimu.gait
+.. automodule:: skdh.gait
     :ignore-module-all:

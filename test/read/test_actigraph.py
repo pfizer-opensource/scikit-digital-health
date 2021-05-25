@@ -1,7 +1,7 @@
 import pytest
 from numpy import allclose, ndarray
 
-from skimu.read import ReadGT3X
+from skdh.read import ReadGT3X
 
 
 class TestReadGt3x:

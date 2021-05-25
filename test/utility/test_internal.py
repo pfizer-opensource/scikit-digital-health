@@ -1,7 +1,7 @@
 import pytest
 from numpy import allclose, array, arange
 
-from skimu.utility.internal import get_day_index_intersection, apply_downsample, rle
+from skdh.utility.internal import get_day_index_intersection, apply_downsample, rle
 
 
 class TestGetDayIndexIntersection:

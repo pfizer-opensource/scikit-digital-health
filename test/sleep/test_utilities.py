@@ -6,9 +6,9 @@ Pfizer DMTI 2021
 """
 import numpy as np
 
-from skimu.utility import moving_median
-from skimu.sleep.utility import *
-from skimu.sleep.utility import get_weartime
+from skdh.utility import moving_median
+from skdh.sleep.utility import *
+from skdh.sleep.utility import get_weartime
 
 
 class TestGetWearTime:

@@ -1,7 +1,7 @@
 import pytest
 from numpy import allclose
 
-from skimu.preprocessing.wear_detection import DetectWear, _modify_wear_times
+from skdh.preprocessing.wear_detection import DetectWear, _modify_wear_times
 
 
 class TestWearDetection:

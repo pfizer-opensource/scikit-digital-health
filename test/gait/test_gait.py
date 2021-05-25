@@ -1,8 +1,8 @@
 import pytest
 from numpy import allclose, array
 
-from skimu.gait.gait import Gait, LowFrequencyError
-from skimu.gait import gait_endpoints
+from skdh.gait.gait import Gait, LowFrequencyError
+from skdh.gait import gait_endpoints
 
 
 class TestGait:

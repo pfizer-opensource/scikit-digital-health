@@ -1,6 +1,6 @@
 import pytest
 
-from skimu.base import _BaseProcess
+from skdh.base import _BaseProcess
 
 
 @pytest.fixture(scope="module")

@@ -1,10 +1,10 @@
 .. _devindex:
 
 ##########################
-Contributing to scikit-IMU
+Contributing to scikit-digital-health
 ##########################
 
-Contributing to ``scikit-imu`` is fairly straightforward, and the process is laid out below.  Much of the guidelines borrow from and are very similar to ``NumPy's`` guidelines.
+Contributing to ``scikit-digital-health`` is fairly straightforward, and the process is laid out below.  Much of the guidelines borrow from and are very similar to ``NumPy's`` guidelines.
 
 Development process - summary
 =============================
@@ -13,22 +13,22 @@ This is the short summary, complete descriptions are below:
 
 1. If you are contributing for the first time:
 
-    * Go to https://github.com/PfizerRD/scikit-imu and use the "fork" button to create a version that will create a copy for yourself.
+    * Go to https://github.com/PfizerRD/scikit-digital-health and use the "fork" button to create a version that will create a copy for yourself.
     * Clone the project to your local computer::
 
-        git clone https://github.com/your-username/scikit-imu.git
+        git clone https://github.com/your-username/scikit-digital-health.git
     
     * Change the directory::
 
-        cd scikit-imu
+        cd scikit-digital-health
     
     * Add the upstream repository::
 
-        git remote add upstream https://github.com/PfizerRD/scikit-imu.git
+        git remote add upstream https://github.com/PfizerRD/scikit-digital-health.git
     
     * After adding the upstream repository, `git remote -v` will show two remote repositories:
 
-        - ``upstream``, the `scikit-imu` repository
+        - ``upstream``, the `scikit-digital-health` repository
         - ``origin``: your personal fork
 
 2. Add your contribution:
@@ -113,7 +113,7 @@ Tests should provide 100% coverage in an ideal case. Coverage can be measured by
 
     coverage run -m pytest && coverage html
 
-from the top-level ``scikit-imu`` folder. This will generate html documents in ``coverage/`` which can easily be explored to find statements that are not covered:
+from the top-level ``scikit-digital-health`` folder. This will generate html documents in ``coverage/`` which can easily be explored to find statements that are not covered:
 
 .. code:: sh
 
@@ -130,7 +130,7 @@ To build the html documentation:
 
     make html 
 
-HTML files will be generated in ``docs/_build/html/``. Since the documentation is based on docstrings, the correct version of ``scikit-imu`` must be installed in the current environment used to run sphinx.
+HTML files will be generated in ``docs/_build/html/``. Since the documentation is based on docstrings, the correct version of ``scikit-digital-health`` must be installed in the current environment used to run sphinx.
 
 Additional requirements for building the docs are listed in ``doc_requirements.txt``
 

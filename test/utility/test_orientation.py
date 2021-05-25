@@ -1,7 +1,7 @@
 import pytest
 from numpy import abs, mean, allclose
 
-from skimu.utility.orientation import correct_accelerometer_orientation
+from skdh.utility.orientation import correct_accelerometer_orientation
 
 
 class TestCorrectAccelerometerOrientation:

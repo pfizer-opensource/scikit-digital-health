@@ -1,7 +1,7 @@
 import pytest
 from numpy import isclose, allclose
 
-from skimu.sit2stand import Sit2Stand
+from skdh.sit2stand import Sit2Stand
 
 
 class TestSit2Stand:
