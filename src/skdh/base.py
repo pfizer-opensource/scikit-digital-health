@@ -154,6 +154,8 @@ class _BaseProcess:
 
         DataFrame(results).to_csv(file_name, index=False)
 
+        return file_name
+
     def _setup_plotting(self, save_name):
         """
         Setup plotting. If this needs to be available to the end user, it should be aliased as
