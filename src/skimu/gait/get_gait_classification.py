@@ -6,7 +6,7 @@ Pfizer DMTI 2020
 """
 from sys import version_info
 
-from numpy import ndarray, array, where, diff, insert, append, ascontiguousarray, int_
+from numpy import isclose, where, diff, insert, append, ascontiguousarray, int_
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt
 import lightgbm as lgb
@@ -53,6 +53,8 @@ def get_gait_classification_lgbm(gait_starts, gait_stops, accel, fs):
     if gait_starts is not None and gait_stops is not None:
         return gait_starts, gait_stops
     else:
+        if not isclose(fs, 50.) or not isclose(fs, 20.):
+            raise ValueError("fs must be either 50hz or 20hz.")
         suffix = "50hz" if fs == 50.0 else "20hz"
 
         wlen = int(fs * 3)  # window length, 3 seconds
