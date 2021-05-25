@@ -245,6 +245,8 @@ class Sleep(_BaseProcess):
         - name: process name.
         - file: file name used in the pipeline, or "" if not found.
         """
+        if save_file is None:
+            return
         # move this inside here so that it doesnt effect everything on load
         if gettrace() is None:  # only set if not debugging
             matplotlib.use(
