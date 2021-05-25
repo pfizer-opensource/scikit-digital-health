@@ -1,5 +1,9 @@
+from pathlib import Path
+
 from pytest import fixture
-from numpy import array, zeros, arange, sin, pi
+from numpy import array, zeros, arange, sin, pi, load
+
+from skimu.utility.internal import apply_downsample
 
 
 @fixture
@@ -78,3 +82,23 @@ def get_bgait_samples_truth():  # boolean gait classification
         return starts, stops, time, n_max_sep * dt, n_min_time * dt, bouts
 
     return get_stuff
+
+
+@fixture
+def gait_classification_input_50():
+    cwd = Path.cwd().parts
+
+    if cwd[-1] == "gait":
+        path = Path("data/gait_input.npz")
+    elif cwd[-1] == "test":
+        path = Path("read/data/gait_input.npz")
+    elif cwd[-1] == "scikit-imu":
+        path = Path("test/read/data/gait_input.npz")
+
+    data = load(path)
+    t = data['time']
+    acc = data['accel']
+
+    t50, (acc50,) = apply_downsample(50., t, (acc,), ())
+
+    return t50, acc50
