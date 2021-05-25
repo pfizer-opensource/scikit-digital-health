@@ -1,7 +1,7 @@
 import pytest
 from numpy import allclose, ndarray
 
-from skimu.read import ReadCWA
+from skdh.read import ReadCWA
 
 
 class TestReadCwa:

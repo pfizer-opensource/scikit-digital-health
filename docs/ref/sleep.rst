@@ -1,2 +1,2 @@
-.. automodule:: skimu.sleep
+.. automodule:: skdh.sleep
     :ignore-module-all:

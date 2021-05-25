@@ -3,7 +3,7 @@ from pathlib import Path
 from pytest import fixture
 from numpy import array, zeros, arange, sin, pi, load
 
-from skimu.utility.internal import apply_downsample
+from skdh.utility.internal import apply_downsample
 
 
 @fixture

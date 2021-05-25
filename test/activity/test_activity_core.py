@@ -3,8 +3,8 @@ import datetime as dt
 import pytest
 from numpy import array, allclose
 
-from skimu.activity.cutpoints import _base_cutpoints
-from skimu.activity.core import (
+from skdh.activity.cutpoints import _base_cutpoints
+from skdh.activity.core import (
     _update_date_results,
     ActivityLevelClassification,
     get_activity_bouts,

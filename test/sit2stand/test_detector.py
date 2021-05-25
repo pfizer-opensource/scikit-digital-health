@@ -3,7 +3,7 @@ from numpy import array, allclose, arange, pi, sin, cos, zeros, isclose
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt
 
-from skimu.sit2stand.detector import pad_moving_sd, get_stillness, Detector
+from skdh.sit2stand.detector import pad_moving_sd, get_stillness, Detector
 
 
 def test_pad_moving_sd():

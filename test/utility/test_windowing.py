@@ -1,7 +1,7 @@
 import pytest
 from numpy import asfortranarray
 
-from skimu.utility.windowing import (
+from skdh.utility.windowing import (
     DimensionError,
     ContiguityError,
     compute_window_samples,

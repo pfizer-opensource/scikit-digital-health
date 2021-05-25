@@ -1,4 +1,4 @@
-.. _skimu api reference
+.. _skdh api reference
 
 API Reference
 =============
@@ -6,7 +6,7 @@ API Reference
 .. toctree::
     :maxdepth: 2
 
-    skimu
+    skdh
     read
     preprocessing
     features

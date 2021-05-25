@@ -9,7 +9,7 @@ Documentation should be fairly simple as long as the class/function docstrings a
 Style guidelines
 ----------------
 
-* ``scikit-imu`` uses `NumPy Docstrings <https://numpydoc.readthedocs.io/en/latest/format.html>`_
+* ``scikit-digital-health`` uses `NumPy Docstrings <https://numpydoc.readthedocs.io/en/latest/format.html>`_
 
 Adding documentation
 --------------------
@@ -21,12 +21,12 @@ Documentation of the your new module occurs almost fully in the ``__init__.py`` 
 
 .. code::python
 
-    # src/skimu/preprocessing/__init__.py
+    # src/skdh/preprocessing/__init__.py
     """
-    IMU Preprocessing (:mod:`skimu.preprocessing`)
+    IMU Preprocessing (:mod:`skdh.preprocessing`)
     ==============================================
 
-    .. currentmodule:: skimu.preprocessing
+    .. currentmodule:: skdh.preprocessing
 
     Inertial sensor preprocessing
     -----------------------------
@@ -40,9 +40,9 @@ Documentation of the your new module occurs almost fully in the ``__init__.py`` 
     ----------
     content
     """
-    from skimu.preprocessing.preprocessing import Preprocessing
+    from skdh.preprocessing.preprocessing import Preprocessing
 
-The docstring is written like a `.rst` header file (which is how it will get interpreted). For an example in `skimu`, see the `gait init file <src/skimu/gait/__init__.py>`_.  For an example of a good module documentation from NumPY, see the `FFT <https://numpy.org/doc/stable/reference/routines.fft.html>`_ page.
+The docstring is written like a `.rst` header file (which is how it will get interpreted). For an example in `skdh`, see the `gait init file <src/skdh/gait/__init__.py>`_.  For an example of a good module documentation from NumPY, see the `FFT <https://numpy.org/doc/stable/reference/routines.fft.html>`_ page.
 
 With this documentation written, the last thing is to add a short `.rst` file inside the actual documentation folder, which will instruct `sphinx` to read the documentation for this module:
 
@@ -50,7 +50,7 @@ With this documentation written, the last thing is to add a short `.rst` file in
 
     .. _this_file: docs/ref/preprocessing.rst
 
-    .. automodule:: skimu.preprocessing
+    .. automodule:: skdh.preprocessing
         :ignore-module-all:
 
 Then add this new file to ``docs/ref/index.rst``:
@@ -58,7 +58,7 @@ Then add this new file to ``docs/ref/index.rst``:
 .. code:: rst
 
     .. _this_file: docs/ref/index.rst
-    .. _skimu api reference
+    .. _skdh api reference
 
     API Reference
     =============

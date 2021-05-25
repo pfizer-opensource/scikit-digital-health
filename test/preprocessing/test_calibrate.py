@@ -3,7 +3,7 @@ import pytest
 from numpy import around, mean, abs, arange, array, zeros, allclose
 from numpy.linalg import norm
 
-from skimu.preprocessing import CalibrateAccelerometer
+from skdh.preprocessing import CalibrateAccelerometer
 
 
 class TestCalibrateAccelerometer:

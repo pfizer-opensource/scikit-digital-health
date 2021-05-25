@@ -4,15 +4,15 @@
 Adding modules
 ##############
 
-The goal of ``scikit-imu`` is to have one package with a defined structure that allows for easy pipeline generaton with multiple stages that may or may not depend on previous stages. 
+The goal of ``scikit-digital-health`` is to have one package with a defined structure that allows for easy pipeline generaton with multiple stages that may or may not depend on previous stages.
 To that end, there are several pre-defined base classes intended to be sub-classeed that will help setting up modules that are intended to directly interface with the pipeline infrastructure.
 
 Add a new module
 ================
 
-1. Create a new module directory under ``src/skimu`` with the desired name. For this example, we will use ``preprocessing``::
+1. Create a new module directory under ``src/skdh`` with the desired name. For this example, we will use ``preprocessing``::
 
-    cd src/skimu
+    cd src/skdh
     mkdir preprocessing
     touch preprocessing/__init__.py
 
@@ -24,10 +24,10 @@ Add a new module
 
     .. code:: python
 
-        # src/skimu/preprocessing/preprocessing.py
+        # src/skdh/preprocessing/preprocessing.py
         import ... 
 
-        from skimu.base import _BaseProcess  # import the base process class
+        from skdh.base import _BaseProcess  # import the base process class
 
 
         class Preprocessing(_BaseProcess):
@@ -120,7 +120,7 @@ Add a new module
 
 4. Make sure everyting is setup/imported
 
-    * make sure all importes are handled in ``scr/skimu/preprocessing/__init__.py``, as well as adding ``preprocessing`` to ``src/skimu/__init__.py``
+    * make sure all importes are handled in ``scr/skdh/preprocessing/__init__.py``, as well as adding ``preprocessing`` to ``src/skdh/__init__.py``
 
 5. Make any additions to ``setup.py``
 
@@ -136,16 +136,16 @@ Add a new module
         # DATA FILES
         # ========================
         config.add_data_files(
-            ('skimu/gait/model', 'src/skimu/gait/model/final_features.json'),
-            ('skimu/gait/model', 'src/skimu/gait/model/lgbm_gait_classifier_no-stairs.lgbm'),
-            ('skimu/preprocessing/data', 'src/skimu/preprocessing/data/preprocessing_info.dat')        # Added this file
+            ('skdh/gait/model', 'src/skdh/gait/model/final_features.json'),
+            ('skdh/gait/model', 'src/skdh/gait/model/lgbm_gait_classifier_no-stairs.lgbm'),
+            ('skdh/preprocessing/data', 'src/skdh/preprocessing/data/preprocessing_info.dat')        # Added this file
         )
 
         # alternatively add this directory, any files/folders under this directory will be added recursively
-        config.add_data_dir('src/skimu/preprocessing/data')
+        config.add_data_dir('src/skdh/preprocessing/data')
         # ========================
 
-        config.get_version('src/skimu/version.py')
+        config.get_version('src/skdh/version.py')
 
         return config
     
@@ -163,14 +163,14 @@ Add a new module
             # built as a fortran function that will be imported into C code
             config.add_library(
                 'fcwa_convert', 
-                sources='src/skimu/read/_extensions/cwa_convert.f95'
+                sources='src/skdh/read/_extensions/cwa_convert.f95'
             )
 
             # C code that contains the necessary CPython API calls to allow it to 
             # be imported and used in python
             config.add_extension(
-                'skimu/read/_extensions/cwa_convert',  # note the path WITHOUT src/
-                sources='src/skimu/read/_extensions/cwa_convert.c',  # note the path WITH src/
+                'skdh/read/_extensions/cwa_convert',  # note the path WITHOUT src/
+                sources='src/skdh/read/_extensions/cwa_convert.c',  # note the path WITH src/
                 libraries=['fcwa_convert']  # link the previously built fortran library
             )
 
@@ -178,8 +178,8 @@ Add a new module
             # Adding a Fortran extension follows the same syntax 
             # (numpy will do the heavy lifting for whatever compilation is required)
             config.add_extension(
-                'skimu/read/_extensions/bin_convert',
-                sources='src/skimu/read/_extensions/bin_convert.c'
+                'skdh/read/_extensions/bin_convert',
+                sources='src/skdh/read/_extensions/bin_convert.c'
             )
 
             # dealing with Cython extensions. 

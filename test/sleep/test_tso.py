@@ -1,6 +1,6 @@
 import numpy as np
 
-from skimu.sleep.tso import get_total_sleep_opportunity
+from skdh.sleep.tso import get_total_sleep_opportunity
 
 
 class TestDetectTSO:

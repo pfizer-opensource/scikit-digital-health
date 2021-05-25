@@ -1,7 +1,7 @@
 import pytest
 from numpy import zeros, allclose, isclose, sqrt, diff, sum, std, abs
 
-from skimu.features.lib import (
+from skdh.features.lib import (
     Mean,
     MeanCrossRate,
     StdDev,

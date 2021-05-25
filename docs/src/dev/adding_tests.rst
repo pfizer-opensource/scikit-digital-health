@@ -11,7 +11,7 @@ Tests are written with `PyTest <https://docs.pytest.org/en/stable/>`_, and cover
 Adding tests for a new module
 -----------------------------
 
-In order to make sure that any tests are run on installed versions of ``scikit-imu``, the test directory is outside the ``src`` directory. Again, convenient base process testing classes are available to make setting up the basic testing easy and quick.
+In order to make sure that any tests are run on installed versions of ``scikit-digital-health``, the test directory is outside the ``src`` directory. Again, convenient base process testing classes are available to make setting up the basic testing easy and quick.
 
 1. Create a new directory for your new module under the ``test/`` directory.
 
@@ -19,7 +19,7 @@ In order to make sure that any tests are run on installed versions of ``scikit-i
     * Add the test file, eg ``test_preprocessing.py`` for this example.
     * Add a ``conftest.py`` file if desired::
 
-        scikit-imu
+        scikit-digital-health
         ├── src
         ├── test
         │   └──preprocessing
@@ -38,7 +38,7 @@ In order to make sure that any tests are run on installed versions of ``scikit-i
     # tests run in multiple locations
     from ..base_conftest import *
 
-    from skimu.preprocessing import Preprocessing
+    from skdh.preprocessing import Preprocessing
 
     class TestPreprocessing(BaseProcessTester):
         @classmethod

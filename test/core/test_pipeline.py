@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from skimu.pipeline import Pipeline, NotAProcessError, ProcessNotFoundError
-from skimu.gait import Gait
+from skdh.pipeline import Pipeline, NotAProcessError, ProcessNotFoundError
+from skdh.gait import Gait
 
 
 class TestPipeline:
@@ -68,7 +68,7 @@ class TestPipeline:
 
         tp = testprocess(kw1=2)
         # overwrite this for saving
-        tp.__class__.__module__ = "skimu.test.testmodule"
+        tp.__class__.__module__ = "skdh.test.testmodule"
 
         p.add(tp)
 

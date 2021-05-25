@@ -3,7 +3,7 @@ from pathlib import Path
 
 from numpy import array, allclose
 
-from skimu.base import _BaseProcess
+from skdh.base import _BaseProcess
 
 
 class Test_BaseProcess:

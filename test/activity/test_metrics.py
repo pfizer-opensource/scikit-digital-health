@@ -1,6 +1,6 @@
 from numpy import allclose, sort, abs, mean, cos, pi, arange
 
-from skimu.activity.metrics import (
+from skdh.activity.metrics import (
     metric_anglez,
     metric_en,
     metric_enmo,

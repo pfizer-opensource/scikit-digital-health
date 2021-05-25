@@ -16,15 +16,15 @@
 
 # -- Project information -----------------------------------------------------
 
-project = "SciKit-IMU"
-copyright = "2020, Pfizer DMTI Data Science"
+project = "SciKit-Digital-Health"
+copyright = "2021, Pfizer DMTI Data Science"
 author = "Pfizer DMTI Data Science"
 
-import skimu
+import skdh
 
-version = skimu.__version__[:3]
+version = skdh.__version__[:3]
 # The full version, including alpha/beta/rc tags
-release = skimu.__version__
+release = skdh.__version__
 
 # -- General configuration ---------------------------------------------------
 

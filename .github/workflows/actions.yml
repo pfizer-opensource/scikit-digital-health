@@ -1,4 +1,4 @@
-name: skimu
+name: skdh
 
 on:
   pull_request:
@@ -39,13 +39,13 @@ jobs:
       shell: bash
     - name: Install libzip and GSL
       run: sudo apt-get install libzip-dev gsl-bin libgsl0-dev -y
-    - name: Install skimu
+    - name: Install skdh
       run: |
         # if macOS, make sure to set the environment variables so that it can find gfortran-9
         # if [ "$RUNNER_OS" == "macOS" ]; then
         #   export F90=gfortran-9
         # fi
-        # install scikit-imu
+        # install scikit-dh
         pip install .
       shell: bash
     - name: Lint with flake8

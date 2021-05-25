@@ -218,16 +218,16 @@ def configuration(parent_package="", top_path=None):
     config.add_include_dirs(sysconfig.get_path("data") + os.sep + "include")
     # UTILITY
     config.add_library(
-        "fmoving_moments", sources="src/skimu/utility/_extensions/moving_moments.f95"
+        "fmoving_moments", sources="src/skdh/utility/_extensions/moving_moments.f95"
     )
     config.add_extension(
-        "skimu/utility/_extensions/moving_moments",
-        sources="src/skimu/utility/_extensions/moving_moments.c",
+        "skdh/utility/_extensions/moving_moments",
+        sources="src/skdh/utility/_extensions/moving_moments.c",
         libraries=["fmoving_moments"]
     )
     config.add_extension(
-        "skimu/utility/_extensions/moving_median",
-        sources="src/skimu/utility/_extensions/moving_median.c",
+        "skdh/utility/_extensions/moving_median",
+        sources="src/skdh/utility/_extensions/moving_median.c",
         libraries=["gsl"]
     )
     # Read library
@@ -235,22 +235,22 @@ def configuration(parent_package="", top_path=None):
         "read",
         sources=[
             # utility HAS to be first so that read_axivity can use the module it compiles
-            "src/skimu/read/_extensions/utility.f95",
-            "src/skimu/read/_extensions/read_axivity.f95",
-            "src/skimu/read/_extensions/read_geneactiv.c",
+            "src/skdh/read/_extensions/utility.f95",
+            "src/skdh/read/_extensions/read_axivity.f95",
+            "src/skdh/read/_extensions/read_geneactiv.c",
         ]
     )
     config.add_extension(
-        "skimu/read/_extensions/read",
-        sources="src/skimu/read/_extensions/pyread.c",
+        "skdh/read/_extensions/read",
+        sources="src/skdh/read/_extensions/pyread.c",
         libraries=["read"],
     )
 
     # gt3x (actigraph)  needs its own library for some reason
-    config.add_library("gt3x", sources="src/skimu/read/_extensions/gt3x.c")
+    config.add_library("gt3x", sources="src/skdh/read/_extensions/gt3x.c")
     config.add_extension(
-        "skimu/read/_extensions/gt3x_convert",
-        sources=["src/skimu/read/_extensions/pygt3x_convert.c"],
+        "skdh/read/_extensions/gt3x_convert",
+        sources=["src/skdh/read/_extensions/pygt3x_convert.c"],
         libraries=["gt3x", "zip"]
     )
 
@@ -258,11 +258,11 @@ def configuration(parent_package="", top_path=None):
     config.add_library(
         "ffeatures",
         sources=[
-            "src/skimu/features/lib/extensions/ffeatures.f95",
-            "src/skimu/features/lib/extensions/real_fft.f95",
-            "src/skimu/features/lib/extensions/f_rfft.f95",
-            "src/skimu/features/lib/extensions/sort.f95",
-            "src/skimu/features/lib/extensions/utility.f95",
+            "src/skdh/features/lib/extensions/ffeatures.f95",
+            "src/skdh/features/lib/extensions/real_fft.f95",
+            "src/skdh/features/lib/extensions/f_rfft.f95",
+            "src/skdh/features/lib/extensions/sort.f95",
+            "src/skdh/features/lib/extensions/utility.f95",
         ]
     )
     for ext in [
@@ -274,8 +274,8 @@ def configuration(parent_package="", top_path=None):
         "_utility"
     ]:
         config.add_extension(
-            f"skimu/features/lib/extensions/{ext}",
-            sources=[f"src/skimu/features/lib/extensions/{ext}.c"],
+            f"skdh/features/lib/extensions/{ext}",
+            sources=[f"src/skdh/features/lib/extensions/{ext}.c"],
             libraries=["ffeatures"]
         )
 
@@ -283,19 +283,19 @@ def configuration(parent_package="", top_path=None):
     # DATA FILES
     # ========================
     config.add_data_files(
-        ("skimu/gait/model", "src/skimu/gait/model/final_features.json"),
+        ("skdh/gait/model", "src/skdh/gait/model/final_features.json"),
         (
-            "skimu/gait/model",
-            "src/skimu/gait/model/lgbm_gait_classifier_no-stairs_50hz.lgbm",
+            "skdh/gait/model",
+            "src/skdh/gait/model/lgbm_gait_classifier_no-stairs_50hz.lgbm",
         ),
         (
-            "skimu/gait/model",
-            "src/skimu/gait/model/lgbm_gait_classifier_no-stairs_20hz.lgbm",
+            "skdh/gait/model",
+            "src/skdh/gait/model/lgbm_gait_classifier_no-stairs_20hz.lgbm",
         )
     )
     # ========================
 
-    config.get_version("src/skimu/version.py")
+    config.get_version("src/skdh/version.py")
 
     return config
 
@@ -305,7 +305,7 @@ def setup_package():
 
     with open("README.md", "r") as fh:
         long_description = fh.read()
-    with open("src/skimu/version.py") as fid:
+    with open("src/skdh/version.py") as fid:
         vers = fid.readlines()[-1].split()[-1].strip("\"'")
 
     setup_kwargs = dict(
@@ -315,7 +315,7 @@ def setup_package():
         description="Python general purpose IMU data processing package.",
         long_description=long_description,
         long_description_content_type="text/markdown",
-        # download_url="https:/pypi.org/skimu",  # download link, likely PyPi
+        # download_url="https:/pypi.org/skdh",  # download link, likely PyPi
         # project_urls={
         #     "Documentation": "https://skimu.readthedocs.io./en/latest/"
         # },

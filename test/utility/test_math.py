@@ -4,8 +4,8 @@ import pytest
 from numpy import allclose, mean, std, median, all, isnan
 from scipy.stats import skew, kurtosis
 
-from skimu.utility.windowing import get_windowed_view
-from skimu.utility.math import (
+from skdh.utility.windowing import get_windowed_view
+from skdh.utility.math import (
     moving_mean,
     moving_sd,
     moving_skewness,

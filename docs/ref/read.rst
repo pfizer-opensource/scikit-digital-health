@@ -1,2 +1,2 @@
-.. automodule:: skimu.read
+.. automodule:: skdh.read
     :ignore-module-all:

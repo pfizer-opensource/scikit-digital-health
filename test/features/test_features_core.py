@@ -1,7 +1,7 @@
 import pytest
 from pandas import DataFrame
 
-from skimu.features.core import (
+from skdh.features.core import (
     get_n_feats,
     partial_index_check,
     normalize_indices,
@@ -10,7 +10,7 @@ from skimu.features.core import (
     Feature,
     ArrayConversionError,
 )
-from skimu.features.lib.moments import Mean, StdDev, Skewness, Kurtosis
+from skdh.features.lib.moments import Mean, StdDev, Skewness, Kurtosis
 
 
 @pytest.mark.parametrize(

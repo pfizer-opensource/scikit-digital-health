@@ -1,15 +1,15 @@
-.. _skimu documentation master file, created by
+.. _skdh documentation master file, created by
    sphinx-quickstart on Tue Oct  6 14:50:59 2020.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to SciKit-IMU's documentation!
+Welcome to SciKit-Digital-Health's documentation!
 ======================================
 
-.. image:: https://github.com/PfizerRD/scikit-imu/workflows/skimu/badge.svg
+.. image:: https://github.com/PfizerRD/scikit-digital-health/workflows/skdh/badge.svg
    :alt: GitHub Actions Badge
 
-`SciKit-IMU` is a Python package with methods for reading, pre-processing, manipulating, and analyzing Inertial Meausurement Unit data. `scikit-imu` contains the following sub-modules:
+`SciKit-Digital-Health` is a Python package with methods for reading, pre-processing, manipulating, and analyzing Inertial Meausurement Unit data. `scikit-digital-health` contains the following sub-modules:
 
 sit2stand
 ---------

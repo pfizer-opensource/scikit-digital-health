@@ -1,7 +1,7 @@
 import pytest
 from numpy import allclose, ndarray
 
-from skimu.read import ReadBin
+from skdh.read import ReadBin
 
 
 class TestReadBin:
