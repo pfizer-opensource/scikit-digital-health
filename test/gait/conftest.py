@@ -92,7 +92,7 @@ def gait_input_50():
         path = Path("data/gait_input.npz")
     elif cwd[-1] == "test":
         path = Path("gait/data/gait_input.npz")
-    elif cwd[-1] == "scikit-imu":
+    elif cwd[-1] == "scikit-digital-health":
         path = Path("test/gait/data/gait_input.npz")
 
     data = load(path)
@@ -112,7 +112,7 @@ def gait_res_50():
         path = Path("data/gait_results.npz")
     elif cwd[-1] == "test":
         path = Path("gait/data/gait_results.npz")
-    elif cwd[-1] == "scikit-imu":
+    elif cwd[-1] == "scikit-digital-health":
         path = Path("test/gait/data/gait_results.npz")
 
     return load(path)

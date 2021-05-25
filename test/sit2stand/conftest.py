@@ -22,7 +22,7 @@ def s2s_input():
         path = Path("data/s2s_input_data.npz")
     elif cwd[-1] == "test":
         path = Path("sit2stand/data/s2s_input_data.npz")
-    elif cwd[-1] == "scikit-imu":
+    elif cwd[-1] == "scikit-digital-health":
         path = Path("test/sit2stand/data/s2s_input_data.npz")
 
     return load(path, allow_pickle=False)
@@ -36,7 +36,7 @@ def stillness_truth():
         path = "data/s2s_stillness_results.npz"
     elif cwd[-1] == "test":
         path = "sit2stand/data/s2s_stillness_results.npz"
-    elif cwd[-1] == "scikit-imu":
+    elif cwd[-1] == "scikit-digital-health":
         path = "test/sit2stand/data/s2s_stillness_results.npz"
 
     data = load(path, allow_pickle=False)
@@ -52,7 +52,7 @@ def displacement_truth():
         path = "data/s2s_displacement_results.npz"
     elif cwd[-1] == "test":
         path = "sit2stand/data/s2s_displacement_results.npz"
-    elif cwd[-1] == "scikit-imu":
+    elif cwd[-1] == "scikit-digital-health":
         path = "test/sit2stand/data/s2s_displacement_results.npz"
 
     data = load(path, allow_pickle=False)

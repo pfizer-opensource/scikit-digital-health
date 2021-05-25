@@ -309,7 +309,7 @@ def setup_package():
         vers = fid.readlines()[-1].split()[-1].strip("\"'")
 
     setup_kwargs = dict(
-        name="scikit-imu",
+        name="scikit-digital-health",
         maintainer=MAINTAINERS,
         maintainer_email=MAINTAINER_EMAILS,
         description="Python general purpose IMU data processing package.",

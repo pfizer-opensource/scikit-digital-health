@@ -12,7 +12,7 @@ def gnactv_file():
         return Path("data/gnactv_sample.bin")
     elif cwd[-1] == "test":
         return Path("read/data/gnactv_sample.bin")
-    elif cwd[-1] == "scikit-imu":
+    elif cwd[-1] == "scikit-digital-health":
         return Path("test/read/data/gnactv_sample.bin")
 
 
@@ -24,7 +24,7 @@ def gnactv_truth():
         path = "data/gnactv_data.npz"
     elif cwd[-1] == "test":
         path = "read/data/gnactv_data.npz"
-    elif cwd[-1] == "scikit-imu":
+    elif cwd[-1] == "scikit-digital-health":
         path = "test/read/data/gnactv_data.npz"
 
     dat = load(path, allow_pickle=False)
@@ -45,7 +45,7 @@ def ax3_file():
         return Path("data/ax3_sample.cwa")
     elif cwd[-1] == "test":
         return Path("read/data/ax3_sample.cwa")
-    elif cwd[-1] == "scikit-imu":
+    elif cwd[-1] == "scikit-digital-health":
         return Path("test/read/data/ax3_sample.cwa")
 
 
@@ -57,7 +57,7 @@ def ax3_truth():
         path = "data/ax3_data.npz"
     elif cwd[-1] == "test":
         path = "read/data/ax3_data.npz"
-    elif cwd[-1] == "scikit-imu":
+    elif cwd[-1] == "scikit-digital-health":
         path = "test/read/data/ax3_data.npz"
 
     dat = load(path, allow_pickle=False)
@@ -78,7 +78,7 @@ def ax6_file():
         return Path("data/ax6_sample.cwa")
     elif cwd[-1] == "test":
         return Path("read/data/ax6_sample.cwa")
-    elif cwd[-1] == "scikit-imu":
+    elif cwd[-1] == "scikit-digital-health":
         return Path("test/read/data/ax6_sample.cwa")
 
 
@@ -90,7 +90,7 @@ def ax6_truth():
         path = "data/ax6_data.npz"
     elif cwd[-1] == "test":
         path = "read/data/ax6_data.npz"
-    elif cwd[-1] == "scikit-imu":
+    elif cwd[-1] == "scikit-digital-health":
         path = "test/read/data/ax6_data.npz"
 
     dat = load(path, allow_pickle=False)
@@ -111,7 +111,7 @@ def gt3x_file():
         return Path("data/gt3x_sample.gt3x")
     elif cwd[-1] == "test":
         return Path("read/data/gt3x_sample.gt3x")
-    elif cwd[-1] == "scikit-imu":
+    elif cwd[-1] == "scikit-digital-health":
         return Path("test/read/data/gt3x_sample.gt3x")
 
 
@@ -123,7 +123,7 @@ def gt3x_truth():
         path = "data/gt3x_data.npz"
     elif cwd[-1] == "test":
         path = "read/data/gt3x_data.npz"
-    elif cwd[-1] == "scikit-imu":
+    elif cwd[-1] == "scikit-digital-health":
         path = "test/read/data/gt3x_data.npz"
 
     dat = load(path, allow_pickle=False)
