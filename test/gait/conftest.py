@@ -85,7 +85,7 @@ def get_bgait_samples_truth():  # boolean gait classification
 
 
 @fixture
-def gait_classification_input_50():
+def gait_input_50():
     cwd = Path.cwd().parts
 
     if cwd[-1] == "gait":
