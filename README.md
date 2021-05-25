@@ -1,4 +1,4 @@
-![Build Status](https://github.com/PfizerRD/scikit-digital-health/workflows/skimu/badge.svg)
+![Build Status](https://github.com/PfizerRD/scikit-digital-health/workflows/skdh/badge.svg)
 
 # SciKit-Digital-Health
 Python package with methods for reading, pre-processing, manipulating, and analyzing Inertial Meausurement Unit data. `scikit-digital-health` contains the following sub-modules:

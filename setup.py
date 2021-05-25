@@ -317,7 +317,7 @@ def setup_package():
         long_description_content_type="text/markdown",
         # download_url="https:/pypi.org/skdh",  # download link, likely PyPi
         # project_urls={
-        #     "Documentation": "https://skimu.readthedocs.io./en/latest/"
+        #     "Documentation": "https://skdh.readthedocs.io./en/latest/"
         # },
         packages=find_packages("src"),
         package_dir={"": "src"},

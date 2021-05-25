@@ -144,7 +144,7 @@ dmypy.json
 .pyre/
 
 # Project specific
-!src/skimu/features/lib/
+!src/skdh/features/lib/
 /docs/ref/gait/generated/
 /docs/**/generated/
 /coverage/

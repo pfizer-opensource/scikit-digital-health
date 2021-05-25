@@ -25,7 +25,7 @@ from skdh import gait
 from skdh import sit2stand
 from skdh import features
 
-__skimu_version__ = __version__
+__skdh_version__ = __version__
 __all__ = [
     "Pipeline",
     "activity",
@@ -36,5 +36,5 @@ __all__ = [
     "preprocessing",
     "features",
     "utility",
-    "__skimu_version__",
+    "__skdh_version__",
 ]
