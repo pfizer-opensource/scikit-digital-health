@@ -12,6 +12,7 @@ from scipy.signal import butter, sosfiltfilt
 import lightgbm as lgb
 
 from skimu.utility import get_windowed_view
+from skimu.utility.internal import rle
 from skimu.features import Bank
 
 if version_info >= (3, 7):
@@ -90,19 +91,9 @@ def get_gait_classification_lgbm(gait_starts, gait_stops, accel, fs):
             bst.predict(accel_feats.T, raw_score=False) > thresh
         ).astype(int_)
 
-        bout_starts = (
-            where(diff(gait_predictions) == 1)[0] + 1
-        )  # account for n-1 samples in diff
-        bout_stops = where(diff(gait_predictions) == -1)[0] + 1
-
-        if gait_predictions[0]:
-            bout_starts = insert(bout_starts, 0, 0)
-        if gait_predictions[-1]:
-            bout_stops = append(bout_stops, gait_predictions.size)
-
-        assert (
-            bout_starts.size == bout_stops.size
-        ), "Starts and stops of bouts do not match"
+        lengths, starts, vals = rle(gait_predictions)
+        bout_starts = starts[vals == 1]
+        bout_stops = bout_starts + lengths[vals == 1]
 
         # convert to actual values that match up with data
         bout_starts *= wstep
