@@ -319,8 +319,9 @@ class Sleep(_BaseProcess):
             file_name = Path(file_name)
 
             for i, start in enumerate(self.sleep_aux["start time"]):
-                new_stem = file_name.stem + f"_per_minute_predictions_day_{i}"
-                rest_file = file_name.with_stem(new_stem)
+                new_name = file_name.stem + f"_per_minute_predictions_day_{i}"
+                new_name += file_name.suffix
+                rest_file = file_name.with_name(new_name)
 
                 tso = self.sleep_aux["tso indices"][i]
 
