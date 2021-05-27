@@ -85,8 +85,9 @@ class TestPipeline:
         exp = [
             {
                 "TestProcess": {
+                    "package": "skdh",
                     "module": "test.testmodule",
-                    "Parameters": {"kw1": 2},
+                    "parameters": {"kw1": 2},
                     "save_file": None,
                     "plot_file": None,
                 }
@@ -99,16 +100,18 @@ class TestPipeline:
         exp = [
             {
                 "Gait": {
+                    "package": "skdh",
                     "module": "gait.gait",
-                    "Parameters": {},
+                    "parameters": {},
                     "save_file": "gait_results.csv",
                     "plot_file": None,
                 }
             },
             {
                 "TestProcess": {
+                    "package": "skdh",
                     "module": "test.testmodule",
-                    "Parameters": {},
+                    "parameters": {},
                     "save_file": None,
                     "plot_file": None,
                 }
@@ -130,16 +133,18 @@ class TestPipeline:
         exp = [
             {
                 "Gait": {
+                    "package": "skdh",
                     "module": "gait.gait",
-                    "Parameters": {},
+                    "parameters": {},
                     "save_file": None,
                     "plot_file": None,
                 }
             },
             {
                 "TestProcess": {
+                    "package": "skdh",
                     "module": "test.testmodule",
-                    "Parameters": {},
+                    "parameters": {},
                     "save_file": None,
                     "plot_file": None,
                 }

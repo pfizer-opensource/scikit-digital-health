@@ -10,8 +10,8 @@ class TestBaseProcess:
     def test_str_repr(self):
         bp = BaseProcess(kw1=1, kw2="2")
 
-        assert str(bp) == "_BaseProcess"
-        assert repr(bp) == "_BaseProcess(kw1=1, kw2='2')"
+        assert str(bp) == "BaseProcess"
+        assert repr(bp) == "BaseProcess(kw1=1, kw2='2')"
 
     def test_eq(self, testprocess, testprocess2):
         tp1_a = testprocess(kw1=1)
@@ -72,11 +72,11 @@ class TestBaseProcess:
 
         assert bp._file_name == ""
         assert (
-            "Entering _BaseProcess processing with call _BaseProcess()"
+            "Entering BaseProcess processing with call BaseProcess()"
             in bp.logger.msgs
         )
         assert (
-            "[_BaseProcess] Day indices [(-1, -1)] not found. No day split used."
+            "[BaseProcess] Day indices [(-1, -1)] not found. No day split used."
             in bp.logger.msgs
         )
 
@@ -94,4 +94,4 @@ class TestBaseProcess:
 
             files = [i.name for i in tdir.glob("*")]
 
-        assert "test_file___BaseProcess.out" in files
+        assert "test_file__BaseProcess.out" in files
