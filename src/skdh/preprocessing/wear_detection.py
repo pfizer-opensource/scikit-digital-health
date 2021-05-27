@@ -17,11 +17,11 @@ from numpy import (
     full,
 )
 
-from skdh.base import _BaseProcess
+from skdh.base import BaseProcess
 from skdh.utility import moving_mean, moving_sd, get_windowed_view
 
 
-class DetectWear(_BaseProcess):
+class DetectWear(BaseProcess):
     r"""
     Detect periods of non-wear in accelerometer recordings.
 

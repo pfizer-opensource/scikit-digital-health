@@ -19,11 +19,11 @@ from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt, find_peaks
 from pywt import cwt, scale2frequency
 
-from skdh.base import _BaseProcess
+from skdh.base import BaseProcess
 from skdh.sit2stand.detector import Detector, pad_moving_sd
 
 
-class Sit2Stand(_BaseProcess):
+class Sit2Stand(BaseProcess):
     """
     Sit-to-stand transfer detection and processing.
 

@@ -19,7 +19,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.lines as mlines
 import matplotlib.pyplot as plt
 
-from skdh.base import _BaseProcess  # import the base process class
+from skdh.base import BaseProcess  # import the base process class
 from skdh.utility.internal import get_day_wear_intersection, apply_downsample, rle
 from skdh.sleep.tso import get_total_sleep_opportunity
 from skdh.sleep.utility import compute_activity_index
@@ -65,7 +65,7 @@ def _get_date(epoch_ts, day_start_hour):
     return start_dt - timedelta(seconds=15), day_str
 
 
-class Sleep(_BaseProcess):
+class Sleep(BaseProcess):
     """
     Process raw accelerometer data from the wrist to determine various sleep metrics and endpoints.
 

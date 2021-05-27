@@ -10,7 +10,7 @@ from warnings import warn
 import h5py
 from numpy import mean, diff, asarray, sum, ndarray
 
-from skdh.base import _BaseProcess
+from skdh.base import BaseProcess
 from skdh.utility.internal import apply_downsample, rle
 
 from skdh.gait.get_gait_classification import (
@@ -27,7 +27,7 @@ class LowFrequencyError(Exception):
     pass
 
 
-class Gait(_BaseProcess):
+class Gait(BaseProcess):
     """
     Process IMU data to extract endpoints of gait. Detect gait, extract gait events (heel-strikes,
     toe-offs), and compute gait endpoints from inertial data collected from a lumbar mounted

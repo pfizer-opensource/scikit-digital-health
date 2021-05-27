@@ -35,7 +35,7 @@ from scipy.stats import linregress
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-from skdh.base import _BaseProcess
+from skdh.base import BaseProcess
 from skdh.utility import moving_mean
 from skdh.utility.internal import get_day_index_intersection
 from skdh.activity.cutpoints import _base_cutpoints, get_level_thresholds
@@ -62,7 +62,7 @@ def _update_date_results(
     return start_dt
 
 
-class ActivityLevelClassification(_BaseProcess):
+class ActivityLevelClassification(BaseProcess):
     """
     Classify accelerometer data into different activity levels as a proxy for assessing physical
     activity energy expenditure (PAEE). Levels are sedentary, light, moderate, and vigorous.

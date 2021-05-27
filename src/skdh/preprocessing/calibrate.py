@@ -22,14 +22,14 @@ from numpy import (
 from numpy.linalg import norm
 from sklearn.linear_model import LinearRegression
 
-from skdh.base import _BaseProcess
+from skdh.base import BaseProcess
 from skdh.utility import moving_mean, moving_sd
 
 
 __all__ = ["CalibrateAccelerometer"]
 
 
-class CalibrateAccelerometer(_BaseProcess):
+class CalibrateAccelerometer(BaseProcess):
     """
     Calibrate pre-recording acceleration readings based on the deviation from 1G when motionless.
     Acceleration values can be modified in place. Calibration typically requires a minimum amount

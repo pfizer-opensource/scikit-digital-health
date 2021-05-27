@@ -12,7 +12,7 @@ from pandas import DataFrame
 from numpy import array
 
 
-class _BaseProcess:
+class BaseProcess:
     # names of the variables that are passed to predict
     # CHANGE IF predict/_predict call changes!
     _file = "file"

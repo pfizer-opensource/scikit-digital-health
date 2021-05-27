@@ -9,7 +9,7 @@ from operator import attrgetter
 from warnings import warn
 import logging
 
-from skdh.base import _BaseProcess as Process
+from skdh.base import BaseProcess as Process
 
 
 class NotAProcessError(Exception):

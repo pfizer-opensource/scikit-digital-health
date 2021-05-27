@@ -8,12 +8,12 @@ from warnings import warn
 
 from numpy import vstack
 
-from skdh.base import _BaseProcess
+from skdh.base import BaseProcess
 from skdh.read.get_window_start_stop import get_window_start_stop
 from skdh.read._extensions import read_gt3x
 
 
-class ReadGT3X(_BaseProcess):
+class ReadGT3X(BaseProcess):
     """
     Read a GT3X archive file from an Actigraph sensor into memory. Acceleration is returned in
     units of 'g', while time is unix time in seconds. If providing a base and period value,

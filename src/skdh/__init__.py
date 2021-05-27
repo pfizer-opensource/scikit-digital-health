@@ -15,6 +15,7 @@ Pipeline Processing
 from skdh.version import __version__
 
 from skdh.pipeline import Pipeline
+from skdh.base import BaseProcess
 
 from skdh import utility
 from skdh import read
@@ -28,6 +29,7 @@ from skdh import features
 __skdh_version__ = __version__
 __all__ = [
     "Pipeline",
+    "BaseProcess",
     "activity",
     "gait",
     "sit2stand",
