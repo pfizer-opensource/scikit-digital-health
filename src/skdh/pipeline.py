@@ -6,6 +6,7 @@ Pfizer DMTI 2020
 """
 import json
 from operator import attrgetter
+from importlib import import_module
 from warnings import warn
 import logging
 
@@ -64,11 +65,13 @@ class Pipeline:
         """
         pipe = []
         for step in self._steps:  # actually look at steps
+            package, module = step.__class__.__module__.split(".", 1)
             pipe.append(
                 {
                     step._name: {
-                        "module": step.__class__.__module__.split(".", 1)[1],
-                        "Parameters": step._kw,
+                        "package": package,
+                        "module": module,
+                        "parameters": step._kw,
                         "save_file": step.pipe_save_file,
                         "plot_file": step.pipe_plot_file,
                     }
@@ -94,16 +97,22 @@ class Pipeline:
 
         for proc in procs:
             name = list(proc.keys())[0]
+            pkg = proc[name]["package"]
             mod = proc[name]["module"]
-            params = proc[name]["Parameters"]
+            params = proc[name]["parameters"]
             save_file = proc[name]["save_file"]
             plot_file = proc[name]["plot_file"]
 
+            if pkg == "skdh":
+                package = skdh
+            else:
+                package = import_module(pkg)
+
             try:
-                process = attrgetter(f"{mod}.{name}")(skdh)
+                process = attrgetter(f"{mod}.{name}")(package)
             except AttributeError:
                 warn(
-                    f"Process (skdh.{mod}.{name}) not found. Not being added to pipeline",
+                    f"Process ({pkg}.{mod}.{name}) not found. Not added to pipeline",
                     UserWarning,
                 )
                 continue
