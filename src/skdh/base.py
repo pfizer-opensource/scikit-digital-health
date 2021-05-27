@@ -13,6 +13,10 @@ from numpy import array
 
 
 class BaseProcess:
+    """
+    The base class for any Process that is designed to work within the
+    Scikit-Digital-Health framework, and the Pipeline class. Should be subclassed.
+    """
     # names of the variables that are passed to predict
     # CHANGE IF predict/_predict call changes!
     _file = "file"
