@@ -3,12 +3,12 @@ from pathlib import Path
 
 from numpy import array, allclose
 
-from skdh.base import _BaseProcess
+from skdh.base import BaseProcess
 
 
-class Test_BaseProcess:
+class TestBaseProcess:
     def test_str_repr(self):
-        bp = _BaseProcess(kw1=1, kw2="2")
+        bp = BaseProcess(kw1=1, kw2="2")
 
         assert str(bp) == "_BaseProcess"
         assert repr(bp) == "_BaseProcess(kw1=1, kw2='2')"
@@ -42,7 +42,7 @@ class Test_BaseProcess:
         return Lgr()
 
     def test__check_if_idx_none(self):
-        bp = _BaseProcess()
+        bp = BaseProcess()
         bp.logger = self.setup_lgr()  # overwrite the logger
 
         x = array([[0, 10], [15, 20]])
@@ -63,7 +63,7 @@ class Test_BaseProcess:
         assert en is None
 
     def test_predict(self):
-        bp = _BaseProcess()
+        bp = BaseProcess()
         bp.logger = self.setup_lgr()
 
         bp.predict(
@@ -81,7 +81,7 @@ class Test_BaseProcess:
         )
 
     def test_save_results(self):
-        bp = _BaseProcess()
+        bp = BaseProcess()
 
         bp.predict(expect_wear=False, expect_days=False, file="test_file.infile")
 

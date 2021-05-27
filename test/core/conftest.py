@@ -1,11 +1,11 @@
 import pytest
 
-from skdh.base import _BaseProcess
+from skdh.base import BaseProcess
 
 
 @pytest.fixture(scope="module")
 def testprocess():
-    class TestProcess(_BaseProcess):
+    class TestProcess(BaseProcess):
         def __init__(self, kw1=1):
             super().__init__(kw1=kw1)
             self.kw1 = kw1
@@ -20,7 +20,7 @@ def testprocess():
 
 @pytest.fixture(scope="module")
 def testprocess2():
-    class TestProcess2(_BaseProcess):
+    class TestProcess2(BaseProcess):
         def __init__(self, kwa=5):
             super().__init__(kwa=kwa)
             self.kwa = kwa
