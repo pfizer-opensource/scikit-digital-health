@@ -30,7 +30,7 @@ class Test_update_date_results:
             hour=23,
             minute=59,
             second=57,
-            tzinfo=dt.timezone.utc
+            tzinfo=dt.timezone.utc,
         )
         epoch_ts = date.timestamp()
 
@@ -53,7 +53,7 @@ class Test_update_date_results:
             hour=10,
             minute=32,
             second=13,
-            tzinfo=dt.timezone.utc
+            tzinfo=dt.timezone.utc,
         )
         epoch_ts = date.timestamp()
 

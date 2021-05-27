@@ -10,24 +10,24 @@ def test_get_strides():
     ic = array([10, 60, 100, 160, 210, 260, 305, 360])
     fc = array([15, 67, 104, 166, 218, 265, 310, 367])
 
-    gait = {i: [] for i in ['IC', "FC", 'FC opp foot', 'valid cycle', 'delta h']}
+    gait = {i: [] for i in ["IC", "FC", "FC opp foot", "valid cycle", "delta h"]}
 
-    n_steps = get_strides(gait, x, 0, ic, fc, t, 50., 2.25, 0.2)
+    n_steps = get_strides(gait, x, 0, ic, fc, t, 50.0, 2.25, 0.2)
 
     assert n_steps == 7
-    assert allclose(gait['IC'], ic[:n_steps])
-    assert allclose(gait['FC'], fc[1:])
-    assert allclose(gait['FC opp foot'], fc[:n_steps])
-    assert sum(gait['valid cycle']) == 5
-    assert allclose(array(gait['delta h'])[[0, 3, 4]], 5.073504651555079)
+    assert allclose(gait["IC"], ic[:n_steps])
+    assert allclose(gait["FC"], fc[1:])
+    assert allclose(gait["FC opp foot"], fc[:n_steps])
+    assert sum(gait["valid cycle"]) == 5
+    assert allclose(array(gait["delta h"])[[0, 3, 4]], 5.073504651555079)
 
     # second set to catch some continues/nan filling
     ic = array([10, 60, 100])
     fc = array([44, 67, 104])
 
-    gait = {i: [] for i in ['IC', "FC", 'FC opp foot', 'valid cycle', 'delta h']}
+    gait = {i: [] for i in ["IC", "FC", "FC opp foot", "valid cycle", "delta h"]}
 
-    n_steps = get_strides(gait, x, 0, ic, fc, t, 50., 2.25, 0.2)
+    n_steps = get_strides(gait, x, 0, ic, fc, t, 50.0, 2.25, 0.2)
 
     assert n_steps == 1
-    assert allclose(gait['valid cycle'], [False])
+    assert allclose(gait["valid cycle"], [False])

@@ -29,9 +29,7 @@ def gnactv_truth():
 
     dat = load(path, allow_pickle=False)
 
-    data = {
-        i: dat[i] for i in ['accel', 'time', 'temperature', 'light']
-    }
+    data = {i: dat[i] for i in ["accel", "time", "temperature", "light"]}
     data["day_ends"] = {(8, 12): dat["day_ends_8_12"]}
 
     return data
@@ -62,9 +60,7 @@ def ax3_truth():
 
     dat = load(path, allow_pickle=False)
 
-    data = {
-        i: dat[i] for i in ['accel', 'time', 'temperature', 'fs']
-    }
+    data = {i: dat[i] for i in ["accel", "time", "temperature", "fs"]}
     data["day_ends"] = {(8, 12): dat["day_ends_8_12"]}
 
     return data
@@ -95,9 +91,7 @@ def ax6_truth():
 
     dat = load(path, allow_pickle=False)
 
-    data = {
-        i: dat[i] for i in ['accel', 'time', 'gyro', 'temperature', 'fs']
-    }
+    data = {i: dat[i] for i in ["accel", "time", "gyro", "temperature", "fs"]}
     data["day_ends"] = {(8, 12): dat["day_ends_8_12"]}
 
     return data
@@ -128,9 +122,7 @@ def gt3x_truth():
 
     dat = load(path, allow_pickle=False)
 
-    data = {
-        i: dat[i] for i in ['accel', 'time']
-    }
+    data = {i: dat[i] for i in ["accel", "time"]}
     data["day_ends"] = {(9, 2): dat["day_ends_9_2"]}
 
     return data

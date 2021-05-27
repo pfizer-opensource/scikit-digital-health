@@ -265,7 +265,7 @@ class ActivityLevelClassification(BaseProcess):
             accel=accel,
             fs=fs,
             wear=wear,
-            **kwargs
+            **kwargs,
         )
 
         # ========================================================================================
@@ -287,9 +287,7 @@ class ActivityLevelClassification(BaseProcess):
         slp_msg = (
             f"[{self!s}] No sleep information found. Only computing full day metrics."
         )
-        sleep_starts, sleep_stops = self._check_if_idx_none(
-            sleep, slp_msg, None, None
-        )
+        sleep_starts, sleep_stops = self._check_if_idx_none(sleep, slp_msg, None, None)
 
         # ========================================================================================
         # SETUP RESULTS KEYS/ENDPOINTS

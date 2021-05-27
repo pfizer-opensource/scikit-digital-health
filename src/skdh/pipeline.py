@@ -224,7 +224,8 @@ class Pipeline:
             kwargs, step_result = proc.predict(**kwargs)
             if proc.pipe_save_file is not None:
                 proc.save_results(
-                    step_result if step_result is not None else kwargs, proc.pipe_save_file
+                    step_result if step_result is not None else kwargs,
+                    proc.pipe_save_file,
                 )
             if step_result is not None:
                 results[proc._name] = step_result

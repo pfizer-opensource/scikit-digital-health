@@ -12,13 +12,13 @@ class TestReadGt3x:
         assert allclose(
             res["time"] - gt3x_truth["time"][0],
             gt3x_truth["time"] - gt3x_truth["time"][0],
-            atol=5e-5
+            atol=5e-5,
         )
 
         assert allclose(res["accel"], gt3x_truth["accel"], atol=5e-5)
 
         assert all([i in res["day_ends"] for i in gt3x_truth["day_ends"]])
-        assert allclose(res["day_ends"][(9, 2)], gt3x_truth['day_ends'][(9, 2)])
+        assert allclose(res["day_ends"][(9, 2)], gt3x_truth["day_ends"][(9, 2)])
 
     def test_window_inputs(self):
         r = ReadGT3X(base=None, period=None)

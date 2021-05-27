@@ -67,14 +67,18 @@ class Test_BaseProcess:
         bp.logger = self.setup_lgr()
 
         bp.predict(
-            expect_days=True,
-            expect_wear=True,
-            accel=array([[1, 2, 3], [4, 5, 6]])
+            expect_days=True, expect_wear=True, accel=array([[1, 2, 3], [4, 5, 6]])
         )
 
         assert bp._file_name == ""
-        assert "Entering _BaseProcess processing with call _BaseProcess()" in bp.logger.msgs
-        assert "[_BaseProcess] Day indices [(-1, -1)] not found. No day split used." in bp.logger.msgs
+        assert (
+            "Entering _BaseProcess processing with call _BaseProcess()"
+            in bp.logger.msgs
+        )
+        assert (
+            "[_BaseProcess] Day indices [(-1, -1)] not found. No day split used."
+            in bp.logger.msgs
+        )
 
     def test_save_results(self):
         bp = _BaseProcess()

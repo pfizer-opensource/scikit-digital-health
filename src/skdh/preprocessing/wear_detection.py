@@ -168,8 +168,7 @@ class DetectWear(BaseProcess):
         acc_w_range = acc_w.max(axis=1) - acc_w.min(axis=1)
 
         nonwear = (
-            sum((acc_rsd < self.sd_crit) & (acc_w_range < self.range_crit), axis=1)
-            >= 2
+            sum((acc_rsd < self.sd_crit) & (acc_w_range < self.range_crit), axis=1) >= 2
         )
 
         # flip to wear starts/stops now

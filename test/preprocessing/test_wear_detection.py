@@ -25,14 +25,14 @@ class TestWearDetection:
     @pytest.mark.parametrize(
         ("case", "setup", "ship"),
         (
-                (1, False, [0, 0]),
-                (1, True, [12, 12]),
-                (2, False, [0, 0]),
-                (2, True, [12, 12]),
-                (3, False, [0, 0]),
-                (3, True, [12, 12]),
-                (4, False, [0, 0]),
-                (4, True, [12, 12]),
+            (1, False, [0, 0]),
+            (1, True, [12, 12]),
+            (2, False, [0, 0]),
+            (2, True, [12, 12]),
+            (3, False, [0, 0]),
+            (3, True, [12, 12]),
+            (4, False, [0, 0]),
+            (4, True, [12, 12]),
         ),
     )
     def test_wear_time_modifiction(self, case, setup, ship, simple_nonwear_data):

@@ -48,7 +48,10 @@ class TestPipeline:
         p.add(testprocess(kw1=1))
 
         assert str(p) == "IMUAnalysisPipeline"
-        assert repr(p) == "IMUAnalysisPipeline[\n\tTestProcess(kw1=2),\n\tTestProcess(kw1=1),\n]"
+        assert (
+            repr(p)
+            == "IMUAnalysisPipeline[\n\tTestProcess(kw1=2),\n\tTestProcess(kw1=1),\n]"
+        )
 
     def test_add(self, testprocess):
         p = Pipeline()
@@ -79,14 +82,16 @@ class TestPipeline:
             with fname.open() as f:
                 res = json.load(f)
 
-        exp = [{
-            "TestProcess": {
-                "module": "test.testmodule",
-                "Parameters": {"kw1": 2},
-                "save_file": None,
-                "plot_file": None
+        exp = [
+            {
+                "TestProcess": {
+                    "module": "test.testmodule",
+                    "Parameters": {"kw1": 2},
+                    "save_file": None,
+                    "plot_file": None,
+                }
             }
-        }]
+        ]
 
         assert res == exp
 
@@ -97,7 +102,7 @@ class TestPipeline:
                     "module": "gait.gait",
                     "Parameters": {},
                     "save_file": "gait_results.csv",
-                    "plot_file": None
+                    "plot_file": None,
                 }
             },
             {
@@ -105,9 +110,9 @@ class TestPipeline:
                     "module": "test.testmodule",
                     "Parameters": {},
                     "save_file": None,
-                    "plot_file": None
+                    "plot_file": None,
                 }
-            }
+            },
         ]
 
         with TemporaryDirectory() as tdir:
@@ -128,7 +133,7 @@ class TestPipeline:
                     "module": "gait.gait",
                     "Parameters": {},
                     "save_file": None,
-                    "plot_file": None
+                    "plot_file": None,
                 }
             },
             {
@@ -136,9 +141,9 @@ class TestPipeline:
                     "module": "test.testmodule",
                     "Parameters": {},
                     "save_file": None,
-                    "plot_file": None
+                    "plot_file": None,
                 }
-            }
+            },
         ]
 
         p = Pipeline()

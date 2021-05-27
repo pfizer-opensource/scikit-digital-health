@@ -26,7 +26,7 @@ def test_get_stillness(dummy_stillness_data):
     }
     still, starts, stops, long_starts, long_stops = get_stillness(
         dummy_stillness_data * 9.81,
-        1/20,
+        1 / 20,
         9.81,
         0.25,
         0.5,
@@ -46,10 +46,10 @@ class TestDetector:
         t_ = arange(0, 10, 0.01)
         acc = zeros((5000, 3))
         acc[:, 2] += 1
-        acc[2000:2500, 2] += (0.33 * t_**(1/3) * sin(2 * pi * 0.1 * t_))[::2]
+        acc[2000:2500, 2] += (0.33 * t_ ** (1 / 3) * sin(2 * pi * 0.1 * t_))[::2]
         acc += np_rng.standard_normal(acc.shape) * 0.03
 
-        sos = butter(4, 2 * 1.5 / 100, btype="low", output='sos')
+        sos = butter(4, 2 * 1.5 / 100, btype="low", output="sos")
         acc = sosfiltfilt(sos, acc, axis=0)
 
         res = {
@@ -71,14 +71,14 @@ class TestDetector:
         Detector().predict(res, 0.01, arange(0, 20, 0.004), acc, acc_f, array([2200]))
 
         # 2 seconds, off due to detection of still periods, etc
-        assert isclose(res['Duration'][0], 1.92, atol=5e-2)
+        assert isclose(res["Duration"][0], 1.92, atol=5e-2)
         # large ranges due to random noise
-        assert isclose(res['Max. Accel.'][0], 14.2, atol=0.3)
-        assert isclose(res['Min. Accel.'][0], 3.4, atol=0.2)
-        assert isclose(res['SPARC'][0], -1.9, atol=0.2)
+        assert isclose(res["Max. Accel."][0], 14.2, atol=0.3)
+        assert isclose(res["Min. Accel."][0], 3.4, atol=0.2)
+        assert isclose(res["SPARC"][0], -1.9, atol=0.2)
         # this is off so much because of synthetic data
-        assert isclose(res['Vertical Displacement'][0], 20.4, atol=0.5)
-        assert not res['Partial'][0]
+        assert isclose(res["Vertical Displacement"][0], 20.4, atol=0.5)
+        assert not res["Partial"][0]
 
     def test_update_thresh(self):
         d = Detector(thresholds={"accel moving avg": 0.5, "test": 100})
@@ -106,7 +106,7 @@ class TestDetector:
         a = sin(c * t)
 
         vt = (-cos(c * t) + 1) / c
-        pt = (c * t - sin(c * t)) / c**2
+        pt = (c * t - sin(c * t)) / c ** 2
 
         v, p = Detector._integrate(a, dt, True)
         v1, p1 = Detector._integrate(a, dt, False)
@@ -190,12 +190,7 @@ class TestDetector:
         assert start is None
 
     def test__is_transfer_valid(self):
-        d = Detector(
-            thresholds={
-                "duration factor": 4,
-                "stand displacement": 0.125
-            }
-        )
+        d = Detector(thresholds={"duration factor": 4, "stand displacement": 0.125})
 
         res = {"STS Start": []}
         peak = 350
@@ -205,7 +200,9 @@ class TestDetector:
         sts_end = 525
         prev_int_start = 0
 
-        valid, tsi, tei = d._is_transfer_valid(res, peak, time, vp, sts_start, sts_end, prev_int_start)
+        valid, tsi, tei = d._is_transfer_valid(
+            res, peak, time, vp, sts_start, sts_end, prev_int_start
+        )
 
         assert valid
         assert tsi == sts_start
@@ -214,5 +211,7 @@ class TestDetector:
         # with existing transition
         res = {"STS Start": [2.7]}  # less than 0.4 away from time[300] = 3.0s
 
-        valid, *_ = d._is_transfer_valid(res, peak, time, vp, sts_start, sts_end, prev_int_start)
+        valid, *_ = d._is_transfer_valid(
+            res, peak, time, vp, sts_start, sts_end, prev_int_start
+        )
         assert not valid

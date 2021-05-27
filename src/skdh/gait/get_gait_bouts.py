@@ -34,11 +34,7 @@ def get_gait_bouts(starts, stops, day_start, day_stop, ts, max_bout_sep, min_bou
      List slices with the starts and stops of gait bouts
     """
     starts_subset, stops_subset = get_day_index_intersection(
-        (starts,),
-        (stops,),
-        (True,),
-        day_start,
-        day_stop
+        (starts,), (stops,), (True,), day_start, day_stop
     )
 
     bouts = []

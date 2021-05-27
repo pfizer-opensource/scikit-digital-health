@@ -11,7 +11,7 @@ class TestReadBin:
         # make sure it will catch small differences
         assert allclose(
             res["time"] - gnactv_truth["time"][0],
-            gnactv_truth["time"] - gnactv_truth["time"][0]
+            gnactv_truth["time"] - gnactv_truth["time"][0],
         )
 
         for k in ["accel", "temperature", "light"]:
@@ -20,7 +20,7 @@ class TestReadBin:
             assert allclose(res[k], gnactv_truth[k], atol=5e-5)
 
         assert all([i in res["day_ends"] for i in gnactv_truth["day_ends"]])
-        assert allclose(res["day_ends"][(8, 12)], gnactv_truth['day_ends'][(8, 12)])
+        assert allclose(res["day_ends"][(8, 12)], gnactv_truth["day_ends"][(8, 12)])
 
     def test_window_inputs(self):
         r = ReadBin(bases=None, periods=None)

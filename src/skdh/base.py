@@ -17,6 +17,7 @@ class BaseProcess:
     The base class for any Process that is designed to work within the
     Scikit-Digital-Health framework, and the Pipeline class. Should be subclassed.
     """
+
     # names of the variables that are passed to predict
     # CHANGE IF predict/_predict call changes!
     _file = "file"
@@ -123,7 +124,9 @@ class BaseProcess:
             n = kwargs.get(self._acc, kwargs.get(self._time)).shape[0] - 1
 
             days = kwargs.get(self._days, {}).get(self.day_key, None)
-            msg = f"[{self!s}] Day indices [{self.day_key}] not found. No day split used."
+            msg = (
+                f"[{self!s}] Day indices [{self.day_key}] not found. No day split used."
+            )
             self.day_idx = self._check_if_idx_none(days, msg, 0, n)
 
         if expect_wear:

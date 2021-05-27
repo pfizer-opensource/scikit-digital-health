@@ -195,7 +195,7 @@ class Sleep(BaseProcess):
             min_day_hours=min_day_hours,
             downsample=downsample,
             day_window=day_window,
-            save_per_minute_results=save_per_minute_results
+            save_per_minute_results=save_per_minute_results,
         )
 
         self.window_size = 60
@@ -329,7 +329,7 @@ class Sleep(BaseProcess):
                 df["Rest"] = self.sleep_aux["rest predictions"][i]
                 df["Time"] = date_range(start, periods=df.shape[0], freq="1T")
                 df["TSO"] = False
-                df.loc[tso[0]:tso[1], "TSO"] = True
+                df.loc[tso[0] : tso[1], "TSO"] = True
 
                 df.to_csv(rest_file, index=False)
 
@@ -367,7 +367,7 @@ class Sleep(BaseProcess):
             temperature=temperature,
             fs=fs,
             wear=wear,
-            **kwargs
+            **kwargs,
         )
 
         if fs is None:
@@ -390,8 +390,15 @@ class Sleep(BaseProcess):
         # downsample if necessary
         goal_fs = 20.0
         if fs != goal_fs and self.downsample:
-            time_ds, (accel_ds, temp_ds), (day_starts_ds, day_stops_ds, wear_starts_ds, wear_stops_ds) = apply_downsample(
-                goal_fs, time, data=(accel, temperature), indices=(*self.day_idx, *self.wear_idx)
+            (
+                time_ds,
+                (accel_ds, temp_ds),
+                (day_starts_ds, day_stops_ds, wear_starts_ds, wear_stops_ds),
+            ) = apply_downsample(
+                goal_fs,
+                time,
+                data=(accel, temperature),
+                indices=(*self.day_idx, *self.wear_idx),
             )
 
         else:
@@ -423,7 +430,9 @@ class Sleep(BaseProcess):
         # sleep aux storage if saving per minute results
         if self.save_pm:
             self.sleep_aux = {
-                "start time": [], "rest predictions": [], "tso indices": []
+                "start time": [],
+                "rest predictions": [],
+                "tso indices": [],
             }
 
         # setup storage for sleep indices

@@ -362,11 +362,17 @@ class Gait(BaseProcess):
             )
 
         # handle gait_pred input types
-        gait_starts, gait_stops = self._handle_input_gait_predictions(gait_pred, time.size)
+        gait_starts, gait_stops = self._handle_input_gait_predictions(
+            gait_pred, time.size
+        )
 
-        goal_fs = 50.0 if fs >= 50.0 else 20.
+        goal_fs = 50.0 if fs >= 50.0 else 20.0
         if fs != goal_fs:
-            time_ds, (accel_ds,), (gait_starts_ds, gait_stops_ds, day_starts_ds, day_stops_ds) = apply_downsample(
+            (
+                time_ds,
+                (accel_ds,),
+                (gait_starts_ds, gait_stops_ds, day_starts_ds, day_stops_ds),
+            ) = apply_downsample(
                 goal_fs, time, (accel,), (gait_starts, gait_stops, *self.day_idx)
             )
         else:
@@ -506,9 +512,7 @@ class Gait(BaseProcess):
         gait.pop("FC opp foot", None)
         gait.pop("valid cycle", None)
 
-        kwargs.update(
-            {self._acc: accel, self._time: time, "fs": fs, "height": height}
-        )
+        kwargs.update({self._acc: accel, self._time: time, "fs": fs, "height": height})
         if self._in_pipeline:
             return kwargs, gait
         else:

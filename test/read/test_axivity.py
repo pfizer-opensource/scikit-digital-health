@@ -12,7 +12,7 @@ class TestReadCwa:
         assert allclose(
             res["time"] - ax3_truth["time"][0],
             ax3_truth["time"] - ax3_truth["time"][0],
-            atol=5e-5
+            atol=5e-5,
         )
 
         for k in ["accel", "temperature", "fs"]:
@@ -21,7 +21,7 @@ class TestReadCwa:
             assert allclose(res[k], ax3_truth[k], atol=5e-5)
 
         assert all([i in res["day_ends"] for i in ax3_truth["day_ends"]])
-        assert allclose(res["day_ends"][(8, 12)], ax3_truth['day_ends'][(8, 12)])
+        assert allclose(res["day_ends"][(8, 12)], ax3_truth["day_ends"][(8, 12)])
 
     def test_ax6(self, ax6_file, ax6_truth):
         res = ReadCWA(bases=8, periods=12).predict(ax6_file)
@@ -30,7 +30,7 @@ class TestReadCwa:
         assert allclose(
             res["time"] - ax6_truth["time"][0],
             ax6_truth["time"] - ax6_truth["time"][0],
-            atol=5e-5
+            atol=5e-5,
         )
 
         for k in ["accel", "gyro", "temperature", "fs"]:
@@ -39,7 +39,7 @@ class TestReadCwa:
             assert allclose(res[k], ax6_truth[k], atol=5e-5)
 
         assert all([i in res["day_ends"] for i in ax6_truth["day_ends"]])
-        assert allclose(res["day_ends"][(8, 12)], ax6_truth['day_ends'][(8, 12)])
+        assert allclose(res["day_ends"][(8, 12)], ax6_truth["day_ends"][(8, 12)])
 
     def test_window_inputs(self):
         r = ReadCWA(bases=None, periods=None)

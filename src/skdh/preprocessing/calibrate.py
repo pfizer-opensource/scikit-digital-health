@@ -97,7 +97,9 @@ class CalibrateAccelerometer(BaseProcess):
         self.max_iter = max_iter
         self.tol = tol
 
-    def predict(self, time=None, accel=None, *, fs=None, apply=True, temperature=None, **kwargs):
+    def predict(
+        self, time=None, accel=None, *, fs=None, apply=True, temperature=None, **kwargs
+    ):
         r"""
         Run the calibration on the accelerometer data.
 
@@ -143,7 +145,7 @@ class CalibrateAccelerometer(BaseProcess):
             fs=fs,
             apply=apply,
             temperature=temperature,
-            **kwargs
+            **kwargs,
         )
 
         # calculate fs if necessary

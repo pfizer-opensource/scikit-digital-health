@@ -20,7 +20,7 @@ from numpy import (
     append,
     sign,
     median,
-    arange
+    arange,
 )
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt, detrend
@@ -61,10 +61,12 @@ def pad_moving_sd(x, wlen, skip):
     pad = int(ceil(wlen / 2))
     nr = x.shape[0] // skip - wlen + 1
 
-    m_sd[pad:pad + nr], m_mn[pad:pad + nr] = moving_sd(x, wlen, skip, axis=0, return_previous=True)
+    m_sd[pad : pad + nr], m_mn[pad : pad + nr] = moving_sd(
+        x, wlen, skip, axis=0, return_previous=True
+    )
 
-    m_mn[:pad], m_mn[pad + nr:] = m_mn[pad], m_mn[-pad]
-    m_sd[:pad], m_sd[pad + nr:] = m_sd[pad], m_sd[-pad]
+    m_mn[:pad], m_mn[pad + nr :] = m_mn[pad], m_mn[-pad]
+    m_sd[:pad], m_sd[pad + nr :] = m_sd[pad], m_sd[-pad]
 
     return m_mn, m_sd, pad
 
@@ -282,7 +284,8 @@ class Detector:
                 # get zero crossings
                 pos_zc = insert(where(diff(sign(v_vel)) > 0)[0] + 1, 0, 0) + end_still
                 neg_zc = (
-                    append(where(diff(sign(v_vel)) < 0)[0] + 1, v_vel.size - 1) + end_still
+                    append(where(diff(sign(v_vel)) < 0)[0] + 1, v_vel.size - 1)
+                    + end_still
                 )
 
             # maker sure the velocity is high enough to indicate a peak
@@ -301,7 +304,9 @@ class Detector:
                 continue
 
             # Run quality checks and if they pass add the transition to the results
-            valid_transfer, t_start_i, t_end_i = self._is_transfer_valid(sts, ppk, time, v_pos, sts_start, sts_end, prev_int_start)
+            valid_transfer, t_start_i, t_end_i = self._is_transfer_valid(
+                sts, ppk, time, v_pos, sts_start, sts_end, prev_int_start
+            )
             if not valid_transfer:
                 continue
 
@@ -467,7 +472,7 @@ class Detector:
         return sts_start
 
     def _is_transfer_valid(
-            self, res, peak, time, vp, sts_start, sts_end, prev_int_start
+        self, res, peak, time, vp, sts_start, sts_end, prev_int_start
     ):
         """
         Check if the sit-to-stand transfer is a valid one.

@@ -377,7 +377,7 @@ class IntraStrideCovarianceV(GaitEventEndpoint):
 
         for i, idx in enumerate(nonzero(mask)[0]):
             j_ = gait_aux["inertial data i"][idx]
-            x = gait_aux["accel"][j_][i1[i]:i3[i], gait_aux["vert axis"][idx]]
+            x = gait_aux["accel"][j_][i1[i] : i3[i], gait_aux["vert axis"][idx]]
 
             if (i3[i] - i1[i]) > x.size:
                 gait[self.k_][idx] = nan
@@ -414,7 +414,7 @@ class IntraStepCovarianceV(GaitEventEndpoint):
 
         for i, idx in enumerate(nonzero(mask)[0]):
             j_ = gait_aux["inertial data i"][idx]
-            x = gait_aux["accel"][j_][i1[i]:i3[i], gait_aux["vert axis"][idx]]
+            x = gait_aux["accel"][j_][i1[i] : i3[i], gait_aux["vert axis"][idx]]
 
             if (i3[i] - i1[i]) > x.size:
                 gait[self.k_][idx] = nan
