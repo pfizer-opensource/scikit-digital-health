@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from datetime import date as dt_date
 
-from numpy import mean, diff, array, nan, sum, arange, nonzero, full, allclose, int_
+from numpy import mean, diff, array, nan, sum, arange, full, int_
 from numpy.ma import masked_where
 from pandas import DataFrame, date_range
 import matplotlib
