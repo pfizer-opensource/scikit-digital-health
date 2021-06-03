@@ -319,7 +319,8 @@ class Sleep(BaseProcess):
             file_name = Path(file_name)
 
             for i, start in enumerate(self.sleep_aux["start time"]):
-                new_name = file_name.stem + f"_per_minute_predictions_day_{i}"
+                day_n = self.sleep_aux["day_n"][i]
+                new_name = file_name.stem + f"_per_minute_predictions_day_{day_n}"
                 new_name += file_name.suffix
                 rest_file = file_name.with_name(new_name)
 
@@ -431,6 +432,7 @@ class Sleep(BaseProcess):
         if self.save_pm:
             self.sleep_aux = {
                 "start time": [],
+                "day n": [],
                 "rest predictions": [],
                 "tso indices": [],
             }
@@ -510,7 +512,7 @@ class Sleep(BaseProcess):
             sw_lengths, sw_starts, sw_vals = rle(pred_during_tso)
 
             # save the sleep per minute results if desired
-            self._store_sleep_aux(start_datetime, predictions, tso_start, tso_stop)
+            self._store_sleep_aux(start_datetime, iday, predictions, tso_start, tso_stop)
 
             # set the sleep start and end values as the TSO (essentially time in bed)
             sleep_idx[iday, 0] = tso[2] + int(start * fs / goal_fs)
@@ -757,11 +759,12 @@ class Sleep(BaseProcess):
 
             pp.close()
 
-    def _store_sleep_aux(self, start_dt, predictions, tso_start, tso_stop):
+    def _store_sleep_aux(self, start_dt, day_n, predictions, tso_start, tso_stop):
         """
         Store the sleep predictions if desired.
         """
         if self.save_pm:
             self.sleep_aux["start time"].append(start_dt)
+            self.sleep_aux["day n"].append(day_n)
             self.sleep_aux["rest predictions"].append(predictions)
             self.sleep_aux["tso indices"].append([tso_start, tso_stop])
