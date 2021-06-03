@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from datetime import date as dt_date
 
-from numpy import mean, diff, array, nan, sum, arange, nonzero, full, int_
+from numpy import mean, diff, array, nan, sum, arange, nonzero, full, allclose, int_
 from numpy.ma import masked_where
 from pandas import DataFrame, date_range
 import matplotlib
@@ -512,14 +512,9 @@ class Sleep(BaseProcess):
             # save the sleep per minute results if desired
             self._store_sleep_aux(start_datetime, predictions, tso_start, tso_stop)
 
-            # set the sleep start and end values from the predictions indexed into original data
-            to_start = int(tso_start * 60 * fs) + int(start * fs / goal_fs)
-            sleep_idx[iday, 0] = (
-                int(nonzero(pred_during_tso)[0][0] * 60 * fs) + to_start
-            )  # sleep
-            sleep_idx[iday, 1] = (
-                int(nonzero(pred_during_tso)[0][-1] * 60 * fs) + to_start
-            )  # wake
+            # set the sleep start and end values as the TSO (essentially time in bed)
+            sleep_idx[iday, 0] = tso[2] + int(start * fs / goal_fs)
+            sleep_idx[iday, 1] = tso[3] + int(start * fs / goal_fs)
 
             # plotting
             self._plot_sleep_wear_predictions(
