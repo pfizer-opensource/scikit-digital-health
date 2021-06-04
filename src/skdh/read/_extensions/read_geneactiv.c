@@ -73,7 +73,7 @@ int get_timestamps(long *Nps, char time[40], GN_Info_t *info, GN_Data_t *data, W
 
     /* convert to seconds since epoch */
     t0 = (double)timegm(&tm0);
-    t0 += (double)t.msec / 1000000.0f;  /* add microseconds */
+    t0 += (double)t.msec / 1000.0f;  /* add microseconds */
 
     /* create the full timestamp array for the block */
     for (int j = 0; j < GN_SAMPLES; ++j)
