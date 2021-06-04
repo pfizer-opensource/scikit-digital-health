@@ -61,7 +61,7 @@ int get_timestamps(long *Nps, char time[40], GN_Info_t *info, GN_Data_t *data, W
     t.hour = GN_DATE_HOUR(time);
     t.min = GN_DATE_MIN(time);
     t.sec = GN_DATE_SEC(time);
-    t.msec = GN_DATE_MSEC(time) * 1000;
+    t.msec = GN_DATE_MSEC(time);
 
     memset(&tm0, 0, sizeof(tm0));
     tm0.tm_year = GN_DATE_YEAR(time) - 1900;  /* need years since 1900 */
