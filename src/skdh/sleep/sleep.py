@@ -319,7 +319,7 @@ class Sleep(BaseProcess):
             file_name = Path(file_name)
 
             for i, start in enumerate(self.sleep_aux["start time"]):
-                day_n = self.sleep_aux["day_n"][i]
+                day_n = self.sleep_aux["day n"][i]
                 new_name = file_name.stem + f"_per_minute_predictions_day_{day_n}"
                 new_name += file_name.suffix
                 rest_file = file_name.with_name(new_name)
