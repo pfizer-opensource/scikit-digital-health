@@ -5,10 +5,12 @@ Lukas Adamowicz
 Pfizer DMTI 2020
 """
 from warnings import warn
+from pathlib import Path
 
 from numpy import vstack
 
 from skdh.base import BaseProcess
+from skdh.read import FileSizeError
 from skdh.read.get_window_start_stop import get_window_start_stop
 from skdh.read._extensions import read_gt3x
 
@@ -108,6 +110,8 @@ class ReadGT3X(BaseProcess):
             file = str(file)
         if file[-4:] != "gt3x":
             warn("File extension is not expected '.gt3x'", UserWarning)
+        if Path(file).stat().st_size < 1000:
+            raise FileSizeError("File is less than 1kb, nothing to read.")
 
         super().predict(expect_days=False, expect_wear=False, file=file, **kwargs)
 

@@ -10,6 +10,7 @@ from pathlib import Path
 from numpy import vstack, asarray, int_
 
 from skdh.base import BaseProcess
+from skdh.read import FileSizeError
 from skdh.read._extensions import read_axivity
 
 
@@ -125,6 +126,8 @@ class ReadCWA(BaseProcess):
             warn("File extension is not expected '.cwa'", UserWarning)
         if not Path(file).exists():
             raise FileNotFoundError(f"File [{file}] does not exist.")
+        if Path(file).stat().st_size < 1000:
+            raise FileSizeError("File is less than 1kb, nothing to read.")
 
         super().predict(expect_days=False, expect_wear=False, file=file, **kwargs)
 

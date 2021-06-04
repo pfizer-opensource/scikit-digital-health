@@ -5,10 +5,12 @@ Lukas Adamowicz
 Pfizer DMTI 2020
 """
 from warnings import warn
+from pathlib import Path
 
 from numpy import vstack, asarray, int_
 
 from skdh.base import BaseProcess
+from skdh.read import FileSizeError
 from skdh.read._extensions import read_geneactiv
 
 
@@ -117,6 +119,8 @@ class ReadBin(BaseProcess):
             file = str(file)
         if file[-3:] != "bin":
             warn("File extension is not expected '.bin'", UserWarning)
+        if Path(file).stat().st_size < 1000:
+            raise FileSizeError("File is less than 1kb, nothing to read.")
 
         super().predict(expect_days=False, expect_wear=False, file=file, **kwargs)
 
