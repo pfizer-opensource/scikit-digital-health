@@ -10,9 +10,12 @@ from pathlib import Path
 from numpy import vstack
 
 from skdh.base import BaseProcess
-from skdh.read import FileSizeError
 from skdh.read.get_window_start_stop import get_window_start_stop
 from skdh.read._extensions import read_gt3x
+
+
+class FileSizeError(Exception):
+    pass
 
 
 class ReadGT3X(BaseProcess):

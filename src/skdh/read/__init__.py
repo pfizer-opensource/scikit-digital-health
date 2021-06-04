@@ -22,7 +22,3 @@ from skdh.read.actigraph import ReadGT3X
 from skdh.read import actigraph
 
 __all__ = ("ReadCWA", "ReadBin", "ReadGT3X", "axivity", "geneactiv", "actigraph")
-
-
-class FileSizeError(Exception):
-    pass

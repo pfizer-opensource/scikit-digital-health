@@ -10,8 +10,11 @@ from pathlib import Path
 from numpy import vstack, asarray, int_
 
 from skdh.base import BaseProcess
-from skdh.read import FileSizeError
 from skdh.read._extensions import read_geneactiv
+
+
+class FileSizeError(Exception):
+    pass
 
 
 class ReadBin(BaseProcess):
