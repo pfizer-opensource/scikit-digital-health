@@ -508,8 +508,6 @@ class Sleep(BaseProcess):
             tso_start = int(tso[2] / int(60 * goal_fs))  # convert to minute indexing
             tso_stop = int(tso[3] / int(60 * goal_fs))
             pred_during_tso = predictions[tso_start:tso_stop]
-            # run length encoding for sleep metrics
-            sw_lengths, sw_starts, sw_vals = rle(pred_during_tso)
 
             # save the sleep per minute results if desired
             self._store_sleep_aux(start_datetime, iday, predictions, tso_start, tso_stop)
@@ -533,6 +531,11 @@ class Sleep(BaseProcess):
             sleep["TSO Start Timestamp"][-1] = tso[0]
             sleep["TSO Start"][-1] = tso_start_dt.strftime("%Y-%m-%d %H:%M:%S.%f")
             sleep["TSO Duration"][-1] = (tso[3] - tso[2]) / (goal_fs * 60)  # in minutes
+
+            # run length encoding for sleep metrics
+            if tso_start == tso_stop:
+                continue
+            sw_lengths, sw_starts, sw_vals = rle(pred_during_tso)
 
             for param in init_params:
                 sleep[param.name][-1] = param.predict(
