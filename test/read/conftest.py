@@ -126,3 +126,15 @@ def gt3x_truth():
     data["day_ends"] = {(9, 2): dat["day_ends_9_2"]}
 
     return data
+
+
+@fixture
+def apdm_file():
+    cwd = Path.cwd().parts
+
+    if cwd[-1] == "read":
+        return Path("data/apdm_sample.h5")
+    elif cwd[-1] == "test":
+        return Path("read/data/apdm_sample.h5")
+    elif cwd[-1] == "scikit-digital-health":
+        return Path("test/read/data/apdm_sample.h5")
