@@ -13,6 +13,7 @@ Binary File Readers
     ReadCWA
     ReadBin
     ReadGT3X
+    ReadApdmH5
 """
 from skdh.read.axivity import ReadCWA
 from skdh.read import axivity
@@ -20,5 +21,7 @@ from skdh.read.geneactiv import ReadBin
 from skdh.read import geneactiv
 from skdh.read.actigraph import ReadGT3X
 from skdh.read import actigraph
+from skdh.read.apdm import ReadApdmH5
+from skdh.read import apdm
 
-__all__ = ("ReadCWA", "ReadBin", "ReadGT3X", "axivity", "geneactiv", "actigraph")
+__all__ = ("ReadCWA", "ReadBin", "ReadGT3X", "ReadApdmH5", "axivity", "geneactiv", "actigraph", "apdm")
