@@ -88,7 +88,7 @@ class ReadBin(BaseProcess):
         """
         predict(file)
 
-        Read the data from the axivity file
+        Read the data from the GeneActiv file
 
         Parameters
         ----------
