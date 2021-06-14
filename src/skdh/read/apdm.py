@@ -85,7 +85,7 @@ class ReadApdmH5(BaseProcess):
             raise ValueError("`file` must not be None.")
         if not isinstance(file, str):
             file = str(file)
-        if file[-2:] != ".h5":
+        if file[-2:] != "h5":
             warn("File extension is not expected '.h5'", UserWarning)
         if not Path(file).exists():
             raise FileNotFoundError(f"File {file} does not exist.")
