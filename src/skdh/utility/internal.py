@@ -83,8 +83,8 @@ def get_day_index_intersection(starts, stops, for_inclusion, day_start, day_stop
             stops_subset.append(stop[start != stop])
 
     # get overlap
-    all_starts = concatenate(starts_subset)
-    all_stops = concatenate(stops_subset)
+    all_starts = concatenate(starts_subset) if len(starts_subset) > 0 else asarray(starts_subset)
+    all_stops = concatenate(stops_subset) if len(starts_subset) > 0 else asarray(starts_subset)
 
     valid_starts, valid_stops = [day_start], [day_stop]
 
