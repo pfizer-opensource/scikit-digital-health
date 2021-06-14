@@ -204,7 +204,9 @@ class CalibrateAccelerometer(BaseProcess):
             {"offset": offset, "scale": scale, "temperature scale": temp_scale}
         )
 
-        kwargs.update({self._time: time, self._acc: accel, self._temp: temperature})
+        kwargs.update(
+            {"fs": fs, self._time: time, self._acc: accel, self._temp: temperature}
+        )
         if self._in_pipeline:
             return kwargs, None
         else:
