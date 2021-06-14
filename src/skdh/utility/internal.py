@@ -70,6 +70,8 @@ def get_day_index_intersection(starts, stops, for_inclusion, day_start, day_stop
     stops_tmp = list(minimum(maximum(i, day_start), day_stop) for i in stops)
     starts_subset, stops_subset = [], []
     for start, stop, fi in zip(starts_tmp, stops_tmp, for_inclusion):
+        if start.size == 0 or stop.size == 0:
+            continue
         if fi:  # flip everything to being an "exclude" window
             tmp = roll(start, -1)
             tmp[-1] = day_stop
