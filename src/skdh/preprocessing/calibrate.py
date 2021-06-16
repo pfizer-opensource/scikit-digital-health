@@ -183,7 +183,7 @@ class CalibrateAccelerometer(BaseProcess):
                 temp_mean,
             ) = self._do_iterative_closest_point_fit(store)
 
-            if not finished and (nh + i_h * n12h) > accel.shape[0]:
+            if not finished and (nh + i_h * n12h) >= accel.shape[0]:
                 finished = True
                 warn(
                     f"Recalibration not done with {self.min_hours + i_h * 12} hours due to "
