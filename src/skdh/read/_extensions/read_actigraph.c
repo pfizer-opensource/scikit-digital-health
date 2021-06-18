@@ -51,5 +51,47 @@ END CONSTANTS
 /* parse a version number from text */
 void parse_version(char *vers, AG_Version_t *vers_info)
 {
+    char *end;
 
+    vers_info->major = strtol(vers, &end, 10);
+    vers = end + 1;  /* increment to after period */
+    vers_info->minor = strtol(vers, &end, 10);
+    vers = end + 1;
+    vers_info->build = strtol(vers, &end, 10);
 }
+
+/* parse net ticks into a unix timestamp */
+double parse_NET_ticks(char *tick_str)
+{
+    long long ticks = strtoll(tick_str, NULL, 10);
+    if (ticks == 0LL) return 0.0;
+    /* remove ticks from 1970, and divide to get seconds */
+    return (double)(ticks - NET_TICKS_1970) / 1.0e7;
+}
+
+/* get the number of samples based on start and end times */
+void get_n_samples(AG_Info_t *info, AG_SensorInfo_t *sensor)
+{
+    /* end time is last sample time if not 0, or stop time if not 0, or download time */
+    double end = 0.0;
+    if (sensor->last_sample_time > 0.0)
+        end = sensor->last_sample_time;
+    else
+    {
+        if (sensor->stop_time > 0)
+            end = sensor->stop_time;
+        else
+            end = sensor->download_time;
+    }
+
+    info->samples = (int)lround(end - sensor->start_time) * sensor->sample_rate;
+    info->n_days = (int)ceil((end - sensor->start_time) / (60 * 60 * 24));  /* round up # of days */
+
+    if (info->samples <= 0)
+    {
+        fprintf(stderr, "Invalid # of samples estimated, using maximum samples (100 days)\n");
+        info->samples = 100 * 24 * 60 * 60 * sensor->sample_rate;
+        info->n_days = 100;  /* set to 100 days */
+    }
+}
+
