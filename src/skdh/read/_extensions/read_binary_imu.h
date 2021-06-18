@@ -146,8 +146,8 @@ ACTIGRAPH
 ======================================
 */
 
-#define AG_DBGPRINT(a) if (pinfo->debug) fprintf(stdout, a "\n");
-#define AG_DBGPRINT1(a, b) if (pinfo->debug) fprintf(stdout, a "\n", b);
+#define AG_DBGPRINT(a) if (info->debug) fprintf(stdout, a "\n");
+#define AG_DBGPRINT1(a, b) if (info->debug) fprintf(stdout, a "\n", b);
 
 /* READ ERRORS */
 typedef enum {

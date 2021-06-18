@@ -263,3 +263,84 @@ int parse_info(zip_t *archive, AG_Info_t *info, AG_SensorInfo_t *sensor)
 
     return AG_READ_E_NONE;
 }
+
+
+/*
+=========================
+Activity parser helpers
+=========================
+*/
+int bytes2samplesize(const unsigned char type, const unsigned short bytes)
+{
+    if (type == RECORDTYPE_ACTIVITY)
+        return (bytes * 2) / 9;
+    else if (type == RECORDTYPE_ACTIVITY2)
+        return (bytes / 2) / 3;
+    else
+        return 0;
+}
+
+double decode_float_param(const uint32_t value)
+{
+    double significand, exponent;
+    int32_t i32;
+
+    /* handle parameters that are too big */
+    if (value == PARAM_ENCODED_MAXIMUM)
+        return DBL_MAX;
+    else if (value == PARAM_ENCODED_MINIMUM)
+        return -DBL_MAX;
+
+    /* extract exponent */
+    i32 = (int32_t)((value & PARAM_EXPONENT_MASK) >> PARAM_EXPONENT_OFFSET);
+    if ((i32 & 0x80) != 0)
+        i32 = (int32_t)((uint32_t)i32 | 0xFFFFFF00u);
+    
+    exponent = (double)i32;
+
+    /* extract significand */
+    i32 = (int32_t)(value & PARAM_SIGNIFICAND_MASK);
+    if ((i32 & PARAM_ENCODED_MINIMUM) != 0)
+        i32 = (int32_t)((uint32_t)i32 | 0xFF000000u);
+    
+    significand = (double)i32 / PARAM_FLOAT_MAXIMUM;
+
+    /* calculate floating point value */
+    return significand * pow(2.0, exponent);
+}
+
+void parse_parameters(zip_file_t *file, AG_SensorInfo_t *sensor, const unsigned short bytes, unsigned int *start_time)
+{
+    int n_params = bytes / 8;
+    unsigned short address = 0;
+    unsigned short key = 0;
+    unsigned int value = 0;
+
+    for (int i = 0; i < n_params; ++i)
+    {
+        zip_fread(file, &address, 2);
+        zip_fread(file, &key, 2);
+        zip_fread(file, &value, 4);
+
+        if (address == 0)
+        {
+            /* accel scale is key 55 */
+            if (key == 55)
+            {
+                if (value != 0)
+                {
+                    sensor->accel_scale = decode_float_param(value);
+                }
+            }
+        }
+        if (address == 1)
+        {
+            /* start time is key 12 */
+            if (key == 12)
+            {
+                *start_time = value;  /* convert int UNIX time to double */
+            }
+        }
+    }
+}
+
