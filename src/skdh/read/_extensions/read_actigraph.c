@@ -125,3 +125,141 @@ int is_old_version(AG_SensorInfo_t *sensor)
     }
     return serial && version;
 }
+
+/*
+Parse the info file in a GT3X archive
+
+Parameters
+----------
+archive : zip_t
+    Open GT3X archive file
+pinfo : ParseInfo_t
+    Struct for storing information relevant during the parsing of the file
+sensor : GT3XInfo_t
+    Struct for storing the information from the info file
+
+Modifies
+--------
+sensor
+info.samples
+    Number of samples contained in the GT3X archive.
+*/
+int parse_info(zip_t *archive, AG_Info_t *info, AG_SensorInfo_t *sensor)
+{
+    /* get the file stats first */
+    zip_stat_t stats;
+    int err = 0;
+    unsigned long bytes;
+    err = zip_stat(archive, "info.txt", ZIP_FL_ENC_GUESS, &stats);
+    /* make sure the size is valid */
+    if (((stats.valid & ZIP_STAT_SIZE) != 0) && (err == 0))
+    {
+        bytes = stats.size;
+    }
+    else
+    {
+        return AG_READ_E_INFO_OPEN;
+    }
+    /* open the info text file from inside the zip archive */
+    zip_file_t *info_file = zip_fopen(archive, "info.txt", ZIP_FL_ENC_GUESS);
+    if (info_file == NULL) {
+        return AG_READ_E_INFO_OPEN;
+    }
+
+    /* allocate buffer based on file size */
+    char *buffer = malloc(bytes);
+    if (!buffer)
+    {
+        return AG_READ_E_MALLOC;
+    }
+
+    int sep = 0;  /* line colon index */
+    char *line = NULL;
+
+    AG_DBGPRINT("Parsing info file ...");
+    zip_fread(info_file, buffer, bytes);
+
+    /* get the line token splitting on new lines */
+    line = strtok(buffer, "\n");
+    while (line)
+    {
+        sep = strcspn(line, ":") + 2;  // ": " 2 extra characters
+        if (strstr(line, "Serial Number") != NULL)
+        {
+            memcpy(sensor->serial, &line[sep], 13);
+            AG_DBGPRINT1("Serial number: %s", sensor->serial)
+        }
+        else if (strstr(line, "Firmware") != NULL)
+        {
+            parse_version(&line[sep], &(sensor->firmware));
+            if (info->debug)
+                fprintf(stdout, "Firmware: %d.%d.%d\n", sensor->firmware.major, sensor->firmware.minor, sensor->firmware.build);
+
+        }
+        else if (strstr(line, "Sample Rate") != NULL)
+        {
+            sensor->sample_rate = strtol(&line[sep], NULL, 10);
+            AG_DBGPRINT1("Sample rate: %i", sensor->sample_rate)
+
+        }
+        else if (strstr(line, "Start Date") != NULL)
+        {
+            sensor->start_time = parse_NET_ticks(&line[sep]);
+            AG_DBGPRINT1("Start date: %f", sensor->start_time)
+
+        }
+        else if (strstr(line, "Stop Date") != NULL)
+        {
+            sensor->stop_time = parse_NET_ticks(&line[sep]);
+            AG_DBGPRINT1("Stop date: %f", sensor->stop_time)
+
+        }
+        else if (strstr(line, "Last Sample Time") != NULL)
+        {
+            sensor->last_sample_time = parse_NET_ticks(&line[sep]);
+            AG_DBGPRINT1("Last sample time: %f", sensor->last_sample_time)
+
+        }
+        else if (strstr(line, "Download Date") != NULL)
+        {
+            sensor->download_time = parse_NET_ticks(&line[sep]);
+            AG_DBGPRINT1("Download date: %f", sensor->download_time)
+
+        }
+        else if (strstr(line, "Acceleration Scale") != NULL)
+        {
+            sensor->accel_scale = strtod(&line[sep], NULL);
+            AG_DBGPRINT1("Acceleration scale: %f\n", sensor->accel_scale)
+        }
+
+        line = strtok(NULL, "\n");
+    }
+
+    zip_fclose(info_file);
+    free(buffer);
+
+    AG_DBGPRINT("Computing # of samples ...")
+    /* check if the file is the old version as this determines sample calculation */
+    info->is_old_version = is_old_version(sensor);
+
+    get_n_samples(info, sensor);
+    /* if it is the old version, check file size to determine # of samples */
+    if (info->is_old_version)
+    {
+        err = zip_stat(archive, "activity.bin", ZIP_FL_ENC_GUESS, &stats);
+        if (((stats.valid & ZIP_STAT_SIZE) != 0) && (err = 0))
+        {
+            /* bytes -> bits, 36 bits per 3axis sample */
+            int est_n_samples = (int)stats.size * 8 / 36;
+            if (est_n_samples > info->samples)
+                info->samples = (int)est_n_samples;
+        }
+        else
+        {
+            return AG_READ_E_INFO_STAT;
+        }
+    }
+    AG_DBGPRINT1("Number of samles: %i", info->samples);
+
+    return AG_READ_E_NONE;
+}
