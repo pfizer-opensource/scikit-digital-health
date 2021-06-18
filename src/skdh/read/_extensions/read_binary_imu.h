@@ -170,7 +170,7 @@ typedef struct {
     int ndi;  /* n_days index tracker */
     int current_sample;  /* track the current sample in arrays */
     int open_err;  /* error saving for the zip archive */
-} AG_Into_t;
+} AG_Info_t;
 
 typedef struct {
     int major;
@@ -187,7 +187,7 @@ typedef struct {
     double download_time;
     double accel_scale;
     AG_Version_t firmware;
-} AG_Gt3x_t;
+} AG_SensorInfo_t;
 
 typedef struct {
     double *ts;
