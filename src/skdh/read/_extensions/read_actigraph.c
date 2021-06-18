@@ -95,3 +95,33 @@ void get_n_samples(AG_Info_t *info, AG_SensorInfo_t *sensor)
     }
 }
 
+/* check if the file is using the old version */
+int is_old_version(AG_SensorInfo_t *sensor)
+{
+    int serial = (strncmp(sensor->serial, "MRA", 3) == 0) || (strncmp(sensor->serial, "NEO", 3) == 0);
+    int version = 0;
+    if (sensor->firmware.major < 2)
+    {
+        version = 1;
+    }
+    else if (sensor->firmware.major >= 3)
+    {
+        version = 0;
+    }
+    else  /* major = 2 */
+    {
+        if (sensor->firmware.minor < 5)
+        {
+            version = 1;
+        }
+        else if (sensor->firmware.minor >= 6)
+        {
+            version = 0;
+        }
+        else  /* minor = 5 */
+        {
+            version = sensor->firmware.build == 0;
+        }
+    }
+    return serial && version;
+}
