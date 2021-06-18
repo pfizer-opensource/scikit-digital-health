@@ -3,6 +3,9 @@
 #include <string.h>
 #include <time.h>
 #include <math.h>
+#include <float.h>
+/* for reading from ActiGraph files */
+#include <zip.h>
 
 /*
 ======================================
@@ -160,8 +163,8 @@ typedef enum {
 
 /* Information structures */
 typedef struct {
-    bool debug;
-    bool is_old_version;  /* if the file is using the old format */
+    int debug;  /* bool */
+    int is_old_version;  /* boolean if the file is using the old format */
     int samples;  /* number of samples in the file */
     int n_days;  /* to keep track of the number of days */
     int ndi;  /* n_days index tracker */
