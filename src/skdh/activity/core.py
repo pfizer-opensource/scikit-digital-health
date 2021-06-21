@@ -4,6 +4,7 @@ Activity level classification based on accelerometer data
 Lukas Adamowicz
 Pfizer DMTI 2021
 """
+from sys import gettrace  # to check if debugging
 from datetime import datetime, timedelta
 from warnings import warn
 from pathlib import Path
@@ -32,8 +33,10 @@ from numpy import (
     max,
 )
 from scipy.stats import linregress
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
+import matplotlib
+from matplotlib.backends.backend_pdf import PdfPages
+import matplotlib.lines as mlines
+import matplotlib.pyplot as plt
 
 from skdh.base import BaseProcess
 from skdh.utility import moving_mean
@@ -228,9 +231,18 @@ class ActivityLevelClassification(BaseProcess):
         - name: process name.
         - file: file name used in the pipeline, or "" if not found.
         """
+        if save_name is None:
+            return
+
+        # move this inside here so that it doesnt effect everything on load
+        if gettrace() is None:  # only set if not debugging
+            matplotlib.use("PDF")  # non-interactiv, dont want to spam plots
+        plt.style.use("ggplot")
+
+        self.f = []  # need a plot for each day
+        self.ax = []  # correspond to each day
         self.plot_fname = save_name
 
-        self.f = []
         self._t60 = arange(0, 24.1, 1 / 60)
 
     def predict(self, time=None, accel=None, *, fs=None, wear=None, **kwargs):
@@ -523,127 +535,65 @@ class ActivityLevelClassification(BaseProcess):
         if self.f is None:
             return
 
-        f = make_subplots(
-            rows=4,
-            cols=1,
-            row_heights=[1, 1, 1, 0.5],
-            specs=[[{"type": "scatter"}]] * 4,
-            shared_xaxes=True,
-            vertical_spacing=0.0,
+        f, ax = plt.subplots(nrows=4, figsize=(12, 6), sharex=True, gridspec_kw={"height_ratios": [1, 1, 1, 0.5]})
+        f.suptitle(
+            f"Activity Visual Report: {self._file_name}\nDay: {day_n}\nDate: {date_str}"
         )
 
-        for i in range(1, 5):
-            f.update_xaxes(
-                row=i, col=1, showgrid=False, showticklabels=False, zeroline=False
-            )
-            f.update_yaxes(
-                row=i, col=1, showgrid=False, showticklabels=False, zeroline=False
+        for x in ax:
+            x.grid(False)
+            x.spines["left"].set_visible(False)
+            x.spines["right"].set_visible(False)
+            x.spines["top"].set_visible(False)
+            x.spines["bottom"].set_visible(False)
+
+            x.tick_params(
+                axis='both',
+                which='both',
+                bottom=False,
+                top=False,
+                right=False,
+                left=False,
             )
 
-        # update last one so we can see the hour labels
-        f.update_xaxes(row=4, col=1, showticklabels=True)
+            x.set_yticks([])
+            x.set_xticks([])
+
         self.f.append(f)
+        self.ax.append(ax)
 
         start_hr = start_dt.hour + start_dt.minute / 60 + start_dt.second / 3600
         x = self._t60 + start_hr
         n60 = int(fs * 60)
 
-        sfile_name = Path(self._file_name).name
-        f.update_layout(
-            title=f"Activity Visual Report: {sfile_name}<br>Day: {day_n}<br>Date: {date_str}"
-        )
+        ax[0].plot(x[:int(ceil(accel.shape[0] / n60))], accel[::n60], lw=0.5)
 
-        for i, axname in enumerate(["accel x", "accel y", "accel z"]):
-            f.add_trace(
-                go.Scattergl(
-                    x=x[: int(ceil(accel.shape[0] / n60))],
-                    y=accel[::n60, i],
-                    mode="lines",
-                    name=axname,
-                    line={"width": 1},
-                ),
-                row=1,
-                col=1,
-            )
+        hx = mlines.Line2D([], [], color='C0', label='X', lw=0.5)
+        hy = mlines.Line2D([], [], color='C1', label='Y', lw=0.5)
+        hz = mlines.Line2D([], [], color='C2', label='Z', lw=0.5)
+
+        ax[0].legend(handles=[hx, hy, hz], bbox_to_anchor=(0, 0.5), loc="center right")
 
         # compute the metric over 1 minute intervals
         metric_fn = get_metric(self.cutpoints["metric"])
         acc_metric = metric_fn(accel, n60, **self.cutpoints["kwargs"])
 
-        f.add_trace(
-            go.Scattergl(
-                x=x[: acc_metric.size],
-                y=acc_metric,
-                mode="lines",
-                name=self.cutpoints["metric"],  # get the name of the metric
-            ),
-            row=2,
-            col=1,
-        )
-        # do this in reverse order so that the legend top down reads the same order as the lines
+        # add to second sub-axis
+        ax[1].plot(x[:acc_metric.size], acc_metric, label=self.cutpoints['metric'])
+        ax[1].legend(bbox_to_anchor=(0, 0.5), loc='center right')
+
+        # add thresholds to plot
+        # do this in reverse order so legend top down is same order as lines
         for thresh in ["moderate", "light", "sedentary"]:
-            f.add_trace(
-                go.Scattergl(
-                    x=self.day_key,
-                    y=[self.cutpoints[thresh]] * 2,
-                    mode="lines",
-                    showlegend=False,
-                    line={"color": "black", "dash": "dash", "width": 1},
-                ),
-                row=2,
-                col=1,
-            )
+            ax[1].plot(self.day_key, [self.cutpoints[thresh]] * 2, 'k--')
 
         # labeling the thresholds
-        f.add_annotation(
-            text="vigorous \u2191",
-            x=0,
-            y=self.cutpoints["moderate"],
-            bgcolor="rgba(0.8, 0.8, 0.8, 1)",
-            showarrow=False,
-            xref="x2 domain",
-            xanchor="left",
-            yref="y2",
-            yanchor="bottom",
-            yshift=1,
-        )
-        f.add_annotation(
-            text="moderate",
-            x=0,
-            y=self.cutpoints["moderate"],
-            bgcolor="rgba(0.8, 0.8, 0.8, 1)",
-            showarrow=False,
-            xref="x2 domain",
-            xanchor="left",
-            yref="y2",
-            yanchor="top",
-            yshift=-1,
-        )
-        f.add_annotation(
-            text="light",
-            x=0,
-            y=self.cutpoints["light"],
-            bgcolor="rgba(0.8, 0.8, 0.8, 1)",
-            showarrow=False,
-            xref="x2 domain",
-            xanchor="left",
-            yref="y2",
-            yanchor="top",
-            yshift=-1,
-        )
-        f.add_annotation(
-            text="sedentary",
-            x=0,
-            y=self.cutpoints["sedentary"],
-            bgcolor="rgba(0.8, 0.8, 0.8, 1)",
-            showarrow=False,
-            xref="x2 domain",
-            xanchor="left",
-            yref="y2",
-            yanchor="top",
-            yshift=-1,
-        )
+        ax[1].text(0, 1.05 * self.cutpoints['moderate'], "vigorous \u2191", color='k')
+        ax[1].text(0, 0.9 * self.cutpoints['moderate'], "moderate", color='k')
+        ax[1].text(0, 0.9 * self.cutpoints['light'], 'light', color='k')
+        ax[1].text(0, 0.9 * self.cutpoints['sedentary'], 'sedentary', color='k')
 
+        # acceleration level plotting
         acc_level = zeros(acc_metric.size, dtype="int")
         acc_level_text = full(acc_level.size, "", dtype="<U10")
         for i, lvl in enumerate(["sedentary", "light", "moderate", "vigorous"]):
@@ -652,25 +602,16 @@ class ActivityLevelClassification(BaseProcess):
             acc_level[(acc_metric >= lthresh) & (acc_metric < uthresh)] = i
             acc_level_text[(acc_metric >= lthresh) & (acc_metric < uthresh)] = lvl
 
-        f.add_trace(
-            go.Scattergl(
-                x=x[: acc_level.size],
-                y=acc_level,
-                mode="lines",
-                name="Accel. Level",
-                line={"color": "black", "width": 1},
-                text=acc_level_text,
-                hoverinfo="text",
-            ),
-            row=3,
-            col=1,
-        )
+        ax[2].plot(x[:acc_level.size], acc_level, color='k', label='Accel. Level')
+        ax[2].legend(bbox_to_anchor=(0, 0.5), loc='center right')
 
-        f.update_yaxes(title="Accel.", row=1, col=1)
-        f.update_yaxes(title="Accel. Metric", row=2, col=1)
-        f.update_yaxes(title="Accel. Level", row=3, col=1)
-        f.update_yaxes(title="Wear/Sleep", row=4, col=1)
-        f.update_xaxes(title="Day Hour", range=self.day_key, row=4, col=1)
+        ax[-1].set_xlim([self.day_key[0], sum(self.day_key)])
+        ax[-1].set_xticks(
+            [i for i in range(self.day_key[0], sum(self.day_key) + 1, 3)]
+        )
+        ax[-1].set_xticklabels(
+            [f"{int(i % 24)}:00" for i in ax[-1].get_xticks()]
+        )
 
     def _plot_day_wear(self, fs, day_wear_starts, day_wear_stops, start_dt, day_start):
         if self.f is None:
@@ -685,20 +626,9 @@ class ActivityLevelClassification(BaseProcess):
 
             wear.extend([sh, eh, None])  # add None so gaps dont get connected
 
-        self.f[-1].add_trace(
-            go.Scattergl(
-                x=wear,
-                y=[2] * len(wear),
-                mode="lines",
-                name="Wear",
-                legendgroup="wear",
-                line={"width": 8},
-            ),
-            row=4,
-            col=1,
-        )
-
-        self.f[-1].update_yaxes(range=[0.75, 2.25], row=4, col=1)
+        self.ax[-1][-1].plot(wear, [2] * len(wear), label="Wear", lw=3)
+        self.ax[-1][-1].set_ylim([0.75, 2.25])
+        self.ax[-1][-1].legend(bbox_to_anchor=(0, 0.5), loc='center right')
 
     def _plot_day_sleep(
         self, fs, sleep_starts, sleep_stops, day_start, day_stop, start_dt
@@ -720,18 +650,8 @@ class ActivityLevelClassification(BaseProcess):
 
             sleep.extend([sh, eh, None])  # add none so it doesn't get connected
 
-        self.f[-1].add_trace(
-            go.Scattergl(
-                x=sleep,
-                y=[1] * len(sleep),
-                mode="lines",
-                name="Sleep",
-                legendgroup="sleep",
-                line={"width": 8},
-            ),
-            row=4,
-            col=1,
-        )
+        self.ax[-1][-1].plot(sleep, [1] * len(sleep), label="Sleep Opportunity", lw=3)
+        self.ax[-1][-1].legend(bbox_to_anchor=(0, 0.5), loc='center right')
 
     def _finalize_plots(self):
         if self.f is None:
@@ -742,9 +662,14 @@ class ActivityLevelClassification(BaseProcess):
             date=date, name=self._name, file=self._file_name
         )
 
-        with open(form_fname, "w") as fid:
-            for fig in self.f:
-                fid.write(fig.to_html(full_html=False, include_plotlyjs="cdn"))
+        pp = PdfPages(Path(form_fname).with_suffix('.pdf'))
+
+        for f in self.f:
+            f.tight_layout()
+            f.subplots_adjust(hspace=0)
+            pp.savefig(f)
+
+        pp.close()
 
 
 def get_activity_bouts(
