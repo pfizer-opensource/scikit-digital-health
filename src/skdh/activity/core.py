@@ -504,7 +504,8 @@ class ActivityLevelClassification(BaseProcess):
             results[key][day_n] = 0.0
 
         for start, stop in zip(starts, stops):
-            acc_metric = self.cutpoints["metric"](
+            metric_fn = get_metric(self.cutpoints["metric"])
+            acc_metric = metric_fn(
                 accel[start:stop], n_wlen, fs, **self.cutpoints["kwargs"]
             )
 
@@ -563,7 +564,8 @@ class ActivityLevelClassification(BaseProcess):
             )
 
         # compute the metric over 1 minute intervals
-        acc_metric = self.cutpoints["metric"](accel, n60, **self.cutpoints["kwargs"])
+        metric_fn = get_metric(self.cutpoints["metric"])
+        acc_metric = metric_fn(accel, n60, **self.cutpoints["kwargs"])
 
         f.add_trace(
             go.Scattergl(
