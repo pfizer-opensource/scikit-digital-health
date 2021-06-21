@@ -49,12 +49,16 @@ def get_level_thresholds(level, cutpoints):
         raise ValueError(f"Activity level label [{level}] not recognized.")
 
 
+def get_metric(name):
+    return getattr(metrics, name)
+
+
 # ==========================================================
 # Activity cutpoints
 _base_cutpoints = {}
 
 _base_cutpoints["esliger_lwrist_adult"] = {
-    "metric": metrics.metric_enmo,
+    "metric": "metric_enmo",
     "kwargs": {"take_abs": True},
     "sedentary": 217 / 80 / 60,  # paper at 80hz, summed for each minute long window
     "light": 644 / 80 / 60,
@@ -62,7 +66,7 @@ _base_cutpoints["esliger_lwrist_adult"] = {
 }
 
 _base_cutpoints["esliger_rwirst_adult"] = {
-    "metric": metrics.metric_enmo,
+    "metric": "metric_enmo",
     "kwargs": {"take_abs": True},
     "sedentary": 386 / 80 / 60,  # paper at 80hz, summed for each 1min window
     "light": 439 / 80 / 60,
@@ -70,7 +74,7 @@ _base_cutpoints["esliger_rwirst_adult"] = {
 }
 
 _base_cutpoints["esliger_lumbar_adult"] = {
-    "metric": metrics.metric_enmo,
+    "metric": "metric_enmo",
     "kwargs": {"take_abs": True},
     "sedentary": 77 / 80 / 60,  # paper at 80hz, summed for each 1min window
     "light": 219 / 80 / 60,
@@ -78,7 +82,7 @@ _base_cutpoints["esliger_lumbar_adult"] = {
 }
 
 _base_cutpoints["schaefer_ndomwrist_child6-11"] = {
-    "metric": metrics.metric_bfen,
+    "metric": "metric_bfen",
     "kwargs": {"low_cutoff": 0.2, "high_cutoff": 15, "trim_zero": False},
     "sedentary": 0.190,
     "light": 0.314,
@@ -86,7 +90,7 @@ _base_cutpoints["schaefer_ndomwrist_child6-11"] = {
 }
 
 _base_cutpoints["phillips_rwrist_child8-14"] = {
-    "metric": metrics.metric_enmo,
+    "metric": "metric_enmo",
     "kwargs": {"take_abs": True},
     "sedentary": 6 / 80,  # paper at 80hz, summed for each 1s window
     "light": 21 / 80,
@@ -94,7 +98,7 @@ _base_cutpoints["phillips_rwrist_child8-14"] = {
 }
 
 _base_cutpoints["phillips_lwrist_child8-14"] = {
-    "metric": metrics.metric_enmo,
+    "metric": "metric_enmo",
     "kwargs": {"take_abs": True},
     "sedentary": 7 / 80,
     "light": 19 / 80,
@@ -102,7 +106,7 @@ _base_cutpoints["phillips_lwrist_child8-14"] = {
 }
 
 _base_cutpoints["phillips_hip_child8-14"] = {
-    "metric": metrics.metric_enmo,
+    "metric": "metric_enmo",
     "kwargs": {"take_abs": True},
     "sedentary": 3 / 80,
     "light": 16 / 80,
@@ -110,14 +114,14 @@ _base_cutpoints["phillips_hip_child8-14"] = {
 }
 
 _base_cutpoints["vaha-ypya_hip_adult"] = {
-    "metric": metrics.metric_mad,
+    "metric": "metric_mad",
     "kwargs": {},
     "light": 0.091,  # originally presented in mg
     "moderate": 0.414,
 }
 
 _base_cutpoints["hildebrand_hip_adult_actigraph"] = {
-    "metric": metrics.metric_enmo,
+    "metric": "metric_enmo",
     "kwargs": {"take_abs": False, "trim_zero": True},
     "sedentary": 0.0474,
     "light": 0.0691,
@@ -125,7 +129,7 @@ _base_cutpoints["hildebrand_hip_adult_actigraph"] = {
 }
 
 _base_cutpoints["hildebrand_hip_adult_geneactv"] = {
-    "metric": metrics.metric_enmo,
+    "metric": "metric_enmo",
     "kwargs": {"take_abs": False, "trim_zero": True},
     "sedentary": 0.0469,
     "light": 0.0687,
@@ -133,7 +137,7 @@ _base_cutpoints["hildebrand_hip_adult_geneactv"] = {
 }
 
 _base_cutpoints["hildebrand_wrist_adult_actigraph"] = {
-    "metric": metrics.metric_enmo,
+    "metric": "metric_enmo",
     "kwargs": {"take_abs": False, "trim_zero": True},
     "sedentary": 0.0448,
     "light": 0.1006,
@@ -141,7 +145,7 @@ _base_cutpoints["hildebrand_wrist_adult_actigraph"] = {
 }
 
 _base_cutpoints["hildebrand_wrist_adult_geneactiv"] = {
-    "metric": metrics.metric_enmo,
+    "metric": "metric_enmo",
     "kwargs": {"take_abs": False, "trim_zero": True},
     "sedentary": 0.0458,
     "light": 0.0932,
@@ -149,7 +153,7 @@ _base_cutpoints["hildebrand_wrist_adult_geneactiv"] = {
 }
 
 _base_cutpoints["hildebrand_hip_child7-11_actigraph"] = {
-    "metric": metrics.metric_enmo,
+    "metric": "metric_enmo",
     "kwargs": {"take_abs": False, "trim_zero": True},
     "sedentary": 0.0633,
     "light": 0.1426,
@@ -157,7 +161,7 @@ _base_cutpoints["hildebrand_hip_child7-11_actigraph"] = {
 }
 
 _base_cutpoints["hildebrand_hip_child7-11_geneactiv"] = {
-    "metric": metrics.metric_enmo,
+    "metric": "metric_enmo",
     "kwargs": {"take_abs": False, "trim_zero": True},
     "sedentary": 0.0641,
     "light": 0.1528,
@@ -165,7 +169,7 @@ _base_cutpoints["hildebrand_hip_child7-11_geneactiv"] = {
 }
 
 _base_cutpoints["hildebrand_wrist_child7-11_actigraph"] = {
-    "metric": metrics.metric_enmo,
+    "metric": "metric_enmo",
     "kwargs": {"take_abs": False, "trim_zero": True},
     "sedentary": 0.0356,
     "light": 0.2014,
@@ -173,7 +177,7 @@ _base_cutpoints["hildebrand_wrist_child7-11_actigraph"] = {
 }
 
 _base_cutpoints["hildebrand_wrist_child7-11_geneactiv"] = {
-    "metric": metrics.metric_enmo,
+    "metric": "metric_enmo",
     "kwargs": {"take_abs": False, "trim_zero": True},
     "sedentary": 0.0563,
     "light": 0.1916,
@@ -181,7 +185,7 @@ _base_cutpoints["hildebrand_wrist_child7-11_geneactiv"] = {
 }
 
 _base_cutpoints["migueles_wrist_adult"] = {
-    "metric": metrics.metric_enmo,
+    "metric": "metric_enmo",
     "kwargs": {"take_abs": False, "trim_zero": True},
     "sedentary": 0.050,
     "light": 0.110,

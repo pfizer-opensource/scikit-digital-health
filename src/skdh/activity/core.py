@@ -38,7 +38,7 @@ from plotly.subplots import make_subplots
 from skdh.base import BaseProcess
 from skdh.utility import moving_mean
 from skdh.utility.internal import get_day_index_intersection
-from skdh.activity.cutpoints import _base_cutpoints, get_level_thresholds
+from skdh.activity.cutpoints import _base_cutpoints, get_level_thresholds, get_metric
 
 
 def _update_date_results(
@@ -289,9 +289,9 @@ class ActivityLevelClassification(BaseProcess):
         )
         sleep_starts, sleep_stops = self._check_if_idx_none(sleep, slp_msg, None, None)
 
-        # ========================================================================================
+        # =============================================================================
         # SETUP RESULTS KEYS/ENDPOINTS
-        # ========================================================================================
+        # =============================================================================
         res_keys = [("Date", "", "U11"), ("Weekday", "", "U11"), ("Day N", -1, "int")]
         res_keys += [
             ("N hours", nan, "float"),
@@ -319,9 +319,9 @@ class ActivityLevelClassification(BaseProcess):
 
         res = {i: full(len(self.day_idx[0]), j, dtype=k) for i, j, k in res_keys}
 
-        # ========================================================================================
+        # =============================================================================
         # PROCESSING
-        # ========================================================================================
+        # =============================================================================
         for iday, day_idx in enumerate(zip(*self.day_idx)):
             day_start, day_stop = day_idx
             # update the results dictionary with date strings, # of hours, etc
@@ -433,13 +433,14 @@ class ActivityLevelClassification(BaseProcess):
         # allocate histogram for intensity gradient
         hist = zeros(ig_levels.size - 1)
 
-        # initialize values from nan to 0.0. Do this here because days with less than minimum
-        # hours should have nan values
+        # initialize values from nan to 0.0. Do this here because days with less than
+        # minimum hours should have nan values
         self._initialize_awake_values(results, day_n)
 
         for start, stop in zip(starts, stops):
             # compute the desired acceleration metric
-            acc_metric = self.cutpoints["metric"](
+            metric_fn = get_metric(self.cutpoints["metric"])
+            acc_metric = metric_fn(
                 accel[start:stop], n_wlen, fs, **self.cutpoints["kwargs"]
             )
 
