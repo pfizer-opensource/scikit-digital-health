@@ -26,7 +26,7 @@ def get_available_cutpoints(name=None):
         cuts = _base_cutpoints[name]
 
         print(f"{name}\n{'-' * 15}")
-        print(f"Metric: {cuts['metric'].__name__}")
+        print(f"Metric: {cuts['metric']}")
 
         for level in ["sedentary", "light", "moderate", "vigorous"]:
             lthresh, uthresh = get_level_thresholds(level, cuts)
