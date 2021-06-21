@@ -572,7 +572,7 @@ class ActivityLevelClassification(BaseProcess):
                 x=x[: acc_metric.size],
                 y=acc_metric,
                 mode="lines",
-                name=self.cutpoints["metric"].__name__,  # get the name of the metric
+                name=self.cutpoints["metric"],  # get the name of the metric
             ),
             row=2,
             col=1,
