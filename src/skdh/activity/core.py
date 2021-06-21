@@ -505,9 +505,12 @@ class ActivityLevelClassification(BaseProcess):
 
         for start, stop in zip(starts, stops):
             metric_fn = get_metric(self.cutpoints["metric"])
-            acc_metric = metric_fn(
-                accel[start:stop], n_wlen, fs, **self.cutpoints["kwargs"]
-            )
+            try:
+                acc_metric = metric_fn(
+                    accel[start:stop], n_wlen, fs, **self.cutpoints["kwargs"]
+                )
+            except ValueError:  # if not enough points, just skip, value is already set
+                continue
 
             for lvl in self.act_levels:
                 lthresh, uthresh = get_level_thresholds(lvl, self.cutpoints)
