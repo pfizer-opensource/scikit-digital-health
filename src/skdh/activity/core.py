@@ -585,13 +585,13 @@ class ActivityLevelClassification(BaseProcess):
         # add thresholds to plot
         # do this in reverse order so legend top down is same order as lines
         for thresh in ["moderate", "light", "sedentary"]:
-            ax[1].plot(self.day_key, [self.cutpoints[thresh]] * 2, 'k--')
+            ax[1].plot(self.day_key, [self.cutpoints[thresh]] * 2, 'k--', lw=0.5)
 
         # labeling the thresholds
-        ax[1].text(0, 1.05 * self.cutpoints['moderate'], "vigorous \u2191", color='k')
-        ax[1].text(0, 0.9 * self.cutpoints['moderate'], "moderate", color='k')
-        ax[1].text(0, 0.9 * self.cutpoints['light'], 'light', color='k')
-        ax[1].text(0, 0.9 * self.cutpoints['sedentary'], 'sedentary', color='k')
+        ax[1].text(0, self.cutpoints['moderate'] + 0.025, "vigorous \u2191", color='k')
+        ax[1].text(0, self.cutpoints['moderate'] - 0.05, "moderate", color='k')
+        ax[1].text(0, self.cutpoints['light'] - 0.05, 'light', color='k')
+        ax[1].text(0, self.cutpoints['sedentary'] - 0.05, 'sedentary', color='k')
 
         # acceleration level plotting
         acc_level = zeros(acc_metric.size, dtype="int")
@@ -602,7 +602,7 @@ class ActivityLevelClassification(BaseProcess):
             acc_level[(acc_metric >= lthresh) & (acc_metric < uthresh)] = i
             acc_level_text[(acc_metric >= lthresh) & (acc_metric < uthresh)] = lvl
 
-        ax[2].plot(x[:acc_level.size], acc_level, color='k', label='Accel. Level')
+        ax[2].plot(x[:acc_level.size], acc_level, color='k', lw=0.5, label='Accel. Level')
         ax[2].legend(bbox_to_anchor=(0, 0.5), loc='center right')
 
         ax[-1].set_xlim([self.day_key[0], sum(self.day_key)])
