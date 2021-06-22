@@ -6,4 +6,3 @@ pywavelets
 scikit-learn
 h5py
 matplotlib
-plotly
