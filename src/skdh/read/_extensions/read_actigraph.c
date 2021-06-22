@@ -343,4 +343,3 @@ void parse_parameters(zip_file_t *file, AG_SensorInfo_t *sensor, const unsigned 
         }
     }
 }
-
