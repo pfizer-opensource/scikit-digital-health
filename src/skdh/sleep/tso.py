@@ -126,8 +126,8 @@ def get_total_sleep_opportunity(
     )
 
     # get the number of windows there would be without additional data
-    # .size - 1 due to taking difference
-    nw = ((_z_rm.size - 1) - (12 * 5)) + 1  # // 1 left out
+    # .size because the difference is computed and left at the same size
+    nw = (_z_rm.size - (12 * 5)) + 1  # "// 1" left out
     # create the TSO mask (1 -> sleep opportunity, only happens during wear)
     tso = zeros(nw, dtype=bool_)
     # block off external non-wear times, scale by 5s blocks
