@@ -122,22 +122,19 @@ class Sleep(BaseProcess):
 
     References
     ----------
-    .. [1] van Hees V, Fang Z, Zhao J, Heywood J, Mirkes E, Sabia S, Migueles J (2019). GGIR: Raw
-        Accelerometer Data Analysis. doi: 10.5281/zenodo.1051064, R package version 1.9-1,
-        https://CRAN.R-project.org/package=GGIR.
-    .. [2] van Hees V, Fang Z, Langford J, Assah F, Mohammad Mirkes A, da Silva I, Trenell M,
+    .. [1] van Hees V, Fang Z, Langford J, Assah F, Mohammad Mirkes A, da Silva I, Trenell M,
         White T, Wareham N, Brage S (2014). 'Autocalibration of accelerometer data or free-living
         physical activity assessment using local gravity and temperature: an evaluation on four
         continents.' Journal of Applied Physiology, 117(7), 738-744.
         doi: 10.1152/japplphysiol.00421.2014,
         https://www.physiology.org/doi/10.1152/japplphysiol.00421.2014
-    .. [3] van Hees V, Sabia S, Anderson K, Denton S, Oliver J, Catt M, Abell J, Kivimaki M,
+    .. [2] van Hees V, Sabia S, Anderson K, Denton S, Oliver J, Catt M, Abell J, Kivimaki M,
         Trenell M, Singh-Maoux A (2015). 'A Novel, Open Access Method to Assess Sleep Duration
         Using a Wrist-Worn Accelerometer.' PloS One, 10(11). doi: 10.1371/journal.pone.0142533,
         https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0142533.
-    .. [4] Cole, R.J., Kripke, D.F., Gruen, W.'., Mullaney, D.J., & Gillin, J.C. (1992). Automatic
+    .. [3] Cole, R.J., Kripke, D.F., Gruen, W.'., Mullaney, D.J., & Gillin, J.C. (1992). Automatic
         sleep/wake identification from wrist activity. Sleep, 15 5, 461-9.
-    .. [5] Bai J, Di C, Xiao L, Evenson KR, LaCroix AZ, Crainiceanu CM, et al. (2016) An Activity
+    .. [4] Bai J, Di C, Xiao L, Evenson KR, LaCroix AZ, Crainiceanu CM, et al. (2016) An Activity
         Index for Raw Accelerometry Data and Its Comparison with Other Activity Metrics. PLoS ONE
         11(8): e0160644. https://doi.org/10.1371/journal.pone.0160644
     """
