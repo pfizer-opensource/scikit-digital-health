@@ -125,15 +125,18 @@ def get_total_sleep_opportunity(
         dz_rm_rmd, min_td=min_angle_thresh, max_td=max_angle_thresh
     )
 
+    # get the number of windows there would be without additional data
+    # .size - 1 due to taking difference
+    nw = ((_z_rm.size - 1) - (12 * 5)) + 1  # // 1 left out
     # create the TSO mask (1 -> sleep opportunity, only happens during wear)
-    tso = zeros(dz_rm_rmd.size, dtype=bool_)
+    tso = zeros(nw, dtype=bool_)
     # block off external non-wear times, scale by 5s blocks
     for strt, stp in zip((wear_starts - idx_start) / n5, (wear_stops - idx_start) / n5):
         tso[int(strt) : int(stp)] = True
 
     # apply the threshold before any internal wear checking
     tso &= (
-        dz_rm_rmd < tso_thresh
+        dz_rm_rmd[blocksize:blocksize + nw] < tso_thresh
     )  # now only blocks where there is no movement, and wear are left
 
     # check if we can compute wear internally
