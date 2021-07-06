@@ -108,17 +108,23 @@ class Sleep(BaseProcess):
         days. Default is (12, 24), which will look for days starting at 12 noon and lasting 24
         hours. This should only be changed if the data coming in is from someone who sleeps
         during the day, in which case (0, 24) makes the most sense.
+    add_active_time : float, optional
+        Add active time to the accelerometer signal start and end when detecting the
+        total sleep opportunity. This can occasionally be useful if less than 24 hrs of
+        data are collected, as sleep-period skewed data can effect the sleep window
+        cutoff, effecting the end results. Suggested is not adding more than 1.5
+        hours [5]. Default is 0.0 for no added data.
     save_per_minute_results : bool, optional
         Save minute-by-minute predictions of rest for each day. Default is False.
 
     Notes
     -----
-    Sleep window detection is based off of methods in [1]_, [2]_, [3]_.
+    Sleep window detection is based off of methods in [1]_, [2]_.
 
     The detection of sleep and wake states uses a heuristic model based
-    on the algorithm described in [4]_.
+    on the algorithm described in [3]_.
 
-    The activity index feature is based on the index described in [5]_.
+    The activity index feature is based on the index described in [4]_.
 
     References
     ----------
@@ -137,6 +143,10 @@ class Sleep(BaseProcess):
     .. [4] Bai J, Di C, Xiao L, Evenson KR, LaCroix AZ, Crainiceanu CM, et al. (2016) An Activity
         Index for Raw Accelerometry Data and Its Comparison with Other Activity Metrics. PLoS ONE
         11(8): e0160644. https://doi.org/10.1371/journal.pone.0160644
+    .. [5] V. T. van Hees et al., “Estimating sleep parameters using an accelerometer
+        without sleep diary,” Scientific Reports, vol. 8, no. 1, Art. no. 1, Aug. 2018,
+        doi: 10.1038/s41598-018-31266-z.
+
     """
 
     _params = [
@@ -176,6 +186,7 @@ class Sleep(BaseProcess):
         downsample=True,
         day_window=(12, 24),
         save_per_minute_results=False,
+        add_active_time=0.0,
     ):
         super().__init__(
             start_buffer=start_buffer,
@@ -193,6 +204,7 @@ class Sleep(BaseProcess):
             downsample=downsample,
             day_window=day_window,
             save_per_minute_results=save_per_minute_results,
+            add_active_time=add_active_time,
         )
 
         self.window_size = 60
@@ -211,6 +223,7 @@ class Sleep(BaseProcess):
         self.min_day_hrs = min_day_hours
         self.downsample = downsample
         self.save_pm = save_per_minute_results
+        self.add_time = add_active_time
 
         # for storing sleep auxiliary data
         self.sleep_aux = None
@@ -489,6 +502,7 @@ class Sleep(BaseProcess):
                 self.int_w_move,
                 self._plot_arm_angle,
                 idx_start=start,
+                add_active_time=self.add_time,
             )
 
             if tso[0] is None:

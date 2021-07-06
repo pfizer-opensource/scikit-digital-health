@@ -4,7 +4,8 @@ Function for the detection of sleep boundaries, here defined as the total sleep 
 Yiorgos Christakis
 Pfizer DMTI 2021
 """
-from numpy import min, max, percentile, zeros, bool_, pad
+from numpy import min, max, percentile, zeros, bool_, pad, sin, arange, pi, concatenate
+from numpy.random import default_rng
 
 from skdh.utility import moving_mean, moving_median, moving_sd
 from skdh.sleep.utility import (
@@ -30,6 +31,7 @@ def get_total_sleep_opportunity(
     int_wear_move,
     plot_fn,
     idx_start=0,
+    add_active_time=0.0,
 ):
     """
     Compute the period of time in which sleep can occur for a given days worth of data. For this
@@ -73,6 +75,12 @@ def get_total_sleep_opportunity(
     idx_start : int, optional
         Offset index for wear-time indices. If `wear_starts` and `wear_stops` are relative to the
         day of interest, then `idx_start` should equal 0.
+    add_active_time : float, optional
+        Add active time to the accelerometer signal start and end when detecting the
+        total sleep opportunity. This can occasionally be useful if less than 24 hrs of
+        data are collected, as sleep-period skewed data can effect the sleep window
+        cutoff, effecting the end results. Suggested is not adding more than 1.5
+        hours. Default is 0.0 for no added data.
 
     Returns
     -------
@@ -94,9 +102,17 @@ def get_total_sleep_opportunity(
     z = compute_z_angle(acc_rmd)
 
     # rolling 5s mean with non-overlapping windows for the z-angle
-    z_rm = moving_mean(z, n5, n5)
+    _z_rm = moving_mean(z, n5, n5)
     # plot arm angle
-    plot_fn(z_rm)
+    plot_fn(_z_rm)
+
+    # add data as required
+    rng = default_rng()
+    blocksize = max([int(12 * 60 * add_active_time), 0])
+    angleblock = sin(arange(blocksize) / pi * 0.1) * 40
+    angleblock += rng.normal(loc=0., scale=10., size=blocksize)
+
+    z_rm = concatenate((angleblock, _z_rm, angleblock))
 
     # the angle differences
     dz_rm = compute_absolute_difference(z_rm)
