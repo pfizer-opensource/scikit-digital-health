@@ -508,7 +508,7 @@ class Sleep(BaseProcess):
                 dw_stops,
                 self.min_rest_block,
                 self.max_act_break,
-                self.tso_min_tresh,
+                self.tso_min_thresh,
                 self.tso_max_thresh,
                 self.tso_perc,
                 self.tso_factor,
