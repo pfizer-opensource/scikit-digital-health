@@ -93,7 +93,8 @@ def get_total_sleep_opportunity(
     arg_stop : int
         Total sleep opportunity stop index, into the specific period of time.
     """
-    # samples in 5 seconds
+    # samples in 5 seconds. GGIR makes this always odd, which is a function
+    # of the library (zoo) they are using for rollmedian
     n5 = int(5 * fs)
     # compute the rolling median for 5s windows
     acc_rmd = moving_median(accel, n5, skip=1, pad=False, axis=0)
