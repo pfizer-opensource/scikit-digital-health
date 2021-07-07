@@ -88,10 +88,16 @@ class Sleep(BaseProcess):
     max_activity_break : int, optional
         Number of minutes of activity allowed to interrupt the major rest period. Default is 30
         minutes.
-    min_angle_thresh : float, optional
+    tso_min_thresh : float, optional
         Minimum allowed z-angle threshold for determining major rest period. Default is 0.1.
-    max_angle_thresh : float, optional
+    tso_max_thresh : float, optional
         Maximum allowed z-angle threshold for determining major rest period. Default is 1.0.
+    tso_perc : int
+        The percentile to use when calculating the TSO threshold from daily data.
+        Default is 10.
+    tso_factor : float
+        The factor to multiply the percentile value by co get the TSO threshold.
+        Default is 15.0.
     min_rest_period : float, optional
         Minimum length allowed for major rest period. Default is None
     nonwear_move_thresh : float, optional
@@ -177,8 +183,10 @@ class Sleep(BaseProcess):
         internal_wear_move_thresh=0.001,
         min_rest_block=30,
         max_activity_break=60,
-        min_angle_thresh=0.1,
-        max_angle_thresh=1.0,
+        tso_min_thresh=0.1,
+        tso_max_thresh=1.0,
+        tso_perc=10,
+        tso_factor=15.0,
         min_rest_period=None,
         nonwear_move_thresh=None,
         min_wear_time=0,
@@ -195,8 +203,10 @@ class Sleep(BaseProcess):
             internal_wear_move_thresh=internal_wear_move_thresh,
             min_rest_block=min_rest_block,
             max_activity_break=max_activity_break,
-            min_angle_thresh=min_angle_thresh,
-            max_angle_thresh=max_angle_thresh,
+            tso_min_thresh=tso_min_thresh,
+            tso_max_thresh=tso_max_thresh,
+            tso_perc=tso_perc,
+            tso_factor=tso_factor,
             min_rest_period=min_rest_period,
             nonwear_move_thresh=nonwear_move_thresh,
             min_wear_time=min_wear_time,
@@ -215,8 +225,10 @@ class Sleep(BaseProcess):
         self.int_w_move = internal_wear_move_thresh
         self.min_rest_block = min_rest_block
         self.max_act_break = max_activity_break
-        self.min_angle = min_angle_thresh
-        self.max_angle = max_angle_thresh
+        self.tso_min_thresh = tso_min_thresh
+        self.tso_max_thresh = tso_max_thresh
+        self.tso_perc = tso_perc
+        self.tso_factor = tso_factor
         self.min_rest_period = min_rest_period
         self.nw_thresh = nonwear_move_thresh
         self.min_wear_time = min_wear_time
@@ -496,8 +508,10 @@ class Sleep(BaseProcess):
                 dw_stops,
                 self.min_rest_block,
                 self.max_act_break,
-                self.min_angle,
-                self.max_angle,
+                self.tso_min_tresh,
+                self.tso_max_thresh,
+                self.tso_perc,
+                self.tso_factor,
                 self.int_w_temp,
                 self.int_w_move,
                 self._plot_arm_angle,

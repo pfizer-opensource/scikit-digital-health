@@ -25,8 +25,10 @@ def get_total_sleep_opportunity(
     wear_stops,
     min_rest_block,
     max_act_break,
-    min_angle_thresh,
-    max_angle_thresh,
+    tso_min_thresh,
+    tso_max_thresh,
+    tso_perc,
+    tso_factor,
     int_wear_temp,
     int_wear_move,
     plot_fn,
@@ -34,8 +36,8 @@ def get_total_sleep_opportunity(
     add_active_time=0.0,
 ):
     """
-    Compute the period of time in which sleep can occur for a given days worth of data. For this
-    algorithm, it is the longest period of wear-time that has low activity.
+    Compute the period of time in which sleep can occur for a given days worth of data.
+    For this algorithm, it is the longest period of wear-time that has low activity.
 
     Parameters
     ----------
@@ -48,24 +50,28 @@ def get_total_sleep_opportunity(
     temperature : numpy.ndarray
         (N, 3) array of temperature values in celsius.
     wear_starts : {numpy.ndarray, None}
-        Indices for the starts of wear-time. Note that while `time` and `accel` should be the
-        values for one day, `wear_starts` is likely indexed to the whole data series. This offset
-        can be adjusted by `idx_start`. If indexing only into the one day, `idx_start` should be 0.
-        If None, will compute wear internally.
+        Indices for the starts of wear-time. Note that while `time` and `accel` should
+        be the values for one day, `wear_starts` is likely indexed to the whole data
+        series. This offset can be adjusted by `idx_start`. If indexing only into
+        the one day, `idx_start` should be 0. If None, will compute wear internally.
     wear_stops : {numpy.ndarray, None}
-        Indices for the stops of wear-time. Note that while `time` and `accel` should be the values
-        for one day, `wear_stops` is likely indexed to the whole data series. This offset can
-        be adjusted by `idx_start`. If indexing only into the one day, `idx_start` should be 0.
-        If None, will compute wear internally.
+        Indices for the stops of wear-time. Note that while `time` and `accel` should
+        be the values for one day, `wear_stops` is likely indexed to the whole data
+        series. This offset can be adjusted by `idx_start`. If indexing only into
+        the one day, `idx_start` should be 0. If None, will compute wear internally.
     min_rest_block : int
         Minimum number of minutes that a rest period can be
     max_act_break : int
-        Maximum number of minutes an active block can be so that it doesn't interrupt a longer
-        rest period.
-    min_angle_thresh : float
-        Minimum angle threshold used to compute the TSO threshold.
-    max_angle_thresh : float
-        Maximum angle threshold used to compute the TSO threshold.
+        Maximum number of minutes an active block can be so that it doesn't interrupt
+        a longer rest period.
+    tso_min_thresh : float
+        Minimum angle value the TSO threshold can be.
+    tso_max_thresh : float
+        Maximum angle value the TSO threshold can be.
+    tso_perc : int
+        The percentile to use when calculating the TSO threshold from daily data.
+    tso_factor : float
+        The factor to multiply the percentile value by co get the TSO threshold.
     int_wear_temp : float
         Internal wear temperature threshold in celsius.
     int_wear_move : float
@@ -73,14 +79,14 @@ def get_total_sleep_opportunity(
     plot_fn : function
         Plotting function for the arm angle.
     idx_start : int, optional
-        Offset index for wear-time indices. If `wear_starts` and `wear_stops` are relative to the
-        day of interest, then `idx_start` should equal 0.
+        Offset index for wear-time indices. If `wear_starts` and `wear_stops` are
+        relative to the day of interest, then `idx_start` should equal 0.
     add_active_time : float, optional
-        Add active time to the accelerometer signal start and end when detecting the
-        total sleep opportunity. This can occasionally be useful if less than 24 hrs of
-        data are collected, as sleep-period skewed data can effect the sleep window
-        cutoff, effecting the end results. Suggested is not adding more than 1.5
-        hours. Default is 0.0 for no added data.
+        Add active time to the accelerometer signal start and end when detecting
+        the total sleep opportunity. This can occasionally be useful if less than
+        24 hrs of data are collected, as sleep-period skewed data can effect the
+        sleep window cutoff, effecting the end results. Suggested is not adding
+        more than 1.5 hours. Default is 0.0 for no added data.
 
     Returns
     -------
@@ -123,7 +129,11 @@ def get_total_sleep_opportunity(
 
     # compute the TSO threshold
     tso_thresh = compute_tso_threshold(
-        dz_rm_rmd, min_td=min_angle_thresh, max_td=max_angle_thresh
+        dz_rm_rmd,
+        min_td=tso_min_thresh,
+        max_td=tso_max_thresh,
+        perc=tso_perc,
+        factor=tso_factor,
     )
 
     # get the number of windows there would be without additional data
@@ -163,7 +173,7 @@ def get_total_sleep_opportunity(
         tso[move_nonwear] = False
 
     # drop rest blocks less than minimum allowed rest length
-    # even though rolling 5min, the underlying windows are 5s, so 12 * minutes => number of samples
+    # rolling 5min, the underlying windows are 5s, so 12 * minutes => # of samples
     tso = drop_min_blocks(
         tso, 12 * min_rest_block, drop_value=1, replace_value=0, skip_bounds=True
     )
@@ -177,7 +187,7 @@ def get_total_sleep_opportunity(
 
     # get the timestamps of the longest bout
     if arg_start is not None:
-        # account for left justified windows - times need to be bumped up by half a window
+        # account for left justified windows - times need to be bumped up half a window
         # account for 5s windows in indexing
         arg_start = (arg_start + 30) * n5  # 12 * 5 / 2 = 30
         arg_end = (arg_end + 30) * n5
@@ -189,10 +199,10 @@ def get_total_sleep_opportunity(
     return start, end, arg_start, arg_end
 
 
-def compute_tso_threshold(arr, min_td=0.1, max_td=0.5):
+def compute_tso_threshold(arr, min_td=0.1, max_td=0.5, perc=10, factor=15.0):
     """
-    Computes the daily threshold value separating rest periods from active periods for the TSO
-    detection algorithm.
+    Computes the daily threshold value separating rest periods from active periods
+    for the TSO detection algorithm.
 
     Parameters
     ----------
@@ -202,11 +212,15 @@ def compute_tso_threshold(arr, min_td=0.1, max_td=0.5):
         Minimum acceptable threshold value.
     max_td : float
         Maximum acceptable threshold value.
+    perc : integer, optional
+        Percentile to use for the threshold. Default is 10.
+    factor : float, optional
+        Factor to multiply the percentil value by. Default is 15.0.
 
     Returns
     -------
     td : float
 
     """
-    td = min((max((percentile(arr, 10) * 15.0, min_td)), max_td))
+    td = min((max((percentile(arr, perc) * factor, min_td)), max_td))
     return td
