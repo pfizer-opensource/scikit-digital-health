@@ -148,6 +148,11 @@ class CalibrateAccelerometer(BaseProcess):
             **kwargs,
         )
 
+        # update before it might have to be returned early
+        kwargs.update(
+            {"fs": fs, self._time: time, self._acc: accel, self._temp: temperature}
+        )
+
         # calculate fs if necessary
         fs = 1 / mean(diff(time)) if fs is None else fs
         # parameters
@@ -163,7 +168,10 @@ class CalibrateAccelerometer(BaseProcess):
                 UserWarning,
             )
             kwargs.update({self._time: time, self._acc: accel, self._temp: temperature})
-            return kwargs
+            if self._in_pipeline:
+                return kwargs, None
+            else:
+                return kwargs
 
         finished = False
         # use the Store object in order to save computation time
@@ -204,9 +212,6 @@ class CalibrateAccelerometer(BaseProcess):
             {"offset": offset, "scale": scale, "temperature scale": temp_scale}
         )
 
-        kwargs.update(
-            {"fs": fs, self._time: time, self._acc: accel, self._temp: temperature}
-        )
         if self._in_pipeline:
             return kwargs, None
         else:
