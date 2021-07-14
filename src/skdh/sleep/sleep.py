@@ -538,8 +538,8 @@ class Sleep(BaseProcess):
             self._store_sleep_aux(start_datetime, iday, predictions, tso_start, tso_stop)
 
             # set the sleep start and end values as the TSO (essentially time in bed)
-            sleep_idx[iday, 0] = tso[2] + int(start * fs / goal_fs)
-            sleep_idx[iday, 1] = tso[3] + int(start * fs / goal_fs)
+            sleep_idx[iday, 0] = int((tso[2] + start) * fs / goal_fs)
+            sleep_idx[iday, 1] = int((tso[3] + start) * fs / goal_fs)
 
             # plotting
             self._plot_sleep_wear_predictions(
