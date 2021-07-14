@@ -880,6 +880,9 @@ def get_intensity_gradient(ig_values, counts):
     )  # convert back to mg to match GGIR/existing work
     ly = log(counts[counts > 0])
 
+    if ly.size == 0:
+        return nan, nan, nan
+
     slope, intercept, rval, *_ = linregress(lx, ly)
 
     return slope, intercept, rval ** 2
