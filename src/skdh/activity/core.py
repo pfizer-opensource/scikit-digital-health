@@ -802,7 +802,10 @@ def get_activity_bouts(
         xt[lookforbreaks == 0] = -(60 / wlen) * nboutdur
 
         # in this way there will not be bout breaks lasting longer than 1 minute
-        rm = moving_mean(xt, nboutdur, 1)
+        try:
+            rm = moving_mean(xt, nboutdur, 1)
+        except ValueError:
+            return 0.0
 
         p = nonzero(rm > boutcrit)[0]
         start = int(floor((nboutdur + 1) / 2)) - 1 - int(round(nboutdur / 2))
@@ -830,7 +833,10 @@ def get_activity_bouts(
         xt[lookforbreaks == 0] = -(60 / wlen) * nboutdur
 
         # in this way there will not be bout breaks lasting longer than 1 minute
-        rm = moving_mean(xt, nboutdur, 1)
+        try:
+            rm = moving_mean(xt, nboutdur, 1)
+        except ValueError:
+            return 0.0
 
         p = nonzero(rm >= boutcrit)[0]
         start = int(floor((nboutdur + 1) / 2)) - 1 - int(round(nboutdur / 2))
