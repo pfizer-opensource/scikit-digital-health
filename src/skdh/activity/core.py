@@ -778,9 +778,11 @@ def get_activity_bouts(
         # insert negative numbers to prevent these minutes from being counted in bouts
         xt[lookforbreaks == 0] = -(60 / wlen) * nboutdur
         # in this way there will not be bout breaks lasting longer than 1 minute
-        rm = moving_mean(
-            xt, nboutdur, 1
-        )  # window determination can go back to left justified
+        try:
+            # window determination can go back to left justified
+            rm = moving_mean(xt, nboutdur, 1)
+        except ValueError:
+            return 0.0
 
         p = nonzero(rm > boutcrit)[0]
         for gi in range(nboutdur):
