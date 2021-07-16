@@ -66,6 +66,9 @@ class Gait(BaseProcess):
         Acceleration low-pass filter order. Default is 4
     filter_cutoff : float, optional
         Acceleration low-pass filter cutoff in Hz. Default is 20.0Hz
+    downsample_aa_filter : bool, optional
+        Apply an anti-aliasing filter before downsampling. Default is True.
+        Uses the same IIR filter as :py:function:`scipy.signal.decimate`.
     day_window : array-like
         Two (2) element array-like of the base and period of the window to use for determining
         days. Default is (0, 24), which will look for days starting at midnight and lasting 24
@@ -156,6 +159,7 @@ class Gait(BaseProcess):
         prov_leg_length=False,
         filter_order=4,
         filter_cutoff=20.0,
+        downsample_aa_filter=True,
         day_window=(0, 24),
     ):
         super().__init__(
@@ -170,6 +174,7 @@ class Gait(BaseProcess):
             prov_leg_length=prov_leg_length,
             filter_order=filter_order,
             filter_cutoff=filter_cutoff,
+            downsample_aa_filter=downsample_aa_filter,
             day_window=day_window,
         )
 
@@ -188,6 +193,8 @@ class Gait(BaseProcess):
 
         self.filt_ord = filter_order
         self.filt_cut = filter_cutoff
+
+        self.aa_filter = downsample_aa_filter
 
         # for saving gait predictions
         self._save_classifier_fn = lambda time, starts, stops: None
@@ -373,7 +380,7 @@ class Gait(BaseProcess):
                 (accel_ds,),
                 (gait_starts_ds, gait_stops_ds, day_starts_ds, day_stops_ds),
             ) = apply_downsample(
-                goal_fs, time, (accel,), (gait_starts, gait_stops, *self.day_idx)
+                goal_fs, time, (accel,), (gait_starts, gait_stops, *self.day_idx), self.aa_filter
             )
         else:
             time_ds = time

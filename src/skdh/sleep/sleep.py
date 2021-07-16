@@ -109,6 +109,9 @@ class Sleep(BaseProcess):
         Minimum number of hours required to consider a day useable. Default is 6 hours.
     downsample : bool, optional
         Downsample to 20Hz. Default is True.
+    downsample_aa_filter : bool, optional
+        Apply an anti-aliasing filter before downsampling. Default is True.
+        Uses the same IIR filter as :py:function:`scipy.signal.decimate`.
     day_window : array-like, optional
         Two (2) element array-like of the base and period of the window to use for determining
         days. Default is (12, 24), which will look for days starting at 12 noon and lasting 24
@@ -192,6 +195,7 @@ class Sleep(BaseProcess):
         min_wear_time=0,
         min_day_hours=6,
         downsample=True,
+        downsample_aa_filter=True,
         day_window=(12, 24),
         save_per_minute_results=False,
         add_active_time=0.0,
@@ -212,6 +216,7 @@ class Sleep(BaseProcess):
             min_wear_time=min_wear_time,
             min_day_hours=min_day_hours,
             downsample=downsample,
+            downsample_aa_filter=downsample_aa_filter,
             day_window=day_window,
             save_per_minute_results=save_per_minute_results,
             add_active_time=add_active_time,
@@ -234,6 +239,7 @@ class Sleep(BaseProcess):
         self.min_wear_time = min_wear_time
         self.min_day_hrs = min_day_hours
         self.downsample = downsample
+        self.aa_filter = downsample_aa_filter
         self.save_pm = save_per_minute_results
         self.add_time = add_active_time
 
@@ -422,6 +428,7 @@ class Sleep(BaseProcess):
                 time,
                 data=(accel, temperature),
                 indices=(*self.day_idx, *self.wear_idx),
+                aa_filter=self.aa_filter
             )
 
         else:

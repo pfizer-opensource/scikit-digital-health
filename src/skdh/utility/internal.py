@@ -178,7 +178,8 @@ def apply_downsample(goal_fs, time, data=(), indices=(), aa_filter=True):
         Tuple of arrays of indices to downsample.
     aa_filter : bool, optional
         Apply an anti-aliasing filter before downsampling. Default is True. This
-        is the same filter as used by `scipy.signal.decimate`. See [1]_ for details.
+        is the same filter as used by :py:function:`scipy.signal.decimate`.
+        See [1]_ for details.
 
     Returns
     -------
