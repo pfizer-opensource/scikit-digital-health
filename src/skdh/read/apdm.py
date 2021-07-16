@@ -96,27 +96,27 @@ class ReadApdmH5(BaseProcess):
         # read the file
         with h5py.File(file, "r") as f:
             sid = None  # sensor id
-            for sens in f['Sensors']:
-                sname = f['Sensors'][sens]['Configuration'].attrs['Label 0']
-                if sname.decode('utf-8') == self.sens:
+            for sens in f["Sensors"]:
+                sname = f["Sensors"][sens]["Configuration"].attrs["Label 0"]
+                if sname.decode("utf-8") == self.sens:
                     sid = sens
             if sens is None:
                 raise SensorNotFoundError(f"Sensor {self.sens} was not found.")
 
-            res[self._acc] = f['Sensors'][sid]['Accelerometer'][()] / self.g
-            res[self._time] = f['Sensors'][sid]['Time'][()] / 1e6  # to seconds
+            res[self._acc] = f["Sensors"][sid]["Accelerometer"][()] / self.g
+            res[self._time] = f["Sensors"][sid]["Time"][()] / 1e6  # to seconds
             try:
-                res[self._gyro] = f['Sensors'][sid]['Gyroscope'][()]
+                res[self._gyro] = f["Sensors"][sid]["Gyroscope"][()]
             except KeyError:
                 # TODO change if processes start using gyroscope data.
                 # leave as info for now since no algorithms use gyro data yet
                 self.logger.info("No gyroscope data found.", UserWarning)
             try:
-                res[self._temp] = f['Sensors'][sid]['Temperature'][()]
+                res[self._temp] = f["Sensors"][sid]["Temperature"][()]
             except KeyError:
                 warn("No temperature data found.", UserWarning)
 
-        res['file'] = file
+        res["file"] = file
         kwargs.update(res)
         if self._in_pipeline:
             return kwargs, None

@@ -428,7 +428,7 @@ class Sleep(BaseProcess):
                 time,
                 data=(accel, temperature),
                 indices=(*self.day_idx, *self.wear_idx),
-                aa_filter=self.aa_filter
+                aa_filter=self.aa_filter,
             )
 
         else:
@@ -542,7 +542,9 @@ class Sleep(BaseProcess):
             pred_during_tso = predictions[tso_start:tso_stop]
 
             # save the sleep per minute results if desired
-            self._store_sleep_aux(start_datetime, iday, predictions, tso_start, tso_stop)
+            self._store_sleep_aux(
+                start_datetime, iday, predictions, tso_start, tso_stop
+            )
 
             # set the sleep start and end values as the TSO (essentially time in bed)
             sleep_idx[iday, 0] = int((tso[2] + start) * fs / goal_fs)

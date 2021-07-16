@@ -117,7 +117,7 @@ def get_total_sleep_opportunity(
     rng = default_rng()
     blocksize = max([int(12 * 60 * add_active_time), 0])
     angleblock = sin(arange(blocksize) / pi * 0.1) * 40
-    angleblock += rng.normal(loc=0., scale=10., size=blocksize)
+    angleblock += rng.normal(loc=0.0, scale=10.0, size=blocksize)
 
     z_rm = concatenate((angleblock, _z_rm, angleblock))
 
@@ -147,7 +147,7 @@ def get_total_sleep_opportunity(
 
     # apply the threshold before any internal wear checking
     tso &= (
-        dz_rm_rmd[blocksize:blocksize + nw] < tso_thresh
+        dz_rm_rmd[blocksize : blocksize + nw] < tso_thresh
     )  # now only blocks where there is no movement, and wear are left
 
     # check if we can compute wear internally

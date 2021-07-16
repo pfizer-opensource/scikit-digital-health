@@ -535,7 +535,12 @@ class ActivityLevelClassification(BaseProcess):
         if self.f is None:
             return
 
-        f, ax = plt.subplots(nrows=4, figsize=(12, 6), sharex=True, gridspec_kw={"height_ratios": [1, 1, 1, 0.5]})
+        f, ax = plt.subplots(
+            nrows=4,
+            figsize=(12, 6),
+            sharex=True,
+            gridspec_kw={"height_ratios": [1, 1, 1, 0.5]},
+        )
         f.suptitle(
             f"Activity Visual Report: {self._file_name}\nDay: {day_n}\nDate: {date_str}"
         )
@@ -548,8 +553,8 @@ class ActivityLevelClassification(BaseProcess):
             x.spines["bottom"].set_visible(False)
 
             x.tick_params(
-                axis='both',
-                which='both',
+                axis="both",
+                which="both",
                 bottom=False,
                 top=False,
                 right=False,
@@ -566,11 +571,11 @@ class ActivityLevelClassification(BaseProcess):
         x = self._t60 + start_hr
         n60 = int(fs * 60)
 
-        ax[0].plot(x[:int(ceil(accel.shape[0] / n60))], accel[::n60], lw=0.5)
+        ax[0].plot(x[: int(ceil(accel.shape[0] / n60))], accel[::n60], lw=0.5)
 
-        hx = mlines.Line2D([], [], color='C0', label='X', lw=0.5)
-        hy = mlines.Line2D([], [], color='C1', label='Y', lw=0.5)
-        hz = mlines.Line2D([], [], color='C2', label='Z', lw=0.5)
+        hx = mlines.Line2D([], [], color="C0", label="X", lw=0.5)
+        hy = mlines.Line2D([], [], color="C1", label="Y", lw=0.5)
+        hz = mlines.Line2D([], [], color="C2", label="Z", lw=0.5)
 
         ax[0].legend(handles=[hx, hy, hz], bbox_to_anchor=(0, 0.5), loc="center right")
 
@@ -579,19 +584,19 @@ class ActivityLevelClassification(BaseProcess):
         acc_metric = metric_fn(accel, n60, **self.cutpoints["kwargs"])
 
         # add to second sub-axis
-        ax[1].plot(x[:acc_metric.size], acc_metric, label=self.cutpoints['metric'])
-        ax[1].legend(bbox_to_anchor=(0, 0.5), loc='center right')
+        ax[1].plot(x[: acc_metric.size], acc_metric, label=self.cutpoints["metric"])
+        ax[1].legend(bbox_to_anchor=(0, 0.5), loc="center right")
 
         # add thresholds to plot
         # do this in reverse order so legend top down is same order as lines
         for thresh in ["moderate", "light", "sedentary"]:
-            ax[1].plot(self.day_key, [self.cutpoints[thresh]] * 2, 'k--', lw=0.5)
+            ax[1].plot(self.day_key, [self.cutpoints[thresh]] * 2, "k--", lw=0.5)
 
         # labeling the thresholds
-        ax[1].text(0, self.cutpoints['moderate'] + 0.025, "vigorous \u2191", color='k')
-        ax[1].text(0, self.cutpoints['moderate'] - 0.05, "moderate", color='k')
-        ax[1].text(0, self.cutpoints['light'] - 0.05, 'light', color='k')
-        ax[1].text(0, self.cutpoints['sedentary'] - 0.05, 'sedentary', color='k')
+        ax[1].text(0, self.cutpoints["moderate"] + 0.025, "vigorous \u2191", color="k")
+        ax[1].text(0, self.cutpoints["moderate"] - 0.05, "moderate", color="k")
+        ax[1].text(0, self.cutpoints["light"] - 0.05, "light", color="k")
+        ax[1].text(0, self.cutpoints["sedentary"] - 0.05, "sedentary", color="k")
 
         # acceleration level plotting
         acc_level = zeros(acc_metric.size, dtype="int")
@@ -602,16 +607,14 @@ class ActivityLevelClassification(BaseProcess):
             acc_level[(acc_metric >= lthresh) & (acc_metric < uthresh)] = i
             acc_level_text[(acc_metric >= lthresh) & (acc_metric < uthresh)] = lvl
 
-        ax[2].plot(x[:acc_level.size], acc_level, color='k', lw=0.5, label='Accel. Level')
-        ax[2].legend(bbox_to_anchor=(0, 0.5), loc='center right')
+        ax[2].plot(
+            x[: acc_level.size], acc_level, color="k", lw=0.5, label="Accel. Level"
+        )
+        ax[2].legend(bbox_to_anchor=(0, 0.5), loc="center right")
 
         ax[-1].set_xlim([self.day_key[0], sum(self.day_key)])
-        ax[-1].set_xticks(
-            [i for i in range(self.day_key[0], sum(self.day_key) + 1, 3)]
-        )
-        ax[-1].set_xticklabels(
-            [f"{int(i % 24)}:00" for i in ax[-1].get_xticks()]
-        )
+        ax[-1].set_xticks([i for i in range(self.day_key[0], sum(self.day_key) + 1, 3)])
+        ax[-1].set_xticklabels([f"{int(i % 24)}:00" for i in ax[-1].get_xticks()])
 
     def _plot_day_wear(self, fs, day_wear_starts, day_wear_stops, start_dt, day_start):
         if self.f is None:
@@ -628,7 +631,7 @@ class ActivityLevelClassification(BaseProcess):
 
         self.ax[-1][-1].plot(wear, [2] * len(wear), label="Wear", lw=3)
         self.ax[-1][-1].set_ylim([0.75, 2.25])
-        self.ax[-1][-1].legend(bbox_to_anchor=(0, 0.5), loc='center right')
+        self.ax[-1][-1].legend(bbox_to_anchor=(0, 0.5), loc="center right")
 
     def _plot_day_sleep(
         self, fs, sleep_starts, sleep_stops, day_start, day_stop, start_dt
@@ -651,7 +654,7 @@ class ActivityLevelClassification(BaseProcess):
             sleep.extend([sh, eh, None])  # add none so it doesn't get connected
 
         self.ax[-1][-1].plot(sleep, [1] * len(sleep), label="Sleep Opportunity", lw=3)
-        self.ax[-1][-1].legend(bbox_to_anchor=(0, 0.5), loc='center right')
+        self.ax[-1][-1].legend(bbox_to_anchor=(0, 0.5), loc="center right")
 
     def _finalize_plots(self):
         if self.f is None:
@@ -662,7 +665,7 @@ class ActivityLevelClassification(BaseProcess):
             date=date, name=self._name, file=self._file_name
         )
 
-        pp = PdfPages(Path(form_fname).with_suffix('.pdf'))
+        pp = PdfPages(Path(form_fname).with_suffix(".pdf"))
 
         for f in self.f:
             f.tight_layout()

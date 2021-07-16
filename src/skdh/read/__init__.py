@@ -24,4 +24,13 @@ from skdh.read import actigraph
 from skdh.read.apdm import ReadApdmH5
 from skdh.read import apdm
 
-__all__ = ("ReadCwa", "ReadBin", "ReadGT3X", "ReadApdmH5", "axivity", "geneactiv", "actigraph", "apdm")
+__all__ = (
+    "ReadCwa",
+    "ReadBin",
+    "ReadGT3X",
+    "ReadApdmH5",
+    "axivity",
+    "geneactiv",
+    "actigraph",
+    "apdm",
+)

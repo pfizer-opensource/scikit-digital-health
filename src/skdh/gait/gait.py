@@ -380,7 +380,11 @@ class Gait(BaseProcess):
                 (accel_ds,),
                 (gait_starts_ds, gait_stops_ds, day_starts_ds, day_stops_ds),
             ) = apply_downsample(
-                goal_fs, time, (accel,), (gait_starts, gait_stops, *self.day_idx), self.aa_filter
+                goal_fs,
+                time,
+                (accel,),
+                (gait_starts, gait_stops, *self.day_idx),
+                self.aa_filter,
             )
         else:
             time_ds = time

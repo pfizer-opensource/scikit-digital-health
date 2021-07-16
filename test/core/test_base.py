@@ -72,8 +72,7 @@ class TestBaseProcess:
 
         assert bp._file_name == ""
         assert (
-            "Entering BaseProcess processing with call BaseProcess()"
-            in bp.logger.msgs
+            "Entering BaseProcess processing with call BaseProcess()" in bp.logger.msgs
         )
         assert (
             "[BaseProcess] Day indices [(-1, -1)] not found. No day split used."
