@@ -22,6 +22,7 @@ from numpy import (
     maximum,
     roll,
 )
+from scipy.signal import cheby1, sosfiltfilt
 
 
 def get_day_index_intersection(starts, stops, for_inclusion, day_start, day_stop):
@@ -160,7 +161,7 @@ def get_day_wear_intersection(starts, stops, day_start, day_stop):
     return starts_subset, stops_subset
 
 
-def apply_downsample(goal_fs, time, data=(), indices=()):
+def apply_downsample(goal_fs, time, data=(), indices=(), aa_filter=True):
     """
     Apply a downsample to a set of data.
 
@@ -175,6 +176,9 @@ def apply_downsample(goal_fs, time, data=(), indices=()):
         Can handle `None` inputs, and will return an array of zeros matching the downsampled size.
     indices : tuple, optional
         Tuple of arrays of indices to downsample.
+    aa_filter : bool, optional
+        Apply an anti-aliasing filter before downsampling. Default is True. This
+        is the same filter as used by `scipy.signal.decimate`. See [1]_ for details.
 
     Returns
     -------
@@ -184,8 +188,14 @@ def apply_downsample(goal_fs, time, data=(), indices=()):
         Downsampled data, if provided.
     indices : tuple, optional
         Downsampled indices, if provided.
+
+    References
+    ----------
+    .. [1] https://en.wikipedia.org/wiki/Downsampling_(signal_processing)
     """
     time_ds = arange(time[0], time[-1], 1 / goal_fs)
+    # AA filter, if necessary
+    sos = cheby1(8, 0.05, 0.8 / 5, output='sos')
 
     data_ds = ()
 
@@ -193,11 +203,13 @@ def apply_downsample(goal_fs, time, data=(), indices=()):
         if dat is None:
             data_ds += (None,)
         elif dat.ndim == 1:
-            data_ds += (interp(time_ds, time, dat),)
+            data_to_ds = sosfiltfilt(sos, dat) if aa_filter else dat
+            data_ds += (interp(time_ds, time, data_to_ds),)
         elif dat.ndim == 2:
             data_ds += (zeros((time_ds.size, dat.shape[1]), dtype=float_),)
+            data_to_ds = sosfiltfilt(sos, dat, axis=-1) if aa_filter else dat
             for i in range(dat.shape[1]):
-                data_ds[-1][:, i] = interp(time_ds, time, dat[:, i])
+                data_ds[-1][:, i] = interp(time_ds, time, data_to_ds[:, i])
         else:
             raise ValueError("Data dimension exceeds 2, or data not understood.")
 
