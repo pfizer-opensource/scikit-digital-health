@@ -20,6 +20,8 @@ class TestDetectTSO:
             max_act_break=60,
             tso_min_thresh=0.1,
             tso_max_thresh=1.0,
+            tso_perc=10,
+            tso_factor=15.0,
             int_wear_temp=25.0,
             int_wear_move=0.001,
             plot_fn=lambda x: None,
