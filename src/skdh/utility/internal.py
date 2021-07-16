@@ -212,7 +212,7 @@ def apply_downsample(goal_fs, time, data=(), indices=(), aa_filter=True):
             data_ds += (interp(time_ds, time, data_to_ds),)
         elif dat.ndim == 2:
             data_ds += (zeros((time_ds.size, dat.shape[1]), dtype=float_),)
-            data_to_ds = sosfiltfilt(sos, dat, axis=-1) if aa_filter else dat
+            data_to_ds = sosfiltfilt(sos, dat, axis=0) if aa_filter else dat
             for i in range(dat.shape[1]):
                 data_ds[-1][:, i] = interp(time_ds, time, data_to_ds[:, i])
         else:
