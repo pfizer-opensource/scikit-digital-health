@@ -6,8 +6,9 @@
 #include <stdlib.h>
 #include <math.h>
 
-
+extern void mov_moments_1(long *, double *, long *, long *, double *);
 extern void moving_moments_1(long *, double *, long *, long *, double *);
+extern void mov_moments_2(long *, double *, long *, long *, double *, double *);
 extern void moving_moments_2(long *, double *, long *, long *, double *, double *);
 extern void moving_moments_3(long *, double *, long *, long *, double *, double *, double *);
 extern void moving_moments_4(long *, double *, long *, long *, double *, double *, double *, double *);
@@ -67,7 +68,7 @@ PyObject * moving_mean(PyObject *NPY_UNUSED(self), PyObject *args){
 
     for (int i = 0; i < nrepeats; ++i)
     {
-        moving_moments_1(&npts, dptr, &wlen, &skip, rmean_ptr);
+        mov_moments_1(&npts, dptr, &wlen, &skip, rmean_ptr);
         dptr += npts;  // increment by number of points in last dimension
         rmean_ptr += res_stride;
     }
@@ -138,7 +139,7 @@ PyObject * moving_sd(PyObject *NPY_UNUSED(self), PyObject *args){
 
     for (int i = 0; i < nrepeats; ++i)
     {
-        moving_moments_2(&stride, dptr, &wlen, &skip, rmean_ptr, rsd_ptr);
+        mov_moments_2(&stride, dptr, &wlen, &skip, rmean_ptr, rsd_ptr);
         dptr += stride;
         rmean_ptr += res_stride;
         rsd_ptr += res_stride;
