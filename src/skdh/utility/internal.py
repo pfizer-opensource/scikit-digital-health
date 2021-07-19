@@ -165,7 +165,7 @@ def get_day_wear_intersection(starts, stops, day_start, day_stop):
     return starts_subset, stops_subset
 
 
-def apply_downsample(goal_fs, time, data=(), indices=(), aa_filter=True):
+def apply_downsample(goal_fs, time, data=(), indices=(), aa_filter=True, fs=None):
     """
     Apply a downsample to a set of data.
 
@@ -184,6 +184,10 @@ def apply_downsample(goal_fs, time, data=(), indices=(), aa_filter=True):
         Apply an anti-aliasing filter before downsampling. Default is True. This
         is the same filter as used by :py:function:`scipy.signal.decimate`.
         See [1]_ for details.
+    fs : {None, float}, optional
+        Original sampling frequency in Hz. If `goal_fs` is an integer factor
+        of `fs`, every nth sample will be taken, otherwise `np.interp` will be
+        used. Leave blank to always use `np.interp`.
 
     Returns
     -------
@@ -198,7 +202,27 @@ def apply_downsample(goal_fs, time, data=(), indices=(), aa_filter=True):
     ----------
     .. [1] https://en.wikipedia.org/wiki/Downsampling_(signal_processing)
     """
-    time_ds = arange(time[0], time[-1], 1 / goal_fs)
+    def downsample(x, factor, time, time_ds):
+        if int(1 / factor) == 1 / factor:
+            if x.ndim == 1:
+                return (x[::int(1 / factor)],)
+            elif x.ndim == 2:
+                return (x[::int(1 / factor)],)
+        else:
+            if x.ndim == 1:
+                return (interp(time_ds, time, x),)
+            elif x.ndim == 2:
+                xds = zeros((time_ds.size, x.shape[1]), dtype=float_)
+                for i in range(x.shape[1]):
+                    xds[:, i] = interp(time_ds, time, x[:, i])
+                return (xds,)
+    if fs is None:
+        fs = 1.1 * goal_fs
+
+    if int(fs / goal_fs) == fs / goal_fs:
+        time_ds = time[::int(fs / goal_fs)]
+    else:
+        time_ds = arange(time[0], time[-1], 1 / goal_fs)
     # AA filter, if necessary
     sos = cheby1(8, 0.05, 0.8 / 5, output="sos")
 
@@ -207,14 +231,9 @@ def apply_downsample(goal_fs, time, data=(), indices=(), aa_filter=True):
     for dat in data:
         if dat is None:
             data_ds += (None,)
-        elif dat.ndim == 1:
-            data_to_ds = sosfiltfilt(sos, dat) if aa_filter else dat
-            data_ds += (interp(time_ds, time, data_to_ds),)
-        elif dat.ndim == 2:
-            data_ds += (zeros((time_ds.size, dat.shape[1]), dtype=float_),)
+        elif dat.ndim in [1, 2]:
             data_to_ds = sosfiltfilt(sos, dat, axis=0) if aa_filter else dat
-            for i in range(dat.shape[1]):
-                data_ds[-1][:, i] = interp(time_ds, time, data_to_ds[:, i])
+            data_ds += downsample(data_to_ds, fs / goal_fs, time, time_ds)
         else:
             raise ValueError("Data dimension exceeds 2, or data not understood.")
 
