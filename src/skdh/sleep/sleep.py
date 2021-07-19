@@ -429,6 +429,7 @@ class Sleep(BaseProcess):
                 data=(accel, temperature),
                 indices=(*self.day_idx, *self.wear_idx),
                 aa_filter=self.aa_filter,
+                fs=fs,
             )
 
         else:
