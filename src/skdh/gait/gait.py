@@ -509,13 +509,14 @@ class Gait(BaseProcess):
         gait_aux["inertial data i"] = asarray(gait_aux["inertial data i"])
         gait_aux["vert axis"] = asarray(gait_aux["vert axis"])
 
-        # loop over endpoints and compute
-        for param in self._params:
-            param().predict(goal_fs, leg_length, gait, gait_aux)
+        # loop over endpoints and compute if there is data to compute on
+        if len(gait_aux["inertial data i"]) != 0:
+            for param in self._params:
+                param().predict(goal_fs, leg_length, gait, gait_aux)
 
-        # remove invalid gait cycles
-        for k in [i for i in gait if i != "valid cycle"]:
-            gait[k] = gait[k][gait["valid cycle"]]
+            # remove invalid gait cycles
+            for k in [i for i in gait if i != "valid cycle"]:
+                gait[k] = gait[k][gait["valid cycle"]]
 
         # remove unnecessary stuff from gait dict
         gait.pop("IC", None)
