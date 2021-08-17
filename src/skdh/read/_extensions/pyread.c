@@ -59,7 +59,6 @@ void axivity_set_error_message(int ierr)
 
 static PyObject *read_axivity(PyObject *NPY_UNUSED(self), PyObject *args)
 {
-    PyObject* bytes;
     char *file;
     Py_ssize_t flen;
     int ierr = AX_READ_E_NONE, fail = 0;
