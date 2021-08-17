@@ -79,7 +79,7 @@ typedef enum {
 } Read_Cwa_Error_t;
 
 extern void axivity_read_header(long *, char[], AX_Info_t *, int *);
-extern void axivity_read_block(AX_Info_t *, long *, double *, double *, long *, long *, long *, 
+extern void axivity_read_block(AX_Info_t *, long *, double *, double *, double *, long *, long *,
     long *, long *, long *, long *, int *);
 extern void axivity_close(AX_Info_t *);
 
