@@ -7,7 +7,7 @@ Pfizer DMTI 2020
 from warnings import warn
 from pathlib import Path
 
-from numpy import vstack, asarray, int_
+from numpy import vstack, asarray, ascontiguousarray, int_
 
 from skdh.base import BaseProcess
 from skdh.read._extensions import read_axivity
@@ -155,11 +155,11 @@ class ReadCwa(BaseProcess):
 
         results = {self._time: ts, "file": file, "fs": fs, self._temp: temperature}
         if acc_axes is not None:
-            results[self._acc] = imudata[:, acc_axes]
+            results[self._acc] = ascontiguousarray(imudata[:, acc_axes])
         if gyr_axes is not None:
-            results[self._gyro] = imudata[:, gyr_axes]
+            results[self._gyro] = ascontiguousarray(imudata[:, gyr_axes])
         if mag_axes is not None:  # pragma: no cover :: don't have data to test this
-            results[self._mag] = imudata[:, mag_axes]
+            results[self._mag] = ascontiguousarray(imudata[:, mag_axes])
 
         if self.window:
             results[self._days] = {}
