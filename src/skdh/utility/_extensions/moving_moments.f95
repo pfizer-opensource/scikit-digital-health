@@ -37,7 +37,7 @@ subroutine mov_moments_2(n, x, wlen, skip, mean, sd) bind(C, name="mov_moments_2
     real(c_double), intent(out) :: sd((n-wlen)/skip+1)
     ! local
     integer(c_long) :: i, j
-    real(c_double) :: m1(n), m2(n), m3(n)
+    real(c_double) :: m1(n), m2(n)
     real(c_double) :: delta, delta_n, term1
     integer(c_long) :: na, nb
 
