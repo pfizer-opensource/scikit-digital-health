@@ -341,7 +341,7 @@ static PyObject *read_geneactiv(PyObject *NPY_UNUSED(self), PyObject *args)
 
         if (ierr == GN_READ_E_BLOCK_FS_WARN)
         {
-            int err_ret = PyErr_WarnEx(PyExc_RuntimeWarning, warn_str, 1);
+            int err_ret = PyErr_WarnEx(PyExc_RuntimeWarning, "Block fs is not the same as header fs. Setting to block fs.", 1);
 
             if (err_ret == -1)  /* warnings are being raised as exceptions */
             {

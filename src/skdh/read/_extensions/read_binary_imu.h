@@ -138,8 +138,6 @@ typedef struct {
 int geneactiv_read_header(FILE *fp, GN_Info_t *info);
 int geneactiv_read_block(FILE *fp, Window_t *w_info, GN_Info_t *info, GN_Data_t *data);
 
-char warn_str[120];
-
 /*
 ======================================
 ACTIGRAPH

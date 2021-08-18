@@ -121,9 +121,6 @@ int geneactiv_read_block(FILE *fp, Window_t *w_info, GN_Info_t *info, GN_Data_t 
     GN_READLINE; GN_READLINE; GN_READLINE;
     fs = strtod(&buff[22], NULL);
     if ((fs != info->fs) && (info->fs_err < 1)){
-        /* set a warning */
-        sprintf(warn_str, "Block (%li) fs [%.2f] is not the same as header fs [%.2f]. Setting fs to block fs.", N, fs, info->fs);
-
         info->fs_err ++;  /* increment the error counter, this error should only happen once */
         /* set the sampling frequency to that of the block */
         info->fs = fs;
