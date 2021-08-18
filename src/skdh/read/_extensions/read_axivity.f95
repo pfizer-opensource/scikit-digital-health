@@ -262,7 +262,7 @@ contains
             call data_packet_sum_packed(pkt, packedData, checksum, wordsum)
 
             if (wordsum /= 0) then
-                ierr = AX_READ_E_BAD_CHECKSUM
+                ierr = AX_READ_E_NONE  ! no error, just skip populating the block with data
                 return
             end if
 
@@ -291,7 +291,7 @@ contains
             ! make sure block checksum is good
             call data_packet_sum_unpacked(pkt, rawData, checksum, wordsum)
             if (wordsum /= 0) then
-                ierr = AX_READ_E_BAD_CHECKSUM
+                ierr = AX_READ_E_NONE  ! no error, just skip populating the block with data
                 return
             end if
         end if
