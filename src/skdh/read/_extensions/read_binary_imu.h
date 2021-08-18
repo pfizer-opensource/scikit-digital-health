@@ -58,6 +58,7 @@ typedef struct {
     double frequency;
     long Nwin;  /* number of windows (bases/periods) */
     long max_days;  /* max days set for the size of the starts/stops array */
+    long n_bad_blocks;  /* number of blocks with nonzero checksums */
 } AX_Info_t;
 
 typedef struct {

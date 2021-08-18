@@ -210,8 +210,9 @@ static PyObject *read_axivity(PyObject *NPY_UNUSED(self), PyObject *args)
     }
 
     return Py_BuildValue(
-        "dNNNNN",  /* need to use N to not increment reference counter */
+        "dlNNNNN",  /* need to use N to not increment reference counter */
         info.frequency,
+        info.n_bad_blocks * info.count,
         (PyObject *)imudata,
         (PyObject *)time,
         (PyObject *)temperature,

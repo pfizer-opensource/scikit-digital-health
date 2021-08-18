@@ -7,7 +7,7 @@ Pfizer DMTI 2020
 from warnings import warn
 from pathlib import Path
 
-from numpy import vstack, asarray, ascontiguousarray, int_
+from numpy import vstack, asarray, ascontiguousarray, minimum, int_
 
 from skdh.base import BaseProcess
 from skdh.read._extensions import read_axivity
@@ -135,9 +135,11 @@ class ReadCwa(BaseProcess):
         super().predict(expect_days=False, expect_wear=False, file=file, **kwargs)
 
         # read the file
-        fs, imudata, ts, temperature, starts, stops = read_axivity(
+        fs, n_bad_samples, imudata, ts, temperature, starts, stops = read_axivity(
             file, self.bases, self.periods
         )
+
+        end = None if n_bad_samples == 0 else -n_bad_samples
 
         num_axes = imudata.shape[1]
         gyr_axes = mag_axes = None
@@ -153,13 +155,13 @@ class ReadCwa(BaseProcess):
         else:  # pragma: no cover :: not expected to reach here only if file is corrupt
             raise UnexpectedAxesError("Unexpected number of axes in the IMU data")
 
-        results = {self._time: ts, "file": file, "fs": fs, self._temp: temperature}
+        results = {self._time: ts[:end], "file": file, "fs": fs, self._temp: temperature[:end]}
         if acc_axes is not None:
-            results[self._acc] = ascontiguousarray(imudata[:, acc_axes])
+            results[self._acc] = ascontiguousarray(imudata[:end, acc_axes])
         if gyr_axes is not None:
-            results[self._gyro] = ascontiguousarray(imudata[:, gyr_axes])
+            results[self._gyro] = ascontiguousarray(imudata[:end, gyr_axes])
         if mag_axes is not None:  # pragma: no cover :: don't have data to test this
-            results[self._mag] = ascontiguousarray(imudata[:, mag_axes])
+            results[self._mag] = ascontiguousarray(imudata[:end, mag_axes])
 
         if self.window:
             results[self._days] = {}
@@ -167,7 +169,7 @@ class ReadCwa(BaseProcess):
                 strt = starts[stops[:, i] != 0, i]
                 stp = stops[stops[:, i] != 0, i]
 
-                results[self._days][(data[0], data[1])] = vstack((strt, stp)).T
+                results[self._days][(data[0], data[1])] = minimum(vstack((strt, stp)).T, results[self._time].size)
 
         kwargs.update(results)
         if self._in_pipeline:
