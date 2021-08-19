@@ -155,7 +155,12 @@ class ReadCwa(BaseProcess):
         else:  # pragma: no cover :: not expected to reach here only if file is corrupt
             raise UnexpectedAxesError("Unexpected number of axes in the IMU data")
 
-        results = {self._time: ts[:end], "file": file, "fs": fs, self._temp: temperature[:end]}
+        results = {
+            self._time: ts[:end],
+            "file": file,
+            "fs": fs,
+            self._temp: temperature[:end],
+        }
         if acc_axes is not None:
             results[self._acc] = ascontiguousarray(imudata[:end, acc_axes])
         if gyr_axes is not None:
@@ -169,7 +174,9 @@ class ReadCwa(BaseProcess):
                 strt = starts[stops[:, i] != 0, i]
                 stp = stops[stops[:, i] != 0, i]
 
-                results[self._days][(data[0], data[1])] = minimum(vstack((strt, stp)).T, results[self._time].size)
+                results[self._days][(data[0], data[1])] = minimum(
+                    vstack((strt, stp)).T, results[self._time].size - 1
+                )
 
         kwargs.update(results)
         if self._in_pipeline:
