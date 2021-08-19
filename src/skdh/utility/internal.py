@@ -202,12 +202,13 @@ def apply_downsample(goal_fs, time, data=(), indices=(), aa_filter=True, fs=None
     ----------
     .. [1] https://en.wikipedia.org/wiki/Downsampling_(signal_processing)
     """
+
     def downsample(x, factor, time, time_ds):
         if int(1 / factor) == 1 / factor:
             if x.ndim == 1:
-                return (x[::int(1 / factor)],)
+                return (x[:: int(1 / factor)],)
             elif x.ndim == 2:
-                return (x[::int(1 / factor)],)
+                return (x[:: int(1 / factor)],)
         else:
             if x.ndim == 1:
                 return (interp(time_ds, time, x),)
@@ -216,11 +217,12 @@ def apply_downsample(goal_fs, time, data=(), indices=(), aa_filter=True, fs=None
                 for i in range(x.shape[1]):
                     xds[:, i] = interp(time_ds, time, x[:, i])
                 return (xds,)
+
     if fs is None:
         fs = 1.1 * goal_fs
 
     if int(fs / goal_fs) == fs / goal_fs:
-        time_ds = time[::int(fs / goal_fs)]
+        time_ds = time[:: int(fs / goal_fs)]
     else:
         time_ds = arange(time[0], time[-1], 1 / goal_fs)
     # AA filter, if necessary
