@@ -614,4 +614,4 @@ class Gait(BaseProcess):
             self.ax.legend(loc='best')
             self.f.tight_layout()
 
-            self.f.savefig(Path(self.plot_fname).with_suffix(".pdf"))
+            self.f.savefig(Path(form_fname).with_suffix(".pdf"))
