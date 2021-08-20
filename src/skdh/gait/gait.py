@@ -4,11 +4,17 @@ Gait detection, processing, and analysis from wearable inertial sensor data
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
+from sys import gettrace
 from collections.abc import Iterable
 from warnings import warn
+from pathlib import Path
+from datetime import date as dt_date
 
 import h5py
 from numpy import mean, diff, asarray, sum, ndarray
+from numpy.linalg import norm
+import matplotlib
+import matplotlib.pyplot as plt
 
 from skdh.base import BaseProcess
 from skdh.utility.internal import apply_downsample, rle
@@ -199,6 +205,11 @@ class Gait(BaseProcess):
         # for saving gait predictions
         self._save_classifier_fn = lambda time, starts, stops: None
 
+        # is plotting available/valid
+        self.valid_plot = False
+        # enable plotting as a public method
+        self.setup_plotting = self._setup_plotting
+
         if day_window is None:
             self.day_key = (-1, -1)
         else:
@@ -295,6 +306,35 @@ class Gait(BaseProcess):
 
         return bout_starts, bout_stops
 
+    def _setup_plotting(self, save_file):
+        """
+        Setup gait specific plotting.
+
+        Parameters
+        ----------
+        save_file : str
+            The file name to save the resulting plot to. Extension will be set to
+            PDF. There are formatting options as well for dynamically generated
+            names. See Notes.
+
+        Notes
+        -----
+        Available format variables available:
+
+        - date: todays date expressed in yyyymmdd format.
+        - name: process name.
+        - file: file name used in the pipeline, or "" if not found.
+        """
+        if save_file is None:
+            return
+
+        if gettrace() is None:  # only set if not debugging
+            matplotlib.use("PDF")
+            # non-interactive, don't want to be displaying plots constantly
+        plt.style.use("ggplot")
+
+        self.plot_fname = save_file
+
     def predict(
         self, time=None, accel=None, *, fs=None, height=None, gait_pred=None, **kwargs
     ):
@@ -367,6 +407,10 @@ class Gait(BaseProcess):
                 "this may effect gait endpoints results values",
                 UserWarning,
             )
+
+        # check if plotting is available (<10min of data)
+        self.valid_plot = (time[-1] - time[0]) < (10 * 60)
+        self._initialize_plot(kwargs.get("file", self.plot_fname))
 
         # handle gait_pred input types
         gait_starts, gait_stops = self._handle_input_gait_predictions(
@@ -475,6 +519,9 @@ class Gait(BaseProcess):
                     self.loading_factor,
                 )
 
+                # plotting
+                self._plot(time_ds, accel_ds, bout, ic, fc, gait)
+
                 # add inertial data to the aux dict for use in gait endpoints calculation
                 gait_aux["accel"].append(accel_ds[bout, :])
                 # add the index for the corresponding accel/velocity/position
@@ -518,6 +565,9 @@ class Gait(BaseProcess):
             for k in [i for i in gait if i != "valid cycle"]:
                 gait[k] = gait[k][gait["valid cycle"]]
 
+        # finalize/save the plot
+        self._finalize_plot(kwargs.get("file", self.plot_fname))
+
         # remove unnecessary stuff from gait dict
         gait.pop("IC", None)
         gait.pop("FC", None)
@@ -529,3 +579,36 @@ class Gait(BaseProcess):
             return kwargs, gait
         else:
             return gait
+
+    def _initialize_plot(self, file):
+        """
+        Setup the plot
+        """
+        if self.valid_plot:
+            self.f, self.ax = plt.subplots(figsize=(12, 5))
+            self.f.suptitle(
+                f"Gait Visual Report: {Path(file).name}"
+            )
+
+            self.ax.set_xlabel(r"Time [$s$]")
+            self.ax.set_ylabel(r"Accel. [$\frac{m}{s^2}$]")
+
+    def _plot(self, time, accel, gait_bout, ic, fc, gait):
+        if self.valid_plot and self.f is not None:
+            rtime = time[gait_bout] - time[0]
+            baccel = norm(accel[gait_bout], axis=1)
+
+            self.ax.plot(rtime, baccel, label='Accel. Mag.')
+            self.ax.plot(rtime[ic], baccel[ic], "x", color='k', label='Poss. IC')
+            self.ax.plot(rtime[fc], baccel[fc], "+", color='k', label='Poss. FC')
+
+            # valid contacts
+            allc = gait['IC'] + gait['FC'] + gait['FC opp foot']
+            self.ax.plot(rtime[allc], baccel[allc], 'o', color='g', alpha=0.4, label='Valid')
+
+    def _finalize_plot(self, file):
+        if self.valid_plot and self.f is not None:
+            date = dt_date.today().strftime("%Y%m%d")
+            form_fname = self.plot_fname.format(date=date, name=self._name, file=file)
+
+            self.f.savefig(Path(self.plot_fname).with_suffix(".pdf"))
