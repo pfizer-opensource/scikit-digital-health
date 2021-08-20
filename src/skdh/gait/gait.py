@@ -609,7 +609,7 @@ class Gait(BaseProcess):
     def _finalize_plot(self, file):
         if self.valid_plot and self.f is not None:
             date = dt_date.today().strftime("%Y%m%d")
-            form_fname = self.plot_fname.format(date=date, name=self._name, file=file)
+            form_fname = self.plot_fname.format(date=date, name=self._name, file=Path(file).stem)
 
             self.ax.legend(loc='best')
             self.f.tight_layout()
