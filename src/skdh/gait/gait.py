@@ -604,7 +604,7 @@ class Gait(BaseProcess):
 
             # valid contacts
             allc = gait['IC'] + gait['FC'] + gait['FC opp foot']
-            self.ax.plot(rtime[allc], baccel[allc], 'o', color='g', alpha=0.4, label='Valid')
+            self.ax.plot(rtime[allc], baccel[allc], 'o', color='g', alpha=0.4, label='Valid Contact')
 
     def _finalize_plot(self, file):
         if self.valid_plot and self.f is not None:
