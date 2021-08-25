@@ -586,9 +586,7 @@ class Gait(BaseProcess):
         """
         if self.valid_plot:
             self.f, self.ax = plt.subplots(figsize=(12, 5))
-            self.f.suptitle(
-                f"Gait Visual Report: {Path(file).name}"
-            )
+            self.f.suptitle(f"Gait Visual Report: {Path(file).name}")
 
             self.ax.set_xlabel(r"Time [$s$]")
             self.ax.set_ylabel(r"Accel. [$\frac{m}{s^2}$]")
@@ -598,20 +596,29 @@ class Gait(BaseProcess):
             rtime = time[gait_bout] - time[0]
             baccel = norm(accel[gait_bout], axis=1)
 
-            self.ax.plot(rtime, baccel, label='Accel. Mag.')
-            self.ax.plot(rtime[ic], baccel[ic], "x", color='k', label='Poss. IC')
-            self.ax.plot(rtime[fc], baccel[fc], "+", color='k', label='Poss. FC')
+            self.ax.plot(rtime, baccel, label="Accel. Mag.")
+            self.ax.plot(rtime[ic], baccel[ic], "x", color="k", label="Poss. IC")
+            self.ax.plot(rtime[fc], baccel[fc], "+", color="k", label="Poss. FC")
 
             # valid contacts
-            allc = gait['IC'] + gait['FC'] + gait['FC opp foot']
-            self.ax.plot(rtime[allc], baccel[allc], 'o', color='g', alpha=0.4, label='Valid Contact')
+            allc = gait["IC"] + gait["FC"] + gait["FC opp foot"]
+            self.ax.plot(
+                rtime[allc],
+                baccel[allc],
+                "o",
+                color="g",
+                alpha=0.4,
+                label="Valid Contact",
+            )
 
     def _finalize_plot(self, file):
         if self.valid_plot and self.f is not None:
             date = dt_date.today().strftime("%Y%m%d")
-            form_fname = self.plot_fname.format(date=date, name=self._name, file=Path(file).stem)
+            form_fname = self.plot_fname.format(
+                date=date, name=self._name, file=Path(file).stem
+            )
 
-            self.ax.legend(loc='best')
+            self.ax.legend(loc="best")
             self.f.tight_layout()
 
             self.f.savefig(Path(form_fname).with_suffix(".pdf"))

@@ -7,16 +7,7 @@ Pfizer DMTI 2019-2021
 from abc import ABC, abstractmethod
 import logging
 
-from numpy import (
-    around,
-    nonzero,
-    diff,
-    argmax,
-    sum,
-    int_,
-    maximum,
-    nan
-)
+from numpy import around, nonzero, diff, argmax, sum, int_, maximum, nan
 
 from skdh.utility import fragmentation_endpoints as frag_endpts
 
@@ -330,7 +321,9 @@ class SleepWakeTransitionProbability(SleepEndpoint):
         satp : float
             Sleep to awake transition probability during the total sleep opportunity.
         """
-        return frag_endpts.state_transition_probability(lengths=lengths, values=values, voi=1)
+        return frag_endpts.state_transition_probability(
+            lengths=lengths, values=values, voi=1
+        )
 
 
 class WakeSleepTransitionProbability(SleepEndpoint):
@@ -377,7 +370,9 @@ class WakeSleepTransitionProbability(SleepEndpoint):
         astp : float
             Awake to sleep transition probability during the total sleep opportunity.
         """
-        return frag_endpts.state_transition_probability(lengths=lengths, values=values, voi=0)
+        return frag_endpts.state_transition_probability(
+            lengths=lengths, values=values, voi=0
+        )
 
 
 class SleepGiniIndex(SleepEndpoint):
@@ -613,7 +608,9 @@ class SleepPowerLawDistribution(SleepEndpoint):
         alpha : float
             Sleep bout power law distribution scaling parameter.
         """
-        return frag_endpts.state_power_law_distribution(lengths=lengths, values=values, voi=1)
+        return frag_endpts.state_power_law_distribution(
+            lengths=lengths, values=values, voi=1
+        )
 
 
 class WakePowerLawDistribution(SleepEndpoint):
@@ -661,4 +658,6 @@ class WakePowerLawDistribution(SleepEndpoint):
         alpha : float
             Awake bout power law distribution scaling parameter.
         """
-        return frag_endpts.state_power_law_distribution(lengths=lengths, values=values, voi=0)
+        return frag_endpts.state_power_law_distribution(
+            lengths=lengths, values=values, voi=0
+        )

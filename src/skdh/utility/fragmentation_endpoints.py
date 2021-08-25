@@ -5,12 +5,31 @@ Lukas Adamowicz
 2021
 Pfizer
 """
-from numpy import mean, asarray, cumsum, minimum, sort, argsort, unique, insert, sum, log, nan, float_
+from numpy import (
+    mean,
+    asarray,
+    cumsum,
+    minimum,
+    sort,
+    argsort,
+    unique,
+    insert,
+    sum,
+    log,
+    nan,
+    float_,
+)
 
 from skdh.utility.internal import rle
 
 
-__all__ = ["average_duration", "state_transition_probability", "gini_index", "average_hazard", "state_power_law_distribution"]
+__all__ = [
+    "average_duration",
+    "state_transition_probability",
+    "gini_index",
+    "average_hazard",
+    "state_power_law_distribution",
+]
 
 
 def gini(x, w=None, corr=True):
