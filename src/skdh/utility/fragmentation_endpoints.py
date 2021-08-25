@@ -5,9 +5,12 @@ Lukas Adamowicz
 2021
 Pfizer
 """
-from numpy import mean, asarray, cumsum, minimum, sort, argsort, unique, insert, sum, log, float_
+from numpy import mean, asarray, cumsum, minimum, sort, argsort, unique, insert, sum, log, nan, float_
 
 from skdh.utility.internal import rle
+
+
+__all__ = ["average_duration", "state_transition_probability", "gini_index", "average_hazard", "state_power_law_distribution"]
 
 
 def gini(x, w=None, corr=True):
@@ -190,7 +193,7 @@ def state_transition_probability(a=None, *, lengths=None, values=None, voi=1):
             lens = lens[values == voi]
 
     if lens.size == 0:
-        return 0.0
+        return nan
 
     return 1 / mean(lens)
 
@@ -342,7 +345,7 @@ def average_hazard(a=None, *, lengths=None, values=None, voi=1):
             lens = lens[values == voi]
 
     if lens.size == 0:
-        return 0.0
+        return nan
 
     unq, cnts = unique(lens, return_counts=True)
     sidx = argsort(unq)
@@ -385,16 +388,16 @@ def state_power_law_distribution(a=None, *, lengths=None, values=None, voi=1):
 
     >>> x = [0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1]
     >>> state_power_law_distribution(x, voi=1)
-    0.61111111
+    1.7749533004219864
     >>> state_power_law_distribution(x, voi=0)
-    0.61111111
+    2.5517837760569524
 
     >>> lengths = [4, 2, 9, 1, 3, 3]
     >>> values = [0, 1, 0, 1, 0, 1]
     >>> state_power_law_distribution(lengths=lengths, values=values, voi=1)
-    0.61111111
+    1.7749533004219864
     >>> state_power_law_distribution(lengths=lengths)
-    0.61111111
+    1.7749533004219864
 
     References
     ----------
