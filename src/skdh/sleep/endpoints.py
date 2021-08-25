@@ -13,15 +13,9 @@ from numpy import (
     diff,
     argmax,
     sum,
-    mean,
-    log,
-    unique,
-    argsort,
-    cumsum,
-    insert,
     int_,
     maximum,
-    nan,
+    nan
 )
 
 from skdh.utility import fragmentation_endpoints as frag_endpts
