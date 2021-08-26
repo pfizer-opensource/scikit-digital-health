@@ -205,7 +205,7 @@ def get_activity_bouts(
 class ActivityEndpoint:
     def __init__(self, name, state):
         if isinstance(name, (tuple, list)):
-            self.name = [f'{state} {i}' for i in state]
+            self.name = [f'{state} {i}' for i in name]
         else:
             self.name = f'{state} {name}'
 
@@ -229,8 +229,8 @@ class IntensityGradient(ActivityEndpoint):
         )
 
         # default from rowlands
-        self.ig_levels = array([i for i in range(0, 4001, 25)] + [8000]) / 1000
-        self.ig_vals = (self.ig_levels[1:] - self.ig_levels[:-1]) / 2
+        self.ig_levels = array([i for i in range(0, 4001, 25)] + [8000], dtype="float") / 1000
+        self.ig_vals = (self.ig_levels[1:] + self.ig_levels[:-1]) / 2
 
         # values that need to be cached and stored between runs
         self.hist = zeros(self.ig_vals.size)
@@ -255,7 +255,7 @@ class IntensityGradient(ActivityEndpoint):
         super(IntensityGradient, self).reset_cached()
 
         # make sure we have results locations to set
-        if None not in [self.ig, self.ig_int, self.ig_r, self.i]:
+        if all([i is not None for i in [self.ig, self.ig_int, self.ig_r, self.i]]):
             # compute the results
             # convert back to mg to match existing work
             lx = log(self.ig_vals[self.hist > 0] * 1000)
@@ -269,7 +269,7 @@ class IntensityGradient(ActivityEndpoint):
             # set the results values
             self.ig[self.i] = slope
             self.ig_int[self.i] = intercept
-            self.ig_r[self.i] = rval
+            self.ig_r[self.i] = rval ** 2
 
         # reset the histogram counts to 0, and results to None
         self.hist = zeros(self.ig_vals.size)
@@ -296,7 +296,7 @@ class MaxAcceleration(ActivityEndpoint):
     def predict(self, results, i, accel_metric, epoch_s, epochs_per_min, **kwargs):
         super(MaxAcceleration, self).predict()
 
-        for wlen, name in zip(self.wlens, self.names):
+        for wlen, name in zip(self.wlens, self.name):
             n = wlen * epochs_per_min
             # skip 1 sample because we want the window with the largest acceleration
             # skipping more samples would introduce bias by random chance of
@@ -307,7 +307,7 @@ class MaxAcceleration(ActivityEndpoint):
                 return  # if the window length is too long for this block of data
 
             # check that we don't have a larger result already for this day
-            results[name][i] = nanmax([tmp_max, results[self.name][i]])
+            results[name][i] = nanmax([tmp_max, results[name][i]])
 
 
 class TotalIntensityTime(ActivityEndpoint):
