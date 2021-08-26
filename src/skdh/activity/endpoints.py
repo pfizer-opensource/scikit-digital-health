@@ -13,6 +13,9 @@ from skdh.utility import moving_mean
 from skdh.activity.cutpoints import _base_cutpoints, get_level_thresholds
 
 
+__all__ = ["ActivityEndpoint", "IntensityGradient", "MaxAcceleration", "TotalIntensityTime", "BoutIntensityTime"]
+
+
 def get_activity_bouts(
     accm, lower_thresh, upper_thresh, wlen, boutdur, boutcrit, closedbout, boutmetric=1
 ):
@@ -236,7 +239,7 @@ class IntensityGradient(ActivityEndpoint):
         self.ig_r = None
         self.i = None
 
-    def predict(self, results, i, accel_metric, epochs_per_min):
+    def predict(self, results, i, accel_metric, epoch_s, epochs_per_min, **kwargs):
         super(IntensityGradient, self).predict()
 
         # get the counts in number of minutes in each intensity bin
@@ -285,7 +288,7 @@ class MaxAcceleration(ActivityEndpoint):
 
         super().__init__(f'max acc {self.wlen}min [g]', state)
 
-    def predict(self, results, i, accel_metric, epochs_per_min):
+    def predict(self, results, i, accel_metric, epoch_s, epochs_per_min, **kwargs):
         super(MaxAcceleration, self).predict()
 
         n = self.wlen * epochs_per_min
@@ -315,7 +318,7 @@ class TotalIntensityTime(ActivityEndpoint):
 
         self.lthresh, self.uthresh = get_level_thresholds(self.level, cutpoints)
 
-    def predict(self, results, i, accel_metric, epochs_per_min):
+    def predict(self, results, i, accel_metric, epoch_s, epochs_per_min, **kwargs):
         super().predict()
 
         time = sum((accel_metric >= self.lthresh) & (accel_metric < self.uthresh))
@@ -344,7 +347,7 @@ class BoutIntensityTime(ActivityEndpoint):
 
         self.lthresh, self.uthresh = get_level_thresholds(self.level, cutpoints)
 
-    def predict(self, results, i, accel_metric, epoch_s, epochs_per_minute):
+    def predict(self, results, i, accel_metric, epoch_s, epochs_per_min, **kwargs):
         super().predict()
 
         for bout_len, name in zip(self.blens, self.name):
