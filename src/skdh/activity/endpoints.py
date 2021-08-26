@@ -337,7 +337,7 @@ class BoutIntensityTime(ActivityEndpoint):
     Compute the time spent in bouts of intensity levels.
     """
     def __init__(self, level, bout_lengths, bout_criteria, bout_metric, closed_bout, cutpoints=None, state='wake'):
-        if isinstance(bout_lengths):
+        if isinstance(bout_lengths, int):
             bout_lengths = [bout_lengths]
 
         super(BoutIntensityTime, self).__init__(
