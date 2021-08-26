@@ -283,25 +283,28 @@ class MaxAcceleration(ActivityEndpoint):
     """
     Compute the maximum acceleration over windows of the specified length.
     """
-    def __init__(self, window_length=5, state='wake'):
-        self.wlen = int(window_length)
+    def __init__(self, window_lengths, state='wake'):
+        super().__init__(
+            [f'max acc {i}min [g]' for i in window_lengths], state
+        )
 
-        super().__init__(f'max acc {self.wlen}min [g]', state)
+        self.wlens = window_lengths
 
     def predict(self, results, i, accel_metric, epoch_s, epochs_per_min, **kwargs):
         super(MaxAcceleration, self).predict()
 
-        n = self.wlen * epochs_per_min
-        # skip 1 sample because we want the window with the largest acceleration
-        # skipping more samples would introduce bias by random chance of
-        # where the windows start and stop
-        try:
-            tmp_max = max(moving_mean(accel_metric, n, 1))
-        except ValueError:
-            return  # if the window length is too long for this block of data
+        for wlen, name in zip(self.wlens, self.names):
+            n = wlen * epochs_per_min
+            # skip 1 sample because we want the window with the largest acceleration
+            # skipping more samples would introduce bias by random chance of
+            # where the windows start and stop
+            try:
+                tmp_max = max(moving_mean(accel_metric, n, 1))
+            except ValueError:
+                return  # if the window length is too long for this block of data
 
-        # check that we don't have a larger result already for this day
-        results[self.name][i] = nanmax([tmp_max, results[self.name][i]])
+            # check that we don't have a larger result already for this day
+            results[name][i] = nanmax([tmp_max, results[self.name][i]])
 
 
 class TotalIntensityTime(ActivityEndpoint):
