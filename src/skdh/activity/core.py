@@ -10,7 +10,6 @@ from warnings import warn
 from pathlib import Path
 
 from numpy import (
-    nonzero,
     array,
     mean,
     diff,
@@ -18,28 +17,18 @@ from numpy import (
     zeros,
     abs,
     argmin,
-    argmax,
-    maximum,
-    int_,
-    floor,
     ceil,
-    histogram,
-    log,
     nan,
     around,
     full,
-    nanmax,
-    arange,
-    max,
+    arange
 )
-from scipy.stats import linregress
 import matplotlib
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.lines as mlines
 import matplotlib.pyplot as plt
 
 from skdh.base import BaseProcess
-from skdh.utility import moving_mean
 from skdh.utility.internal import get_day_index_intersection
 from skdh.activity.cutpoints import _base_cutpoints, get_level_thresholds, get_metric
 from skdh.activity import endpoints as ept
