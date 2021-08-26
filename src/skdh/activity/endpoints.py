@@ -6,14 +6,35 @@ Pfizer DMTI 2021
 """
 from warnings import warn
 
-from numpy import array, zeros, max, nanmax, histogram, log, nan, sum, nonzero, maximum, argmax, int_, floor, ceil
+from numpy import (
+    array,
+    zeros,
+    max,
+    nanmax,
+    histogram,
+    log,
+    nan,
+    sum,
+    nonzero,
+    maximum,
+    argmax,
+    int_,
+    floor,
+    ceil,
+)
 from scipy.stats import linregress
 
 from skdh.utility import moving_mean
 from skdh.activity.cutpoints import _base_cutpoints, get_level_thresholds
 
 
-__all__ = ["ActivityEndpoint", "IntensityGradient", "MaxAcceleration", "TotalIntensityTime", "BoutIntensityTime"]
+__all__ = [
+    "ActivityEndpoint",
+    "IntensityGradient",
+    "MaxAcceleration",
+    "TotalIntensityTime",
+    "BoutIntensityTime",
+]
 
 
 def get_activity_bouts(
@@ -37,26 +58,30 @@ def get_activity_bouts(
     boutcrit : float
         Fraction of the bout that needs to be above the threshold to qualify as a bout.
     closedbout : bool
-        If True then count breaks in a bout towards the bout duration. If False then only count
-        time spent above the threshold towards the bout duration.
+        If True then count breaks in a bout towards the bout duration. If False then
+        only count time spent above the threshold towards the bout duration.
     boutmetric : {1, 2, 3, 4, 5}, optional
-        - 1: MVPA bout definition from Sabia AJE 2014 and da Silva IJE 2014. Here the algorithm
-            looks for 10 minute windows in which more than XX percent of the epochs are above mvpa
-            threshold and then counts the entire window as mvpa. The motivation for the definition
-            1 threshold was: A person who spends 10 minutes in MVPA with a 2 minute break in the
-            middle is equally active as a person who spends 8 minutes in MVPA without taking a
-            break. Therefore, both should be counted equal and as a 10 minute MVPA bout
-        - 2: Code looks for groups of epochs with a value above mvpa threshold that span a time
-            window of at least mvpadur minutes in which more than BOUTCRITER percent of the epochs
-            are above the threshold. Motivation is: not counting breaks towards MVPA may simplify
-            interpretation and still counts the two persons in the example as each others equal
-        - 3: Use sliding window across the data to test bout criteria per window and do not allow
-            for breaks larger than 1 minute and with fraction of time larger than the BOUTCRITER
-            threshold.
-        - 4: same as 3 but also requires the first and last epoch to meet the threshold criteria.
-        - 5: same as 4, but now looks for breaks larger than a minute such that 1 minute breaks
-            are allowed, and the fraction of time that meets the threshold should be equal
-            or greater than the BOUTCRITER threshold.
+        - 1: MVPA bout definition from Sabia AJE 2014 and da Silva IJE 2014. Here
+            the algorithm looks for 10 minute windows in which more than XX percent
+            of the epochs are above MVPA threshold and then counts the entire window
+            as MVPA. The motivation for the definition 1 threshold was: A person
+            who spends 10 minutes in MVPA with a 2 minute break in the middle is
+            equally active as a person who spends 8 minutes in MVPA without taking
+            a break. Therefore, both should be counted equal and as a 10 minute MVPA
+            bout.
+        - 2: Code looks for groups of epochs with a value above mvpa threshold that
+            span a time window of at least mvpadur minutes in which more than `boutcrit`
+            percent of the epochs are above the threshold. Motivation is: not counting
+            breaks towards MVPA may simplify interpretation and still counts the
+            two persons in the example as each others equal
+        - 3: Use sliding window across the data to test bout criteria per window
+            and do not allow for breaks larger than 1 minute and with fraction of
+            time larger than the `boutcrit` threshold.
+        - 4: same as 3 but also requires the first and last epoch to meet the threshold
+            criteria.
+        - 5: same as 4, but now looks for breaks larger than a minute such that 1
+            minute breaks are allowed, and the fraction of time that meets the threshold
+            should be equal or greater than the `boutcrit` threshold.
 
     Returns
     -------
@@ -155,7 +180,8 @@ def get_activity_bouts(
 
         p = nonzero(rm > boutcrit)[0]
         start = int(floor((nboutdur + 1) / 2)) - 1 - int(round(nboutdur / 2))
-        # only consider windows that at least start and end with value that meets criteria
+        # only consider windows that at least start and end with value that
+        # meets criteria
         tri = p + start
         tri = tri[(tri > 0) & (tri < (x.size - nboutdur - 1))]
         p = p[nonzero((x[tri] == 1) & (x[tri + nboutdur - 1] == 1))]
@@ -205,9 +231,9 @@ def get_activity_bouts(
 class ActivityEndpoint:
     def __init__(self, name, state):
         if isinstance(name, (tuple, list)):
-            self.name = [f'{state} {i}' for i in name]
+            self.name = [f"{state} {i}" for i in name]
         else:
-            self.name = f'{state} {name}'
+            self.name = f"{state} {name}"
 
         self.state = state
 
@@ -222,14 +248,16 @@ class IntensityGradient(ActivityEndpoint):
     """
     Compute the gradient of the acceleration movement intensity.
     """
-    def __init__(self, state='wake'):
+
+    def __init__(self, state="wake"):
         super(IntensityGradient, self).__init__(
-            ["intensity gradient", 'ig intercept', 'ig r-squared'],
-            state
+            ["intensity gradient", "ig intercept", "ig r-squared"], state
         )
 
         # default from rowlands
-        self.ig_levels = array([i for i in range(0, 4001, 25)] + [8000], dtype="float") / 1000
+        self.ig_levels = (
+            array([i for i in range(0, 4001, 25)] + [8000], dtype="float") / 1000
+        )
         self.ig_vals = (self.ig_levels[1:] + self.ig_levels[:-1]) / 2
 
         # values that need to be cached and stored between runs
@@ -243,7 +271,10 @@ class IntensityGradient(ActivityEndpoint):
         super(IntensityGradient, self).predict()
 
         # get the counts in number of minutes in each intensity bin
-        self.hist += histogram(accel_metric, bins=self.ig_levels, density=False)[0] / epochs_per_min
+        self.hist += (
+            histogram(accel_metric, bins=self.ig_levels, density=False)[0]
+            / epochs_per_min
+        )
 
         # get pointers to the intensity gradient results
         self.ig = results[self.name[0]]
@@ -283,13 +314,12 @@ class MaxAcceleration(ActivityEndpoint):
     """
     Compute the maximum acceleration over windows of the specified length.
     """
-    def __init__(self, window_lengths, state='wake'):
+
+    def __init__(self, window_lengths, state="wake"):
         if isinstance(window_lengths, int):
             window_lengths = [window_lengths]
 
-        super().__init__(
-            [f'max acc {i}min [g]' for i in window_lengths], state
-        )
+        super().__init__([f"max acc {i}min [g]" for i in window_lengths], state)
 
         self.wlens = window_lengths
 
@@ -314,13 +344,14 @@ class TotalIntensityTime(ActivityEndpoint):
     """
     Compute the total time spent in an intensity level
     """
-    def __init__(self, level, epoch_length, cutpoints=None, state='wake'):
-        super().__init__(f'{level} {epoch_length}s epoch [min]', state)
+
+    def __init__(self, level, epoch_length, cutpoints=None, state="wake"):
+        super().__init__(f"{level} {epoch_length}s epoch [min]", state)
         self.level = level
 
         if cutpoints is None:
             warn(f"Cutpoints not specified for {self!r}. Using `migueles_wrist_adult`")
-            cutpoints = _base_cutpoints['migueles_wrist_adult']
+            cutpoints = _base_cutpoints["migueles_wrist_adult"]
 
         self.lthresh, self.uthresh = get_level_thresholds(self.level, cutpoints)
 
@@ -336,13 +367,22 @@ class BoutIntensityTime(ActivityEndpoint):
     """
     Compute the time spent in bouts of intensity levels.
     """
-    def __init__(self, level, bout_lengths, bout_criteria, bout_metric, closed_bout, cutpoints=None, state='wake'):
+
+    def __init__(
+        self,
+        level,
+        bout_lengths,
+        bout_criteria,
+        bout_metric,
+        closed_bout,
+        cutpoints=None,
+        state="wake",
+    ):
         if isinstance(bout_lengths, int):
             bout_lengths = [bout_lengths]
 
         super(BoutIntensityTime, self).__init__(
-            [f'{level} {i}min bout [min]' for i in bout_lengths],
-            state
+            [f"{level} {i}min bout [min]" for i in bout_lengths], state
         )
         self.level = level
         self.blens = bout_lengths
@@ -352,7 +392,7 @@ class BoutIntensityTime(ActivityEndpoint):
 
         if cutpoints is None:
             warn(f"Cutpoints not specified for {self!r}. Using `migueles_wrist_adult`")
-            cutpoints = _base_cutpoints['migueles_wrist_adult']
+            cutpoints = _base_cutpoints["migueles_wrist_adult"]
 
         self.lthresh, self.uthresh = get_level_thresholds(self.level, cutpoints)
 

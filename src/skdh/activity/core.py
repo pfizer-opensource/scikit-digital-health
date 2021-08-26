@@ -21,7 +21,7 @@ from numpy import (
     nan,
     around,
     full,
-    arange
+    arange,
 )
 import matplotlib
 from matplotlib.backends.backend_pdf import PdfPages
@@ -38,8 +38,8 @@ from skdh.activity.endpoints import ActivityEndpoint
 def _update_date_results(
     results, time, day_n, day_start_idx, day_stop_idx, day_start_hour
 ):
-    # add 15 seconds to make sure any rounding effects for the hour don't adversely effect
-    # the result of the comparison
+    # add 15 seconds to make sure any rounding effects for the hour don't adversely
+    # effect the result of the comparison
     start_dt = datetime.utcfromtimestamp(time[day_start_idx])
 
     window_start_dt = start_dt + timedelta(seconds=15)
@@ -58,76 +58,82 @@ def _update_date_results(
 
 class ActivityLevelClassification(BaseProcess):
     """
-    Classify accelerometer data into different activity levels as a proxy for assessing physical
-    activity energy expenditure (PAEE). Levels are sedentary, light, moderate, and vigorous.
-    If provided, sleep time will always be excluded from the activity level classification.
+    Classify accelerometer data into different activity levels as a proxy for assessing
+    physical activity energy expenditure (PAEE). Levels are sedentary, light, moderate,
+    and vigorous. If provided, sleep time will always be excluded from the activity
+    level classification.
 
     Parameters
     ----------
     short_wlen : int, optional
-        Short window length in seconds, used for the initial computation acceleration metrics.
-        Default is 5 seconds. Must be a factor of 60 seconds.
+        Short window length in seconds, used for the initial computation acceleration
+        metrics. Default is 5 seconds. Must be a factor of 60 seconds.
     max_accel_lens : iterable, optional
-        Windows to compute the maximum mean acceleration metric over, in minutes. Default is
-        (6, 15, 60).
+        Windows to compute the maximum mean acceleration metric over, in minutes.
+        Default is (6, 15, 60).
     bout_lens : iterable, optional
         Activity bout lengths. Default is (1, 5, 10).
     bout_criteria : float, optional
-        Value between 0 and 1 for how much of a bout must be above the specified threshold. Default
-        is 0.8
+        Value between 0 and 1 for how much of a bout must be above the specified
+        threshold. Default is 0.8
     bout_metric : {1, 2, 3, 4, 5}, optional
-        How a bout of MVPA is computed. Default is 4. See notes for descriptions of each method.
+        How a bout of MVPA is computed. Default is 4. See notes for descriptions
+        of each method.
     closed_bout : bool, optional
-        If True then count breaks in a bout towards the bout duration. If False then only count
-        time spent above the threshold towards the bout duration. Only used if `bout_metric=1`.
-        Default is False.
+        If True then count breaks in a bout towards the bout duration. If False
+        then only count time spent above the threshold towards the bout duration.
+        Only used if `bout_metric=1`. Default is False.
     min_wear_time : int, optional
         Minimum wear time in hours for a day to be analyzed. Default is 10 hours.
     cutpoints : {str, dict, list}, optional
-        Cutpoints to use for sedentary/light/moderate/vigorous activity classification. Default
-        is "migueles_wrist_adult" [1]_. For a list of all available metrics use
-        `skdh.activity.get_available_cutpoints()`. Custom cutpoints can be provided in a
-        dictionary (see :ref:`Using Custom Cutpoints`).
+        Cutpoints to use for sedentary/light/moderate/vigorous activity classification.
+        Default is "migueles_wrist_adult" [1]_. For a list of all available metrics
+        use `skdh.activity.get_available_cutpoints()`. Custom cutpoints can be provided
+        in a dictionary (see :ref:`Using Custom Cutpoints`).
     day_window : array-like
-        Two (2) element array-like of the base and period of the window to use for determining
-        days. Default is (0, 24), which will look for days starting at midnight and lasting 24
-        hours. None removes any day-based windowing.
+        Two (2) element array-like of the base and period of the window to use for
+        determining days. Default is (0, 24), which will look for days starting at
+        midnight and lasting 24 hours. None removes any day-based windowing.
 
     Notes
     -----
-    While the `bout_metric` methods all should yield fairly similar results, there are subtle
-    differences in how the results are computed:
+    While the `bout_metric` methods all should yield fairly similar results, there
+    are subtle differences in how the results are computed:
 
-    1. MVPA bout definition from [2]_ and [3]_. Here the algorithm looks for `bout_len` minute
-       windows in which more than `bout_criteria` percent of the epochs are above the MVPA
-       threshold (above the "light" activity threshold) and then counts the entire window as mvpa.
-       The motivation for this definition was as follows: A person who spends 10 minutes in MVPA
-       with a 2 minute break in the middle is equally active as a person who spends 8 minutes in
-       MVPA without taking a break. Therefore, both should be counted equal.
-    2. Look for groups of epochs with a value above the MVPA threshold that span a time
-       window of at least `bout_len` minutes in which more than `bout_criteria` percent of the
-       epochs are above the threshold. Motivation: not counting breaks towards MVPA may simplify
-       interpretation and still counts the two persons in the above example as each others equal.
-    3. Use a sliding window across the data to test `bout_criteria` per window and do not allow
-       for breaks larger than 1 minute, and with fraction of time larger than the `bout_criteria`
-       threshold.
-    4. Same as 3, but also requires the first and last epoch to meet the threshold criteria.
-    5. Same as 4, but now looks for breaks larger than a minute such that 1 minute breaks
-       are allowed, and the fraction of time that meets the threshold should be equal
-       or greater than the `bout_criteria` threshold.
+    1. MVPA bout definition from [2]_ and [3]_. Here the algorithm looks for `bout_len`
+        minute windows in which more than `bout_criteria` percent of the epochs are
+        above the MVPA threshold (above the "light" activity threshold) and then
+        counts the entire window as mvpa. The motivation for this definition was
+        as follows: A person who spends 10 minutes in MVPA with a 2 minute break
+        in the middle is equally active as a person who spends 8 minutes in MVPA
+        without taking a break. Therefore, both should be counted equal.
+    2. Look for groups of epochs with a value above the MVPA threshold that span
+        a time window of at least `bout_len` minutes in which more than `bout_criteria`
+        percent of the epochs are above the threshold. Motivation: not counting breaks
+        towards MVPA may simplify interpretation and still counts the two persons
+        in the above example as each others equal.
+    3. Use a sliding window across the data to test `bout_criteria` per window and
+        do not allow for breaks larger than 1 minute, and with fraction of time larger
+        than the `bout_criteria` threshold.
+    4. Same as 3, but also requires the first and last epoch to meet the threshold
+        criteria.
+    5. Same as 4, but now looks for breaks larger than a minute such that 1 minute
+        breaks are allowed, and the fraction of time that meets the threshold should
+        be equal or greater than the `bout_criteria` threshold.
 
     References
     ----------
-    .. [1] J. H. Migueles et al., “Comparability of accelerometer signal aggregation metrics
-        across placements and dominant wrist cut points for the assessment of physical activity in
-        adults,” Scientific Reports, vol. 9, no. 1, Art. no. 1, Dec. 2019,
-        doi: 10.1038/s41598-019-54267-y.
-    .. [2] I. C. da Silva et al., “Physical activity levels in three Brazilian birth cohorts as
-        assessed with raw triaxial wrist accelerometry,” International Journal of Epidemiology,
-        vol. 43, no. 6, pp. 1959–1968, Dec. 2014, doi: 10.1093/ije/dyu203.
-    .. [3] S. Sabia et al., “Association between questionnaire- and accelerometer-assessed
-        physical activity: the role of sociodemographic factors,” Am J Epidemiol, vol. 179,
-        no. 6, pp. 781–790, Mar. 2014, doi: 10.1093/aje/kwt330.
+    .. [1] J. H. Migueles et al., “Comparability of accelerometer signal aggregation
+        metrics across placements and dominant wrist cut points for the assessment
+        of physical activity in adults,” Scientific Reports, vol. 9, no. 1,
+        Art. no. 1, Dec. 2019, doi: 10.1038/s41598-019-54267-y.
+    .. [2] I. C. da Silva et al., “Physical activity levels in three Brazilian birth
+        cohorts as assessed with raw triaxial wrist accelerometry,” International
+        Journal of Epidemiology, vol. 43, no. 6, pp. 1959–1968, Dec. 2014,
+        doi: 10.1093/ije/dyu203.
+    .. [3] S. Sabia et al., “Association between questionnaire- and
+        accelerometer-assessed physical activity: the role of sociodemographic factors,”
+        Am J Epidemiol, vol. 179, no. 6, pp. 781–790, Mar. 2014, doi: 10.1093/aje/kwt330.
     """
 
     act_levels = ["MVPA", "sed", "light", "mod", "vig"]
@@ -144,7 +150,8 @@ class ActivityLevelClassification(BaseProcess):
         cutpoints="migueles_wrist_adult",
         day_window=(0, 24),
     ):
-        # make sure that the short_wlen is a factor of 60, and if not send it to nearest factor
+        # make sure that the short_wlen is a factor of 60, and if not send it to
+        # nearest factor
         if (60 % short_wlen) != 0:
             tmp = [1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30]
             short_wlen = tmp[argmin(abs(array(tmp) - short_wlen))]
@@ -162,7 +169,8 @@ class ActivityLevelClassification(BaseProcess):
             cutpoints_ = _base_cutpoints.get(cutpoints, None)
             if cutpoints_ is None:
                 warn(
-                    f"Specified cutpoints [{cutpoints}] not found. Using `migueles_wrist_adult`."
+                    f"Specified cutpoints [{cutpoints}] not found. "
+                    f"Using `migueles_wrist_adult`."
                 )
                 cutpoints_ = _base_cutpoints["migueles_wrist_adult"]
         else:
@@ -201,11 +209,12 @@ class ActivityLevelClassification(BaseProcess):
 
         # setup wake endpoints
         self.wake_endpoints = [
-            ept.IntensityGradient(state='wake'),
-            ept.MaxAcceleration(self.max_acc_lens, state='wake'),
+            ept.IntensityGradient(state="wake"),
+            ept.MaxAcceleration(self.max_acc_lens, state="wake"),
         ]
         self.wake_endpoints += [
-            ept.TotalIntensityTime(lvl, self.wlen, self.cutpoints, state='wake') for lvl in self.act_levels
+            ept.TotalIntensityTime(lvl, self.wlen, self.cutpoints, state="wake")
+            for lvl in self.act_levels
         ]
         self.wake_endpoints += [
             ept.BoutIntensityTime(
@@ -215,12 +224,14 @@ class ActivityLevelClassification(BaseProcess):
                 self.boutmetric,
                 self.closedbout,
                 self.cutpoints,
-                state='wake',
-            ) for lvl in self.act_levels
+                state="wake",
+            )
+            for lvl in self.act_levels
         ]
 
         self.sleep_endpoints = [
-            ept.TotalIntensityTime(lvl, self.wlen, self.cutpoints, state='sleep') for lvl in self.act_levels
+            ept.TotalIntensityTime(lvl, self.wlen, self.cutpoints, state="sleep")
+            for lvl in self.act_levels
         ]
 
     def add(self, endpoint):
@@ -235,21 +246,27 @@ class ActivityLevelClassification(BaseProcess):
         if isinstance(endpoint, (list, tuple)):
             if all([isinstance(i, ActivityEndpoint) for i in endpoint]):
                 for ept in endpoint:
-                    if ept.state == 'wake':
+                    if ept.state == "wake":
                         self.wake_endpoints.append(ept)
-                    elif ept.state == 'sleep':
+                    elif ept.state == "sleep":
                         self.sleep_endpoints.append(ept)
                     else:
-                        warn(f'Endpoint {ept!r}.state ({ept.state}) not "wake" or "sleep". Skipping')
+                        warn(
+                            f'Endpoint {ept!r}.state ({ept.state}) not "wake" or '
+                            f'"sleep". Skipping'
+                        )
         elif isinstance(endpoint, ActivityEndpoint):
-            if endpoint.state == 'wake':
+            if endpoint.state == "wake":
                 self.wake_endpoints.append(endpoint)
-            elif endpoint.state == 'sleep':
+            elif endpoint.state == "sleep":
                 self.sleep_endpoints.append(endpoint)
             else:
-                warn(f'Endpoint {endpoint!r}.state ({endpoint.state}) not "wake" or "sleep". Skipping')
+                warn(
+                    f'Endpoint {endpoint!r}.state ({endpoint.state}) not "wake" or '
+                    f'"sleep". Skipping'
+                )
         else:
-            warn(f'`endpoint` argument not an ActivityEndpoint or list/tuple. Skipping')
+            warn(f"`endpoint` argument not an ActivityEndpoint or list/tuple. Skipping")
 
     def _setup_plotting(self, save_name):
         """
@@ -258,8 +275,9 @@ class ActivityLevelClassification(BaseProcess):
         Parameters
         ----------
         save_name : str
-            The file name to save the resulting plot to. Extension will be set to PDF. There
-            are formatting options as well for dynamically generated names. See Notes
+            The file name to save the resulting plot to. Extension will be set to PDF.
+            There are formatting options as well for dynamically generated names. See
+            Notes.
 
         Notes
         -----
@@ -294,14 +312,14 @@ class ActivityLevelClassification(BaseProcess):
         time : numpy.ndarray
             (N, ) array of continuous unix timestamps, in seconds
         accel : numpy.ndarray
-            (N, 3) array of accelerations measured by centrally mounted lumbar device, in
-            units of 'g'
+            (N, 3) array of accelerations measured by centrally mounted lumbar device,
+            in units of 'g'.
         fs : {None, float}, optional
-            Sampling frequency in Hz. If None will be computed from the first 5000 samples of
-            `time`.
+            Sampling frequency in Hz. If None will be computed from the first 5000
+            samples of `time`.
         wear : {None, list}, optional
-            List of length-2 lists of wear-time ([start, stop]). Default is None, which uses the
-            whole recording as wear time.
+            List of length-2 lists of wear-time ([start, stop]). Default is None,
+            which uses the whole recording as wear time.
 
         Returns
         -------
@@ -318,9 +336,9 @@ class ActivityLevelClassification(BaseProcess):
             **kwargs,
         )
 
-        # ========================================================================================
+        # ==============================================================================
         # SETUP / INITIALIZATION
-        # ========================================================================================
+        # ==============================================================================
         if fs is None:
             fs = 1 / mean(diff(time[:5000]))
 
@@ -334,9 +352,9 @@ class ActivityLevelClassification(BaseProcess):
         )
         sleep_starts, sleep_stops = self._check_if_idx_none(sleep, slp_msg, None, None)
 
-        # =============================================================================
+        # ==============================================================================
         # SETUP RESULTS KEYS/ENDPOINTS
-        # =============================================================================
+        # ==============================================================================
         n_ = self.day_idx[0].size
         res = {
             "Date": full(n_, "", dtype="U11"),
@@ -344,10 +362,10 @@ class ActivityLevelClassification(BaseProcess):
             "Day N": full(n_, -1, dtype="int"),
             "N hours": full(n_, nan, dtype="float"),
             "N wear hours": full(n_, nan, dtype="float"),
-            "N wear wake hours": full(n_, nan, dtype="float")
+            "N wear wake hours": full(n_, nan, dtype="float"),
         }
 
-        for endpt in (self.wake_endpoints + self.sleep_endpoints):
+        for endpt in self.wake_endpoints + self.sleep_endpoints:
             if isinstance(endpt.name, (list, tuple)):
                 for name in endpt.name:
                     res[name] = full(self.day_idx[0].size, nan, dtype="float")
@@ -415,14 +433,7 @@ class ActivityLevelClassification(BaseProcess):
 
             # compute waking hours activity endpoints
             self._compute_awake_activity_endpoints(
-                res,
-                accel,
-                fs,
-                iday,
-                dwear_starts,
-                dwear_stops,
-                nwlen,
-                epm
+                res, accel, fs, iday, dwear_starts, dwear_stops, nwlen, epm
             )
             # compute sleeping hours activity endpoints
             self._compute_sleep_activity_endpoints(
@@ -450,7 +461,7 @@ class ActivityLevelClassification(BaseProcess):
         day_n : int
             Day index value
         """
-        for endpt in (self.wake_endpoints + self.sleep_endpoints):
+        for endpt in self.wake_endpoints + self.sleep_endpoints:
             if isinstance(endpt.name, (list, tuple)):
                 for name in endpt.name:
                     results[name][day_n] = 0.0
@@ -484,8 +495,8 @@ class ActivityLevelClassification(BaseProcess):
         if starts is None or stops is None:
             return  # don't initialize/compute any values if there is no sleep data
 
-        # initialize values from nan to 0.0. Do this here because days with less than minimum
-        # hours should have nan values
+        # initialize values from nan to 0.0. Do this here because days with less than
+        # minimum hours should have nan values
         for endpt in self.sleep_endpoints:
             if isinstance(endpt.name, (list, tuple)):
                 for name in endpt.name:
