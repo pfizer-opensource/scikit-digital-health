@@ -284,6 +284,9 @@ class MaxAcceleration(ActivityEndpoint):
     Compute the maximum acceleration over windows of the specified length.
     """
     def __init__(self, window_lengths, state='wake'):
+        if isinstance(window_lengths, int):
+            window_lengths = [window_lengths]
+
         super().__init__(
             [f'max acc {i}min [g]' for i in window_lengths], state
         )
@@ -334,6 +337,9 @@ class BoutIntensityTime(ActivityEndpoint):
     Compute the time spent in bouts of intensity levels.
     """
     def __init__(self, level, bout_lengths, bout_criteria, bout_metric, closed_bout, cutpoints=None, state='wake'):
+        if isinstance(bout_lengths):
+            bout_lengths = [bout_lengths]
+
         super(BoutIntensityTime, self).__init__(
             [f'{level} {i}min bout [min]' for i in bout_lengths],
             state
