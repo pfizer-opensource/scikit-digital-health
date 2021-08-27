@@ -9,8 +9,18 @@ from operator import attrgetter
 from importlib import import_module
 from warnings import warn
 import logging
+from packaging import version
 
+from skdh import __skdh_version__ as skdh_version
 from skdh.base import BaseProcess as Process
+
+# ==============================================================================
+# MINIMUM VERSION FOR BACKWARDS COMPATIBILITY
+# ==============================================================================
+MINIMUM_VERSION = "0.0.0"
+# ==============================================================================
+# MINIMUM VERSION FOR BACKWARDS COMPATIBILITY
+# ==============================================================================
 
 
 class NotAProcessError(Exception):
@@ -63,10 +73,10 @@ class Pipeline:
         file : {str, path-like}
             File path to save the pipeline structure to
         """
-        pipe = []
+        pipe = {"Steps": [], "Version": skdh_version}
         for step in self._steps:  # actually look at steps
             package, module = step.__class__.__module__.split(".", 1)
-            pipe.append(
+            pipe["Steps"].append(
                 {
                     step._name: {
                         "package": package,
@@ -93,7 +103,27 @@ class Pipeline:
         import skdh
 
         with open(file, "r") as f:
-            procs = json.load(f)
+            data = json.load(f)
+
+        if "Steps" in data and "Version" in data:
+            procs = data["Steps"]
+            saved_version = data["Version"]
+        else:
+            warn(
+                "Pipeline created by and unknown older version of skdh. "
+                "Functionality is not guaranteed",
+                UserWarning
+            )
+            procs = data
+            saved_version = "0.0.1"
+
+        if version.parse(saved_version) < version.parse(MINIMUM_VERSION):
+            warn(
+                f"Pipeline was created by an older version of skdh ({saved_version}), "
+                f"which may not be compatible with the current version "
+                f"({skdh_version}). Functionality is not guaranteed.",
+                UserWarning
+            )
 
         for proc in procs:
             name = list(proc.keys())[0]
