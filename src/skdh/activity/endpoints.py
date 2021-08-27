@@ -232,6 +232,17 @@ def get_activity_bouts(
 
 
 class ActivityEndpoint:
+    """
+    Base class for activity endpoints. Should be subclassed for creating
+    custom activity endpoints.
+
+    Attributes
+    ----------
+    name : {list, str}
+        Name, or list of names of the endpoints being generated.
+    state : {'wake', 'sleep'}
+        State during which the endpoint is being computed.
+    """
     def __init__(self, name, state):
         if isinstance(name, (tuple, list)):
             self.name = [f"{state} {i}" for i in name]
@@ -241,15 +252,45 @@ class ActivityEndpoint:
         self.state = state
 
     def predict(self, **kwargs):
+        """
+        predict(results, i, accel_metric, epoch_s, epochs_per_min)
+        Method that gets called during each block of wear time during either waking
+        hours (if `state='wake'`) or sleeping hours (if `state='sleep'`). This
+        means it may run multiple times per state.
+
+        Parameters
+        ----------
+        results : dict
+            Dictionary containing the initialized results arrays. Keys in `results`
+            are taken from the names of endpoints.
+        i : int
+            Index of the day, used to index into individual result arrays, e.g.
+            `results[self.name][i] = 5.0`
+        accel_metric : numpy.ndarray
+            Computed acceleration metric (e.g. ENMO).
+        epoch_s : int
+            Duration in seconds of each sample of `accel_metric`.
+        epochs_per_min : int
+            Number of epochs per minute.
+        """
         pass
 
     def reset_cached(self):
+        """
+        Called after all the blocks during the desired `state` have been run.
+        Can be used to calculate results on all data for the day/state.
+        """
         pass
 
 
 class IntensityGradient(ActivityEndpoint):
     """
     Compute the gradient of the acceleration movement intensity.
+
+    Parameters
+    ----------
+    state : {'wake', 'sleep'}
+        State during which the endpoint is being computed.
     """
 
     def __init__(self, state="wake"):
@@ -271,6 +312,24 @@ class IntensityGradient(ActivityEndpoint):
         self.i = None
 
     def predict(self, results, i, accel_metric, epoch_s, epochs_per_min, **kwargs):
+        """
+        Saves the histogram counts for each bin of acceleration intensities.
+
+        Parameters
+        ----------
+        results : dict
+            Dictionary containing the initialized results arrays. Keys in `results`
+            are taken from the names of endpoints.
+        i : int
+            Index of the day, used to index into individual result arrays, e.g.
+            `results[self.name][i] = 5.0`
+        accel_metric : numpy.ndarray
+            Computed acceleration metric (e.g. ENMO).
+        epoch_s : int
+            Duration in seconds of each sample of `accel_metric`.
+        epochs_per_min : int
+            Number of epochs per minute.
+        """
         super(IntensityGradient, self).predict()
 
         # get the counts in number of minutes in each intensity bin
@@ -286,6 +345,10 @@ class IntensityGradient(ActivityEndpoint):
         self.i = i
 
     def reset_cached(self):
+        """
+        Generate the intensity gradient metrics from the cumulative data,
+        and reset the attributes.
+        """
         super(IntensityGradient, self).reset_cached()
 
         # make sure we have results locations to set
@@ -316,6 +379,13 @@ class IntensityGradient(ActivityEndpoint):
 class MaxAcceleration(ActivityEndpoint):
     """
     Compute the maximum acceleration over windows of the specified length.
+
+    Parameters
+    ----------
+    window_lengths : {list, int}
+        List of window lengths, or a single window length.
+    state : {'wake', 'sleep}
+        State during which the endpoint is being computed.
     """
 
     def __init__(self, window_lengths, state="wake"):
@@ -327,6 +397,25 @@ class MaxAcceleration(ActivityEndpoint):
         self.wlens = window_lengths
 
     def predict(self, results, i, accel_metric, epoch_s, epochs_per_min, **kwargs):
+        """
+        Compute the maximum acceleration during this set of data, and compare it
+        to the previous largest detected value.
+
+        Parameters
+        ----------
+        results : dict
+            Dictionary containing the initialized results arrays. Keys in `results`
+            are taken from the names of endpoints.
+        i : int
+            Index of the day, used to index into individual result arrays, e.g.
+            `results[self.name][i] = 5.0`
+        accel_metric : numpy.ndarray
+            Computed acceleration metric (e.g. ENMO).
+        epoch_s : int
+            Duration in seconds of each sample of `accel_metric`.
+        epochs_per_min : int
+            Number of epochs per minute.
+        """
         super(MaxAcceleration, self).predict()
 
         for wlen, name in zip(self.wlens, self.name):
@@ -345,7 +434,18 @@ class MaxAcceleration(ActivityEndpoint):
 
 class TotalIntensityTime(ActivityEndpoint):
     """
-    Compute the total time spent in an intensity level
+    Compute the total time spent in an intensity level.
+
+    Parameters
+    ----------
+    level : {"sed", "light", "mod", "vig", "MVPA", "SLPA"}
+        Level of intensity to compute the total time for.
+    epoch_length : int
+        Number of seconds for each epoch.
+    cutpoints : {str, None}
+        Cutpoints to use for the thresholding. If None, will use `migueles_wrist_adult`.
+    state : {'wake', 'sleep'}
+        State during which the endpoint is being computed.
     """
 
     def __init__(self, level, epoch_length, cutpoints=None, state="wake"):
@@ -359,6 +459,24 @@ class TotalIntensityTime(ActivityEndpoint):
         self.lthresh, self.uthresh = get_level_thresholds(self.level, cutpoints)
 
     def predict(self, results, i, accel_metric, epoch_s, epochs_per_min, **kwargs):
+        """
+        Compute the time spent at the specified intensity level.
+
+        Parameters
+        ----------
+        results : dict
+            Dictionary containing the initialized results arrays. Keys in `results`
+            are taken from the names of endpoints.
+        i : int
+            Index of the day, used to index into individual result arrays, e.g.
+            `results[self.name][i] = 5.0`
+        accel_metric : numpy.ndarray
+            Computed acceleration metric (e.g. ENMO).
+        epoch_s : int
+            Duration in seconds of each sample of `accel_metric`.
+        epochs_per_min : int
+            Number of epochs per minute.
+        """
         super().predict()
 
         time = sum((accel_metric >= self.lthresh) & (accel_metric < self.uthresh))
@@ -369,6 +487,26 @@ class TotalIntensityTime(ActivityEndpoint):
 class BoutIntensityTime(ActivityEndpoint):
     """
     Compute the time spent in bouts of intensity levels.
+
+    Parameters
+    ----------
+    level : {"sed", "light", "mod", "vig", "MVPA", "SLPA"}
+        Level of intensity to compute the total time for.
+    bout_lengths : {list, int}
+        Lengths of bouts, in minutes.
+    bout_criteria : float
+        Percentage (0-1) of time that must be spent in the bout. See
+        :class:`.ActivityLevelClassification`.
+    bout_metric : {1, 2, 3, 4, 5}
+        Rules for how a bout is determined. See :class:`.ActivityLevelClassification`
+        for more details.
+    closed_bout : bool
+        Include all time for a bout or just the time at the intensity level. See
+        :class:`.ActivityLevelClassification` for more details.
+    cutpoints : {str, None}
+        Cutpoints to use for the thresholding. If None, will use `migueles_wrist_adult`.
+    state : {'wake', 'sleep'}
+        State during which the endpoint is being computed.
     """
 
     def __init__(
@@ -400,6 +538,24 @@ class BoutIntensityTime(ActivityEndpoint):
         self.lthresh, self.uthresh = get_level_thresholds(self.level, cutpoints)
 
     def predict(self, results, i, accel_metric, epoch_s, epochs_per_min, **kwargs):
+        """
+        Compute the time spent in bouts at the specified intensity level.
+
+        Parameters
+        ----------
+        results : dict
+            Dictionary containing the initialized results arrays. Keys in `results`
+            are taken from the names of endpoints.
+        i : int
+            Index of the day, used to index into individual result arrays, e.g.
+            `results[self.name][i] = 5.0`
+        accel_metric : numpy.ndarray
+            Computed acceleration metric (e.g. ENMO).
+        epoch_s : int
+            Duration in seconds of each sample of `accel_metric`.
+        epochs_per_min : int
+            Number of epochs per minute.
+        """
         super().predict()
 
         for bout_len, name in zip(self.blens, self.name):
@@ -418,6 +574,15 @@ class BoutIntensityTime(ActivityEndpoint):
 class FragmentationEndpoints(ActivityEndpoint):
     """
     Compute fragmentation metrics for the desired intensity level.
+
+    Parameters
+    ----------
+    level : {"sed", "light", "mod", "vig", "MVPA", "SLPA"}
+        Level of intensity to compute the total time for.
+    cutpoints : {str, None}
+        Cutpoints to use for the thresholding. If None, will use `migueles_wrist_adult`.
+    state : {'wake', 'sleep'}
+        State during which the endpoint is being computed.
     """
     def __init__(self, level, cutpoints=None, state='wake'):
         super().__init__(
@@ -450,6 +615,24 @@ class FragmentationEndpoints(ActivityEndpoint):
         self.i = None
 
     def predict(self, results, i, accel_metric, epoch_s, epochs_per_min, **kwargs):
+        """
+        Compute and save the lengths of runs of the specified intensity level.
+
+        Parameters
+        ----------
+        results : dict
+            Dictionary containing the initialized results arrays. Keys in `results`
+            are taken from the names of endpoints.
+        i : int
+            Index of the day, used to index into individual result arrays, e.g.
+            `results[self.name][i] = 5.0`
+        accel_metric : numpy.ndarray
+            Computed acceleration metric (e.g. ENMO).
+        epoch_s : int
+            Duration in seconds of each sample of `accel_metric`.
+        epochs_per_min : int
+            Number of epochs per minute.
+        """
         super().predict()
 
         mask = (accel_metric >= self.lthresh) & (accel_metric < self.uthresh)
@@ -466,6 +649,10 @@ class FragmentationEndpoints(ActivityEndpoint):
         self.i = i
 
     def reset_cached(self):
+        """
+        Compute the fragmentation metrics based on the previously saved lengths
+        of intensity level runs.
+        """
         super().reset_cached()
 
         if all([i is not None for i in [self.r_ad, self.r_tp, self.r_gi, self.r_ah, self.r_pld, self.i]]):
