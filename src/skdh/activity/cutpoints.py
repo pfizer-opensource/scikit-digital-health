@@ -45,6 +45,8 @@ def get_level_thresholds(level, cutpoints):
         return cutpoints["moderate"], 1e5
     elif level.lower() == "mvpa":
         return cutpoints["light"], 1e5
+    elif level.lower() == "slpa":  # sedentary-light phys. act.
+        return -1e5, cutpoints["light"]
     else:
         raise ValueError(f"Activity level label [{level}] not recognized.")
 
