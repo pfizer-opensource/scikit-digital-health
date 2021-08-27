@@ -243,6 +243,7 @@ class ActivityEndpoint:
     state : {'wake', 'sleep'}
         State during which the endpoint is being computed.
     """
+
     def __init__(self, name, state):
         if isinstance(name, (tuple, list)):
             self.name = [f"{state} {i}" for i in name]
@@ -460,7 +461,9 @@ class TotalIntensityTime(ActivityEndpoint):
         elif isinstance(cutpoints, dict):
             pass
         else:
-            raise ValueError("cutpoints must be None, a string, or a dictionary of cutpoints")
+            raise ValueError(
+                "cutpoints must be None, a string, or a dictionary of cutpoints"
+            )
 
         self.lthresh, self.uthresh = get_level_thresholds(self.level, cutpoints)
 
@@ -545,7 +548,9 @@ class BoutIntensityTime(ActivityEndpoint):
         elif isinstance(cutpoints, dict):
             pass
         else:
-            raise ValueError("cutpoints must be None, a string, or a dictionary of cutpoints")
+            raise ValueError(
+                "cutpoints must be None, a string, or a dictionary of cutpoints"
+            )
 
         self.lthresh, self.uthresh = get_level_thresholds(self.level, cutpoints)
 
@@ -596,16 +601,17 @@ class FragmentationEndpoints(ActivityEndpoint):
     state : {'wake', 'sleep'}
         State during which the endpoint is being computed.
     """
-    def __init__(self, level, cutpoints=None, state='wake'):
+
+    def __init__(self, level, cutpoints=None, state="wake"):
         super().__init__(
             [
-                f'{level} avg duration',
-                f'{level} transition probability',
-                f'{level} gini index',
-                f'{level} avg hazard',
-                f'{level} power law distribution',
+                f"{level} avg duration",
+                f"{level} transition probability",
+                f"{level} gini index",
+                f"{level} avg hazard",
+                f"{level} power law distribution",
             ],
-            state
+            state,
         )
 
         self.level = level
@@ -618,7 +624,9 @@ class FragmentationEndpoints(ActivityEndpoint):
         elif isinstance(cutpoints, dict):
             pass
         else:
-            raise ValueError("cutpoints must be None, a string, or a dictionary of cutpoints")
+            raise ValueError(
+                "cutpoints must be None, a string, or a dictionary of cutpoints"
+            )
 
         self.lthresh, self.uthresh = get_level_thresholds(self.level, cutpoints)
 
@@ -659,11 +667,11 @@ class FragmentationEndpoints(ActivityEndpoint):
         self.lens.extend(lens[vals == 1].tolist())
 
         # save results/day info
-        self.r_ad = results[f'{self.state} {self.level} avg duration']
-        self.r_tp = results[f'{self.state} {self.level} transition probability']
-        self.r_gi = results[f'{self.state} {self.level} gini index']
-        self.r_ah = results[f'{self.state} {self.level} avg hazard']
-        self.r_pld = results[f'{self.state} {self.level} power law distribution']
+        self.r_ad = results[f"{self.state} {self.level} avg duration"]
+        self.r_tp = results[f"{self.state} {self.level} transition probability"]
+        self.r_gi = results[f"{self.state} {self.level} gini index"]
+        self.r_ah = results[f"{self.state} {self.level} avg hazard"]
+        self.r_pld = results[f"{self.state} {self.level} power law distribution"]
         self.i = i
 
     def reset_cached(self):
@@ -673,7 +681,19 @@ class FragmentationEndpoints(ActivityEndpoint):
         """
         super().reset_cached()
 
-        if all([i is not None for i in [self.r_ad, self.r_tp, self.r_gi, self.r_ah, self.r_pld, self.i]]):
+        if all(
+            [
+                i is not None
+                for i in [
+                    self.r_ad,
+                    self.r_tp,
+                    self.r_gi,
+                    self.r_ah,
+                    self.r_pld,
+                    self.i,
+                ]
+            ]
+        ):
             self.r_ad[self.i] = fe.average_duration(lengths=self.lens)
             self.r_tp[self.i] = fe.state_transition_probability(lengths=self.lens)
             self.r_gi[self.i] = fe.gini_index(lengths=self.lens)

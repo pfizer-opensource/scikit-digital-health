@@ -114,7 +114,7 @@ class Pipeline:
             warn(
                 "Pipeline created by and unknown older version of skdh. "
                 "Functionality is not guaranteed",
-                UserWarning
+                UserWarning,
             )
             procs = data
             saved_version = "0.0.1"
@@ -124,7 +124,7 @@ class Pipeline:
                 f"Pipeline was created by an older version of skdh ({saved_version}), "
                 f"which may not be compatible with the current version "
                 f"({skdh_version}). Functionality is not guaranteed.",
-                UserWarning
+                UserWarning,
             )
 
         for proc in procs:

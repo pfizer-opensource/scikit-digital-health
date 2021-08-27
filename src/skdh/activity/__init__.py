@@ -250,9 +250,8 @@ from skdh.activity.cutpoints import get_available_cutpoints
 from skdh.activity.endpoints import *
 from skdh.activity import endpoints
 
-__all__ = [
-    "ActivityLevelClassification",
-    "metrics",
-    "get_available_cutpoints",
-    "endpoints"
-] + metrics.__all__ + endpoints.__all__
+__all__ = (
+    ["ActivityLevelClassification", "metrics", "get_available_cutpoints", "endpoints"]
+    + metrics.__all__
+    + endpoints.__all__
+)
