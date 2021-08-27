@@ -11,7 +11,6 @@ from warnings import warn
 import logging
 from packaging import version
 
-from skdh import __skdh_version__ as skdh_version
 from skdh.base import BaseProcess as Process
 
 # ==============================================================================
@@ -73,6 +72,9 @@ class Pipeline:
         file : {str, path-like}
             File path to save the pipeline structure to
         """
+        # avoid circular import
+        from skdh import __skdh_version__ as skdh_version
+
         pipe = {"Steps": [], "Version": skdh_version}
         for step in self._steps:  # actually look at steps
             package, module = step.__class__.__module__.split(".", 1)
