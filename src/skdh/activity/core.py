@@ -228,6 +228,11 @@ class ActivityLevelClassification(BaseProcess):
             )
             for lvl in self.act_levels
         ]
+        self.wake_endpoints += [
+            ept.FragmentationEndpoints("sed", cutpoints="migueles_wrist_adult"),
+            ept.FragmentationEndpoints("SLPA", cutpoints="migueles_wrist_adult"),
+            ept.FragmentationEndpoints("MVPA", cutpoints="migueles_wrist_adult"),
+        ]
 
         self.sleep_endpoints = [
             ept.TotalIntensityTime(lvl, self.wlen, self.cutpoints, state="sleep")
