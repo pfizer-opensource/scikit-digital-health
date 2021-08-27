@@ -4,8 +4,8 @@ IMU Activity Analysis (:mod:`skdh.activity`)
 
 .. currentmodule:: skdh.activity
 
-Pipeline activity processing
-------------------------
+Pipeline Activity Processing
+----------------------------
 
 .. autosummary::
     :toctree: generated/
@@ -14,8 +14,21 @@ Pipeline activity processing
 
 .. _accelerometer-metrics:
 
+Activity Endpoints
+------------------
+
+.. autosummary::
+    :toctree: generated/
+
+    ActivityEndpoint
+    IntensityGradient
+    MaxAcceleration
+    TotalIntensityTime
+    BoutIntensityTime
+    FragmentationEndpoints
+
 Accelerometer Metrics
-------------------------
+---------------------
 
 .. autosummary::
     :toctree: generated/
@@ -132,9 +145,12 @@ from skdh.activity.core import ActivityLevelClassification
 from skdh.activity.metrics import *
 from skdh.activity import metrics
 from skdh.activity.cutpoints import get_available_cutpoints
+from skdh.activity.endpoints import *
+from skdh.activity import endpoints
 
 __all__ = [
     "ActivityLevelClassification",
     "metrics",
     "get_available_cutpoints",
-] + metrics.__all__
+    "endpoints"
+] + metrics.__all__ + endpoints.__all__
