@@ -455,6 +455,12 @@ class TotalIntensityTime(ActivityEndpoint):
         if cutpoints is None:
             warn(f"Cutpoints not specified for {self!r}. Using `migueles_wrist_adult`")
             cutpoints = _base_cutpoints["migueles_wrist_adult"]
+        elif isinstance(cutpoints, str):
+            cutpoints = _base_cutpoints[cutpoints]
+        elif isinstance(cutpoints, dict):
+            pass
+        else:
+            raise ValueError("cutpoints must be None, a string, or a dictionary of cutpoints")
 
         self.lthresh, self.uthresh = get_level_thresholds(self.level, cutpoints)
 
@@ -534,6 +540,12 @@ class BoutIntensityTime(ActivityEndpoint):
         if cutpoints is None:
             warn(f"Cutpoints not specified for {self!r}. Using `migueles_wrist_adult`")
             cutpoints = _base_cutpoints["migueles_wrist_adult"]
+        elif isinstance(cutpoints, str):
+            cutpoints = _base_cutpoints[cutpoints]
+        elif isinstance(cutpoints, dict):
+            pass
+        else:
+            raise ValueError("cutpoints must be None, a string, or a dictionary of cutpoints")
 
         self.lthresh, self.uthresh = get_level_thresholds(self.level, cutpoints)
 
@@ -601,6 +613,12 @@ class FragmentationEndpoints(ActivityEndpoint):
         if cutpoints is None:
             warn(f"Cutpoints not specified for {self!r}. Using `migueles_wrist_adult`")
             cutpoints = _base_cutpoints["migueles_wrist_adult"]
+        elif isinstance(cutpoints, str):
+            cutpoints = _base_cutpoints[cutpoints]
+        elif isinstance(cutpoints, dict):
+            pass
+        else:
+            raise ValueError("cutpoints must be None, a string, or a dictionary of cutpoints")
 
         self.lthresh, self.uthresh = get_level_thresholds(self.level, cutpoints)
 
