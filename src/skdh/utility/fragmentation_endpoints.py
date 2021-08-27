@@ -94,10 +94,10 @@ def average_duration(a=None, *, lengths=None, values=None, voi=1):
     a : array-like, optional
         1D array of binary values. If not provided, all of `lengths`, `starts`,
         and `values` must be provided.
-    lengths : numpy.ndarray, optional
+    lengths : {numpy.ndarray, list}, optional
         Lengths of runs of the binary values. If not provided, `a` must be. Must
         be the same size as `values`.
-    values : numpy.ndarray, optional
+    values : {numpy.ndarray, list}, optional
         Values of the runs. If not provided, all `lengths` will be assumed to be
         for the `voi`.
     voi : {int, bool}, optional
@@ -152,10 +152,10 @@ def state_transition_probability(a=None, *, lengths=None, values=None, voi=1):
     a : array-like, optional
         1D array of binary values. If not provided, all of `lengths`, `starts`,
         and `values` must be provided.
-    lengths : numpy.ndarray, optional
+    lengths : {numpy.ndarray, list}, optional, optional
         Lengths of runs of the binary values. If not provided, `a` must be. Must
         be the same size as `values`.
-    values : numpy.ndarray, optional
+    values : {numpy.ndarray, list}, optional, optional
         Values of the runs. If not provided, all `lengths` will be assumed to be
         for the `voi`.
     voi : {int, bool}, optional
@@ -227,10 +227,10 @@ def gini_index(a=None, *, lengths=None, values=None, voi=1):
     a : array-like, optional
         1D array of binary values. If not provided, all of `lengths`, `starts`,
         and `values` must be provided.
-    lengths : numpy.ndarray, optional
+    lengths : {numpy.ndarray, list}, optional, optional
         Lengths of runs of the binary values. If not provided, `a` must be. Must
         be the same size as `values`.
-    values : numpy.ndarray, optional
+    values : {numpy.ndarray, list}, optional, optional
         Values of the runs. If not provided, all `lengths` will be assumed to be
         for the `voi`.
     voi : {int, bool}, optional
@@ -298,10 +298,10 @@ def average_hazard(a=None, *, lengths=None, values=None, voi=1):
     a : array-like, optional
         1D array of binary values. If not provided, all of `lengths`, `starts`,
         and `values` must be provided.
-    lengths : numpy.ndarray, optional
+    lengths : {numpy.ndarray, list}, optional, optional
         Lengths of runs of the binary values. If not provided, `a` must be. Must
         be the same size as `values`.
-    values : numpy.ndarray, optional
+    values : {numpy.ndarray, list}, optional, optional
         Values of the runs. If not provided, all `lengths` will be assumed to be
         for the `voi`.
     voi : {int, bool}, optional
@@ -387,10 +387,10 @@ def state_power_law_distribution(a=None, *, lengths=None, values=None, voi=1):
     a : array-like, optional
         1D array of binary values. If not provided, all of `lengths`, `starts`,
         and `values` must be provided.
-    lengths : numpy.ndarray, optional
+    lengths : {numpy.ndarray, list}, optional, optional
         Lengths of runs of the binary values. If not provided, `a` must be. Must
         be the same size as `values`.
-    values : numpy.ndarray, optional
+    values : {numpy.ndarray, list}, optional, optional
         Values of the runs. If not provided, all `lengths` will be assumed to be
         for the `voi`.
     voi : {int, bool}, optional
