@@ -25,6 +25,8 @@ from numpy import (
 from scipy.stats import linregress
 
 from skdh.utility import moving_mean
+from skdh.utility import fragmentation_endpoints as fe
+from skdh.utility.internal import rle
 from skdh.activity.cutpoints import _base_cutpoints, get_level_thresholds
 
 
@@ -34,6 +36,7 @@ __all__ = [
     "MaxAcceleration",
     "TotalIntensityTime",
     "BoutIntensityTime",
+    "FragmentationEndpoints",
 ]
 
 
@@ -410,3 +413,73 @@ class BoutIntensityTime(ActivityEndpoint):
                 self.cbout,
                 self.bmetric,
             )
+
+
+class FragmentationEndpoints(ActivityEndpoint):
+    """
+    Compute fragmentation metrics for the desired intensity level.
+    """
+    def __init__(self, level, cutpoints=None, state='wake'):
+        super().__init__(
+            [
+                f'{level} avg duration',
+                f'{level} transition probability',
+                f'{level} gini index',
+                f'{level} avg hazard',
+                f'{level} power law distribution',
+            ],
+            state
+        )
+
+        self.level = level
+
+        if cutpoints is None:
+            warn(f"Cutpoints not specified for {self!r}. Using `migueles_wrist_adult`")
+            cutpoints = _base_cutpoints["migueles_wrist_adult"]
+
+        self.lthresh, self.uthresh = get_level_thresholds(self.level, cutpoints)
+
+        # caching results
+        self.lens = []
+
+        self.r_ad = None  # average duration
+        self.r_tp = None  # transition prob
+        self.r_gi = None  # gini index
+        self.r_ah = None  # avg hazard
+        self.r_pld = None  # power law dist
+        self.i = None
+
+    def predict(self, results, i, accel_metric, epoch_s, epochs_per_min, **kwargs):
+        super().predict()
+
+        mask = (accel_metric >= self.lthresh) & (accel_metric < self.uthresh)
+        lens, starts, vals = rle(mask)
+        # save the lengths of the desired blocks
+        self.lens.extend(lens[vals == 1].tolist())
+
+        # save results/day info
+        self.r_ad = results[f'{self.state} {self.level} avg duration']
+        self.r_tp = results[f'{self.state} {self.level} transition probability']
+        self.r_gi = results[f'{self.state} {self.level} gini index']
+        self.r_ah = results[f'{self.state} {self.level} avg hazard']
+        self.r_pld = results[f'{self.state} {self.level} power law distribution']
+        self.i = i
+
+    def reset_cached(self):
+        super().reset_cached()
+
+        if all([i is not None for i in [self.r_ad, self.r_tp, self.r_gi, self.r_ah, self.r_pld, self.i]]):
+            self.r_ad[self.i] = fe.average_duration(lengths=self.lens)
+            self.r_tp[self.i] = fe.state_transition_probability(lengths=self.lens)
+            self.r_gi[self.i] = fe.gini_index(lengths=self.lens)
+            self.r_ah[self.i] = fe.average_hazard(lengths=self.lens)
+            self.r_pld[self.i] = fe.state_power_law_distribution(lengths=self.lens)
+
+        # reset attributes
+        self.lens = []
+        self.r_ad = None
+        self.r_tp = None
+        self.r_gi = None
+        self.r_ah = None
+        self.r_pld = None
+        self.i = None
