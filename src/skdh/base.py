@@ -164,10 +164,10 @@ class BaseProcess:
 
         # get the information to save
         lines = [
-            "Scikit-Digital-Health",
-            f"Version,{skdh_version}",
-            f"Date,{date}",
-            f'{self._kw}'.strip("{}"),
+            "Scikit-Digital-Health\n",
+            f"Version,{skdh_version}\n",
+            f"Date,{date}\n",
+            f'{self._kw}\n'.strip("{}"),
             '\n',
             '\n'
         ]
