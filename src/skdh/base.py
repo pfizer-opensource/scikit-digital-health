@@ -162,20 +162,22 @@ class BaseProcess:
 
         file_name = file_name.format(date=date, name=self._name, file=self._file_name)
 
+        kw_line = [f"{k}: {self._kw[k]}".replace(",", "  ") for k in self._kw]
+
         # get the information to save
         lines = [
             "Scikit-Digital-Health\n",
             f"Version,{skdh_version}\n",
             f"Date,{date}\n",
-            f'{self._kw}\n'.strip("{}"),
-            '\n',
-            '\n'
+            ",".join(kw_line),
+            "\n",
+            "\n",
         ]
 
         with open(file_name, "w") as f:
             f.writelines(lines)
 
-        DataFrame(results).to_csv(file_name, index=False, mode='a')
+        DataFrame(results).to_csv(file_name, index=False, mode="a")
 
         return file_name
 
