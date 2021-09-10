@@ -155,11 +155,27 @@ class BaseProcess:
         - name: process name.
         - file: file name used in the pipeline, or "" if not found.
         """
+        # avoid circular import
+        from skdh import __skdh_version__ as skdh_version
+
         date = dt_date.today().strftime("%Y%m%d")
 
         file_name = file_name.format(date=date, name=self._name, file=self._file_name)
 
-        DataFrame(results).to_csv(file_name, index=False)
+        # get the information to save
+        lines = [
+            "Scikit-Digital-Health",
+            f"Version,{skdh_version}",
+            f"Date,{date}",
+            f'{self._kw}'.strip("{}"),
+            '\n',
+            '\n'
+        ]
+
+        with open(file_name, "w") as f:
+            f.writelines(lines)
+
+        DataFrame(results).to_csv(file_name, index=False, mode='a')
 
         return file_name
 
