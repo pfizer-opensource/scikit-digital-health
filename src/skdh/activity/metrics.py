@@ -94,7 +94,7 @@ def metric_enmo(accel, wlen, *args, take_abs=False, trim_zero=True, **kwargs):
 
 
 def metric_bfen(
-    accel, wlen, fs, low_cutoff=0.2, high_cutoff=15, trim_zero=True, **kwargs
+    accel, wlen, fs, low_cutoff=0.2, high_cutoff=15, **kwargs
 ):
     """
     Compute the band-pass filtered euclidean norm.
@@ -111,8 +111,6 @@ def metric_bfen(
         Band-pass low cutoff in Hz. Default is 0.2Hz.
     high_cutoff : float, optional
         Band-pass high cutoff in Hz. Default is 15Hz
-    trim_zero : bool, optional
-        Trim values to no less than 0. Default is True.
 
     Returns
     -------
@@ -122,12 +120,9 @@ def metric_bfen(
     sos = butter(
         4, [2 * low_cutoff / fs, 2 * high_cutoff / fs], btype="bandpass", output="sos"
     )
-    if trim_zero:
-        return moving_mean(
-            maximum(norm(sosfiltfilt(sos, accel, axis=0), axis=1), 0), wlen, wlen
-        )
-    else:
-        return moving_mean(norm(sosfiltfilt(sos, accel, axis=0), axis=1), wlen, wlen)
+    # no reason to for trimming zeros as the norm after the filter will always
+    # be positive
+    return moving_mean(norm(sosfiltfilt(sos, accel, axis=0), axis=1), wlen, wlen)
 
 
 def metric_hfen(accel, wlen, fs, low_cutoff=0.2, trim_zero=True, **kwargs):
@@ -154,12 +149,9 @@ def metric_hfen(accel, wlen, fs, low_cutoff=0.2, trim_zero=True, **kwargs):
     """
     sos = butter(4, 2 * low_cutoff / fs, btype="high", output="sos")
 
-    if trim_zero:
-        return moving_mean(
-            maximum(norm(sosfiltfilt(sos, accel, axis=0), axis=1), 0), wlen, wlen
-        )
-    else:
-        return moving_mean(norm(sosfiltfilt(sos, accel, axis=0), axis=1), wlen, wlen)
+    # no reason to for trimming zeros as the norm after the filter will always
+    # be positive
+    return moving_mean(norm(sosfiltfilt(sos, accel, axis=0), axis=1), wlen, wlen)
 
 
 def metric_hfenplus(accel, wlen, fs, cutoff=0.2, trim_zero=True, **kwargs):
