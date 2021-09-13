@@ -584,7 +584,7 @@ class Gait(BaseProcess):
         """
         Setup the plot
         """
-        if self.valid_plot:
+        if self.valid_plot and self.plot_fname is not None:
             fname = Path(file).name if file is not None else "file-None"
 
             self.f, self.ax = plt.subplots(figsize=(12, 5))
