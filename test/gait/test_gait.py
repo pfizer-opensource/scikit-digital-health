@@ -20,6 +20,7 @@ class TestGait:
             prov_leg_length=False,
             filter_order=4,
             filter_cutoff=20.0,
+            downsample_aa_filter=True,
             day_window=(0, 24),
         )
 
