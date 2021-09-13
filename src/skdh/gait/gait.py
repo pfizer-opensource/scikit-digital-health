@@ -520,7 +520,7 @@ class Gait(BaseProcess):
                 )
 
                 # plotting
-                self._plot(time_ds, accel_ds, bout, ic, fc, gait)
+                self._plot(time_ds, accel_ds, bout, ic, fc, gait, strides_in_bout)
 
                 # add inertial data to the aux dict for use in gait endpoints calculation
                 gait_aux["accel"].append(accel_ds[bout, :])
@@ -585,23 +585,25 @@ class Gait(BaseProcess):
         Setup the plot
         """
         if self.valid_plot:
+            fname = Path(file).name if file is not None else "file-None"
+
             self.f, self.ax = plt.subplots(figsize=(12, 5))
-            self.f.suptitle(f"Gait Visual Report: {Path(file).name}")
+            self.f.suptitle(f"Gait Visual Report: {fname}")
 
             self.ax.set_xlabel(r"Time [$s$]")
             self.ax.set_ylabel(r"Accel. [$\frac{m}{s^2}$]")
 
-    def _plot(self, time, accel, gait_bout, ic, fc, gait):
+    def _plot(self, time, accel, gait_bout, ic, fc, gait, sib):
         if self.valid_plot and self.f is not None:
             rtime = time[gait_bout] - time[0]
             baccel = norm(accel[gait_bout], axis=1)
 
-            self.ax.plot(rtime, baccel, label="Accel. Mag.")
+            self.ax.plot(rtime, baccel, label="Accel. Mag.", color='C0')
             self.ax.plot(rtime[ic], baccel[ic], "x", color="k", label="Poss. IC")
             self.ax.plot(rtime[fc], baccel[fc], "+", color="k", label="Poss. FC")
 
             # valid contacts
-            allc = gait["IC"] + gait["FC"] + gait["FC opp foot"]
+            allc = gait["IC"][-sib:] + gait["FC"][-sib:] + gait["FC opp foot"][-sib:]
             self.ax.plot(
                 rtime[allc],
                 baccel[allc],
