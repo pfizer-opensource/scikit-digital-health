@@ -6,6 +6,7 @@ import pytest
 
 from skdh.pipeline import Pipeline, NotAProcessError, ProcessNotFoundError
 from skdh.gait import Gait
+from skdh import __version__ as skdh_vers
 
 
 class TestPipeline:
@@ -82,41 +83,46 @@ class TestPipeline:
             with fname.open() as f:
                 res = json.load(f)
 
-        exp = [
-            {
-                "TestProcess": {
-                    "package": "skdh",
-                    "module": "test.testmodule",
-                    "parameters": {"kw1": 2},
-                    "save_file": None,
-                    "plot_file": None,
+        exp = {
+            "Steps": [
+                {
+                    "TestProcess": {
+                        "package": "skdh",
+                        "module": "test.testmodule",
+                        "parameters": {"kw1": 2},
+                        "save_file": None,
+                        "plot_file": None,
+                    }
                 }
-            }
-        ]
+            ],
+            "Version": skdh_vers
+        }
 
         assert res == exp
 
     def test_load_through_init(self):
-        exp = [
-            {
-                "Gait": {
-                    "package": "skdh",
-                    "module": "gait.gait",
-                    "parameters": {},
-                    "save_file": "gait_results.csv",
-                    "plot_file": None,
-                }
-            },
-            {
-                "TestProcess": {
-                    "package": "skdh",
-                    "module": "test.testmodule",
-                    "parameters": {},
-                    "save_file": None,
-                    "plot_file": None,
-                }
-            },
-        ]
+        exp = {'Steps': [
+                {
+                    "Gait": {
+                        "package": "skdh",
+                        "module": "gait.gait",
+                        "parameters": {},
+                        "save_file": "gait_results.csv",
+                        "plot_file": None,
+                    }
+                },
+                {
+                    "TestProcess": {
+                        "package": "skdh",
+                        "module": "test.testmodule",
+                        "parameters": {},
+                        "save_file": None,
+                        "plot_file": None,
+                    }
+                },
+            ],
+            'Version': skdh_vers
+        }
 
         with TemporaryDirectory() as tdir:
             fname = Path(tdir) / "file.json"
