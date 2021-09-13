@@ -7,8 +7,6 @@ from skdh.activity.cutpoints import _base_cutpoints
 from skdh.activity.core import (
     _update_date_results,
     ActivityLevelClassification,
-    get_activity_bouts,
-    get_intensity_gradient,
 )
 
 
