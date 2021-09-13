@@ -99,7 +99,7 @@ def gait_input_50():
     t = data["time"]
     acc = data["accel"]
 
-    t50, (acc50,) = apply_downsample(50.0, t, (acc,), ())
+    t50, (acc50,) = apply_downsample(50.0, t, (acc,), (), aa_filter=True)
 
     return t50, acc50
 
