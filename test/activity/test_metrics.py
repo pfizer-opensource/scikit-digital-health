@@ -85,13 +85,18 @@ def test_metric_hfenplus(get_sin_signal, get_linear_accel):
     y[:, 2] += x
 
     res = metric_hfenplus(y, 10, fs, cutoff=1.0, trim_zero=False)
+    res_tz = metric_hfenplus(y, 10, fs, cutoff=1.0, trim_zero=True)
 
-    z1 = mean(abs(get_sin_signal(1.0, 5.0, 0.0)[1]).reshape((-1, 10)), axis=1)
+    z1 = abs(get_sin_signal(1.0, 5.0, 0.0)[1]).reshape((-1, 10))
     # no abs because the it would be abs(sin + 1) - 1 == sin_signal
-    z2 = mean(get_sin_signal(0.5, 0.5, 0.0)[1].reshape((-1, 10)), axis=1)
+    z2 = get_sin_signal(0.5, 0.5, 0.0)[1].reshape((-1, 10))
+
+    c = z1 + z2
+    c[c < 0] = 0.0
 
     # there are some edge effects
-    assert allclose(res[6:40], (z1 + z2)[6:40], atol=0.05)
+    assert allclose(res[6:40], mean(z1 + z2, axis=1)[6:40], atol=0.05)
+    assert allclose(res_tz[6:40], mean(c, axis=1)[6:40], atol=0.05)
 
 
 def test_metric_mad(get_sin_signal, get_linear_accel):
