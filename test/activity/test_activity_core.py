@@ -8,6 +8,8 @@ from skdh.activity.core import (
     _update_date_results,
     ActivityLevelClassification,
 )
+from skdh.activity import endpoints as epts
+from skdh.gait import gait_endpoints as gait_epts
 
 
 class Test_update_date_results:
@@ -85,3 +87,29 @@ class TestActivityLevelClassification:
 
         # dont have name so make sure that the values are correct
         assert a.cutpoints == _base_cutpoints["migueles_wrist_adult"]
+
+        c = {'light': 5, 'sedentary': 2, 'moderate': 10, 'vigorous': 15}
+        a = ActivityLevelClassification(cutpoints=c, day_window=None)
+        assert a.cutpoints == c
+        assert a.day_key == (-1, -1)
+
+    def test_add(self):
+        a = ActivityLevelClassification()
+        # reset endpoints list
+        a.wake_endpoints = []
+        a.sleep_endpoints = []
+
+        a.add([epts.MaxAcceleration(5, state='wake'), epts.MaxAcceleration(5, state='sleep')])
+        a.add(epts.IntensityGradient(state='wake'))
+        a.add(epts.IntensityGradient(state='sleep'))
+
+        with pytest.warns(UserWarning):
+            a.add([epts.MaxAcceleration(5, state='test')])
+            a.add(epts.MaxAcceleration(5, state='test'))
+
+        with pytest.warns(UserWarning):
+            a.add(gait_epts.GaitSpeed())
+
+        assert len(a.wake_endpoints) == 2
+        assert len(a.sleep_endpoints) == 2
+
