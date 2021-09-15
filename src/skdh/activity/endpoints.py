@@ -77,13 +77,11 @@ def get_activity_bouts(
             span a time window of at least mvpadur minutes in which more than `boutcrit`
             percent of the epochs are above the threshold.
         - 3: Use sliding window across the data to test bout criteria per window
-            and do not allow for breaks larger than 1 minute and with fraction of
-            time larger than the `boutcrit` threshold.
+            and do not allow for breaks larger than 1 minute (exactly 1 minute long
+             breaks are allowed) and with fraction of time larger than the
+             `boutcrit` threshold.
         - 4: same as 3 but also requires the first and last epoch to meet the threshold
             criteria.
-        - 5: same as 4, but now looks for breaks larger than a minute such that 1
-            minute breaks are allowed, and the fraction of time that meets the threshold
-            should be equal or greater than the `boutcrit` threshold.
 
     Returns
     -------
@@ -145,7 +143,8 @@ def get_activity_bouts(
 
         # look for breaks larger than 1 minute
         lookforbreaks = zeros(x.size)
-        N = int(60 / wlen)
+        # add 1 so that breaks of exactly 1 minute are NOT excluded
+        N = int(60 / wlen) + 1
         i1 = int(floor((N + 1) / 2)) - 1
         i2 = int(ceil(x.size - N / 2))
         lookforbreaks[i1:i2] = moving_mean(x, N, 1)
@@ -170,7 +169,8 @@ def get_activity_bouts(
         xt = x * 1  # not a view
         # look for breaks longer than 1 minute
         lookforbreaks = zeros(x.size)
-        N = int(60 / wlen)
+        # add 1 so that breaks of exactly 1 minute are NOT excluded
+        N = int(60 / wlen) + 1
         i1 = int(floor((N + 1) / 2)) - 1
         i2 = int(ceil(x.size - N / 2))
         lookforbreaks[i1:i2] = moving_mean(x, N, 1)
@@ -184,51 +184,17 @@ def get_activity_bouts(
             return 0.0
 
         p = nonzero(rm > boutcrit)[0]
-        start = int(floor((nboutdur + 1) / 2)) - 1 - int(round(nboutdur / 2))
-        # only consider windows that at least start and end with value that
-        # meets criteria
-        tri = p + start
-        tri = tri[(tri > 0) & (tri < (x.size - nboutdur - 1))]
-        p = p[nonzero((x[tri] == 1) & (x[tri + nboutdur - 1] == 1))]
+        # only get bouts where they start and end with valid values
+        p = p[nonzero((x[p] == 1) & (x[p + nboutdur - 1] == 1))]
         # now mark all epochs that are covered by the remaining windows
         for gi in range(nboutdur):
             ind = p + gi
-            xt[ind[nonzero((ind > 0) & (ind < xt.size))]] = 2
+            xt[ind[nonzero((ind >= 0) & (ind < xt.size))]] = 2
         x[xt != 2] = 0
         x[xt == 2] = 1
         time_in_bout += sum(x) * (wlen / 60)
-    elif boutmetric == 5:
-        x = ((accm >= lower_thresh) & (accm < upper_thresh)).astype(int_)
-        xt = x * 1  # not a view
-        # look for breaks longer than 1 minute
-        lookforbreaks = zeros(x.size)
-        N = int(60 / wlen)
-        i1 = int(floor((N + 1) / 2)) - 1
-        i2 = int(ceil(x.size - N / 2)) - 1
-        lookforbreaks[i1:i2] = moving_mean(x, N + 1, 1)
-        # insert negative numbers to prevent these minutes from being counted in bouts
-        xt[lookforbreaks == 0] = -(60 / wlen) * nboutdur
-
-        # in this way there will not be bout breaks lasting longer than 1 minute
-        try:
-            rm = moving_mean(xt, nboutdur, 1)
-        except ValueError:
-            return 0.0
-
-        p = nonzero(rm >= boutcrit)[0]
-        start = int(floor((nboutdur + 1) / 2)) - 1 - int(round(nboutdur / 2))
-        # only consider windows that at least start and end with value that meets crit
-        tri = p + start
-        tri = tri[(tri > 0) & (tri < (x.size - nboutdur - 1))]
-        p = p[nonzero((x[tri] == 1) & (x[tri + nboutdur - 1] == 1))]
-
-        for gi in range(nboutdur):
-            ind = p + gi
-            xt[ind[nonzero((ind > 0) & (ind < xt.size))]] = 2
-
-        x[xt != 2] = 0
-        x[xt == 2] = 1
-        time_in_bout += sum(x) * (wlen / 60)  # in minutes
+    else:
+        raise ValueError("boutmetric must be in {1, 2, 3, 4}.")
 
     return time_in_bout
 
