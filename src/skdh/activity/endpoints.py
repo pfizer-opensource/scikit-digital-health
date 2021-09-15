@@ -104,16 +104,17 @@ def get_activity_bouts(
             end = start + nboutdur
             if end < x.size:
                 if sum(x[start:end]) > (nboutdur * boutcrit):
-                    while (sum(x[start:end]) > ((end - start) * boutcrit)) and (
+                    while (sum(x[start:end + 1]) > ((end + 1 - start) * boutcrit)) and (
                         end < x.size
                     ):
                         end += 1
                     select = p[i_mvpa:][p[i_mvpa:] < end]
                     jump = maximum(select.size, 1)
                     if closedbout:
-                        time_in_bout += (p[argmax(p < end)] - start) * (wlen / 60)
+                        # +1 accounts for subtraction and actual end values
+                        time_in_bout += (max(p[p < end]) - start + 1) * (wlen / 60)
                     else:
-                        time_in_bout += jump * (wlen / 60)  # in minutes
+                        time_in_bout += select.size * (wlen / 60)  # in minutes
                 else:
                     jump = 1
             else:
@@ -129,8 +130,8 @@ def get_activity_bouts(
             start = p[i_mvpa]
             end = start + nboutdur
             if end < x.size:
-                if sum(x[start : end + 1]) > (nboutdur * boutcrit):
-                    xt[start : end + 1] = 2
+                if sum(x[start : end]) > (nboutdur * boutcrit):
+                    xt[start : end] = 2
                 else:
                     x[start] = 0
             else:
