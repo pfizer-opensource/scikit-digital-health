@@ -36,3 +36,22 @@ class Test_get_activity_bouts:
 
         r = get_activity_bouts(x, 0.5, 1.5, 60, 6, 0.8, False, 4)
         assert isclose(r, 0.0)
+
+
+class TestActivityEndpoint:
+    def test_init(self):
+        a = ActivityEndpoint('test', 'wake')
+
+        assert a.name == 'wake test'
+
+        b = ActivityEndpoint(['t1', 't2'], 'wake')
+
+        assert b.name == ['wake t1', 'wake t2']
+
+    def test_predict(self):
+        a = ActivityEndpoint('test', 'wake')
+        a.predict()
+
+    def test_reset_cached(self):
+        a = ActivityEndpoint('test', 'wake')
+        a.reset_cached()
