@@ -62,7 +62,8 @@ def get_activity_bouts(
         Fraction of the bout that needs to be above the threshold to qualify as a bout.
     closedbout : bool
         If True then count breaks in a bout towards the bout duration. If False then
-        only count time spent above the threshold towards the bout duration.
+        only count time spent above the threshold towards the bout duration. Only
+        used when `boutmetric` is 1.
     boutmetric : {1, 2, 3, 4, 5}, optional
         - 1: MVPA bout definition from Sabia AJE 2014 and da Silva IJE 2014. Here
             the algorithm looks for 10 minute windows in which more than XX percent
@@ -74,9 +75,7 @@ def get_activity_bouts(
             bout.
         - 2: Code looks for groups of epochs with a value above mvpa threshold that
             span a time window of at least mvpadur minutes in which more than `boutcrit`
-            percent of the epochs are above the threshold. Motivation is: not counting
-            breaks towards MVPA may simplify interpretation and still counts the
-            two persons in the example as each others equal
+            percent of the epochs are above the threshold.
         - 3: Use sliding window across the data to test bout criteria per window
             and do not allow for breaks larger than 1 minute and with fraction of
             time larger than the `boutcrit` threshold.
@@ -147,7 +146,9 @@ def get_activity_bouts(
         # look for breaks larger than 1 minute
         lookforbreaks = zeros(x.size)
         N = int(60 / wlen)
-        lookforbreaks[N // 2 : -N // 2 + 1] = moving_mean(x, N, 1)
+        i1 = int(floor((N + 1) / 2)) - 1
+        i2 = int(ceil(x.size - N / 2))
+        lookforbreaks[i1:i2] = moving_mean(x, N, 1)
         # insert negative numbers to prevent these minutes from being counted in bouts
         xt[lookforbreaks == 0] = -(60 / wlen) * nboutdur
         # in this way there will not be bout breaks lasting longer than 1 minute
@@ -160,7 +161,7 @@ def get_activity_bouts(
         p = nonzero(rm > boutcrit)[0]
         for gi in range(nboutdur):
             ind = p + gi
-            xt[ind[(ind > 0) & (ind < xt.size)]] = 2
+            xt[ind[(ind >= 0) & (ind < xt.size)]] = 2
         x[xt != 2] = 0
         x[xt == 2] = 1
         time_in_bout += sum(x) * (wlen / 60)
