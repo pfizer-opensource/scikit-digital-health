@@ -103,10 +103,10 @@ class DetectWear(BaseProcess):
         window_skip = int(window_skip)
         if isinstance(shipping_criteria, (list, tuple)):
             shipping_criteria = [int(shipping_criteria[i]) for i in range(2)]
-        elif isinstance(shipping_criteria, int):
-            shipping_criteria = [shipping_criteria, shipping_criteria]
         elif isinstance(shipping_criteria, bool):
             shipping_criteria = [24, 24]
+        elif isinstance(shipping_criteria, int):
+            shipping_criteria = [shipping_criteria, shipping_criteria]
 
         super().__init__(
             sd_crit=sd_crit,
