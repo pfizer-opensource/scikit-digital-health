@@ -112,7 +112,7 @@ class Pipeline:
             saved_version = data["Version"]
         else:
             warn(
-                "Pipeline created by and unknown older version of skdh. "
+                "Pipeline created by an unknown older version of skdh. "
                 "Functionality is not guaranteed",
                 UserWarning,
             )
@@ -123,7 +123,7 @@ class Pipeline:
             warn(
                 f"Pipeline was created by an older version of skdh ({saved_version}), "
                 f"which may not be compatible with the current version "
-                f"({skdh_version}). Functionality is not guaranteed.",
+                f"({skdh.__version__}). Functionality is not guaranteed.",
                 UserWarning,
             )
 
