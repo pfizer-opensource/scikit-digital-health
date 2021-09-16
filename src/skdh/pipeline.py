@@ -52,7 +52,7 @@ class Pipeline:
 
         self.logger = logging.getLogger(__name__)
 
-        self.__min_vers = None
+        self._min_vers = None
 
         if file is not None:
             self.load(file=file)
@@ -98,7 +98,7 @@ class Pipeline:
         """
         import skdh
 
-        min_vers = self.__min_vers if not None else skdh.__minimum_version__
+        min_vers = self._min_vers if not None else skdh.__minimum_version__
 
         with open(file, "r") as f:
             data = json.load(f)
