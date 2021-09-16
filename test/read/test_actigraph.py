@@ -27,13 +27,9 @@ class TestReadGt3x:
         r = ReadGT3X(base=None, period=None)
         assert not r.window
 
-        with pytest.warns(UserWarning) as record:
+        with pytest.warns(UserWarning, match="One of base or period is None"):
             r = ReadGT3X(base=8, period=None)
             r = ReadGT3X(base=None, period=12)
-
-        assert len(record) == 2
-        assert "One of base or period is None" in record[0].message.args[0]
-        assert "One of base or period is None" in record[1].message.args[0]
 
     def test_window_range_error(self):
         with pytest.raises(ValueError):
@@ -44,12 +40,9 @@ class TestReadGt3x:
             ReadGT3X().predict(None)
 
     def test_extension_warning(self):
-        with pytest.warns(UserWarning) as record:
+        with pytest.warns(UserWarning, match="File extension is not expected"):
             with pytest.raises(Exception):
                 ReadGT3X().predict("test.random")
-
-        assert len(record) == 1
-        assert "File extension is not expected '.gt3x'" in record[0].message.args[0]
 
     def test_small_size(self):
         ntf = NamedTemporaryFile(mode='w', suffix='.gt3x')
