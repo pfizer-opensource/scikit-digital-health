@@ -215,7 +215,7 @@ class Gait(BaseProcess):
         else:
             self.day_key = tuple(day_window)
 
-    def _save_classifier_predictions(self, fname):
+    def _save_classifier_predictions(self, fname):  # pragma: no cover
         def fn(time, starts, stops):
             with h5py.File(fname, "w") as f:
                 f["time"] = time
@@ -306,7 +306,7 @@ class Gait(BaseProcess):
 
         return bout_starts, bout_stops
 
-    def _setup_plotting(self, save_file):
+    def _setup_plotting(self, save_file):  # pragma: no cover
         """
         Setup gait specific plotting.
 
@@ -580,7 +580,7 @@ class Gait(BaseProcess):
         else:
             return gait
 
-    def _initialize_plot(self, file):
+    def _initialize_plot(self, file):  # pragma: no cover
         """
         Setup the plot
         """
@@ -593,7 +593,7 @@ class Gait(BaseProcess):
             self.ax.set_xlabel(r"Time [$s$]")
             self.ax.set_ylabel(r"Accel. [$\frac{m}{s^2}$]")
 
-    def _plot(self, time, accel, gait_bout, ic, fc, gait, sib):
+    def _plot(self, time, accel, gait_bout, ic, fc, gait, sib):  # pragma: no cover
         if self.valid_plot and self.f is not None:
             rtime = time[gait_bout] - time[0]
             baccel = norm(accel[gait_bout], axis=1)
@@ -613,7 +613,7 @@ class Gait(BaseProcess):
                 label="Valid Contact",
             )
 
-    def _finalize_plot(self, file):
+    def _finalize_plot(self, file):  # pragma: no cover
         if self.valid_plot and self.f is not None:
             date = dt_date.today().strftime("%Y%m%d")
             form_fname = self.plot_fname.format(
