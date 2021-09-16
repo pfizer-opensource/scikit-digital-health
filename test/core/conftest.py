@@ -1,6 +1,7 @@
 import pytest
 
 from skdh.base import BaseProcess
+from skdh import __version__ as skdh_vers
 
 
 @pytest.fixture(scope="module")
@@ -31,3 +32,31 @@ def testprocess2():
             return {"kwa": self.kwa}, {"kwa": self.kwa}
 
     return TestProcess2
+
+
+@pytest.fixture(scope='module')
+def dummy_pipeline():
+    exp = {'Steps': [
+        {
+            "Gait": {
+                "package": "skdh",
+                "module": "gait.gait",
+                "parameters": {},
+                "save_file": "gait_results.csv",
+                "plot_file": None,
+            }
+        },
+        {
+            "TestProcess": {
+                "package": "skdh",
+                "module": "test.testmodule",
+                "parameters": {},
+                "save_file": None,
+                "plot_file": None,
+            }
+        },
+    ],
+        'Version': skdh_vers
+    }
+
+    return exp

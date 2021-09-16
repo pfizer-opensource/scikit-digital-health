@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from skdh.pipeline import Pipeline, NotAProcessError, ProcessNotFoundError
+from skdh.pipeline import Pipeline, NotAProcessError, ProcessNotFoundError, MINIMUM_VERSION
 from skdh.gait import Gait
 from skdh import __version__ as skdh_vers
 
@@ -100,72 +100,42 @@ class TestPipeline:
 
         assert res == exp
 
-    def test_load_through_init(self):
-        exp = {'Steps': [
-                {
-                    "Gait": {
-                        "package": "skdh",
-                        "module": "gait.gait",
-                        "parameters": {},
-                        "save_file": "gait_results.csv",
-                        "plot_file": None,
-                    }
-                },
-                {
-                    "TestProcess": {
-                        "package": "skdh",
-                        "module": "test.testmodule",
-                        "parameters": {},
-                        "save_file": None,
-                        "plot_file": None,
-                    }
-                },
-            ],
-            'Version': skdh_vers
-        }
-
+    def test_load_through_init(self, dummy_pipeline):
         with TemporaryDirectory() as tdir:
             fname = Path(tdir) / "file.json"
 
             with fname.open(mode="w") as f:
-                json.dump(exp, f)
+                json.dump(dummy_pipeline, f)
 
             with pytest.warns(UserWarning):
                 p = Pipeline(str(fname))
 
         assert p._steps == [Gait()]
 
-    def test_load_function(self):
-        exp = [
-            {
-                "Gait": {
-                    "package": "skdh",
-                    "module": "gait.gait",
-                    "parameters": {},
-                    "save_file": None,
-                    "plot_file": None,
-                }
-            },
-            {
-                "TestProcess": {
-                    "package": "skdh",
-                    "module": "test.testmodule",
-                    "parameters": {},
-                    "save_file": None,
-                    "plot_file": None,
-                }
-            },
-        ]
-
+    def test_load_function(self, dummy_pipeline):
         p = Pipeline()
 
         with TemporaryDirectory() as tdir:
             fname = Path(tdir) / "file.json"
 
             with fname.open(mode="w") as f:
-                json.dump(exp, f)
+                # save only the steps to trigger version warning
+                json.dump(dummy_pipeline['Steps'], f)
 
-            with pytest.warns(UserWarning):
+            with pytest.warns(UserWarning, match='Pipeline created by an unknown older version'):
                 p.load(str(fname))
 
         assert p._steps == [Gait()]
+
+    def test_load_version_warning(self, dummy_pipeline):
+        p = Pipeline()
+
+        with TemporaryDirectory() as tdir:
+            fname = Path(tdir) / "file.json"
+
+            with fname.open(mode="w") as f:
+                json.dump(dummy_pipeline, f)
+
+            with pytest.warns(UserWarning, match='Pipeline was created by an older version of skdh'):
+                p.load(str(fname))
+
