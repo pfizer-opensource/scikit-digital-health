@@ -20,7 +20,7 @@ import matplotlib.lines as mlines
 import matplotlib.pyplot as plt
 
 from skdh.base import BaseProcess  # import the base process class
-from skdh.utility.internal import get_day_wear_intersection, apply_downsample, rle
+from skdh.utility.internal import get_day_index_intersection, apply_downsample, rle
 from skdh.sleep.tso import get_total_sleep_opportunity
 from skdh.sleep.utility import compute_activity_index
 from skdh.sleep.sleep_classification import compute_sleep_predictions
@@ -495,9 +495,7 @@ class Sleep(BaseProcess):
             self._plot_accel(goal_fs, accel_ds[start:stop])
 
             # get the starts and stops of wear during the day
-            dw_starts, dw_stops = get_day_wear_intersection(
-                wear_starts_ds, wear_stops_ds, start, stop
-            )
+            dw_starts, dw_stops = get_day_index_intersection(wear_starts_ds, wear_stops_ds, True, start, stop)
 
             if (sum(dw_stops - dw_starts) / (3600 * goal_fs)) < self.min_wear_time:
                 self.logger.info(
