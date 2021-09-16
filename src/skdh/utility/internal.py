@@ -117,54 +117,6 @@ def get_day_index_intersection(starts, stops, for_inclusion, day_start, day_stop
     )
 
 
-def get_day_wear_intersection(starts, stops, day_start, day_stop):
-    """
-    Get the intersection between wear times and day starts/stops.
-    Parameters
-    ----------
-    starts : numpy.ndarray
-        Array of integer indices where gait bouts start.
-    stops : numpy.ndarray
-        Array of integer indices where gait bouts stop.
-    day_start : int
-        Index of the day start.
-    day_stop : int
-        Index of the day stop.
-    Returns
-    -------
-    day_wear_starts : numpy.ndarray
-        Array of wear start indices for the day.
-    day_wear_stops : numpy.ndarray
-        Array of wear stop indices for the day
-    """
-    day_start, day_stop = int(day_start), int(day_stop)
-    # get the portion of wear times for the day
-    starts_subset = starts[(starts >= day_start) & (starts < day_stop)]
-    stops_subset = stops[(stops > day_start) & (stops <= day_stop)]
-
-    if starts_subset.size == 0 and stops_subset.size == 0:
-        try:
-            if stops[nonzero(starts <= day_start)[0][-1]] >= day_stop:
-                return asarray([day_start]), asarray([day_stop])
-            else:
-                return asarray([]), asarray([])
-        except IndexError:
-            return asarray([]), asarray([])
-    if starts_subset.size == 0 and stops_subset.size == 1:
-        starts_subset = asarray([day_start])
-    if starts_subset.size == 1 and stops_subset.size == 0:
-        stops_subset = asarray([day_stop])
-
-    if starts_subset[0] > stops_subset[0]:
-        starts_subset = insert(starts_subset, 0, day_start)
-    if starts_subset[-1] > stops_subset[-1]:
-        stops_subset = append(stops_subset, day_stop)
-
-    assert starts_subset.size == stops_subset.size, "bout starts and stops do not match"
-
-    return starts_subset, stops_subset
-
-
 def apply_downsample(goal_fs, time, data=(), indices=(), aa_filter=True, fs=None):
     """
     Apply a downsample to a set of data.
