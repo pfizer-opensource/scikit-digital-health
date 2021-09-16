@@ -450,10 +450,7 @@ class ActivityLevelClassification(BaseProcess):
 
         kwargs.update({self._time: time, self._acc: accel})
 
-        if self._in_pipeline:
-            return kwargs, res
-        else:
-            return res
+        return kwargs, res if self._in_pipeline else res
 
     def _initialize_awake_values(self, results, day_n):
         """

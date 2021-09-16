@@ -150,7 +150,5 @@ class ReadBin(BaseProcess):
                 results[self._days][(data[0], data[1])] = vstack((strt, stp)).T
 
         kwargs.update(results)
-        if self._in_pipeline:
-            return kwargs, None
-        else:
-            return kwargs
+
+        return kwargs, None if self._in_pipeline else kwargs

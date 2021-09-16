@@ -291,7 +291,5 @@ class Sit2Stand(BaseProcess):
         sts.pop("Partial")
 
         kwargs.update({self._time: time, self._acc: accel})
-        if self._in_pipeline:
-            return kwargs, sts
-        else:
-            return sts
+
+        return kwargs, sts if self._in_pipeline else sts

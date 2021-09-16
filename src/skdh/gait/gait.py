@@ -575,10 +575,7 @@ class Gait(BaseProcess):
         gait.pop("valid cycle", None)
 
         kwargs.update({self._acc: accel, self._time: time, "fs": fs, "height": height})
-        if self._in_pipeline:
-            return kwargs, gait
-        else:
-            return gait
+        return kwargs, gait if self._in_pipeline else gait
 
     def _initialize_plot(self, file):  # pragma: no cover
         """

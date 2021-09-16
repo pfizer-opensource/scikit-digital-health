@@ -594,10 +594,8 @@ class Sleep(BaseProcess):
                 "sleep": sleep_idx,
             }
         )
-        if self._in_pipeline:
-            return kwargs, sleep
-        else:
-            return sleep
+
+        return kwargs, sleep if self._in_pipeline else sleep
 
     def _setup_day_plot(self, iday, source_file, date_str, start_dt):
         if self.f is not None:

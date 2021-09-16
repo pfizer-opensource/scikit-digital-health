@@ -179,7 +179,5 @@ class ReadCwa(BaseProcess):
                 )
 
         kwargs.update(results)
-        if self._in_pipeline:
-            return kwargs, None
-        else:
-            return kwargs
+
+        return kwargs, None if self._in_pipeline else kwargs
