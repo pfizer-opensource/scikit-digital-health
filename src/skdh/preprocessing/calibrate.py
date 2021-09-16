@@ -168,7 +168,7 @@ class CalibrateAccelerometer(BaseProcess):
                 UserWarning,
             )
             kwargs.update({self._time: time, self._acc: accel, self._temp: temperature})
-            return kwargs, None if self._in_pipeline else kwargs
+            return (kwargs, None) if self._in_pipeline else kwargs
 
         finished = False
         # use the Store object in order to save computation time
@@ -209,7 +209,7 @@ class CalibrateAccelerometer(BaseProcess):
             {"offset": offset, "scale": scale, "temperature scale": temp_scale}
         )
 
-        return kwargs, None if self._in_pipeline else kwargs
+        return (kwargs, None) if self._in_pipeline else kwargs
 
     def _do_iterative_closest_point_fit(self, store):
         """

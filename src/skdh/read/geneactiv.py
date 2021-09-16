@@ -151,4 +151,4 @@ class ReadBin(BaseProcess):
 
         kwargs.update(results)
 
-        return kwargs, None if self._in_pipeline else kwargs
+        return (kwargs, None) if self._in_pipeline else kwargs

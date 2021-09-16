@@ -119,4 +119,4 @@ class ReadApdmH5(BaseProcess):
         res["file"] = file
         kwargs.update(res)
 
-        return kwargs, None if self._in_pipeline else kwargs
+        return (kwargs, None) if self._in_pipeline else kwargs
