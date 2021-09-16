@@ -31,9 +31,11 @@ gait speed: stride_length / stride time
 """
 from numpy import (
     zeros,
+    full,
     nanmean,
     nanstd,
     nanmedian,
+    unique,
     sum,
     sqrt,
     nan,
@@ -725,13 +727,12 @@ class StepRegularityV(GaitBoutEndpoint):
         super().__init__("step regularity - V", __name__, depends=[StepTime])
 
     def _predict(self, fs, leg_length, gait, gait_aux):
-        stepreg = zeros(len(gait_aux["accel"]), dtype=float_)
+        stepreg = full(len(gait_aux["accel"]), nan, dtype=float_)
 
-        for i, acc in enumerate(gait_aux["accel"]):
-            mask = gait_aux["inertial data i"] == i
-            if mask.sum() == 0:
-                stepreg[i] = nan
-                continue
+        for i in unique(gait_aux['inertial data i']):
+            acc = gait_aux['accel'][i]
+            mask = gait_aux['inertial data i'] == i
+
             va = gait_aux["vert axis"][mask][0]
             lag_ = nanmedian(gait["PARAM:step time"][mask]) * fs
             if isnan(lag_):  # if only nan values in the bout
@@ -784,13 +785,12 @@ class StrideRegularityV(GaitBoutEndpoint):
         super().__init__("stride regularity - V", __name__, depends=[StrideTime])
 
     def _predict(self, fs, leg_length, gait, gait_aux):
-        stridereg = zeros(len(gait_aux["accel"]), dtype=float_)
+        stridereg = full(len(gait_aux["accel"]), nan, dtype=float_)
 
-        for i, acc in enumerate(gait_aux["accel"]):
-            mask = gait_aux["inertial data i"] == i
-            if mask.sum() == 0:
-                stridereg[i] = nan
-                continue
+        for i in unique(gait_aux['inertial data i']):
+            acc = gait_aux['accel'][i]
+            mask = gait_aux['inertial data i'] == i
+
             va = gait_aux["vert axis"][mask][0]
             lag_ = nanmedian(gait["PARAM:stride time"][mask]) * fs
             if isnan(lag_):  # if only nan values in the bout
