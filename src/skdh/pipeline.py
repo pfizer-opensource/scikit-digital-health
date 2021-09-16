@@ -98,7 +98,7 @@ class Pipeline:
         """
         import skdh
 
-        min_vers = self._min_vers if not None else skdh.__minimum_version__
+        min_vers = skdh.__minimum_version__ if self._min_vers is None else self._min_vers
 
         with open(file, "r") as f:
             data = json.load(f)
