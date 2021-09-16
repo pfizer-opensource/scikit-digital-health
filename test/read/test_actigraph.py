@@ -1,7 +1,10 @@
+from tempfile import NamedTemporaryFile
+
 import pytest
-from numpy import allclose, ndarray
+from numpy import allclose
 
 from skdh.read import ReadGT3X
+from skdh.read.actigraph import FileSizeError
 
 
 class TestReadGt3x:
@@ -47,3 +50,13 @@ class TestReadGt3x:
 
         assert len(record) == 1
         assert "File extension is not expected '.gt3x'" in record[0].message.args[0]
+
+    def test_small_size(self):
+        ntf = NamedTemporaryFile(mode='w', suffix='.gt3x')
+
+        ntf.writelines(['a\n', 'b\n', 'c\n'])
+
+        with pytest.raises(FileSizeError):
+            ReadGT3X().predict(ntf.name)
+
+        ntf.close()
