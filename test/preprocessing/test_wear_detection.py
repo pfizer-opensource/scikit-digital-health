@@ -44,3 +44,13 @@ class TestWearDetection:
 
         assert allclose(starts, true_wear[:, 0])
         assert allclose(stops, true_wear[:, 1])
+
+    def test_init(self):
+        d = DetectWear(shipping_criteria=[5, 10])
+        assert d.ship_crit == [5, 10]
+
+        d = DetectWear(shipping_criteria=5)
+        assert d.ship_crit == [5, 5]
+
+        d = DetectWear(shipping_criteria=True)
+        assert d.ship_crit == [24, 24]
