@@ -11,10 +11,7 @@ from numpy import vstack, asarray, ascontiguousarray, minimum, int_
 
 from skdh.base import BaseProcess
 from skdh.read._extensions import read_axivity
-
-
-class FileSizeError(Exception):
-    pass
+from skdh.read import FileSizeError
 
 
 class UnexpectedAxesError(Exception):

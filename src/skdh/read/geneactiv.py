@@ -11,10 +11,7 @@ from numpy import vstack, asarray, int_
 
 from skdh.base import BaseProcess
 from skdh.read._extensions import read_geneactiv
-
-
-class FileSizeError(Exception):
-    pass
+from skdh.read import FileSizeError
 
 
 class ReadBin(BaseProcess):

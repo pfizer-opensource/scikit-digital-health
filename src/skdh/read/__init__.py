@@ -34,3 +34,8 @@ __all__ = (
     "actigraph",
     "apdm",
 )
+
+
+class FileSizeError(Exception):
+    pass
+

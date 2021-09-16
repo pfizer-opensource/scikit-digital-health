@@ -12,10 +12,7 @@ from numpy import vstack, allclose
 from skdh.base import BaseProcess
 from skdh.read.get_window_start_stop import get_window_start_stop
 from skdh.read._extensions import read_gt3x
-
-
-class FileSizeError(Exception):
-    pass
+from skdh.read import FileSizeError
 
 
 class ReadGT3X(BaseProcess):
