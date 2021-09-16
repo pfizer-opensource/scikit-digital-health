@@ -7,7 +7,7 @@ Pfizer DMTI 2020
 from warnings import warn
 from pathlib import Path
 
-from numpy import vstack
+from numpy import vstack, allclose
 
 from skdh.base import BaseProcess
 from skdh.read.get_window_start_stop import get_window_start_stop
@@ -122,7 +122,7 @@ class ReadGT3X(BaseProcess):
 
         results = {self._time: time[:N], self._acc: accel[:N], "file": file}
 
-        if not all(lux == 0.0):
+        if not allclose(lux, 0.0):
             results["light"] = lux[:N]
 
         if self.window:
