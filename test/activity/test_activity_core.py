@@ -1,7 +1,8 @@
 import datetime as dt
 
 import pytest
-from numpy import array, allclose
+from numpy import array, allclose, zeros, arange
+from numpy.random import default_rng
 
 from skdh.activity.cutpoints import _base_cutpoints
 from skdh.activity.core import (
@@ -112,4 +113,23 @@ class TestActivityLevelClassification:
 
         assert len(a.wake_endpoints) == 2
         assert len(a.sleep_endpoints) == 2
+
+    def test(self, activity_res):
+        a = ActivityLevelClassification(short_wlen=5, max_accel_lens=(10,), bout_lens=(10,),
+                                        bout_criteria=0.8, bout_metric=4, min_wear_time=1,
+                                        cutpoints='migueles_wrist_adult')
+
+        rng = default_rng(seed=5)
+        x = zeros((240000, 3))
+        x[:, 2] += rng.normal(loc=1, scale=1, size=x.shape[0])
+        t = arange(1.6e9, 1.6e9 + x.shape[0] * 0.02, 0.02)
+
+        sleep = array([[int(0.8 * t.size), t.size - 1]])
+
+        res = a.predict(t, x, fs=None, wear=None, sleep=sleep)
+
+        for k in activity_res:
+            assert allclose(res[k], activity_res[k], equal_nan=True)
+
+
 

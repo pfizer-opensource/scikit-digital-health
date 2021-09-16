@@ -1,5 +1,7 @@
+from pathlib import Path
+
 from pytest import fixture
-from numpy import array
+from numpy import array, load
 
 
 @fixture(scope='module')
@@ -64,3 +66,17 @@ def dummy_frag_predictions():
             0,
         ]
     )
+
+
+@fixture
+def activity_res():
+    cwd = Path.cwd().parts
+
+    if cwd[-1] == "activity":
+        path = Path("data/activity_results.npz")
+    elif cwd[-1] == "test":
+        path = Path("activity/data/activity_results.npz")
+    elif cwd[-1] == "scikit-digital-health":
+        path = Path("test/activity/data/activity_results.npz")
+
+    return load(path)
