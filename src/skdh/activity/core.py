@@ -273,7 +273,7 @@ class ActivityLevelClassification(BaseProcess):
         else:
             warn(f"`endpoint` argument not an ActivityEndpoint or list/tuple. Skipping")
 
-    def _setup_plotting(self, save_name):
+    def _setup_plotting(self, save_name):  # pragma: no cover
         """
         Setup sleep specific plotting
 
@@ -525,7 +525,7 @@ class ActivityLevelClassification(BaseProcess):
         for endpoint in self.wake_endpoints:
             endpoint.reset_cached()
 
-    def _plot_day_accel(self, day_n, fs, accel, date_str, start_dt):
+    def _plot_day_accel(self, day_n, fs, accel, date_str, start_dt):  # pragma: no cover
         if self.f is None:
             return
 
@@ -610,7 +610,7 @@ class ActivityLevelClassification(BaseProcess):
         ax[-1].set_xticks([i for i in range(self.day_key[0], sum(self.day_key) + 1, 3)])
         ax[-1].set_xticklabels([f"{int(i % 24)}:00" for i in ax[-1].get_xticks()])
 
-    def _plot_day_wear(self, fs, day_wear_starts, day_wear_stops, start_dt, day_start):
+    def _plot_day_wear(self, fs, day_wear_starts, day_wear_stops, start_dt, day_start):  # pragma: no cover
         if self.f is None:
             return
         start_hr = start_dt.hour + start_dt.minute / 60 + start_dt.second / 3600
@@ -629,7 +629,7 @@ class ActivityLevelClassification(BaseProcess):
 
     def _plot_day_sleep(
         self, fs, sleep_starts, sleep_stops, day_start, day_stop, start_dt
-    ):
+    ):  # pragma: no cover
         if self.f is None or sleep_starts is None or sleep_stops is None:
             return
 
@@ -650,7 +650,7 @@ class ActivityLevelClassification(BaseProcess):
         self.ax[-1][-1].plot(sleep, [1] * len(sleep), label="Sleep Opportunity", lw=3)
         self.ax[-1][-1].legend(bbox_to_anchor=(0, 0.5), loc="center right")
 
-    def _finalize_plots(self):
+    def _finalize_plots(self):  # pragma: no cover
         if self.f is None:
             return
 
