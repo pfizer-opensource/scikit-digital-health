@@ -129,6 +129,7 @@ class TestPipeline:
 
     def test_load_version_warning(self, dummy_pipeline):
         p = Pipeline()
+        p._min_vers = "100.0.0"
 
         with TemporaryDirectory() as tdir:
             fname = Path(tdir) / "file.json"
