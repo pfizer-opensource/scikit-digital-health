@@ -12,7 +12,7 @@ Pipeline Processing
 
     Pipeline
 """
-from skdh.version import __version__
+from skdh.version import __version__, __minimum_version__
 
 from skdh.pipeline import Pipeline
 from skdh.base import BaseProcess

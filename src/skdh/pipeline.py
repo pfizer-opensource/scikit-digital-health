@@ -13,14 +13,6 @@ from packaging import version
 
 from skdh.base import BaseProcess as Process
 
-# ==============================================================================
-# MINIMUM VERSION FOR BACKWARDS COMPATIBILITY
-# ==============================================================================
-MINIMUM_VERSION = "0.0.0"
-# ==============================================================================
-# MINIMUM VERSION FOR BACKWARDS COMPATIBILITY
-# ==============================================================================
-
 
 class NotAProcessError(Exception):
     pass
@@ -59,6 +51,8 @@ class Pipeline:
         self._current = -1  # iteration tracking
 
         self.logger = logging.getLogger(__name__)
+
+        self.__min_vers = None
 
         if file is not None:
             self.load(file=file)
@@ -104,6 +98,8 @@ class Pipeline:
         """
         import skdh
 
+        min_vers = self.__min_vers if not None else skdh.__minimum_version__
+
         with open(file, "r") as f:
             data = json.load(f)
 
@@ -119,7 +115,7 @@ class Pipeline:
             procs = data
             saved_version = "0.0.1"
 
-        if version.parse(saved_version) < version.parse(MINIMUM_VERSION):
+        if version.parse(saved_version) < version.parse(min_vers):
             warn(
                 f"Pipeline was created by an older version of skdh ({saved_version}), "
                 f"which may not be compatible with the current version "
