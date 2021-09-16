@@ -165,6 +165,12 @@ class TestArgLongestBout:
         expected = 1, 4
         assert out == expected
 
+    def test_one_value(self):
+        arr = np.array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
+        out = arg_longest_bout(arr, 0)
+
+        assert out == (None, None)
+
 
 class TestComputeActivityIndex:
     def test(self):
