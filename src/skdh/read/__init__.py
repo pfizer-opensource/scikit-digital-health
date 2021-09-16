@@ -23,6 +23,7 @@ from skdh.read.actigraph import ReadGT3X
 from skdh.read import actigraph
 from skdh.read.apdm import ReadApdmH5
 from skdh.read import apdm
+from skdh.read.utility import FileSizeError
 
 __all__ = (
     "ReadCwa",
@@ -34,8 +35,4 @@ __all__ = (
     "actigraph",
     "apdm",
 )
-
-
-class FileSizeError(Exception):
-    pass
 
