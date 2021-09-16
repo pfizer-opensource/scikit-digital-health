@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from skdh.pipeline import Pipeline, NotAProcessError, ProcessNotFoundError, MINIMUM_VERSION
+from skdh.pipeline import Pipeline, NotAProcessError, ProcessNotFoundError
 from skdh.gait import Gait
 from skdh import __version__ as skdh_vers
 
