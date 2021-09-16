@@ -4,6 +4,7 @@ import h5py
 from numpy import allclose
 
 from skdh.read import ReadApdmH5
+from skdh.read.apdm import SensorNotFoundError
 
 
 class TestReadBin:
@@ -27,9 +28,10 @@ class TestReadBin:
             ReadApdmH5("Lumbar").predict(None)
 
     def test_extension_warning(self):
-        with pytest.warns(UserWarning) as record:
+        with pytest.warns(UserWarning, match='File extension is not expected'):
             with pytest.raises(Exception):
                 ReadApdmH5("Lumbar").predict("test.random")
 
-        assert len(record) == 1
-        assert "File extension is not expected '.h5'" in record[0].message.args[0]
+    def test_bad_sensor(self, apdm_file):
+        with pytest.raises(SensorNotFoundError):
+            ReadApdmH5("badSensor", gravity_acceleration=9.81).predict(apdm_file)
