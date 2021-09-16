@@ -8,7 +8,6 @@ from numpy import (
     asarray,
     nonzero,
     insert,
-    append,
     arange,
     interp,
     zeros,
@@ -155,20 +154,20 @@ def apply_downsample(goal_fs, time, data=(), indices=(), aa_filter=True, fs=None
     .. [1] https://en.wikipedia.org/wiki/Downsampling_(signal_processing)
     """
 
-    def downsample(x, factor, time, time_ds):
+    def downsample(x, factor, t, t_ds):
         if int(1 / factor) == 1 / factor:
             if x.ndim == 1:
-                return (x[:: int(1 / factor)],)
+                return x[:: int(1 / factor)],
             elif x.ndim == 2:
-                return (x[:: int(1 / factor)],)
+                return x[:: int(1 / factor)],
         else:
             if x.ndim == 1:
-                return (interp(time_ds, time, x),)
+                return interp(t_ds, t, x),
             elif x.ndim == 2:
-                xds = zeros((time_ds.size, x.shape[1]), dtype=float_)
-                for i in range(x.shape[1]):
-                    xds[:, i] = interp(time_ds, time, x[:, i])
-                return (xds,)
+                xds = zeros((t_ds.size, x.shape[1]), dtype=float_)
+                for j in range(x.shape[1]):
+                    xds[:, j] = interp(t_ds, t, x[:, j])
+                return xds,
 
     if fs is None:
         fs = 1.1 * goal_fs
