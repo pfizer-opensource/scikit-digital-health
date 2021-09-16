@@ -1,3 +1,4 @@
+import pytest
 import numpy as np
 
 from skdh.utility import fragmentation_endpoints as fe
@@ -25,6 +26,10 @@ class TestGini:
         assert np.isclose(
             np.around(fe.gini(x, w=w, corr=True), 4), np.around(0.2553 * 5 / 4, 4)
         )
+
+    def test_size(self):
+        x = fe.gini(np.array([]), None, True)
+        assert np.isclose(x, 0.0)
 
 
 class _BaseTestFragEndpoint:
@@ -70,6 +75,10 @@ class _BaseTestFragEndpoint:
 
         assert np.isclose(res_0, self.zeros_result_0, equal_nan=True)
         assert np.isclose(res_1, self.zeros_result_1, equal_nan=True)
+
+    def test_missing_inputs(self):
+        with pytest.raises(ValueError):
+            self.metric(a=None, lengths=None)
 
 
 class TestAverageDuration(_BaseTestFragEndpoint):
