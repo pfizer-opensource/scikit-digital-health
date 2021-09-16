@@ -122,6 +122,8 @@ class ReadGT3X(BaseProcess):
 
         results = {self._time: time[:N], self._acc: accel[:N], "file": file}
 
+        # can't include it by default, because if it is garbage data, dont want
+        # that influencing downstream results. Better to just not use in that case
         if not allclose(lux, 0.0):
             results["light"] = lux[:N]
 
