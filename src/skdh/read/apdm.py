@@ -100,7 +100,7 @@ class ReadApdmH5(BaseProcess):
                 sname = f["Sensors"][sens]["Configuration"].attrs["Label 0"]
                 if sname.decode("utf-8") == self.sens:
                     sid = sens
-            if sens is None:
+            if sid is None:
                 raise SensorNotFoundError(f"Sensor {self.sens} was not found.")
 
             res[self._acc] = f["Sensors"][sid]["Accelerometer"][()] / self.g
