@@ -1,0 +1,2 @@
+class FileSizeError(Exception):
+    pass

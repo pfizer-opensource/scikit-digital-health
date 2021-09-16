@@ -1,7 +1,9 @@
+from tempfile import NamedTemporaryFile
+
 import pytest
 from numpy import allclose, ndarray
 
-from skdh.read import ReadCwa
+from skdh.read import ReadCwa, FileSizeError
 
 
 class TestReadCwa:
@@ -70,3 +72,13 @@ class TestReadCwa:
 
         assert len(record) == 1
         assert "File extension is not expected '.cwa'" in record[0].message.args[0]
+
+    def test_small_size(self):
+        ntf = NamedTemporaryFile(mode='w', suffix='.cwa')
+
+        ntf.writelines(['a\n', 'b\n', 'c\n'])
+
+        with pytest.raises(FileSizeError):
+            ReadCwa().predict(ntf.name)
+
+        ntf.close()
