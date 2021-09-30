@@ -49,7 +49,15 @@ class Gait(BaseProcess):
         Use the optimal scale/frequency relationship (see Notes). This changes which
         scale is used for the smoothing/differentiation operation performed with the
         continuous wavelet transform. Default is True. See Notes for a caveat of the
-        relationship
+        relationship.
+    wavelet_scale : {"default", float, int}, optional
+        The wavelet scale to use. If `use_cwt_scale_relation=True`, then this is only
+        used initially to determine the optimal scale. If `False`, then is used as the
+        scale for the initial and final contact event detection. `"default"`
+        corresponds to the default scale from [3]_, scaled for the sampling frequency.
+        If a float, this is the value in Hz that the desired wavelet decomposition
+        happens. For reference, [3]_ used a frequency of 1.25Hz. If an integer,
+        uses that value as the scale.
     min_bout_time : float, optional
         Minimum time in seconds for a gait bout. Default is 8s (making a minimum of 3 3-second
         windows)
@@ -157,6 +165,7 @@ class Gait(BaseProcess):
         self,
         correct_accel_orient=True,
         use_cwt_scale_relation=True,
+        wavelet_scale="default",
         min_bout_time=8.0,
         max_bout_separation_time=0.5,
         max_stride_time=2.25,
@@ -186,6 +195,7 @@ class Gait(BaseProcess):
 
         self.corr_accel_orient = correct_accel_orient
         self.use_opt_scale = use_cwt_scale_relation
+        self.cwt_scale = wavelet_scale
         self.min_bout = min_bout_time
         self.max_bout_sep = max_bout_separation_time
 
@@ -305,6 +315,36 @@ class Gait(BaseProcess):
             bout_stops = asarray([n_exp - 1])
 
         return bout_starts, bout_stops
+
+    def _handle_wavelet_scale(self, fs):
+        """
+        Compute the scale to use for the wavelet decompositions.
+
+        Parameters
+        ----------
+        fs : float
+            Sampling frequency.
+
+        Returns
+        -------
+        scale : int
+            Wavelet decomposition scale.
+        """
+        # original scale. Compute outside loop since stays the same
+        # 1.25 comes from original paper, corresponds to desired frequency
+        # 0.2 is the central frequency of the 'gaus1' wavelet (normalized to 1)
+        original_scale = max(round(0.2 / (1.25 / fs)), 1)
+
+        if self.cwt_scale == 'default':
+            scale = original_scale
+        elif isinstance(self.cwt_scale, float):
+            scale = max(round(0.2 / (1.25 / fs)), 1)
+        elif isinstance(self.cwt_scale, int):
+            scale = self.cwt_scale
+        else:
+            raise ValueError("Type of `wavelet_scale` [{type(self.cwt_scale)}] not understood.")
+
+        return scale
 
     def _setup_plotting(self, save_file):  # pragma: no cover
         """
@@ -437,10 +477,7 @@ class Gait(BaseProcess):
             gait_stops_ds = gait_stops
             day_starts_ds, day_stops_ds = self.day_idx
 
-        # original scale. Compute outside loop since stays the same
-        # 1.25 comes from original paper, corresponds to desired frequency
-        # 0.2 is the central frequency of the 'gaus1' wavelet (normalized to 1)
-        original_scale = max(round(0.2 / (1.25 / goal_fs)), 1)
+        wavelet_scale = self._handle_wavelet_scale(goal_fs)
 
         # setup the storage for the gait parameters
         gait = {
@@ -499,7 +536,7 @@ class Gait(BaseProcess):
                     accel_ds[bout],
                     goal_fs,
                     time_ds[bout],
-                    original_scale,
+                    wavelet_scale,
                     self.filt_ord,
                     self.filt_cut,
                     self.corr_accel_orient,
