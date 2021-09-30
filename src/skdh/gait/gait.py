@@ -346,7 +346,7 @@ class Gait(BaseProcess):
 
         return scale
 
-    def _setup_plotting(self, save_file):  # pragma: no cover
+    def _setup_plotting(self, save_file, debug=False):  # pragma: no cover
         """
         Setup gait specific plotting.
 
@@ -368,7 +368,7 @@ class Gait(BaseProcess):
         if save_file is None:
             return
 
-        if gettrace() is None:  # only set if not debugging
+        if gettrace() is None and not debug:  # only set if not debugging
             matplotlib.use("PDF")
             # non-interactive, don't want to be displaying plots constantly
         plt.style.use("ggplot")
