@@ -744,9 +744,11 @@ class StepRegularityV(GaitBoutEndpoint):
             lag = int(round(lag_))
             acf = _autocovariancefn(acc[:, va], int(4.5 * fs), biased=False, axis=0)
             pks, _ = find_peaks(acf)
-            idx = pks[argmin(abs(pks - lag))]
-
-            stepreg[i] = acf[idx]
+            try:
+                idx = pks[argmin(abs(pks - lag))]
+                stepreg[i] = acf[idx]
+            except ValueError:
+                stepreg[i] = nan
 
         # broadcast step regularity into gait for each step
         gait[self.k_] = stepreg[gait_aux["inertial data i"]]
@@ -802,9 +804,11 @@ class StrideRegularityV(GaitBoutEndpoint):
             lag = int(round(lag_))
             acf = _autocovariancefn(acc[:, va], int(4.5 * fs), biased=False, axis=0)
             pks, _ = find_peaks(acf)
-            idx = pks[argmin(abs(pks - lag))]
-
-            stridereg[i] = acf[idx]
+            try:
+                idx = pks[argmin(abs(pks - lag))]
+                stridereg[i] = acf[idx]
+            except ValueError:
+                stridereg[i] = nan
 
         # broadcast step regularity into gait for each step
         gait[self.k_] = stridereg[gait_aux["inertial data i"]]
