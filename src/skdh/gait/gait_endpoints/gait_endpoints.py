@@ -682,11 +682,14 @@ class GaitSymmetryIndex(GaitBoutEndpoint):
             # C_stride is the sum of 3 axes
             pks, _ = find_peaks(sum(ac, axis=1))
             # find the closest peak to the computed ideal half stride lag
-            t_stride = pks[argmin(abs(pks - lag))]
-            idx = int(0.5 * t_stride)
+            try:
+                t_stride = pks[argmin(abs(pks - lag))]
+                idx = int(0.5 * t_stride)
 
-            # maximum ensures no sqrt of negative numbers
-            gsi[i] = sqrt(sum(maximum(ac[idx], 0))) / sqrt(3)
+                # maximum ensures no sqrt of negative numbers
+                gsi[i] = sqrt(sum(maximum(ac[idx], 0))) / sqrt(3)
+            except ValueError:
+                gsi[i] = nan
 
         gait[self.k_] = gsi[gait_aux["inertial data i"]]
 
