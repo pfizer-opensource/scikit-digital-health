@@ -1,4 +1,5 @@
 from datetime import datetime
+from importlib import resources
 
 from pytest import fixture
 import numpy as np
@@ -77,3 +78,11 @@ def dummy_sleep_predictions():
             0,
         ]
     )
+
+
+@fixture(scope="module")
+def activity_index_data():
+    with resources.path(
+        "sleep.test_data", "test_activity_index.h5"
+    ) as file_path:
+        return file_path
