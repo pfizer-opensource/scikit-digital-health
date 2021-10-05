@@ -23,6 +23,8 @@ from skdh.read.actigraph import ReadGT3X
 from skdh.read import actigraph
 from skdh.read.apdm import ReadApdmH5
 from skdh.read import apdm
+from skdh.read.numpy_compressed import ReadNumpyFile
+from skdh.read import numpy_compressed
 from skdh.read.utility import FileSizeError
 
 __all__ = (
@@ -30,9 +32,11 @@ __all__ = (
     "ReadBin",
     "ReadGT3X",
     "ReadApdmH5",
+    "ReadNumpyFile",
     "axivity",
     "geneactiv",
     "actigraph",
     "apdm",
+    "numpy_compressed",
 )
 
