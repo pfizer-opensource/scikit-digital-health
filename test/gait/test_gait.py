@@ -24,9 +24,7 @@ class TestGait:
             day_window=(0, 24),
         )
 
-        # silence some warnings
-        with pytest.warns(RuntimeWarning):
-            res = g.predict(time=t, accel=acc, fs=50.0, height=1.88)
+        res = g.predict(time=t, accel=acc, fs=50.0, height=1.88)
 
         for key in gait_res_50.files:
             assert allclose(res[key], gait_res_50[key], equal_nan=True)
