@@ -41,11 +41,11 @@ class TestGetDayIndexIntersection:
         wear_starts, wear_stops = wear_ends
 
         p_starts, p_stops = get_day_index_intersection(
-            wear_starts, wear_stops, True, day_start, day_stop
+            wear_starts, wear_stops, True, 0, day_stop
         )
 
-        assert allclose(p_starts, wear_starts[1:])
-        assert allclose(p_stops, wear_stops[1:])
+        assert allclose(p_starts, wear_starts)
+        assert allclose(p_stops, wear_stops)
 
     def test_mismatch_length_error(self, day_ends, wear_ends):
         day_start, day_stop = day_ends
