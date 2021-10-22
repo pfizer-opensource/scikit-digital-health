@@ -70,7 +70,7 @@ def sleep_ends():
 
 @pytest.fixture(scope="module")
 def wear_ends():
-    wear_starts = np.array([0, 2300, 3000])
+    wear_starts = np.array([200, 2300, 3000])
     wear_stops = np.array([1800, 2900, 3900])
     return wear_starts, wear_stops
 
