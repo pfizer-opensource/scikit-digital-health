@@ -54,7 +54,7 @@ def get_gait_classification_lgbm(gait_starts, gait_stops, accel, fs):
     if gait_starts is not None and gait_stops is not None:
         return gait_starts, gait_stops
     else:
-        if not isclose(fs, 50.) and not isclose(fs, 20.):
+        if not isclose(fs, 50.0) and not isclose(fs, 20.0):
             raise ValueError("fs must be either 50hz or 20hz.")
         suffix = "50hz" if fs == 50.0 else "20hz"
 

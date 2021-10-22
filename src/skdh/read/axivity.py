@@ -7,17 +7,18 @@ Pfizer DMTI 2020
 from warnings import warn
 from pathlib import Path
 
-from numpy import vstack, asarray, int_
+from numpy import vstack, asarray, ascontiguousarray, minimum, int_
 
-from skdh.base import _BaseProcess
+from skdh.base import BaseProcess
 from skdh.read._extensions import read_axivity
+from skdh.read.utility import FileSizeError
 
 
 class UnexpectedAxesError(Exception):
     pass
 
 
-class ReadCWA(_BaseProcess):
+class ReadCwa(BaseProcess):
     """
     Read a binary CWA file from an axivity sensor into memory. Acceleration is return in units of
     'g' while angular velocity (if available) is returned in units of `deg/s`. If providing a base
@@ -37,13 +38,13 @@ class ReadCWA(_BaseProcess):
     --------
     Setup a reader with no windowing:
 
-    >>> reader = ReadCWA()
+    >>> reader = ReadCwa()
     >>> reader.predict('example.cwa')
     {'accel': ..., 'time': ..., ...}
 
     Setup a reader that does windowing between 8:00 AM and 8:00 PM (20:00):
 
-    >>> reader = ReadCWA(bases=8, periods=12)  # 8 + 12 = 20
+    >>> reader = ReadCwa(bases=8, periods=12)  # 8 + 12 = 20
     >>> reader.predict('example.cwa')
     {'accel': ..., 'time': ..., 'day_ends': [130, 13951, ...], ...}
     """
@@ -125,13 +126,17 @@ class ReadCWA(_BaseProcess):
             warn("File extension is not expected '.cwa'", UserWarning)
         if not Path(file).exists():
             raise FileNotFoundError(f"File [{file}] does not exist.")
+        if Path(file).stat().st_size < 1000:
+            raise FileSizeError("File is less than 1kb, nothing to read.")
 
         super().predict(expect_days=False, expect_wear=False, file=file, **kwargs)
 
         # read the file
-        fs, imudata, ts, temperature, starts, stops = read_axivity(
+        fs, n_bad_samples, imudata, ts, temperature, starts, stops = read_axivity(
             file, self.bases, self.periods
         )
+
+        end = None if n_bad_samples == 0 else -n_bad_samples
 
         num_axes = imudata.shape[1]
         gyr_axes = mag_axes = None
@@ -147,13 +152,18 @@ class ReadCWA(_BaseProcess):
         else:  # pragma: no cover :: not expected to reach here only if file is corrupt
             raise UnexpectedAxesError("Unexpected number of axes in the IMU data")
 
-        results = {self._time: ts, "file": file, "fs": fs, self._temp: temperature}
+        results = {
+            self._time: ts[:end],
+            "file": file,
+            "fs": fs,
+            self._temp: temperature[:end],
+        }
         if acc_axes is not None:
-            results[self._acc] = imudata[:, acc_axes]
+            results[self._acc] = ascontiguousarray(imudata[:end, acc_axes])
         if gyr_axes is not None:
-            results[self._gyro] = imudata[:, gyr_axes]
+            results[self._gyro] = ascontiguousarray(imudata[:end, gyr_axes])
         if mag_axes is not None:  # pragma: no cover :: don't have data to test this
-            results[self._mag] = imudata[:, mag_axes]
+            results[self._mag] = ascontiguousarray(imudata[:end, mag_axes])
 
         if self.window:
             results[self._days] = {}
@@ -161,10 +171,10 @@ class ReadCWA(_BaseProcess):
                 strt = starts[stops[:, i] != 0, i]
                 stp = stops[stops[:, i] != 0, i]
 
-                results[self._days][(data[0], data[1])] = vstack((strt, stp)).T
+                results[self._days][(data[0], data[1])] = minimum(
+                    vstack((strt, stp)).T, results[self._time].size - 1
+                )
 
         kwargs.update(results)
-        if self._in_pipeline:
-            return kwargs, None
-        else:
-            return kwargs
+
+        return (kwargs, None) if self._in_pipeline else kwargs

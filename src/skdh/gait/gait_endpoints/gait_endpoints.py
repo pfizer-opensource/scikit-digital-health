@@ -31,9 +31,11 @@ gait speed: stride_length / stride time
 """
 from numpy import (
     zeros,
+    full,
     nanmean,
     nanstd,
     nanmedian,
+    unique,
     sum,
     sqrt,
     nan,
@@ -377,7 +379,7 @@ class IntraStrideCovarianceV(GaitEventEndpoint):
 
         for i, idx in enumerate(nonzero(mask)[0]):
             j_ = gait_aux["inertial data i"][idx]
-            x = gait_aux["accel"][j_][i1[i]:i3[i], gait_aux["vert axis"][idx]]
+            x = gait_aux["accel"][j_][i1[i] : i3[i], gait_aux["vert axis"][idx]]
 
             if (i3[i] - i1[i]) > x.size:
                 gait[self.k_][idx] = nan
@@ -414,7 +416,7 @@ class IntraStepCovarianceV(GaitEventEndpoint):
 
         for i, idx in enumerate(nonzero(mask)[0]):
             j_ = gait_aux["inertial data i"][idx]
-            x = gait_aux["accel"][j_][i1[i]:i3[i], gait_aux["vert axis"][idx]]
+            x = gait_aux["accel"][j_][i1[i] : i3[i], gait_aux["vert axis"][idx]]
 
             if (i3[i] - i1[i]) > x.size:
                 gait[self.k_][idx] = nan
@@ -680,11 +682,14 @@ class GaitSymmetryIndex(GaitBoutEndpoint):
             # C_stride is the sum of 3 axes
             pks, _ = find_peaks(sum(ac, axis=1))
             # find the closest peak to the computed ideal half stride lag
-            t_stride = pks[argmin(abs(pks - lag))]
-            idx = int(0.5 * t_stride)
+            try:
+                t_stride = pks[argmin(abs(pks - lag))]
+                idx = int(0.5 * t_stride)
 
-            # maximum ensures no sqrt of negative numbers
-            gsi[i] = sqrt(sum(maximum(ac[idx], 0))) / sqrt(3)
+                # maximum ensures no sqrt of negative numbers
+                gsi[i] = sqrt(sum(maximum(ac[idx], 0))) / sqrt(3)
+            except ValueError:
+                gsi[i] = nan
 
         gait[self.k_] = gsi[gait_aux["inertial data i"]]
 
@@ -725,13 +730,12 @@ class StepRegularityV(GaitBoutEndpoint):
         super().__init__("step regularity - V", __name__, depends=[StepTime])
 
     def _predict(self, fs, leg_length, gait, gait_aux):
-        stepreg = zeros(len(gait_aux["accel"]), dtype=float_)
+        stepreg = full(len(gait_aux["accel"]), nan, dtype=float_)
 
-        for i, acc in enumerate(gait_aux["accel"]):
-            mask = gait_aux["inertial data i"] == i
-            if mask.sum() == 0:
-                stepreg[i] = nan
-                continue
+        for i in unique(gait_aux['inertial data i']):
+            acc = gait_aux['accel'][i]
+            mask = gait_aux['inertial data i'] == i
+
             va = gait_aux["vert axis"][mask][0]
             lag_ = nanmedian(gait["PARAM:step time"][mask]) * fs
             if isnan(lag_):  # if only nan values in the bout
@@ -740,9 +744,11 @@ class StepRegularityV(GaitBoutEndpoint):
             lag = int(round(lag_))
             acf = _autocovariancefn(acc[:, va], int(4.5 * fs), biased=False, axis=0)
             pks, _ = find_peaks(acf)
-            idx = pks[argmin(abs(pks - lag))]
-
-            stepreg[i] = acf[idx]
+            try:
+                idx = pks[argmin(abs(pks - lag))]
+                stepreg[i] = acf[idx]
+            except ValueError:
+                stepreg[i] = nan
 
         # broadcast step regularity into gait for each step
         gait[self.k_] = stepreg[gait_aux["inertial data i"]]
@@ -784,13 +790,12 @@ class StrideRegularityV(GaitBoutEndpoint):
         super().__init__("stride regularity - V", __name__, depends=[StrideTime])
 
     def _predict(self, fs, leg_length, gait, gait_aux):
-        stridereg = zeros(len(gait_aux["accel"]), dtype=float_)
+        stridereg = full(len(gait_aux["accel"]), nan, dtype=float_)
 
-        for i, acc in enumerate(gait_aux["accel"]):
-            mask = gait_aux["inertial data i"] == i
-            if mask.sum() == 0:
-                stridereg[i] = nan
-                continue
+        for i in unique(gait_aux['inertial data i']):
+            acc = gait_aux['accel'][i]
+            mask = gait_aux['inertial data i'] == i
+
             va = gait_aux["vert axis"][mask][0]
             lag_ = nanmedian(gait["PARAM:stride time"][mask]) * fs
             if isnan(lag_):  # if only nan values in the bout
@@ -799,9 +804,11 @@ class StrideRegularityV(GaitBoutEndpoint):
             lag = int(round(lag_))
             acf = _autocovariancefn(acc[:, va], int(4.5 * fs), biased=False, axis=0)
             pks, _ = find_peaks(acf)
-            idx = pks[argmin(abs(pks - lag))]
-
-            stridereg[i] = acf[idx]
+            try:
+                idx = pks[argmin(abs(pks - lag))]
+                stridereg[i] = acf[idx]
+            except ValueError:
+                stridereg[i] = nan
 
         # broadcast step regularity into gait for each step
         gait[self.k_] = stridereg[gait_aux["inertial data i"]]

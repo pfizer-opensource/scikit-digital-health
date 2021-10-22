@@ -13,7 +13,7 @@ def d_gait():
         "FC": array([110, 165, 210, 265, 310, 365, 415, 455]),
         "FC opp foot": array([65, 110, 165, 210, 260, 315, 360, 405]),
         "delta h": array([0.1, 0.2, 0.1, 0.2, 0.2, 0.2, 0.1, 0.1]),
-        "Bout N": array([1, 1, 1, 2, 2, 2, 2, 2])
+        "Bout N": array([1, 1, 1, 2, 2, 2, 2, 2]),
     }
     return gait
 
@@ -30,7 +30,7 @@ def d_gait_aux():
     gait_aux = {
         "accel": [a[:199], a],
         "vert axis": array([0] * 8),
-        "inertial data i": array([0, 0, 0, 1, 1, 1, 1, 1])
+        "inertial data i": array([0, 0, 0, 1, 1, 1, 1, 1]),
     }
 
     return gait_aux
@@ -96,10 +96,10 @@ def gait_input_50():
         path = Path("test/gait/data/gait_input.npz")
 
     data = load(path)
-    t = data['time']
-    acc = data['accel']
+    t = data["time"]
+    acc = data["accel"]
 
-    t50, (acc50,) = apply_downsample(50., t, (acc,), ())
+    t50, (acc50,) = apply_downsample(50.0, t, (acc,), (), aa_filter=True)
 
     return t50, acc50
 

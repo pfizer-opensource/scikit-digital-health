@@ -5,14 +5,16 @@ Lukas Adamowicz
 Pfizer DMTI 2020
 """
 from warnings import warn
+from pathlib import Path
 
 from numpy import vstack, asarray, int_
 
-from skdh.base import _BaseProcess
+from skdh.base import BaseProcess
 from skdh.read._extensions import read_geneactiv
+from skdh.read.utility import FileSizeError
 
 
-class ReadBin(_BaseProcess):
+class ReadBin(BaseProcess):
     """
     Read a binary .bin file from a GeneActiv sensor into memory. Acceleration values are returned
     in units of `g`. If providing a base and period value, included in the output will be the
@@ -83,7 +85,7 @@ class ReadBin(_BaseProcess):
         """
         predict(file)
 
-        Read the data from the axivity file
+        Read the data from the GeneActiv file
 
         Parameters
         ----------
@@ -117,6 +119,8 @@ class ReadBin(_BaseProcess):
             file = str(file)
         if file[-3:] != "bin":
             warn("File extension is not expected '.bin'", UserWarning)
+        if Path(file).stat().st_size < 1000:
+            raise FileSizeError("File is less than 1kb, nothing to read.")
 
         super().predict(expect_days=False, expect_wear=False, file=file, **kwargs)
 
@@ -143,7 +147,5 @@ class ReadBin(_BaseProcess):
                 results[self._days][(data[0], data[1])] = vstack((strt, stp)).T
 
         kwargs.update(results)
-        if self._in_pipeline:
-            return kwargs, None
-        else:
-            return kwargs
+
+        return (kwargs, None) if self._in_pipeline else kwargs

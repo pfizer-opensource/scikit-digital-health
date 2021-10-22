@@ -22,14 +22,14 @@ from numpy import (
 from numpy.linalg import norm
 from sklearn.linear_model import LinearRegression
 
-from skdh.base import _BaseProcess
+from skdh.base import BaseProcess
 from skdh.utility import moving_mean, moving_sd
 
 
 __all__ = ["CalibrateAccelerometer"]
 
 
-class CalibrateAccelerometer(_BaseProcess):
+class CalibrateAccelerometer(BaseProcess):
     """
     Calibrate pre-recording acceleration readings based on the deviation from 1G when motionless.
     Acceleration values can be modified in place. Calibration typically requires a minimum amount
@@ -97,7 +97,9 @@ class CalibrateAccelerometer(_BaseProcess):
         self.max_iter = max_iter
         self.tol = tol
 
-    def predict(self, time=None, accel=None, *, fs=None, apply=True, temperature=None, **kwargs):
+    def predict(
+        self, time=None, accel=None, *, fs=None, apply=True, temperature=None, **kwargs
+    ):
         r"""
         Run the calibration on the accelerometer data.
 
@@ -143,7 +145,12 @@ class CalibrateAccelerometer(_BaseProcess):
             fs=fs,
             apply=apply,
             temperature=temperature,
-            **kwargs
+            **kwargs,
+        )
+
+        # update before it might have to be returned early
+        kwargs.update(
+            {"fs": fs, self._time: time, self._acc: accel, self._temp: temperature}
         )
 
         # calculate fs if necessary
@@ -161,7 +168,7 @@ class CalibrateAccelerometer(_BaseProcess):
                 UserWarning,
             )
             kwargs.update({self._time: time, self._acc: accel, self._temp: temperature})
-            return kwargs
+            return (kwargs, None) if self._in_pipeline else kwargs
 
         finished = False
         # use the Store object in order to save computation time
@@ -181,7 +188,7 @@ class CalibrateAccelerometer(_BaseProcess):
                 temp_mean,
             ) = self._do_iterative_closest_point_fit(store)
 
-            if not finished and (nh + i_h * n12h) > accel.shape[0]:
+            if not finished and (nh + i_h * n12h) >= accel.shape[0]:
                 finished = True
                 warn(
                     f"Recalibration not done with {self.min_hours + i_h * 12} hours due to "
@@ -202,11 +209,7 @@ class CalibrateAccelerometer(_BaseProcess):
             {"offset": offset, "scale": scale, "temperature scale": temp_scale}
         )
 
-        kwargs.update({self._time: time, self._acc: accel, self._temp: temperature})
-        if self._in_pipeline:
-            return kwargs, None
-        else:
-            return kwargs
+        return (kwargs, None) if self._in_pipeline else kwargs
 
     def _do_iterative_closest_point_fit(self, store):
         """

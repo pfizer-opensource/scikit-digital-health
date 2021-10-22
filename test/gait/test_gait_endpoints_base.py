@@ -31,7 +31,7 @@ class BoutEndpoint1Test(endpoints.GaitBoutEndpoint):
 def test_depends(capsys):
     tbe1 = BoutEndpoint1Test()
 
-    tbe1.predict(50., 1.8, {}, {})
+    tbe1.predict(50.0, 1.8, {}, {})
 
     record = capsys.readouterr().out
 
@@ -42,7 +42,7 @@ def test_depends(capsys):
 class TestBoutEndpoint:
     def test_already_run(self, capsys):
         tbe1 = BoutEndpoint1Test()
-        tbe1.predict(50., 1.8, {tbe1.k_: []}, {})
+        tbe1.predict(50.0, 1.8, {tbe1.k_: []}, {})
 
         record = capsys.readouterr().out
 
@@ -52,7 +52,7 @@ class TestBoutEndpoint:
 class TestEventEndpoint:
     def test_already_run(self, capsys):
         tee1 = EventEndpoint1Test()
-        tee1.predict(50., 1.8, {tee1.k_: []}, {})
+        tee1.predict(50.0, 1.8, {tee1.k_: []}, {})
 
         record = capsys.readouterr().out
 
@@ -61,7 +61,7 @@ class TestEventEndpoint:
     def test__get_mask(self):
         gait = {
             "IC": array([10, 20, 30, 40, 50, 60, 70, 80]),
-            "Bout N": array([1, 1, 1, 2, 2, 2, 2, 2])
+            "Bout N": array([1, 1, 1, 2, 2, 2, 2, 2]),
         }
 
         mask = endpoints.GaitEventEndpoint._get_mask(gait, 1)
@@ -75,13 +75,13 @@ class TestEventEndpoint:
         gait = {
             "IC": array([10, 20, 30, 40, 50, 60, 70, 80]),
             "Bout N": array([1, 1, 1, 2, 2, 2, 2, 2]),
-            "PARAM:test event ept 1": arange(1, 9)
+            "PARAM:test event ept 1": arange(1, 9),
         }
 
         tee1 = EventEndpoint1Test()
-        tee1._predict_asymmetry(50., 1.8, gait, {})
+        tee1._predict_asymmetry(50.0, 1.8, gait, {})
 
-        res = gait['PARAM:test event ept 1 asymmetry']
+        res = gait["PARAM:test event ept 1 asymmetry"]
         exp = array([1, 1, nan, 1, 1, 1, 1, nan], dtype="float")
 
         assert allclose(res, exp, equal_nan=True)
@@ -89,7 +89,7 @@ class TestEventEndpoint:
     def test__predict_init(self):
         gait = {
             "IC": array([10, 20, 30, 40, 50, 60, 70, 80]),
-            "Bout N": array([1, 1, 1, 2, 2, 2, 2, 2])
+            "Bout N": array([1, 1, 1, 2, 2, 2, 2, 2]),
         }
 
         tee1 = EventEndpoint1Test()

@@ -3,15 +3,15 @@ from pathlib import Path
 
 from numpy import array, allclose
 
-from skdh.base import _BaseProcess
+from skdh.base import BaseProcess
 
 
-class Test_BaseProcess:
+class TestBaseProcess:
     def test_str_repr(self):
-        bp = _BaseProcess(kw1=1, kw2="2")
+        bp = BaseProcess(kw1=1, kw2="2")
 
-        assert str(bp) == "_BaseProcess"
-        assert repr(bp) == "_BaseProcess(kw1=1, kw2='2')"
+        assert str(bp) == "BaseProcess"
+        assert repr(bp) == "BaseProcess(kw1=1, kw2='2')"
 
     def test_eq(self, testprocess, testprocess2):
         tp1_a = testprocess(kw1=1)
@@ -42,7 +42,7 @@ class Test_BaseProcess:
         return Lgr()
 
     def test__check_if_idx_none(self):
-        bp = _BaseProcess()
+        bp = BaseProcess()
         bp.logger = self.setup_lgr()  # overwrite the logger
 
         x = array([[0, 10], [15, 20]])
@@ -63,21 +63,24 @@ class Test_BaseProcess:
         assert en is None
 
     def test_predict(self):
-        bp = _BaseProcess()
+        bp = BaseProcess()
         bp.logger = self.setup_lgr()
 
         bp.predict(
-            expect_days=True,
-            expect_wear=True,
-            accel=array([[1, 2, 3], [4, 5, 6]])
+            expect_days=True, expect_wear=True, accel=array([[1, 2, 3], [4, 5, 6]])
         )
 
         assert bp._file_name == ""
-        assert "Entering _BaseProcess processing with call _BaseProcess()" in bp.logger.msgs
-        assert "[_BaseProcess] Day indices [(-1, -1)] not found. No day split used." in bp.logger.msgs
+        assert (
+            "Entering BaseProcess processing with call BaseProcess()" in bp.logger.msgs
+        )
+        assert (
+            "[BaseProcess] Day indices [(-1, -1)] not found. No day split used."
+            in bp.logger.msgs
+        )
 
     def test_save_results(self):
-        bp = _BaseProcess()
+        bp = BaseProcess()
 
         bp.predict(expect_wear=False, expect_days=False, file="test_file.infile")
 
@@ -90,4 +93,4 @@ class Test_BaseProcess:
 
             files = [i.name for i in tdir.glob("*")]
 
-        assert "test_file___BaseProcess.out" in files
+        assert "test_file__BaseProcess.out" in files

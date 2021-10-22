@@ -61,7 +61,7 @@ int get_timestamps(long *Nps, char time[40], GN_Info_t *info, GN_Data_t *data, W
     t.hour = GN_DATE_HOUR(time);
     t.min = GN_DATE_MIN(time);
     t.sec = GN_DATE_SEC(time);
-    t.msec = GN_DATE_MSEC(time) * 1000;
+    t.msec = GN_DATE_MSEC(time);
 
     memset(&tm0, 0, sizeof(tm0));
     tm0.tm_year = GN_DATE_YEAR(time) - 1900;  /* need years since 1900 */
@@ -73,7 +73,7 @@ int get_timestamps(long *Nps, char time[40], GN_Info_t *info, GN_Data_t *data, W
 
     /* convert to seconds since epoch */
     t0 = (double)timegm(&tm0);
-    t0 += (double)t.msec / 1000000.0f;  /* add microseconds */
+    t0 += (double)t.msec / 1000.0f;  /* add microseconds */
 
     /* create the full timestamp array for the block */
     for (int j = 0; j < GN_SAMPLES; ++j)
@@ -121,9 +121,6 @@ int geneactiv_read_block(FILE *fp, Window_t *w_info, GN_Info_t *info, GN_Data_t 
     GN_READLINE; GN_READLINE; GN_READLINE;
     fs = strtod(&buff[22], NULL);
     if ((fs != info->fs) && (info->fs_err < 1)){
-        /* set a warning */
-        sprintf(warn_str, "Block (%li) fs [%.2f] is not the same as header fs [%.2f]. Setting fs to block fs.", N, fs, info->fs);
-
         info->fs_err ++;  /* increment the error counter, this error should only happen once */
         /* set the sampling frequency to that of the block */
         info->fs = fs;

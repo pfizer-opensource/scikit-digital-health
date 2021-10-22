@@ -59,7 +59,6 @@ void axivity_set_error_message(int ierr)
 
 static PyObject *read_axivity(PyObject *NPY_UNUSED(self), PyObject *args)
 {
-    PyObject* bytes;
     char *file;
     Py_ssize_t flen;
     int ierr = AX_READ_E_NONE, fail = 0;
@@ -211,8 +210,9 @@ static PyObject *read_axivity(PyObject *NPY_UNUSED(self), PyObject *args)
     }
 
     return Py_BuildValue(
-        "dNNNNN",  /* need to use N to not increment reference counter */
+        "dlNNNNN",  /* need to use N to not increment reference counter */
         info.frequency,
+        info.n_bad_blocks * info.count,
         (PyObject *)imudata,
         (PyObject *)time,
         (PyObject *)temperature,
@@ -342,7 +342,7 @@ static PyObject *read_geneactiv(PyObject *NPY_UNUSED(self), PyObject *args)
 
         if (ierr == GN_READ_E_BLOCK_FS_WARN)
         {
-            int err_ret = PyErr_WarnEx(PyExc_RuntimeWarning, warn_str, 1);
+            int err_ret = PyErr_WarnEx(PyExc_RuntimeWarning, "Block fs is not the same as header fs. Setting to block fs.", 1);
 
             if (err_ret == -1)  /* warnings are being raised as exceptions */
             {

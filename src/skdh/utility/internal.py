@@ -8,7 +8,6 @@ from numpy import (
     asarray,
     nonzero,
     insert,
-    append,
     arange,
     interp,
     zeros,
@@ -22,6 +21,7 @@ from numpy import (
     maximum,
     roll,
 )
+from scipy.signal import cheby1, sosfiltfilt
 
 
 def get_day_index_intersection(starts, stops, for_inclusion, day_start, day_stop):
@@ -70,19 +70,27 @@ def get_day_index_intersection(starts, stops, for_inclusion, day_start, day_stop
     stops_tmp = list(minimum(maximum(i, day_start), day_stop) for i in stops)
     starts_subset, stops_subset = [], []
     for start, stop, fi in zip(starts_tmp, stops_tmp, for_inclusion):
+        if start.size == 0 or stop.size == 0:
+            continue
         if fi:  # flip everything to being an "exclude" window
-            tmp = roll(start, -1)
+            tmp = insert(roll(start, -1), 0, start[0])
             tmp[-1] = day_stop
 
-            starts_subset.append(stop[stop != tmp])
-            stops_subset.append(tmp[stop != tmp])
+            tmp_stop = insert(stop, 0, 0)
+
+            starts_subset.append(tmp_stop[tmp_stop != tmp])
+            stops_subset.append(tmp[tmp_stop != tmp])
         else:
             starts_subset.append(start[start != stop])
             stops_subset.append(stop[start != stop])
 
     # get overlap
-    all_starts = concatenate(starts_subset)
-    all_stops = concatenate(stops_subset)
+    all_starts = (
+        concatenate(starts_subset) if len(starts_subset) > 0 else asarray(starts_subset)
+    )
+    all_stops = (
+        concatenate(stops_subset) if len(starts_subset) > 0 else asarray(starts_subset)
+    )
 
     valid_starts, valid_stops = [day_start], [day_stop]
 
@@ -110,55 +118,7 @@ def get_day_index_intersection(starts, stops, for_inclusion, day_start, day_stop
     )
 
 
-def get_day_wear_intersection(starts, stops, day_start, day_stop):
-    """
-    Get the intersection between wear times and day starts/stops.
-    Parameters
-    ----------
-    starts : numpy.ndarray
-        Array of integer indices where gait bouts start.
-    stops : numpy.ndarray
-        Array of integer indices where gait bouts stop.
-    day_start : int
-        Index of the day start.
-    day_stop : int
-        Index of the day stop.
-    Returns
-    -------
-    day_wear_starts : numpy.ndarray
-        Array of wear start indices for the day.
-    day_wear_stops : numpy.ndarray
-        Array of wear stop indices for the day
-    """
-    day_start, day_stop = int(day_start), int(day_stop)
-    # get the portion of wear times for the day
-    starts_subset = starts[(starts >= day_start) & (starts < day_stop)]
-    stops_subset = stops[(stops > day_start) & (stops <= day_stop)]
-
-    if starts_subset.size == 0 and stops_subset.size == 0:
-        try:
-            if stops[nonzero(starts <= day_start)[0][-1]] >= day_stop:
-                return asarray([day_start]), asarray([day_stop])
-            else:
-                return asarray([]), asarray([])
-        except IndexError:
-            return asarray([]), asarray([])
-    if starts_subset.size == 0 and stops_subset.size == 1:
-        starts_subset = asarray([day_start])
-    if starts_subset.size == 1 and stops_subset.size == 0:
-        stops_subset = asarray([day_stop])
-
-    if starts_subset[0] > stops_subset[0]:
-        starts_subset = insert(starts_subset, 0, day_start)
-    if starts_subset[-1] > stops_subset[-1]:
-        stops_subset = append(stops_subset, day_stop)
-
-    assert starts_subset.size == stops_subset.size, "bout starts and stops do not match"
-
-    return starts_subset, stops_subset
-
-
-def apply_downsample(goal_fs, time, data=(), indices=()):
+def apply_downsample(goal_fs, time, data=(), indices=(), aa_filter=True, fs=None):
     """
     Apply a downsample to a set of data.
 
@@ -173,6 +133,14 @@ def apply_downsample(goal_fs, time, data=(), indices=()):
         Can handle `None` inputs, and will return an array of zeros matching the downsampled size.
     indices : tuple, optional
         Tuple of arrays of indices to downsample.
+    aa_filter : bool, optional
+        Apply an anti-aliasing filter before downsampling. Default is True. This
+        is the same filter as used by :py:function:`scipy.signal.decimate`.
+        See [1]_ for details.
+    fs : {None, float}, optional
+        Original sampling frequency in Hz. If `goal_fs` is an integer factor
+        of `fs`, every nth sample will be taken, otherwise `np.interp` will be
+        used. Leave blank to always use `np.interp`.
 
     Returns
     -------
@@ -182,20 +150,45 @@ def apply_downsample(goal_fs, time, data=(), indices=()):
         Downsampled data, if provided.
     indices : tuple, optional
         Downsampled indices, if provided.
+
+    References
+    ----------
+    .. [1] https://en.wikipedia.org/wiki/Downsampling_(signal_processing)
     """
-    time_ds = arange(time[0], time[-1], 1 / goal_fs)
+
+    def downsample(x, factor, t, t_ds):
+        if int(1 / factor) == 1 / factor:
+            if x.ndim == 1:
+                return x[:: int(1 / factor)],
+            elif x.ndim == 2:
+                return x[:: int(1 / factor)],
+        else:
+            if x.ndim == 1:
+                return interp(t_ds, t, x),
+            elif x.ndim == 2:
+                xds = zeros((t_ds.size, x.shape[1]), dtype=float_)
+                for j in range(x.shape[1]):
+                    xds[:, j] = interp(t_ds, t, x[:, j])
+                return xds,
+
+    if fs is None:
+        fs = 1.1 * goal_fs
+
+    if int(fs / goal_fs) == fs / goal_fs:
+        time_ds = time[:: int(fs / goal_fs)]
+    else:
+        time_ds = arange(time[0], time[-1], 1 / goal_fs)
+    # AA filter, if necessary
+    sos = cheby1(8, 0.05, 0.8 / 5, output="sos")
 
     data_ds = ()
 
     for dat in data:
         if dat is None:
             data_ds += (None,)
-        elif dat.ndim == 1:
-            data_ds += (interp(time_ds, time, dat),)
-        elif dat.ndim == 2:
-            data_ds += (zeros((time_ds.size, dat.shape[1]), dtype=float_),)
-            for i in range(dat.shape[1]):
-                data_ds[-1][:, i] = interp(time_ds, time, dat[:, i])
+        elif dat.ndim in [1, 2]:
+            data_to_ds = sosfiltfilt(sos, dat, axis=0) if aa_filter else dat
+            data_ds += downsample(data_to_ds, fs / goal_fs, time, time_ds)
         else:
             raise ValueError("Data dimension exceeds 2, or data not understood.")
 

@@ -11,15 +11,16 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from datetime import date as dt_date
 
-from numpy import mean, diff, array, nan, sum, arange, nonzero, full, int_
+from numpy import mean, diff, array, nan, sum, arange, full, int_
 from numpy.ma import masked_where
+from pandas import DataFrame, date_range
 import matplotlib
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.lines as mlines
 import matplotlib.pyplot as plt
 
-from skdh.base import _BaseProcess  # import the base process class
-from skdh.utility.internal import get_day_wear_intersection, apply_downsample, rle
+from skdh.base import BaseProcess  # import the base process class
+from skdh.utility.internal import get_day_index_intersection, apply_downsample, rle
 from skdh.sleep.tso import get_total_sleep_opportunity
 from skdh.sleep.utility import compute_activity_index
 from skdh.sleep.sleep_classification import compute_sleep_predictions
@@ -64,7 +65,7 @@ def _get_date(epoch_ts, day_start_hour):
     return start_dt - timedelta(seconds=15), day_str
 
 
-class Sleep(_BaseProcess):
+class Sleep(BaseProcess):
     """
     Process raw accelerometer data from the wrist to determine various sleep metrics and endpoints.
 
@@ -87,10 +88,16 @@ class Sleep(_BaseProcess):
     max_activity_break : int, optional
         Number of minutes of activity allowed to interrupt the major rest period. Default is 30
         minutes.
-    min_angle_thresh : float, optional
+    tso_min_thresh : float, optional
         Minimum allowed z-angle threshold for determining major rest period. Default is 0.1.
-    max_angle_thresh : float, optional
+    tso_max_thresh : float, optional
         Maximum allowed z-angle threshold for determining major rest period. Default is 1.0.
+    tso_perc : int
+        The percentile to use when calculating the TSO threshold from daily data.
+        Default is 10.
+    tso_factor : float
+        The factor to multiply the percentile value by co get the TSO threshold.
+        Default is 15.0.
     min_rest_period : float, optional
         Minimum length allowed for major rest period. Default is None
     nonwear_move_thresh : float, optional
@@ -102,41 +109,53 @@ class Sleep(_BaseProcess):
         Minimum number of hours required to consider a day useable. Default is 6 hours.
     downsample : bool, optional
         Downsample to 20Hz. Default is True.
-    day_window : array-like
+    downsample_aa_filter : bool, optional
+        Apply an anti-aliasing filter before downsampling. Default is True.
+        Uses the same IIR filter as :py:function:`scipy.signal.decimate`.
+    day_window : array-like, optional
         Two (2) element array-like of the base and period of the window to use for determining
         days. Default is (12, 24), which will look for days starting at 12 noon and lasting 24
         hours. This should only be changed if the data coming in is from someone who sleeps
         during the day, in which case (0, 24) makes the most sense.
+    add_active_time : float, optional
+        Add active time to the accelerometer signal start and end when detecting the
+        total sleep opportunity. This can occasionally be useful if less than 24 hrs of
+        data are collected, as sleep-period skewed data can effect the sleep window
+        cutoff, effecting the end results. Suggested is not adding more than 1.5
+        hours [5]. Default is 0.0 for no added data.
+    save_per_minute_results : bool, optional
+        Save minute-by-minute predictions of rest for each day. Default is False.
 
     Notes
     -----
-    Sleep window detection is based off of methods in [1]_, [2]_, [3]_.
+    Sleep window detection is based off of methods in [1]_, [2]_.
 
     The detection of sleep and wake states uses a heuristic model based
-    on the algorithm described in [4]_.
+    on the algorithm described in [3]_.
 
-    The activity index feature is based on the index described in [5]_.
+    The activity index feature is based on the index described in [4]_.
 
     References
     ----------
-    .. [1] van Hees V, Fang Z, Zhao J, Heywood J, Mirkes E, Sabia S, Migueles J (2019). GGIR: Raw
-        Accelerometer Data Analysis. doi: 10.5281/zenodo.1051064, R package version 1.9-1,
-        https://CRAN.R-project.org/package=GGIR.
-    .. [2] van Hees V, Fang Z, Langford J, Assah F, Mohammad Mirkes A, da Silva I, Trenell M,
+    .. [1] van Hees V, Fang Z, Langford J, Assah F, Mohammad Mirkes A, da Silva I, Trenell M,
         White T, Wareham N, Brage S (2014). 'Autocalibration of accelerometer data or free-living
         physical activity assessment using local gravity and temperature: an evaluation on four
         continents.' Journal of Applied Physiology, 117(7), 738-744.
         doi: 10.1152/japplphysiol.00421.2014,
         https://www.physiology.org/doi/10.1152/japplphysiol.00421.2014
-    .. [3] van Hees V, Sabia S, Anderson K, Denton S, Oliver J, Catt M, Abell J, Kivimaki M,
+    .. [2] van Hees V, Sabia S, Anderson K, Denton S, Oliver J, Catt M, Abell J, Kivimaki M,
         Trenell M, Singh-Maoux A (2015). 'A Novel, Open Access Method to Assess Sleep Duration
         Using a Wrist-Worn Accelerometer.' PloS One, 10(11). doi: 10.1371/journal.pone.0142533,
-        http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0142533.
-    .. [4] Cole, R.J., Kripke, D.F., Gruen, W.'., Mullaney, D.J., & Gillin, J.C. (1992). Automatic
+        https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0142533.
+    .. [3] Cole, R.J., Kripke, D.F., Gruen, W.'., Mullaney, D.J., & Gillin, J.C. (1992). Automatic
         sleep/wake identification from wrist activity. Sleep, 15 5, 461-9.
-    .. [5] Bai J, Di C, Xiao L, Evenson KR, LaCroix AZ, Crainiceanu CM, et al. (2016) An Activity
+    .. [4] Bai J, Di C, Xiao L, Evenson KR, LaCroix AZ, Crainiceanu CM, et al. (2016) An Activity
         Index for Raw Accelerometry Data and Its Comparison with Other Activity Metrics. PLoS ONE
         11(8): e0160644. https://doi.org/10.1371/journal.pone.0160644
+    .. [5] V. T. van Hees et al., “Estimating sleep parameters using an accelerometer
+        without sleep diary,” Scientific Reports, vol. 8, no. 1, Art. no. 1, Aug. 2018,
+        doi: 10.1038/s41598-018-31266-z.
+
     """
 
     _params = [
@@ -167,14 +186,19 @@ class Sleep(_BaseProcess):
         internal_wear_move_thresh=0.001,
         min_rest_block=30,
         max_activity_break=60,
-        min_angle_thresh=0.1,
-        max_angle_thresh=1.0,
+        tso_min_thresh=0.1,
+        tso_max_thresh=1.0,
+        tso_perc=10,
+        tso_factor=15.0,
         min_rest_period=None,
         nonwear_move_thresh=None,
         min_wear_time=0,
         min_day_hours=6,
         downsample=True,
+        downsample_aa_filter=True,
         day_window=(12, 24),
+        save_per_minute_results=False,
+        add_active_time=0.0,
     ):
         super().__init__(
             start_buffer=start_buffer,
@@ -183,14 +207,19 @@ class Sleep(_BaseProcess):
             internal_wear_move_thresh=internal_wear_move_thresh,
             min_rest_block=min_rest_block,
             max_activity_break=max_activity_break,
-            min_angle_thresh=min_angle_thresh,
-            max_angle_thresh=max_angle_thresh,
+            tso_min_thresh=tso_min_thresh,
+            tso_max_thresh=tso_max_thresh,
+            tso_perc=tso_perc,
+            tso_factor=tso_factor,
             min_rest_period=min_rest_period,
             nonwear_move_thresh=nonwear_move_thresh,
             min_wear_time=min_wear_time,
             min_day_hours=min_day_hours,
             downsample=downsample,
+            downsample_aa_filter=downsample_aa_filter,
             day_window=day_window,
+            save_per_minute_results=save_per_minute_results,
+            add_active_time=add_active_time,
         )
 
         self.window_size = 60
@@ -201,13 +230,21 @@ class Sleep(_BaseProcess):
         self.int_w_move = internal_wear_move_thresh
         self.min_rest_block = min_rest_block
         self.max_act_break = max_activity_break
-        self.min_angle = min_angle_thresh
-        self.max_angle = max_angle_thresh
+        self.tso_min_thresh = tso_min_thresh
+        self.tso_max_thresh = tso_max_thresh
+        self.tso_perc = tso_perc
+        self.tso_factor = tso_factor
         self.min_rest_period = min_rest_period
         self.nw_thresh = nonwear_move_thresh
         self.min_wear_time = min_wear_time
         self.min_day_hrs = min_day_hours
         self.downsample = downsample
+        self.aa_filter = downsample_aa_filter
+        self.save_pm = save_per_minute_results
+        self.add_time = add_active_time
+
+        # for storing sleep auxiliary data
+        self.sleep_aux = None
 
         if day_window is None:
             self.day_key = (-1, -1)
@@ -236,6 +273,8 @@ class Sleep(_BaseProcess):
         - name: process name.
         - file: file name used in the pipeline, or "" if not found.
         """
+        if save_file is None:
+            return
         # move this inside here so that it doesnt effect everything on load
         if gettrace() is None:  # only set if not debugging
             matplotlib.use(
@@ -280,6 +319,49 @@ class Sleep(_BaseProcess):
             else:
                 raise ValueError(f"Metric {metrics!r} is not a `SleepMetric`.")
 
+    def save_results(self, results, file_name):
+        """
+        Save the results of the processing pipeline to a csv file. Will also
+        save per minute rest/sleep predictions if `save_per_minute_results` was
+        set to `True`. The file name for per minute results is the same as the
+        sleep endpoints file with "_per_minute_predictions_day_<n>" added to the end.
+
+        Parameters
+        ----------
+        results : dict
+            Dictionary of results from the output of predict
+        file_name : str
+            File name. Can be optionally formatted (see Notes)
+
+        Notes
+        -----
+        Available format variables available:
+
+        - date: todays date expressed in yyyymmdd format.
+        - name: process name.
+        - file: file name used in the pipeline, or "" if not found.
+        """
+        file_name = super().save_results(results, file_name)
+
+        if self.save_pm:
+            file_name = Path(file_name)
+
+            for i, start in enumerate(self.sleep_aux["start time"]):
+                day_n = self.sleep_aux["day n"][i]
+                new_name = file_name.stem + f"_per_minute_predictions_day_{day_n}"
+                new_name += file_name.suffix
+                rest_file = file_name.with_name(new_name)
+
+                tso = self.sleep_aux["tso indices"][i]
+
+                df = DataFrame(columns=["Time", "Rest", "TSO"])
+                df["Rest"] = self.sleep_aux["rest predictions"][i]
+                df["Time"] = date_range(start, periods=df.shape[0], freq="1T")
+                df["TSO"] = False
+                df.loc[tso[0] : tso[1], "TSO"] = True
+
+                df.to_csv(rest_file, index=False)
+
     def predict(
         self, time=None, accel=None, *, temperature=None, fs=None, wear=None, **kwargs
     ):
@@ -314,7 +396,7 @@ class Sleep(_BaseProcess):
             temperature=temperature,
             fs=fs,
             wear=wear,
-            **kwargs
+            **kwargs,
         )
 
         if fs is None:
@@ -337,8 +419,17 @@ class Sleep(_BaseProcess):
         # downsample if necessary
         goal_fs = 20.0
         if fs != goal_fs and self.downsample:
-            time_ds, (accel_ds, temp_ds), (day_starts_ds, day_stops_ds, wear_starts_ds, wear_stops_ds) = apply_downsample(
-                goal_fs, time, data=(accel, temperature), indices=(*self.day_idx, *self.wear_idx)
+            (
+                time_ds,
+                (accel_ds, temp_ds),
+                (day_starts_ds, day_stops_ds, wear_starts_ds, wear_stops_ds),
+            ) = apply_downsample(
+                goal_fs,
+                time,
+                data=(accel, temperature),
+                indices=(*self.day_idx, *self.wear_idx),
+                aa_filter=self.aa_filter,
+                fs=fs,
             )
 
         else:
@@ -360,14 +451,24 @@ class Sleep(_BaseProcess):
                 "TSO Duration",
             ]
         }
-        # setup storage for sleep indices
-        sleep_idx = full((day_starts_ds.size, 2), -1, dtype=int_)
 
         # iterate over the parameters, initialize them, and put their names into sleep
         init_params = []
         for param in self._params:
             init_params.append(param())
             sleep[init_params[-1].name] = []
+
+        # sleep aux storage if saving per minute results
+        if self.save_pm:
+            self.sleep_aux = {
+                "start time": [],
+                "day n": [],
+                "rest predictions": [],
+                "tso indices": [],
+            }
+
+        # setup storage for sleep indices
+        sleep_idx = full((day_starts_ds.size, 2), -1, dtype=int_)
 
         # iterate over the days
         for iday, (start, stop) in enumerate(zip(day_starts_ds, day_stops_ds)):
@@ -394,9 +495,7 @@ class Sleep(_BaseProcess):
             self._plot_accel(goal_fs, accel_ds[start:stop])
 
             # get the starts and stops of wear during the day
-            dw_starts, dw_stops = get_day_wear_intersection(
-                wear_starts_ds, wear_stops_ds, start, stop
-            )
+            dw_starts, dw_stops = get_day_index_intersection(wear_starts_ds, wear_stops_ds, True, start, stop)
 
             if (sum(dw_stops - dw_starts) / (3600 * goal_fs)) < self.min_wear_time:
                 self.logger.info(
@@ -415,12 +514,15 @@ class Sleep(_BaseProcess):
                 dw_stops,
                 self.min_rest_block,
                 self.max_act_break,
-                self.min_angle,
-                self.max_angle,
+                self.tso_min_thresh,
+                self.tso_max_thresh,
+                self.tso_perc,
+                self.tso_factor,
                 self.int_w_temp,
                 self.int_w_move,
                 self._plot_arm_angle,
                 idx_start=start,
+                add_active_time=self.add_time,
             )
 
             if tso[0] is None:
@@ -437,17 +539,15 @@ class Sleep(_BaseProcess):
             tso_start = int(tso[2] / int(60 * goal_fs))  # convert to minute indexing
             tso_stop = int(tso[3] / int(60 * goal_fs))
             pred_during_tso = predictions[tso_start:tso_stop]
-            # run length encoding for sleep metrics
-            sw_lengths, sw_starts, sw_vals = rle(pred_during_tso)
 
-            # set the sleep start and end values from the predictions indexed into original data
-            to_start = int(tso_start * 60 * fs) + int(start * fs / goal_fs)
-            sleep_idx[iday, 0] = (
-                int(nonzero(pred_during_tso)[0][0] * 60 * fs) + to_start
-            )  # sleep
-            sleep_idx[iday, 1] = (
-                int(nonzero(pred_during_tso)[0][-1] * 60 * fs) + to_start
-            )  # wake
+            # save the sleep per minute results if desired
+            self._store_sleep_aux(
+                start_datetime, iday, predictions, tso_start, tso_stop
+            )
+
+            # set the sleep start and end values as the TSO (essentially time in bed)
+            sleep_idx[iday, 0] = int((tso[2] + start) * fs / goal_fs)
+            sleep_idx[iday, 1] = int((tso[3] + start) * fs / goal_fs)
 
             # plotting
             self._plot_sleep_wear_predictions(
@@ -464,6 +564,11 @@ class Sleep(_BaseProcess):
             sleep["TSO Start Timestamp"][-1] = tso[0]
             sleep["TSO Start"][-1] = tso_start_dt.strftime("%Y-%m-%d %H:%M:%S.%f")
             sleep["TSO Duration"][-1] = (tso[3] - tso[2]) / (goal_fs * 60)  # in minutes
+
+            # run length encoding for sleep metrics
+            if tso_start == tso_stop:
+                continue
+            sw_lengths, sw_starts, sw_vals = rle(pred_during_tso)
 
             for param in init_params:
                 sleep[param.name][-1] = param.predict(
@@ -487,10 +592,8 @@ class Sleep(_BaseProcess):
                 "sleep": sleep_idx,
             }
         )
-        if self._in_pipeline:
-            return kwargs, sleep
-        else:
-            return sleep
+
+        return (kwargs, sleep) if self._in_pipeline else sleep
 
     def _setup_day_plot(self, iday, source_file, date_str, start_dt):
         if self.f is not None:
@@ -689,3 +792,13 @@ class Sleep(_BaseProcess):
                 pp.savefig(f)
 
             pp.close()
+
+    def _store_sleep_aux(self, start_dt, day_n, predictions, tso_start, tso_stop):
+        """
+        Store the sleep predictions if desired.
+        """
+        if self.save_pm:
+            self.sleep_aux["start time"].append(start_dt)
+            self.sleep_aux["day n"].append(day_n)
+            self.sleep_aux["rest predictions"].append(predictions)
+            self.sleep_aux["tso indices"].append([tso_start, tso_stop])

@@ -19,11 +19,11 @@ from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt, find_peaks
 from pywt import cwt, scale2frequency
 
-from skdh.base import _BaseProcess
+from skdh.base import BaseProcess
 from skdh.sit2stand.detector import Detector, pad_moving_sd
 
 
-class Sit2Stand(_BaseProcess):
+class Sit2Stand(BaseProcess):
     """
     Sit-to-stand transfer detection and processing.
 
@@ -209,7 +209,9 @@ class Sit2Stand(_BaseProcess):
             days. Dictionary keys are in the format "{base}, {period}". If not provided, or the
             key specified by `day_window` is not found, no day-based windowing will be done.
         """
-        super().predict(expect_days=True, expect_wear=False, time=time, accel=accel, **kwargs)
+        super().predict(
+            expect_days=True, expect_wear=False, time=time, accel=accel, **kwargs
+        )
 
         # FILTERING
         # ======================================================
@@ -289,7 +291,5 @@ class Sit2Stand(_BaseProcess):
         sts.pop("Partial")
 
         kwargs.update({self._time: time, self._acc: accel})
-        if self._in_pipeline:
-            return kwargs, sts
-        else:
-            return sts
+
+        return (kwargs, sts) if self._in_pipeline else sts

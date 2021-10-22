@@ -148,3 +148,4 @@ dmypy.json
 /docs/ref/gait/generated/
 /docs/**/generated/
 /coverage/
+/misc_script/

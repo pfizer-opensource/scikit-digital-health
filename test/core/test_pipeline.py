@@ -6,6 +6,7 @@ import pytest
 
 from skdh.pipeline import Pipeline, NotAProcessError, ProcessNotFoundError
 from skdh.gait import Gait
+from skdh import __version__ as skdh_vers
 
 
 class TestPipeline:
@@ -48,7 +49,10 @@ class TestPipeline:
         p.add(testprocess(kw1=1))
 
         assert str(p) == "IMUAnalysisPipeline"
-        assert repr(p) == "IMUAnalysisPipeline[\n\tTestProcess(kw1=2),\n\tTestProcess(kw1=1),\n]"
+        assert (
+            repr(p)
+            == "IMUAnalysisPipeline[\n\tTestProcess(kw1=2),\n\tTestProcess(kw1=1),\n]"
+        )
 
     def test_add(self, testprocess):
         p = Pipeline()
@@ -79,77 +83,60 @@ class TestPipeline:
             with fname.open() as f:
                 res = json.load(f)
 
-        exp = [{
-            "TestProcess": {
-                "module": "test.testmodule",
-                "Parameters": {"kw1": 2},
-                "save_file": None,
-                "plot_file": None
-            }
-        }]
+        exp = {
+            "Steps": [
+                {
+                    "TestProcess": {
+                        "package": "skdh",
+                        "module": "test.testmodule",
+                        "parameters": {"kw1": 2},
+                        "save_file": None,
+                        "plot_file": None,
+                    }
+                }
+            ],
+            "Version": skdh_vers
+        }
 
         assert res == exp
 
-    def test_load_through_init(self):
-        exp = [
-            {
-                "Gait": {
-                    "module": "gait.gait",
-                    "Parameters": {},
-                    "save_file": "gait_results.csv",
-                    "plot_file": None
-                }
-            },
-            {
-                "TestProcess": {
-                    "module": "test.testmodule",
-                    "Parameters": {},
-                    "save_file": None,
-                    "plot_file": None
-                }
-            }
-        ]
-
+    def test_load_through_init(self, dummy_pipeline):
         with TemporaryDirectory() as tdir:
             fname = Path(tdir) / "file.json"
 
             with fname.open(mode="w") as f:
-                json.dump(exp, f)
+                json.dump(dummy_pipeline, f)
 
             with pytest.warns(UserWarning):
                 p = Pipeline(str(fname))
 
         assert p._steps == [Gait()]
 
-    def test_load_function(self):
-        exp = [
-            {
-                "Gait": {
-                    "module": "gait.gait",
-                    "Parameters": {},
-                    "save_file": None,
-                    "plot_file": None
-                }
-            },
-            {
-                "TestProcess": {
-                    "module": "test.testmodule",
-                    "Parameters": {},
-                    "save_file": None,
-                    "plot_file": None
-                }
-            }
-        ]
-
+    def test_load_function(self, dummy_pipeline):
         p = Pipeline()
 
         with TemporaryDirectory() as tdir:
             fname = Path(tdir) / "file.json"
 
             with fname.open(mode="w") as f:
-                json.dump(exp, f)
+                # save only the steps to trigger version warning
+                json.dump(dummy_pipeline['Steps'], f)
 
-            with pytest.warns(UserWarning):
+            with pytest.warns(UserWarning, match='Pipeline created by an unknown older version'):
                 p.load(str(fname))
 
         assert p._steps == [Gait()]
+
+    def test_load_version_warning(self, dummy_pipeline):
+        p = Pipeline()
+        p._min_vers = "100.0.0"
+
+        with TemporaryDirectory() as tdir:
+            fname = Path(tdir) / "file.json"
+
+            with fname.open(mode="w") as f:
+                json.dump(dummy_pipeline, f)
+
+            with pytest.warns(UserWarning, match='Pipeline was created by an older version of skdh'):
+                p.load(str(fname))
+

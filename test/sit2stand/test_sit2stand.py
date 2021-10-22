@@ -41,7 +41,7 @@ class TestSit2Stand:
             reconstruction_window=0.25,
         )
 
-        res = s2s.predict(time=s2s_input['time'], accel=s2s_input['accel'])
+        res = s2s.predict(time=s2s_input["time"], accel=s2s_input["accel"])
 
         for k in stillness_truth:
             assert allclose(res[k], stillness_truth[k])
@@ -65,7 +65,7 @@ class TestSit2Stand:
             reconstruction_window=0.25,
         )
 
-        res = s2s.predict(time=s2s_input['time'], accel=s2s_input['accel'])
+        res = s2s.predict(time=s2s_input["time"], accel=s2s_input["accel"])
 
         for k in displacement_truth:
             assert allclose(res[k], displacement_truth[k])

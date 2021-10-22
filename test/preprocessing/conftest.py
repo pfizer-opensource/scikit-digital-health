@@ -51,13 +51,13 @@ def dummy_temp_data():
     a = (rng.random((t.size, 3)) - 0.5) * 0.07
     N3 = a.shape[0] // 3
     a[:N3, 0] = 1 + (rng.random(N3) - 0.5) * 0.15
-    a[N3: 2 * N3, 1] = 0.5 + (rng.random(N3) - 0.4) * 0.15
-    a[2 * N3:, 2] = 0.7 + (rng.random(t.size - 2 * N3) - 0.3) * 0.12
+    a[N3 : 2 * N3, 1] = 0.5 + (rng.random(N3) - 0.4) * 0.15
+    a[2 * N3 :, 2] = 0.7 + (rng.random(t.size - 2 * N3) - 0.3) * 0.12
 
     # rotate 1/6 segements so there are enough points around the sphere
     N6 = a.shape[0] // 6
-    a[N6: N3 + N6] *= np.array([-1, -1, 1])
-    a[2 * N3 + N6:] *= np.array([-1, 1, -1])
+    a[N6 : N3 + N6] *= np.array([-1, -1, 1])
+    a[2 * N3 + N6 :] *= np.array([-1, 1, -1])
 
     sos = butter(1, 2 * 1 / 50, btype="low", output="sos")
     a = sosfiltfilt(sos, a, axis=0)

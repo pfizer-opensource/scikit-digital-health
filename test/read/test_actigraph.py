@@ -1,7 +1,9 @@
-import pytest
-from numpy import allclose, ndarray
+from tempfile import NamedTemporaryFile
 
-from skdh.read import ReadGT3X
+import pytest
+from numpy import allclose
+
+from skdh.read import ReadGT3X, FileSizeError
 
 
 class TestReadGt3x:
@@ -12,25 +14,21 @@ class TestReadGt3x:
         assert allclose(
             res["time"] - gt3x_truth["time"][0],
             gt3x_truth["time"] - gt3x_truth["time"][0],
-            atol=5e-5
+            atol=5e-5,
         )
 
         assert allclose(res["accel"], gt3x_truth["accel"], atol=5e-5)
 
         assert all([i in res["day_ends"] for i in gt3x_truth["day_ends"]])
-        assert allclose(res["day_ends"][(9, 2)], gt3x_truth['day_ends'][(9, 2)])
+        assert allclose(res["day_ends"][(9, 2)], gt3x_truth["day_ends"][(9, 2)])
 
     def test_window_inputs(self):
         r = ReadGT3X(base=None, period=None)
         assert not r.window
 
-        with pytest.warns(UserWarning) as record:
+        with pytest.warns(UserWarning, match="One of base or period is None"):
             r = ReadGT3X(base=8, period=None)
             r = ReadGT3X(base=None, period=12)
-
-        assert len(record) == 2
-        assert "One of base or period is None" in record[0].message.args[0]
-        assert "One of base or period is None" in record[1].message.args[0]
 
     def test_window_range_error(self):
         with pytest.raises(ValueError):
@@ -41,9 +39,16 @@ class TestReadGt3x:
             ReadGT3X().predict(None)
 
     def test_extension_warning(self):
-        with pytest.warns(UserWarning) as record:
+        with pytest.warns(UserWarning, match="File extension is not expected"):
             with pytest.raises(Exception):
                 ReadGT3X().predict("test.random")
 
-        assert len(record) == 1
-        assert "File extension is not expected '.gt3x'" in record[0].message.args[0]
+    def test_small_size(self):
+        ntf = NamedTemporaryFile(mode='w', suffix='.gt3x')
+
+        ntf.writelines(['a\n', 'b\n', 'c\n'])
+
+        with pytest.raises(FileSizeError):
+            ReadGT3X().predict(ntf.name)
+
+        ntf.close()

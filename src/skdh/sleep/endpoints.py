@@ -7,24 +7,9 @@ Pfizer DMTI 2019-2021
 from abc import ABC, abstractmethod
 import logging
 
-from numpy import (
-    around,
-    nonzero,
-    diff,
-    argmax,
-    sum,
-    mean,
-    log,
-    unique,
-    argsort,
-    cumsum,
-    insert,
-    int_,
-    maximum,
-    nan,
-)
+from numpy import around, nonzero, diff, argmax, sum, int_, maximum, nan
 
-from skdh.sleep.utility import gini
+from skdh.utility import fragmentation_endpoints as frag_endpts
 
 __all__ = [
     "SleepEndpoint",
@@ -251,11 +236,7 @@ class AverageSleepDuration(SleepEndpoint):
         asp : float
             Average number of minutes per bout of sleep during total sleep opportunity.
         """
-        sleep_lengths = lengths[values == 1]
-        if sleep_lengths.size == 0:
-            return 0.0
-
-        return mean(sleep_lengths)
+        return frag_endpts.average_duration(lengths=lengths, values=values, voi=1)
 
 
 class AverageWakeDuration(SleepEndpoint):
@@ -293,11 +274,7 @@ class AverageWakeDuration(SleepEndpoint):
         awp : float
             Average number of minutes per bout of wake during total sleep opportunity.
         """
-        wake_lengths = lengths[values == 0]
-        if wake_lengths.size == 0:
-            return 0.0
-
-        return mean(wake_lengths)
+        return frag_endpts.average_duration(lengths=lengths, values=values, voi=0)
 
 
 class SleepWakeTransitionProbability(SleepEndpoint):
@@ -344,9 +321,9 @@ class SleepWakeTransitionProbability(SleepEndpoint):
         satp : float
             Sleep to awake transition probability during the total sleep opportunity.
         """
-        sleep_lengths = lengths[values == 1]
-
-        return 1 / mean(sleep_lengths)
+        return frag_endpts.state_transition_probability(
+            lengths=lengths, values=values, voi=1
+        )
 
 
 class WakeSleepTransitionProbability(SleepEndpoint):
@@ -393,9 +370,9 @@ class WakeSleepTransitionProbability(SleepEndpoint):
         astp : float
             Awake to sleep transition probability during the total sleep opportunity.
         """
-        wake_lengths = lengths[values == 0]
-
-        return 1 / mean(wake_lengths)
+        return frag_endpts.state_transition_probability(
+            lengths=lengths, values=values, voi=0
+        )
 
 
 class SleepGiniIndex(SleepEndpoint):
@@ -436,9 +413,7 @@ class SleepGiniIndex(SleepEndpoint):
         gini : float
             Sleep normalized variability or Gini Index during total sleep opportunity.
         """
-        sleep_lengths = lengths[values == 1]
-
-        return gini(sleep_lengths, w=None, corr=True)
+        return frag_endpts.gini_index(lengths=lengths, values=values, voi=1)
 
 
 class WakeGiniIndex(SleepEndpoint):
@@ -479,9 +454,7 @@ class WakeGiniIndex(SleepEndpoint):
         gini : float
             Awake normalized variability or Gini Index during total sleep opportunity.
         """
-        wake_lengths = lengths[values == 0]
-
-        return gini(wake_lengths, w=None, corr=True)
+        return frag_endpts.gini_index(lengths=lengths, values=values, voi=0)
 
 
 class SleepAverageHazard(SleepEndpoint):
@@ -534,17 +507,7 @@ class SleepAverageHazard(SleepEndpoint):
         h_sleep : float
             Sleep bout average hazard.
         """
-        sleep_lengths = lengths[values == 1]
-
-        u_sl, c_sl = unique(sleep_lengths, return_counts=True)
-        sidx = argsort(u_sl)
-
-        c_sl = c_sl[sidx]
-        cs_c_sl = insert(cumsum(c_sl), 0, 0)
-
-        h_i = c_sl / (cs_c_sl[-1] - cs_c_sl[:-1])
-
-        return sum(h_i) / u_sl.size
+        return frag_endpts.average_hazard(lengths=lengths, values=values, voi=1)
 
 
 class WakeAverageHazard(SleepEndpoint):
@@ -597,17 +560,7 @@ class WakeAverageHazard(SleepEndpoint):
         h_awake : float
             Awake bout average hazard.
         """
-        wake_lengths = lengths[values == 0]
-
-        u_al, c_al = unique(wake_lengths, return_counts=True)
-        sidx = argsort(u_al)
-
-        c_al = c_al[sidx]
-        cs_c_al = insert(cumsum(c_al), 0, 0)
-
-        h_i = c_al / (cs_c_al[-1] - cs_c_al[:-1])
-
-        return sum(h_i) / u_al.size
+        return frag_endpts.average_hazard(lengths=lengths, values=values, voi=0)
 
 
 class SleepPowerLawDistribution(SleepEndpoint):
@@ -655,13 +608,8 @@ class SleepPowerLawDistribution(SleepEndpoint):
         alpha : float
             Sleep bout power law distribution scaling parameter.
         """
-        sleep_lengths = lengths[values == 1]
-
-        if sleep_lengths.size == 0:
-            return 1.0
-
-        return 1 + sleep_lengths.size / sum(
-            log(sleep_lengths / (sleep_lengths.min() - 0.5))
+        return frag_endpts.state_power_law_distribution(
+            lengths=lengths, values=values, voi=1
         )
 
 
@@ -710,11 +658,6 @@ class WakePowerLawDistribution(SleepEndpoint):
         alpha : float
             Awake bout power law distribution scaling parameter.
         """
-        wake_lengths = lengths[values == 0]
-
-        if wake_lengths.size == 0:
-            return 1.0
-
-        return 1 + wake_lengths.size / sum(
-            log(wake_lengths / (wake_lengths.min() - 0.5))
+        return frag_endpts.state_power_law_distribution(
+            lengths=lengths, values=values, voi=0
         )

@@ -17,7 +17,7 @@ class TestGetDayIndexIntersection:
                 (sleep_stops[i], wear_stops),
                 (False, True),
                 day_start,
-                day_stop
+                day_stop,
             )
 
             assert allclose(p_starts, true_starts[i])
@@ -41,11 +41,11 @@ class TestGetDayIndexIntersection:
         wear_starts, wear_stops = wear_ends
 
         p_starts, p_stops = get_day_index_intersection(
-            wear_starts, wear_stops, True, day_start, day_stop
+            wear_starts, wear_stops, True, 0, day_stop
         )
 
-        assert allclose(p_starts, wear_starts[1:])
-        assert allclose(p_stops, wear_stops[1:])
+        assert allclose(p_starts, wear_starts)
+        assert allclose(p_stops, wear_stops)
 
     def test_mismatch_length_error(self, day_ends, wear_ends):
         day_start, day_stop = day_ends
@@ -66,10 +66,7 @@ class TestApplyDownsample:
         x = np_rng.random((dummy_time.size, 3))
         y = np_rng.random((dummy_time.size,))
         tds, (x_ds, y_ds), (idx_ds_1, idx_ds_2) = apply_downsample(
-            10.,
-            dummy_time,
-            (x, y),
-            (dummy_idx_1d[0], dummy_idx_2d[0])
+            10.0, dummy_time, (x, y), (dummy_idx_1d[0], dummy_idx_2d[0])
         )
 
         assert allclose(tds, arange(0, 10, 0.1))
@@ -79,12 +76,7 @@ class TestApplyDownsample:
         assert allclose(idx_ds_2, dummy_idx_2d[1])
 
     def test_none(self, dummy_time):
-        tds, (acc_ds,), (idx_ds,) = apply_downsample(
-            10.,
-            dummy_time,
-            (None,),
-            (None,)
-        )
+        tds, (acc_ds,), (idx_ds,) = apply_downsample(10.0, dummy_time, (None,), (None,))
 
         assert acc_ds is None
         assert idx_ds is None
@@ -93,7 +85,7 @@ class TestApplyDownsample:
         x = np_rng.random((500, 3, 2))
 
         with pytest.raises(ValueError):
-            apply_downsample(10., dummy_time, (x,))
+            apply_downsample(10.0, dummy_time, (x,))
 
 
 class TestRLE:

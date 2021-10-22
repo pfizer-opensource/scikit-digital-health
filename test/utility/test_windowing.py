@@ -13,10 +13,10 @@ class TestComputeWindowSamples:
     @pytest.mark.parametrize(
         ("fs", "w_length", "w_step", "length", "step"),
         (
-                (50., 5., 1, 250, 1),
-                (50., 5., 1.0, 250, 250),
-                (50., 5., 0.5, 250, 125),
-                (50., 5., 25, 250, 25)
+            (50.0, 5.0, 1, 250, 1),
+            (50.0, 5.0, 1.0, 250, 250),
+            (50.0, 5.0, 0.5, 250, 125),
+            (50.0, 5.0, 25, 250, 25),
         ),
     )
     def test(self, fs, w_length, w_step, length, step):
@@ -27,35 +27,35 @@ class TestComputeWindowSamples:
 
     def test_float_range_error(self):
         with pytest.raises(ValueError):
-            compute_window_samples(50., 5., 1.5)
+            compute_window_samples(50.0, 5.0, 1.5)
         with pytest.raises(ValueError):
-            compute_window_samples(50., 5., -1.5)
+            compute_window_samples(50.0, 5.0, -1.5)
 
     @pytest.mark.parametrize(
         ("w_length", "w_step"),
         (
-                (None, None),
-                (None, 10),
-                (5., None),
+            (None, None),
+            (None, 10),
+            (5.0, None),
         ),
     )
     def test_none(self, w_length, w_step):
-        pl, ps = compute_window_samples(50., w_length, w_step)
+        pl, ps = compute_window_samples(50.0, w_length, w_step)
 
         assert pl is None
         assert ps is None
 
     def test_negative_window_step_error(self):
         with pytest.raises(ValueError):
-            compute_window_samples(50., 5., -1)
+            compute_window_samples(50.0, 5.0, -1)
 
 
 class TestGetWindowedView:
     @pytest.mark.parametrize(
         ("w_length", "w_step", "res_shape"),
         (
-                (250, 1, (751, 250)),
-                (250, 250, (4, 250)),
+            (250, 1, (751, 250)),
+            (250, 250, (4, 250)),
         ),
     )
     def test_1d(self, w_length, w_step, res_shape, np_rng):
@@ -70,8 +70,8 @@ class TestGetWindowedView:
     @pytest.mark.parametrize(
         ("w_length", "w_step", "res_shape"),
         (
-                (250, 1, (751, 250, 2)),
-                (250, 250, (4, 250, 2)),
+            (250, 1, (751, 250, 2)),
+            (250, 250, (4, 250, 2)),
         ),
     )
     def test_2d(self, w_length, w_step, res_shape, np_rng):

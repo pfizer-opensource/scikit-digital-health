@@ -4,13 +4,19 @@ Gait detection, processing, and analysis from wearable inertial sensor data
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
+from sys import gettrace
 from collections.abc import Iterable
 from warnings import warn
+from pathlib import Path
+from datetime import date as dt_date
 
 import h5py
 from numpy import mean, diff, asarray, sum, ndarray
+from numpy.linalg import norm
+import matplotlib
+import matplotlib.pyplot as plt
 
-from skdh.base import _BaseProcess
+from skdh.base import BaseProcess
 from skdh.utility.internal import apply_downsample, rle
 
 from skdh.gait.get_gait_classification import (
@@ -27,7 +33,7 @@ class LowFrequencyError(Exception):
     pass
 
 
-class Gait(_BaseProcess):
+class Gait(BaseProcess):
     """
     Process IMU data to extract endpoints of gait. Detect gait, extract gait events (heel-strikes,
     toe-offs), and compute gait endpoints from inertial data collected from a lumbar mounted
@@ -43,7 +49,15 @@ class Gait(_BaseProcess):
         Use the optimal scale/frequency relationship (see Notes). This changes which
         scale is used for the smoothing/differentiation operation performed with the
         continuous wavelet transform. Default is True. See Notes for a caveat of the
-        relationship
+        relationship.
+    wavelet_scale : {"default", float, int}, optional
+        The wavelet scale to use. If `use_cwt_scale_relation=True`, then this is only
+        used initially to determine the optimal scale. If `False`, then is used as the
+        scale for the initial and final contact event detection. `"default"`
+        corresponds to the default scale from [3]_, scaled for the sampling frequency.
+        If a float, this is the value in Hz that the desired wavelet decomposition
+        happens. For reference, [3]_ used a frequency of 1.25Hz. If an integer,
+        uses that value as the scale.
     min_bout_time : float, optional
         Minimum time in seconds for a gait bout. Default is 8s (making a minimum of 3 3-second
         windows)
@@ -66,6 +80,9 @@ class Gait(_BaseProcess):
         Acceleration low-pass filter order. Default is 4
     filter_cutoff : float, optional
         Acceleration low-pass filter cutoff in Hz. Default is 20.0Hz
+    downsample_aa_filter : bool, optional
+        Apply an anti-aliasing filter before downsampling. Default is True.
+        Uses the same IIR filter as :py:function:`scipy.signal.decimate`.
     day_window : array-like
         Two (2) element array-like of the base and period of the window to use for determining
         days. Default is (0, 24), which will look for days starting at midnight and lasting 24
@@ -148,6 +165,7 @@ class Gait(_BaseProcess):
         self,
         correct_accel_orient=True,
         use_cwt_scale_relation=True,
+        wavelet_scale="default",
         min_bout_time=8.0,
         max_bout_separation_time=0.5,
         max_stride_time=2.25,
@@ -156,6 +174,7 @@ class Gait(_BaseProcess):
         prov_leg_length=False,
         filter_order=4,
         filter_cutoff=20.0,
+        downsample_aa_filter=True,
         day_window=(0, 24),
     ):
         super().__init__(
@@ -170,11 +189,13 @@ class Gait(_BaseProcess):
             prov_leg_length=prov_leg_length,
             filter_order=filter_order,
             filter_cutoff=filter_cutoff,
+            downsample_aa_filter=downsample_aa_filter,
             day_window=day_window,
         )
 
         self.corr_accel_orient = correct_accel_orient
         self.use_opt_scale = use_cwt_scale_relation
+        self.cwt_scale = wavelet_scale
         self.min_bout = min_bout_time
         self.max_bout_sep = max_bout_separation_time
 
@@ -189,15 +210,22 @@ class Gait(_BaseProcess):
         self.filt_ord = filter_order
         self.filt_cut = filter_cutoff
 
+        self.aa_filter = downsample_aa_filter
+
         # for saving gait predictions
         self._save_classifier_fn = lambda time, starts, stops: None
+
+        # is plotting available/valid
+        self.valid_plot = False
+        # enable plotting as a public method
+        self.setup_plotting = self._setup_plotting
 
         if day_window is None:
             self.day_key = (-1, -1)
         else:
             self.day_key = tuple(day_window)
 
-    def _save_classifier_predictions(self, fname):
+    def _save_classifier_predictions(self, fname):  # pragma: no cover
         def fn(time, starts, stops):
             with h5py.File(fname, "w") as f:
                 f["time"] = time
@@ -288,6 +316,65 @@ class Gait(_BaseProcess):
 
         return bout_starts, bout_stops
 
+    def _handle_wavelet_scale(self, fs):
+        """
+        Compute the scale to use for the wavelet decompositions.
+
+        Parameters
+        ----------
+        fs : float
+            Sampling frequency.
+
+        Returns
+        -------
+        scale : int
+            Wavelet decomposition scale.
+        """
+        # original scale. Compute outside loop since stays the same
+        # 1.25 comes from original paper, corresponds to desired frequency
+        # 0.2 is the central frequency of the 'gaus1' wavelet (normalized to 1)
+        original_scale = max(round(0.2 / (1.25 / fs)), 1)
+
+        if self.cwt_scale == 'default':
+            scale = original_scale
+        elif isinstance(self.cwt_scale, float):
+            scale = max(round(0.2 / (1.25 / fs)), 1)
+        elif isinstance(self.cwt_scale, int):
+            scale = self.cwt_scale
+        else:
+            raise ValueError("Type of `wavelet_scale` [{type(self.cwt_scale)}] not understood.")
+
+        return scale
+
+    def _setup_plotting(self, save_file, debug=False):  # pragma: no cover
+        """
+        Setup gait specific plotting.
+
+        Parameters
+        ----------
+        save_file : str
+            The file name to save the resulting plot to. Extension will be set to
+            PDF. There are formatting options as well for dynamically generated
+            names. See Notes.
+
+        Notes
+        -----
+        Available format variables available:
+
+        - date: todays date expressed in yyyymmdd format.
+        - name: process name.
+        - file: file name used in the pipeline, or "" if not found.
+        """
+        if save_file is None:
+            return
+
+        if gettrace() is None and not debug:  # only set if not debugging
+            matplotlib.use("PDF")
+            # non-interactive, don't want to be displaying plots constantly
+        plt.style.use("ggplot")
+
+        self.plot_fname = save_file
+
     def predict(
         self, time=None, accel=None, *, fs=None, height=None, gait_pred=None, **kwargs
     ):
@@ -361,13 +448,27 @@ class Gait(_BaseProcess):
                 UserWarning,
             )
 
-        # handle gait_pred input types
-        gait_starts, gait_stops = self._handle_input_gait_predictions(gait_pred, time.size)
+        # check if plotting is available (<10min of data)
+        self.valid_plot = (time[-1] - time[0]) < (10 * 60)
+        self._initialize_plot(kwargs.get("file", self.plot_fname))
 
-        goal_fs = 50.0 if fs >= 50.0 else 20.
+        # handle gait_pred input types
+        gait_starts, gait_stops = self._handle_input_gait_predictions(
+            gait_pred, time.size
+        )
+
+        goal_fs = 50.0 if fs >= 50.0 else 20.0
         if fs != goal_fs:
-            time_ds, (accel_ds,), (gait_starts_ds, gait_stops_ds, day_starts_ds, day_stops_ds) = apply_downsample(
-                goal_fs, time, (accel,), (gait_starts, gait_stops, *self.day_idx)
+            (
+                time_ds,
+                (accel_ds,),
+                (gait_starts_ds, gait_stops_ds, day_starts_ds, day_stops_ds),
+            ) = apply_downsample(
+                goal_fs,
+                time,
+                (accel,),
+                (gait_starts, gait_stops, *self.day_idx),
+                self.aa_filter,
             )
         else:
             time_ds = time
@@ -376,10 +477,7 @@ class Gait(_BaseProcess):
             gait_stops_ds = gait_stops
             day_starts_ds, day_stops_ds = self.day_idx
 
-        # original scale. Compute outside loop since stays the same
-        # 1.25 comes from original paper, corresponds to desired frequency
-        # 0.2 is the central frequency of the 'gaus1' wavelet (normalized to 1)
-        original_scale = max(round(0.2 / (1.25 / goal_fs)), 1)
+        wavelet_scale = self._handle_wavelet_scale(goal_fs)
 
         # setup the storage for the gait parameters
         gait = {
@@ -438,7 +536,7 @@ class Gait(_BaseProcess):
                     accel_ds[bout],
                     goal_fs,
                     time_ds[bout],
-                    original_scale,
+                    wavelet_scale,
                     self.filt_ord,
                     self.filt_cut,
                     self.corr_accel_orient,
@@ -457,6 +555,9 @@ class Gait(_BaseProcess):
                     self.max_stride_time,
                     self.loading_factor,
                 )
+
+                # plotting
+                self._plot(time_ds, accel_ds, bout, ic, fc, gait, strides_in_bout)
 
                 # add inertial data to the aux dict for use in gait endpoints calculation
                 gait_aux["accel"].append(accel_ds[bout, :])
@@ -492,13 +593,17 @@ class Gait(_BaseProcess):
         gait_aux["inertial data i"] = asarray(gait_aux["inertial data i"])
         gait_aux["vert axis"] = asarray(gait_aux["vert axis"])
 
-        # loop over endpoints and compute
-        for param in self._params:
-            param().predict(goal_fs, leg_length, gait, gait_aux)
+        # loop over endpoints and compute if there is data to compute on
+        if len(gait_aux["inertial data i"]) != 0:
+            for param in self._params:
+                param().predict(goal_fs, leg_length, gait, gait_aux)
 
-        # remove invalid gait cycles
-        for k in [i for i in gait if i != "valid cycle"]:
-            gait[k] = gait[k][gait["valid cycle"]]
+            # remove invalid gait cycles
+            for k in [i for i in gait if i != "valid cycle"]:
+                gait[k] = gait[k][gait["valid cycle"]]
+
+        # finalize/save the plot
+        self._finalize_plot(kwargs.get("file", self.plot_fname))
 
         # remove unnecessary stuff from gait dict
         gait.pop("IC", None)
@@ -506,10 +611,50 @@ class Gait(_BaseProcess):
         gait.pop("FC opp foot", None)
         gait.pop("valid cycle", None)
 
-        kwargs.update(
-            {self._acc: accel, self._time: time, "fs": fs, "height": height}
-        )
-        if self._in_pipeline:
-            return kwargs, gait
-        else:
-            return gait
+        kwargs.update({self._acc: accel, self._time: time, "fs": fs, "height": height})
+        return (kwargs, gait) if self._in_pipeline else gait
+
+    def _initialize_plot(self, file):  # pragma: no cover
+        """
+        Setup the plot
+        """
+        if self.valid_plot and self.plot_fname is not None:
+            fname = Path(file).name if file is not None else "file-None"
+
+            self.f, self.ax = plt.subplots(figsize=(12, 5))
+            self.f.suptitle(f"Gait Visual Report: {fname}")
+
+            self.ax.set_xlabel(r"Time [$s$]")
+            self.ax.set_ylabel(r"Accel. [$\frac{m}{s^2}$]")
+
+    def _plot(self, time, accel, gait_bout, ic, fc, gait, sib):  # pragma: no cover
+        if self.valid_plot and self.f is not None:
+            rtime = time[gait_bout] - time[0]
+            baccel = norm(accel[gait_bout], axis=1)
+
+            self.ax.plot(rtime, baccel, label="Accel. Mag.", color='C0')
+            self.ax.plot(rtime[ic], baccel[ic], "x", color="k", label="Poss. IC")
+            self.ax.plot(rtime[fc], baccel[fc], "+", color="k", label="Poss. FC")
+
+            # valid contacts
+            allc = gait["IC"][-sib:] + gait["FC"][-sib:] + gait["FC opp foot"][-sib:]
+            self.ax.plot(
+                rtime[allc],
+                baccel[allc],
+                "o",
+                color="g",
+                alpha=0.4,
+                label="Valid Contact",
+            )
+
+    def _finalize_plot(self, file):  # pragma: no cover
+        if self.valid_plot and self.f is not None:
+            date = dt_date.today().strftime("%Y%m%d")
+            form_fname = self.plot_fname.format(
+                date=date, name=self._name, file=Path(file).stem
+            )
+
+            self.ax.legend(loc="best")
+            self.f.tight_layout()
+
+            self.f.savefig(Path(form_fname).with_suffix(".pdf"))

@@ -4,6 +4,18 @@ Utility Functions (:mod:`skdh.utility`)
 
 .. currentmodule:: skdh.utility
 
+Binary State Fragmentation Endpoints
+------------------------------------
+
+.. autosummary:
+    :toctree: generated/
+
+    fragmentation_endpoints.average_duration
+    fragmentation_endpoints.state_transition_probability
+    fragmentation_endpoints.gini_index
+    fragmentation_endpoints.average_hazard
+    fragmentation_endpoints.state_power_law_distribution
+
 Misc. Math Functions
 --------------------
 
@@ -35,6 +47,8 @@ Windowing Functions
     windowing.get_windowed_view
 """
 
+from skdh.utility.fragmentation_endpoints import *
+from skdh.utility import fragmentation_endpoints
 from skdh.utility.math import *
 from skdh.utility import math
 from skdh.utility.orientation import correct_accelerometer_orientation
@@ -44,7 +58,8 @@ from skdh.utility import windowing
 
 
 __all__ = (
-    ["math", "windowing", "orientation"]
+    ["math", "windowing", "orientation", "fragmentation_endpoints"]
+    + fragmentation_endpoints.__all__
     + math.__all__
     + windowing.__all__
     + orientation.__all__

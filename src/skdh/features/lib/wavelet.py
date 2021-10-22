@@ -4,7 +4,7 @@ Features using wavelet transforms
 Lukas Adamowicz
 Pfizer DMTI 2020
 """
-from numpy import ndarray, zeros, ceil, log2, sort, sum, diff, sign
+from numpy import zeros, ceil, log2, sort, sum, diff, sign, maximum
 import pywt
 
 from skdh.features.core import Feature
@@ -85,10 +85,7 @@ class DetailPower(Feature):
 
         N = sum(diff(sign(xr), axis=-1) > 0, axis=-1).astype(float)
         # ensure no 0 values to prevent divide by 0
-        if isinstance(N, ndarray):
-            N[N == 0] = 1e-4
-        else:
-            N = N if N != 0 else 1e-4
+        N = maximum(N, 1e-10)
 
         rshape = x.shape[:-1]
 

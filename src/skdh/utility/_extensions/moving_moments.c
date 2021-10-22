@@ -6,8 +6,9 @@
 #include <stdlib.h>
 #include <math.h>
 
-
+extern void mov_moments_1(long *, double *, long *, long *, double *);
 extern void moving_moments_1(long *, double *, long *, long *, double *);
+extern void mov_moments_2(long *, double *, long *, long *, double *, double *);
 extern void moving_moments_2(long *, double *, long *, long *, double *, double *);
 extern void moving_moments_3(long *, double *, long *, long *, double *, double *, double *);
 extern void moving_moments_4(long *, double *, long *, long *, double *, double *, double *, double *);
@@ -33,8 +34,9 @@ PyObject * moving_mean(PyObject *NPY_UNUSED(self), PyObject *args){
 
     // get the number of dimensions, and the shape
     int ndim = PyArray_NDIM(data);
-    npy_intp *ddims = PyArray_DIMS(data);
-    npy_intp *rdims = (npy_intp *)malloc(ndim * sizeof(ddims));
+    const npy_intp *ddims = PyArray_DIMS(data);
+    long npts = ddims[ndim - 1];
+    npy_intp *rdims = (npy_intp *)malloc(ndim * sizeof(npy_intp));
     if (!rdims)
     {
         Py_XDECREF(data);
@@ -45,13 +47,13 @@ PyObject * moving_mean(PyObject *NPY_UNUSED(self), PyObject *args){
     {
         rdims[i] = ddims[i];
     }
-    rdims[ndim-1] = (ddims[ndim-1] - wlen) / skip + 1;  // dimension of the roll
+    rdims[ndim-1] = (npts - wlen) / skip + 1;  // dimension of the roll
 
     PyArrayObject *rmean = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
+    free(rdims);
 
     if (!rmean)
     {
-        free(rdims);  /* make sure it gets freed */
         Py_XDECREF(data);
         Py_XDECREF(rmean);
         return NULL;
@@ -61,17 +63,13 @@ PyObject * moving_mean(PyObject *NPY_UNUSED(self), PyObject *args){
     double *dptr = (double *)PyArray_DATA(data);
     double *rmean_ptr = (double *)PyArray_DATA(rmean);
     // for iterating over the data
-    long stride = ddims[ndim-1];  // stride to get to the next computation "column"
-    long res_stride = rdims[ndim-1];  // stride to get to the next results "column"
-    int nrepeats = PyArray_SIZE(data) / stride;  // number of repetitions to cover all the data
-
-    // has to be freed down here since its used by res_stride
-    free(rdims);
+    long res_stride = PyArray_DIM(rmean, ndim - 1);  // stride to get to the next results "column"
+    int nrepeats = PyArray_SIZE(data) / npts;  // number of repetitions to cover all the data
 
     for (int i = 0; i < nrepeats; ++i)
     {
-        moving_moments_1(&stride, dptr, &wlen, &skip, rmean_ptr);
-        dptr += stride;
+        mov_moments_1(&npts, dptr, &wlen, &skip, rmean_ptr);
+        dptr += npts;  // increment by number of points in last dimension
         rmean_ptr += res_stride;
     }
 
@@ -141,7 +139,7 @@ PyObject * moving_sd(PyObject *NPY_UNUSED(self), PyObject *args){
 
     for (int i = 0; i < nrepeats; ++i)
     {
-        moving_moments_2(&stride, dptr, &wlen, &skip, rmean_ptr, rsd_ptr);
+        mov_moments_2(&stride, dptr, &wlen, &skip, rmean_ptr, rsd_ptr);
         dptr += stride;
         rmean_ptr += res_stride;
         rsd_ptr += res_stride;

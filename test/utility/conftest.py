@@ -70,7 +70,7 @@ def sleep_ends():
 
 @pytest.fixture(scope="module")
 def wear_ends():
-    wear_starts = np.array([0, 2300, 3000])
+    wear_starts = np.array([200, 2300, 3000])
     wear_stops = np.array([1800, 2900, 3900])
     return wear_starts, wear_stops
 
@@ -132,3 +132,41 @@ def dummy_idx_2d():
     orig = np.array([[0, 20], [113, 265], [481, 499]])
     truth = np.array([[0, 4], [23, 53], [96, 99]])
     return orig, truth
+
+
+@pytest.fixture(scope="module")
+def dummy_frag_predictions():
+    return np.array(
+        [
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+        ]
+    )

@@ -2,10 +2,19 @@ import pytest
 from numpy import isclose, allclose
 
 from skdh.activity.cutpoints import (
+    get_metric,
     get_available_cutpoints,
     get_level_thresholds,
     _base_cutpoints,
 )
+
+
+def test_get_metric():
+    f = get_metric('metric_enmo')
+    assert 'metric_enmo' in str(f)
+
+    f = get_metric('metric_mad')
+    assert 'metric_mad' in str(f)
 
 
 def test_get_level_thresholds():

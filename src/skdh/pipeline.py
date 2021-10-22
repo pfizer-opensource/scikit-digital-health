@@ -6,10 +6,12 @@ Pfizer DMTI 2020
 """
 import json
 from operator import attrgetter
+from importlib import import_module
 from warnings import warn
 import logging
+from packaging import version
 
-from skdh.base import _BaseProcess as Process
+from skdh.base import BaseProcess as Process
 
 
 class NotAProcessError(Exception):
@@ -50,6 +52,8 @@ class Pipeline:
 
         self.logger = logging.getLogger(__name__)
 
+        self._min_vers = None
+
         if file is not None:
             self.load(file=file)
 
@@ -62,13 +66,18 @@ class Pipeline:
         file : {str, path-like}
             File path to save the pipeline structure to
         """
-        pipe = []
+        # avoid circular import
+        from skdh import __skdh_version__ as skdh_version
+
+        pipe = {"Steps": [], "Version": skdh_version}
         for step in self._steps:  # actually look at steps
-            pipe.append(
+            package, module = step.__class__.__module__.split(".", 1)
+            pipe["Steps"].append(
                 {
                     step._name: {
-                        "module": step.__class__.__module__.split(".", 1)[1],
-                        "Parameters": step._kw,
+                        "package": package,
+                        "module": module,
+                        "parameters": step._kw,
                         "save_file": step.pipe_save_file,
                         "plot_file": step.pipe_plot_file,
                     }
@@ -89,21 +98,49 @@ class Pipeline:
         """
         import skdh
 
+        min_vers = skdh.__minimum_version__ if self._min_vers is None else self._min_vers
+
         with open(file, "r") as f:
-            procs = json.load(f)
+            data = json.load(f)
+
+        if "Steps" in data and "Version" in data:
+            procs = data["Steps"]
+            saved_version = data["Version"]
+        else:
+            warn(
+                "Pipeline created by an unknown older version of skdh. "
+                "Functionality is not guaranteed",
+                UserWarning,
+            )
+            procs = data
+            saved_version = "0.0.1"
+
+        if version.parse(saved_version) < version.parse(min_vers):
+            warn(
+                f"Pipeline was created by an older version of skdh ({saved_version}), "
+                f"which may not be compatible with the current version "
+                f"({skdh.__version__}). Functionality is not guaranteed.",
+                UserWarning,
+            )
 
         for proc in procs:
             name = list(proc.keys())[0]
+            pkg = proc[name]["package"]
             mod = proc[name]["module"]
-            params = proc[name]["Parameters"]
+            params = proc[name]["parameters"]
             save_file = proc[name]["save_file"]
             plot_file = proc[name]["plot_file"]
 
+            if pkg == "skdh":
+                package = skdh
+            else:
+                package = import_module(pkg)
+
             try:
-                process = attrgetter(f"{mod}.{name}")(skdh)
+                process = attrgetter(f"{mod}.{name}")(package)
             except AttributeError:
                 warn(
-                    f"Process (skdh.{mod}.{name}) not found. Not being added to pipeline",
+                    f"Process ({pkg}.{mod}.{name}) not found. Not added to pipeline",
                     UserWarning,
                 )
                 continue
@@ -224,7 +261,8 @@ class Pipeline:
             kwargs, step_result = proc.predict(**kwargs)
             if proc.pipe_save_file is not None:
                 proc.save_results(
-                    step_result if step_result is not None else kwargs, proc.pipe_save_file
+                    step_result if step_result is not None else kwargs,
+                    proc.pipe_save_file,
                 )
             if step_result is not None:
                 results[proc._name] = step_result

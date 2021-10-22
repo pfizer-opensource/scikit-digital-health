@@ -3,6 +3,9 @@
 #include <string.h>
 #include <time.h>
 #include <math.h>
+#include <float.h>
+/* for reading from ActiGraph files */
+#include <zip.h>
 
 /*
 ======================================
@@ -55,6 +58,7 @@ typedef struct {
     double frequency;
     long Nwin;  /* number of windows (bases/periods) */
     long max_days;  /* max days set for the size of the starts/stops array */
+    long n_bad_blocks;  /* number of blocks with nonzero checksums */
 } AX_Info_t;
 
 typedef struct {
@@ -76,7 +80,7 @@ typedef enum {
 } Read_Cwa_Error_t;
 
 extern void axivity_read_header(long *, char[], AX_Info_t *, int *);
-extern void axivity_read_block(AX_Info_t *, long *, double *, double *, long *, long *, long *, 
+extern void axivity_read_block(AX_Info_t *, long *, double *, double *, double *, long *, long *,
     long *, long *, long *, long *, int *);
 extern void axivity_close(AX_Info_t *);
 
@@ -135,4 +139,59 @@ typedef struct {
 int geneactiv_read_header(FILE *fp, GN_Info_t *info);
 int geneactiv_read_block(FILE *fp, Window_t *w_info, GN_Info_t *info, GN_Data_t *data);
 
-char warn_str[120];
+/*
+======================================
+ACTIGRAPH
+======================================
+*/
+
+#define AG_DBGPRINT(a) if (info->debug) fprintf(stdout, a "\n");
+#define AG_DBGPRINT1(a, b) if (info->debug) fprintf(stdout, a "\n", b);
+
+/* READ ERRORS */
+typedef enum {
+    AG_READ_E_NONE,  /* no error return value */
+    AG_READ_E_INFO_STAT,  /* Error getting the file info stats */
+    AG_READ_E_INFO_OPEN,  /* Error getting the file info */
+    AG_READ_E_LOG_OPEN,  /* Error getting the log file from the zip archive */
+    AG_READ_E_LOG_MULTIPLE_ACTIVITY_TYPES,  /* multiple activity types in the log */
+    AG_READ_E_OLD_ACTIVITY_OPEN,  /* error opening an old activity file */
+    AG_READ_E_OLD_LUX_OPEN,  /* error opening an old format lux file */
+    AG_READ_E_MALLOC  /* error malloc'ing some data */
+} Read_Gt3x_Error_t;
+
+/* Information structures */
+typedef struct {
+    int debug;  /* bool */
+    int is_old_version;  /* boolean if the file is using the old format */
+    int samples;  /* number of samples in the file */
+    int n_days;  /* to keep track of the number of days */
+    int ndi;  /* n_days index tracker */
+    int current_sample;  /* track the current sample in arrays */
+    int open_err;  /* error saving for the zip archive */
+} AG_Info_t;
+
+typedef struct {
+    int major;
+    int minor;
+    int build;
+} AG_Version_t;
+
+typedef struct {
+    char serial[14];
+    int sample_rate;
+    double start_time;
+    double stop_time;
+    double last_sample_time;
+    double download_time;
+    double accel_scale;
+    AG_Version_t firmware;
+} AG_SensorInfo_t;
+
+typedef struct {
+    double *ts;
+    double *acc;
+    double *lux;
+    long *day_starts;
+    long *day_stops;
+} AG_Data_t;

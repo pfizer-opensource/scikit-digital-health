@@ -1,5 +1,79 @@
 ! -*- f95 -*-
 
+subroutine mov_moments_1(n, x, wlen, skip, mean) bind(C, name="mov_moments_1")
+    use, intrinsic :: iso_c_binding
+    implicit none
+    integer(c_long), intent(in) :: n, wlen, skip
+    real(c_double), intent(in) :: x(n)
+    real(c_double), intent(out) :: mean((n-wlen)/skip+1)
+    ! local
+    integer(c_long) :: i, j
+    real(c_double) :: m1(n)
+
+    m1(1) = x(1)
+
+    do i=2, n
+        m1(i) = m1(i-1) + x(i)
+    end do
+
+    j = 2_c_long
+    mean(1) = m1(wlen)
+
+    do i=wlen+skip, n, skip
+        mean(j) = m1(i) - m1(i-wlen)
+        j = j + 1
+    end do
+
+    mean = mean / wlen
+end subroutine
+
+
+subroutine mov_moments_2(n, x, wlen, skip, mean, sd) bind(C, name="mov_moments_2")
+    use, intrinsic :: iso_c_binding
+    implicit none
+    integer(c_long), intent(in) :: n, wlen, skip
+    real(c_double), intent(in) :: x(n)
+    real(c_double), intent(out) :: mean((n-wlen)/skip+1)
+    real(c_double), intent(out) :: sd((n-wlen)/skip+1)
+    ! local
+    integer(c_long) :: i, j
+    real(c_double) :: m1(n), m2(n)
+    real(c_double) :: delta, delta_n, term1
+    integer(c_long) :: na, nb
+
+    m1(1) = x(1)
+    m2(1) = 0._c_double
+
+    do i=2, n
+        delta = x(i) - m1(i-1) / (i-1)
+        delta_n = delta / i
+        term1 = delta * delta_n * (i-1)
+
+        m1(i) = m1(i-1) + x(i)
+        m2(i) = m2(i-1) + term1
+    end do
+
+    j = 2_c_long
+    mean(1) = m1(wlen)
+    sd(1) = m2(wlen)
+
+    do i=wlen+skip, n, skip
+        na = wlen
+        nb = i-wlen
+
+        delta = m1(nb) / nb - (m1(i) - m1(nb)) / wlen
+
+        mean(j) = m1(i) - m1(nb)
+        sd(j) = m2(i) - m2(nb) - delta**2 * na * nb / i
+
+        j = j + 1
+    end do
+
+    ! NOTE: currently, sd = M2, skew = M3, kurt = M4, so this order of computation matters
+    mean = mean / wlen
+    sd = sqrt(sd / (wlen - 1))
+
+end subroutine
 
 ! =======================================================
 ! computation of moving statistical moments

@@ -49,6 +49,7 @@ module axivity
         real(c_double) :: frequency
         integer(c_long) :: Nwin
         integer(c_long) :: max_days
+        integer(c_long) :: n_bad_blocks
     end type FileInfo_t
 
     ! converted from hex representations
@@ -104,6 +105,7 @@ contains
         ! initialize
         finfo%N = 17_c_int
         finfo%tLast = -1000._c_double
+        finfo%n_bad_blocks = 0_c_long
 
         open(unit=finfo%N, file=file_, access="stream", action="read")
 
@@ -262,7 +264,8 @@ contains
             call data_packet_sum_packed(pkt, packedData, checksum, wordsum)
 
             if (wordsum /= 0) then
-                ierr = AX_READ_E_BAD_CHECKSUM
+                info%n_bad_blocks = info%n_bad_blocks + 1_c_long
+                ierr = AX_READ_E_NONE  ! no error, just skip populating the block with data
                 return
             end if
 
@@ -291,12 +294,13 @@ contains
             ! make sure block checksum is good
             call data_packet_sum_unpacked(pkt, rawData, checksum, wordsum)
             if (wordsum /= 0) then
-                ierr = AX_READ_E_BAD_CHECKSUM
+                info%n_bad_blocks = info%n_bad_blocks + 1_c_long
+                ierr = AX_READ_E_NONE  ! no error, just skip populating the block with data
                 return
             end if
         end if
 
-        i1 = pkt%sequenceID * info%count + 1_c_int16_t
+        i1 = (pkt%sequenceID - info%n_bad_blocks) * info%count + 1_c_int16_t
         i2 = i1 + info%count
 
         ! set the temperature for the block, and convert to deg C

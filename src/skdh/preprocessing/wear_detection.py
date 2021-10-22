@@ -17,11 +17,11 @@ from numpy import (
     full,
 )
 
-from skdh.base import _BaseProcess
+from skdh.base import BaseProcess
 from skdh.utility import moving_mean, moving_sd, get_windowed_view
 
 
-class DetectWear(_BaseProcess):
+class DetectWear(BaseProcess):
     r"""
     Detect periods of non-wear in accelerometer recordings.
 
@@ -103,10 +103,10 @@ class DetectWear(_BaseProcess):
         window_skip = int(window_skip)
         if isinstance(shipping_criteria, (list, tuple)):
             shipping_criteria = [int(shipping_criteria[i]) for i in range(2)]
-        elif isinstance(shipping_criteria, int):
-            shipping_criteria = [shipping_criteria, shipping_criteria]
         elif isinstance(shipping_criteria, bool):
             shipping_criteria = [24, 24]
+        elif isinstance(shipping_criteria, int):
+            shipping_criteria = [shipping_criteria, shipping_criteria]
 
         super().__init__(
             sd_crit=sd_crit,
@@ -168,8 +168,7 @@ class DetectWear(_BaseProcess):
         acc_w_range = acc_w.max(axis=1) - acc_w.min(axis=1)
 
         nonwear = (
-            sum((acc_rsd < self.sd_crit) & (acc_w_range < self.range_crit), axis=1)
-            >= 2
+            sum((acc_rsd < self.sd_crit) & (acc_w_range < self.range_crit), axis=1) >= 2
         )
 
         # flip to wear starts/stops now
@@ -180,10 +179,7 @@ class DetectWear(_BaseProcess):
         wear = concatenate((wear_starts, wear_stops)).reshape((2, -1)).T * n_wskip
 
         kwargs.update({self._time: time, self._acc: accel, "wear": wear})
-        if self._in_pipeline:
-            return kwargs, None
-        else:
-            return kwargs
+        return (kwargs, None) if self._in_pipeline else kwargs
 
 
 def _modify_wear_times(nonwear, wskip, apply_setup_rule, shipping_crit):

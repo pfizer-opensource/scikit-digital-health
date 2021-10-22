@@ -479,7 +479,7 @@ def moving_median(a, w_len, skip=1, pad=False, axis=-1):
 
     Compute with overlapping windows:
 
-    >>> moving_mean(x, 3, 1)
+    >>> moving_median(x, 3, 1)
     array([1., 2., 3., 4., 5., 6., 7., 8.])
 
     Compute on a nd-array to see output shape. On the moving axis, the output should be equal to
@@ -490,20 +490,20 @@ def moving_median(a, w_len, skip=1, pad=False, axis=-1):
     >>> window_skip = 50
     >>> shape = (3, n, 5, 10)
     >>> y = np.random.random(shape)
-    >>> res = moving_mean(y, window_length, window_skip, axis=1)
+    >>> res = moving_median(y, window_length, window_skip, axis=1)
     >>> print(res.shape)
     (3, 9, 5, 10)
 
     Check flags for different axis output
 
     >>> z = np.random.random((10, 10, 10))
-    >>> moving_mean(z, 3, 3, axis=0).flags['C_CONTIGUOUS']
+    >>> moving_median(z, 3, 3, axis=0).flags['C_CONTIGUOUS']
     False
 
-    >>> moving_mean(z, 3, 3, axis=1).flags['C_CONTIGUOUS']
+    >>> moving_median(z, 3, 3, axis=1).flags['C_CONTIGUOUS']
     False
 
-    >>> moving_mean(z, 3, 3, axis=2).flags['C_CONTIGUOUS']
+    >>> moving_median(z, 3, 3, axis=2).flags['C_CONTIGUOUS']
     True
     """
     if w_len <= 0 or skip <= 0:

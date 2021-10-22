@@ -5,15 +5,17 @@ Lukas Adamowicz
 Pfizer DMTI 2020
 """
 from warnings import warn
+from pathlib import Path
 
-from numpy import vstack
+from numpy import vstack, allclose
 
-from skdh.base import _BaseProcess
+from skdh.base import BaseProcess
 from skdh.read.get_window_start_stop import get_window_start_stop
 from skdh.read._extensions import read_gt3x
+from skdh.read.utility import FileSizeError
 
 
-class ReadGT3X(_BaseProcess):
+class ReadGT3X(BaseProcess):
     """
     Read a GT3X archive file from an Actigraph sensor into memory. Acceleration is returned in
     units of 'g', while time is unix time in seconds. If providing a base and period value,
@@ -108,6 +110,8 @@ class ReadGT3X(_BaseProcess):
             file = str(file)
         if file[-4:] != "gt3x":
             warn("File extension is not expected '.gt3x'", UserWarning)
+        if Path(file).stat().st_size < 1000:
+            raise FileSizeError("File is less than 1kb, nothing to read.")
 
         super().predict(expect_days=False, expect_wear=False, file=file, **kwargs)
 
@@ -115,15 +119,16 @@ class ReadGT3X(_BaseProcess):
 
         results = {self._time: time[:N], self._acc: accel[:N], "file": file}
 
-        if not all(lux == 0.0):
+        # can't include it by default, because if it is garbage data, dont want
+        # that influencing downstream results. Better to just not use in that case
+        if not allclose(lux, 0.0):
             results["light"] = lux[:N]
 
         if self.window:
             day_starts, day_stops = get_window_start_stop(index, N)
-            results[self._days] = {(self.base, self.period): vstack((day_starts, day_stops)).T}
+            results[self._days] = {
+                (self.base, self.period): vstack((day_starts, day_stops)).T
+            }
 
         kwargs.update(results)
-        if self._in_pipeline:
-            return kwargs, None
-        else:
-            return kwargs
+        return (kwargs, None) if self._in_pipeline else kwargs

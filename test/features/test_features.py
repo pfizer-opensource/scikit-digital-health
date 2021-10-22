@@ -60,7 +60,7 @@ def test_StdDev(get_linear_accel):
 
 
 def test_Skewness(get_cubic_signal):
-    x = get_cubic_signal(2., 1., 1., 1., 0.)
+    x = get_cubic_signal(2.0, 1.0, 1.0, 1.0, 0.0)
 
     res = Skewness().compute(x)
 
@@ -68,7 +68,7 @@ def test_Skewness(get_cubic_signal):
 
 
 def test_Kurtosis(get_cubic_signal):
-    x = get_cubic_signal(2., 1., 1., 1., 0.)
+    x = get_cubic_signal(2.0, 1.0, 1.0, 1.0, 0.0)
 
     res = Kurtosis().compute(x)
 
@@ -79,7 +79,7 @@ def test_DominantFrequency(get_sin_signal):
     fs, x = get_sin_signal([1.0, 0.5], [1.0, 5.0], 0.0)
 
     df_low = DominantFrequency(padlevel=2, low_cutoff=0.0, high_cutoff=2.5)
-    df_high = DominantFrequency(padlevel=2, low_cutoff=2.5, high_cutoff=15.)
+    df_high = DominantFrequency(padlevel=2, low_cutoff=2.5, high_cutoff=15.0)
     df_all = DominantFrequency(padlevel=2, low_cutoff=0.0, high_cutoff=15.0)
 
     res_low = df_low.compute(x, fs=fs)
@@ -96,7 +96,7 @@ def test_DominantFrequencyValue(get_sin_signal):
 
     # use 1024 samples for the FFT (pad = 1 -> *2)
     df_low = DominantFrequencyValue(padlevel=1, low_cutoff=0.0, high_cutoff=2.5)
-    df_high = DominantFrequencyValue(padlevel=1, low_cutoff=2.5, high_cutoff=15.)
+    df_high = DominantFrequencyValue(padlevel=1, low_cutoff=2.5, high_cutoff=15.0)
     df_all = DominantFrequencyValue(padlevel=1, low_cutoff=0.0, high_cutoff=15.0)
 
     res_low = df_low.compute(x, fs=fs)
@@ -114,7 +114,7 @@ def test_PowerSpectralSum(get_sin_signal):
     fs, x = get_sin_signal([1.0, 0.5], [1.0, 5.0], 0.0)
 
     df_low = PowerSpectralSum(padlevel=1, low_cutoff=0.0, high_cutoff=2.5)
-    df_high = PowerSpectralSum(padlevel=1, low_cutoff=2.5, high_cutoff=15.)
+    df_high = PowerSpectralSum(padlevel=1, low_cutoff=2.5, high_cutoff=15.0)
     df_all = PowerSpectralSum(padlevel=1, low_cutoff=0.0, high_cutoff=15.0)
 
     res_low = df_low.compute(x, fs=fs)
@@ -134,7 +134,7 @@ def test_SpectralFlatness(get_sin_signal):
     fs, x = get_sin_signal([1.0, 0.5], [1.0, 5.0], 0.0)
 
     df_low = SpectralFlatness(padlevel=0, low_cutoff=0.0, high_cutoff=2.5)
-    df_high = SpectralFlatness(padlevel=0, low_cutoff=2.5, high_cutoff=15.)
+    df_high = SpectralFlatness(padlevel=0, low_cutoff=2.5, high_cutoff=15.0)
     df_all = SpectralFlatness(padlevel=0, low_cutoff=0.0, high_cutoff=15.0)
 
     res_low = df_low.compute(x, fs=fs)
@@ -150,7 +150,7 @@ def test_SpectralEntropy(get_sin_signal):
     fs, x = get_sin_signal([1.0, 0.5], [1.0, 5.0], 0.0)
 
     df_low = SpectralEntropy(padlevel=1, low_cutoff=0.0, high_cutoff=2.5)
-    df_high = SpectralEntropy(padlevel=1, low_cutoff=2.5, high_cutoff=15.)
+    df_high = SpectralEntropy(padlevel=1, low_cutoff=2.5, high_cutoff=15.0)
     df_all = SpectralEntropy(padlevel=1, low_cutoff=0.0, high_cutoff=15.0)
 
     res_low = df_low.compute(x, fs=fs)
@@ -193,14 +193,14 @@ def test_Autocorrelation(get_sin_signal):
 def test_LinearSlope(get_cubic_signal):
     x = get_cubic_signal(0.0, 0.0, 1.375, -13.138, 0.0)
 
-    assert isclose(LinearSlope().compute(x, 100.), 1.375)
+    assert isclose(LinearSlope().compute(x, 100.0), 1.375)
 
 
 def test_ComplexityInvariantDistance(get_sin_signal):
     fs, x = get_sin_signal(1.0, 2.0, scale=0.0)
 
     res = ComplexityInvariantDistance(normalize=False).compute(x)
-    truth = sqrt(sum(diff(x)**2))
+    truth = sqrt(sum(diff(x) ** 2))
 
     assert isclose(res, truth)
 
@@ -261,8 +261,10 @@ class TestDimensionlessJerk:
         fs, x = get_sin_signal(2.0, 1.0, 0.0)
 
         res = DimensionlessJerk(log=True, signal_type="acceleration").compute(x)
+        res2 = DimensionlessJerk(log=False, signal_type='acceleration').compute(x)
 
         assert isclose(res, -6.19715)
+        assert isclose(res2, -491.3467056034191)
 
     def test_signal_type_error(self):
         with pytest.raises(ValueError):
@@ -278,30 +280,34 @@ def test_SPARC(get_sin_signal):
 
     fs, x = get_sin_signal(1.0, 1.0, 0.05)
 
-    res2 = SPARC(padlevel=0, fc=10., amplitude_threshold=0.05).compute(x, fs)
+    res2 = SPARC(padlevel=0, fc=10.0, amplitude_threshold=0.05).compute(x, fs)
 
     assert res2 < res
 
 
 def test_DetailPower(get_sin_signal):
-    fs, x = get_sin_signal([2.0, 0.5], [1.5, 5.], 0.0)
+    fs, x = get_sin_signal([2.0, 0.5], [1.5, 5.0], 0.0)
 
     # default band is 1-3
     res_low = DetailPower(wavelet="coif4", freq_band=None).compute(x, fs=fs)
-    res_high = DetailPower(wavelet="coif4", freq_band=[2.5, 15.]).compute(x, fs=fs)
-    res_all = DetailPower(wavelet="coif4", freq_band=[0.0001, 15.]).compute(x, fs=fs)
+    res_high = DetailPower(wavelet="coif4", freq_band=[2.5, 15.0]).compute(x, fs=fs)
+    res_all = DetailPower(wavelet="coif4", freq_band=[0.0001, 15.0]).compute(x, fs=fs)
 
     assert res_high < res_all
     assert res_low < res_all
 
 
 def test_DetailPowerRatio(get_sin_signal):
-    fs, x = get_sin_signal([2.0, 0.5], [1.5, 5.], 0.0)
+    fs, x = get_sin_signal([2.0, 0.5], [1.5, 5.0], 0.0)
 
     # default band is 1-3
     res_low = DetailPowerRatio(wavelet="coif4", freq_band=None).compute(x, fs=fs)
-    res_high = DetailPowerRatio(wavelet="coif4", freq_band=[2.5, 15.]).compute(x, fs=fs)
-    res_all = DetailPowerRatio(wavelet="coif4", freq_band=[0.0001, 15.]).compute(x, fs=fs)
+    res_high = DetailPowerRatio(wavelet="coif4", freq_band=[2.5, 15.0]).compute(
+        x, fs=fs
+    )
+    res_all = DetailPowerRatio(wavelet="coif4", freq_band=[0.0001, 15.0]).compute(
+        x, fs=fs
+    )
 
     assert isclose(res_high, res_low, atol=0.03)
     assert res_high < res_all

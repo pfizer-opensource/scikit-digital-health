@@ -209,7 +209,7 @@ def configuration(parent_package="", top_path=None):
         ignore_setup_xxx_py=True,
         assume_default_configuration=True,
         delegate_options_to_subpackages=True,
-        quiet=False
+        quiet=False,
     )
 
     # EXTENSIONS
@@ -223,12 +223,12 @@ def configuration(parent_package="", top_path=None):
     config.add_extension(
         "skdh/utility/_extensions/moving_moments",
         sources="src/skdh/utility/_extensions/moving_moments.c",
-        libraries=["fmoving_moments"]
+        libraries=["fmoving_moments"],
     )
     config.add_extension(
         "skdh/utility/_extensions/moving_median",
         sources="src/skdh/utility/_extensions/moving_median.c",
-        libraries=["gsl"]
+        libraries=["gsl"],
     )
     # Read library
     config.add_library(
@@ -238,7 +238,7 @@ def configuration(parent_package="", top_path=None):
             "src/skdh/read/_extensions/utility.f95",
             "src/skdh/read/_extensions/read_axivity.f95",
             "src/skdh/read/_extensions/read_geneactiv.c",
-        ]
+        ],
     )
     config.add_extension(
         "skdh/read/_extensions/read",
@@ -251,7 +251,7 @@ def configuration(parent_package="", top_path=None):
     config.add_extension(
         "skdh/read/_extensions/gt3x_convert",
         sources=["src/skdh/read/_extensions/pygt3x_convert.c"],
-        libraries=["gt3x", "zip"]
+        libraries=["gt3x", "zip"],
     )
 
     # Fortran/C feature extensions
@@ -263,7 +263,7 @@ def configuration(parent_package="", top_path=None):
             "src/skdh/features/lib/extensions/f_rfft.f95",
             "src/skdh/features/lib/extensions/sort.f95",
             "src/skdh/features/lib/extensions/utility.f95",
-        ]
+        ],
     )
     for ext in [
         "entropy",
@@ -271,12 +271,12 @@ def configuration(parent_package="", top_path=None):
         "misc_features",
         "smoothness",
         "statistics",
-        "_utility"
+        "_utility",
     ]:
         config.add_extension(
             f"skdh/features/lib/extensions/{ext}",
             sources=[f"src/skdh/features/lib/extensions/{ext}.c"],
-            libraries=["ffeatures"]
+            libraries=["ffeatures"],
         )
 
     # ========================
@@ -291,7 +291,7 @@ def configuration(parent_package="", top_path=None):
         (
             "skdh/gait/model",
             "src/skdh/gait/model/lgbm_gait_classifier_no-stairs_20hz.lgbm",
-        )
+        ),
     )
     # ========================
 
