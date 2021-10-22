@@ -73,11 +73,13 @@ def get_day_index_intersection(starts, stops, for_inclusion, day_start, day_stop
         if start.size == 0 or stop.size == 0:
             continue
         if fi:  # flip everything to being an "exclude" window
-            tmp = roll(start, -1)
+            tmp = insert(roll(start, -1), 0, start[0])
             tmp[-1] = day_stop
 
-            starts_subset.append(stop[stop != tmp])
-            stops_subset.append(tmp[stop != tmp])
+            tmp_stop = insert(stop, 0, 0)
+
+            starts_subset.append(tmp_stop[tmp_stop != tmp])
+            stops_subset.append(tmp[tmp_stop != tmp])
         else:
             starts_subset.append(start[start != stop])
             stops_subset.append(stop[start != stop])
