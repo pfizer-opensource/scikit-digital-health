@@ -116,7 +116,7 @@ class ReadGT3X(BaseProcess):
         - `accel`: acceleration [g]
         - `time`: timestamps [s]
         - `lux`: light readings. Note that this will not be returned if the data is
-            not valid
+          not valid
         - `day_ends`: window indices
         """
         if file is None:
