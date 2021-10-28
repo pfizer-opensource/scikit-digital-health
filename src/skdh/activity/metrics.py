@@ -93,9 +93,7 @@ def metric_enmo(accel, wlen, *args, take_abs=False, trim_zero=True, **kwargs):
         return moving_mean(enmo, wlen, wlen)
 
 
-def metric_bfen(
-    accel, wlen, fs, low_cutoff=0.2, high_cutoff=15, **kwargs
-):
+def metric_bfen(accel, wlen, fs, low_cutoff=0.2, high_cutoff=15, **kwargs):
     """
     Compute the band-pass filtered euclidean norm.
 

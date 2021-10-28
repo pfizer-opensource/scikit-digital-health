@@ -121,7 +121,9 @@ def get_gait_events(
     # low-pass filter
     sos = butter(filter_order, 2 * filter_cutoff / fs, btype="low", output="sos")
     # multiply by 1 to ensure a copy and not a view
-    filt_vert_accel = sosfiltfilt(sos, vert_accel) if fs > (2 * filter_cutoff) else vert_accel * 1
+    filt_vert_accel = (
+        sosfiltfilt(sos, vert_accel) if fs > (2 * filter_cutoff) else vert_accel * 1
+    )
 
     # first integrate the vertical accel to get velocity
     vert_velocity = cumtrapz(filt_vert_accel, x=ts - ts[0], initial=0)

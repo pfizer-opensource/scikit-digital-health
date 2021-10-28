@@ -495,7 +495,9 @@ class Sleep(BaseProcess):
             self._plot_accel(goal_fs, accel_ds[start:stop])
 
             # get the starts and stops of wear during the day
-            dw_starts, dw_stops = get_day_index_intersection(wear_starts_ds, wear_stops_ds, True, start, stop)
+            dw_starts, dw_stops = get_day_index_intersection(
+                wear_starts_ds, wear_stops_ds, True, start, stop
+            )
 
             if (sum(dw_stops - dw_starts) / (3600 * goal_fs)) < self.min_wear_time:
                 self.logger.info(

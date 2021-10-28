@@ -34,11 +34,11 @@ class TestDetectTSO:
     def test_all_moving(self):
         x = np.zeros((50000, 3))
         x[:, 2] = np.random.default_rng(seed=5).random(x.shape[0]) + 1
-        temp = np.zeros(x.shape[0]) + 18.
+        temp = np.zeros(x.shape[0]) + 18.0
         time = np.arange(1.6e9, 1.6e9 + x.shape[0] / 20, 1 / 20)
 
         tso = get_total_sleep_opportunity(
-            20.,
+            20.0,
             time,
             x,
             temp,

@@ -732,9 +732,9 @@ class StepRegularityV(GaitBoutEndpoint):
     def _predict(self, fs, leg_length, gait, gait_aux):
         stepreg = full(len(gait_aux["accel"]), nan, dtype=float_)
 
-        for i in unique(gait_aux['inertial data i']):
-            acc = gait_aux['accel'][i]
-            mask = gait_aux['inertial data i'] == i
+        for i in unique(gait_aux["inertial data i"]):
+            acc = gait_aux["accel"][i]
+            mask = gait_aux["inertial data i"] == i
 
             va = gait_aux["vert axis"][mask][0]
             lag_ = nanmedian(gait["PARAM:step time"][mask]) * fs
@@ -792,9 +792,9 @@ class StrideRegularityV(GaitBoutEndpoint):
     def _predict(self, fs, leg_length, gait, gait_aux):
         stridereg = full(len(gait_aux["accel"]), nan, dtype=float_)
 
-        for i in unique(gait_aux['inertial data i']):
-            acc = gait_aux['accel'][i]
-            mask = gait_aux['inertial data i'] == i
+        for i in unique(gait_aux["inertial data i"]):
+            acc = gait_aux["accel"][i]
+            mask = gait_aux["inertial data i"] == i
 
             va = gait_aux["vert axis"][mask][0]
             lag_ = nanmedian(gait["PARAM:stride time"][mask]) * fs

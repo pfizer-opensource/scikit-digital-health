@@ -335,14 +335,16 @@ class Gait(BaseProcess):
         # 0.2 is the central frequency of the 'gaus1' wavelet (normalized to 1)
         original_scale = max(round(0.2 / (1.25 / fs)), 1)
 
-        if self.cwt_scale == 'default':
+        if self.cwt_scale == "default":
             scale = original_scale
         elif isinstance(self.cwt_scale, float):
             scale = max(round(0.2 / (1.25 / fs)), 1)
         elif isinstance(self.cwt_scale, int):
             scale = self.cwt_scale
         else:
-            raise ValueError("Type of `wavelet_scale` [{type(self.cwt_scale)}] not understood.")
+            raise ValueError(
+                "Type of `wavelet_scale` [{type(self.cwt_scale)}] not understood."
+            )
 
         return scale
 
@@ -632,7 +634,7 @@ class Gait(BaseProcess):
             rtime = time[gait_bout] - time[0]
             baccel = norm(accel[gait_bout], axis=1)
 
-            self.ax.plot(rtime, baccel, label="Accel. Mag.", color='C0')
+            self.ax.plot(rtime, baccel, label="Accel. Mag.", color="C0")
             self.ax.plot(rtime[ic], baccel[ic], "x", color="k", label="Poss. IC")
             self.ax.plot(rtime[fc], baccel[fc], "+", color="k", label="Poss. FC")
 

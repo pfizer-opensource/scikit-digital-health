@@ -44,9 +44,9 @@ class TestReadGt3x:
                 ReadGT3X().predict("test.random")
 
     def test_small_size(self):
-        ntf = NamedTemporaryFile(mode='w', suffix='.gt3x')
+        ntf = NamedTemporaryFile(mode="w", suffix=".gt3x")
 
-        ntf.writelines(['a\n', 'b\n', 'c\n'])
+        ntf.writelines(["a\n", "b\n", "c\n"])
 
         with pytest.raises(FileSizeError):
             ReadGT3X().predict(ntf.name)

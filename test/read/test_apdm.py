@@ -28,7 +28,7 @@ class TestReadBin:
             ReadApdmH5("Lumbar").predict(None)
 
     def test_extension_warning(self):
-        with pytest.warns(UserWarning, match='File extension is not expected'):
+        with pytest.warns(UserWarning, match="File extension is not expected"):
             with pytest.raises(Exception):
                 ReadApdmH5("Lumbar").predict("test.random")
 

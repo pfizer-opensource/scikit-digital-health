@@ -34,29 +34,30 @@ def testprocess2():
     return TestProcess2
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def dummy_pipeline():
-    exp = {'Steps': [
-        {
-            "Gait": {
-                "package": "skdh",
-                "module": "gait.gait",
-                "parameters": {},
-                "save_file": "gait_results.csv",
-                "plot_file": None,
-            }
-        },
-        {
-            "TestProcess": {
-                "package": "skdh",
-                "module": "test.testmodule",
-                "parameters": {},
-                "save_file": None,
-                "plot_file": None,
-            }
-        },
-    ],
-        'Version': skdh_vers
+    exp = {
+        "Steps": [
+            {
+                "Gait": {
+                    "package": "skdh",
+                    "module": "gait.gait",
+                    "parameters": {},
+                    "save_file": "gait_results.csv",
+                    "plot_file": None,
+                }
+            },
+            {
+                "TestProcess": {
+                    "package": "skdh",
+                    "module": "test.testmodule",
+                    "parameters": {},
+                    "save_file": None,
+                    "plot_file": None,
+                }
+            },
+        ],
+        "Version": skdh_vers,
     }
 
     return exp

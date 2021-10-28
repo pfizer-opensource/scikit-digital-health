@@ -89,7 +89,7 @@ class TestActivityLevelClassification:
         # dont have name so make sure that the values are correct
         assert a.cutpoints == _base_cutpoints["migueles_wrist_adult"]
 
-        c = {'light': 5, 'sedentary': 2, 'moderate': 10, 'vigorous': 15}
+        c = {"light": 5, "sedentary": 2, "moderate": 10, "vigorous": 15}
         a = ActivityLevelClassification(cutpoints=c, day_window=None)
         assert a.cutpoints == c
         assert a.day_key == (-1, -1)
@@ -100,13 +100,18 @@ class TestActivityLevelClassification:
         a.wake_endpoints = []
         a.sleep_endpoints = []
 
-        a.add([epts.MaxAcceleration(5, state='wake'), epts.MaxAcceleration(5, state='sleep')])
-        a.add(epts.IntensityGradient(state='wake'))
-        a.add(epts.IntensityGradient(state='sleep'))
+        a.add(
+            [
+                epts.MaxAcceleration(5, state="wake"),
+                epts.MaxAcceleration(5, state="sleep"),
+            ]
+        )
+        a.add(epts.IntensityGradient(state="wake"))
+        a.add(epts.IntensityGradient(state="sleep"))
 
         with pytest.warns(UserWarning):
-            a.add([epts.MaxAcceleration(5, state='test')])
-            a.add(epts.MaxAcceleration(5, state='test'))
+            a.add([epts.MaxAcceleration(5, state="test")])
+            a.add(epts.MaxAcceleration(5, state="test"))
 
         with pytest.warns(UserWarning):
             a.add(gait_epts.GaitSpeed())
@@ -115,9 +120,15 @@ class TestActivityLevelClassification:
         assert len(a.sleep_endpoints) == 2
 
     def test(self, activity_res):
-        a = ActivityLevelClassification(short_wlen=5, max_accel_lens=(10,), bout_lens=(10,),
-                                        bout_criteria=0.8, bout_metric=4, min_wear_time=1,
-                                        cutpoints='migueles_wrist_adult')
+        a = ActivityLevelClassification(
+            short_wlen=5,
+            max_accel_lens=(10,),
+            bout_lens=(10,),
+            bout_criteria=0.8,
+            bout_metric=4,
+            min_wear_time=1,
+            cutpoints="migueles_wrist_adult",
+        )
 
         rng = default_rng(seed=5)
         x = zeros((240000, 3))
@@ -130,6 +141,3 @@ class TestActivityLevelClassification:
 
         for k in activity_res:
             assert allclose(res[k], activity_res[k], equal_nan=True)
-
-
-
