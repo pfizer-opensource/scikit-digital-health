@@ -12,8 +12,8 @@ Combined Feature Processing
 
     Bank
 
-Features
---------
+Signal Features
+---------------
 
 .. autosummary::
     :toctree: generated/

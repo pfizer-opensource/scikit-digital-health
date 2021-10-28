@@ -4,8 +4,8 @@ Binary File Reading (:mod:`skdh.read`)
 
 .. currentmodule:: skdh.read
 
-Binary File Readers
--------------------
+These processes are designed to quickly read in data from various different
+wearable devices from their default binary file format.
 
 .. autosummary::
     :toctree: generated/
