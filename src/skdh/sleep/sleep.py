@@ -2,7 +2,7 @@
 Sleep and major rest period detection
 
 Yiorgos Christakis, Lukas Adamowicz
-Pfizer DMTI 2019-2021
+Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from sys import gettrace
 from collections.abc import Iterable

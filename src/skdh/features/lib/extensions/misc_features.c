@@ -1,3 +1,4 @@
+// Copyright (c) 2021. Pfizer Inc. All rights reserved.
 #define PY_SSIZE_T_CLEAN
 #include "Python.h"
 #include "numpy/arrayobject.h"

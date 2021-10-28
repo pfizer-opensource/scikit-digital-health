@@ -2,7 +2,7 @@
 Wear detection algorithms
 
 Lukas Adamowicz
-Pfizer DMTI 2021
+Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from numpy import (
     mean,

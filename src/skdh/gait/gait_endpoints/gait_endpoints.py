@@ -2,7 +2,7 @@
 Gait event-level and bout-level endpoint definitions
 
 Lukas Adamowicz
-2020, Pfizer DMTI
+Copyright (c) 2021. Pfizer Inc. All rights reserved.
 
 
      IC             FC      IC             FC      IC             FC

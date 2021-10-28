@@ -2,7 +2,7 @@
 Different entropy measures
 
 Lukas Adamowicz
-Pfizer DMTI 2020
+Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from skdh.features.core import Feature
 from skdh.features.lib import extensions

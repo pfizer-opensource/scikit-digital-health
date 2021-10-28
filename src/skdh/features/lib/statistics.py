@@ -2,7 +2,7 @@
 Signal features based on statistics measures
 
 Lukas Adamowicz
-Pfizer DMTI 2020
+Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from numpy import max, min, quantile, mean, std
 

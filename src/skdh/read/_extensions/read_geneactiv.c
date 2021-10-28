@@ -1,3 +1,4 @@
+// Copyright (c) 2021. Pfizer Inc. All rights reserved.
 #include "read_binary_imu.h"
 
 void parseline(FILE *fp, char *buff, int buff_len, char **key, char **val)

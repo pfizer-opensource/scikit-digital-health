@@ -2,7 +2,7 @@
 Activity level classification based on accelerometer data
 
 Lukas Adamowicz
-Pfizer DMTI 2021
+Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from sys import gettrace  # to check if debugging
 from datetime import datetime, timedelta

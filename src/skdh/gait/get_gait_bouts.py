@@ -2,7 +2,7 @@
 Function for getting the bouts of continuous gait
 
 Lukas Adamowicz
-Pfizer DMTI 2020
+Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from skdh.utility.internal import get_day_index_intersection
 

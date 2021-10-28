@@ -1,5 +1,8 @@
 ! -*- f95 -*-
 
+! Copyright (c) 2021. Pfizer Inc. All rights reserved.
+
+
 subroutine mov_moments_1(n, x, wlen, skip, mean) bind(C, name="mov_moments_1")
     use, intrinsic :: iso_c_binding
     implicit none

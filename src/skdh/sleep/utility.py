@@ -2,7 +2,7 @@
 Utility functions required for sleep metric generation
 
 Yiorgos Christakis
-Pfizer DMTI 2021
+Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from numpy import (
     any,

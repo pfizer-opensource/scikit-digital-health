@@ -2,7 +2,7 @@
 Sleep predictions
 
 Yiorgos Christakis, Lukas Adamowicz
-Pfizer DMTI 2019-2021
+Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from numpy import array, convolve, int_
 

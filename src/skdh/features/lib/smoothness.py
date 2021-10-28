@@ -2,7 +2,7 @@
 Features dealing with the smoothness of a signal
 
 Lukas Adamowicz
-Pfizer DMTI 2020
+Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from numpy import log as nplog, abs
 

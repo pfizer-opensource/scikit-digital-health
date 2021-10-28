@@ -2,7 +2,7 @@
 Pipeline class for stringing multiple features into 1 processing pipeline
 
 Lukas Adamowicz
-Pfizer DMTI 2020
+Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 import json
 from operator import attrgetter

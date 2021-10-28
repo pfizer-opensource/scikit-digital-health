@@ -1,5 +1,8 @@
 ! -*- f95 -*-
 
+! Copyright (c) 2021. Pfizer Inc. All rights reserved.
+
+
 module axivity
     use, intrinsic :: iso_c_binding
     implicit none

@@ -2,7 +2,7 @@
 Base gait endpoints class
 
 Lukas Adamowicz
-2020, Pfizer DMTI
+Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 import functools
 import logging

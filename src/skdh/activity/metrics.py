@@ -2,7 +2,7 @@
 Metrics for classifying activity
 
 Lukas Adamowicz
-Pfizer DMTI 2021
+Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from numpy import maximum, abs, repeat, arctan, sqrt, pi
 from numpy.linalg import norm

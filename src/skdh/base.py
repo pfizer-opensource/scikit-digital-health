@@ -2,7 +2,7 @@
 Base classes, functions, etc for the skdh library
 
 Lukas Adamowicz
-Pfizer DMTI 2020
+Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from datetime import date as dt_date
 import logging

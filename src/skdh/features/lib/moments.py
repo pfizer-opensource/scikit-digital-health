@@ -2,7 +2,7 @@
 Features from statistical moments
 
 Lukas Adamowicz
-Pfizer DMTI 2020
+Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from numpy import mean, std, sum, diff, sign
 from scipy.stats import skew, kurtosis

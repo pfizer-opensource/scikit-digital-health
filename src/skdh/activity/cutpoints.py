@@ -2,8 +2,7 @@
 Cutpoint definitions
 
 Lukas Adamowicz
-Pfizer DMTI
-2021
+Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from skdh.activity import metrics
 

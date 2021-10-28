@@ -2,7 +2,7 @@
 Internal utility functions that don't necessarily need to be exposed in the public API
 
 Lukas Adamowicz
-Pfizer DMTI 2021
+Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from numpy import (
     asarray,

@@ -2,7 +2,7 @@
 Gait detection, processing, and analysis from wearable inertial sensor data
 
 Lukas Adamowicz
-Pfizer DMTI 2020
+Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from sys import gettrace
 from collections.abc import Iterable

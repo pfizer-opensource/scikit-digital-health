@@ -2,8 +2,7 @@
 Generic endpoints dealing with the fragmentation of binary predictions.
 
 Lukas Adamowicz
-2021
-Pfizer
+Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from numpy import (
     mean,

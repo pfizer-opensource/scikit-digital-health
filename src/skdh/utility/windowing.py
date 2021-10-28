@@ -2,7 +2,7 @@
 Utility methods
 
 Lukas Adamowicz
-Pfizer DMTI 2020
+Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from numpy import require
 from numpy.lib.stride_tricks import as_strided

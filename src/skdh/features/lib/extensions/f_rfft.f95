@@ -1,5 +1,7 @@
 ! -*- f95 -*-
 
+! Copyright (c) 2021. Pfizer Inc. All rights reserved.
+
 subroutine f_rfft(n, x, nfft, F) bind(C, name="f_rfft")
     use, intrinsic :: iso_c_binding
     use real_fft, only : execute_real_forward

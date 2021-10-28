@@ -2,7 +2,7 @@
 Function for getting gait events from an accelerometer signal
 
 Lukas Adamowicz
-Pfizer DMTI 2020
+Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from numpy import fft, argmax, std, abs, argsort, corrcoef, mean, sign
 from scipy.signal import detrend, butter, sosfiltfilt, find_peaks
