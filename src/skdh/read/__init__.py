@@ -10,10 +10,11 @@ Binary File Readers
 .. autosummary::
     :toctree: generated/
 
-    ReadCWA
+    ReadCwa
     ReadBin
     ReadGT3X
     ReadApdmH5
+    ReadNumpyFile
 """
 from skdh.read.axivity import ReadCwa
 from skdh.read import axivity
