@@ -26,6 +26,12 @@ Full documentation is available [HERE INSERT LINK]()
 - lightgbm >= 2.3.0
 - pywavelets
 
+### Library Requirements
+SKDH also has some compiled library requirements:
+
+- libzip (if installing outside conda probably labeled as libzip-dev)
+- gsl (if not installing with conda probably labeled as libgsl##-dev)
+
 ## Installation
 ```shell script
 pip install git+ssh://git@github.com/PfizerRD/scikit-digital-health.git
