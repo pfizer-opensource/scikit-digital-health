@@ -17,6 +17,8 @@ from skdh.read.utility import FileSizeError
 
 class ReadGT3X(BaseProcess):
     """
+    NOTE: THIS FUNCTION IS AS-IS CURRENTLY - HAVE SEEN ISSUES WITH ITS OUTPUT
+
     Read a GT3X archive file from an Actigraph sensor into memory. Acceleration is returned in
     units of 'g', while time is unix time in seconds. If providing a base and period value,
     included in the output will be the indices to create windows starting at the `base` time, with
@@ -52,6 +54,11 @@ class ReadGT3X(BaseProcess):
             # kwargs
             base=base,
             period=None,
+        )
+
+        warn(
+            "This class is provided as-is. Validate output compared to ActiGraph CSV.",
+            UserWarning,
         )
 
         if (base is None) and (period is None):
