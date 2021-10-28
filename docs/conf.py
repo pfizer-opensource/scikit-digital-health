@@ -17,8 +17,8 @@
 # -- Project information -----------------------------------------------------
 
 project = "SciKit-Digital-Health"
-copyright = "2021, Pfizer DMTI Data Science"
-author = "Pfizer DMTI Data Science"
+copyright = "2021, Pfizer, Inc. All rights reserved"
+author = "Pfizer, Inc"
 
 import skdh
 
@@ -91,8 +91,15 @@ html_theme = "pydata_sphinx_theme"
 # documentation.
 #
 html_theme_options = {
-    "prev_next_buttons": True,
-    "github_url": f"https://github.com/PfizerRD/{project}",
+    # "prev_next_buttons": True,
+    "show_nav_level": 3,
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": f"https://github.com/PfizerRD/{project}",
+            "icon": "fab fa-github-square",
+        },
+    ]
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -112,8 +119,10 @@ html_title = f"{project} Documentation"
 # default: ``['localtoc.html', 'relations.html', 'sourcelink.html',
 # 'searchbox.html']``.
 #
-html_sidebars = {"**": ["globaltoc.html", "relations.html", "searchbox.html"]}
-
+# html_sidebars = {"**": ["globaltoc.html", "relations.html", "searchbox.html"]}
+html_sidebars = {
+    "**": ["search-field.html", "sidebar-nav-bs.html"]
+}
 
 # -- Options for HTMLHelp output ---------------------------------------------
 

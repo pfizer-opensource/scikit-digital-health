@@ -19,7 +19,7 @@ Other than this, the docstrings will be automatically scanned and generated, wit
 
 Documentation of the your new module occurs almost fully in the ``__init__.py`` file for the module. An example for the example ``preprocessing`` module is below:
 
-.. code::python
+.. code-block:: python
 
     # src/skdh/preprocessing/__init__.py
     """
