@@ -2,7 +2,7 @@
 Metrics for classifying activity
 
 Lukas Adamowicz
-Pfizer DMTI 2021
+Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from numpy import maximum, abs, repeat, arctan, sqrt, pi
 from numpy.linalg import norm
@@ -93,9 +93,7 @@ def metric_enmo(accel, wlen, *args, take_abs=False, trim_zero=True, **kwargs):
         return moving_mean(enmo, wlen, wlen)
 
 
-def metric_bfen(
-    accel, wlen, fs, low_cutoff=0.2, high_cutoff=15, **kwargs
-):
+def metric_bfen(accel, wlen, fs, low_cutoff=0.2, high_cutoff=15, **kwargs):
     """
     Compute the band-pass filtered euclidean norm.
 

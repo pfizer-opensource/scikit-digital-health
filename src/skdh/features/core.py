@@ -1,7 +1,8 @@
 """
 Core functionality for feature computation
+
 Lukas Adamowicz
-Pfizer DMTI 2020
+Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from abc import ABC, abstractmethod
 from collections.abc import Iterator, Sequence

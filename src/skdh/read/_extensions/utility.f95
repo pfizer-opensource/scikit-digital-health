@@ -1,5 +1,8 @@
 ! -*- f95 -*-
 
+! Copyright (c) 2021. Pfizer Inc. All rights reserved.
+
+
 module custom_time
     use, intrinsic :: iso_c_binding
     implicit none

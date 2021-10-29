@@ -1,4 +1,4 @@
-.. _skdh api reference
+.. _skdh-api-reference:
 
 API Reference
 =============

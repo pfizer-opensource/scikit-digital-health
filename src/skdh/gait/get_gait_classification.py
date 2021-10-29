@@ -2,7 +2,7 @@
 Gait bout detection from accelerometer data
 
 Lukas Adamowicz
-Pfizer DMTI 2020
+Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from sys import version_info
 

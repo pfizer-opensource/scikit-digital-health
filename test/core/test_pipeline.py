@@ -95,7 +95,7 @@ class TestPipeline:
                     }
                 }
             ],
-            "Version": skdh_vers
+            "Version": skdh_vers,
         }
 
         assert res == exp
@@ -120,9 +120,11 @@ class TestPipeline:
 
             with fname.open(mode="w") as f:
                 # save only the steps to trigger version warning
-                json.dump(dummy_pipeline['Steps'], f)
+                json.dump(dummy_pipeline["Steps"], f)
 
-            with pytest.warns(UserWarning, match='Pipeline created by an unknown older version'):
+            with pytest.warns(
+                UserWarning, match="Pipeline created by an unknown older version"
+            ):
                 p.load(str(fname))
 
         assert p._steps == [Gait()]
@@ -137,6 +139,7 @@ class TestPipeline:
             with fname.open(mode="w") as f:
                 json.dump(dummy_pipeline, f)
 
-            with pytest.warns(UserWarning, match='Pipeline was created by an older version of skdh'):
+            with pytest.warns(
+                UserWarning, match="Pipeline was created by an older version of skdh"
+            ):
                 p.load(str(fname))
-

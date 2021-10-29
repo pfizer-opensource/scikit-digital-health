@@ -11,6 +11,14 @@ Sensor Calibration
     :toctree: generated/
 
     CalibrateAccelerometer
+
+Wear Detection
+--------------
+
+.. autosummary::
+    :toctree: generated/
+
+    DetectWear
 """
 from skdh.preprocessing.calibrate import CalibrateAccelerometer
 from skdh.preprocessing import calibrate

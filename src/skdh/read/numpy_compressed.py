@@ -2,7 +2,7 @@
 Read from a numpy compressed file.
 
 Lukas Adamowicz
-Pfizer DMTI 2020
+Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from warnings import warn
 from pathlib import Path
@@ -21,6 +21,7 @@ class ReadNumpyFile(BaseProcess):
     'g' and time in units of seconds. No day windowing is performed. Expected
     keys are `time` and `accel`. If `fs` is present, it is used as well.
     """
+
     def __init__(self):
         super(ReadNumpyFile, self).__init__()
 
@@ -66,13 +67,9 @@ class ReadNumpyFile(BaseProcess):
         data = load(file)
 
         kwargs.update(
-            {
-                self._time: data['time'],
-                self._acc: data['accel'],
-                'file': file
-            }
+            {self._time: data["time"], self._acc: data["accel"], "file": file}
         )
-        if 'fs' in data:
-            kwargs['fs'] = data['fs'][()]
+        if "fs" in data:
+            kwargs["fs"] = data["fs"][()]
 
         return (kwargs, None) if self._in_pipeline else kwargs

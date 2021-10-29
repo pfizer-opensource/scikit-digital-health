@@ -1,5 +1,6 @@
 ! -*- f95 -*-
 
+! Copyright (c) 2021. Pfizer Inc. All rights reserved.
 
 ! --------------------------------------------------------------------
 ! SUBROUTINE  autocorr_1d

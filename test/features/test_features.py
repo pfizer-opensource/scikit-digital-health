@@ -261,7 +261,7 @@ class TestDimensionlessJerk:
         fs, x = get_sin_signal(2.0, 1.0, 0.0)
 
         res = DimensionlessJerk(log=True, signal_type="acceleration").compute(x)
-        res2 = DimensionlessJerk(log=False, signal_type='acceleration').compute(x)
+        res2 = DimensionlessJerk(log=False, signal_type="acceleration").compute(x)
 
         assert isclose(res, -6.19715)
         assert isclose(res2, -491.3467056034191)

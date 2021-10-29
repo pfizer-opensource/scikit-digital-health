@@ -2,7 +2,7 @@
 Sit-to-stand transfer detection and processing
 
 Lukas Adamowicz
-Pfizer DMTI 2020
+Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 import datetime
 

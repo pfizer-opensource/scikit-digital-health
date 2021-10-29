@@ -2,7 +2,7 @@
 Actigraph reading functions
 
 Lukas Adamowicz
-Pfizer DMTI 2020
+Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from warnings import warn
 from pathlib import Path
@@ -17,20 +17,29 @@ from skdh.read.utility import FileSizeError
 
 class ReadGT3X(BaseProcess):
     """
-    Read a GT3X archive file from an Actigraph sensor into memory. Acceleration is returned in
-    units of 'g', while time is unix time in seconds. If providing a base and period value,
-    included in the output will be the indices to create windows starting at the `base` time, with
-    a length of `period` hours.  If the GT3X file was produced by an older version (wearable with a
-    light sensor), the lux values returned will be useful.
+    Read a GT3X archive file from an Actigraph sensor into memory. Acceleration
+    is returned in units of 'g', while time is unix time in seconds. If providing
+    a base and period value, included in the output will be the indices to create
+    windows starting at the `base` time, with a length of `period` hours.  If the
+    GT3X file was produced by an older version (wearable with a light sensor), the
+    lux values returned will be useful.
 
     Parameters
     ----------
     base : {None, int}, optional
-        Base hour [0, 23] in which to start a window of time. Default is None, which will not
-        do any windowing. Both `base` and `period` must be defined in order to window.
+        Base hour [0, 23] in which to start a window of time. Default is None, which
+        will not do any windowing. Both `base` and `period` must be defined in order
+        to window.
     period : {None, int}, optional
-        Period for each window, in [1, 24]. Defines the number of hours per window. Default is
-        None, which will do no windowing. Both `period` and `base` must be defined to window
+        Period for each window, in [1, 24]. Defines the number of hours per window.
+        Default is None, which will do no windowing. Both `period` and `base` must be
+        defined to window.
+
+    Warnings
+    --------
+    Due to continuous changes in GT3X file structures, this functionality is
+    provided AS-IS. Users should validate the output for their version of files
+    with the ActiGraph CSV export.
 
     Examples
     --------
@@ -52,6 +61,11 @@ class ReadGT3X(BaseProcess):
             # kwargs
             base=base,
             period=None,
+        )
+
+        warn(
+            "This class is provided as-is. Validate output compared to ActiGraph CSV.",
+            UserWarning,
         )
 
         if (base is None) and (period is None):
@@ -82,8 +96,8 @@ class ReadGT3X(BaseProcess):
         Parameters
         ----------
         file : {str, Path}
-            Path to the file to read. Must either be a string, or be able to be converted by
-            `str(file)`
+            Path to the file to read. Must either be a string, or be able to be
+            converted by `str(file)`
 
         Returns
         -------
@@ -101,7 +115,8 @@ class ReadGT3X(BaseProcess):
 
         - `accel`: acceleration [g]
         - `time`: timestamps [s]
-        - `lux`: light readings. Note that this will not be returned if the data is not valid
+        - `lux`: light readings. Note that this will not be returned if the data is
+          not valid
         - `day_ends`: window indices
         """
         if file is None:

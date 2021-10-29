@@ -55,9 +55,9 @@ class TestReadBin:
         assert "File extension is not expected '.bin'" in record[0].message.args[0]
 
     def test_small_size(self):
-        ntf = NamedTemporaryFile(mode='w', suffix='.bin')
+        ntf = NamedTemporaryFile(mode="w", suffix=".bin")
 
-        ntf.writelines(['a\n', 'b\n', 'c\n'])
+        ntf.writelines(["a\n", "b\n", "c\n"])
 
         with pytest.raises(FileSizeError):
             ReadBin().predict(ntf.name)

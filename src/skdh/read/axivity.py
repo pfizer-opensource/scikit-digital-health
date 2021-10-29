@@ -2,7 +2,7 @@
 Axivity reading functions
 
 Lukas Adamowicz
-Pfizer DMTI 2020
+Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from warnings import warn
 from pathlib import Path

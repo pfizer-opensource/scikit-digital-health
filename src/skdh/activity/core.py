@@ -2,7 +2,7 @@
 Activity level classification based on accelerometer data
 
 Lukas Adamowicz
-Pfizer DMTI 2021
+Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from sys import gettrace  # to check if debugging
 from datetime import datetime, timedelta
@@ -607,7 +607,9 @@ class ActivityLevelClassification(BaseProcess):
         ax[-1].set_xticks([i for i in range(self.day_key[0], sum(self.day_key) + 1, 3)])
         ax[-1].set_xticklabels([f"{int(i % 24)}:00" for i in ax[-1].get_xticks()])
 
-    def _plot_day_wear(self, fs, day_wear_starts, day_wear_stops, start_dt, day_start):  # pragma: no cover
+    def _plot_day_wear(
+        self, fs, day_wear_starts, day_wear_stops, start_dt, day_start
+    ):  # pragma: no cover
         if self.f is None:
             return
         start_hr = start_dt.hour + start_dt.minute / 60 + start_dt.second / 3600

@@ -2,7 +2,7 @@
 Pipeline class for stringing multiple features into 1 processing pipeline
 
 Lukas Adamowicz
-Pfizer DMTI 2020
+Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 import json
 from operator import attrgetter
@@ -98,7 +98,9 @@ class Pipeline:
         """
         import skdh
 
-        min_vers = skdh.__minimum_version__ if self._min_vers is None else self._min_vers
+        min_vers = (
+            skdh.__minimum_version__ if self._min_vers is None else self._min_vers
+        )
 
         with open(file, "r") as f:
             data = json.load(f)

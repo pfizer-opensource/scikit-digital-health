@@ -10,11 +10,11 @@ from skdh.activity.cutpoints import (
 
 
 def test_get_metric():
-    f = get_metric('metric_enmo')
-    assert 'metric_enmo' in str(f)
+    f = get_metric("metric_enmo")
+    assert "metric_enmo" in str(f)
 
-    f = get_metric('metric_mad')
-    assert 'metric_mad' in str(f)
+    f = get_metric("metric_mad")
+    assert "metric_mad" in str(f)
 
 
 def test_get_level_thresholds():

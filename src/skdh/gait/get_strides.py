@@ -2,7 +2,7 @@
 Function for getting strides from detected gait events
 
 Lukas Adamowicz
-Pfizer DMTI 2020
+Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from numpy import nan, array
 from scipy.integrate import cumtrapz
