@@ -496,6 +496,7 @@ class Gait(BaseProcess):
                 "FC opp foot",
                 "valid cycle",
                 "delta h",
+                "IC Time",
             ]
         }
         # aux dictionary for storing values for computing gait endpoints
