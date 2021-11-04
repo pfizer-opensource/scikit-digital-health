@@ -32,6 +32,8 @@ jobs:
         python -m pip install --upgrade pip
         # install the listed requirements
         pip install -r gh_actions_requirements.txt
+        # install testing requirements
+        pip install -r test_requirements.txt
         # if macOS install libomp
         # if [ "$RUNNER_OS" == "macOS" ]; then
         #   HOMEBREW_NO_AUTO_UPDATE=1 brew install libomp
