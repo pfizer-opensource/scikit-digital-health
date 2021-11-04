@@ -55,7 +55,7 @@ def get_strides(
     gait_fc_opp_times = []
 
     # mask the steps that have already been used, to avoid using duplicate FC events
-    fc_unused = ones(fc_times.size, dtype='bool')
+    fc_unused = ones(fc_times.size, dtype="bool")
 
     bout_n_steps = 0
     for i, curr_ic in enumerate(ic_times):
@@ -97,9 +97,7 @@ def get_strides(
         cond1 = (gait_ic_times[2:] - gait_ic_times[:-2]) < max_stride_time
         # Condition 2: "FC opp foot" for next step should match current step FC
         cond2 = gait_fc_times[:-1] == gait_fc_opp_times[1:]
-        gait["valid cycle"].extend(
-            cond1 & cond2[:-1]
-        )
+        gait["valid cycle"].extend(cond1 & cond2[:-1])
         gait["valid cycle"].extend([False] * 2)
     elif bout_n_steps > 0:
         gait["valid cycle"].extend([False] * bout_n_steps)
