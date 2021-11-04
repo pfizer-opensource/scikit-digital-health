@@ -1,5 +1,5 @@
 import pytest
-from numpy import zeros, allclose, isclose, sqrt, diff, sum, std, abs
+from numpy import zeros, allclose, isclose, sqrt, diff, sum, std, abs, array
 
 from skdh.features.lib import (
     Mean,
@@ -29,6 +29,31 @@ from skdh.features.lib import (
     DetailPower,
     DetailPowerRatio,
 )
+
+
+def test_size_0_input():
+    ext_features = [
+        DominantFrequency,
+        DominantFrequencyValue,
+        PowerSpectralSum,
+        SpectralFlatness,
+        SpectralEntropy,
+        Autocorrelation,
+        LinearSlope,
+        ComplexityInvariantDistance,
+        RangeCountPercentage,
+        RatioBeyondRSigma,
+        SignalEntropy,
+        SampleEntropy,
+        PermutationEntropy,
+        JerkMetric,
+        DimensionlessJerk,
+        SPARC,
+    ]
+
+    for fn in ext_features:
+        with pytest.raises(ValueError):
+            fn().compute(array([]))
 
 
 def test_Mean(get_linear_accel):

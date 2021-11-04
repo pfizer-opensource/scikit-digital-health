@@ -23,12 +23,18 @@ PyObject * autocorrelation(PyObject *NPY_UNUSED(self), PyObject *args){
         PyErr_SetString(PyExc_ValueError, "norm argument must be 0/1");
         return NULL;
     }
-
     PyArrayObject *data = (PyArrayObject *)PyArray_FromAny(
         x_, PyArray_DescrFromType(NPY_DOUBLE), 1, 0,
         NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_CARRAY_RO, NULL
     );
     if (!data) return NULL;
+
+    // catch size 0 inputs
+    if (PyArray_SIZE(data) == 0)
+    {
+        PyErr_SetString(PyExc_ValueError, "Input data size must be larger than 0.");
+        return NULL;
+    }
 
     int ndim = PyArray_NDIM(data);
 
@@ -81,6 +87,12 @@ PyObject * linear_regression(PyObject *NPY_UNUSED(self), PyObject *args){
         NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_CARRAY_RO, NULL
     );
     if (!data) return NULL;
+    // catch size 0 inputs
+    if (PyArray_SIZE(data) == 0)
+    {
+        PyErr_SetString(PyExc_ValueError, "Input data size must be larger than 0.");
+        return NULL;
+    }
 
     int ndim = PyArray_NDIM(data);
 
