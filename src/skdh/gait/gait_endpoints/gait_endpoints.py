@@ -529,13 +529,16 @@ class StrideSPARC(GaitEventEndpoint):
         for i, idx in enumerate(nonzero(mask)[0]):
             bout_i = gait_aux["inertial data i"][idx]
 
-            gait[self.k_][idx] = SPARC(
-                norm(gait_aux["accel"][bout_i][i1[i] : i2[i], :], axis=1) - 1,
-                fs,  # fsample
-                4,  # padlevel
-                10.0,  # fcut
-                0.05,  # amplitude threshold
-            )
+            if i2[i] - i1[i] > 0:
+                gait[self.k_][idx] = SPARC(
+                    norm(gait_aux["accel"][bout_i][i1[i] : i2[i], :], axis=1) - 1,
+                    fs,  # fsample
+                    4,  # padlevel
+                    10.0,  # fcut
+                    0.05,  # amplitude threshold
+                )
+            else:
+                gait[self.k_][idx] = nan
 
 
 # ===========================================================
