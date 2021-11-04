@@ -4,7 +4,7 @@ Function for getting strides from detected gait events
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
-from numpy import nan, array
+from numpy import nan, array, ones, nonzero
 from scipy.integrate import cumtrapz
 
 
@@ -51,11 +51,17 @@ def get_strides(
 
     # for easier use later
     gait_ic_times = []
+    gait_fc_times = []
+    gait_fc_opp_times = []
+
+    # mask the steps that have already been used, to avoid using duplicate FC events
+    fc_unused = ones(fc_times.size, dtype="bool")
 
     bout_n_steps = 0
     for i, curr_ic in enumerate(ic_times):
-        fc_forward = fc[fc_times > curr_ic]
-        fc_forward_times = fc_times[fc_times > curr_ic]
+        forward_idx = nonzero((fc_times > curr_ic) & fc_unused)[0]
+        fc_forward = fc[forward_idx]
+        fc_forward_times = fc_times[forward_idx]
 
         # OPTIMIZATION 1: initial double support (loading) time should be less than
         # max_stride_time * loading_factor
@@ -69,16 +75,29 @@ def get_strides(
         gait["IC"].append(ic[i])
         gait["FC"].append(fc_forward[1])
         gait["FC opp foot"].append(fc_forward[0])
+        gait["IC Time"].append(curr_ic)
         gait_ic_times.append(ic_times[i])
+        gait_fc_times.append(fc_forward_times[1])
+        gait_fc_opp_times.append(fc_forward_times[0])
+
+        # block off these FCs from being used for future steps
+        # We only need to block off the opp foot FC because the FC
+        # for this step will become FC opp foot for the next step
+        fc_unused[forward_idx[0]] = False
+
         bout_n_steps += 1
 
     # convert to array for vector subtration
     gait_ic_times = array(gait_ic_times)
+    gait_fc_times = array(gait_fc_times)
+    gait_fc_opp_times = array(gait_fc_opp_times)
 
     if bout_n_steps > 2:
-        gait["valid cycle"].extend(
-            (gait_ic_times[2:] - gait_ic_times[:-2]) < max_stride_time
-        )
+        # Condition 1: stride times are less than maximum
+        cond1 = (gait_ic_times[2:] - gait_ic_times[:-2]) < max_stride_time
+        # Condition 2: "FC opp foot" for next step should match current step FC
+        cond2 = gait_fc_times[:-1] == gait_fc_opp_times[1:]
+        gait["valid cycle"].extend(cond1 & cond2[:-1])
         gait["valid cycle"].extend([False] * 2)
     elif bout_n_steps > 0:
         gait["valid cycle"].extend([False] * bout_n_steps)
