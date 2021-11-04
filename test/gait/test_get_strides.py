@@ -10,7 +10,7 @@ def test_get_strides():
     ic = array([10, 60, 100, 160, 210, 260, 305, 360])
     fc = array([15, 67, 104, 166, 218, 265, 310, 367])
 
-    gait = {i: [] for i in ["IC", "FC", "FC opp foot", "valid cycle", "delta h"]}
+    gait = {i: [] for i in ["IC", "FC", "FC opp foot", "valid cycle", "delta h", "IC Time"]}
 
     n_steps = get_strides(gait, x, 0, ic, fc, t, 50.0, 2.25, 0.2)
 
@@ -25,7 +25,7 @@ def test_get_strides():
     ic = array([10, 60, 100])
     fc = array([44, 67, 104])
 
-    gait = {i: [] for i in ["IC", "FC", "FC opp foot", "valid cycle", "delta h"]}
+    gait = {i: [] for i in ["IC", "FC", "FC opp foot", "valid cycle", "delta h", "IC Time"]}
 
     n_steps = get_strides(gait, x, 0, ic, fc, t, 50.0, 2.25, 0.2)
 
