@@ -27,6 +27,12 @@ PyObject * complexity_invariant_distance(PyObject *NPY_UNUSED(self), PyObject *a
         NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_CARRAY_RO, NULL
     );
     if (!data) return NULL;
+    // catch size 0 inputs
+    if (PyArray_SIZE(data) == 0)
+    {
+        PyErr_SetString(PyExc_ValueError, "Input data size must be larger than 0.");
+        return NULL;
+    }
 
     int ndim = PyArray_NDIM(data);
 
@@ -79,6 +85,12 @@ PyObject * range_count(PyObject *NPY_UNUSED(self), PyObject *args){
         NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_CARRAY_RO, NULL
     );
     if (!data) return NULL;
+    // catch size 0 inputs
+    if (PyArray_SIZE(data) == 0)
+    {
+        PyErr_SetString(PyExc_ValueError, "Input data size must be larger than 0.");
+        return NULL;
+    }
 
     int ndim = PyArray_NDIM(data);
 
@@ -131,6 +143,12 @@ PyObject * ratio_beyond_r_sigma(PyObject *NPY_UNUSED(self), PyObject *args){
         NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_CARRAY_RO, NULL
     );
     if (!data) return NULL;
+    // catch size 0 inputs
+    if (PyArray_SIZE(data) == 0)
+    {
+        PyErr_SetString(PyExc_ValueError, "Input data size must be larger than 0.");
+        return NULL;
+    }
 
     int ndim = PyArray_NDIM(data);
 
