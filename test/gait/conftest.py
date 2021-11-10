@@ -116,3 +116,36 @@ def gait_res_50():
         path = Path("test/gait/data/gait_results.npz")
 
     return load(path)
+
+
+@fixture
+def gait_input_gyro():
+    cwd = Path.cwd().parts
+
+    if cwd[-1] == "gait":
+        path = Path("data/gait_input2.npz")
+    elif cwd[-1] == "test":
+        path = Path("gait/data/gait_input2.npz")
+    elif cwd[-1] == "scikit-digital-health":
+        path = Path("test/gait/data/gait_input2.npz")
+
+    data = load(path)
+    t = data["time"]
+    acc = data["accel"]
+    gyr = data["gyro"]
+
+    return t, acc, gyr
+
+
+@fixture
+def gait_res_gyro():
+    cwd = Path.cwd().parts
+
+    if cwd[-1] == "gait":
+        path = Path("data/gait_results2.npz")
+    elif cwd[-1] == "test":
+        path = Path("gait/data/gait_results2.npz")
+    elif cwd[-1] == "scikit-digital-health":
+        path = Path("test/gait/data/gait_results2.npz")
+
+    return load(path)

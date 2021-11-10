@@ -10,6 +10,7 @@ from importlib import import_module
 from warnings import warn
 import logging
 from packaging import version
+from copy import copy
 
 from skdh.base import BaseProcess as Process
 
@@ -151,7 +152,7 @@ class Pipeline:
 
             self.add(proc, save_file=save_file, plot_file=plot_file)
 
-    def add(self, process, save_file=None, plot_file=None):
+    def add(self, process, save_file=None, plot_file=None, make_copy=True):
         """
         Add a processing step to the pipeline
 
@@ -165,6 +166,10 @@ class Pipeline:
         plot_file : {None, str}, optional
             Optionally formattable path for the output of plotting. If left/set
             to None, the plot will not be generated and saved.
+        make_copy : bool, optional
+            Create a shallow copy of `process` to add to the pipeline. This allows
+            a single instance to be used in multiple pipelines while retaining custom
+            save file names and other pipeline-specific attributes. Default is True.
 
         Notes
         -----
@@ -211,22 +216,26 @@ class Pipeline:
         """
         if not isinstance(process, Process):
             raise NotAProcessError(
-                "process is not a subclass of _BaseProcess, "
+                f"process is not a subclass of {Process!r}, "
                 "cannot be added to the pipeline"
             )
+        if not make_copy:
+            proc = process
+        else:
+            proc = copy(process)
 
         # attach the save bool and save_name to the process
-        process._in_pipeline = True
-        process.pipe_save_file = save_file
-        process.pipe_plot_file = plot_file
+        proc._in_pipeline = True
+        proc.pipe_save_file = save_file
+        proc.pipe_plot_file = plot_file
 
         # setup plotting
-        process._setup_plotting(plot_file)
+        proc._setup_plotting(plot_file)
 
         # point the step logging disabled to the pipeline disabled
-        process.logger.disabled = self.logger.disabled
+        proc.logger.disabled = self.logger.disabled
 
-        self._steps += [process]
+        self._steps += [proc]
 
     def __iter__(self):
         return self

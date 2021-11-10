@@ -2,7 +2,7 @@ name: skdh
 
 on:
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 jobs:
   build:
 

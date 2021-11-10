@@ -29,6 +29,31 @@ class TestGait:
         for key in gait_res_50.files:
             assert allclose(res[key], gait_res_50[key], equal_nan=True)
 
+    def test_with_turns(self, gait_input_gyro, gait_res_gyro):
+        t, acc, gyr = gait_input_gyro
+
+        g = Gait(
+            correct_accel_orient=True,
+            use_cwt_scale_relation=True,
+            min_bout_time=8.0,
+            max_bout_separation_time=0.25,
+            max_stride_time=2.25,
+            loading_factor=0.2,
+            height_factor=0.53,
+            prov_leg_length=False,
+            filter_order=4,
+            filter_cutoff=20.0,
+            downsample_aa_filter=True,
+            day_window=(0, 24),
+        )
+
+        res = g.predict(
+            time=t, accel=acc, gyro=gyr, fs=128.0, height=1.88, gait_pred=True
+        )
+
+        for key in gait_res_gyro.files:
+            assert allclose(res[key], gait_res_gyro[key], equal_nan=True)
+
     def test_add_metrics(self):
         g = Gait()
         g._params = []  # reset for easy testing

@@ -99,7 +99,7 @@ html_theme_options = {
             "url": f"https://github.com/PfizerRD/{project}",
             "icon": "fab fa-github-square",
         },
-    ]
+    ],
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -120,9 +120,7 @@ html_title = f"{project} Documentation"
 # 'searchbox.html']``.
 #
 # html_sidebars = {"**": ["globaltoc.html", "relations.html", "searchbox.html"]}
-html_sidebars = {
-    "**": ["search-field.html", "sidebar-nav-bs.html"]
-}
+html_sidebars = {"**": ["search-field.html", "sidebar-nav-bs.html"]}
 
 # -- Options for HTMLHelp output ---------------------------------------------
 
