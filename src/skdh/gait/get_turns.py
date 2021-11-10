@@ -48,6 +48,7 @@ def get_turns(gait, accel, gyro, fs, n_strides):
     # first check if we can detect turns
     if gyro is None:
         gait['Turn'].extend([-1] * n_strides)
+        return
 
     # get the first available still period to start the yaw tracking
     n = int(0.05 * fs)  # number of samples to use for still period
@@ -138,7 +139,7 @@ def get_turns(gait, accel, gyro, fs, n_strides):
 
     # mask for strides in turn
     in_turn = zeros(n_strides, dtype="int")
-    for d, s in zip(lengths, starts):
+    for d, s in zip(lengths[values == 1], starts[values == 1]):
         in_turn += (gait['IC'][-n_strides:] > s) & (gait['IC'][-n_strides:] < (s + d))
         in_turn += (gait['FC'][-n_strides:] > s) & (gait['FC'][-n_strides:] < (s + d))
 

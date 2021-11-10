@@ -585,7 +585,8 @@ class Gait(BaseProcess):
                 # check if strides are during turns
                 get_turns(
                     gait,
-                    gyro_ds[bout],
+                    accel_ds[bout],
+                    gyro_ds[bout] if gyro_ds is not None else None,
                     goal_fs,
                     strides_in_bout,
                 )
