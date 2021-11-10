@@ -393,7 +393,15 @@ class Gait(BaseProcess):
         self.plot_fname = save_file
 
     def predict(
-        self, time=None, accel=None, *, gyro=None, fs=None, height=None, gait_pred=None, **kwargs
+        self,
+        time=None,
+        accel=None,
+        *,
+        gyro=None,
+        fs=None,
+        height=None,
+        gait_pred=None,
+        **kwargs,
     ):
         """
         predict(time, accel, *, gyro=None, fs=None, height=None, gait_pred=None, day_ends={})

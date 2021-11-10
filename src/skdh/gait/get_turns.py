@@ -4,7 +4,26 @@ Function for getting strides from detected gait events
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
-from numpy import max, min, mean, arccos, sum, array, sin, cos, full, nan, arctan2, unwrap, pi, sign, diff, abs, zeros, cross
+from numpy import (
+    max,
+    min,
+    mean,
+    arccos,
+    sum,
+    array,
+    sin,
+    cos,
+    full,
+    nan,
+    arctan2,
+    unwrap,
+    pi,
+    sign,
+    diff,
+    abs,
+    zeros,
+    cross,
+)
 from numpy.linalg import norm
 
 from skdh.utility.internal import rle
@@ -47,7 +66,7 @@ def get_turns(gait, accel, gyro, fs, n_strides):
     """
     # first check if we can detect turns
     if gyro is None:
-        gait['Turn'].extend([-1] * n_strides)
+        gait["Turn"].extend([-1] * n_strides)
         return
 
     # get the first available still period to start the yaw tracking
@@ -55,10 +74,10 @@ def get_turns(gait, accel, gyro, fs, n_strides):
 
     min_slice = None
     for i in range(int(2 * fs)):
-        tmp = norm(accel[i:i + n], axis=1)
+        tmp = norm(accel[i : i + n], axis=1)
         acc_range = max(tmp) - min(tmp)
         if acc_range < (0.2 / 9.81):  # range defined by the Pham paper
-            min_slice = accel[i:i + n]
+            min_slice = accel[i : i + n]
             break
 
     if min_slice is None:
@@ -70,8 +89,8 @@ def get_turns(gait, accel, gyro, fs, n_strides):
     phi = arccos(sum(acc_init * array([0, 0, 1])) / norm(acc_init))
 
     # create the rotation matrix/rotations from sensor frame to global frame
-    gsZ = array([sin(phi), cos(phi), 0.])
-    gsX = array([1., 0., 0.])
+    gsZ = array([sin(phi), cos(phi), 0.0])
+    gsX = array([1.0, 0.0, 0.0])
 
     gsY = cross(gsZ, gsX)
     gsY /= norm(gsY)
@@ -94,11 +113,13 @@ def get_turns(gait, accel, gyro, fs, n_strides):
         wy = gyro[i, 1]
         wz = gyro[i, 2]
 
-        update_R = array([
-            [t * wx**2 + c, t * wx * wy + s * wz, t * wx * wz - s * wy],
-            [t * wx * wy - s * wz, t * wy**2 + c, t * wy * wz + s * wx],
-            [t * wx * wz + s * wy, t * wy * wz - s * wx, t * wz**2 + c],
-        ])
+        update_R = array(
+            [
+                [t * wx ** 2 + c, t * wx * wy + s * wz, t * wx * wz - s * wy],
+                [t * wx * wy - s * wz, t * wy ** 2 + c, t * wy * wz + s * wx],
+                [t * wx * wz + s * wy, t * wy * wz - s * wx, t * wz ** 2 + c],
+            ]
+        )
 
         gsR = update_R @ gsR
         alpha[i] = arctan2(gsR[2, 0], gsR[1, 0])
@@ -126,21 +147,21 @@ def get_turns(gait, accel, gyro, fs, n_strides):
 
     # set hesitation turns to match surrounding
     for l, s in zip(lengths[mask], starts[mask]):
-        turns[s:s + l] = turns[s - 1]
+        turns[s : s + l] = turns[s - 1]
 
     # enforce the time limit (0.1 - 10s) and angle limit (90 deg)
     lengths, starts, values = rle(turns == 1)
-    mask = abs(alpha[starts + lengths] - alpha[starts]) < (pi / 2) # exclusion mask
+    mask = abs(alpha[starts + lengths] - alpha[starts]) < (pi / 2)  # exclusion mask
     mask |= ((lengths / fs) < 0.1) & ((lengths / fs) > 10)
     for l, s in zip(lengths[mask], starts[mask]):
-        turns[s:s + l] = 0
+        turns[s : s + l] = 0
     # final list of turns
     lengths, starts, values = rle(turns != 0)
 
     # mask for strides in turn
     in_turn = zeros(n_strides, dtype="int")
     for d, s in zip(lengths[values == 1], starts[values == 1]):
-        in_turn += (gait['IC'][-n_strides:] > s) & (gait['IC'][-n_strides:] < (s + d))
-        in_turn += (gait['FC'][-n_strides:] > s) & (gait['FC'][-n_strides:] < (s + d))
+        in_turn += (gait["IC"][-n_strides:] > s) & (gait["IC"][-n_strides:] < (s + d))
+        in_turn += (gait["FC"][-n_strides:] > s) & (gait["FC"][-n_strides:] < (s + d))
 
-    gait['Turn'].extend(in_turn)
+    gait["Turn"].extend(in_turn)

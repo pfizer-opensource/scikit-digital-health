@@ -132,7 +132,7 @@ def gait_input_gyro():
     data = load(path)
     t = data["time"]
     acc = data["accel"]
-    gyr = data['gyro']
+    gyr = data["gyro"]
 
     return t, acc, gyr
 

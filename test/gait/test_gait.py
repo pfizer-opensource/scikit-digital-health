@@ -47,7 +47,9 @@ class TestGait:
             day_window=(0, 24),
         )
 
-        res = g.predict(time=t, accel=acc, gyro=gyr, fs=128.0, height=1.88, gait_pred=True)
+        res = g.predict(
+            time=t, accel=acc, gyro=gyr, fs=128.0, height=1.88, gait_pred=True
+        )
 
         for key in gait_res_gyro.files:
             assert allclose(res[key], gait_res_gyro[key], equal_nan=True)
