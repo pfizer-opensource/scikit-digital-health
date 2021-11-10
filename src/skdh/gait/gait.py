@@ -25,6 +25,7 @@ from skdh.gait.get_gait_classification import (
 from skdh.gait.get_gait_bouts import get_gait_bouts
 from skdh.gait.get_gait_events import get_gait_events
 from skdh.gait.get_strides import get_strides
+from skdh.gait.get_turns import get_turns
 from skdh.gait.gait_endpoints import gait_endpoints
 from skdh.gait.gait_endpoints import GaitEventEndpoint, GaitBoutEndpoint
 
@@ -35,9 +36,10 @@ class LowFrequencyError(Exception):
 
 class Gait(BaseProcess):
     """
-    Process IMU data to extract endpoints of gait. Detect gait, extract gait events (heel-strikes,
-    toe-offs), and compute gait endpoints from inertial data collected from a lumbar mounted
-    wearable inertial measurement unit
+    Process IMU data to extract endpoints of gait. Detect gait, extract gait events
+    (heel-strikes, toe-offs), and compute gait endpoints from inertial data collected
+    from a lumbar mounted wearable inertial measurement unit. If angular velocity
+    data is provided, turns are detected, and steps during turns are noted.
 
     Parameters
     ----------
@@ -104,6 +106,14 @@ class Gait(BaseProcess):
 
     3. Stride time must be less than `max\\_stride\\_time`
 
+    If angular velocity data is provided, turns are detected [8]_, and steps during
+    turns are noted in the results. Values are assigned as follows:
+
+    - -1: Turns not detected (lacking angular velocity data)
+    - 0: No turn found
+    - 1: Turn overlaps with either Initial or Final contact
+    - 2: Turn overlaps with both Initial and Final contact
+
     References
     ----------
     .. [1] B. Najafi, K. Aminian, A. Paraschiv-Ionescu, F. Loew, C. J. Bula, and P. Robert,
@@ -131,6 +141,11 @@ class Gait(BaseProcess):
     .. [7] R. Moe-Nilssen, “A new method for evaluating motor control in gait under real-life
         environmental conditions. Part 1: The instrument,” Clinical Biomechanics, vol. 13, no.
         4–5, pp. 320–327, Jun. 1998, doi: 10.1016/S0268-0033(98)00089-8.
+    .. [8] M. H. Pham et al., “Algorithm for Turning Detection and Analysis
+        Validated under Home-Like Conditions in Patients with Parkinson’s Disease
+        and Older Adults using a 6 Degree-of-Freedom Inertial Measurement Unit at
+        the Lower Back,” Front. Neurol., vol. 8, Apr. 2017,
+        doi: 10.3389/fneur.2017.00135.
     """
 
     # gait parameters
@@ -378,10 +393,10 @@ class Gait(BaseProcess):
         self.plot_fname = save_file
 
     def predict(
-        self, time=None, accel=None, *, fs=None, height=None, gait_pred=None, **kwargs
+        self, time=None, accel=None, *, gyro=None, fs=None, height=None, gait_pred=None, **kwargs
     ):
         """
-        predict(time, accel, *, fs=None, height=None, gait_pred=None, day_ends={})
+        predict(time, accel, *, gyro=None, fs=None, height=None, gait_pred=None, day_ends={})
 
         Get the gait events and endpoints from a time series signal
 
@@ -390,10 +405,15 @@ class Gait(BaseProcess):
         time : numpy.ndarray
             (N, ) array of unix timestamps, in seconds
         accel : numpy.ndarray
-            (N, 3) array of accelerations measured by centrally mounted lumbar
-            device, in units of 'g'
+            (N, 3) array of accelerations measured by a centrally mounted lumbar
+            inertial measurement device, in units of 'g'.
+        gyro : numpy.ndarray
+            (N, 3) array of angular velocities measured by a centrally mounted
+            lumbar inertial measurement device, in units of 'rad/s'. If provided,
+            will be used to indicate if steps occur during turns. Default is None.
         fs : float, optional
-            Sampling frequency in Hz of the accelerometer data.
+            Sampling frequency in Hz of the accelerometer data. If not provided,
+            will be computed form the timestamps.
         height : float, optional
             Either height (False) or leg length (True) of the subject who wore
             the inertial measurement device, in meters, depending on `leg_length`.
@@ -426,6 +446,7 @@ class Gait(BaseProcess):
             expect_wear=False,  # currently not using wear
             time=time,
             accel=accel,
+            gyro=gyro,
             fs=fs,
             height=height,
             gait_pred=gait_pred,
@@ -463,18 +484,19 @@ class Gait(BaseProcess):
         if fs != goal_fs:
             (
                 time_ds,
-                (accel_ds,),
+                (accel_ds, gyro_ds),
                 (gait_starts_ds, gait_stops_ds, day_starts_ds, day_stops_ds),
             ) = apply_downsample(
                 goal_fs,
                 time,
-                (accel,),
+                (accel, gyro),
                 (gait_starts, gait_stops, *self.day_idx),
                 self.aa_filter,
             )
         else:
             time_ds = time
             accel_ds = accel
+            gyro_ds = gyro
             gait_starts_ds = gait_starts
             gait_stops_ds = gait_stops
             day_starts_ds, day_stops_ds = self.day_idx
@@ -497,6 +519,7 @@ class Gait(BaseProcess):
                 "valid cycle",
                 "delta h",
                 "IC Time",
+                "Turn",
             ]
         }
         # aux dictionary for storing values for computing gait endpoints
@@ -557,6 +580,15 @@ class Gait(BaseProcess):
                     goal_fs,
                     self.max_stride_time,
                     self.loading_factor,
+                )
+
+                # check if strides are during turns
+                get_turns(
+                    gait,
+                    accel_ds[bout],
+                    gyro_ds[bout] if gyro_ds is not None else None,
+                    goal_fs,
+                    strides_in_bout,
                 )
 
                 # plotting
