@@ -56,13 +56,23 @@ class TestPipeline:
 
     def test_add(self, testprocess):
         p = Pipeline()
+        p2 = Pipeline()
 
         tp = testprocess(kw1=500)
-        p.add(tp, save_file="test_saver.csv")
+        tp2 = testprocess(kw1=400)
+        p.add(tp, save_file="test_saver.csv", make_copy=False)
+        p2.add(tp2, save_file="test_saver.csv")
 
+        assert p._steps[0] is tp
         assert p._steps == [testprocess(kw1=500)]
         assert tp._in_pipeline
         assert tp.pipe_save_file == "test_saver.csv"
+
+        # check when adding a copy
+        assert tp2 is not p2._steps[0]
+        assert not tp2._in_pipeline  # should be set on the copy
+        assert tp2.pipe_save_file is None
+        assert p2._steps[0]._in_pipeline
 
         with pytest.raises(NotAProcessError):
             p.add(list())
