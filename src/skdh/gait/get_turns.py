@@ -4,7 +4,7 @@ Function for getting strides from detected gait events
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
-from numpy import max, min, mean, arccos, sum, array, sin, cos, full, nan, arctan2, unwrap, pi, sign, diff
+from numpy import max, min, mean, arccos, sum, array, sin, cos, full, nan, arctan2, unwrap, pi, sign, diff, abs, zeros, cross
 from numpy.linalg import norm
 
 from skdh.utility.internal import rle
@@ -57,11 +57,11 @@ def get_turns(gait, accel, gyro, fs, n_strides):
         tmp = norm(accel[i:i + n], axis=1)
         acc_range = max(tmp) - min(tmp)
         if acc_range < (0.2 / 9.81):  # range defined by the Pham paper
-            min_slice = acc[i:i + n]
+            min_slice = accel[i:i + n]
             break
 
     if min_slice is None:
-        min_slice = acc[:n]
+        min_slice = accel[:n]
 
     # compute the mean value over that time frame
     acc_init = mean(min_slice, axis=0)
@@ -108,8 +108,36 @@ def get_turns(gait, accel, gyro, fs, n_strides):
     # get the sign of the difference as initial turn indication
     turns = sign(diff(alpha))
 
+    # get the angles of the turns
     lengths, starts, values = rle(turns == 1)
+    turn_angles = abs(alpha[starts + lengths] - alpha[starts])
 
+    # find hesitations in turns
+    mask = (lengths / fs) < 0.5  # less than half a second
+    mask[1:-1] &= turn_angles[:-2] >= (pi / 180 * 10)  # adjacent turns > 10 degrees
+    mask[1:-1] &= turn_angles[2:] >= (pi / 180 * 10)
 
+    # one adjacent turn greater than 45 degrees
+    mask[1:-1] &= (turn_angles[:-2] > pi / 4) | (turn_angles[2:] >= pi / 4)
 
+    # magnitude of hesitation less than 10% of turn angle
+    mask[1:-1] = turn_angles[1:-1] < (0.1 * (turn_angles[:-2] + turn_angles[2:]))
 
+    # set hesitation turns to match surrounding
+    for l, s in zip(lengths[mask], starts[mask]):
+        turns[s:s + l] = turns[s - 1]
+
+    # enforce the time limit (0.1 - 10s) and angle limit (90 deg)
+    lengths, starts, values = rle(turns == 1)
+    mask = abs(alpha[starts + lengths] - alpha[starts]) < (pi / 2) # exclusion mask
+    mask |= ((lengths / fs) < 0.1) & ((lengths / fs) > 10)
+    for l, s in zip(lengths[mask], starts[mask]):
+        turns[s:s + l] = 0
+    # final list of turns
+    lengths, starts, values = rle(turns != 0)
+
+    # mask for strides in turn
+    in_turn = zeros(n_strides, dtype="int")
+    for d, s in zip(lengths, starts):
+        in_turn += (gait['IC'][-n_strides:] > s) & (gait['IC'][-n_strides:] < (s + d))
+        in_turn += (gait['FC'][-n_strides:] > s) & (gait['FC'][-n_strides:] < (s + d))
