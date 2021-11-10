@@ -141,3 +141,5 @@ def get_turns(gait, accel, gyro, fs, n_strides):
     for d, s in zip(lengths, starts):
         in_turn += (gait['IC'][-n_strides:] > s) & (gait['IC'][-n_strides:] < (s + d))
         in_turn += (gait['FC'][-n_strides:] > s) & (gait['FC'][-n_strides:] < (s + d))
+
+    gait['Turn'].extend(in_turn)
