@@ -65,7 +65,7 @@ def get_turns(gait, accel, gyro, fs, n_strides):
 
     """
     # first check if we can detect turns
-    if gyro is None:
+    if gyro is None or n_strides < 1:
         gait["Turn"].extend([-1] * n_strides)
         return
 
