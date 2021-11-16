@@ -92,8 +92,9 @@ class TestEventEndpoint:
 
     def test__predict_init(self):
         gait = {
-            "IC": array([10, 20, 30, 40, 50, 60, 70, 80]),
-            "Bout N": array([1, 1, 1, 2, 2, 2, 2, 2]),
+            "IC": array([10, 20, 30, 40, 50, 60, 70, 80, 90, 100]),
+            "Bout N":         array([1, 1, 1, 2, 2, 2, 2, 2, 2, 2]),
+            'forward cycles': array([2, 1, 0, 2, 2, 1, 0, 2, 1, 0]),
         }
 
         tee1 = EventEndpoint1Test()
@@ -101,5 +102,5 @@ class TestEventEndpoint:
         m, mo = tee1._predict_init(gait, init=True, offset=1)
 
         assert "PARAM:test event ept 1" in gait
-        assert gait["PARAM:test event ept 1"].size == 8
+        assert gait["PARAM:test event ept 1"].size == 10
         assert all(isnan(gait["PARAM:test event ept 1"]))
