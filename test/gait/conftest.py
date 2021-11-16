@@ -14,6 +14,7 @@ def d_gait():
         "FC opp foot": array([65, 110, 165, 210, 260, 315, 360, 405]),
         "delta h": array([0.1, 0.2, 0.1, 0.2, 0.2, 0.2, 0.1, 0.1]),
         "Bout N": array([1, 1, 1, 2, 2, 2, 2, 2]),
+        'forward cycles': array([2, 1, 0, 2, 2, 2, 1, 0]),
     }
     return gait
 
