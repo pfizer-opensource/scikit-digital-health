@@ -1,4 +1,4 @@
-__version__ = "0.9.6"
+__version__ = "0.9.7"
 
 # ==============================================================================
 # MINIMUM VERSION FOR GUARANTEED BACKWARDS COMPATIBILITY
