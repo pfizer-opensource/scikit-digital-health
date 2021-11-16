@@ -60,13 +60,16 @@ class TestEventEndpoint:
 
     def test__get_mask(self):
         gait = {
-            "IC": array([10, 20, 30, 40, 50, 60, 70, 80]),
-            "Bout N": array([1, 1, 1, 2, 2, 2, 2, 2]),
+            "IC": array([10, 20, 30, 40, 50, 60, 70, 80, 90, 100]),
+            "Bout N":         array([1, 1, 1, 2, 2, 2, 2, 2, 2, 2]),
+            'forward cycles': array([2, 1, 0, 2, 2, 1, 0, 2, 1, 0])
         }
 
-        mask = endpoints.GaitEventEndpoint._get_mask(gait, 1)
+        mask_1 = endpoints.GaitEventEndpoint._get_mask(gait, 1)
+        mask_2 = endpoints.GaitEventEndpoint._get_mask(gait, 2)
 
-        assert allclose(mask, [True, True, False, True, True, True, True, False])
+        assert allclose(mask_1, [1, 1, 0, 1, 1, 1, 0, 1, 1, 0])
+        assert allclose(mask_2, [1, 0, 0, 1, 1, 0, 0, 1, 0, 0])
 
         with pytest.raises(ValueError):
             endpoints.GaitEventEndpoint._get_mask(gait, 5)
