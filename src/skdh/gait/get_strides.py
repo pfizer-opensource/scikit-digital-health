@@ -4,7 +4,7 @@ Function for getting strides from detected gait events
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
-from numpy import nan, array, ones, nonzero
+from numpy import nan, array, ones, nonzero, zeros
 from scipy.integrate import cumtrapz
 
 
@@ -92,21 +92,19 @@ def get_strides(
     gait_fc_times = array(gait_fc_times)
     gait_fc_opp_times = array(gait_fc_opp_times)
 
-    if bout_n_steps > 2:
-        # Condition 1: stride times are less than maximum
-        cond1 = (gait_ic_times[2:] - gait_ic_times[:-2]) < max_stride_time
-        # Condition 2: "FC opp foot" for next step should match current step FC
-        cond2 = gait_fc_times[:-1] == gait_fc_opp_times[1:]
-        gait["valid cycle"].extend(cond1 & cond2[:-1])
-        gait["valid cycle"].extend([False] * 2)
-    elif bout_n_steps > 0:
-        gait["valid cycle"].extend([False] * bout_n_steps)
+    forward_cycles = zeros(gait_ic_times.size, dtype="int")
+    # are there 2 forward cycles within the maximum stride time
+    forward_cycles[:-2] += (gait_ic_times[2:] - gait_ic_times[:-2]) < max_stride_time
+    # is the next step continuous
+    forward_cycles[:-1] += gait_fc_opp_times[1:] == gait_fc_times[:-1]
+
+    gait['forward cycles'].extend(forward_cycles)
 
     for i in range(gait_index, gait_index + bout_n_steps - 1):
         i1 = gait["IC"][i]
         i2 = gait["IC"][i + 1]
 
-        if gait["valid cycle"][i]:
+        if gait["forward cycles"][i] > 0:
             vacc = vert_accel[i1:i2]
             vvel = cumtrapz(vacc, x=ts[i1:i2], initial=0)
             vpos = cumtrapz(vvel, x=ts[i1:i2], initial=0)
