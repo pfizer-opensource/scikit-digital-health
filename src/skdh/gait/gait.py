@@ -524,7 +524,7 @@ class Gait(BaseProcess):
                 "IC",
                 "FC",
                 "FC opp foot",
-                "valid cycle",
+                "forward cycles",
                 "delta h",
                 "IC Time",
                 "Turn",
@@ -619,7 +619,8 @@ class Gait(BaseProcess):
 
                 gait["Bout Steps"].extend([strides_in_bout] * strides_in_bout)
                 gait["Gait Cycles"].extend(
-                    [sum(gait["valid cycle"][gait_i:])] * strides_in_bout
+                    [sum(asarray(gait["forward cycles"][gait_i:]) == 2)]
+                    * strides_in_bout
                 )
 
                 gait_i += strides_in_bout
@@ -641,10 +642,6 @@ class Gait(BaseProcess):
             for param in self._params:
                 param().predict(goal_fs, leg_length, gait, gait_aux)
 
-            # remove invalid gait cycles
-            for k in [i for i in gait if i != "valid cycle"]:
-                gait[k] = gait[k][gait["valid cycle"]]
-
         # finalize/save the plot
         self._finalize_plot(kwargs.get("file", self.plot_fname))
 
@@ -652,7 +649,7 @@ class Gait(BaseProcess):
         gait.pop("IC", None)
         gait.pop("FC", None)
         gait.pop("FC opp foot", None)
-        gait.pop("valid cycle", None)
+        gait.pop("forward cycles", None)
 
         kwargs.update({self._acc: accel, self._time: time, "fs": fs, "height": height})
         return (kwargs, gait) if self._in_pipeline else gait

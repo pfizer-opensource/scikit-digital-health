@@ -27,7 +27,7 @@ class TestGait:
         res = g.predict(time=t, accel=acc, fs=50.0, height=1.88)
 
         for key in gait_res_50.files:
-            assert allclose(res[key], gait_res_50[key], equal_nan=True)
+            assert allclose(res[key], gait_res_50[key], equal_nan=True), key
 
     def test_with_turns(self, gait_input_gyro, gait_res_gyro):
         t, acc, gyr = gait_input_gyro
@@ -52,7 +52,7 @@ class TestGait:
         )
 
         for key in gait_res_gyro.files:
-            assert allclose(res[key], gait_res_gyro[key], equal_nan=True)
+            assert allclose(res[key], gait_res_gyro[key], equal_nan=True), key
 
     def test_add_metrics(self):
         g = Gait()
