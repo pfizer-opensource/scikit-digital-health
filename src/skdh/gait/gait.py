@@ -619,7 +619,8 @@ class Gait(BaseProcess):
 
                 gait["Bout Steps"].extend([strides_in_bout] * strides_in_bout)
                 gait["Gait Cycles"].extend(
-                    [sum(asarray(gait["forward cycles"][gait_i:]) == 2)] * strides_in_bout
+                    [sum(asarray(gait["forward cycles"][gait_i:]) == 2)]
+                    * strides_in_bout
                 )
 
                 gait_i += strides_in_bout

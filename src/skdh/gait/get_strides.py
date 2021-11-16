@@ -98,7 +98,7 @@ def get_strides(
     # is the next step continuous
     forward_cycles[:-1] += gait_fc_opp_times[1:] == gait_fc_times[:-1]
 
-    gait['forward cycles'].extend(forward_cycles)
+    gait["forward cycles"].extend(forward_cycles)
 
     for i in range(gait_index, gait_index + bout_n_steps - 1):
         i1 = gait["IC"][i]

@@ -61,8 +61,8 @@ class TestEventEndpoint:
     def test__get_mask(self):
         gait = {
             "IC": array([10, 20, 30, 40, 50, 60, 70, 80, 90, 100]),
-            "Bout N":         array([1, 1, 1, 2, 2, 2, 2, 2, 2, 2]),
-            'forward cycles': array([2, 1, 0, 2, 2, 1, 0, 2, 1, 0])
+            "Bout N": array([1, 1, 1, 2, 2, 2, 2, 2, 2, 2]),
+            "forward cycles": array([2, 1, 0, 2, 2, 1, 0, 2, 1, 0]),
         }
 
         mask_1 = endpoints.GaitEventEndpoint._get_mask(gait, 1)
@@ -77,8 +77,8 @@ class TestEventEndpoint:
     def test__predict_asymmetry(self):
         gait = {
             "IC": array([10, 20, 30, 40, 50, 60, 70, 80, 90, 100]),
-            "Bout N":         array([1, 1, 1, 2, 2, 2, 2, 2, 2, 2]),
-            'forward cycles': array([2, 1, 0, 2, 2, 1, 0, 2, 1, 0]),
+            "Bout N": array([1, 1, 1, 2, 2, 2, 2, 2, 2, 2]),
+            "forward cycles": array([2, 1, 0, 2, 2, 1, 0, 2, 1, 0]),
             "PARAM:test event ept 1": arange(1, 11),
         }
 
@@ -93,8 +93,8 @@ class TestEventEndpoint:
     def test__predict_init(self):
         gait = {
             "IC": array([10, 20, 30, 40, 50, 60, 70, 80, 90, 100]),
-            "Bout N":         array([1, 1, 1, 2, 2, 2, 2, 2, 2, 2]),
-            'forward cycles': array([2, 1, 0, 2, 2, 1, 0, 2, 1, 0]),
+            "Bout N": array([1, 1, 1, 2, 2, 2, 2, 2, 2, 2]),
+            "forward cycles": array([2, 1, 0, 2, 2, 1, 0, 2, 1, 0]),
         }
 
         tee1 = EventEndpoint1Test()

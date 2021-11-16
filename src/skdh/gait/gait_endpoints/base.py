@@ -98,7 +98,7 @@ class GaitEventEndpoint:
         mask = zeros(gait["IC"].size, dtype=bool_)
         mask[:-offset] = (gait["Bout N"][offset:] - gait["Bout N"][:-offset]) == 0
         # account for non-continuous gait bouts
-        mask &= gait['forward cycles'] >= offset
+        mask &= gait["forward cycles"] >= offset
 
         return mask
 

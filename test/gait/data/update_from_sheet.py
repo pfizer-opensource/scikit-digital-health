@@ -14,8 +14,8 @@ if __name__ == "__main__":
         "PARAM:single support",
         "PARAM:step length",
         "PARAM:cadence",
-        'PARAM:stance time asymmetry',
-        'PARAM:initial double support asymmetry',
+        "PARAM:stance time asymmetry",
+        "PARAM:initial double support asymmetry",
     ]
     # 2 forward cycles required
     offset_2 = [
@@ -23,11 +23,11 @@ if __name__ == "__main__":
         "PARAM:swing time",
         "PARAM:stride length",
         "PARAM:gait speed",
-        'PARAM:step time asymmetry',
-        'PARAM:terminal double support asymmetry',
-        'PARAM:double support asymmetry',
-        'PARAM:single support asymmetry',
-        'PARAM:step length asymmetry'
+        "PARAM:step time asymmetry",
+        "PARAM:terminal double support asymmetry",
+        "PARAM:double support asymmetry",
+        "PARAM:single support asymmetry",
+        "PARAM:step length asymmetry",
     ]
 
     # 3 forward cycles required
@@ -35,21 +35,21 @@ if __name__ == "__main__":
         "PARAM:stride time asymmetry",
         "PARAM:swing time asymmetry",
         "PARAM:stride length asymmetry",
-        "PARAM:gait speed asymmetry"
+        "PARAM:gait speed asymmetry",
     ]
 
     # set these values to nan where appropriate
     for k in offset_1:
         df.loc[df["forward cycles"] < 1, k] = np.nan
-        df_turn.loc[df_turn['forward cycles'] < 1, k] = np.nan
+        df_turn.loc[df_turn["forward cycles"] < 1, k] = np.nan
 
     for k in offset_2:
         df.loc[df["forward cycles"] < 2, k] = np.nan
-        df_turn.loc[df_turn['forward cycles'] < 2, k] = np.nan
+        df_turn.loc[df_turn["forward cycles"] < 2, k] = np.nan
 
     for k in offset_3:
-        df.loc[df['forward cycles'] < 3, k] = np.nan
-        df_turn.loc[df_turn['forward cycles'] < 3, k] = np.nan
+        df.loc[df["forward cycles"] < 3, k] = np.nan
+        df_turn.loc[df_turn["forward cycles"] < 3, k] = np.nan
 
     # get keys to update results for
     keys = [i for i in df.columns if "PARAM" in i]
@@ -69,7 +69,11 @@ if __name__ == "__main__":
 
     tmp_turn = {k: df_turn.loc[:, k].values for k in keys_turn}
     tmp_turn.update(
-        {k: np.full(tmp_turn['Bout N'].size, np.nan) for k in old_turn.files if k not in tmp_turn}
+        {
+            k: np.full(tmp_turn["Bout N"].size, np.nan)
+            for k in old_turn.files
+            if k not in tmp_turn
+        }
     )
 
     # np.savez("gait_results.npz", **tmp)
