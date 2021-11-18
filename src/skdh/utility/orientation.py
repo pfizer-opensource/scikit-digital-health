@@ -93,8 +93,8 @@ def correct_accelerometer_orientation(accel, v_axis=None, ap_axis=None):
     s_theta_a = mean(accel[:, ap_axis])
     s_theta_m = mean(accel[:, ml_axis])
     # make sure the theta values are in range
-    if s_theta_a < 0 or s_theta_a > 1 or s_theta_m < 0 or s_theta_m > 1:
-        warn("Accel. correction angles outside possible range. Not correcting.")
+    if s_theta_a < -1 or s_theta_a > 1 or s_theta_m < -1 or s_theta_m > 1:
+        warn("Accel. correction angles outside possible range [-1, 1]. Not correcting.")
         return accel
 
     c_theta_a = cos(arcsin(s_theta_a))
