@@ -124,6 +124,7 @@ class TestPipeline:
 
     def test_load_function(self, dummy_pipeline):
         p = Pipeline()
+        p2 = Pipeline()
 
         with TemporaryDirectory() as tdir:
             fname = Path(tdir) / "file.json"
@@ -133,11 +134,16 @@ class TestPipeline:
                 json.dump(dummy_pipeline["Steps"], f)
 
             with pytest.warns(
-                UserWarning, match="Pipeline created by an unknown older version"
+                UserWarning, match="Pipeline created by an unknown version"
             ):
                 p.load(str(fname))
 
         assert p._steps == [Gait()]
+
+        pipe_str = json.dumps(dummy_pipeline)
+        p2.load(json_str=pipe_str)
+
+        assert p2._steps == [Gait()]
 
     def test_load_version_warning(self, dummy_pipeline):
         p = Pipeline()
