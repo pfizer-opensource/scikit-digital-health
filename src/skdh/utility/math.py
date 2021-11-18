@@ -104,7 +104,7 @@ def moving_mean(a, w_len, skip, axis=-1):
     # check that there are enough samples
     if w_len > x.shape[-1]:
         raise ValueError(
-            "Cannot have a window length larger than the computation axis."
+            "Window length is larger than the computation axis."
         )
 
     rmean = _extensions.moving_mean(x, w_len, skip)
