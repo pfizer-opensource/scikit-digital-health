@@ -11,6 +11,7 @@ from warnings import warn
 import logging
 from packaging import version
 from copy import copy
+from pathlib import Path
 
 from skdh.base import BaseProcess as Process
 
@@ -96,6 +97,9 @@ class Pipeline:
                 }
             )
 
+        if Path(file).suffix != ".skdh":
+            file += ".skdh"
+
         with open(file, "w") as f:
             json.dump(pipe, f)
 
@@ -129,6 +133,8 @@ class Pipeline:
         if json_str is not None:
             data = json.loads(json_str)
         else:
+            if Path(file).suffix != ".skdh":
+                warn("File does not have expected suffix '.skdh'", UserWarning)
             with open(file, "r") as f:
                 data = json.load(f)
 
