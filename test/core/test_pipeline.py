@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from skdh.pipeline import Pipeline, NotAProcessError, ProcessNotFoundError
+from skdh.pipeline import Pipeline, NotAProcessError, ProcessNotFoundError, VersionError
 from skdh.gait import Gait
 from skdh import __version__ as skdh_vers
 
@@ -144,6 +144,22 @@ class TestPipeline:
         p2.load(json_str=pipe_str)
 
         assert p2._steps == [Gait()]
+
+    def test_load_errors(self, dummy_pipeline):
+        p = Pipeline()
+
+        pipe_str = json.dumps(dummy_pipeline)
+        pipe_str_steps_only = json.dumps(dummy_pipeline['Steps'])
+
+        with pytest.raises(VersionError):
+            p.load(json_str=pipe_str_steps_only, noversion_raise=True)
+
+        with pytest.raises(VersionError):
+            p._min_vers = "100.0.0"
+            p.load(json_str=pipe_str, old_raise=True)
+
+        with pytest.raises(ProcessNotFoundError):
+            p.load(json_str=pipe_str, process_raise=True)
 
     def test_load_version_warning(self, dummy_pipeline):
         p = Pipeline()
