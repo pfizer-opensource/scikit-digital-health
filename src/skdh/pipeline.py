@@ -31,7 +31,7 @@ def warn_or_raise(msg, err, err_raise):
     if err_raise:
         raise err(msg)
     else:
-        warn(msg)
+        warn(msg, UserWarning)
 
 
 class Pipeline:
@@ -136,7 +136,7 @@ class Pipeline:
             procs = data["Steps"]
             saved_version = data["Version"]
         else:
-            warn_or_raise("Pipeline created by an unkown version of skdh. Functionality not guaranteed.", VersionError, noversion_raise)
+            warn_or_raise("Pipeline created by an unknown version of skdh. Functionality not guaranteed.", VersionError, noversion_raise)
 
             procs = data
             saved_version = "0.0.1"
