@@ -23,6 +23,17 @@ class ProcessNotFoundError(Exception):
     pass
 
 
+class VersionError(Exception):
+    pass
+
+
+def warn_or_raise(msg, err, err_raise):
+    if err_raise:
+        raise err(msg)
+    else:
+        warn(msg, UserWarning)
+
+
 class Pipeline:
     """
     Pipeline class that can have multiple steps that are processed sequentially. Some of the output
@@ -88,14 +99,26 @@ class Pipeline:
         with open(file, "w") as f:
             json.dump(pipe, f)
 
-    def load(self, file):
+    def load(self, file=None, *, json_str=None, process_raise=False, noversion_raise=False, old_raise=False):
         """
-        Load a previously saved pipeline from a file
+        Load a previously saved pipeline from a file or JSON string.
 
         Parameters
         ----------
         file : {str, path-like}
-            File path to load the pipeline structure from
+            File path to load the pipeline structure from.
+        json_str : str
+            JSON string of the pipeline. If provided, `file` is ignored.
+        process_raise : bool, optional
+            Raise an error if a process in `file` or `json_str` cannot be added
+            to the pipeline. Default is False, which issues a warning instead.
+        noversion_raise : bool
+            Raise an error if no version is provided in the input data. Default
+            is False, which issues a warning instead.
+        old_raise : bool
+            Raise an error if the version used to create the pipeline is old enough
+            to potentially cause compatibility/functionality errors. Default is False,
+            which issues a warning instead.
         """
         import skdh
 
@@ -103,28 +126,23 @@ class Pipeline:
             skdh.__minimum_version__ if self._min_vers is None else self._min_vers
         )
 
-        with open(file, "r") as f:
-            data = json.load(f)
+        if json_str is not None:
+            data = json.loads(json_str)
+        else:
+            with open(file, "r") as f:
+                data = json.load(f)
 
         if "Steps" in data and "Version" in data:
             procs = data["Steps"]
             saved_version = data["Version"]
         else:
-            warn(
-                "Pipeline created by an unknown older version of skdh. "
-                "Functionality is not guaranteed",
-                UserWarning,
-            )
+            warn_or_raise("Pipeline created by an unknown version of skdh. Functionality not guaranteed.", VersionError, noversion_raise)
+
             procs = data
             saved_version = "0.0.1"
 
         if version.parse(saved_version) < version.parse(min_vers):
-            warn(
-                f"Pipeline was created by an older version of skdh ({saved_version}), "
-                f"which may not be compatible with the current version "
-                f"({skdh.__version__}). Functionality is not guaranteed.",
-                UserWarning,
-            )
+            warn_or_raise(f"Pipeline was created by an older version of skdh ({saved_version}), which may not be compatible with the current version ({skdh.__version__}). Functionality is not guaranteed.", VersionError, old_raise)
 
         for proc in procs:
             name = list(proc.keys())[0]
@@ -142,10 +160,7 @@ class Pipeline:
             try:
                 process = attrgetter(f"{mod}.{name}")(package)
             except AttributeError:
-                warn(
-                    f"Process ({pkg}.{mod}.{name}) not found. Not added to pipeline",
-                    UserWarning,
-                )
+                warn_or_raise(f"Process ({pkg}.{mod}.{name}) not found. Not added to pipeline", ProcessNotFoundError, process_raise)
                 continue
 
             proc = process(**params)
