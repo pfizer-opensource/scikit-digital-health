@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from skdh.pipeline import Pipeline, NotAProcessError, ProcessNotFoundError
+from skdh.pipeline import Pipeline, NotAProcessError, ProcessNotFoundError, VersionError
 from skdh.gait import Gait
 from skdh import __version__ as skdh_vers
 
@@ -87,7 +87,7 @@ class TestPipeline:
         p.add(tp)
 
         with TemporaryDirectory() as tdir:
-            fname = Path(tdir) / "file.json"
+            fname = Path(tdir) / "file.skdh"
 
             p.save(str(fname))
             with fname.open() as f:
@@ -124,20 +124,42 @@ class TestPipeline:
 
     def test_load_function(self, dummy_pipeline):
         p = Pipeline()
+        p2 = Pipeline()
 
         with TemporaryDirectory() as tdir:
-            fname = Path(tdir) / "file.json"
+            fname = Path(tdir) / "file.skdh"
 
             with fname.open(mode="w") as f:
                 # save only the steps to trigger version warning
                 json.dump(dummy_pipeline["Steps"], f)
 
             with pytest.warns(
-                UserWarning, match="Pipeline created by an unknown older version"
+                UserWarning, match="Pipeline created by an unknown version"
             ):
                 p.load(str(fname))
 
         assert p._steps == [Gait()]
+
+        pipe_str = json.dumps(dummy_pipeline)
+        p2.load(json_str=pipe_str)
+
+        assert p2._steps == [Gait()]
+
+    def test_load_errors(self, dummy_pipeline):
+        p = Pipeline()
+
+        pipe_str = json.dumps(dummy_pipeline)
+        pipe_str_steps_only = json.dumps(dummy_pipeline['Steps'])
+
+        with pytest.raises(VersionError):
+            p.load(json_str=pipe_str_steps_only, noversion_raise=True)
+
+        with pytest.raises(VersionError):
+            p._min_vers = "100.0.0"
+            p.load(json_str=pipe_str, old_raise=True)
+
+        with pytest.raises(ProcessNotFoundError):
+            p.load(json_str=pipe_str, process_raise=True)
 
     def test_load_version_warning(self, dummy_pipeline):
         p = Pipeline()

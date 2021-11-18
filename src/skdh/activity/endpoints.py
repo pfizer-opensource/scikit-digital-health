@@ -92,6 +92,9 @@ def get_activity_bouts(
 
     time_in_bout = 0
 
+    if accm.size < nboutdur:
+        return time_in_bout
+
     if boutmetric == 1:
         x = ((accm >= lower_thresh) & (accm < upper_thresh)).astype(int_)
         p = nonzero(x)[0]
