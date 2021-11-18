@@ -87,7 +87,7 @@ class TestPipeline:
         p.add(tp)
 
         with TemporaryDirectory() as tdir:
-            fname = Path(tdir) / "file.json"
+            fname = Path(tdir) / "file.skdh"
 
             p.save(str(fname))
             with fname.open() as f:
@@ -127,7 +127,7 @@ class TestPipeline:
         p2 = Pipeline()
 
         with TemporaryDirectory() as tdir:
-            fname = Path(tdir) / "file.json"
+            fname = Path(tdir) / "file.skdh"
 
             with fname.open(mode="w") as f:
                 # save only the steps to trigger version warning
