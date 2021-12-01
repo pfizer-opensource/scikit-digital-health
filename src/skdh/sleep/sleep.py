@@ -527,13 +527,16 @@ class Sleep(BaseProcess):
                 add_active_time=self.add_time,
             )
 
-            if tso[0] is None:
-                continue
-
             # calculate activity index
             act_index = compute_activity_index(goal_fs, accel_ds[start:stop])
 
             self._plot_activity_index(act_index)
+
+            # move this after activity index calculation so that activity index
+            # gets plotted always
+            if tso[0] is None:
+                self._plot_sleep_wear_predictions(goal_fs, None, None, None, dw_starts - start, dw_stops - start)
+                continue
 
             # sleep wake predictions
             predictions = compute_sleep_predictions(act_index, sf=0.243)
@@ -701,11 +704,11 @@ class Sleep(BaseProcess):
         ----------
         fs : float
             Sampling frequency in Hz.
-        slp : numpy.ndarray
+        slp : numpy.ndarray, None
             Minute-by-minute sleep predictions for the whole day
-        tso_start_i : int
+        tso_start_i : int, None
             Start index for TSO in minute length epochs
-        tso_end_i : int
+        tso_end_i : int, None
             End index for TSO in minute length epochs
         wear_starts : numpy.ndarray
             Indices for wear starts. Indexed to `fs`.
@@ -730,23 +733,29 @@ class Sleep(BaseProcess):
                     [sh, eh], [2, 2], color="C0", lw=3, solid_capstyle="round"
                 )
             # Sleep predictions
-            (h2,) = self.ax[-1][-1].plot(
-                self.t60[: slp.size],
-                masked_where(slp == 1, slp) + 1,
-                solid_capstyle="round",
-                lw=3,
-                color="C1",
-                label="Wake Predictions",
-            )
+            if slp is not None:
+                (h2,) = self.ax[-1][-1].plot(
+                    self.t60[: slp.size],
+                    masked_where(slp == 1, slp) + 1,
+                    solid_capstyle="round",
+                    lw=3,
+                    color="C1",
+                    label="Wake Predictions",
+                )
+            else:
+                h2 = mlines.Line2D([self.t60[0]], [0], solid_capstyle='round', lw=3, color='C1', label='Wake Predictions')
             # Total sleep opportunity
-            (h3,) = self.ax[-1][-1].plot(
-                [self.t60[tso_start_i], self.t60[tso_end_i]],
-                [0, 0],
-                solid_capstyle="round",
-                lw=3,
-                color="C2",
-                label="Sleep Opportunity",
-            )
+            if tso_start_i is not None and tso_end_i is not None:
+                (h3,) = self.ax[-1][-1].plot(
+                    [self.t60[tso_start_i], self.t60[tso_end_i]],
+                    [0, 0],
+                    solid_capstyle="round",
+                    lw=3,
+                    color="C2",
+                    label="Sleep Opportunity",
+                )
+            else:
+                h3 = mlines.Line2D([self.t60[0]], [0], solid_capstyle='round', lw=3, color='C2', label='Sleep Opportunity')
 
             self.ax[-1][-1].set_xlim([self.day_key[0], sum(self.day_key)])
             self.ax[-1][-1].set_ylim([-0.25, 2.25])
