@@ -616,6 +616,9 @@ class ActivityLevelClassification(BaseProcess):
         if self.f is None:
             return
         start_hr = start_dt.hour + start_dt.minute / 60 + start_dt.second / 3600
+        if self.day_key[0] == 0:
+            if 0 < 24 - start_hr < 1.5 / 3600:  # within 1.5 seconds
+                start_hr -= 24
 
         wear = []
         for s, e in zip(day_wear_starts - day_start, day_wear_stops - day_start):
