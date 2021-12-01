@@ -559,6 +559,9 @@ class ActivityLevelClassification(BaseProcess):
         self.ax.append(ax)
 
         start_hr = start_dt.hour + start_dt.minute / 60 + start_dt.second / 3600
+        if self.day_key[0] == 0:
+            if 0 < 24 - start_hr < 1.5 / 3600:  # within 1.5 seconds
+                start_hr -= 24
         x = self._t60 + start_hr
         n60 = int(fs * 60)
 
