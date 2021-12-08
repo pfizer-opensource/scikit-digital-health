@@ -765,6 +765,7 @@ class Sleep(BaseProcess):
             self.ax[-1][-1].set_xticklabels(
                 [f"{int(i % 24)}:00" for i in self.ax[-1][-1].get_xticks()]
             )
+            self.ax[-1][-1].set_xlabel('Hour of Day')
 
             self.ax[-1][-1].legend(
                 handles=[h1, h2, h3], bbox_to_anchor=(0, 0.5), loc="center right"
