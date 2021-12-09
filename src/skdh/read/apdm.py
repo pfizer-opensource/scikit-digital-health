@@ -29,6 +29,10 @@ class ReadApdmH5(BaseProcess):
     gravity_acceleration : float, optional
         Acceleration due to gravity. Used to convert values to units of `g`.
         Default is 9.81 m/s^2.
+    ext_error : {"warn", "raise", "skip"}, optional
+        What to do if the file extension does not match the expected extension (.h5).
+        Default is "warn". "raise" raises a ValueError. "skip" skips the file
+        reading altogether and attempts to continue with the pipeline.
 
     Notes
     -----
@@ -44,12 +48,18 @@ class ReadApdmH5(BaseProcess):
     - Sternum
     """
 
-    def __init__(self, sensor_location, gravity_acceleration=9.81):
+    def __init__(self, sensor_location, gravity_acceleration=9.81, ext_error='warn'):
         super().__init__(
             # kwargs
             sensor_location=sensor_location,
             gravity_acceleration=gravity_acceleration,
+            ext_error=ext_error,
         )
+
+        if ext_error.lower() in ['warn', 'raise', 'skip']:
+            self.ext_error = ext_error.lower()
+        else:
+            raise ValueError("`ext_error` must be one of 'raise', 'warn', 'skip'.")
 
         self.sens = sensor_location
         self.g = gravity_acceleration
@@ -86,7 +96,12 @@ class ReadApdmH5(BaseProcess):
         if not isinstance(file, str):
             file = str(file)
         if file[-2:] != "h5":
-            warn("File extension is not expected '.h5'", UserWarning)
+            if self.ext_error == 'warn':
+                warn("File extension is not expected '.h5'", UserWarning)
+            elif self.ext_error == 'raise':
+                raise ValueError("File extension is not expected '.h5'")
+            elif self.ext_error == 'skip':
+                return (kwargs, None) if self._in_pipeline else kwargs
         if not Path(file).exists():
             raise FileNotFoundError(f"File {file} does not exist.")
 

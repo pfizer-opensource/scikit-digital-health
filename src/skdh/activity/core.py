@@ -559,6 +559,9 @@ class ActivityLevelClassification(BaseProcess):
         self.ax.append(ax)
 
         start_hr = start_dt.hour + start_dt.minute / 60 + start_dt.second / 3600
+        if self.day_key[0] == 0:
+            if 0 < 24 - start_hr < 1.5 / 3600:  # within 1.5 seconds
+                start_hr -= 24
         x = self._t60 + start_hr
         n60 = int(fs * 60)
 
@@ -606,6 +609,7 @@ class ActivityLevelClassification(BaseProcess):
         ax[-1].set_xlim([self.day_key[0], sum(self.day_key)])
         ax[-1].set_xticks([i for i in range(self.day_key[0], sum(self.day_key) + 1, 3)])
         ax[-1].set_xticklabels([f"{int(i % 24)}:00" for i in ax[-1].get_xticks()])
+        ax[-1].set_xlabel('Hour of Day')
 
     def _plot_day_wear(
         self, fs, day_wear_starts, day_wear_stops, start_dt, day_start
@@ -613,6 +617,9 @@ class ActivityLevelClassification(BaseProcess):
         if self.f is None:
             return
         start_hr = start_dt.hour + start_dt.minute / 60 + start_dt.second / 3600
+        if self.day_key[0] == 0:
+            if 0 < 24 - start_hr < 1.5 / 3600:  # within 1.5 seconds
+                start_hr -= 24
 
         wear = []
         for s, e in zip(day_wear_starts - day_start, day_wear_stops - day_start):
@@ -633,6 +640,9 @@ class ActivityLevelClassification(BaseProcess):
             return
 
         start_hr = start_dt.hour + start_dt.minute / 60 + start_dt.second / 3600
+        if self.day_key[0] == 0:
+            if 0 < 24 - start_hr < 1.5 / 3600:  # within 1.5 seconds
+                start_hr -= 24
         # get day-sleep intersection
         day_sleep_starts, day_sleep_stops = get_day_index_intersection(
             sleep_starts, sleep_stops, True, day_start, day_stop
