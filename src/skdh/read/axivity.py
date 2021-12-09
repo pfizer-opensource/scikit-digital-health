@@ -27,12 +27,18 @@ class ReadCwa(BaseProcess):
 
     Parameters
     ----------
-    base : {None, int}, optional
-        Base hour [0, 23] in which to start a window of time. Default is None, which will not
-        do any windowing. Both `base` and `period` must be defined in order to window.
-    period : {None, int}, optional
-        Period for each window, in [1, 24]. Defines the number of hours per window. Default is
-        None, which will do no windowing. Both `period` and `base` must be defined to window
+    bases : {None, int}, optional
+        Base hour [0, 23] in which to start a window of time. Default is None, which
+        will not do any windowing. Both `base` and `period` must be defined in order
+        to window.
+    periods : {None, int}, optional
+        Period for each window, in [1, 24]. Defines the number of hours per window.
+        Default is None, which will do no windowing. Both `period` and `base` must
+        be defined to window
+    ext_error : {"warn", "raise", "skip"}, optional
+        What to do if the file extension does not match the expected extension (.cwa).
+        Default is "warn". "raise" raises a ValueError. "skip" skips the file
+        reading altogether and attempts to continue with the pipeline.
 
     Examples
     --------
@@ -49,12 +55,18 @@ class ReadCwa(BaseProcess):
     {'accel': ..., 'time': ..., 'day_ends': [130, 13951, ...], ...}
     """
 
-    def __init__(self, bases=None, periods=None):
+    def __init__(self, bases=None, periods=None, ext_error='warn'):
         super().__init__(
             # kwargs
             bases=bases,
             periods=periods,
+            ext_error=ext_error,
         )
+
+        if ext_error.lower() in ['warn', 'raise', 'skip']:
+            self.ext_error = ext_error.lower()
+        else:
+            raise ValueError("`ext_error` must be one of 'raise', 'warn', 'skip'.")
 
         if (bases is None) and (periods is None):
             self.window = False
@@ -123,7 +135,12 @@ class ReadCwa(BaseProcess):
         if not isinstance(file, str):
             file = str(file)
         if file[-3:] != "cwa":
-            warn("File extension is not expected '.cwa'", UserWarning)
+            if self.ext_error == "warn":
+                warn("File extension is not expected '.cwa'", UserWarning)
+            elif self.ext_error == 'raise':
+                raise ValueError("File extension is not expected '.cwa'")
+            elif self.ext_error == 'skip':
+                return (kwargs, None) if self._in_pipeline else kwargs
         if not Path(file).exists():
             raise FileNotFoundError(f"File [{file}] does not exist.")
         if Path(file).stat().st_size < 1000:
