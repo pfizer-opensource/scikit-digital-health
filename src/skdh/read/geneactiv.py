@@ -23,13 +23,19 @@ class ReadBin(BaseProcess):
     Parameters
     ----------
     bases : {None, int, list-like}, optional
-        Base hours [0, 23] in which to start a window of time. Default is None, which will not
-        do any windowing. Both `base` and `period` must be defined in order to window. Can use
-        multiple, but the number of `bases` must match the number of `periods`.
+        Base hours [0, 23] in which to start a window of time. Default is None,
+        which will not do any windowing. Both `base` and `period` must be defined
+        in order to window. Can use multiple, but the number of `bases` must match
+        the number of `periods`.
     periods : {None, int, list-like}, optional
-        Periods for each window, in [1, 24]. Defines the number of hours per window. Default is
-        None, which will do no windowing. Both `period` and `base` must be defined to window. Can
-        use multiple but the number of `periods` must math the number of `bases`.
+        Periods for each window, in [1, 24]. Defines the number of hours per window.
+        Default is None, which will do no windowing. Both `period` and `base` must
+        be defined to window. Can use multiple but the number of `periods` must
+        match the number of `bases`.
+    ext_error : {"warn", "raise", "skip"}, optional
+        What to do if the file extension does not match the expected extension (.bin).
+        Default is "warn". "raise" raises a ValueError. "skip" skips the file
+        reading altogether and attempts to continue with the pipeline.
 
     Examples
     ========
@@ -46,12 +52,18 @@ class ReadBin(BaseProcess):
     {'accel': ..., 'time': ..., 'day_ends': [130, 13951, ...]}
     """
 
-    def __init__(self, bases=None, periods=None):
+    def __init__(self, bases=None, periods=None, ext_error='warn'):
         super().__init__(
             # kwargs
             bases=bases,
             periods=periods,
+            ext_error=ext_error,
         )
+
+        if ext_error.lower() in ['warn', 'raise', 'skip']:
+            self.ext_error = ext_error.lower()
+        else:
+            raise ValueError("`ext_error` must be one of 'raise', 'warn', 'skip'.")
 
         if (bases is None) and (periods is None):
             self.window = False
@@ -118,7 +130,12 @@ class ReadBin(BaseProcess):
         if not isinstance(file, str):
             file = str(file)
         if file[-3:] != "bin":
-            warn("File extension is not expected '.bin'", UserWarning)
+            if self.ext_error == 'warn':
+                warn("File extension is not expected '.bin'", UserWarning)
+            elif self.ext_error == 'raise':
+                raise ValueError("File extension is not expected '.bin'")
+            elif self.ext_error == 'skip':
+                return (kwargs, None) if self._in_pipeline else kwargs
         if Path(file).stat().st_size < 1000:
             raise FileSizeError("File is less than 1kb, nothing to read.")
 

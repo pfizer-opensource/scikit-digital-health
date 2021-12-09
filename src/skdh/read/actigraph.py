@@ -34,6 +34,10 @@ class ReadGT3X(BaseProcess):
         Period for each window, in [1, 24]. Defines the number of hours per window.
         Default is None, which will do no windowing. Both `period` and `base` must be
         defined to window.
+    ext_error : {"warn", "raise", "skip"}, optional
+        What to do if the file extension does not match the expected extension (.gt3x).
+        Default is "warn". "raise" raises a ValueError. "skip" skips the file
+        reading altogether and attempts to continue with the pipeline.
 
     Warnings
     --------
@@ -56,17 +60,23 @@ class ReadGT3X(BaseProcess):
     {'accel': ..., 'time': ..., 'day_ends': [130, 13950, ...], ...}
     """
 
-    def __init__(self, base=None, period=None):
+    def __init__(self, base=None, period=None, ext_error="warn"):
         super().__init__(
             # kwargs
             base=base,
             period=None,
+            ext_error=ext_error,
         )
 
         warn(
             "This class is provided as-is. Validate output compared to ActiGraph CSV.",
             UserWarning,
         )
+
+        if ext_error.lower() in ['warn', 'raise', 'skip']:
+            self.ext_error = ext_error.lower()
+        else:
+            raise ValueError("`ext_error` must be one of 'raise', 'warn', 'skip'.")
 
         if (base is None) and (period is None):
             self.window = False
@@ -124,7 +134,12 @@ class ReadGT3X(BaseProcess):
         if not isinstance(file, str):
             file = str(file)
         if file[-4:] != "gt3x":
-            warn("File extension is not expected '.gt3x'", UserWarning)
+            if self.ext_error == "warn":
+                warn("File extension is not expected '.gt3x'", UserWarning)
+            elif self.ext_error == "raise":
+                raise ValueError("File extension is not expected '.gt3x'")
+            elif self.ext_error == "skip":
+                return (kwargs, None) if self._in_pipeline else kwargs
         if Path(file).stat().st_size < 1000:
             raise FileSizeError("File is less than 1kb, nothing to read.")
 
