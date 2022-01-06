@@ -19,7 +19,6 @@ formats: []
 
 # Optionally set the version of Python and requirements required to build your docs
 python:
-  version: 3.8
   install:
     - requirements: doc_requirements.txt
     - method: pip
@@ -27,3 +26,7 @@ python:
     - method: setuptools
       path: .
   system_packages: true
+build:
+  os: ubuntu-20.04
+  tools:
+    python: "3"
