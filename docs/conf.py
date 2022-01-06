@@ -47,6 +47,13 @@ extensions = [
 # see https://github.com/numpy/numpydoc/issues/69
 numpydoc_class_members_toctree = False
 
+# mock imports with extensions
+autodoc_mock_imports = [
+    "skdh.features.lib.extensions",
+    "skdh.read._extensions",
+    "skdh.utility._extensions",
+]
+
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
