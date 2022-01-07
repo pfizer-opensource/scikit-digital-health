@@ -74,6 +74,9 @@ class BaseProcess:
         self.day_idx = (None, None)
         self.wear_idx = (None, None)
 
+        # file name saving
+        self._file_name = ""
+
         # for plotting
         self.f = self.ax = self.plot_fname = None
 
