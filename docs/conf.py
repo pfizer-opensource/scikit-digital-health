@@ -49,9 +49,8 @@ numpydoc_class_members_toctree = False
 
 # mock imports with extensions
 autodoc_mock_imports = [
-    "skdh.features.lib.extensions",
-    "skdh.read._extensions",
-    "skdh.utility._extensions",
+    "numpy",
+    "scipy",
 ]
 
 
