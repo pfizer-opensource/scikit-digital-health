@@ -4,12 +4,10 @@ GeneActiv reading process
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
-from warnings import warn
-from pathlib import Path
-
 import h5py
 
 from skdh.base import BaseProcess
+from skdh.read.base import check_input_file
 
 
 class SensorNotFoundError(Exception):
@@ -64,6 +62,7 @@ class ReadApdmH5(BaseProcess):
         self.sens = sensor_location
         self.g = gravity_acceleration
 
+    @check_input_file(".h5", check_size=False)
     def predict(self, file=None, **kwargs):
         """
         predict(file)
@@ -91,20 +90,6 @@ class ReadApdmH5(BaseProcess):
         skdh.read.SensorNotFoundError
             If the specified sensor name was not found.
         """
-        if file is None:
-            raise ValueError("`file` must not be None.")
-        if not isinstance(file, str):
-            file = str(file)
-        if file[-2:] != "h5":
-            if self.ext_error == 'warn':
-                warn("File extension is not expected '.h5'", UserWarning)
-            elif self.ext_error == 'raise':
-                raise ValueError("File extension is not expected '.h5'")
-            elif self.ext_error == 'skip':
-                return (kwargs, None) if self._in_pipeline else kwargs
-        if not Path(file).exists():
-            raise FileNotFoundError(f"File {file} does not exist.")
-
         super().predict(expect_days=False, expect_wear=False, file=file, **kwargs)
 
         res = {}
