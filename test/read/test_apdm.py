@@ -1,5 +1,6 @@
 import pytest
 import h5py
+from tempfile import NamedTemporaryFile
 
 from numpy import allclose
 
@@ -23,14 +24,11 @@ class TestReadBin:
         assert allclose(res["gyro"], gyro)
         assert allclose(res["temperature"], temp)
 
-    def test_none_file_error(self):
-        with pytest.raises(ValueError):
-            ReadApdmH5("Lumbar").predict(None)
-
-    def test_extension_warning(self):
-        with pytest.warns(UserWarning, match="File extension is not expected"):
-            with pytest.raises(Exception):
-                ReadApdmH5("Lumbar").predict("test.random")
+    def test_extension(self):
+        with NamedTemporaryFile(suffix='.abc') as tmpf:
+            with pytest.warns(UserWarning, match=r"expected \[.h5\]"):
+                with pytest.raises(Exception):
+                    ReadApdmH5("Lumbar").predict(tmpf.name)
 
     def test_bad_sensor(self, apdm_file):
         with pytest.raises(SensorNotFoundError):

@@ -61,17 +61,11 @@ class TestReadCwa:
         with pytest.raises(ValueError):
             ReadCwa(bases=[0, 24], periods=[5, 26])
 
-    def test_none_file_error(self):
-        with pytest.raises(ValueError):
-            ReadCwa().predict(None)
-
-    def test_extension_warning(self):
-        with pytest.warns(UserWarning) as record:
-            with pytest.raises(Exception):
-                ReadCwa().predict("test.random")
-
-        assert len(record) == 1
-        assert "File extension is not expected '.cwa'" in record[0].message.args[0]
+    def test_extension(self):
+        with NamedTemporaryFile(suffix='.abc') as tmpf:
+            with pytest.warns(UserWarning, match=r"expected \[.cwa\]"):
+                with pytest.raises(Exception):
+                    ReadCwa().predict(tmpf.name)
 
     def test_small_size(self):
         ntf = NamedTemporaryFile(mode="w", suffix=".cwa")
