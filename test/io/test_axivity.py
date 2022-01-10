@@ -3,7 +3,7 @@ from tempfile import NamedTemporaryFile
 import pytest
 from numpy import allclose, ndarray
 
-from skdh.read import ReadCwa, FileSizeError
+from skdh.io import ReadCwa, FileSizeError
 
 
 class TestReadCwa:

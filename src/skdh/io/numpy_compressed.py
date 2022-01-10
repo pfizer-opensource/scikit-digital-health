@@ -7,7 +7,7 @@ Copyright (c) 2021. Pfizer Inc. All rights reserved.
 from numpy import load
 
 from skdh.base import BaseProcess
-from skdh.read.base import check_input_file
+from skdh.io.base import check_input_file
 
 
 class ReadNumpyFile(BaseProcess):

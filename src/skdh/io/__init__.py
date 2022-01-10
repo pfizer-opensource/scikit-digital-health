@@ -1,0 +1,42 @@
+"""
+Binary File Reading (:mod:`skdh.io`)
+=======================================
+
+.. currentmodule:: skdh.io
+
+These processes are designed to quickly read in data from various different
+wearable devices from their default binary file format.
+
+.. autosummary::
+    :toctree: generated/
+
+    ReadCwa
+    ReadBin
+    ReadGT3X
+    ReadApdmH5
+    ReadNumpyFile
+"""
+from skdh.io.axivity import ReadCwa
+from skdh.io import axivity
+from skdh.io.geneactiv import ReadBin
+from skdh.io import geneactiv
+from skdh.io.actigraph import ReadGT3X
+from skdh.io import actigraph
+from skdh.io.apdm import ReadApdmH5
+from skdh.io import apdm
+from skdh.io.numpy_compressed import ReadNumpyFile
+from skdh.io import numpy_compressed
+from skdh.io.utility import FileSizeError
+
+__all__ = (
+    "ReadCwa",
+    "ReadBin",
+    "ReadGT3X",
+    "ReadApdmH5",
+    "ReadNumpyFile",
+    "axivity",
+    "geneactiv",
+    "actigraph",
+    "apdm",
+    "numpy_compressed",
+)

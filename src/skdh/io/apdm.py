@@ -7,7 +7,7 @@ Copyright (c) 2021. Pfizer Inc. All rights reserved.
 import h5py
 
 from skdh.base import BaseProcess
-from skdh.read.base import check_input_file
+from skdh.io.base import check_input_file
 
 
 class SensorNotFoundError(Exception):
@@ -87,7 +87,7 @@ class ReadApdmH5(BaseProcess):
             If the file name is not provided.
         FileNotFoundError
             If the file does not exist.
-        skdh.read.SensorNotFoundError
+        skdh.io.SensorNotFoundError
             If the specified sensor name was not found.
         """
         super().predict(expect_days=False, expect_wear=False, file=file, **kwargs)

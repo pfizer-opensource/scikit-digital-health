@@ -9,8 +9,8 @@ from warnings import warn
 from numpy import vstack, asarray, int_
 
 from skdh.base import BaseProcess
-from skdh.read.base import check_input_file
-from skdh.read._extensions import read_geneactiv
+from skdh.io.base import check_input_file
+from skdh.io._extensions import read_geneactiv
 
 
 class ReadBin(BaseProcess):

@@ -8,7 +8,7 @@ from pathlib import Path
 import functools
 from warnings import warn
 
-from skdh.read.utility import FileSizeError
+from skdh.io.utility import FileSizeError
 
 
 def check_input_file(extension, check_size=True, ext_message="File extension [{}] does not match expected [{}]"):
