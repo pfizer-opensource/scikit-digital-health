@@ -535,7 +535,9 @@ class Sleep(BaseProcess):
             # move this after activity index calculation so that activity index
             # gets plotted always
             if tso[0] is None:
-                self._plot_sleep_wear_predictions(goal_fs, None, None, None, dw_starts - start, dw_stops - start)
+                self._plot_sleep_wear_predictions(
+                    goal_fs, None, None, None, dw_starts - start, dw_stops - start
+                )
                 continue
 
             # sleep wake predictions
@@ -743,7 +745,14 @@ class Sleep(BaseProcess):
                     label="Wake Predictions",
                 )
             else:
-                h2 = mlines.Line2D([self.t60[0]], [0], solid_capstyle='round', lw=3, color='C1', label='Wake Predictions')
+                h2 = mlines.Line2D(
+                    [self.t60[0]],
+                    [0],
+                    solid_capstyle="round",
+                    lw=3,
+                    color="C1",
+                    label="Wake Predictions",
+                )
             # Total sleep opportunity
             if tso_start_i is not None and tso_end_i is not None:
                 (h3,) = self.ax[-1][-1].plot(
@@ -755,7 +764,14 @@ class Sleep(BaseProcess):
                     label="Sleep Opportunity",
                 )
             else:
-                h3 = mlines.Line2D([self.t60[0]], [0], solid_capstyle='round', lw=3, color='C2', label='Sleep Opportunity')
+                h3 = mlines.Line2D(
+                    [self.t60[0]],
+                    [0],
+                    solid_capstyle="round",
+                    lw=3,
+                    color="C2",
+                    label="Sleep Opportunity",
+                )
 
             self.ax[-1][-1].set_xlim([self.day_key[0], sum(self.day_key)])
             self.ax[-1][-1].set_ylim([-0.25, 2.25])
@@ -765,7 +781,7 @@ class Sleep(BaseProcess):
             self.ax[-1][-1].set_xticklabels(
                 [f"{int(i % 24)}:00" for i in self.ax[-1][-1].get_xticks()]
             )
-            self.ax[-1][-1].set_xlabel('Hour of Day')
+            self.ax[-1][-1].set_xlabel("Hour of Day")
 
             self.ax[-1][-1].legend(
                 handles=[h1, h2, h3], bbox_to_anchor=(0, 0.5), loc="center right"

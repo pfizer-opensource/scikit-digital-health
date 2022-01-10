@@ -25,7 +25,7 @@ class TestReadBin:
         assert allclose(res["temperature"], temp)
 
     def test_extension(self):
-        with NamedTemporaryFile(suffix='.abc') as tmpf:
+        with NamedTemporaryFile(suffix=".abc") as tmpf:
             with pytest.warns(UserWarning, match=r"expected \[.h5\]"):
                 with pytest.raises(Exception):
                     ReadApdmH5("Lumbar").predict(tmpf.name)

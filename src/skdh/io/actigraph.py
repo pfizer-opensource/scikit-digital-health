@@ -72,7 +72,7 @@ class ReadGT3X(BaseProcess):
             UserWarning,
         )
 
-        if ext_error.lower() in ['warn', 'raise', 'skip']:
+        if ext_error.lower() in ["warn", "raise", "skip"]:
             self.ext_error = ext_error.lower()
         else:
             raise ValueError("`ext_error` must be one of 'raise', 'warn', 'skip'.")

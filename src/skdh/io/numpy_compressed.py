@@ -26,10 +26,10 @@ class ReadNumpyFile(BaseProcess):
         reading altogether and attempts to continue with the pipeline.
     """
 
-    def __init__(self, ext_error='warn'):
+    def __init__(self, ext_error="warn"):
         super(ReadNumpyFile, self).__init__(ext_error=ext_error)
 
-        if ext_error.lower() in ['warn', 'raise', 'skip']:
+        if ext_error.lower() in ["warn", "raise", "skip"]:
             self.ext_error = ext_error.lower()
         else:
             raise ValueError("`ext_error` must be one of 'raise', 'warn', 'skip'.")

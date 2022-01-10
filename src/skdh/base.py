@@ -165,7 +165,9 @@ class BaseProcess:
         date = dt_date.today().strftime("%Y%m%d")
         version = skdh_version.replace(".", "")
 
-        file_name = file_name.format(date=date, name=self._name, file=self._file_name, version=version)
+        file_name = file_name.format(
+            date=date, name=self._name, file=self._file_name, version=version
+        )
 
         kw_line = [f"{k}: {self._kw[k]}".replace(",", "  ") for k in self._kw]
 

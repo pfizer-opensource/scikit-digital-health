@@ -54,7 +54,7 @@ class ReadCwa(BaseProcess):
     {'accel': ..., 'time': ..., 'day_ends': [130, 13951, ...], ...}
     """
 
-    def __init__(self, bases=None, periods=None, ext_error='warn'):
+    def __init__(self, bases=None, periods=None, ext_error="warn"):
         super().__init__(
             # kwargs
             bases=bases,
@@ -62,7 +62,7 @@ class ReadCwa(BaseProcess):
             ext_error=ext_error,
         )
 
-        if ext_error.lower() in ['warn', 'raise', 'skip']:
+        if ext_error.lower() in ["warn", "raise", "skip"]:
             self.ext_error = ext_error.lower()
         else:
             raise ValueError("`ext_error` must be one of 'raise', 'warn', 'skip'.")

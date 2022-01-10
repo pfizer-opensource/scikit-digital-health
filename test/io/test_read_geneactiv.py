@@ -43,7 +43,7 @@ class TestReadBin:
             ReadBin(bases=[0, 24], periods=[5, 26])
 
     def test_extension(self):
-        with NamedTemporaryFile(suffix='.abc') as tmpf:
+        with NamedTemporaryFile(suffix=".abc") as tmpf:
             with pytest.warns(UserWarning, match=r"expected \[.bin\]"):
                 with pytest.raises(FileSizeError):
                     ReadBin().predict(tmpf.name)

@@ -12,12 +12,12 @@ def dummy_reader_class():
     class Rdr(BaseProcess):
         _in_pipeline = False
 
-        def __init__(self, ext_error='warn'):
+        def __init__(self, ext_error="warn"):
             super().__init__(
                 ext_error=ext_error,
             )
 
-            if ext_error.lower() in ['warn', 'raise', 'skip']:
+            if ext_error.lower() in ["warn", "raise", "skip"]:
                 self.ext_error = ext_error.lower()
             else:
                 raise ValueError("`ext_error` must be one of 'raise', 'warn', 'skip'.")
@@ -26,7 +26,7 @@ def dummy_reader_class():
         def predict(self, file=None, **kwargs):
             super().predict(expect_wear=False, expect_days=False, file=file, **kwargs)
 
-            kwargs.update({'file': file, 'in_predict': True})
+            kwargs.update({"file": file, "in_predict": True})
             return (kwargs, None) if self._in_pipeline else kwargs
 
     return Rdr

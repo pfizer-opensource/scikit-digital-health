@@ -35,7 +35,7 @@ class TestReadGt3x:
             ReadGT3X(base=24, period=26)
 
     def test_extension(self):
-        with NamedTemporaryFile(suffix='.abc') as tmpf:
+        with NamedTemporaryFile(suffix=".abc") as tmpf:
             with pytest.warns(UserWarning, match=r"expected \[.gt3x\]"):
                 with pytest.raises(Exception):
                     ReadGT3X().predict(tmpf.name)
