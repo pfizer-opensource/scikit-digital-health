@@ -8,8 +8,10 @@ from pathlib import Path
 import functools
 from warnings import warn
 
+from skdh.read.utility import FileSizeError
 
-def check_input_file(extension, ext_message="File extension [{}] does not match expected [{}]"):
+
+def check_input_file(extension, check_size=True, ext_message="File extension [{}] does not match expected [{}]"):
     """
     Check the input file for existence and suffix.
 
@@ -17,6 +19,8 @@ def check_input_file(extension, ext_message="File extension [{}] does not match 
     ----------
     extension : str
         Expected file suffix, eg '.abc'.
+    check_size : bool, optional
+        Check file size is over 1kb. Default is True.
     ext_message : str, optional
         Message to print if the suffix does not match. Should take 2 format arguments
         ('{}'), the first for the actual file suffix, and the second for the
@@ -42,8 +46,16 @@ def check_input_file(extension, ext_message="File extension [{}] does not match 
                 elif self.ext_error == 'raise':
                     raise ValueError(ext_message.format(pfile.suffix, extension))
                 elif self.ext_error == 'skip':
-                    kwargs.update({'file': file})
+                    kwargs.update({'file': str(file)})
                     return (kwargs, None) if self._in_pipeline else kwargs
+
+            # check file size if desired
+            if check_size:
+                if pfile.stat().st_size < 1000:
+                    raise FileSizeError("File is less than 1kb, nothing to read.")
+
+            # cast to a string
+            file = str(file)
 
             return func(self, file=file, **kwargs)
 
