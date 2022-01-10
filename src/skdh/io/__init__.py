@@ -4,6 +4,9 @@ Binary File Reading (:mod:`skdh.io`)
 
 .. currentmodule:: skdh.io
 
+Device Specific IO
+------------------
+
 These processes are designed to quickly read in data from various different
 wearable devices from their default binary file format.
 
@@ -14,6 +17,15 @@ wearable devices from their default binary file format.
     ReadBin
     ReadGT3X
     ReadApdmH5
+
+General Data IO
+---------------
+
+These processes are generic and not limited to a specific device/manufacturer's format.
+
+.. autosummary::
+    :toctree: generated/
+
     ReadNumpyFile
 """
 from skdh.io.axivity import ReadCwa
