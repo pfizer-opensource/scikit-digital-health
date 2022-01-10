@@ -3,7 +3,7 @@ from tempfile import NamedTemporaryFile
 import pytest
 from numpy import allclose, ndarray
 
-from skdh.read import ReadBin, FileSizeError
+from skdh.io import ReadBin, FileSizeError
 
 
 class TestReadBin:

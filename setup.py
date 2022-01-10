@@ -235,22 +235,22 @@ def configuration(parent_package="", top_path=None):
         "read",
         sources=[
             # utility HAS to be first so that read_axivity can use the module it compiles
-            "src/skdh/read/_extensions/utility.f95",
-            "src/skdh/read/_extensions/read_axivity.f95",
-            "src/skdh/read/_extensions/read_geneactiv.c",
+            "src/skdh/io/_extensions/utility.f95",
+            "src/skdh/io/_extensions/read_axivity.f95",
+            "src/skdh/io/_extensions/read_geneactiv.c",
         ],
     )
     config.add_extension(
-        "skdh/read/_extensions/read",
-        sources="src/skdh/read/_extensions/pyread.c",
+        "skdh/io/_extensions/read",
+        sources="src/skdh/io/_extensions/pyread.c",
         libraries=["read"],
     )
 
     # gt3x (actigraph)  needs its own library for some reason
-    config.add_library("gt3x", sources="src/skdh/read/_extensions/gt3x.c")
+    config.add_library("gt3x", sources="src/skdh/io/_extensions/gt3x.c")
     config.add_extension(
-        "skdh/read/_extensions/gt3x_convert",
-        sources=["src/skdh/read/_extensions/pygt3x_convert.c"],
+        "skdh/io/_extensions/gt3x_convert",
+        sources=["src/skdh/io/_extensions/pygt3x_convert.c"],
         libraries=["gt3x", "zip"],
     )
 

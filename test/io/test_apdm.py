@@ -4,8 +4,8 @@ from tempfile import NamedTemporaryFile
 
 from numpy import allclose
 
-from skdh.read import ReadApdmH5
-from skdh.read.apdm import SensorNotFoundError
+from skdh.io import ReadApdmH5
+from skdh.io.apdm import SensorNotFoundError
 
 
 class TestReadBin:

@@ -3,7 +3,7 @@ from tempfile import NamedTemporaryFile
 import pytest
 from numpy import allclose
 
-from skdh.read import ReadGT3X, FileSizeError
+from skdh.io import ReadGT3X, FileSizeError
 
 
 class TestReadGt3x:

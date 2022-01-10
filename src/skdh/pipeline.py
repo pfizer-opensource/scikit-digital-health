@@ -227,7 +227,7 @@ class Pipeline:
         Add a binary file reader without saving the results and gait processing
         with a variable file name:
 
-        >>> from skdh.read import ReadBin
+        >>> from skdh.io import ReadBin
         >>> p = Pipeline()
         >>> p.add(ReadBin(bases=0, periods=24), save_results=None)
         >>> p.add(Gait(), save_results="{date}_{name}_results.csv")
