@@ -26,7 +26,7 @@ class TestReadBin:
 
     def test_extension(self):
         with NamedTemporaryFile(suffix='.abc') as tmpf:
-            with pytest.warns(UserWarning, match="expected \[.h5\]"):
+            with pytest.warns(UserWarning, match=r"expected \[.h5\]"):
                 with pytest.raises(Exception):
                     ReadApdmH5("Lumbar").predict(tmpf.name)
 

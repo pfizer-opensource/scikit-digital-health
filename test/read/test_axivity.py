@@ -63,7 +63,7 @@ class TestReadCwa:
 
     def test_extension(self):
         with NamedTemporaryFile(suffix='.abc') as tmpf:
-            with pytest.warns(UserWarning, match="expected \[.cwa\]"):
+            with pytest.warns(UserWarning, match=r"expected \[.cwa\]"):
                 with pytest.raises(Exception):
                     ReadCwa().predict(tmpf.name)
 
