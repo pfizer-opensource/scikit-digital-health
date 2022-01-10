@@ -10,8 +10,6 @@ from skdh.read.base import check_input_file
 @fixture
 def dummy_reader_class():
     class Rdr(BaseProcess):
-        extn = ".abc"
-        extn_message = "File extension is not expected '{}'"
         _in_pipeline = False
 
         def __init__(self, ext_error='warn'):
@@ -24,7 +22,7 @@ def dummy_reader_class():
             else:
                 raise ValueError("`ext_error` must be one of 'raise', 'warn', 'skip'.")
 
-        @check_input_file
+        @check_input_file(".abc")
         def predict(self, file=None, **kwargs):
             super().predict(expect_wear=False, expect_days=False, file=file, **kwargs)
 

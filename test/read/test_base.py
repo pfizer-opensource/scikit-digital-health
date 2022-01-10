@@ -23,7 +23,7 @@ class TestCheckInputFile:
         # due to self in the predict method, dummy predict must be wrapped in conftest
 
         with NamedTemporaryFile(suffix='.cba') as tmpf:
-            with pytest.warns(UserWarning, match="File extension is not expected"):
+            with pytest.warns(UserWarning, match="File extension \[.cba\] does not match expected"):
                 rdr.predict(file=tmpf.name)
 
     def test_suffix_raise(self, dummy_reader_class):
@@ -31,7 +31,7 @@ class TestCheckInputFile:
         # due to self in the predict method, dummy predict must be wrapped in conftest
 
         with NamedTemporaryFile(suffix='.cba') as tmpf:
-            with pytest.raises(ValueError, match="File extension is not expected"):
+            with pytest.raises(ValueError, match="File extension \[.cba\] does not match expected"):
                 rdr.predict(file=tmpf.name)
 
     def test_suffix_skip(self, dummy_reader_class):
