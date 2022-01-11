@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.7, 3.8, 3.9]
+        python-version: [3.7, 3.9]
 
     steps:
     - uses: actions/checkout@v2
@@ -29,8 +29,8 @@ jobs:
           ${{ runner.os }}-
     - name: Install dependencies
       run: |
+        echo gcc --version
         python -m pip install --upgrade pip
-        pip install numpy==1.21.5
         # install the listed requirements
         pip install -r gh_actions_requirements.txt
         # install testing requirements
