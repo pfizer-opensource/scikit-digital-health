@@ -47,10 +47,10 @@ def np_rng():
 @pytest.fixture(scope="module")
 def get_linear_accel(np_rng):
     def get_la(scale):
-        x = zeros((3, 500))
+        x = zeros((3, 500), dtype=float64)
         x[2] = 1
 
-        x += scale * np_rng.standard_normal((3, 500))
+        x += scale * np_rng.standard_normal((3, 500), dtype=float64)
 
         return x
 
@@ -60,7 +60,7 @@ def get_linear_accel(np_rng):
 @pytest.fixture(scope="module")
 def get_cubic_signal(np_rng):
     def get_sig(a, b, c, d, scale):
-        x = arange(0, 5, 0.01)
+        x = arange(0, 5, 0.01, dtype=float64)
 
         if isinstance(a, ndarray):
             a = a.reshape((-1, 1))
@@ -69,7 +69,7 @@ def get_cubic_signal(np_rng):
             d = d.reshape((-1, 1))
             scale = scale.reshape((-1, 1))
 
-        y = a * x ** 3 + b * x ** 2 + c * x + d + scale * np_rng.standard_normal(500)
+        y = a * x ** 3 + b * x ** 2 + c * x + d + scale * np_rng.standard_normal(500, dtype=float64)
         return y
 
     return get_sig
