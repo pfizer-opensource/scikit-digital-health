@@ -8,5 +8,6 @@ h5py
 flake8
 pytest
 h5py
+tables
 wheel
 psutil
