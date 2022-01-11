@@ -40,7 +40,7 @@ jobs:
         #   export F90=gfortran-9
         # fi
         # install scikit-dh
-        pip install . -v
+        pip install .
       shell: bash
     - name: Test with pytest
       run: |

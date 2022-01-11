@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 
 import pytest
-from numpy import zeros, arange, ndarray, sin, pi
+from numpy import zeros, arange, ndarray, sin, pi, float64
 from numpy.random import default_rng
 
 
@@ -78,15 +78,15 @@ def get_cubic_signal(np_rng):
 @pytest.fixture(scope="module")
 def get_sin_signal(np_rng):
     def get_sig(a, f, scale=0.0):
-        x = arange(0, 5, 0.01)
+        x = arange(0, 5, 0.01, dtype=float64)
         if isinstance(a, Sequence):
-            y = zeros(500)
+            y = zeros(500, dtype=float64)
             for amp, freq in zip(a, f):
                 y += amp * sin(2 * pi * freq * x)
         else:
             y = a * sin(2 * pi * f * x)
 
-        y += np_rng.standard_normal(500) * scale
+        y += np_rng.standard_normal(500, float64) * scale
         return 1 / 0.01, y
 
     return get_sig
