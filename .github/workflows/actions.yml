@@ -29,7 +29,6 @@ jobs:
           ${{ runner.os }}-
     - name: Install dependencies
       run: |
-        gcc --version
         python -m pip install --upgrade pip
         # install the listed requirements
         pip install -r gh_actions_requirements.txt
