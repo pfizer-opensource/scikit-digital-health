@@ -45,4 +45,4 @@ jobs:
       shell: bash
     - name: Test with pytest
       run: |
-        pytest
+        pytest test/features
