@@ -260,6 +260,7 @@ def test_SignalEntropy(get_sin_signal):
 def test_SampleEntropy(get_sin_signal):
     fs, x = get_sin_signal(1.0, 1.0, 0.0)
 
+    print(fs, x.size, x[20:40])
     res = SampleEntropy(m=4, r=1.0).compute(x)
 
     assert isclose(res, 0.0216848)
