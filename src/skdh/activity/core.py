@@ -609,7 +609,7 @@ class ActivityLevelClassification(BaseProcess):
         ax[-1].set_xlim([self.day_key[0], sum(self.day_key)])
         ax[-1].set_xticks([i for i in range(self.day_key[0], sum(self.day_key) + 1, 3)])
         ax[-1].set_xticklabels([f"{int(i % 24)}:00" for i in ax[-1].get_xticks()])
-        ax[-1].set_xlabel('Hour of Day')
+        ax[-1].set_xlabel("Hour of Day")
 
     def _plot_day_wear(
         self, fs, day_wear_starts, day_wear_stops, start_dt, day_start

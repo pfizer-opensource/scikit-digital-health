@@ -18,7 +18,7 @@ from skdh.pipeline import Pipeline
 from skdh.base import BaseProcess
 
 from skdh import utility
-from skdh import read
+from skdh import io
 from skdh import preprocessing
 from skdh import sleep
 from skdh import activity
@@ -33,7 +33,7 @@ __all__ = [
     "activity",
     "gait",
     "sit2stand",
-    "read",
+    "io",
     "sleep",
     "preprocessing",
     "features",

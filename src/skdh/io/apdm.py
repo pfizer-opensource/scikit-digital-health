@@ -4,12 +4,10 @@ GeneActiv reading process
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
-from warnings import warn
-from pathlib import Path
-
 import h5py
 
 from skdh.base import BaseProcess
+from skdh.io.base import check_input_file
 
 
 class SensorNotFoundError(Exception):
@@ -48,7 +46,7 @@ class ReadApdmH5(BaseProcess):
     - Sternum
     """
 
-    def __init__(self, sensor_location, gravity_acceleration=9.81, ext_error='warn'):
+    def __init__(self, sensor_location, gravity_acceleration=9.81, ext_error="warn"):
         super().__init__(
             # kwargs
             sensor_location=sensor_location,
@@ -56,7 +54,7 @@ class ReadApdmH5(BaseProcess):
             ext_error=ext_error,
         )
 
-        if ext_error.lower() in ['warn', 'raise', 'skip']:
+        if ext_error.lower() in ["warn", "raise", "skip"]:
             self.ext_error = ext_error.lower()
         else:
             raise ValueError("`ext_error` must be one of 'raise', 'warn', 'skip'.")
@@ -64,6 +62,7 @@ class ReadApdmH5(BaseProcess):
         self.sens = sensor_location
         self.g = gravity_acceleration
 
+    @check_input_file(".h5", check_size=False)
     def predict(self, file=None, **kwargs):
         """
         predict(file)
@@ -88,23 +87,9 @@ class ReadApdmH5(BaseProcess):
             If the file name is not provided.
         FileNotFoundError
             If the file does not exist.
-        skdh.read.SensorNotFoundError
+        skdh.io.SensorNotFoundError
             If the specified sensor name was not found.
         """
-        if file is None:
-            raise ValueError("`file` must not be None.")
-        if not isinstance(file, str):
-            file = str(file)
-        if file[-2:] != "h5":
-            if self.ext_error == 'warn':
-                warn("File extension is not expected '.h5'", UserWarning)
-            elif self.ext_error == 'raise':
-                raise ValueError("File extension is not expected '.h5'")
-            elif self.ext_error == 'skip':
-                return (kwargs, None) if self._in_pipeline else kwargs
-        if not Path(file).exists():
-            raise FileNotFoundError(f"File {file} does not exist.")
-
         super().predict(expect_days=False, expect_wear=False, file=file, **kwargs)
 
         res = {}

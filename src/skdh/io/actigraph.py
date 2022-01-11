@@ -5,14 +5,13 @@ Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from warnings import warn
-from pathlib import Path
 
 from numpy import vstack, allclose
 
 from skdh.base import BaseProcess
-from skdh.read.get_window_start_stop import get_window_start_stop
-from skdh.read._extensions import read_gt3x
-from skdh.read.utility import FileSizeError
+from skdh.io.base import check_input_file
+from skdh.io.get_window_start_stop import get_window_start_stop
+from skdh.io._extensions import read_gt3x
 
 
 class ReadGT3X(BaseProcess):
@@ -73,7 +72,7 @@ class ReadGT3X(BaseProcess):
             UserWarning,
         )
 
-        if ext_error.lower() in ['warn', 'raise', 'skip']:
+        if ext_error.lower() in ["warn", "raise", "skip"]:
             self.ext_error = ext_error.lower()
         else:
             raise ValueError("`ext_error` must be one of 'raise', 'warn', 'skip'.")
@@ -97,6 +96,7 @@ class ReadGT3X(BaseProcess):
                     "Base must be in [0, 23] and period must be in [1, 23]"
                 )
 
+    @check_input_file(".gt3x")
     def predict(self, file=None, **kwargs):
         """
         predict(file)
@@ -129,20 +129,6 @@ class ReadGT3X(BaseProcess):
           not valid
         - `day_ends`: window indices
         """
-        if file is None:
-            raise ValueError("file must not be None")
-        if not isinstance(file, str):
-            file = str(file)
-        if file[-4:] != "gt3x":
-            if self.ext_error == "warn":
-                warn("File extension is not expected '.gt3x'", UserWarning)
-            elif self.ext_error == "raise":
-                raise ValueError("File extension is not expected '.gt3x'")
-            elif self.ext_error == "skip":
-                return (kwargs, None) if self._in_pipeline else kwargs
-        if Path(file).stat().st_size < 1000:
-            raise FileSizeError("File is less than 1kb, nothing to read.")
-
         super().predict(expect_days=False, expect_wear=False, file=file, **kwargs)
 
         time, accel, lux, index, N = read_gt3x(file, self.base, self.period)

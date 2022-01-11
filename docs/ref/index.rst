@@ -7,7 +7,7 @@ API Reference
     :maxdepth: 2
 
     skdh
-    read
+    io
     preprocessing
     features
     sleep

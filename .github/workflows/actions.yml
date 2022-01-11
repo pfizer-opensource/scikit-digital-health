@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.7, 3.8]
+        python-version: [3.7, 3.9]
 
     steps:
     - uses: actions/checkout@v2
@@ -17,16 +17,8 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Cache pip
-      uses: actions/cache@v2
-      with:
-        # this path is specific to ubuntu
-        path: ~/.cache/pip
-        # look to see if there is a cache hit for the corresponding requirements file
-        key: ${{ runner.os }}-pip-${{ hashFiles('gh_actions_requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
-          ${{ runner.os }}-
+        cache: pip
+        cache-dependency-path: gh_actions_requirements.txt
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -50,12 +42,6 @@ jobs:
         # install scikit-dh
         pip install .
       shell: bash
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 src/ --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 src/ --count --exit-zero --max-complexity=10 --statistics
     - name: Test with pytest
       run: |
-        pytest
+        pytest test/

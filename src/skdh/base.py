@@ -74,6 +74,9 @@ class BaseProcess:
         self.day_idx = (None, None)
         self.wear_idx = (None, None)
 
+        # file name saving
+        self._file_name = ""
+
         # for plotting
         self.f = self.ax = self.plot_fname = None
 
@@ -162,7 +165,9 @@ class BaseProcess:
         date = dt_date.today().strftime("%Y%m%d")
         version = skdh_version.replace(".", "")
 
-        file_name = file_name.format(date=date, name=self._name, file=self._file_name, version=version)
+        file_name = file_name.format(
+            date=date, name=self._name, file=self._file_name, version=version
+        )
 
         kw_line = [f"{k}: {self._kw[k]}".replace(",", "  ") for k in self._kw]
 

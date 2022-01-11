@@ -1,0 +1,55 @@
+name: skdh-macos
+
+on:
+  pull_request:
+    branches: [ main ]
+jobs:
+  build:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        python-version: [3.7, 3.9]
+        include:
+          - os: ubuntu-latest
+            path: ~/.cache/pip
+          - os: macos-latest
+            path: ~/Library/Caches/pip
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: gh_actions_requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # install the listed requirements
+          pip install --upgrade --upgrade-strategy eager -r gh_actions_requirements.txt
+          # if macos install libomp
+          if [ "$RUNNER_OS" == "macOS" ]; then
+            HOMEBREW_NO_AUTO_UPDATE=1 brew install libomp
+          fi
+        shell: bash
+      - name: Install libzip and GSL
+        run: |
+          if [ "$RUNNER_OS" == "macOS" ]; then
+            HOMEBREW_NO_AUTO_UPDATE=1 brew install libzip gsl
+          fi
+        shell: bash
+      - name: Install SKDH
+        run: |
+          # if macos, make sure to set env variables so that it can fine gfortran-9
+          if [ "$RUNNER_OS" == "macOS" ]; then
+            export F90=gfortran-9
+          fi
+          # install SKDH
+          pip install .
+        shell: bash
+      - name: Test with pytest
+        run: |
+          pytest test/
+
+

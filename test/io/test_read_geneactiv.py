@@ -3,7 +3,7 @@ from tempfile import NamedTemporaryFile
 import pytest
 from numpy import allclose, ndarray
 
-from skdh.read import ReadBin, FileSizeError
+from skdh.io import ReadBin, FileSizeError
 
 
 class TestReadBin:
@@ -42,17 +42,11 @@ class TestReadBin:
         with pytest.raises(ValueError):
             ReadBin(bases=[0, 24], periods=[5, 26])
 
-    def test_none_file_error(self):
-        with pytest.raises(ValueError):
-            ReadBin().predict(None)
-
-    def test_extension_warning(self):
-        with pytest.warns(UserWarning) as record:
-            with pytest.raises(Exception):
-                ReadBin().predict("test.random")
-
-        assert len(record) == 1
-        assert "File extension is not expected '.bin'" in record[0].message.args[0]
+    def test_extension(self):
+        with NamedTemporaryFile(suffix=".abc") as tmpf:
+            with pytest.warns(UserWarning, match=r"expected \[.bin\]"):
+                with pytest.raises(FileSizeError):
+                    ReadBin().predict(tmpf.name)
 
     def test_small_size(self):
         ntf = NamedTemporaryFile(mode="w", suffix=".bin")

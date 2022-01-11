@@ -149,7 +149,7 @@ class TestPipeline:
         p = Pipeline()
 
         pipe_str = json.dumps(dummy_pipeline)
-        pipe_str_steps_only = json.dumps(dummy_pipeline['Steps'])
+        pipe_str_steps_only = json.dumps(dummy_pipeline["Steps"])
 
         with pytest.raises(VersionError):
             p.load(json_str=pipe_str_steps_only, noversion_raise=True)

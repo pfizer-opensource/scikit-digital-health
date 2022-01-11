@@ -37,9 +37,10 @@ def warn_or_raise(msg, err, err_raise):
 
 class Pipeline:
     """
-    Pipeline class that can have multiple steps that are processed sequentially. Some of the output
-    is passed between steps. Has the ability to save results from processing steps as local files,
-    as well as return the results in a dictionary following the processing.
+    Pipeline class that can have multiple steps that are processed sequentially.
+    Some of the output is passed between steps. Has the ability to save results
+    from processing steps as local files, as well as return the results in a dictionary
+    following the processing.
 
     Parameters
     ----------
@@ -103,7 +104,15 @@ class Pipeline:
         with open(file, "w") as f:
             json.dump(pipe, f)
 
-    def load(self, file=None, *, json_str=None, process_raise=False, noversion_raise=False, old_raise=False):
+    def load(
+        self,
+        file=None,
+        *,
+        json_str=None,
+        process_raise=False,
+        noversion_raise=False,
+        old_raise=False,
+    ):
         """
         Load a previously saved pipeline from a file or JSON string.
 
@@ -142,13 +151,24 @@ class Pipeline:
             procs = data["Steps"]
             saved_version = data["Version"]
         else:
-            warn_or_raise("Pipeline created by an unknown version of skdh. Functionality not guaranteed.", VersionError, noversion_raise)
+            warn_or_raise(
+                "Pipeline created by an unknown version of skdh. Functionality not "
+                "guaranteed.",
+                VersionError,
+                noversion_raise,
+            )
 
             procs = data
             saved_version = "0.0.1"
 
         if version.parse(saved_version) < version.parse(min_vers):
-            warn_or_raise(f"Pipeline was created by an older version of skdh ({saved_version}), which may not be compatible with the current version ({skdh.__version__}). Functionality is not guaranteed.", VersionError, old_raise)
+            warn_or_raise(
+                f"Pipeline was created by an older version of skdh ({saved_version}), "
+                f"which may not be compatible with the current version "
+                f"({skdh.__version__}). Functionality is not guaranteed.",
+                VersionError,
+                old_raise,
+            )
 
         for proc in procs:
             name = list(proc.keys())[0]
@@ -166,7 +186,11 @@ class Pipeline:
             try:
                 process = attrgetter(f"{mod}.{name}")(package)
             except AttributeError:
-                warn_or_raise(f"Process ({pkg}.{mod}.{name}) not found. Not added to pipeline", ProcessNotFoundError, process_raise)
+                warn_or_raise(
+                    f"Process ({pkg}.{mod}.{name}) not found. Not added to pipeline",
+                    ProcessNotFoundError,
+                    process_raise,
+                )
                 continue
 
             proc = process(**params)
@@ -227,7 +251,7 @@ class Pipeline:
         Add a binary file reader without saving the results and gait processing
         with a variable file name:
 
-        >>> from skdh.read import ReadBin
+        >>> from skdh.io import ReadBin
         >>> p = Pipeline()
         >>> p.add(ReadBin(bases=0, periods=24), save_results=None)
         >>> p.add(Gait(), save_results="{date}_{name}_results.csv")
@@ -271,19 +295,20 @@ class Pipeline:
 
     def run(self, **kwargs):
         """
-        Run through the pipeline, sequentially processing steps. Inputs must be provided as
-        key-word arguments
+        Run through the pipeline, sequentially processing steps. Inputs must be
+        provided as key-word arguments.
 
         Parameters
         ----------
         kwargs
-            Any key-word arguments. Will get passed to the first step of the pipeline, and
-            therefore they must contain at least what the first process is expecting.
+            Any key-word arguments. Will get passed to the first step of the pipeline,
+            and therefore they must contain at least what the first process is
+            expecting.
 
         Returns
         -------
         results : dict
-            Dictionary of the results of any steps of the pipeline that return results
+            Dictionary of the results of any steps of the pipeline that return results.
         """
         # set self._current to restart processing
         self._current = -1
