@@ -153,6 +153,7 @@ end subroutine
 ! --------------------------------------------------------------------
 subroutine sample_entropy_1d(n, x, L, r, samp_ent) bind(C, name="sample_entropy_1d")
     use, intrinsic :: iso_c_binding
+    use, intrinsic :: iso_fortran_env, only: stdout=>output_unit
     implicit none
     integer(c_long), intent(in) :: n, L
     real(c_double), intent(in) :: x(n), r
@@ -184,6 +185,8 @@ subroutine sample_entropy_1d(n, x, L, r, samp_ent) bind(C, name="sample_entropy_
             end if
         end do
     end do
+
+    write(stdout, *) A, B, n
 
     if (L == 1) then
         samp_ent = -log(A / (n * (n - 1) / 2._c_double))
