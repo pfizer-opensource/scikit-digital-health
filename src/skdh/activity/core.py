@@ -578,7 +578,7 @@ class ActivityLevelClassification(BaseProcess):
         acc_metric = metric_fn(accel, n60, **self.cutpoints["kwargs"])
 
         # add to second sub-axis
-        ax[1].plot(x[: acc_metric.size], acc_metric, label=self.cutpoints["metric"])
+        ax[1].plot(x[: acc_metric.size], acc_metric[:1446], label=self.cutpoints["metric"])
         ax[1].legend(bbox_to_anchor=(0, 0.5), loc="center right")
 
         # add thresholds to plot
