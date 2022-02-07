@@ -565,7 +565,7 @@ class ActivityLevelClassification(BaseProcess):
         x = self._t60 + start_hr
         n60 = int(fs * 60)
 
-        ax[0].plot(x[: int(ceil(accel.shape[0] / n60))], accel[::n60], lw=0.5)
+        ax[0].plot(x[: int(ceil(accel.shape[0] / n60))], accel[:int(1446*n60):n60], lw=0.5)
 
         hx = mlines.Line2D([], [], color="C0", label="X", lw=0.5)
         hy = mlines.Line2D([], [], color="C1", label="Y", lw=0.5)
