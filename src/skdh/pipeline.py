@@ -136,6 +136,10 @@ class Pipeline:
         if yaml_str is not None:
             return yaml.safe_load(yaml_str)
         elif json_str is not None:
+            warn(
+                "JSON format will be deprecated in a future version.",
+                DeprecationWarning,
+            )
             return json.loads(json_str)
         else:
             if (pfile := Path(file)).suffix not in valid_json_ext + valid_yaml_ext:
