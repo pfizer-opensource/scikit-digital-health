@@ -152,7 +152,8 @@ class Pipeline:
                         data = yaml.safe_load(f)
                     except yaml.YAMLError:
                         warn(
-                            "Error reading file as YAML specification. Attempting `json.load` which will be deprecated in the future.",
+                            "Error reading file as YAML specification. Attempting "
+                            "`json.load` which will be deprecated in the future.",
                             UserWarning,
                         )
                         data = json.load(f)
