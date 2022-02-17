@@ -86,7 +86,7 @@ def get_sin_signal(np_rng):
         else:
             y = a * sin(2 * pi * f * x)
 
-        y += np_rng.standard_normal(500, float64) * scale
+        y += np_rng.standard_normal(500, dtype=float64) * scale
         return 1 / 0.01, y
 
     return get_sig
