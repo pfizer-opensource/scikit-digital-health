@@ -48,6 +48,10 @@ class Pipeline:
     file : {None, str}, optional
         File path to load a pipeline from. Default is None, in which case no
         file will be loaded.
+    yaml_str : {None, str}, optional
+        YAML string for a saved pipeline configuration. Default is None, in which
+        case no pipeline will be loaded. If provided, will be taken over any input
+        for `file`.
     """
 
     def __str__(self):
@@ -60,7 +64,7 @@ class Pipeline:
         ret += "]"
         return ret
 
-    def __init__(self, file=None):
+    def __init__(self, file=None, yaml_str=None):
         self._steps = []
         self._save = []
         self._current = -1  # iteration tracking
@@ -69,8 +73,8 @@ class Pipeline:
 
         self._min_vers = None
 
-        if file is not None:
-            self.load(file=file)
+        if file is not None or yaml_str is not None:
+            self.load(file=file, yaml_str=yaml_str)
 
     def save(self, file):
         """
