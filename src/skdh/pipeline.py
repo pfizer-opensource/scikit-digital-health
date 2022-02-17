@@ -142,13 +142,19 @@ class Pipeline:
                 )
             with open(file, "r") as f:
                 if pfile.suffix in valid_json_ext:
-                    warn("JSON format will be deprecated in a future version.", DeprecationWarning)
+                    warn(
+                        "JSON format will be deprecated in a future version.",
+                        DeprecationWarning,
+                    )
                     data = json.load(f)
                 else:
                     try:
                         data = yaml.safe_load(f)
                     except yaml.YAMLError:
-                        warn("Error reading file as YAML specification. Attempting `json.load` which will be deprecated in the future.", UserWarning)
+                        warn(
+                            "Error reading file as YAML specification. Attempting `json.load` which will be deprecated in the future.",
+                            UserWarning,
+                        )
                         data = json.load(f)
             return data
 

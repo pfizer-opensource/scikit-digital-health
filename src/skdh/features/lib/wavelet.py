@@ -173,4 +173,4 @@ class DetailPowerRatio(Feature):
         for i in range(lvls[0] - lvls[1] + 1):
             result += sum(cD[i] ** 2, axis=-1)
 
-        return result / sum(x ** 2, axis=-1)
+        return result / sum(x**2, axis=-1)
