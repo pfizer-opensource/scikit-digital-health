@@ -29,6 +29,18 @@ class VersionError(Exception):
     pass
 
 
+# update the YAML safe loader to handle Python tuples
+class TupleSafeLoader(yaml.SafeLoader):
+    def construct_python_tuple(self, node):
+        return tuple(self.construct_sequence(node))
+
+
+TupleSafeLoader.add_constructor(
+    u"tag:yaml.org,2002:python/tuple",
+    TupleSafeLoader.construct_python_tuple,
+)
+
+
 def warn_or_raise(msg, err, err_raise):
     if err_raise:
         raise err(msg)
@@ -134,7 +146,7 @@ class Pipeline:
         valid_yaml_ext = [".skdh", ".yml", ".yaml"]
 
         if yaml_str is not None:
-            return yaml.safe_load(yaml_str)
+            return yaml.load(yaml_str, Loader=TupleSafeLoader)
         elif json_str is not None:
             warn(
                 "JSON format will be deprecated in a future version.",
@@ -157,7 +169,7 @@ class Pipeline:
                     data = json.load(f)
                 else:
                     try:
-                        data = yaml.safe_load(f)
+                        data = yaml.load(f, Loader=TupleSafeLoader)
                     except yaml.YAMLError:
                         warn(
                             "Error reading file as YAML specification. Attempting "
