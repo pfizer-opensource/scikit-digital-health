@@ -57,13 +57,16 @@ class Pipeline:
 
     Parameters
     ----------
-    file : {None, str}, optional
-        File path to load a pipeline from. Default is None, in which case no
-        file will be loaded.
-    yaml_str : {None, str}, optional
-        YAML string for a saved pipeline configuration. Default is None, in which
-        case no pipeline will be loaded. If provided, will be taken over any input
-        for `file`.
+    load_kwargs : {None, dict}, optional
+        Dictionary of key-word arguments that will get directly passed to the
+        `Pipeline.load()` function. If None, no pipeline will be loaded (default).
+
+    Examples
+    --------
+    Load a pipeline, saved in a file, on instantiation. Also set it to raise an
+    error instead of a warning if one of the processes cannot be loaded:
+    >>> pipe = Pipeline(
+    >>>     load_kwargs={"file": "example_pipeline.skdh", "process_raise": False})
     """
 
     def __str__(self):
@@ -76,7 +79,7 @@ class Pipeline:
         ret += "]"
         return ret
 
-    def __init__(self, file=None, yaml_str=None):
+    def __init__(self, load_kwargs=None):
         self._steps = []
         self._save = []
         self._current = -1  # iteration tracking
@@ -85,8 +88,8 @@ class Pipeline:
 
         self._min_vers = None
 
-        if file is not None or yaml_str is not None:
-            self.load(file=file, yaml_str=yaml_str)
+        if load_kwargs is not None:
+            self.load(**load_kwargs)
 
     def save(self, file):
         """
@@ -203,8 +206,9 @@ class Pipeline:
             YAML string of the pipeline. If provided, `file` is ignored. Supersedes
             the `json_str` parameter.
         process_raise : bool, optional
-            Raise an error if a process in `file` or `json_str` cannot be added
-            to the pipeline. Default is False, which issues a warning instead.
+            Raise an error if a process in `file`, `json_str`, or `yaml_str` cannot
+            be added to the pipeline. Default is False, which issues a warning
+            instead.
         noversion_raise : bool
             Raise an error if no version is provided in the input data. Default
             is False, which issues a warning instead.
