@@ -120,13 +120,13 @@ class TestPipeline:
                 yaml.dump(dummy_pipeline, f)
 
             with pytest.warns(UserWarning):
-                p = Pipeline(str(fname))
+                p = Pipeline(dict(file=str(fname)))
 
         assert p._steps == [Gait()]
 
         # Test loading from a yaml string
         dummy_pipe_str = yaml.dump(dummy_pipeline)
-        p2 = Pipeline(yaml_str=dummy_pipe_str)
+        p2 = Pipeline(dict(yaml_str=dummy_pipe_str))
 
         assert p2._steps == [Gait()]
 
@@ -179,7 +179,7 @@ class TestPipeline:
         p._min_vers = "100.0.0"
 
         with TemporaryDirectory() as tdir:
-            fname = Path(tdir) / "file.json"
+            fname = Path(tdir) / "file.yaml"
 
             with fname.open(mode="w") as f:
                 yaml.dump(dummy_pipeline, f)
