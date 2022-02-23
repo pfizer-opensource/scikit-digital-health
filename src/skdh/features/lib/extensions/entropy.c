@@ -77,7 +77,7 @@ PyObject * sample_entropy(PyObject *NPY_UNUSED(self), PyObject *args){
     if (!PyArg_ParseTuple(args, "Old:sample_entropy", &x_, &L, &r)) return NULL;
 
     PyArrayObject *data = (PyArrayObject *)PyArray_FromAny(
-        x_, PyArray_DescrFromType(NPY_DOUBLE), 1, 0,
+        x_, PyArray_DescrFromType(NPY_FLOAT64), 1, 0,
         NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_CARRAY_RO, NULL
     );
     if (!data) return NULL;
