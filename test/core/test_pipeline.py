@@ -112,6 +112,28 @@ class TestPipeline:
 
         assert res == exp
 
+    def test__handle_load_input(self, dummy_pipeline):
+        with TemporaryDirectory() as tdir:
+            fname1 = Path(tdir) / "file.random"
+            fname_json = Path(tdir) / "file.json"
+            fname_yaml = Path(tdir) / "file.yaml"
+
+            with fname1.open(mode="w") as f:
+                yaml.dump(dummy_pipeline, f)
+            with fname_json.open(mode="w") as f:
+                json.dump(dummy_pipeline, f)
+            with fname_yaml.open(mode="w") as f:
+                f.write("unbalanced brackets: ][\n")
+
+            with pytest.warns(UserWarning, match="does not have one of the expected suffixes:"):
+                Pipeline._handle_load_input(None, None, str(fname1))
+            with pytest.warns(DeprecationWarning, match="JSON format will be deprecated"):
+                Pipeline._handle_load_input(None, None, file=str(fname_json))
+            # handle the json reader failing as well
+            with pytest.raises(json.decoder.JSONDecodeError):
+                with pytest.warns(UserWarning, match="Error reading file as YAML"):
+                    Pipeline._handle_load_input(None, None, file=str(fname_yaml))
+
     def test_load_through_init(self, dummy_pipeline):
         with TemporaryDirectory() as tdir:
             fname = Path(tdir) / "file.skdh"
