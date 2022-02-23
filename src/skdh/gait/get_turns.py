@@ -115,9 +115,9 @@ def get_turns(gait, accel, gyro, fs, n_strides):
 
         update_R = array(
             [
-                [t * wx ** 2 + c, t * wx * wy + s * wz, t * wx * wz - s * wy],
-                [t * wx * wy - s * wz, t * wy ** 2 + c, t * wy * wz + s * wx],
-                [t * wx * wz + s * wy, t * wy * wz - s * wx, t * wz ** 2 + c],
+                [t * wx**2 + c, t * wx * wy + s * wz, t * wx * wz - s * wy],
+                [t * wx * wy - s * wz, t * wy**2 + c, t * wy * wz + s * wx],
+                [t * wx * wz + s * wy, t * wy * wz - s * wx, t * wz**2 + c],
             ]
         )
 

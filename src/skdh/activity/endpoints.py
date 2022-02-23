@@ -338,7 +338,7 @@ class IntensityGradient(ActivityEndpoint):
             # set the results values
             self.ig[self.i] = slope
             self.ig_int[self.i] = intercept
-            self.ig_r[self.i] = rval ** 2
+            self.ig_r[self.i] = rval**2
 
         # reset the histogram counts to 0, and results to None
         self.hist = zeros(self.ig_vals.size)

@@ -13,6 +13,7 @@ from packaging import version
 from copy import copy
 from pathlib import Path
 
+import yaml
 from skdh.base import BaseProcess as Process
 
 
@@ -26,6 +27,18 @@ class ProcessNotFoundError(Exception):
 
 class VersionError(Exception):
     pass
+
+
+# update the YAML safe loader to handle Python tuples
+class TupleSafeLoader(yaml.SafeLoader):
+    def construct_python_tuple(self, node):
+        return tuple(self.construct_sequence(node))
+
+
+TupleSafeLoader.add_constructor(
+    u"tag:yaml.org,2002:python/tuple",
+    TupleSafeLoader.construct_python_tuple,
+)
 
 
 def warn_or_raise(msg, err, err_raise):
@@ -44,9 +57,16 @@ class Pipeline:
 
     Parameters
     ----------
-    file : {None, str}, optional
-        File path to load a pipeline from. Default is None, in which case no
-        file will be loaded.
+    load_kwargs : {None, dict}, optional
+        Dictionary of key-word arguments that will get directly passed to the
+        `Pipeline.load()` function. If None, no pipeline will be loaded (default).
+
+    Examples
+    --------
+    Load a pipeline, saved in a file, on instantiation. Also set it to raise an
+    error instead of a warning if one of the processes cannot be loaded:
+    >>> pipe = Pipeline(
+    >>>     load_kwargs={"file": "example_pipeline.skdh", "process_raise": False})
     """
 
     def __str__(self):
@@ -59,7 +79,7 @@ class Pipeline:
         ret += "]"
         return ret
 
-    def __init__(self, file=None):
+    def __init__(self, load_kwargs=None):
         self._steps = []
         self._save = []
         self._current = -1  # iteration tracking
@@ -68,8 +88,8 @@ class Pipeline:
 
         self._min_vers = None
 
-        if file is not None:
-            self.load(file=file)
+        if load_kwargs is not None:
+            self.load(**load_kwargs)
 
     def save(self, file):
         """
@@ -102,29 +122,93 @@ class Pipeline:
             file += ".skdh"
 
         with open(file, "w") as f:
-            json.dump(pipe, f)
+            yaml.dump(pipe, f)
+
+    @staticmethod
+    def _handle_load_input(yaml_str, json_str, file):
+        """
+        Handle different extensions loading
+
+        Parameters
+        ----------
+        yaml_str : str
+            YAML string of the pipeline. If provided, `file` is ignored. Supersedes
+            the `json_str` parameter.
+        json_str : str
+            DEPRECATED. JSON string of the pipeline. If provided, `file` is
+            ignored. WILL BE DEPRECATED IN A FUTURE VERSION.
+        file : str, Path-like
+            File path to load
+
+        Returns
+        -------
+        data : dict
+            Loaded pipeline data.
+        """
+        valid_json_ext = [".json"]
+        valid_yaml_ext = [".skdh", ".yml", ".yaml"]
+
+        if yaml_str is not None:
+            return yaml.load(yaml_str, Loader=TupleSafeLoader)
+        elif json_str is not None:
+            warn(
+                "JSON format will be deprecated in a future version.",
+                DeprecationWarning,
+            )
+            return json.loads(json_str)
+        else:
+            if (pfile := Path(file)).suffix not in valid_json_ext + valid_yaml_ext:
+                warn(
+                    f"File ({file}) does not have one of the expected suffixes: "
+                    f"{valid_yaml_ext + valid_json_ext}",
+                    UserWarning,
+                )
+            with open(file, "r") as f:
+                if pfile.suffix in valid_json_ext:
+                    warn(
+                        "JSON format will be deprecated in a future version.",
+                        DeprecationWarning,
+                    )
+                    data = json.load(f)
+                else:
+                    try:
+                        data = yaml.load(f, Loader=TupleSafeLoader)
+                    except yaml.YAMLError:
+                        warn(
+                            "Error reading file as YAML specification. Attempting "
+                            "`json.load` which will be deprecated in the future.",
+                            UserWarning,
+                        )
+                        data = json.load(f)
+            return data
 
     def load(
         self,
         file=None,
         *,
         json_str=None,
+        yaml_str=None,
         process_raise=False,
         noversion_raise=False,
         old_raise=False,
     ):
         """
-        Load a previously saved pipeline from a file or JSON string.
+        Load a previously saved pipeline from a file or YAML string.
 
         Parameters
         ----------
         file : {str, path-like}
             File path to load the pipeline structure from.
         json_str : str
-            JSON string of the pipeline. If provided, `file` is ignored.
+            DEPRECATED. JSON string of the pipeline. If provided, `file` is
+            ignored. WILL BE DEPRECATED IN A FUTURE VERSION.
+        yaml_str : str
+            YAML string of the pipeline. If provided, `file` is ignored. Supersedes
+            the `json_str` parameter.
         process_raise : bool, optional
-            Raise an error if a process in `file` or `json_str` cannot be added
-            to the pipeline. Default is False, which issues a warning instead.
+            Raise an error if a process in `file`, `json_str`, or `yaml_str` cannot
+            be added to the pipeline. Default is False, which issues a warning
+            instead.
         noversion_raise : bool
             Raise an error if no version is provided in the input data. Default
             is False, which issues a warning instead.
@@ -139,13 +223,8 @@ class Pipeline:
             skdh.__minimum_version__ if self._min_vers is None else self._min_vers
         )
 
-        if json_str is not None:
-            data = json.loads(json_str)
-        else:
-            if Path(file).suffix != ".skdh":
-                warn("File does not have expected suffix '.skdh'", UserWarning)
-            with open(file, "r") as f:
-                data = json.load(f)
+        # import the data, handling possible input/file types
+        data = self._handle_load_input(yaml_str, json_str, file)
 
         if "Steps" in data and "Version" in data:
             procs = data["Steps"]

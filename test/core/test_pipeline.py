@@ -1,8 +1,10 @@
-import json
 from tempfile import TemporaryDirectory
 from pathlib import Path
+# DEPRECATED
+import json
 
 import pytest
+import yaml
 
 from skdh.pipeline import Pipeline, NotAProcessError, ProcessNotFoundError, VersionError
 from skdh.gait import Gait
@@ -91,7 +93,7 @@ class TestPipeline:
 
             p.save(str(fname))
             with fname.open() as f:
-                res = json.load(f)
+                res = yaml.safe_load(f)
 
         exp = {
             "Steps": [
@@ -110,17 +112,45 @@ class TestPipeline:
 
         assert res == exp
 
+    def test__handle_load_input(self, dummy_pipeline):
+        with TemporaryDirectory() as tdir:
+            fname1 = Path(tdir) / "file.random"
+            fname_json = Path(tdir) / "file.json"
+            fname_yaml = Path(tdir) / "file.yaml"
+
+            with fname1.open(mode="w") as f:
+                yaml.dump(dummy_pipeline, f)
+            with fname_json.open(mode="w") as f:
+                json.dump(dummy_pipeline, f)
+            with fname_yaml.open(mode="w") as f:
+                f.write("unbalanced brackets: ][\n")
+
+            with pytest.warns(UserWarning, match="does not have one of the expected suffixes:"):
+                Pipeline._handle_load_input(None, None, str(fname1))
+            with pytest.warns(DeprecationWarning, match="JSON format will be deprecated"):
+                Pipeline._handle_load_input(None, None, file=str(fname_json))
+            # handle the json reader failing as well
+            with pytest.raises(json.decoder.JSONDecodeError):
+                with pytest.warns(UserWarning, match="Error reading file as YAML"):
+                    Pipeline._handle_load_input(None, None, file=str(fname_yaml))
+
     def test_load_through_init(self, dummy_pipeline):
         with TemporaryDirectory() as tdir:
-            fname = Path(tdir) / "file.json"
+            fname = Path(tdir) / "file.skdh"
 
             with fname.open(mode="w") as f:
-                json.dump(dummy_pipeline, f)
+                yaml.dump(dummy_pipeline, f)
 
             with pytest.warns(UserWarning):
-                p = Pipeline(str(fname))
+                p = Pipeline(dict(file=str(fname)))
 
         assert p._steps == [Gait()]
+
+        # Test loading from a yaml string
+        dummy_pipe_str = yaml.dump(dummy_pipeline)
+        p2 = Pipeline(dict(yaml_str=dummy_pipe_str))
+
+        assert p2._steps == [Gait()]
 
     def test_load_function(self, dummy_pipeline):
         p = Pipeline()
@@ -131,7 +161,7 @@ class TestPipeline:
 
             with fname.open(mode="w") as f:
                 # save only the steps to trigger version warning
-                json.dump(dummy_pipeline["Steps"], f)
+                yaml.dump(dummy_pipeline["Steps"], f)
 
             with pytest.warns(
                 UserWarning, match="Pipeline created by an unknown version"
@@ -140,36 +170,41 @@ class TestPipeline:
 
         assert p._steps == [Gait()]
 
-        pipe_str = json.dumps(dummy_pipeline)
-        p2.load(json_str=pipe_str)
+        pipe_str = yaml.dump(dummy_pipeline)
+        p2.load(yaml_str=pipe_str)
 
         assert p2._steps == [Gait()]
+
+        # check for the deprecation warning for json input
+        pipe_str_json = json.dumps(dummy_pipeline)
+        with pytest.warns(DeprecationWarning):
+            p2.load(json_str=pipe_str_json)
 
     def test_load_errors(self, dummy_pipeline):
         p = Pipeline()
 
-        pipe_str = json.dumps(dummy_pipeline)
-        pipe_str_steps_only = json.dumps(dummy_pipeline["Steps"])
+        pipe_str = yaml.dump(dummy_pipeline)
+        pipe_str_steps_only = yaml.dump(dummy_pipeline["Steps"])
 
         with pytest.raises(VersionError):
-            p.load(json_str=pipe_str_steps_only, noversion_raise=True)
+            p.load(yaml_str=pipe_str_steps_only, noversion_raise=True)
 
         with pytest.raises(VersionError):
             p._min_vers = "100.0.0"
-            p.load(json_str=pipe_str, old_raise=True)
+            p.load(yaml_str=pipe_str, old_raise=True)
 
         with pytest.raises(ProcessNotFoundError):
-            p.load(json_str=pipe_str, process_raise=True)
+            p.load(yaml_str=pipe_str, process_raise=True)
 
     def test_load_version_warning(self, dummy_pipeline):
         p = Pipeline()
         p._min_vers = "100.0.0"
 
         with TemporaryDirectory() as tdir:
-            fname = Path(tdir) / "file.json"
+            fname = Path(tdir) / "file.yaml"
 
             with fname.open(mode="w") as f:
-                json.dump(dummy_pipeline, f)
+                yaml.dump(dummy_pipeline, f)
 
             with pytest.warns(
                 UserWarning, match="Pipeline was created by an older version of skdh"

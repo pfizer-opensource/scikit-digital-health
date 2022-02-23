@@ -565,7 +565,9 @@ class ActivityLevelClassification(BaseProcess):
         x = self._t60 + start_hr
         n60 = int(fs * 60)
 
-        ax[0].plot(x[: int(ceil(accel.shape[0] / n60))], accel[:int(1446*n60):n60], lw=0.5)
+        ax[0].plot(
+            x[: int(ceil(accel.shape[0] / n60))], accel[: int(1446 * n60) : n60], lw=0.5
+        )
 
         hx = mlines.Line2D([], [], color="C0", label="X", lw=0.5)
         hy = mlines.Line2D([], [], color="C1", label="Y", lw=0.5)
@@ -578,7 +580,9 @@ class ActivityLevelClassification(BaseProcess):
         acc_metric = metric_fn(accel, n60, **self.cutpoints["kwargs"])
 
         # add to second sub-axis
-        ax[1].plot(x[: acc_metric.size], acc_metric[:1446], label=self.cutpoints["metric"])
+        ax[1].plot(
+            x[: acc_metric.size], acc_metric[:1446], label=self.cutpoints["metric"]
+        )
         ax[1].legend(bbox_to_anchor=(0, 0.5), loc="center right")
 
         # add thresholds to plot
