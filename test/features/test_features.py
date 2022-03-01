@@ -262,7 +262,7 @@ def test_SampleEntropy(get_sin_signal):
 
     res = SampleEntropy(m=4, r=1.1).compute(x)
 
-    assert isclose(res, 0.0216848)
+    assert isclose(res, 0.01959076)
 
 
 def test_PermutationEntropy(get_sin_signal):
