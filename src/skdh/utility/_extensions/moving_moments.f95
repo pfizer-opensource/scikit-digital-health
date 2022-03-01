@@ -129,7 +129,8 @@ subroutine moving_moments_1(n, x, wlen, skip, mean) bind(C, name="moving_moments
         k = 2_c_long
 
         do i = wlen + skip, n, skip
-            m1(0:wlen - skip) = m1(skip:wlen)
+!            m1(0:wlen - skip) = m1(skip:wlen)
+            m1 = eoshift(m1, shift=skip, boundary=0.)
 
             do j = wlen - skip + 1, wlen
                 m1(j) = m1(j - 1) + x(i - wlen + j)
