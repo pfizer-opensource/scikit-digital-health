@@ -157,7 +157,8 @@ class Pipeline:
             )
             return json.loads(json_str)
         else:
-            if (pfile := Path(file)).suffix not in valid_json_ext + valid_yaml_ext:
+            pfile = Path(file)
+            if pfile.suffix not in valid_json_ext + valid_yaml_ext:
                 warn(
                     f"File ({file}) does not have one of the expected suffixes: "
                     f"{valid_yaml_ext + valid_json_ext}",
