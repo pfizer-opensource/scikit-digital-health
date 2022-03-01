@@ -7,3 +7,4 @@ scikit-learn
 h5py
 matplotlib
 packaging
+pyyaml
