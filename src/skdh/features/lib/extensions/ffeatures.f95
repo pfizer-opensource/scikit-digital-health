@@ -186,8 +186,6 @@ subroutine sample_entropy_1d(n, x, L, r, samp_ent) bind(C, name="sample_entropy_
         end do
     end do
 
-    print *, A, B, n
-
     if (L == 1) then
         samp_ent = -log(A / (n * (n - 1) / 2._c_double))
     else
