@@ -186,8 +186,6 @@ subroutine sample_entropy_1d(n, x, L, r, samp_ent) bind(C, name="sample_entropy_
         end do
     end do
 
-    print *, A, B, n
-
     if (L == 1) then
         samp_ent = -log(A / (n * (n - 1) / 2._c_double))
     else
@@ -250,10 +248,10 @@ subroutine signal_entropy_1d(n, x, ent) bind(C, name="signal_entropy_1d")
         estimate = estimate - h(i) * logf
     end do
 
-    nbias = -(d(3) - 1.) / (2. * cnt)
+    nbias = -(d(3) - 1._c_double) / (2._c_double * cnt)
     estimate = estimate / cnt + log(cnt) + log((d(2) - d(1)) / d(3)) - nbias
 
-    ent = exp(estimate**2) - 2.
+    ent = exp(estimate**2) - 2._c_double
 end subroutine
 
 
@@ -501,8 +499,8 @@ subroutine spectral_flatness_1d(n, x, fs, nfft, low_cut, hi_cut, sFlat) bind(C, 
     real(c_double) :: sp_hat(2 * nfft+2), y(2*nfft), mean
 
     ! find the cutoff indices for the high and low cutoffs
-    ihcut = min(floor(hi_cut / (fs / 2) * (nfft - 1) + 1, c_long), nfft + 1)
-    ilcut = max(ceiling(low_cut / (fs / 2) * (nfft - 1) + 1, c_long), 1_c_long)
+    ihcut = min(floor(hi_cut / (fs / 2._c_double) * (nfft - 1) + 1, c_long), nfft + 1)
+    ilcut = max(ceiling(low_cut / (fs / 2._c_double) * (nfft - 1) + 1, c_long), 1_c_long)
     
     if (ihcut > nfft) then
         ihcut = nfft
@@ -585,7 +583,7 @@ subroutine dimensionless_jerk_1d(n, x, stype, djerk) bind(C, name="dimensionless
 
     if (stype == 1) then
         do i=2, n-1
-            jsum = jsum + (x(i-1) - 2 * x(i) + x(i+1))**2
+            jsum = jsum + (x(i-1) - 2._c_double * x(i) + x(i+1))**2
             if (abs(x(i)) > amp) then
                 amp = abs(x(i))
             end if
@@ -768,7 +766,7 @@ subroutine sparc_1d(n, x, fs, padlevel, fc, amp_thresh, sal) bind(C, name="sparc
 
     ! frequency cutoff index. This will essentially function as a low-pass filter
     ! to remove high frequency noise from affecting the next step
-    ixf = min(ceiling(fc / (0.5 * fs) * (nfft / 2)), int(nfft / 2 + 1, c_long))
+    ixf = min(ceiling(fc / (0.5_c_double * fs) * (nfft / 2)), int(nfft / 2 + 1, c_long))
 
     sal = 0._c_double
 
