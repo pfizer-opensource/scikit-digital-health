@@ -171,6 +171,9 @@ subroutine sample_entropy_1d(n, x, L, r, samp_ent) bind(C, name="sample_entropy_
         x1 = x(i)
         do ii = 1, n - i
             i2 = ii + i
+            if ((abs(x(i2) - x1) > (0.98 * r)) .AND. (abs(x(i2) - x1) < (1.02 * r))) then
+                print *, abs(x(i2) - x1), r
+            end if
             if (abs(x(i2) - x1) < r) then
                 run(ii) = run(ii) + 1
 
