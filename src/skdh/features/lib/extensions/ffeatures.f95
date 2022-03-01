@@ -162,6 +162,8 @@ subroutine sample_entropy_1d(n, x, L, r, samp_ent) bind(C, name="sample_entropy_
     real(c_double) :: x1, A, B
     integer(c_long) :: i, ii, i2, run(n)
 
+    print *, "huge c_double", huge(r)
+
     A = 0._c_double
     B = 0._c_double
     run = 0_c_long
