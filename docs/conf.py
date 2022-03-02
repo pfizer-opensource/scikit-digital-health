@@ -40,6 +40,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.autosummary",
     "numpydoc",
+    "autoapi.extension",
     "sphinx.ext.coverage",
 ]
 
@@ -48,10 +49,14 @@ extensions = [
 numpydoc_class_members_toctree = False
 
 # mock imports with extensions
-autodoc_mock_imports = [
-    # "numpy",
-    "scipy",
-]
+# autodoc_mock_imports = [
+#     # "numpy",
+#     "scipy",
+# ]
+
+# Auto API options
+autoapi_dirs = ["../src"]
+autoapi_generate_api_docs = False
 
 
 # Add any paths that contain templates here, relative to this directory.
