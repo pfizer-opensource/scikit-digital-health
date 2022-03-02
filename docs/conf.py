@@ -49,7 +49,7 @@ numpydoc_class_members_toctree = False
 
 # mock imports with extensions
 autodoc_mock_imports = [
-    "numpy",
+    # "numpy",
     "scipy",
 ]
 
