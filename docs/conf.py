@@ -29,7 +29,6 @@ release = skdh.__version__
 # -- General configuration ---------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
-#
 needs_sphinx = "2.2.0"
 
 # Add any Sphinx extension module names here, as strings. They can be
@@ -40,23 +39,12 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.autosummary",
     "numpydoc",
-    "autoapi.extension",
     "sphinx.ext.coverage",
 ]
 
 # this is needed for some reason...
 # see https://github.com/numpy/numpydoc/issues/69
 numpydoc_class_members_toctree = False
-
-# mock imports with extensions
-# autodoc_mock_imports = [
-#     # "numpy",
-#     "scipy",
-# ]
-
-# Auto API options
-autoapi_dirs = ["../src"]
-autoapi_generate_api_docs = False
 
 
 # Add any paths that contain templates here, relative to this directory.
@@ -214,7 +202,6 @@ epub_title = project
 # A list of files that should not be packed into the epub file.
 epub_exclude_files = ["search.html"]
 
-
 # -----------------------------------------------------------------------------
 # Intersphinx configuration
 # -----------------------------------------------------------------------------
@@ -228,9 +215,7 @@ intersphinx_mapping = {
 # -----------------------------------------------------------------------------
 # Autosummary
 # -----------------------------------------------------------------------------
-
 autosummary_generate = True
-
 
 # -----------------------------------------------------------------------------
 # Autodoc
@@ -239,5 +224,12 @@ autodoc_default_options = {
     "members": True,
     "inherited-members": True,
 }
+
+# mock imports with extensions
+autodoc_mock_imports = [
+    "skdh.features.lib.extensions",
+    "skdh.io._extensions",
+    "skdh.utility._extensions",
+]
 
 # -- Extension configuration -------------------------------------------------
