@@ -1,4 +1,5 @@
-.. _skdh documentation master file, created by
+..
+   _skdh documentation master file, created by
    sphinx-quickstart on Tue Oct  6 14:50:59 2020.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
