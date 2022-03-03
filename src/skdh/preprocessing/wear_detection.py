@@ -49,12 +49,12 @@ class DetectWear(BaseProcess):
         Apply the `shipping_criteria` rules to `temperature_factor`. For example,
         setting to true would mean with `temperature_factor=2` that during the first
         and last 24 hours (or specified times) the temperature could solely determine
-        non-wear. Defautl is False.
+        non-wear. Default is False.
     window_length : int, optional
         Number of minutes in a window used to determine non-wear. Default is 60 minutes.
     window_skip : int, optional
         Number of minutes to skip between windows. Default is 15 minutes, which would
-        result in window overlaps of 45 minutes with the default 60 minute
+        result in window overlaps of 45 minutes with the default 60-minute
         `window_length`.
 
     References
