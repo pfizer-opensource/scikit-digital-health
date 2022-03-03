@@ -21,26 +21,26 @@ Documentation of the your new module occurs almost fully in the ``__init__.py`` 
 
 .. code-block:: python
 
-    # src/skdh/preprocessing/__init__.py
+    # src/skdh/custom_module/__init__.py
     """
-    IMU Preprocessing (:mod:`skdh.preprocessing`)
-    ==============================================
+    IMU <Custom Module> (:mod:`skdh.custom_module`)
+    ===============================================
 
-    .. currentmodule:: skdh.preprocessing
+    .. currentmodule:: skdh.custom_module
 
-    Inertial sensor preprocessing
-    -----------------------------
+    Inertial sensor <custom module>
+    -------------------------------
 
     .. autosummary::
         :toctree: generated/
 
-        Preprocessing  .. _this is the name of your class
+        CustomClass  .. _this is the name of your class
     
     Headline 2
     ----------
     content
     """
-    from skdh.preprocessing.preprocessing import Preprocessing
+    from skdh.custom_module.custom_module import CustomModule
 
 The docstring is written like a `.rst` header file (which is how it will get interpreted). For an example in `skdh`, see the `gait init file <src/skdh/gait/__init__.py>`_.  For an example of a good module documentation from NumPY, see the `FFT <https://numpy.org/doc/stable/reference/routines.fft.html>`_ page.
 
@@ -48,9 +48,9 @@ With this documentation written, the last thing is to add a short `.rst` file in
 
 .. code:: rst
 
-    .. _this_file: docs/ref/preprocessing.rst
+    .. _this_file: docs/ref/custom_module.rst
 
-    .. automodule:: skdh.preprocessing
+    .. automodule:: skdh.custom_module
         :ignore-module-all:
 
 Then add this new file to ``docs/ref/index.rst``:
@@ -69,7 +69,7 @@ Then add this new file to ``docs/ref/index.rst``:
         gait
         sit2stand
         read
-        preprocessing
+        custom_module
 
 And thats it! Before pushing and creating a pull request, make sure that the documentation builds properly:
 
