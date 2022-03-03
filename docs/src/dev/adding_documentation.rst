@@ -31,7 +31,9 @@ Documentation of the your new module occurs almost fully in the ``__init__.py`` 
     Inertial sensor <custom module>
     -------------------------------
 
-    .. autosummary::
+    .. _Remove the `` below
+
+    .. ``autosummary``::
         :toctree: generated/
 
         CustomClass  .. _this is the name of your class
