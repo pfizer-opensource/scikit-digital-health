@@ -36,7 +36,7 @@ class TupleSafeLoader(yaml.SafeLoader):
 
 
 TupleSafeLoader.add_constructor(
-    u"tag:yaml.org,2002:python/tuple",
+    "tag:yaml.org,2002:python/tuple",
     TupleSafeLoader.construct_python_tuple,
 )
 

@@ -69,7 +69,13 @@ def get_cubic_signal(np_rng):
             d = d.reshape((-1, 1))
             scale = scale.reshape((-1, 1))
 
-        y = a * x ** 3 + b * x ** 2 + c * x + d + scale * np_rng.standard_normal(500, dtype=float64)
+        y = (
+            a * x**3
+            + b * x**2
+            + c * x
+            + d
+            + scale * np_rng.standard_normal(500, dtype=float64)
+        )
         return y
 
     return get_sig
