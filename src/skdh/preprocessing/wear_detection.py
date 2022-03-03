@@ -77,11 +77,11 @@ class DetectWear(BaseProcess):
     :math:`a_{range}` is the range of acceleration of a window, :math:`S` is the
     `sd_crit`, :math:`R` is `range_crit`.
 
-    _Setup Criteria_ is the rule that if the data starts with a period of non-wear
+    `apply_setup_criteria` is the rule that if the data starts with a period of non-wear
     of less than 3 hours followed by a non-wear period of any length, then that
     first block of wear is changed to non-wear.
 
-    _Shipping Criteria_ is an additional rule that may help in cases where the device
+    `shipping_criteria` is an additional rule that may help in cases where the device
     is being shipped either to or from the participant (or both). Wear periods at the
     start of the recording are filtered by those less than 3 hours that are followed
     by 1 hour of non-wear are re-classified as non-wear. Wear periods at the end
