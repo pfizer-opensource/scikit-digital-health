@@ -1,6 +1,6 @@
 """
-Scikit IMU (:mod:`skdh`)
-=========================
+Scikit Digital Health (:mod:`skdh`)
+===================================
 
 .. currentmodule:: skdh
 

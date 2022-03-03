@@ -1,6 +1,6 @@
 """
 Utility Functions (:mod:`skdh.utility`)
-================================
+=======================================
 
 .. currentmodule:: skdh.utility
 
