@@ -20,11 +20,20 @@ project = "SciKit-Digital-Health"
 copyright = "2021, Pfizer, Inc. All rights reserved"
 author = "Pfizer, Inc"
 
-import skdh
+# import skdh
+#
+# version = skdh.__version__[:3]
+# # The full version, including alpha/beta/rc tags
+# release = skdh.__version__
 
-version = skdh.__version__[:3]
-# The full version, including alpha/beta/rc tags
-release = skdh.__version__
+# Get the version manually. Still need to do this because the c/fortran extensions
+# won't be mocked until after reading this configuration file
+with open("../src/skdh/version.py", "r") as f:
+    line = f.readline()
+    while "__version__" not in line:
+        line = f.readline()
+
+    version = line.split("= ")[1].strip().strip('"')
 
 # -- General configuration ---------------------------------------------------
 
