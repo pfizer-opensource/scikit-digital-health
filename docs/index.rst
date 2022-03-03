@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Welcome to SciKit-Digital-Health's documentation!
-======================================
+=================================================
 
 .. image:: https://github.com/PfizerRD/scikit-digital-health/workflows/skdh/badge.svg
    :alt: GitHub Actions Badge
