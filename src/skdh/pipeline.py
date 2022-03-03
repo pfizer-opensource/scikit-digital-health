@@ -65,6 +65,7 @@ class Pipeline:
     --------
     Load a pipeline, saved in a file, on instantiation. Also set it to raise an
     error instead of a warning if one of the processes cannot be loaded:
+
     >>> pipe = Pipeline(
     >>>     load_kwargs={"file": "example_pipeline.skdh", "process_raise": False})
     """
