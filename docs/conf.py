@@ -100,7 +100,8 @@ html_theme = "pydata_sphinx_theme"
 #
 html_theme_options = {
     # "prev_next_buttons": True,
-    "show_nav_level": 3,
+    "show_nav_level": 1,
+    "show_toc_level": 2,
     "icon_links": [
         {
             "name": "GitHub",
