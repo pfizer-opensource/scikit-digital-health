@@ -109,6 +109,7 @@ html_theme_options = {
             "icon": "fab fa-github-square",
         },
     ],
+    "navbar_start": ["navbar-logo", "version"],
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
