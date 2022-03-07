@@ -38,7 +38,7 @@ with open("../src/skdh/version.py", "r") as f:
 # -- General configuration ---------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
-needs_sphinx = "2.2.0"
+needs_sphinx = "4.0.0"
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -49,6 +49,7 @@ extensions = [
     "sphinx.ext.autosummary",
     "numpydoc",
     "sphinx.ext.coverage",
+    "sphinx_panels",
 ]
 
 # this is needed for some reason...
@@ -100,7 +101,8 @@ html_theme = "pydata_sphinx_theme"
 #
 html_theme_options = {
     # "prev_next_buttons": True,
-    "show_nav_level": 3,
+    "show_nav_level": 1,
+    "show_toc_level": 2,
     "icon_links": [
         {
             "name": "GitHub",
@@ -108,6 +110,7 @@ html_theme_options = {
             "icon": "fab fa-github-square",
         },
     ],
+    "navbar_start": ["navbar-logo", "version"],
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -128,7 +131,7 @@ html_title = f"{project} Documentation"
 # 'searchbox.html']``.
 #
 # html_sidebars = {"**": ["globaltoc.html", "relations.html", "searchbox.html"]}
-html_sidebars = {"**": ["search-field.html", "sidebar-nav-bs.html"]}
+html_sidebars = {"**": ["search-field.html", "sidebar-nav-bs.html", "sidebar-ethical-ads.html"]}
 
 # -- Options for HTMLHelp output ---------------------------------------------
 
@@ -240,5 +243,10 @@ autodoc_mock_imports = [
     "skdh.io._extensions",
     "skdh.utility._extensions",
 ]
+
+# -----------------------------------------------------------------------------
+# Sphinx Panels
+# -----------------------------------------------------------------------------
+panels_add_bootstrapp_css = False
 
 # -- Extension configuration -------------------------------------------------
