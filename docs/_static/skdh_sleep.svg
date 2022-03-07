@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="256"
+   height="256"
+   viewBox="0 0 67.733331 67.733331"
+   version="1.1"
+   id="svg1420"
+   inkscape:version="1.1.2 (b8e25be8, 2022-02-05)"
+   sodipodi:docname="skdh_sleep.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1422"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="px"
+     showgrid="false"
+     width="256mm"
+     units="px"
+     inkscape:zoom="3.2419634"
+     inkscape:cx="84.82514"
+     inkscape:cy="101.63594"
+     inkscape:window-width="1613"
+     inkscape:window-height="1357"
+     inkscape:window-x="1768"
+     inkscape:window-y="25"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1417" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g4848"
+       transform="translate(0,5.6683066)">
+      <g
+         id="g2666"
+         transform="matrix(1.2765194,0,0,1.2765194,-4.4172849,-12.036639)">
+        <path
+           style="fill:none;stroke:#000000;stroke-width:0.79375;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="m 4.8967236,28.07455 0.081612,10.446345 H 43.336004 55.088142"
+           id="path1588"
+           sodipodi:nodetypes="cccc" />
+        <path
+           style="fill:none;stroke:#000000;stroke-width:0.800984;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="m 4.9783357,38.520895 v 6.482291"
+           id="path1590" />
+        <path
+           style="fill:none;stroke:#000000;stroke-width:0.790908;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="m 55.088142,38.520895 v 6.482291"
+           id="path1592" />
+      </g>
+      <circle
+         style="fill:#000000;stroke:none;stroke-width:1.26158"
+         id="path2972"
+         cx="10.862368"
+         cy="28.99839"
+         r="6.6758599" />
+      <path
+         id="rect3040"
+         style="stroke-width:0.333792"
+         d="m 16.548316,31.144443 0.0028,-1.064579 c 0.0067,-2.513167 2.03527,-4.531037 4.548437,-4.524371 l 34.416365,0.09129 c 2.513168,0.0067 4.531038,2.03527 4.524372,4.548437 l -0.0028,1.064578 c -0.01205,4.542199 0.0065,4.536454 -4.548438,4.524372 L 21.072687,35.69288 c -2.513167,-0.0067 -4.531038,-2.035269 -4.524371,-4.548437 z"
+         sodipodi:nodetypes="sssssssss" />
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:10.2591px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.256478"
+         x="17.240093"
+         y="22.04438"
+         id="text3831"><tspan
+           sodipodi:role="line"
+           id="tspan3829"
+           style="stroke-width:0.256478"
+           x="17.240093"
+           y="22.04438">Z</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:7.92748px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.198187"
+         x="24.094761"
+         y="17.749126"
+         id="text3831-3"><tspan
+           sodipodi:role="line"
+           id="tspan3829-7"
+           style="stroke-width:0.198187"
+           x="24.094761"
+           y="17.749126">Z</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:5.59587px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.139897"
+         x="29.919296"
+         y="15.054399"
+         id="text3831-3-8"><tspan
+           sodipodi:role="line"
+           id="tspan3829-7-7"
+           style="stroke-width:0.139897"
+           x="29.919296"
+           y="15.054399">Z</tspan></text>
+    </g>
+  </g>
+</svg>
