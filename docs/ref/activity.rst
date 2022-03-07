@@ -1,4 +1,4 @@
-.. _skdh.activity:
+.. _skdh activity:
 
 .. automodule:: skdh.activity
     :ignore-module-all:

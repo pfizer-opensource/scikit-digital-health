@@ -1,4 +1,4 @@
-.. _skdh.gait:
+.. _skdh gait:
 
 .. automodule:: skdh.gait
     :ignore-module-all:
