@@ -17,65 +17,75 @@ Adding documentation
 The one place to be careful when documenting classes is to make sure that the class docstring occurs directly below the class definition. 
 Other than this, the docstrings will be automatically scanned and generated, with the appropriate call in ``__init__.py``.
 
-Documentation of the your new module occurs almost fully in the ``__init__.py`` file for the module. An example for the example ``preprocessing`` module is below:
+Documentation of the your new module occurs almost fully in the ``__init__.py`` file
+for the module. This will contain any information on the module, how it works, as
+well as any relevant background information (e.g. :ref:`Gait <skdh gait>`). For
+another good reference from NumPy, see the
+`numpy.fft <https://numpy.org/doc/stable/reference/routines.fft.html>`_ page.
 
-.. code-block:: python
+Next is the file directing Sphinx to automatically find and document the custom
+module, ``docs/ref/custom_module.rst``. Finally, to make the new module show up
+in the API reference, add it to the ``docs/ref/index.rst`` toctree!
 
-    # src/skdh/custom_module/__init__.py
-    """
-    IMU <Custom Module> (:mod:`skdh.custom_module`)
-    ===============================================
+.. tabbed:: src/skdh/custom_module/\_\_init\_\_.py
+    :selected:
 
-    .. currentmodule:: skdh.custom_module
+    .. code-block:: python
 
-    Inertial sensor <custom module>
-    -------------------------------
+        """
+        IMU <Custom Module> (:mod:`skdh.custom_module`)
+        ===============================================
 
-    .. _Remove the `` below
+        .. currentmodule:: skdh.custom_module
 
-    .. ``autosummary``::
-        :toctree: generated/
+        Inertial sensor <custom module>
+        -------------------------------
 
-        CustomClass  .. _this is the name of your class
-    
-    Headline 2
-    ----------
-    content
-    """
-    from skdh.custom_module.custom_module import CustomModule
+        .. _Remove the `` below
 
-The docstring is written like a `.rst` header file (which is how it will get interpreted). For an example in `skdh`, see the `gait init file <src/skdh/gait/__init__.py>`_.  For an example of a good module documentation from NumPY, see the `FFT <https://numpy.org/doc/stable/reference/routines.fft.html>`_ page.
+        .. ``autosummary``::
+            :toctree: generated/
 
-With this documentation written, the last thing is to add a short `.rst` file inside the actual documentation folder, which will instruct `sphinx` to read the documentation for this module:
+            CustomClass  .. _this is the name of your class
 
-.. code:: rst
+        Headline 2
+        ----------
+        content
+        """
+        from skdh.custom_module.custom_module import CustomModule
 
-    .. _this_file: docs/ref/custom_module.rst
+.. tabbed:: docs/ref/custom_module.rst
 
-    .. automodule:: skdh.custom_module
-        :ignore-module-all:
+    .. code:: rst
 
-Then add this new file to ``docs/ref/index.rst``:
+        ..
+            _Give it a custom explicit reference label
 
-.. code:: rst
+        .. _skdh custom-module:
 
-    .. _this_file: docs/ref/index.rst
-    .. _skdh api reference
+        .. automodule:: skdh.custom_module
+            :ignore-module-all:
 
-    API Reference
-    =============
+.. tabbed:: docs/ref/index.rst
 
-    .. toctree::
-        :maxdepth: 2
+    .. code:: rst
 
-        gait
-        sit2stand
-        read
-        custom_module
+        .. _skdh api reference:
+
+        API Reference
+        =============
+
+        .. toctree::
+            :maxdepth: 2
+
+            gait
+            sit2stand
+            read
+            custom_module
 
 And thats it! Before pushing and creating a pull request, make sure that the documentation builds properly:
 
-* Make sure all the requirements are installed (``doc_requirements.txt``)
+* Make sure all the requirements are installed (``doocs/requirements.txt``)
 * Run the following in the terminal:
 
 .. code:: sh
