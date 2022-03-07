@@ -49,6 +49,7 @@ extensions = [
     "sphinx.ext.autosummary",
     "numpydoc",
     "sphinx.ext.coverage",
+    "sphinx_panels",
 ]
 
 # this is needed for some reason...
@@ -242,5 +243,10 @@ autodoc_mock_imports = [
     "skdh.io._extensions",
     "skdh.utility._extensions",
 ]
+
+# -----------------------------------------------------------------------------
+# Sphinx Panels
+# -----------------------------------------------------------------------------
+panels_add_bootstrapp_css = False
 
 # -- Extension configuration -------------------------------------------------
