@@ -87,7 +87,7 @@ def configuration(parent_package="", top_path=None):
     # DATA FILES
     # ========================
     config.add_data_files(
-        ("skdh/VERSION", "src/skdh/VERSION"),
+        ("skdh", "src/skdh/VERSION"),
         ("skdh/io/_extensions", "src/skdh/io/_extensions/read_binary_imu.h"),
         ("skdh/io/_extensions", "src/skdh/io/_extensions/gt3x.h"),
         ("skdh/gait/model", "src/skdh/gait/model/final_features.json"),
