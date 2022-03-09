@@ -1,4 +1,5 @@
-![Build Status](https://github.com/PfizerRD/scikit-digital-health/workflows/skdh/badge.svg)
+.. image:: https://github.com/PfizerRD/scikit-digital-health/workflows/skdh/badge.svg
+    :target: https://github.com/PfizerRD/scikit-digital-health/workflows/skdh/badge.svg
 
 Scikit Digital Health (SKDH) is a Python package with methods for ingesting and analyzing wearable inertial sensor data.
 
