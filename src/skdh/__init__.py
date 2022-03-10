@@ -12,7 +12,7 @@ Pipeline Processing
 
     Pipeline
 """
-# from skdh.version import __version__, __minimum_version__
+from skdh.version import __version__, __minimum_version__
 
 from skdh.pipeline import Pipeline
 from skdh.base import BaseProcess
@@ -26,17 +26,8 @@ from skdh import gait
 from skdh import sit2stand
 from skdh import features
 
+__skdh_version__ = __version__
 
-# get the version number from the file
-with open("VERSION", "r") as f:
-    __version__ = f.readline().strip()
-    __skdh_version__ = __version__
-
-# ==============================================================================
-# MINIMUM VERSION FOR GUARANTEED BACKWARDS COMPATIBILITY
-# ==============================================================================
-# set the minimum version
-__minimum_version__ = "0.9.10"
 
 __all__ = [
     "Pipeline",
