@@ -28,8 +28,8 @@ author = "Pfizer, Inc"
 
 # Get the version manually. Still need to do this because the c/fortran extensions
 # won't be mocked until after reading this configuration file
-with open("../src/skdh/VERSION", "r") as f:
-    version = f.readline().strip()
+with open("../src/skdh/version.py", "r") as f:
+    version = f.readline().split(" = ")[1].strip('"\n')
 # -- General configuration ---------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
