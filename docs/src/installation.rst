@@ -50,8 +50,8 @@ In order to build from source, the following are required:
 
 - C compiler (currently has only been tested with GCC)
 - Fortran compiler (currently only been tested with GFortran)
-- `libzip <https://libzip.org/>`
-- `gsl <https://www.gnu.org/software/gsl/>`
+- `libzip <https://libzip.org/>`_
+- `gsl <https://www.gnu.org/software/gsl/>`_
 - setuptools
 - numpy >=1.17.2
 
@@ -75,7 +75,7 @@ Testing the Build
 ^^^^^^^^^^^^^^^^^
 
 In order to test a build, you will need to clone or download the source code from
-`GitHub <https://github.com/PfizerRD/scikit-digital-health>`, as the tests are isolated
+`GitHub <https://github.com/PfizerRD/scikit-digital-health>`_, as the tests are isolated
 from access to the package source code. Additionally, the following are requirements
 to run the test suite:
 
