@@ -1,5 +1,6 @@
 import sysconfig
 import os
+import setuptools
 
 
 def configuration(parent_package="", top_path=None):
