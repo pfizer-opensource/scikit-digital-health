@@ -114,8 +114,8 @@ class PercentTimeAsleep(SleepEndpoint):
 
 class NumberWakeBouts(SleepEndpoint):
     """
-    Compute the number of waking bouts during the total sleep opportunity, excluding the
-    first wake before sleep, and last wake bout after sleep.
+    Compute the number of waking bouts during the total sleep opportunity, excluding
+    the first wake before sleep, and last wake bout after sleep.
     """
 
     def __init__(self):
@@ -170,8 +170,8 @@ class SleepOnsetLatency(SleepEndpoint):
 
 class WakeAfterSleepOnset(SleepEndpoint):
     """
-    Compute the number of minutes awake after the first period of sleep, excluding the last
-    wake period after sleep.
+    Compute the number of minutes awake after the first period of sleep, excluding
+    the last wake period after sleep.
     """
 
     def __init__(self):
@@ -206,9 +206,9 @@ class AverageSleepDuration(SleepEndpoint):
 
     References
     ----------
-    .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are associated with
-        mortality in US adults: The NHANES study,” bioRxiv, p. 182337, Aug. 2017,
-        doi: 10.1101/182337.
+    .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are
+        associated with mortality in US adults: The NHANES study,” bioRxiv, p. 182337,
+        Aug. 2017, doi: 10.1101/182337.
 
     Notes
     -----
@@ -245,9 +245,9 @@ class AverageWakeDuration(SleepEndpoint):
 
     References
     ----------
-    .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are associated with
-        mortality in US adults: The NHANES study,” bioRxiv, p. 182337, Aug. 2017,
-        doi: 10.1101/182337.
+    .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are
+        associated with mortality in US adults: The NHANES study,” bioRxiv, p. 182337,
+        Aug. 2017, doi: 10.1101/182337.
 
     Notes
     -----
@@ -283,14 +283,14 @@ class SleepWakeTransitionProbability(SleepEndpoint):
 
     References
     ----------
-    .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are associated with
-        mortality in US adults: The NHANES study,” bioRxiv, p. 182337, Aug. 2017,
-        doi: 10.1101/182337.
+    .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are
+        associated with mortality in US adults: The NHANES study,” bioRxiv, p. 182337,
+        Aug. 2017, doi: 10.1101/182337.
 
     Notes
     -----
-    Higher values indicate more frequent switching between states, and as a result may indicate
-    greater fragmentation of sleep.
+    Higher values indicate more frequent switching between states, and as a result
+    may indicate greater fragmentation of sleep.
 
     The implementation is straightforward [1]_, and is simply defined as
 
@@ -332,14 +332,14 @@ class WakeSleepTransitionProbability(SleepEndpoint):
 
     References
     ----------
-    .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are associated with
-        mortality in US adults: The NHANES study,” bioRxiv, p. 182337, Aug. 2017,
-        doi: 10.1101/182337.
+    .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are
+        associated with mortality in US adults: The NHANES study,” bioRxiv, p. 182337,
+        Aug. 2017, doi: 10.1101/182337.
 
     Notes
     -----
-    Higher values indicate more frequent switching between states, and as a result may indicate
-    greater fragmentation of sleep.
+    Higher values indicate more frequent switching between states, and as a result
+    may indicate greater fragmentation of sleep.
 
     The implementation is straightforward [1]_, and is simply defined as
 
@@ -377,20 +377,20 @@ class WakeSleepTransitionProbability(SleepEndpoint):
 
 class SleepGiniIndex(SleepEndpoint):
     r"""
-    Compute the normalized variability of the sleep bouts, also known as the Gini Index from
-    economics.
+    Compute the normalized variability of the sleep bouts, also known as the Gini
+    Index from economics.
 
     References
     ----------
-    .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are associated with
-        mortality in US adults: The NHANES study,” bioRxiv, p. 182337, Aug. 2017,
-        doi: 10.1101/182337.
+    .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are
+        associated with mortality in US adults: The NHANES study,” bioRxiv, p. 182337,
+        Aug. 2017, doi: 10.1101/182337.
 
     Notes
     -----
-    Gini Index values are bounded between 0 and 1, with values near 1 indicating the total
-    time accumulating due to a small number of longer bouts, whereas values near 0 indicate all
-    bouts contribute more equally to the total time.
+    Gini Index values are bounded between 0 and 1, with values near 1 indicating
+    the total time accumulating due to a small number of longer bouts, whereas values
+    near 0 indicate all bouts contribute more equally to the total time.
     """
 
     def __init__(self):
@@ -418,20 +418,20 @@ class SleepGiniIndex(SleepEndpoint):
 
 class WakeGiniIndex(SleepEndpoint):
     r"""
-    Compute the normalized variability of the awake bouts, also known as the Gini Index from
-    economics.
+    Compute the normalized variability of the awake bouts, also known as the Gini
+    Index from economics.
 
     References
     ----------
-    .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are associated with
-        mortality in US adults: The NHANES study,” bioRxiv, p. 182337, Aug. 2017,
-        doi: 10.1101/182337.
+    .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are
+        associated with mortality in US adults: The NHANES study,” bioRxiv, p. 182337,
+        Aug. 2017, doi: 10.1101/182337.
 
     Notes
     -----
-    Gini Index values are bounded between 0 and 1, with values near 1 indicating the total
-    time accumulating due to a small number of longer bouts, whereas values near 0 indicate all
-    bouts contribute more equally to the total time.
+    Gini Index values are bounded between 0 and 1, with values near 1 indicating
+    the total time accumulating due to a small number of longer bouts, whereas values
+    near 0 indicate all bouts contribute more equally to the total time.
     """
 
     def __init__(self):
@@ -459,15 +459,15 @@ class WakeGiniIndex(SleepEndpoint):
 
 class SleepAverageHazard(SleepEndpoint):
     r"""
-    Compute the average hazard summary of the hazard function as a function of the sleep bout
-    duration. The average hazard represents a summary of the frequency of transitioning from
-    a sleep to awake state.
+    Compute the average hazard summary of the hazard function as a function of the
+    sleep bout duration. The average hazard represents a summary of the frequency
+    of transitioning from a sleep to awake state.
 
     References
     ----------
-    .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are associated with
-        mortality in US adults: The NHANES study,” bioRxiv, p. 182337, Aug. 2017,
-        doi: 10.1101/182337.
+    .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are
+        associated with mortality in US adults: The NHANES study,” bioRxiv, p. 182337,
+        Aug. 2017, doi: 10.1101/182337.
 
     Notes
     -----
@@ -481,10 +481,10 @@ class SleepAverageHazard(SleepEndpoint):
         \har{h} = \frac{1}{m}\sum_{t\in D}h(t)
 
     where :math:`h(t_n_i)` is the hazard for the sleep bout of length :math:`t_n_i`,
-    :math:`n(t_n_i)` is the number of bouts of length :math:`t_n_i`, :math:`n` is the total
-    number of sleep bouts, :math:`n^c(t_n_i)` is the sum number of bouts less than or equal to
-    length :math:`t_n_i`, and :math:`t\in D` indicates all bouts up to the maximum length
-    (:math:`D`).
+    :math:`n(t_n_i)` is the number of bouts of length :math:`t_n_i`, :math:`n` is
+    the total number of sleep bouts, :math:`n^c(t_n_i)` is the sum number of bouts
+    less than or equal to length :math:`t_n_i`, and :math:`t\in D` indicates all
+    bouts up to the maximum length (:math:`D`).
     """
 
     def __init__(self):
@@ -512,15 +512,15 @@ class SleepAverageHazard(SleepEndpoint):
 
 class WakeAverageHazard(SleepEndpoint):
     r"""
-    Compute the average hazard summary of the hazard function as a function of the awake bout
-    duration. The average hazard represents a summary of the frequency of transitioning from
-    an awake to sleep state.
+    Compute the average hazard summary of the hazard function as a function of the
+    awake bout duration. The average hazard represents a summary of the frequency
+    of transitioning from an awake to sleep state.
 
     References
     ----------
-    .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are associated with
-        mortality in US adults: The NHANES study,” bioRxiv, p. 182337, Aug. 2017,
-        doi: 10.1101/182337.
+    .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are
+        associated with mortality in US adults: The NHANES study,” bioRxiv, p. 182337,
+        Aug. 2017, doi: 10.1101/182337.
 
     Notes
     -----
@@ -534,10 +534,10 @@ class WakeAverageHazard(SleepEndpoint):
         \har{h} = \frac{1}{m}\sum_{t\in D}h(t)
 
     where :math:`h(t_n_i)` is the hazard for the awake bout of length :math:`t_n_i`,
-    :math:`n(t_n_i)` is the number of bouts of length :math:`t_n_i`, :math:`n` is the total
-    number of awake bouts, :math:`n^c(t_n_i)` is the sum number of bouts less than or equal to
-    length :math:`t_n_i`, and :math:`t\in D` indicates all bouts up to the maximum length
-        (:math:`D`).
+    :math:`n(t_n_i)` is the number of bouts of length :math:`t_n_i`, :math:`n` is
+    the total number of awake bouts, :math:`n^c(t_n_i)` is the sum number of bouts
+    less than or equal to length :math:`t_n_i`, and :math:`t\in D` indicates all
+    bouts up to the maximum length (:math:`D`).
     """
 
     def __init__(self):
@@ -565,25 +565,27 @@ class WakeAverageHazard(SleepEndpoint):
 
 class SleepPowerLawDistribution(SleepEndpoint):
     r"""
-    Compute the scaling factor for a power law distribution over the sleep bouts lengths.
+    Compute the scaling factor for a power law distribution over the sleep bouts
+    lengths.
 
     References
     ----------
-    .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are associated with
-        mortality in US adults: The NHANES study,” bioRxiv, p. 182337, Aug. 2017,
-        doi: 10.1101/182337.
+    .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are
+        associated with mortality in US adults: The NHANES study,” bioRxiv, p. 182337,
+        Aug. 2017, doi: 10.1101/182337.
 
     Notes
     -----
-    Larger `alpha` values indicate that the total sleeping time is accumulated with a larger
-    portion of shorter sleep bouts.
+    Larger `alpha` values indicate that the total sleeping time is accumulated with
+    a larger portion of shorter sleep bouts.
 
     The power law scaling factor is computer per [1]_:
 
     .. math:: 1 + \frac{n_{sleep}}{\sum_{i}\log{t_i / \left(min(t) - 0.5\right)}}
 
-    where :math:`n_{sleep}` is the number of sleep bouts, :math:`t_i` is the duration of the
-    :math:`ith` sleep bout, and :math:`min(t)` is the length of the shortest sleep bout.
+    where :math:`n_{sleep}` is the number of sleep bouts, :math:`t_i` is the duration
+    of the :math:`ith` sleep bout, and :math:`min(t)` is the length of the shortest
+    sleep bout.
     """
 
     def __init__(self):
@@ -615,25 +617,27 @@ class SleepPowerLawDistribution(SleepEndpoint):
 
 class WakePowerLawDistribution(SleepEndpoint):
     r"""
-    Compute the scaling factor for a power law distribution over the awake bouts lengths.
+    Compute the scaling factor for a power law distribution over the awake bouts
+    lengths.
 
     References
     ----------
-    .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are associated with
-        mortality in US adults: The NHANES study,” bioRxiv, p. 182337, Aug. 2017,
-        doi: 10.1101/182337.
+    .. [1] J. Di et al., “Patterns of sedentary and active time accumulation are
+        associated with mortality in US adults: The NHANES study,” bioRxiv, p. 182337,
+        Aug. 2017, doi: 10.1101/182337.
 
     Notes
     -----
-    Larger `alpha` values indicate that the total awake time is accumulated with a larger
-    portion of shorter awake bouts.
+    Larger `alpha` values indicate that the total awake time is accumulated with
+    a larger portion of shorter awake bouts.
 
     The power law scaling factor is computer per [1]_:
 
     .. math:: 1 + \frac{n_{awake}}{\sum_{i}\log{t_i / \left(min(t) - 0.5\right)}}
 
-    where :math:`n_{awake}` is the number of awake bouts, :math:`t_i` is the duration of the
-    :math:`ith` awake bout, and :math:`min(t)` is the length of the shortest awake bout.
+    where :math:`n_{awake}` is the number of awake bouts, :math:`t_i` is the duration
+    of the :math:`ith` awake bout, and :math:`min(t)` is the length of the shortest
+    awake bout.
     """
 
     def __init__(self):

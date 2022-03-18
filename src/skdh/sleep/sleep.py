@@ -111,7 +111,7 @@ class Sleep(BaseProcess):
         Downsample to 20Hz. Default is True.
     downsample_aa_filter : bool, optional
         Apply an anti-aliasing filter before downsampling. Default is True.
-        Uses the same IIR filter as :py:function:`scipy.signal.decimate`.
+        Uses the same IIR filter as :py:func:`scipy.signal.decimate`.
     day_window : array-like, optional
         Two (2) element array-like of the base and period of the window to use for determining
         days. Default is (12, 24), which will look for days starting at 12 noon and lasting 24

@@ -1,6 +1,6 @@
 """
-Scikit IMU (:mod:`skdh`)
-=========================
+Scikit Digital Health (:mod:`skdh`)
+===================================
 
 .. currentmodule:: skdh
 
@@ -27,6 +27,8 @@ from skdh import sit2stand
 from skdh import features
 
 __skdh_version__ = __version__
+
+
 __all__ = [
     "Pipeline",
     "BaseProcess",

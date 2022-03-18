@@ -20,17 +20,20 @@ project = "SciKit-Digital-Health"
 copyright = "2021, Pfizer, Inc. All rights reserved"
 author = "Pfizer, Inc"
 
-import skdh
+# import skdh
+#
+# version = skdh.__version__[:3]
+# # The full version, including alpha/beta/rc tags
+# release = skdh.__version__
 
-version = skdh.__version__[:3]
-# The full version, including alpha/beta/rc tags
-release = skdh.__version__
-
+# Get the version manually. Still need to do this because the c/fortran extensions
+# won't be mocked until after reading this configuration file
+with open("../src/skdh/version.py", "r") as f:
+    version = f.readline().split(" = ")[1].strip('"\n')
 # -- General configuration ---------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
-#
-needs_sphinx = "2.2.0"
+needs_sphinx = "4.0.0"
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -41,17 +44,12 @@ extensions = [
     "sphinx.ext.autosummary",
     "numpydoc",
     "sphinx.ext.coverage",
+    "sphinx_panels",
 ]
 
 # this is needed for some reason...
 # see https://github.com/numpy/numpydoc/issues/69
 numpydoc_class_members_toctree = False
-
-# mock imports with extensions
-autodoc_mock_imports = [
-    "numpy",
-    "scipy",
-]
 
 
 # Add any paths that contain templates here, relative to this directory.
@@ -98,7 +96,8 @@ html_theme = "pydata_sphinx_theme"
 #
 html_theme_options = {
     # "prev_next_buttons": True,
-    "show_nav_level": 3,
+    "show_nav_level": 1,
+    "show_toc_level": 2,
     "icon_links": [
         {
             "name": "GitHub",
@@ -106,6 +105,7 @@ html_theme_options = {
             "icon": "fab fa-github-square",
         },
     ],
+    "navbar_start": ["navbar-logo", "version"],
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -126,7 +126,7 @@ html_title = f"{project} Documentation"
 # 'searchbox.html']``.
 #
 # html_sidebars = {"**": ["globaltoc.html", "relations.html", "searchbox.html"]}
-html_sidebars = {"**": ["search-field.html", "sidebar-nav-bs.html"]}
+html_sidebars = {"**": ["search-field.html", "sidebar-nav-bs.html", "sidebar-ethical-ads.html"]}
 
 # -- Options for HTMLHelp output ---------------------------------------------
 
@@ -209,7 +209,6 @@ epub_title = project
 # A list of files that should not be packed into the epub file.
 epub_exclude_files = ["search.html"]
 
-
 # -----------------------------------------------------------------------------
 # Intersphinx configuration
 # -----------------------------------------------------------------------------
@@ -223,9 +222,7 @@ intersphinx_mapping = {
 # -----------------------------------------------------------------------------
 # Autosummary
 # -----------------------------------------------------------------------------
-
 autosummary_generate = True
-
 
 # -----------------------------------------------------------------------------
 # Autodoc
@@ -234,5 +231,17 @@ autodoc_default_options = {
     "members": True,
     "inherited-members": True,
 }
+
+# mock imports with extensions
+autodoc_mock_imports = [
+    "skdh.features.lib.extensions",
+    "skdh.io._extensions",
+    "skdh.utility._extensions",
+]
+
+# -----------------------------------------------------------------------------
+# Sphinx Panels
+# -----------------------------------------------------------------------------
+panels_add_bootstrapp_css = False
 
 # -- Extension configuration -------------------------------------------------

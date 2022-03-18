@@ -1,7 +1,7 @@
 .. _skdh-api-reference:
 
-API Reference
-=============
+SKDH Reference
+==============
 
 .. toctree::
     :maxdepth: 2

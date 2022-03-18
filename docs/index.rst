@@ -1,45 +1,101 @@
-.. _skdh documentation master file, created by
+..
+   _skdh documentation master file, created by
    sphinx-quickstart on Tue Oct  6 14:50:59 2020.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to SciKit-Digital-Health's documentation!
-======================================
+Scikit Digital Health
+=====================
 
 .. image:: https://github.com/PfizerRD/scikit-digital-health/workflows/skdh/badge.svg
    :alt: GitHub Actions Badge
 
 `SciKit-Digital-Health` is a Python package with methods for reading, pre-processing, manipulating, and analyzing Inertial Meausurement Unit data. `scikit-digital-health` contains the following sub-modules:
 
-sit2stand
----------
-The `sit2stand` sub-module uses novel algorithms to first detect Sit-to-Stand transitions from lumbar-mounted accelerometer data, and then provide quantitative metrics assessing the performance of the transitions. As gyroscopes impose a significant detriment to battery life due to power consumption, `sit2stand`'s use of acceleration only allows for a single sensor to collect days worth of analyzable data.
+.. panels::
+    :img-top-cls: pl-3 pr-3
+    :card: shadow
 
-gait
-----
-The `gait` sub-module contains python implementations of existing algorithms from previous literature, as well as a gait classifier for detecting bouts of gait during at-home recordings of data. `gait`'s algorithms detect gait and analyze the gait for metrics such as stride time, stride length, etc from lumbar acceleration data. Adding gyroscope data will also enable several additional features.
+    :img-top: _static/skdh_io.svg
 
-read
-----
-The `read` sub-module contains methods for reading data from several different sensor binary files into python. These have been implemented in low level languages (C, Fortran) to enable significant speed-ups in loading this data over pure-python implementations, or reading csv files
+    :badge:`skdh.io,badge-primary`
 
-features
---------
-The `features` sub-module contains a library of features that can be generated for accelerometer/gyroscope/time-series signals. These features can be used for classification problems, etc. Feature computations are also implemented in Fortran to ensure quicker computation time when dealing with very long (multiple days) recordings.
+    +++
+    .. link-button:: skdh io
+        :type: ref
+        :text: Ingestion of common binary data files and generic data stores.
+        :classes: btn-outline-primary stretched-link btn-block
 
-Requirements
-------------
-- Python >= 3.6
-- numpy >= 1.17.2
-- scipy >= 1.3.1
-- pandas >= 0.23.4
-- lightgbm >= 2.3.0
-- pywavelets
+    ---
+    :img-top: _static/skdh_preproc.svg
+    :badge:`skdh.preprocessing,badge-primary`
+    +++
+    .. link-button:: skdh preprocessing
+        :type: ref
+        :text: Pre-processing algorithms for inertial data.
+        :classes: btn-outline-primary stretched-link btn-block
 
-Contents
---------
+    ---
+    :img-top: _static/skdh_gait.svg
+    :badge:`skdh.gait,badge-primary`
+    +++
+    .. link-button:: skdh gait
+        :type: ref
+        :text: Gait detection and analysis from lumbar inertial data.
+        :classes: btn-outline-primary stretched-link btn-block
+
+    ---
+    :img-top: _static/skdh_s2s.svg
+    :badge:`skdh.sit2stand,badge-primary`
+    +++
+    .. link-button:: skdh sit2stand
+        :type: ref
+        :text: Sit-to-stand detection and analysis from lumbar inertial data.
+        :classes: btn-outline-primary stretched-link btn-block
+
+    ---
+    :img-top: _static/skdh_activity.svg
+    :badge:`skdh.activity,badge-primary`
+    +++
+    .. link-button:: skdh activity
+        :type: ref
+        :text: Actigraphy & activity analysis from inertial data.
+        :classes: btn-outline-primary stretched-link btn-block
+
+    ---
+    :img-top: _static/skdh_sleep.svg
+    :badge:`skdh.sleep,badge-primary`
+    +++
+    .. link-button:: skdh sleep
+        :type: ref
+        :text: Sleep detection and analysis from wrist inertial data.
+        :classes: btn-outline-primary stretched-link btn-block
+
+    ---
+    :img-top: _static/skdh_features.svg
+    :badge:`skdh.features,badge-primary`
+    +++
+    .. link-button:: skdh features
+        :type: ref
+        :text: Common time-series signal features.
+        :classes: btn-outline-primary stretched-link btn-block
+
+    ---
+    :img-top: _static/skdh_utility.svg
+    :badge:`skdh.utility,badge-primary`
+    +++
+    .. link-button:: skdh utility
+        :type: ref
+        :text: Utility functions for time-series analysis.
+        :classes: btn-outline-primary stretched-link btn-block
+
+
+..
+   _ keep the toctree hidden for a cleaner landing page
+
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
+   :hidden:
 
    src/installation
    src/usage

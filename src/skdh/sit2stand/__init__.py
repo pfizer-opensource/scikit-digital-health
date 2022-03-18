@@ -1,6 +1,6 @@
 """
 IMU Sit-to-Stand Analysis (:mod:`skdh.sit2stand`)
-==================================================
+=================================================
 
 .. currentmodule:: skdh.sit2stand
 

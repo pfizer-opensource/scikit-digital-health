@@ -1,6 +1,6 @@
-"""
+r"""
 IMU Gait Analysis (:mod:`skdh.gait`)
-=====================================
+====================================
 
 .. currentmodule:: skdh.gait
 

@@ -1,6 +1,6 @@
 """
 Signal Features (:mod:`skdh.features`)
-=======================================
+======================================
 
 .. currentmodule:: skdh.features
 

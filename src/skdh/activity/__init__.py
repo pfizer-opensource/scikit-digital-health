@@ -1,6 +1,6 @@
 r"""
 IMU Activity Analysis (:mod:`skdh.activity`)
-=====================================
+============================================
 
 .. currentmodule:: skdh.activity
 

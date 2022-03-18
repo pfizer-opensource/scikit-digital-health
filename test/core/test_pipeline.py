@@ -1,5 +1,6 @@
 from tempfile import TemporaryDirectory
 from pathlib import Path
+
 # DEPRECATED
 import json
 
@@ -125,9 +126,13 @@ class TestPipeline:
             with fname_yaml.open(mode="w") as f:
                 f.write("unbalanced brackets: ][\n")
 
-            with pytest.warns(UserWarning, match="does not have one of the expected suffixes:"):
+            with pytest.warns(
+                UserWarning, match="does not have one of the expected suffixes:"
+            ):
                 Pipeline._handle_load_input(None, None, str(fname1))
-            with pytest.warns(DeprecationWarning, match="JSON format will be deprecated"):
+            with pytest.warns(
+                DeprecationWarning, match="JSON format will be deprecated"
+            ):
                 Pipeline._handle_load_input(None, None, file=str(fname_json))
             # handle the json reader failing as well
             with pytest.raises(json.decoder.JSONDecodeError):

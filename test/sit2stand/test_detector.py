@@ -106,7 +106,7 @@ class TestDetector:
         a = sin(c * t)
 
         vt = (-cos(c * t) + 1) / c
-        pt = (c * t - sin(c * t)) / c ** 2
+        pt = (c * t - sin(c * t)) / c**2
 
         v, p = Detector._integrate(a, dt, True)
         v1, p1 = Detector._integrate(a, dt, False)

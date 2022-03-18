@@ -49,12 +49,12 @@ class DetectWear(BaseProcess):
         Apply the `shipping_criteria` rules to `temperature_factor`. For example,
         setting to true would mean with `temperature_factor=2` that during the first
         and last 24 hours (or specified times) the temperature could solely determine
-        non-wear. Defautl is False.
+        non-wear. Default is False.
     window_length : int, optional
         Number of minutes in a window used to determine non-wear. Default is 60 minutes.
     window_skip : int, optional
         Number of minutes to skip between windows. Default is 15 minutes, which would
-        result in window overlaps of 45 minutes with the default 60 minute
+        result in window overlaps of 45 minutes with the default 60-minute
         `window_length`.
 
     References
@@ -77,11 +77,11 @@ class DetectWear(BaseProcess):
     :math:`a_{range}` is the range of acceleration of a window, :math:`S` is the
     `sd_crit`, :math:`R` is `range_crit`.
 
-    _Setup Criteria_ is the rule that if the data starts with a period of non-wear
+    `apply_setup_criteria` is the rule that if the data starts with a period of non-wear
     of less than 3 hours followed by a non-wear period of any length, then that
     first block of wear is changed to non-wear.
 
-    _Shipping Criteria_ is an additional rule that may help in cases where the device
+    `shipping_criteria` is an additional rule that may help in cases where the device
     is being shipped either to or from the participant (or both). Wear periods at the
     start of the recording are filtered by those less than 3 hours that are followed
     by 1 hour of non-wear are re-classified as non-wear. Wear periods at the end

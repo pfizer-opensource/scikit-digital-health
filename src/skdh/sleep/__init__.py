@@ -1,6 +1,6 @@
 """
 IMU Sleep Analysis (:mod:`skdh.sleep`)
-=======================================
+======================================
 
 .. currentmodule:: skdh.sleep
 
@@ -15,7 +15,7 @@ Pipeline sleep processing
 .. _sleep-metrics:
 
 Sleep Endpoints
--------------
+---------------
 
 .. autosummary::
     :toctree: generated/
