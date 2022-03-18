@@ -19,6 +19,11 @@ def configuration(parent_package="", top_path=None):
     # if the environment variable is NOT present, build the extensions
     build_extensions = "BUILD_SKDH_EXTENSIONS" not in os.environ
     if build_extensions:
+        # check if on windows and have a conda prefix path
+        if (os.name == 'nt') and ('CONDA_PREFIX' in os.environ):
+            # add an extra include path for where conda puts libraries in windows
+            config.add_include_dirs([f"{os.environ['CONDA_PREFIX']}\\Library\\Include"])
+
         # add extension paths all at once
         config.add_include_dirs(sysconfig.get_path("data") + os.sep + "include")
         # UTILITY
