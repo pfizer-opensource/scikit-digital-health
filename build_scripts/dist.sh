@@ -13,3 +13,7 @@ python -m build --sdist
 delocate-listdeps --depending dist/*.whl
 # fix dependencies
 delocate-wheel -w fixed_wheels -v dist/*.whl
+
+##########
+# Uploading files
+python -m twine upload --skip-existing --repository skdh dist/*.tar.gz fixed_wheels/*
