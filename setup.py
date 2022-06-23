@@ -28,18 +28,19 @@ def configuration(parent_package="", top_path=None):
         config.add_include_dirs(sysconfig.get_path("data") + os.sep + "include")
         # UTILITY
         config.add_library(
-            "fmoving_moments", sources="src/skdh/utility/_extensions/moving_moments.f95"
+            "fmoving_statistics",
+            sources=[
+                "src/skdh/utility/_extensions/sort.f95",
+                "src/skdh/utility/_extensions/moving_moments.f95",
+                "src/skdh/utility/_extensions/median_heap.f95"
+            ]
         )
         config.add_extension(
-            "skdh/utility/_extensions/moving_moments",
-            sources="src/skdh/utility/_extensions/moving_moments.c",
+            "skdh/utility/_extensions/moving_statistics",
+            sources="src/skdh/utility/_extensions/moving_statistics.c",
             libraries=["fmoving_moments"],
         )
-        config.add_extension(
-            "skdh/utility/_extensions/moving_median",
-            sources="src/skdh/utility/_extensions/moving_median.c",
-            libraries=["gsl"],
-        )
+
         # Read library
         config.add_library(
             "read",
