@@ -48,7 +48,7 @@ contains
             ! replace/insert multiple elements at once
             ! note the max(ii, i) here so that if we are skipping values
             ! we dont need to bother with passing them through the heap
-            call replace_elements(x(max(ii, i):i + wlen - 1))
+            call insert_elements(x(max(ii, i):i + wlen - 1))
 
             ! get the resulting median value
             res(j) = get_median()
