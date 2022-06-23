@@ -24,6 +24,43 @@ module median_heap
     private :: max_sift_towards
 
 contains
+    ! Subroutine to handle the full moving median on a 1D array
+    subroutine fmoving_median(k, x, wlen, skip, res) bind(C, name="fmoving_median")
+        integer(c_int), intent(in) :: k, wlen, skip
+        real(c_double), intent(in) :: x(k)
+        real(c_double), intent(out) :: res((k - wlen) / skip + 1)
+        ! local
+        integer(c_int) :: i, ii, j
+
+        ! first allocate the variables for the heap
+        call allocate_heap(wlen)
+        ! initialize the heap values
+        call initialize_heap(x(1:wlen))
+        ! keep track of the last element (+1) inserted into the heap
+        ii = wlen + 1
+
+        ! get the first median value
+        res(1) = get_median()
+        j = 2  ! keep track of where we are in the result array
+
+        ! iterate over each window starting spot
+        do i = skip + 1, k - wlen + 1, skip
+            ! replace/insert multiple elements at once
+            ! note the max(ii, i) here so that if we are skipping values
+            ! we dont need to bother with passing them through the heap
+            call replace_elements(x(max(ii, i):i + wlen - 1))
+
+            ! get the resulting median value
+            res(j) = get_median()
+            j = j + 1
+            ! update the next element to pull from the input array
+            ii = i + wlen
+        end do
+
+        ! cleanup the heap, deallocating all the workspaces
+        call cleanup_heap()
+    end subroutine fmoving_median
+
     ! Subroutine to allocate the heap workspace
     subroutine allocate_heap(k)
         ! k : number of elements in the heap. equivalent to window length
