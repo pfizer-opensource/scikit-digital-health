@@ -38,7 +38,7 @@ def configuration(parent_package="", top_path=None):
         config.add_extension(
             "skdh/utility/_extensions/moving_statistics",
             sources="src/skdh/utility/_extensions/moving_statistics.c",
-            libraries=["fmoving_moments"],
+            libraries=["fmoving_statistics"],
         )
 
         # Read library
