@@ -7,13 +7,15 @@
 #include <stdlib.h>
 #include <math.h>
 
+/* moving moments */
 extern void mov_moments_1(long *, double *, long *, long *, double *);
 extern void moving_moments_1(long *, double *, long *, long *, double *);
 extern void mov_moments_2(long *, double *, long *, long *, double *, double *);
 extern void moving_moments_2(long *, double *, long *, long *, double *, double *);
 extern void moving_moments_3(long *, double *, long *, long *, double *, double *, double *);
 extern void moving_moments_4(long *, double *, long *, long *, double *, double *, double *, double *);
-
+/* moving median */
+extern void fmoving_median(int *, double *, int *, int *, double *);
 
 PyObject * moving_mean(PyObject *NPY_UNUSED(self), PyObject *args){
     PyObject *x_;
@@ -349,6 +351,67 @@ PyObject * moving_kurtosis(PyObject *NPY_UNUSED(self), PyObject *args){
 }
 
 
+PyObject * moving_median(PyObject *NPY_UNUSED(self), PyObject *args)
+{
+    PyObject *x_;
+    int wlen, skip;
+
+    if (!PyArg_ParseTuple(args, "Oii:moving_median", &x_, &wlen, &skip)) return NULL;
+
+    PyArrayObject *data = (PyArrayObject *)PyArray_FromAny(
+      x_,
+      PyArray_DescrFromType(NPY_DOUBLE),
+      1,
+      0,
+      NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_CARRAY_RO,
+      NULL
+    );
+    if (!data) return NULL;
+
+    // get the number of dimensions and the shape
+    int ndim = PyArray_NDIM(data);
+    const npy_intp *ddims = PyArray_DIMS(data);
+    npy_intp *rdims = (npy_intp *)malloc(ndim * sizeof(npy_intp));
+    int npts = (int)ddims[ndim - 1];
+
+    // create the return shape
+    for (int i = 0; i < (ndim - 1); ++i)
+    {
+        rdims[i] = ddims[i];
+    }
+    rdims[ndim - 1] = ((long)npts - wlen) / skip + 1;  // dimension of the roll
+
+    // allocate the return
+    PyArrayObject *rmed = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
+    free(rdims);  // free the return dimensions array
+    if (!rmed)
+    {
+        Py_XDECREF(data);
+        Py_XDECREF(rmed);
+        return NULL;
+    }
+
+    // data pointers
+    double *dptr = (double *)PyArray_DATA(data);
+    double *rptr = (double *)PyArray_DATA(rmed);
+    // for iterating over the data
+    long res_stride = PyArray_DIM(rmed, ndim - 1);  // stride to get to the next results column
+    int nrepeats = PyArray_SIZE(data) / npts;  // number of "columns"
+
+    // iterate
+    for (int i = 0; i < nrepeats; ++i)
+    {
+        fmoving_median(&npts, dptr, &wlen, &skip, rptr);
+        dptr += npts;  // increment by number of points in the last dimension
+        rptr += res_stride;
+    }
+
+    Py_XDECREF(data);
+
+    return (PyObject *)rmed;
+}
+
+
 static const char rmean_doc[] = "moving_mean(a, wlen, skip)\n\n"
 "Compute the rolling mean over windows of length `wlen` with `skip` samples between window starts.\n\n"
 "Paramters\n"
@@ -412,7 +475,7 @@ static const char rkurt_doc[] = "moving_kurtosis(a, wlen, skip, return_previous)
 "Compute the rolling kurtosis over windows of length `wlen` with `skip` samples "
 "between window starts.  Because previous rolling moments have to be computed as part of "
 "the process, they are availble to return as well.\n\n"
-"Paramters\n"
+"Parameters\n"
 "---------\n"
 "a : array-like\n"
 "    Array of data to compute the rolling kurtosis for. Computation axis is the last axis.\n"
@@ -433,17 +496,34 @@ static const char rkurt_doc[] = "moving_kurtosis(a, wlen, skip, return_previous)
 "rmean : numpy.ndarray, optional\n"
 "    Rolling mean. Only returned if `return_previous` is `True`.";
 
+static const char rmed_doc[] = "moving_median(a, wlen, skip)\n\n"
+"Compute the rolling median over windows of length `wlen` with `skip` samples "
+"between window starts.\n\n"
+"Parameters\n"
+"----------\n"
+"a : array-like\n"
+"    Array of data to compute rolling median on. Computation axis is the last axis.\n"
+"wlen : int\n"
+"    Window size in samples.\n"
+"skip : int\n"
+"    Samples between window starts. `skip=wlen` would result in non-overlapping sequential windows.\n"
+"Returns\n"
+"-------\n"
+"rmed : numpy.ndarray\n"
+"    Rolling median.";
+
 static struct PyMethodDef methods[] = {
     {"moving_mean",   moving_mean,   1, rmean_doc},  // last is the docstring
     {"moving_sd",   moving_sd,   1, rsd_doc},  // last is the docstring
     {"moving_skewness",   moving_skewness,   1, rskew_doc},  // last is the docstring
     {"moving_kurtosis",   moving_kurtosis,   1, rkurt_doc},  // last is the docstring
+    {"moving_median", moving_median, 1, rmed_doc},
     {NULL, NULL, 0, NULL}          /* sentinel */
 };
 
 static struct PyModuleDef moduledef = {
         PyModuleDef_HEAD_INIT,
-        "moving_moments",
+        "moving_statistics",
         NULL,
         -1,
         methods,
@@ -454,7 +534,7 @@ static struct PyModuleDef moduledef = {
 };
 
 /* Initialization function for the module */
-PyMODINIT_FUNC PyInit_moving_moments(void)
+PyMODINIT_FUNC PyInit_moving_statistics(void)
 {
     PyObject *m;
     m = PyModule_Create(&moduledef);
