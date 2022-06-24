@@ -103,7 +103,7 @@ def get_total_sleep_opportunity(
     # of the library (zoo) they are using for rollmedian
     n5 = int(5 * fs)
     # compute the rolling median for 5s windows
-    acc_rmd = moving_median(accel, n5, skip=1, pad=False, axis=0)
+    acc_rmd = moving_median(accel, n5, skip=1, axis=0)
 
     # compute the z-angle
     z = compute_z_angle(acc_rmd)
@@ -125,7 +125,7 @@ def get_total_sleep_opportunity(
     dz_rm = compute_absolute_difference(z_rm)
 
     # rolling 5 minute median. 12 windows per minute * 5 minutes
-    dz_rm_rmd = moving_median(dz_rm, 12 * 5, skip=1, pad=False)
+    dz_rm_rmd = moving_median(dz_rm, 12 * 5, skip=1)
 
     # compute the TSO threshold
     tso_thresh = compute_tso_threshold(
@@ -152,9 +152,9 @@ def get_total_sleep_opportunity(
 
     # check if we can compute wear internally
     if temperature is not None and int_wear_temp > 0.0:
-        t_rmed_5s = moving_median(temperature, n5, 1, pad=False)
+        t_rmed_5s = moving_median(temperature, n5, 1)
         t_rmean_5s = moving_mean(t_rmed_5s, n5, n5)
-        t_rmed_5m = moving_median(t_rmean_5s, 60, 1, pad=False)  # 5 min rolling median
+        t_rmed_5m = moving_median(t_rmean_5s, 60, 1)  # 5 min rolling median
 
         temp_nonwear = t_rmed_5m < int_wear_temp
 

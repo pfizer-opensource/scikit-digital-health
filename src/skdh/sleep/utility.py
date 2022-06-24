@@ -70,11 +70,11 @@ def get_weartime(acc_rmed, temp, fs, move_thresh, temp_thresh):
     # windows, however.
 
     # rolling 5s median of temperature
-    rmd = moving_median(temp, n5, skip=1, pad=False)
+    rmd = moving_median(temp, n5, skip=1)
     # rolling 5s mean (non-overlapping)
     mn = moving_mean(rmd, n5, n5)
     # rolling 5m median
-    temp_rmd = moving_median(mn, 12 * 5, skip=1, pad=False)
+    temp_rmd = moving_median(mn, 12 * 5, skip=1)
 
     move_mask = any(acc_rsd > move_thresh, axis=1)
     temp_mask = temp_rmd >= temp_thresh
