@@ -138,19 +138,3 @@ class TestMovingMedian(BaseMovingStatsTester):
     function = staticmethod(moving_median)
     truth_function = staticmethod(median)
     truth_kw = {}
-
-    @pytest.mark.parametrize("skip", (1, 2, 7, 150, 300))
-    def test_pad(self, skip, np_rng):
-        x = np_rng.random(2000)
-        xw = get_windowed_view(x, 150, skip)
-
-        truth = self.truth_function(xw, axis=-1, **self.truth_kw)
-        pred = self.function(x, 150, skip, pad=True)
-        pred1 = self.function(x, 150, skip, pad=999.0)
-
-        n = (x.size - 150) // skip + 1
-
-        assert allclose(pred[:n], truth)
-        assert all(isnan(pred[n:]))
-
-        assert allclose(pred1[n:], 999.0)

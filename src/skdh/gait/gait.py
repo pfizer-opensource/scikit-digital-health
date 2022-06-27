@@ -353,7 +353,7 @@ class Gait(BaseProcess):
         if self.cwt_scale == "default":
             scale = original_scale
         elif isinstance(self.cwt_scale, float):
-            scale = max(round(0.2 / (1.25 / fs)), 1)
+            scale = max(round(0.2 / (self.cwt_scale / fs)), 1)
         elif isinstance(self.cwt_scale, int):
             scale = self.cwt_scale
         else:
@@ -651,7 +651,16 @@ class Gait(BaseProcess):
         gait.pop("FC opp foot", None)
         gait.pop("forward cycles", None)
 
-        kwargs.update({self._acc: accel, self._time: time, "fs": fs, "height": height})
+        kwargs.update(
+            {
+                self._acc: accel,
+                self._time: time,
+                "fs": fs,
+                "height": height,
+                self._gyro: gyro,
+                "gait_pred": gait_pred
+            }
+        )
         return (kwargs, gait) if self._in_pipeline else gait
 
     def _initialize_plot(self, file):  # pragma: no cover

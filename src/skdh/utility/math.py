@@ -432,7 +432,7 @@ def moving_kurtosis(a, w_len, skip, axis=-1, return_previous=True):
         return moveaxis(res, -1, axis)
 
 
-def moving_median(a, w_len, skip=1, pad=False, axis=-1):
+def moving_median(a, w_len, skip=1, axis=-1):
     r"""
     Compute the moving mean.
 
@@ -444,10 +444,6 @@ def moving_median(a, w_len, skip=1, pad=False, axis=-1):
         Window length in number of samples.
     skip : int
         Window start location skip in number of samples. Default is 1.
-    pad : {bool, int, float}, optional
-        Pad the returned array length with either `nan` (`True`), or the pad value. False does not
-        pad the array with values. Note that the windows are left-justified, so the padded values
-        will be on the end of the array (`rmed[w_len-1:]` for `skip=1`).
     axis : int, optional
         Axis to compute the moving mean along. Default is -1.
 
@@ -463,8 +459,7 @@ def moving_median(a, w_len, skip=1, pad=False, axis=-1):
 
     .. math:: \frac{n - w_{len}}{skip} + 1
 
-    where `n` is the length of the moving axis. Computation efficiency does not decrease for
-    increasing values of `skip` due to the underlying algorithms.
+    where `n` is the length of the moving axis.
 
     Examples
     --------
@@ -516,15 +511,7 @@ def moving_median(a, w_len, skip=1, pad=False, axis=-1):
             "Cannot have a window length larger than the computation axis."
         )
 
-    rmed = _extensions.moving_median(x, w_len)
-
-    if isinstance(pad, bool):
-        if pad:
-            rmed[..., -(w_len - 1) :] = nan
-        else:
-            rmed = rmed[..., : -w_len + 1]
-    else:
-        rmed[..., -(w_len - 1) :] = pad
+    rmed = _extensions.moving_median(x, w_len, skip)
 
     # move computation axis back to original place and return
-    return moveaxis(rmed[..., ::skip], -1, axis)
+    return moveaxis(rmed, -1, axis)
