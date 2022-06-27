@@ -353,7 +353,7 @@ class Gait(BaseProcess):
         if self.cwt_scale == "default":
             scale = original_scale
         elif isinstance(self.cwt_scale, float):
-            scale = max(round(0.2 / (1.25 / fs)), 1)
+            scale = max(round(0.2 / (self.cwt_scale / fs)), 1)
         elif isinstance(self.cwt_scale, int):
             scale = self.cwt_scale
         else:
