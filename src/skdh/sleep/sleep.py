@@ -596,6 +596,7 @@ class Sleep(BaseProcess):
                 self._time: time,
                 "fs": fs,
                 "wear": wear,
+                "temperature": temperature,
                 "sleep": sleep_idx,
             }
         )
