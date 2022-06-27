@@ -134,7 +134,7 @@ contains
         ! = heap(0) * (1 - 0.5 * 1) + 0.5 * heap(1) * 1
         ! = heap(0) * 0.5 + 0.5 * heap(1)
         ! = (heap(0) + heap(1)) / 2
-        get_median = heap(0) * (1.0_c_double - 0.5_c_double * is_even) + 0.5_c_double * heap(1) * is_even
+        get_median = heap(0) * (1.0_c_double - (0.5_c_double * is_even)) + 0.5_c_double * heap(1) * is_even
     end function get_median
 
     ! subroutine to replace multiple elements from the heap at once
@@ -190,6 +190,7 @@ contains
 
         temp = heap(i1)
         heap(i1) = heap(i2)
+        heap(i2) = temp
         ! swap the sorted position
         itemp = pos(i1)
         pos(i1) = pos(i2)
