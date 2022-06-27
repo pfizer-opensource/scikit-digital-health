@@ -194,7 +194,7 @@ contains
         ! swap the sorted position
         itemp = pos(i1)
         pos(i1) = pos(i2)
-        pos(i2) = pos(i1)
+        pos(i2) = itemp
         ! oldest list - need to modify index here since it uses a different index range
         oldest(pos(i1) + n_max_heap - 1) = i1
         oldest(pos(i2) + n_max_heap - 1) = i2
