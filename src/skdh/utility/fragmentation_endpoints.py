@@ -142,7 +142,7 @@ def average_duration(a=None, *, lengths=None, values=None, voi=1):
 
 
 def state_transition_probability(a=None, *, lengths=None, values=None, voi=1):
-    """
+    r"""
     Compute the probability of transitioning from the desired state to the
     second state.
 

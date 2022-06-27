@@ -51,13 +51,12 @@ In order to build from source, the following are required:
 - C compiler (currently has only been tested with GCC)
 - Fortran compiler (currently only been tested with GFortran)
 - `libzip <https://libzip.org/>`_
-- `gsl <https://www.gnu.org/software/gsl/>`_
 - setuptools
 - numpy >=1.17.2
 
-If you are using Conda, both libzip and gsl can easily be installed via::
+If you are using Conda, libzip can easily be installed via::
 
-    conda install -c conda-forge libzip gsl
+    conda install -c conda-forge libzip
 
 C/Fortran Compilers
 ^^^^^^^^^^^^^^^^^^^

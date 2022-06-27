@@ -24,7 +24,7 @@ class TestGetWearTime:
 
         x[n1:n2] = [0, 0, 1]
         t[n1:n2] = 22.0
-        rmd = moving_median(x, 250, 1, pad=False, axis=0)
+        rmd = moving_median(x, 250, 1, axis=0)
 
         wt = get_weartime(rmd, t, fs, 0.001, 25.0)
 
