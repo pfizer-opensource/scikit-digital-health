@@ -37,10 +37,10 @@ py3.install_sources(
 
 # order the subdirs so that the compilations are first for better parallelization
 subdir('features')
-#subdir('utility')
-#subdir('io')
-#subdir('activity')
-#subdir('gait')
-#subdir('preprocessing')
-#subdir('sit2stand')
-#subdir('sleep')
+subdir('utility')
+subdir('io')
+subdir('activity')
+subdir('gait')
+subdir('preprocessing')
+subdir('sit2stand')
+subdir('sleep')
