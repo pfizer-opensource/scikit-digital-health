@@ -44,5 +44,5 @@ if zip_dep.found()
         subdir: 'skdh/io/_extensions',
     )
 else
-    warning("Library `zip` not found, not building the GT3x reader extension.")
+    warning('Library `zip` not found, not building the GT3x reader extension.')
 endif
