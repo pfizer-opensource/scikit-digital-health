@@ -12,7 +12,8 @@ Pipeline Processing
 
     Pipeline
 """
-from skdh.version import __version__, __minimum_version__
+__version__ = importlib.metadata.version("scikit-digital-health")
+__minimum_version__ = "0.9.10"
 
 from skdh.pipeline import Pipeline
 from skdh.base import BaseProcess
