@@ -149,3 +149,4 @@ dmypy.json
 /docs/**/generated/
 /coverage/
 /misc_script/
+/.mesonpy-native-file.ini
