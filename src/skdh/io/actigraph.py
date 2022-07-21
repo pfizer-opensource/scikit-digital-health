@@ -11,7 +11,10 @@ from numpy import vstack, allclose
 from skdh.base import BaseProcess
 from skdh.io.base import check_input_file
 from skdh.io.get_window_start_stop import get_window_start_stop
-from skdh.io._extensions import read_gt3x
+
+
+class MissingBuildDependency(Exception):
+    pass
 
 
 class ReadGT3X(BaseProcess):
@@ -66,6 +69,13 @@ class ReadGT3X(BaseProcess):
             period=None,
             ext_error=ext_error,
         )
+
+        try:
+            from skdh.io._extensions.gt3x_convert import read_gt3x
+        except ImportError as e:
+            raise MissingBuildDependency(
+                "To build the GT3X reader, libzip is required. Install lib-zip and build again."
+            ) from e
 
         warn(
             "This class is provided as-is. Validate output compared to ActiGraph CSV.",
