@@ -22,6 +22,12 @@ inc_np = include_directories(incdir_numpy)
 #
 numpy_nodepr_api = '-DNPY_NO_DEPRECATED_API=NPY_1_9_API_VERSION'
 
+# Add -lm for C code. For Fortran code, Meson already adds `-lm`.
+m_dep = cc.find_library('m', required : false)
+if m_dep.found()
+  add_project_link_arguments('-lm', language : 'c')
+endif
+
 
 py_sources = [
     '__init__.py',
