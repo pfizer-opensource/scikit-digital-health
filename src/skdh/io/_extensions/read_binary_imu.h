@@ -6,7 +6,7 @@
 #include <math.h>
 #include <float.h>
 /* for reading from ActiGraph files */
-#include <zip.h>
+//#include <zip.h>
 
 /*
 ======================================
