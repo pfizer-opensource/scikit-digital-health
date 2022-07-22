@@ -31,20 +31,29 @@ py3.extension_module(
 )
 
 # try to find the zip library. If its not found we won't generate the extension
-zip_dep = cc.find_library('zip', required: false)
+zip_dep = cc.find_library('zip', required: false, dirs: lib_dir)
 
 if zip_dep.found()
+    # get the include directory for conda
+    conda_incl = include_directories(
+        '@0@/include'.format(
+            py3.get_path('data')
+        )
+    )
+
+    # create the reader library
     gt3x_lib = static_library(
         'gt3x',
         'gt3x.c',
         c_args: numpy_nodepr_api,
         dependencies: py3_dep,
+        include_directories: [inc_np, conda_incl],
     )
-
+    # create the extension
     py3.extension_module(
         'gt3x_convert',
         'pygt3x_convert.c',
-        include_directories: [inc_np],
+        include_directories: [inc_np, conda_incl],
         dependencies: [py3_dep, zip_dep],
         link_with: [gt3x_lib],
         c_args: numpy_nodepr_api,

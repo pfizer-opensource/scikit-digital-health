@@ -12,6 +12,9 @@ incdir_numpy = run_command(py3,
 
 inc_np = include_directories(incdir_numpy)
 
+# Library directory
+lib_dir = '@0@/lib'.format(py3.get_path('data'))
+
 # Don't use the deprecated NumPy C API. Define this to a fixed version instead of
 # NPY_API_VERSION in order not to break compilation for released SciPy versions
 # when NumPy introduces a new deprecation. Use in a meson.build file::
