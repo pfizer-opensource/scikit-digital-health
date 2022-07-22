@@ -140,6 +140,8 @@ class ReadGT3X(BaseProcess):
         - `day_ends`: window indices
         """
         super().predict(expect_days=False, expect_wear=False, file=file, **kwargs)
+        # make sure to import so that we can use
+        from skdh.io._extensions.gt3x_convert import read_gt3x
 
         time, accel, lux, index, N = read_gt3x(file, self.base, self.period)
 
