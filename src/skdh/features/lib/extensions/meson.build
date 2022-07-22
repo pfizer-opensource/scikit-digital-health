@@ -15,6 +15,7 @@ fort_features_sources = [
 fort_features_lib = static_library(
     'fort_features',
     fort_features_sources,
+    c_args: numpy_nodepr_api,
     include_directories: [inc_np],
     dependencies: py3_dep,
 )
@@ -38,6 +39,7 @@ foreach feat_source: features_sources
             fort_features_lib,
         ],
         link_language: 'fortran',
+        c_args: numpy_nodepr_api,
         install: true,
         subdir: 'skdh/features/lib/extensions',
     )
