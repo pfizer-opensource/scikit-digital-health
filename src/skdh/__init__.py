@@ -12,6 +12,7 @@ Pipeline Processing
 
     Pipeline
 """
+import importlib.metadata
 __version__ = importlib.metadata.version("scikit-digital-health")
 __minimum_version__ = "0.9.10"
 
