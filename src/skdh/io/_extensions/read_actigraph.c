@@ -1,5 +1,7 @@
 // Copyright (c) 2021. Pfizer Inc. All rights reserved.
 #include "read_binary_imu.h"
+/* put this here so if we are not compiling ActiGraph we dont need zip.h */
+#include <zip.h>
 
 /*
 ---------------------
