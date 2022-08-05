@@ -171,6 +171,7 @@ class CalibrateAccelerometer(BaseProcess):
             return (kwargs, None) if self._in_pipeline else kwargs
 
         finished = False
+        valid_calibration = True
         # use the Store object in order to save computation time
         store = Store(n10)
         while not finished:
@@ -190,13 +191,14 @@ class CalibrateAccelerometer(BaseProcess):
 
             if not finished and (nh + i_h * n12h) >= accel.shape[0]:
                 finished = True
+                valid_calibration = False
                 warn(
                     f"Recalibration not done with {self.min_hours + i_h * 12} hours due to "
                     f"insufficient non-movement data available"
                 )
             i_h += 1
 
-        if apply:
+        if apply and valid_calibration:
             if temperature is None:
                 accel = (accel + offset) * scale
             else:
@@ -206,7 +208,7 @@ class CalibrateAccelerometer(BaseProcess):
 
         # add the results to the returned values
         kwargs.update(
-            {"offset": offset, "scale": scale, "temperature scale": temp_scale}
+            {self._acc: accel, "offset": offset, "scale": scale, "temperature scale": temp_scale}
         )
 
         return (kwargs, None) if self._in_pipeline else kwargs
@@ -224,7 +226,7 @@ class CalibrateAccelerometer(BaseProcess):
         Returns
         -------
         finished : bool
-            If the optimization finished succesfully.
+            If the optimization finished successfully.
         offset : numpy.ndarray
             (3, ) array of offsets
         scale : numpy.ndarray
@@ -317,6 +319,8 @@ class CalibrateAccelerometer(BaseProcess):
         # assess if calibration error has been significantly improved
         if (cal_error_end < cal_error_start) and (cal_error_end < 0.01):
             return True, offset, scale, tmp_scale, tmp_mean
+        else:
+            return False, offset, scale, tmp_scale, tmp_mean
 
 
 class Store:
