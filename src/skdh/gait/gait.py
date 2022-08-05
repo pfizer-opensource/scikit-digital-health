@@ -196,6 +196,7 @@ class Gait(BaseProcess):
             # key-word arguments for storage
             correct_accel_orient=correct_accel_orient,
             use_cwt_scale_relation=use_cwt_scale_relation,
+            wavelet_scale=wavelet_scale,
             min_bout_time=min_bout_time,
             max_bout_separation_time=max_bout_separation_time,
             max_stride_time=max_stride_time,
