@@ -15,6 +15,12 @@ SKDH provides the following:
 - Common time-series/inertial data analysis functions
 - Inertial data analysis algorithms (ie gait, sit-to-stand, sleep, activity)
 
+
+Build Requirements
+##################
+
+As of 0.9.15, Scikit Digital Health is built using Meson.
+
 Citation
 ########
 
