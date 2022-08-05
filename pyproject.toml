@@ -61,7 +61,8 @@ dependencies = [
     "matplotlib",
     "packaging",
     "pyyaml",
-    "importlib_resources;python_version<'3.7'"
+    "importlib_resources;python_version<'3.7'",
+    "importlib_metadata;python_version<'3.8'"
 ]
 
 [project.optional-dependencies]
