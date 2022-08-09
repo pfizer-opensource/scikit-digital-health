@@ -27,7 +27,7 @@ void geneactiv_set_error_message(int ierr)
             PyErr_SetString(PyExc_RuntimeError, "Data length is shorter than 3600");
             break;
         default :
-            PyErr_SetString(PyExc_RuntimeError, "Unkown error reading GeneActiv file");
+            PyErr_SetString(PyExc_RuntimeError, "Unknown error reading GeneActiv file");
     }
 }
 
