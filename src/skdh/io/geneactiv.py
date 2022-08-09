@@ -128,15 +128,15 @@ class ReadBin(BaseProcess):
         super().predict(expect_days=False, expect_wear=False, file=file, **kwargs)
 
         # read the file
-        nmax, fs, acc, time, light, temp, starts, stops = read_geneactiv(
+        blk_max, n_max, fs, acc, time, light, temp, starts, stops = read_geneactiv(
             file, self.bases, self.periods
         )
 
         results = {
-            self._time: time,
-            self._acc: acc,
-            self._temp: temp,
-            "light": light,
+            self._time: time[:n_max],
+            self._acc: acc[:n_max, :],
+            self._temp: temp[:n_max],
+            "light": light[:n_max],
             "fs": fs,
             "file": file,
         }

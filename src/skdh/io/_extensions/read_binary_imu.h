@@ -110,6 +110,7 @@ typedef enum {
     GN_READ_E_BLOCK_TIMESTAMP,  /* issue reading timestamp from block */
     GN_READ_E_BLOCK_FS,  /* block FS does not match header fs */
     GN_READ_E_BLOCK_FS_WARN,  /* warning about FS */
+    GN_READ_E_BLOCK_MISSING_BLOCK_WARN,  /* warn about a missing block of data */
     GN_READ_E_BLOCK_DATA,  /* error reading block data */
     GN_READ_E_BLOCK_DATA_3600  /* data is less than 3600 characters */
 } Read_Bin_Error_t;
