@@ -391,9 +391,8 @@ static PyObject *read_geneactiv(PyObject *NPY_UNUSED(self), PyObject *args)
     }
 
     return Py_BuildValue(
-        "llfNNNNNN",  /* need to use N to not increment reference counter */
-        info.max_n,
-        info.max_n * GN_SAMPLES,
+        "lfNNNNNN",  /* need to use N to not increment reference counter */
+        (info.max_n + 1) * GN_SAMPLES,
         info.fs,
         (PyObject *)accel,
         (PyObject *)time,
