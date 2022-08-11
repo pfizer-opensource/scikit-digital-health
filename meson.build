@@ -3,7 +3,7 @@ project(
     'c',
     version: '0.9.16',
     license: 'MIT',
-    meson_version: '>=0.60',
+    meson_version: '>=0.63',
 )
 
 # https://mesonbuild.com/Python-module.html
