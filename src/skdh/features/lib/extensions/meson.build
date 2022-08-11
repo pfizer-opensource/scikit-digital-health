@@ -17,7 +17,6 @@ fort_features_lib = static_library(
     fort_features_sources,
     c_args: numpy_nodepr_api,
     include_directories: [inc_np],
-#    dependencies: py3_dep,
 )
 
 features_sources = [
@@ -34,7 +33,6 @@ foreach feat_source: features_sources
         feat_source,
         '@0@.c'.format(feat_source),
         include_directories: [inc_np],
-#        dependencies: py3_dep,
         link_with: [
             fort_features_lib,
         ],

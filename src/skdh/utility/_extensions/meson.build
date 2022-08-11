@@ -15,7 +15,6 @@ movstat_lib = static_library(
     ],
     c_args: numpy_nodepr_api,
     include_directories: [inc_np],
-#    dependencies: py3_dep,
 )
 
 py3.extension_module(
@@ -24,7 +23,6 @@ py3.extension_module(
         'moving_statistics.c',
     ],
     include_directories: [inc_np],
-#    dependencies: py3_dep,
     link_with: [movstat_lib],
     link_language: 'fortran',
     c_args: numpy_nodepr_api,
