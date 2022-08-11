@@ -31,6 +31,8 @@ if m_dep.found()
   add_project_link_arguments('-lm', language : 'c')
 endif
 
+add_project_link_arguments('-Wl,-flat_namespace,-undefined,dynamic_lookup', language : 'c')
+
 
 py_sources = [
     '__init__.py',
