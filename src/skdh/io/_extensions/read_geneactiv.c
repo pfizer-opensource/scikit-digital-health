@@ -101,8 +101,10 @@ int geneactiv_read_block(FILE *fp, Window_t *w_info, GN_Info_t *info, GN_Data_t 
     double fs, temp;
     int ier = GN_READ_E_NONE;
 
-    /* skip first 2 lines */
-    GN_READLINE; GN_READLINE;
+    /* read/skip first 2 lines */
+    if (GN_READLINE == NULL)  /* make sure that the first line is actually a "Recorded Data" block */
+        return GN_READ_E_BLOCK_MISSING_BLOCK_WARN;
+    GN_READLINE;
     GN_READLINE;  /* 3d line is sequence number */
     N = strtol(&buff[16], NULL, 10);
     Nps = N * GN_SAMPLES;

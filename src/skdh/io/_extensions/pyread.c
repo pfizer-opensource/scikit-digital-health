@@ -27,7 +27,7 @@ void geneactiv_set_error_message(int ierr)
             PyErr_SetString(PyExc_RuntimeError, "Data length is shorter than 3600");
             break;
         default :
-            PyErr_SetString(PyExc_RuntimeError, "Unkown error reading GeneActiv file");
+            PyErr_SetString(PyExc_RuntimeError, "Unknown error reading GeneActiv file");
     }
 }
 
@@ -341,7 +341,10 @@ static PyObject *read_geneactiv(PyObject *NPY_UNUSED(self), PyObject *args)
     {
         ierr = geneactiv_read_block(fp, &winfo, &info, &data);
 
-        if (ierr == GN_READ_E_BLOCK_FS_WARN)
+        /* check output of ierr */
+        if (ierr == GN_READ_E_NONE)  /* most common case */
+        {}
+        else if (ierr == GN_READ_E_BLOCK_FS_WARN)
         {
             int err_ret = PyErr_WarnEx(PyExc_RuntimeWarning, "Block fs is not the same as header fs. Setting to block fs.", 1);
 
@@ -351,7 +354,15 @@ static PyObject *read_geneactiv(PyObject *NPY_UNUSED(self), PyObject *args)
                 break;
             }
         }
-        else if (ierr != GN_READ_E_NONE)
+        else if (ierr == GN_READ_E_BLOCK_MISSING_BLOCK_WARN)
+        {
+            int err_ret = PyErr_WarnEx(PyExc_RuntimeWarning, "Found an empty block, assuming end of recorded data.", 1);
+            /* break out of the loop, but dont fail, unless raising warnings */
+            if (err_ret == -1) fail = 1;
+
+            break;
+        }
+        else
         {
             fail = 1;
             break;
@@ -381,7 +392,7 @@ static PyObject *read_geneactiv(PyObject *NPY_UNUSED(self), PyObject *args)
 
     return Py_BuildValue(
         "lfNNNNNN",  /* need to use N to not increment reference counter */
-        info.max_n,
+        (info.max_n + 1) * GN_SAMPLES,
         info.fs,
         (PyObject *)accel,
         (PyObject *)time,
