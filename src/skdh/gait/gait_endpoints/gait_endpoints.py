@@ -666,8 +666,12 @@ class GaitSymmetryIndex(GaitBoutEndpoint):
     def _predict(self, fs, leg_length, gait, gait_aux):
         gsi = zeros(len(gait_aux["accel"]), dtype=float_)
 
-        # setup acceleration filter
-        sos = butter(4, 2 * 10 / fs, btype="low", output="sos")
+        # setup acceleration filter if its possible to use
+        if 0 < (2 * 10 / fs) < 1:
+            sos = butter(4, 2 * 10 / fs, btype="low", output="sos")
+        else:
+            sos = None
+
         for i, acc in enumerate(gait_aux["accel"]):
             lag_ = (
                 nanmedian(gait["PARAM:stride time"][gait_aux["inertial data i"] == i])
@@ -678,9 +682,12 @@ class GaitSymmetryIndex(GaitBoutEndpoint):
                 continue
             lag = int(round(lag_))
             # GSI uses biased autocovariance
-            ac = _autocovariancefn(
-                sosfiltfilt(sos, acc, axis=0), int(4.5 * fs), biased=True, axis=0
-            )
+            if sos is not None:
+                ac = _autocovariancefn(
+                    sosfiltfilt(sos, acc, axis=0), int(4.5 * fs), biased=True, axis=0
+                )
+            else:
+                ac = _autocovariancefn(acc, int(4.5 * fs), biased=True, axis=0)
 
             # C_stride is the sum of 3 axes
             pks, _ = find_peaks(sum(ac, axis=1))
