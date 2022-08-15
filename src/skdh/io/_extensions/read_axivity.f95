@@ -387,9 +387,22 @@ contains
         time = (/ (t0 + i * tDelta, i=0, info%count - 1) /)
 
         ! subtract 2 from nblocks for 2 header blocks included in total
-        call get_day_indexing(freq, t, info%max_days, info%Nwin, bases, periods, &
-            int(pkt%sequenceID, c_long), int(info%nblocks, c_long) - 2, int(info%count, c_long), &
-            starts, i_start, stops, i_stop)
+        call get_day_indexing( &
+            freq, & ! Sampling frequency
+            t, &  ! structure containing hours/min/sec/msec
+            t1 - t0, &  ! time delta for the block
+            info%max_days, &  ! maximum days possible
+            info%Nwin, &  ! number of windows (bases & periods)
+            bases, &  ! window start hours
+            periods, &  ! window durations in hours
+            int(pkt%sequenceID, c_long), &  ! Number of the block currently on
+            int(info%nblocks, c_long) - 2, &  ! max number of blocks in the file
+            int(info%count, c_long), &  ! the number of data samples per block
+            starts, &  ! storage for start indices of windows
+            i_start, &  ! keep track of where in starts we are
+            stops, &  ! storage for stop indices of windows
+            i_stop &  ! keep track of where in stops we are
+        )
     end subroutine
 
     ! =============================================================================================
