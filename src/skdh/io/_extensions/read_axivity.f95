@@ -386,11 +386,20 @@ contains
         tDelta = (t1 - t0) / pkt%sampleCount
         time = (/ (t0 + i * tDelta, i=0, info%count - 1) /)
 
+!        if (t%hour == 23 .and. t%min == 59 .and. t%sec == 59) then
+!            print "(I4,A,I0.2,A,I0.2,A,I0.2,A,I0.2,A,I0.2,A,I4,A,F6.3,F6.3)", year, '/', month, '/', day, '  ', t%hour, ':', &
+!                    t%min, ':', t%sec, '.', t%msec, '  block dur:', t1 - t0, time(info%count) - time(1)
+!        end if
+!        if (t%hour == 0 .and. t%min == 0 .and. t%sec < 2) then
+!            print "(I4,A,I0.2,A,I0.2,A,I0.2,A,I0.2,A,I0.2,A,I4,A,F6.3,F6.3)", year, '/', month, '/', day, '  ', t%hour, ':', &
+!                    t%min, ':', t%sec, '.', t%msec, '  block dur:', t1 - t0, time(info%count) - time(1)
+!        end if
+
         ! subtract 2 from nblocks for 2 header blocks included in total
         call get_day_indexing( &
             freq, & ! Sampling frequency
             t, &  ! structure containing hours/min/sec/msec
-            t1 - t0, &  ! time delta for the block
+            t1 - t0 - 0.5 * tDelta, &  ! time delta for the block.  Subtract a little bit so that we dont miss any windows
             info%max_days, &  ! maximum days possible
             info%Nwin, &  ! number of windows (bases & periods)
             bases, &  ! window start hours
