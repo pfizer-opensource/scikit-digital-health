@@ -74,7 +74,7 @@ contains
 
                 if (in_win1 .or. in_win2) then
                     starts(i, 1) = 0
-                    i_starts(i) = i_starts(i) + 1
+                    i_starts(i) = 1  ! can't be anything higher than this
                 end if
             end if
             
