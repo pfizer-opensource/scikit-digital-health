@@ -29,9 +29,13 @@ class ReadNumpyFile(BaseProcess):
     """
 
     def __init__(self, ext_error="warn", bases=None, periods=None):
-        super(ReadNumpyFile, self).__init__(ext_error=ext_error)
-        self.bases = list(bases)
-        self.periods = list(periods)
+        super(ReadNumpyFile, self).__init__(
+            bases=bases,
+            periods=periods,
+            ext_error=ext_error
+        )
+        self.bases = bases
+        self.periods = periods
 
         if ext_error.lower() in ["warn", "raise", "skip"]:
             self.ext_error = ext_error.lower()
@@ -73,37 +77,40 @@ class ReadNumpyFile(BaseProcess):
 
         data = load(file)
 
-        # day/windowing stuff - ADDED
-        time = pd.to_datetime(data["time"])
-        start_date = time[0]
-        end_date = time[-1]
-        days = {}
-        day_dt = pd.Timedelta(1, unit='day')
-        for b, p in zip(self.bases, self.periods):
-            starts, stops = [], []
+        if self.bases is not None and self.periods is not None:
+            # day/windowing stuff - ADDED
+            time = pd.to_datetime(data["time"])
+            start_date = time[0]
+            end_date = time[-1]
+            days = {}
+            day_dt = pd.Timedelta(1, unit='day')
+            for b, p in zip(self.bases, self.periods):
+                starts, stops = [], []
 
-            p2 = (b + p) % 24
+                p2 = (b + p) % 24
 
-            tb = start_date.replace(hour=b, minute=0, second=0) - day_dt
-            tp = start_date.replace(hour=p2, minute=0, second=0) - day_dt
-            if tp <= tb:
-                tp += day_dt
-            while tp < start_date:  # make sure at least one of the indices is during recording
-                tb += day_dt
-                tp += day_dt
+                tb = start_date.replace(hour=b, minute=0, second=0) - day_dt
+                tp = start_date.replace(hour=p2, minute=0, second=0) - day_dt
+                if tp <= tb:
+                    tp += day_dt
+                while tp < start_date:  # make sure at least one of the indices is during recording
+                    tb += day_dt
+                    tp += day_dt
 
-            # iterate over the times
-            while tb < end_date:
-                starts.append(np.argmin(abs(time - tb)))
-                stops.append(np.argmin(abs(time - tp)))
+                # iterate over the times
+                while tb < end_date:
+                    starts.append(np.argmin(abs(time - tb)))
+                    stops.append(np.argmin(abs(time - tp)))
 
-                tb += day_dt
-                tp += day_dt
+                    tb += day_dt
+                    tp += day_dt
 
-            days[(b, p)] = np.vstack((starts, stops)).T
+                days[(b, p)] = np.vstack((starts, stops)).T
+
+            kwargs.update({self._days: days})
 
         kwargs.update(
-            {self._time: data["time"], self._acc: data["accel"], self._temp: data['temperature'], "file": file, self._days: days}
+            {self._time: data["time"], self._acc: data["accel"], self._temp: data['temperature'], "file": file}
         )
         if "fs" in data:
             kwargs["fs"] = data["fs"][()]
