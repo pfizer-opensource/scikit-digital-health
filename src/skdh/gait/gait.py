@@ -501,6 +501,7 @@ class Gait(BaseProcess):
                 (accel, gyro),
                 (gait_starts, gait_stops, *self.day_idx),
                 self.aa_filter,
+                fs=fs,
             )
         else:
             time_ds = time
