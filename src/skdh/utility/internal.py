@@ -174,7 +174,7 @@ def apply_downsample(goal_fs, time, data=(), indices=(), aa_filter=True, fs=None
 
     if fs is None:
         # compute the sampling frequency by hand
-        fs = mean(diff(time[:2500]))
+        fs = 1 / mean(diff(time[:2500]))
 
     if int(fs / goal_fs) == fs / goal_fs:
         time_ds = time[:: int(fs / goal_fs)]
