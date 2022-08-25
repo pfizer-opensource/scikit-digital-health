@@ -40,7 +40,7 @@ typedef struct {
 get_day_indexing(fs, dtime, mxd, n, bases, periods, block_n, max_n, block_samples, starts, 
     i_starts, stops, i_stops)
 */
-extern void get_day_indexing(double *, Time_t *, long *, long *, long *, long *, long *, long *,
+extern void get_day_indexing(double *, Time_t *, double *, long *, long *, long *, long *, long *, long *,
     long *, long *, long *, long *, long *);
 
 /*

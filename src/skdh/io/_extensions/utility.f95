@@ -26,10 +26,11 @@ contains
     ! Sets the index into a time series any of the window ends fall into the provide data block 
     ! time frame.
     ! =============================================================================================
-    subroutine get_day_indexing(fs, dtime, mxd, n, bases, periods, block_n, max_n, block_samples, &
-        starts, i_starts, stops, i_stops) bind(C, name="get_day_indexing")
+    subroutine get_day_indexing(fs, dtime, block_t_delta, mxd, n, bases, periods, block_n, max_n, &
+            block_samples, starts, i_starts, stops, i_stops) bind(C, name="get_day_indexing")
         real(c_double), intent(in) :: fs    ! sampling frequency in Hz
         type(time_t), intent(in) :: dtime   ! storage structure for HH:MM:SS & msec data
+        real(c_double), intent(in) :: block_t_delta  ! time delta across the block
         integer(c_long), intent(in) :: mxd  ! max days/possible windows. Dimension of starts & stops
         integer(c_long), intent(in) :: n    ! number of windows (bases & periods)
         integer(c_long), intent(in) :: bases(n)  ! base (start) window hour, 24 hr notation
@@ -47,8 +48,6 @@ contains
         logical :: in_win1, in_win2
 
         curr = dtime%hour * SEC_HOUR + dtime%min * SEC_MIN + dtime%sec + real(dtime%msec, c_double) / 1000.
-
-        block_dt = block_samples / fs
 
         do i=1, n
             base_sec = bases(i) * SEC_HOUR
@@ -75,7 +74,7 @@ contains
 
                 if (in_win1 .or. in_win2) then
                     starts(i, 1) = 0
-                    i_starts(i) = i_starts(i) + 1
+                    i_starts(i) = 1  ! can't be anything higher than this
                 end if
             end if
             
@@ -94,7 +93,7 @@ contains
             dtmp = period_sec - curr
             dtmp2 = dtmp + DAY_SEC
 
-            if (((dtmp >= 0) .and. (dtmp < block_dt)) .or. (dtmp2 < block_dt)) then
+            if (((dtmp >= 0) .and. (dtmp < block_t_delta)) .or. (dtmp2 < block_t_delta)) then
                 stops(i, idx_stop) = block_samples * block_n + int(fs * min(abs(dtmp), abs(dtmp2)), c_long)
                 i_stops(i) = i_stops(i) + 1
             end if
@@ -103,7 +102,7 @@ contains
             dtmp = base_sec - curr
             dtmp2 = dtmp + DAY_SEC
 
-            if (((dtmp >= 0) .and. (dtmp < block_dt)) .or. (dtmp2 < block_dt)) then
+            if (((dtmp >= 0) .and. (dtmp < block_t_delta)) .or. (dtmp2 < block_t_delta)) then
                 starts(i, idx_start) = block_samples * block_n + int(fs * min(abs(dtmp), abs(dtmp2)), c_long)
                 i_starts(i) = i_starts(i) + 1
             end if
