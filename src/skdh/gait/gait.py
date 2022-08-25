@@ -471,7 +471,7 @@ class Gait(BaseProcess):
 
         # compute fs/delta t
         fs = 1 / mean(diff(time)) if fs is None else fs
-        if fs <= 20.0:
+        if fs < 20.0:
             raise LowFrequencyError(f"Frequency ({fs:.2f}Hz) is too low (<20Hz).")
         if fs < 50:
             warn(
