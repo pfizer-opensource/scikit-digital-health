@@ -13,6 +13,7 @@ from numpy import (
     zeros,
     around,
     diff,
+    mean,
     float_,
     int_,
     ndarray,
@@ -172,14 +173,15 @@ def apply_downsample(goal_fs, time, data=(), indices=(), aa_filter=True, fs=None
                 return (xds,)
 
     if fs is None:
-        fs = 1.1 * goal_fs
+        # compute the sampling frequency by hand
+        fs = mean(diff(time[:2500]))
 
     if int(fs / goal_fs) == fs / goal_fs:
         time_ds = time[:: int(fs / goal_fs)]
     else:
         time_ds = arange(time[0], time[-1], 1 / goal_fs)
     # AA filter, if necessary
-    sos = cheby1(8, 0.05, 0.8 / 5, output="sos")
+    sos = cheby1(8, 0.05, 0.8 / (fs / goal_fs), output="sos")
 
     data_ds = ()
 
