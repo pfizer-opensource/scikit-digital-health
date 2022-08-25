@@ -76,5 +76,5 @@ if __name__ == "__main__":
         }
     )
 
-    # np.savez("gait_results.npz", **tmp)
+    np.savez("gait_results.npz", **tmp)
     np.savez("gait_results2.npz", **tmp_turn)
