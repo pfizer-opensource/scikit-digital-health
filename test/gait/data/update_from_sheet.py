@@ -63,18 +63,18 @@ if __name__ == "__main__":
     old_turn = np.load("gait_results2.npz")
 
     tmp = {k: df.loc[:, k].values for k in keys}
-    tmp.update(
-        {k: np.full(tmp["Bout N"].size, np.nan) for k in old.files if k not in tmp}
-    )
+    # tmp.update(
+    #     {k: np.full(tmp["Bout N"].size, np.nan) for k in old.files if k not in tmp}
+    # )
 
     tmp_turn = {k: df_turn.loc[:, k].values for k in keys_turn}
-    tmp_turn.update(
-        {
-            k: np.full(tmp_turn["Bout N"].size, np.nan)
-            for k in old_turn.files
-            if k not in tmp_turn
-        }
-    )
+    # tmp_turn.update(
+    #     {
+    #         k: np.full(tmp_turn["Bout N"].size, np.nan)
+    #         for k in old_turn.files
+    #         if k not in tmp_turn
+    #     }
+    # )
 
     np.savez("gait_results.npz", **tmp)
     np.savez("gait_results2.npz", **tmp_turn)
