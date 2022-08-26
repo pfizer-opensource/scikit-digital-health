@@ -27,6 +27,7 @@ class ReadNumpyFile(BaseProcess):
         Default is "warn". "raise" raises a ValueError. "skip" skips the file
         reading altogether and attempts to continue with the pipeline.
     """
+    # TODO: Add bases & periods to the docstring here
 
     def __init__(self, ext_error="warn", bases=None, periods=None):
         super(ReadNumpyFile, self).__init__(
