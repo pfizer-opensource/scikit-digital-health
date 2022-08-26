@@ -77,9 +77,11 @@ class ReadNumpyFile(BaseProcess):
 
         data = load(file)
 
+        # TODO: this code is very slow for large amounts of data - needs to be sped up
+        # TODO: this code should be moved to its own function in `utility.py` for easier testing, etc
         if self.bases is not None and self.periods is not None:
             # day/windowing stuff - ADDED
-            time = pd.to_datetime(data["time"])
+            time = pd.to_datetime(data["time"], unit='s')
             start_date = time[0]
             end_date = time[-1]
             days = {}
