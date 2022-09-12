@@ -87,6 +87,15 @@ def get_activity_bouts(
     -------
     bout_time : float
         Time in minutes spent in bouts of sustained MVPA.
+
+    References
+    ----------
+    .. [1] I. C. da Silva et al., “Physical activity levels in three Brazilian birth
+        cohorts as assessed with raw triaxial wrist accelerometry,” International
+        Journal of Epidemiology, vol. 43, no. 6, pp. 1959–1968,  Dec. 2014, doi: 10.1093/ije/dyu203.
+    .. [2] S. Sabia et al., “Association between questionnaire- and accelerometer-assessed
+        physical activity: the role of sociodemographic factors,”
+        Am J Epidemiol, vol. 179, no. 6, pp. 781–790, Mar. 2014, doi: 10.1093/aje/kwt330.
     """
     nboutdur = int(boutdur * (60 / wlen))
 
