@@ -1,7 +1,6 @@
 py3.install_sources(
     [
         '__init__.py',
-        'actigraph.py',
         'apdm.py',
         'axivity.py',
         'base.py',
