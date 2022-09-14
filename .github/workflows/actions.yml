@@ -31,8 +31,6 @@ jobs:
         #   HOMEBREW_NO_AUTO_UPDATE=1 brew install libomp
         # fi
       shell: bash
-    - name: Install libzip
-      run: sudo apt-get install libzip-dev -y
     - name: Install skdh
       run: |
         # if macOS, make sure to set the environment variables so that it can find gfortran-9
