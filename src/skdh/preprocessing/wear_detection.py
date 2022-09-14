@@ -21,9 +21,10 @@ from skdh.base import BaseProcess
 from skdh.utility import moving_mean, moving_sd, get_windowed_view
 
 
-class DetectWear(BaseProcess):
+class DetectWear_AccelThreshold(BaseProcess):
     r"""
-    Detect periods of non-wear in accelerometer recordings.
+    Detect periods of wear/non-wear from accelerometer data only, based on thresholds of the accelerometer
+    standard deviation and range.
 
     Parameters
     ----------
@@ -172,7 +173,7 @@ class DetectWear(BaseProcess):
         )
 
         # flip to wear starts/stops now
-        wear_starts, wear_stops = _modify_wear_times(
+        wear_starts, wear_stops = self._modify_wear_times(
             nonwear, self.wskip, self.apply_setup_crit, self.ship_crit
         )
 
@@ -181,94 +182,94 @@ class DetectWear(BaseProcess):
         kwargs.update({self._time: time, self._acc: accel, "wear": wear, 'temperature': temperature})
         return (kwargs, None) if self._in_pipeline else kwargs
 
-
-def _modify_wear_times(nonwear, wskip, apply_setup_rule, shipping_crit):
-    """
-    Modify the wear times based on a set of rules.
-
-    Parameters
-    ----------
-    nonwear : numpy.ndarray
-        Boolean array of nonwear in blocks.
-    wskip : int
-        Minutes skipped between start of each block.
-    apply_setup_rule : bool
-        Apply the setup filtering
-    shipping_crit : list
-        Two element list of number of hours to apply shipping criteria.
-
-    Returns
-    -------
-    w_starts : numpy.ndarray
-        Indices of blocks of wear time starts.
-    w_stops : numpy.ndarray
-        Indicies of blocks of wear time ends.
-    """
-    nph = int(60 / wskip)  # number of blocks per hour
-    # get the changes in nonwear status
-    ch = nonzero(diff(nonwear.astype(int_)))[0] + 1
-    ch = insert(ch, [0, ch.size], [0, nonwear.size])  # make sure ends are accounted for
-    start_with_wear = not nonwear[0]  # does data start with wear period
-    end_with_wear = not nonwear[-1]  # does data end with wear period
-
-    # always want to start and end with nonwear, as these blocks wont change
-    if start_with_wear:
-        ch = insert(
-            ch, 0, 0
-        )  # extra 0 length nonwear period -> always start with nonwear
-    if end_with_wear:
-        ch = append(
-            ch, nonwear.size
-        )  # extra 0 length wear period ->  always end with nonwear
-
-    # pattern is now always [NW][W][NW][W]...[W][NW][W][NW]
-    for i in range(3):
-        nw_times = (ch[1:None:2] - ch[0:None:2]) / nph  # N
-        w_times = (ch[2:-1:2] - ch[1:-1:2]) / nph  # N - 1
-
-        # percentage based rules
-        pct = w_times / (nw_times[0:-1] + nw_times[1:None])
-        thresh6 = nonzero((w_times <= 6) & (w_times > 3))[0]
-        thresh3 = nonzero(w_times <= 3)[0]
-
-        pct_thresh6 = thresh6[pct[thresh6] < 0.3]
-        pct_thresh3 = thresh3[pct[thresh3] < 0.8]
-
+    @staticmethod
+    def _modify_wear_times(nonwear, wskip, apply_setup_rule, shipping_crit):
         """
-        shipping rules
-        NOTE: shipping at the start is applied the opposite of shipping at the end, 
-        requiring a 1+ hour nonwear period following wear periods less than 3 hours
+        Modify the wear times based on a set of rules.
+
+        Parameters
+        ----------
+        nonwear : numpy.ndarray
+            Boolean array of nonwear in blocks.
+        wskip : int
+            Minutes skipped between start of each block.
+        apply_setup_rule : bool
+            Apply the setup filtering
+        shipping_crit : list
+            Two element list of number of hours to apply shipping criteria.
+
+        Returns
+        -------
+        w_starts : numpy.ndarray
+            Indices of blocks of wear time starts.
+        w_stops : numpy.ndarray
+            Indicies of blocks of wear time ends.
         """
-        ship_start = nonzero((w_times <= 3) & (ch[2:-1:2] <= (shipping_crit[0] * nph)))[
-            0
-        ]
-        ship_end = nonzero(
-            (w_times <= 3) & (ch[1:-1:2] >= ch[-1] - (shipping_crit[1] * nph))
-        )[0]
+        nph = int(60 / wskip)  # number of blocks per hour
+        # get the changes in nonwear status
+        ch = nonzero(diff(nonwear.astype(int_)))[0] + 1
+        ch = insert(ch, [0, ch.size], [0, nonwear.size])  # make sure ends are accounted for
+        start_with_wear = not nonwear[0]  # does data start with wear period
+        end_with_wear = not nonwear[-1]  # does data end with wear period
 
-        ship_start = ship_start[nw_times[ship_start + 1] >= 1]
-        ship_end = ship_end[nw_times[ship_end] >= 1]
+        # always want to start and end with nonwear, as these blocks wont change
+        if start_with_wear:
+            ch = insert(
+                ch, 0, 0
+            )  # extra 0 length nonwear period -> always start with nonwear
+        if end_with_wear:
+            ch = append(
+                ch, nonwear.size
+            )  # extra 0 length wear period ->  always end with nonwear
 
-        switch = concatenate(
-            (
-                pct_thresh6 * 2 + 1,  # start index
-                pct_thresh6 * 2 + 2,  # end index
-                pct_thresh3 * 2 + 1,  # start index
-                pct_thresh3 * 2 + 2,  # end index
-                ship_start * 2 + 1,
-                ship_start * 2 + 2,
-                ship_end * 2 + 1,
-                ship_end * 2 + 2,
+        # pattern is now always [NW][W][NW][W]...[W][NW][W][NW]
+        for i in range(3):
+            nw_times = (ch[1:None:2] - ch[0:None:2]) / nph  # N
+            w_times = (ch[2:-1:2] - ch[1:-1:2]) / nph  # N - 1
+
+            # percentage based rules
+            pct = w_times / (nw_times[0:-1] + nw_times[1:None])
+            thresh6 = nonzero((w_times <= 6) & (w_times > 3))[0]
+            thresh3 = nonzero(w_times <= 3)[0]
+
+            pct_thresh6 = thresh6[pct[thresh6] < 0.3]
+            pct_thresh3 = thresh3[pct[thresh3] < 0.8]
+
+            """
+            shipping rules
+            NOTE: shipping at the start is applied the opposite of shipping at the end, 
+            requiring a 1+ hour nonwear period following wear periods less than 3 hours
+            """
+            ship_start = nonzero((w_times <= 3) & (ch[2:-1:2] <= (shipping_crit[0] * nph)))[
+                0
+            ]
+            ship_end = nonzero(
+                (w_times <= 3) & (ch[1:-1:2] >= ch[-1] - (shipping_crit[1] * nph))
+            )[0]
+
+            ship_start = ship_start[nw_times[ship_start + 1] >= 1]
+            ship_end = ship_end[nw_times[ship_end] >= 1]
+
+            switch = concatenate(
+                (
+                    pct_thresh6 * 2 + 1,  # start index
+                    pct_thresh6 * 2 + 2,  # end index
+                    pct_thresh3 * 2 + 1,  # start index
+                    pct_thresh3 * 2 + 2,  # end index
+                    ship_start * 2 + 1,
+                    ship_start * 2 + 2,
+                    ship_end * 2 + 1,
+                    ship_end * 2 + 2,
+                )
             )
-        )
 
-        ch = delete(ch, switch)
+            ch = delete(ch, switch)
 
-    w_starts = ch[1:-1:2]
-    w_stops = ch[2:-1:2]
+        w_starts = ch[1:-1:2]
+        w_stops = ch[2:-1:2]
 
-    if apply_setup_rule and (w_starts[0] == 0) and (w_stops[0] <= (3 * nph)):
-        w_starts = w_starts[1:]
-        w_stops = w_stops[1:]
+        if apply_setup_rule and (w_starts[0] == 0) and (w_stops[0] <= (3 * nph)):
+            w_starts = w_starts[1:]
+            w_stops = w_stops[1:]
 
-    return w_starts, w_stops
+        return w_starts, w_stops
