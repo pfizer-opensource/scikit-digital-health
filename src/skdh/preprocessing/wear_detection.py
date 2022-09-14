@@ -4,6 +4,8 @@ Wear detection algorithms
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+from warnings import warn
+
 from numpy import (
     mean,
     diff,
@@ -16,10 +18,130 @@ from numpy import (
     int_,
     full,
 )
+from scipy.signal import butter, sosfiltfilt
 
 from skdh.base import BaseProcess
 from skdh.utility import moving_mean, moving_sd, get_windowed_view
 from skdh.utility.internal import rle
+
+
+class DETACH:
+    r"""
+    DEvice Temperature and Acceleration CHange algorithm for detecting wear/non-wear.
+
+    Parameters
+    ----------
+    sd_thresh : float, optional
+        Standard deviation threshold for an acceleration axis to trigger non-wear.
+        Default is 0.008 g (8 milli-g).
+    low_temperature_threshold : float, optional
+        Low temperature threshold for non-wear classification. Default is 26.0 deg C.
+    high_temperature_threshold : float, optional
+        High temperature thoresld for non-wear classification. Default is 30.0 deg C.
+    decrease_threshold : float, optional.
+        Temperature decrease rate-of-change threshold for non-wear classification.
+        Default is -0.2.
+    increase_threshold : float, optional
+        Temperature increase rate-of-chanve threshold for non-wear classification.
+        Default is 0.1
+    n_axes_threshold : {1, 2, 3}
+        Number of axes that must be below `sd_thresh` to be considered non-wear.
+        Default is 2.
+
+    References
+    ----------
+    .. [1] A. Vert et al., “Detecting accelerometer non-wear periods using change
+        in acceleration combined with rate-of-change in temperature,” BMC Medical
+        Research Methodology, vol. 22, no. 1, p. 147, May 2022, doi: 10.1186/s12874-022-01633-6.
+
+    Notes
+    -----
+    This algorithm was based on work done with GENEActiv devices. While efforts
+    were made to keep the algorithm device-agnostic, this should be kept in mind
+    when deploying in alternative devices.
+    """
+    def __init__(self, sd_thresh=0.008, low_temperature_threshold=26.0, high_temperature_threshold=30.0, decrease_threshold=-0.2, increase_threshold=0.1, n_axes_threshold=2):
+        if n_axes_threshold not in [1, 2, 3]:
+            n_axes_threshold = max(min(n_axes_threshold, 3), 1)
+            warn(f"n_axes_threshold must be in {1, 2, 3}. Setting to {n_axes_threshold}", UserWarning)
+
+        super().__init__(
+            sd_thresh=sd_thresh,
+            low_temperature_threshold=low_temperature_threshold,
+            high_temperature_threshold=high_temperature_threshold,
+            decrease_threshold=decrease_threshold,
+            increase_threshold=increase_threshold,
+            n_axes_threshold=n_axes_threshold,
+        )
+
+        self.sd_thresh = sd_thresh
+        self.low_temp = low_temperature_threshold
+        self.high_temp = high_temperature_threshold
+        self.decr_thresh = decrease_threshold
+        self.incr_thresh = increase_threshold
+        self.n_ax = n_axes_threshold
+
+    def predict(self, time=None, accel=None, temperature=None, *, fs=None, **kwargs):
+        """
+        Detect periods of non-wear.
+
+        Parameters
+        ----------
+        time : numpy.ndarray
+            (N, ) array of unix timestamps (in seconds) since 1970-01-01.
+        accel : numpy.ndarray
+            (N, 3) array of measured acceleration values in units of g.
+        temperature : numpy.ndarray
+            (N,) array of measured temperature values during recording in deg C.
+        fs : float, optional
+            Sampling frequency, in Hz. If not provided, will be computed from
+            `time`.
+
+        Returns
+        -------
+        results : dictionary
+            Dictionary of inputs, plus the key `wear` which is an array-like (N, 2)
+            indicating the start and stop indices of wear.
+        """
+        # this implementation was aided by code released by the authors:
+        # https://github.com/nimbal/vertdetach
+        """
+        MIT License
+
+        Copyright (c) 2022 Adam Vert
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+        
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+        """
+
+        # dont start at 0 due to timestamp weirdness with some devices
+        fs = 1 / mean(diff(time[1000:5000])) if fs is None else fs
+
+        # compute a minute long rolling standard deviation
+        wlen = round(fs * 60)
+        # this can be both forward and backwards looking with the correct indexing
+        # current implementation matches the "forwards" looking from pandas
+        rsd_acc = moving_sd(accel, wlen, 1, axis=0, return_previous=False)
+
+        # filter the temperature data
+        sos = butter(2, 2 * 0.005 / fs, btype='low', output='sos')
+        temp_f = sosfiltfilt(sos, temperature)
+
 
 
 class CtaWearDetection(BaseProcess):
