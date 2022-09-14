@@ -138,7 +138,12 @@ class DETACH:
         # current implementation matches the "forwards" looking from pandas
         rsd_acc = moving_sd(accel, wlen, 1, axis=0, return_previous=False)
 
-        # filter the temperature data
+        # In the original algorithm they keep one temperature sample per GENEActiv
+        # block (300 samples), resulting in a temperature sampling rate of 0.25hz
+        # (accel fs=75). Here, temperature is expected to have the same sampling
+        # frequency as the acceleration (ie temperature values are duplicated)
+
+        # filter the temperature data.
         sos = butter(2, 2 * 0.005 / fs, btype='low', output='sos')
         temp_f = sosfiltfilt(sos, temperature)
 
