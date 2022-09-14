@@ -19,12 +19,171 @@ from numpy import (
 
 from skdh.base import BaseProcess
 from skdh.utility import moving_mean, moving_sd, get_windowed_view
+from skdh.utility.internal import rle
+
+
+class CtaWearDetection(BaseProcess):
+    r"""
+    Detect periods of wear/non-wear from accelerometer and temperature data. CTA
+    stands for Combined Temperature and Acceleration.
+
+    Parameters
+    ----------
+    temp_threshold : float, optional
+        Temperature threshold for determining wear or non-wear. From _[1], 26 deg
+        C is the default. NOTE that this was picked for GeneActiv devices,
+        and likely is different for other devices, based on where the temperature
+        sensor is located.
+    sd_crit : float, optional
+        Acceleration standard deviation threshold for determining non-wear.
+        Default is 0.013, which was observed for GeneActiv devices during
+        motionless bench tests, and will likely depend on the brand of accelerometer
+        being used.
+    range_crit : float, optional
+        Acceleration window range threshold for determining non-wear. Default is
+        0.067, which was found for several GeneActiv accelerometers in a bench
+        test as the 75th percentile of the ranges over 60 minute windows.
+    window_length : int, optional
+        Length of the windows on which to detect wear and non wear, in minutes. Default is 1 minute.
+
+    Notes
+    -----
+    In the original paper _[1] a window skip of 1 second is used to gain sub-minute
+    resolution of wear time. However, in this implementation this is dropped,
+    as minute-level resolution is already going to be more than enough resolution
+    into wear times.
+
+    References
+    ----------
+    .. [1] S.-M. Zhou et al., “Classification of accelerometer wear and non-wear events
+        in seconds for monitoring free-living physical activity,” BMJ Open,
+        vol. 5, no. 5, pp. e007447–e007447, May 2015, doi: 10.1136/bmjopen-2014-007447.
+    """
+    def __init__(
+            self,
+            temp_threshold=26.0,
+            sd_crit=0.013,
+            range_crit=0.067,
+            window_length=1,
+            window_skip=1
+    ):
+        window_length = int(window_length)
+        window_skip = int(window_skip)
+
+        super().__init__(
+            temp_thresh=temp_threshold,
+            sd_crit=sd_crit,
+            range_crit=range_crit,
+            window_length=window_length,
+            window_skip=window_skip
+        )
+
+        self.temp_thresh = temp_threshold
+        self.sd_crit = sd_crit
+        self.range_crit = range_crit
+        self.wlen = window_length
+        self.skip = window_skip
+
+    def predict(self, time=None, accel=None, temperature=None, *, fs=None, **kwargs):
+        """
+        Detect periods of non-wear.
+
+        Parameters
+        ----------
+        time : numpy.ndarray
+            (N, ) array of unix timestamps (in seconds) since 1970-01-01.
+        accel : numpy.ndarray
+            (N, 3) array of measured acceleration values in units of g.
+        temperature : numpy.ndarray
+            (N,) array of measured temperature values during recording in deg C.
+        fs : float, optional
+            Sampling frequency, in Hz. If not provided, will be computed from
+            `time`.
+
+        Returns
+        -------
+        results : dictionary
+            Dictionary of inputs, plus the key `wear` which is an array-like (N, 2)
+            indicating the start and stop indices of wear.
+        """
+        super().predict(
+            expect_days=False,
+            expect_wear=False,
+            time=time,
+            accel=accel,
+            temperature=temperature,
+            **kwargs
+        )
+
+        # dont start at 0 due to timestamp weirdness with some devices
+        fs = 1 / mean(diff(time[1000:5000])) if fs is None else fs
+        n_wlen = int(self.wlen * 60 * fs)  # samples in `window_length` minutes
+
+        # The original paper uses a skip of 1s to gain sub-minute resolution of
+        # non-wear times, however dropping this detail as it really wont make
+        # that much of a difference to have that level of resolution
+
+        # compute accel SD for 1 minute non-overlapping windows
+        accel_sd = moving_sd(accel, n_wlen, n_wlen, axis=0, return_previous=False)
+        # compute moving mean of temperature
+        temp_mean = moving_mean(temperature, n_wlen, n_wlen)
+
+        # 3 cases: 1 -> wear, 0 -> non-wear, -1 -> increasing/decreasing rules
+        wear = full(temp_mean.size, -1, dtype="int")
+        wear[temp_mean >= self.temp_thresh] = 1  # wear if temp is above threshold
+
+        # non-wear
+        # TODO check why 3.0 is used? should be sum(accel_sd < 0.013, axis=1) == 3?
+        mask = (temp_mean < self.temp_thresh) & mean(accel_sd, axis=1) < 3.0
+        wear[mask] = 0
+
+        # cases using increasing/decreasing temperature
+        # get actual indices for the else case - start @ 1 and add 1 so that
+        # we dont try to get index 0 and then compare to index -1
+        idx = nonzero(wear[1:] == -1)[0] + 1
+
+        # ELSE case 1 - WEAR: T_t > T_{t-ws}
+        # ELSE case 2 - NONWEAR: T_t < T_{t-ws}
+        wear[idx] = temp_mean[idx] > temp_mean[idx - 1]
+
+        # ELSE case 3 - unchanged: T_t == T_{t-ws}
+        idx3 = idx[temp_mean[idx] == temp_mean[idx - 1]]
+        wear[idx3] = wear[idx3 - 1]  # get previous wear status
+
+        # wear is a series of boolean for wear/nonwear, with time deltas of 1minute
+        # get the starts and stops of wear time
+        lengths, starts, values = rle(wear)
+
+        # convert back to original sampling
+        starts *= n_wlen
+
+        wear_starts = starts[values == 1]
+        wear_stops = starts[values == 0]
+
+        # check ends
+        if not wear[0]:
+            wear_stops = wear_stops[1:]
+        if wear[-1]:
+            wear_stops = append(wear_stops, accel.size)
+
+        wear_idx = concatenate((wear_starts, wear_stops)).reshape((-2, 1)).T
+
+        kwargs.update(
+            {
+                self._time: time,
+                self._acc: accel,
+                "temperature": temperature,
+                "wear": wear_idx,
+            }
+        )
+
+        return (kwargs, None) if self._in_pipeline else kwargs
 
 
 class AccelThresholdWearDetection(BaseProcess):
     r"""
-    Detect periods of wear/non-wear from accelerometer data only, based on thresholds of the accelerometer
-    standard deviation and range.
+    Detect periods of wear/non-wear from accelerometer data only, based on thresholds of
+    the accelerometer standard deviation and range.
 
     Parameters
     ----------
