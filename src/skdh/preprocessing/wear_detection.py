@@ -30,21 +30,27 @@ class CtaWearDetection(BaseProcess):
     Parameters
     ----------
     temp_threshold : float, optional
-        Temperature threshold for determining wear or non-wear. From _[1], 26 deg
+        Temperature threshold for determining wear or non-wear. From [1]_, 26 deg
         C is the default. NOTE that this was picked for GeneActiv devices,
         and likely is different for other devices, based on where the temperature
-        sensor is located.
+        sensor is located. This threshold may also depend on location and
+        population.
     sd_crit : float, optional
         Acceleration standard deviation threshold for determining non-wear.
-        Default is 0.013, which was observed for GeneActiv devices during
+        Default is 0.003 [1]_, which was observed for GeneActiv devices during
         motionless bench tests, and will likely depend on the brand of accelerometer
-        being used.
-    range_crit : float, optional
-        Acceleration window range threshold for determining non-wear. Default is
-        0.067, which was found for several GeneActiv accelerometers in a bench
-        test as the 75th percentile of the ranges over 60 minute windows.
+        being used. 0.013 has also been used [2]_ for this criteria.
     window_length : int, optional
         Length of the windows on which to detect wear and non wear, in minutes. Default is 1 minute.
+
+    References
+    ----------
+    .. [1] S.-M. Zhou et al., “Classification of accelerometer wear and non-wear events
+        in seconds for monitoring free-living physical activity,” BMJ Open,
+        vol. 5, no. 5, pp. e007447–e007447, May 2015, doi: 10.1136/bmjopen-2014-007447.
+    .. [2] I. C. da Silva et al., “Physical activity levels in three Brazilian birth
+        cohorts as assessed with raw triaxial wrist accelerometry,” International
+        Journal of Epidemiology, vol. 43, no. 6, pp. 1959–1968, Dec. 2014, doi: 10.1093/ije/dyu203.
 
     Notes
     -----
@@ -52,18 +58,11 @@ class CtaWearDetection(BaseProcess):
     resolution of wear time. However, in this implementation this is dropped,
     as minute-level resolution is already going to be more than enough resolution
     into wear times.
-
-    References
-    ----------
-    .. [1] S.-M. Zhou et al., “Classification of accelerometer wear and non-wear events
-        in seconds for monitoring free-living physical activity,” BMJ Open,
-        vol. 5, no. 5, pp. e007447–e007447, May 2015, doi: 10.1136/bmjopen-2014-007447.
     """
     def __init__(
             self,
             temp_threshold=26.0,
-            sd_crit=0.013,
-            range_crit=0.067,
+            sd_crit=0.003,
             window_length=1,
             window_skip=1
     ):
@@ -73,14 +72,12 @@ class CtaWearDetection(BaseProcess):
         super().__init__(
             temp_thresh=temp_threshold,
             sd_crit=sd_crit,
-            range_crit=range_crit,
             window_length=window_length,
             window_skip=window_skip
         )
 
         self.temp_thresh = temp_threshold
         self.sd_crit = sd_crit
-        self.range_crit = range_crit
         self.wlen = window_length
         self.skip = window_skip
 
@@ -114,6 +111,8 @@ class CtaWearDetection(BaseProcess):
             temperature=temperature,
             **kwargs
         )
+        if temperature is None:
+            raise ValueError("Temperature is required for this wear algorithm.")
 
         # dont start at 0 due to timestamp weirdness with some devices
         fs = 1 / mean(diff(time[1000:5000])) if fs is None else fs
@@ -132,9 +131,8 @@ class CtaWearDetection(BaseProcess):
         wear = full(temp_mean.size, -1, dtype="int")
         wear[temp_mean >= self.temp_thresh] = 1  # wear if temp is above threshold
 
-        # non-wear
-        # TODO check why 3.0 is used? should be sum(accel_sd < 0.013, axis=1) == 3?
-        mask = (temp_mean < self.temp_thresh) & mean(accel_sd, axis=1) < 3.0
+        # non-wear - temperature threshold and at least 2 axes have less than sd_crit StDev.
+        mask = (temp_mean < self.temp_thresh) & (sum(accel_sd < self.sd_crit, axis=1) >= 2)
         wear[mask] = 0
 
         # cases using increasing/decreasing temperature
@@ -189,7 +187,7 @@ class AccelThresholdWearDetection(BaseProcess):
     ----------
     sd_crit : float, optional
         Acceleration standard deviation threshold for determining non-wear.
-        Default is 0.013, which was observed for GeneActiv devices during
+        Default is 0.013 [3]_, which was observed for GeneActiv devices during
         motionless bench tests, and will likely depend on the brand of accelerometer
         being used.
     range_crit : float, optional
@@ -223,6 +221,14 @@ class AccelThresholdWearDetection(BaseProcess):
         an Acceleration Signal and Implications for the Assessment of Human Daily
         Physical Activity,” PLOS ONE, vol. 8, no. 4, p. e61691, Apr. 2013,
         doi: 10.1371/journal.pone.0061691.
+    .. [2] V. T. van Hees et al., “Estimation of Daily Energy Expenditure in Pregnant
+        and Non-Pregnant Women Using a Wrist-Worn Tri-Axial Accelerometer,”
+        PLOS ONE, vol. 6, no. 7, p. e22922, Jul. 2011, doi: 10.1371/journal.pone.0022922.
+    .. [3] I. C. da Silva et al., “Physical activity levels in three Brazilian birth
+        cohorts as assessed with raw triaxial wrist accelerometry,” International
+        Journal of Epidemiology, vol. 43, no. 6, pp. 1959–1968, Dec. 2014, doi: 10.1093/ije/dyu203.
+
+
 
     Notes
     -----
