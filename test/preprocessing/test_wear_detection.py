@@ -1,13 +1,13 @@
 import pytest
 from numpy import allclose
 
-from skdh.preprocessing.wear_detection import DetectWear_AccelThreshold
+from skdh.preprocessing.wear_detection import AccelThresholdWearDetection
 
 
 class TestDetectWearAccelThreshold:
     @pytest.mark.parametrize(("setup", "ship"), ((False, [0, 0]), (True, [12, 12])))
     def test(self, setup, ship, accel_with_nonwear):
-        dw = DetectWear_AccelThreshold(
+        dw = AccelThresholdWearDetection(
             sd_crit=0.013,
             range_crit=0.05,
             apply_setup_criteria=setup,
@@ -40,17 +40,17 @@ class TestDetectWearAccelThreshold:
 
         nonwear, true_wear = simple_nonwear_data(case, wskip, setup, ship)
 
-        starts, stops = DetectWear_AccelThreshold._modify_wear_times(nonwear, wskip, setup, ship)
+        starts, stops = AccelThresholdWearDetection._modify_wear_times(nonwear, wskip, setup, ship)
 
         assert allclose(starts, true_wear[:, 0])
         assert allclose(stops, true_wear[:, 1])
 
     def test_init(self):
-        d = DetectWear_AccelThreshold(shipping_criteria=[5, 10])
+        d = AccelThresholdWearDetection(shipping_criteria=[5, 10])
         assert d.ship_crit == [5, 10]
 
-        d = DetectWear_AccelThreshold(shipping_criteria=5)
+        d = AccelThresholdWearDetection(shipping_criteria=5)
         assert d.ship_crit == [5, 5]
 
-        d = DetectWear_AccelThreshold(shipping_criteria=True)
+        d = AccelThresholdWearDetection(shipping_criteria=True)
         assert d.ship_crit == [24, 24]

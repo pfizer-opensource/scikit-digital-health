@@ -22,7 +22,7 @@ Wear Detection
 """
 from skdh.preprocessing.calibrate import CalibrateAccelerometer
 from skdh.preprocessing import calibrate
-from skdh.preprocessing.wear_detection import DetectWear_AccelThreshold
+from skdh.preprocessing.wear_detection import AccelThresholdWearDetection
 from skdh.preprocessing import wear_detection
 
-__all__ = ("CalibrateAccelerometer", "calibrate", "DetectWear_AccelThreshold", "wear_detection")
+__all__ = ("CalibrateAccelerometer", "calibrate", "AccelThresholdWearDetection", "wear_detection")

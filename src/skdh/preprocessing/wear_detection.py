@@ -21,7 +21,7 @@ from skdh.base import BaseProcess
 from skdh.utility import moving_mean, moving_sd, get_windowed_view
 
 
-class DetectWear_AccelThreshold(BaseProcess):
+class AccelThresholdWearDetection(BaseProcess):
     r"""
     Detect periods of wear/non-wear from accelerometer data only, based on thresholds of the accelerometer
     standard deviation and range.
