@@ -17,6 +17,9 @@ from numpy import (
     concatenate,
     int_,
     full,
+    sort,
+    unique,
+    asarray,
 )
 from scipy.signal import butter, sosfiltfilt
 
@@ -25,7 +28,7 @@ from skdh.utility import moving_mean, moving_sd, get_windowed_view
 from skdh.utility.internal import rle
 
 
-class DETACH:
+class DETACH(BaseProcess):
     r"""
     DEvice Temperature and Acceleration CHange algorithm for detecting wear/non-wear.
 
@@ -131,9 +134,10 @@ class DETACH:
 
         # dont start at 0 due to timestamp weirdness with some devices
         fs = 1 / mean(diff(time[1000:5000])) if fs is None else fs
+        wlen = int(fs * 60)
+        wlen_5min = int(fs * 60 * 5)
 
         # compute a minute long rolling standard deviation
-        wlen = round(fs * 60)
         # this can be both forward and backwards looking with the correct indexing
         # current implementation matches the "forwards" looking from pandas
         rsd_acc = moving_sd(accel, wlen, 1, axis=0, return_previous=False)
@@ -143,10 +147,121 @@ class DETACH:
         # (accel fs=75). Here, temperature is expected to have the same sampling
         # frequency as the acceleration (ie temperature values are duplicated)
 
+        # in theory, this will make a difference in the end result, however in practice
+        # it does not seem to make a significant enough difference
+
         # filter the temperature data.
         sos = butter(2, 2 * 0.005 / fs, btype='low', output='sos')
         temp_f = sosfiltfilt(sos, temperature)
 
+        # convert to a slope (per minute)
+        delta_temp_f = diff(temp_f, prepend=1) * 60 * fs
+
+        # get the number of axes that are less than std_thresh
+        n_ax_under_accel_sd = sum(rsd_acc < self.sd_thresh, axis=1)
+
+        # find spots where at least N axes are below the StD threshold for at
+        # least 90% of the next 5 minutes  (90% criteria below)
+        perc_under_sd_thresh_5min = moving_mean(
+            n_ax_under_accel_sd >= self.n_ax,  # if more than N axes under StD Thresh
+            wlen_5min,
+            1  # 1 sample skip
+        )
+
+        # in the Python package, next step is to match the number of points between
+        # accel and temperater by downsampling accel to temperature
+
+        # Get the maximum & minimum temperature in 5 minute windows
+        tmp_w = get_windowed_view(temp_f, wlen_5min, 1)
+        max_temp_5min = tmp_w.max(axis=1)
+        min_temp_5min = tmp_w.min(axis=1)
+
+        # get the average temperature change in the next 5 minutes
+        avg_temp_delta_5min = moving_mean(delta_temp_f, wlen_5min, 1)
+
+        # get candidate non-wear start times. 90% criteria next 5 minutes comes here
+        candidate_nw_starts = nonzero(
+            (n_ax_under_accel_sd >= self.n_ax) & (perc_under_sd_thresh_5min >= 0.9)
+        )[0]
+
+        # create the arrays of possible non-wear bout endings
+        # to get a "backwards" looking window, take the moving windows, and add
+        # wlen - 1 to the index
+
+        # criteria 1: Rate of Change
+        stops1 = nonzero(
+            (n_ax_under_accel_sd == 0) & (perc_under_sd_thresh_5min <= 0.50) & (avg_temp_delta_5min > self.incr_thresh)
+        )[0] + wlen - 1
+
+        # criteria 2: absolute temperature
+        stops2 = nonzero(
+            (n_ax_under_accel_sd == 0) & (perc_under_sd_thresh_5min <= 0.50) & (min_temp_5min > self.low_temp)
+        )[0] + wlen - 1
+
+        candidate_nw_stops = sort(unique(concatenate((stops1, stops2))))
+
+        # loop through the starts to identify valid starts, and find their stops
+        prev_end = 0  # keep track of the last bout
+        nonwear_starts = []  # store nonwear bout starts and stops
+        nonwear_stops = []
+        for start in candidate_nw_starts:
+            if start < prev_end:
+                continue  # skip because we are already past the current start
+
+            valid_start = False
+            end_initial = start + int(fs * 60 * 5)  # add 5 minutes to start
+
+            # start criteria 1: rate of change of temperature
+            if (max_temp_5min[start] < self.high_temp) & (avg_temp_delta_5min[start] < self.decr_thresh):
+                valid_start = True
+
+            # start criteria 2: absolute temperature path
+            elif max_temp_5min[start] < self.low_temp:
+                valid_start = True
+
+            # check if we met either of the start criteria
+            if not valid_start:
+                continue  # if we did not, continue to next possible start
+
+            # get all the end points after the initial guess
+            fwd_ends = candidate_nw_stops[candidate_nw_stops > end_initial]
+
+            try:
+                end = fwd_ends[0]
+            except IndexError:
+                end = avg_temp_delta_5min.size
+
+            # add to list
+            nonwear_starts.append(start)
+            nonwear_stops.append(end)
+
+            # reset the last end index
+            prev_end = end
+
+        # make nonwear indices into an array
+        nonwear_starts = asarray(nonwear_starts)
+        nonwear_stops = asarray(nonwear_stops)
+
+        # invert nonwear to wear
+        wear_starts = nonwear_stops[nonwear_stops < avg_temp_delta_5min.size]
+        wear_stops = nonwear_starts[nonwear_starts > 0]
+
+        # last case to deal with for inversion
+        if nonwear_starts[0] > 0:
+            wear_starts = insert(wear_starts, 0, 0)
+
+        wear = concatenate((wear_starts, wear_stops)).reshape((-2, 1)).T
+
+        kwargs.update(
+            {
+                self._time: time,
+                self._acc: accel,
+                self._temp: temperature,
+                "wear": wear
+            }
+        )
+
+        return (kwargs, None) if self._in_pipeline else kwargs
 
 
 class CtaWearDetection(BaseProcess):
