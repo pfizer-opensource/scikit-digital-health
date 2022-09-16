@@ -40,12 +40,12 @@ class DETACH(BaseProcess):
     low_temperature_threshold : float, optional
         Low temperature threshold for non-wear classification. Default is 26.0 deg C.
     high_temperature_threshold : float, optional
-        High temperature thoresld for non-wear classification. Default is 30.0 deg C.
+        High temperature threshold for non-wear classification. Default is 30.0 deg C.
     decrease_threshold : float, optional.
         Temperature decrease rate-of-change threshold for non-wear classification.
         Default is -0.2.
     increase_threshold : float, optional
-        Temperature increase rate-of-chanve threshold for non-wear classification.
+        Temperature increase rate-of-change threshold for non-wear classification.
         Default is 0.1
     n_axes_threshold : {1, 2, 3}
         Number of axes that must be below `sd_thresh` to be considered non-wear.
