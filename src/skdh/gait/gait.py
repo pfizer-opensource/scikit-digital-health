@@ -660,7 +660,7 @@ class Gait(BaseProcess):
                 "fs": fs,
                 "height": height,
                 self._gyro: gyro,
-                "gait_pred": gait_pred
+                "gait_pred": gait_pred,
             }
         )
         return (kwargs, gait) if self._in_pipeline else gait

@@ -63,10 +63,22 @@ class DETACH(BaseProcess):
     were made to keep the algorithm device-agnostic, this should be kept in mind
     when deploying in alternative devices.
     """
-    def __init__(self, sd_thresh=0.008, low_temperature_threshold=26.0, high_temperature_threshold=30.0, decrease_threshold=-0.2, increase_threshold=0.1, n_axes_threshold=2):
+
+    def __init__(
+        self,
+        sd_thresh=0.008,
+        low_temperature_threshold=26.0,
+        high_temperature_threshold=30.0,
+        decrease_threshold=-0.2,
+        increase_threshold=0.1,
+        n_axes_threshold=2,
+    ):
         if n_axes_threshold not in [1, 2, 3]:
             n_axes_threshold = max(min(n_axes_threshold, 3), 1)
-            warn(f"n_axes_threshold must be in {1, 2, 3}. Setting to {n_axes_threshold}", UserWarning)
+            warn(
+                f"n_axes_threshold must be in {1, 2, 3}. Setting to {n_axes_threshold}",
+                UserWarning,
+            )
 
         super().__init__(
             sd_thresh=sd_thresh,
@@ -151,7 +163,7 @@ class DETACH(BaseProcess):
         # it does not seem to make a significant enough difference
 
         # filter the temperature data.
-        sos = butter(2, 2 * 0.005 / fs, btype='low', output='sos')
+        sos = butter(2, 2 * 0.005 / fs, btype="low", output="sos")
         temp_f = sosfiltfilt(sos, temperature)
 
         # convert to a slope (per minute)
@@ -165,7 +177,7 @@ class DETACH(BaseProcess):
         perc_under_sd_thresh_5min = moving_mean(
             n_ax_under_accel_sd >= self.n_ax,  # if more than N axes under StD Thresh
             wlen_5min,
-            1  # 1 sample skip
+            1,  # 1 sample skip
         )
 
         # in the Python package, next step is to match the number of points between
@@ -189,14 +201,26 @@ class DETACH(BaseProcess):
         # wlen - 1 to the index
 
         # criteria 1: Rate of Change
-        stops1 = nonzero(
-            (n_ax_under_accel_sd == 0) & (perc_under_sd_thresh_5min <= 0.50) & (avg_temp_delta_5min > self.incr_thresh)
-        )[0] + wlen - 1
+        stops1 = (
+            nonzero(
+                (n_ax_under_accel_sd == 0)
+                & (perc_under_sd_thresh_5min <= 0.50)
+                & (avg_temp_delta_5min > self.incr_thresh)
+            )[0]
+            + wlen
+            - 1
+        )
 
         # criteria 2: absolute temperature
-        stops2 = nonzero(
-            (n_ax_under_accel_sd == 0) & (perc_under_sd_thresh_5min <= 0.50) & (min_temp_5min > self.low_temp)
-        )[0] + wlen - 1
+        stops2 = (
+            nonzero(
+                (n_ax_under_accel_sd == 0)
+                & (perc_under_sd_thresh_5min <= 0.50)
+                & (min_temp_5min > self.low_temp)
+            )[0]
+            + wlen
+            - 1
+        )
 
         candidate_nw_stops = sort(unique(concatenate((stops1, stops2))))
 
@@ -212,7 +236,9 @@ class DETACH(BaseProcess):
             end_initial = start + int(fs * 60 * 5)  # add 5 minutes to start
 
             # start criteria 1: rate of change of temperature
-            if (max_temp_5min[start] < self.high_temp) & (avg_temp_delta_5min[start] < self.decr_thresh):
+            if (max_temp_5min[start] < self.high_temp) & (
+                avg_temp_delta_5min[start] < self.decr_thresh
+            ):
                 valid_start = True
 
             # start criteria 2: absolute temperature path
@@ -253,12 +279,7 @@ class DETACH(BaseProcess):
         wear = concatenate((wear_starts, wear_stops)).reshape((-2, 1)).T
 
         kwargs.update(
-            {
-                self._time: time,
-                self._acc: accel,
-                self._temp: temperature,
-                "wear": wear
-            }
+            {self._time: time, self._acc: accel, self._temp: temperature, "wear": wear}
         )
 
         return (kwargs, None) if self._in_pipeline else kwargs
@@ -301,12 +322,9 @@ class CtaWearDetection(BaseProcess):
     as minute-level resolution is already going to be more than enough resolution
     into wear times.
     """
+
     def __init__(
-            self,
-            temp_threshold=26.0,
-            sd_crit=0.003,
-            window_length=1,
-            window_skip=1
+        self, temp_threshold=26.0, sd_crit=0.003, window_length=1, window_skip=1
     ):
         window_length = int(window_length)
         window_skip = int(window_skip)
@@ -315,7 +333,7 @@ class CtaWearDetection(BaseProcess):
             temp_thresh=temp_threshold,
             sd_crit=sd_crit,
             window_length=window_length,
-            window_skip=window_skip
+            window_skip=window_skip,
         )
 
         self.temp_thresh = temp_threshold
@@ -351,7 +369,7 @@ class CtaWearDetection(BaseProcess):
             time=time,
             accel=accel,
             temperature=temperature,
-            **kwargs
+            **kwargs,
         )
         if temperature is None:
             raise ValueError("Temperature is required for this wear algorithm.")
@@ -374,7 +392,9 @@ class CtaWearDetection(BaseProcess):
         wear[temp_mean >= self.temp_thresh] = 1  # wear if temp is above threshold
 
         # non-wear - temperature threshold and at least 2 axes have less than sd_crit StDev.
-        mask = (temp_mean < self.temp_thresh) & (sum(accel_sd < self.sd_crit, axis=1) >= 2)
+        mask = (temp_mean < self.temp_thresh) & (
+            sum(accel_sd < self.sd_crit, axis=1) >= 2
+        )
         wear[mask] = 0
 
         # cases using increasing/decreasing temperature
@@ -559,7 +579,7 @@ class AccelThresholdWearDetection(BaseProcess):
             time=time,
             accel=accel,
             temperature=temperature,
-            **kwargs
+            **kwargs,
         )
         # dont start at zero due to timestamp weirdness with some devices
         fs = 1 / mean(diff(time[1000:5000]))
@@ -586,7 +606,14 @@ class AccelThresholdWearDetection(BaseProcess):
 
         wear = concatenate((wear_starts, wear_stops)).reshape((2, -1)).T * n_wskip
 
-        kwargs.update({self._time: time, self._acc: accel, "wear": wear, 'temperature': temperature})
+        kwargs.update(
+            {
+                self._time: time,
+                self._acc: accel,
+                "wear": wear,
+                "temperature": temperature,
+            }
+        )
         return (kwargs, None) if self._in_pipeline else kwargs
 
     @staticmethod
@@ -615,7 +642,9 @@ class AccelThresholdWearDetection(BaseProcess):
         nph = int(60 / wskip)  # number of blocks per hour
         # get the changes in nonwear status
         ch = nonzero(diff(nonwear.astype(int_)))[0] + 1
-        ch = insert(ch, [0, ch.size], [0, nonwear.size])  # make sure ends are accounted for
+        ch = insert(
+            ch, [0, ch.size], [0, nonwear.size]
+        )  # make sure ends are accounted for
         start_with_wear = not nonwear[0]  # does data start with wear period
         end_with_wear = not nonwear[-1]  # does data end with wear period
 
@@ -647,9 +676,9 @@ class AccelThresholdWearDetection(BaseProcess):
             NOTE: shipping at the start is applied the opposite of shipping at the end, 
             requiring a 1+ hour nonwear period following wear periods less than 3 hours
             """
-            ship_start = nonzero((w_times <= 3) & (ch[2:-1:2] <= (shipping_crit[0] * nph)))[
-                0
-            ]
+            ship_start = nonzero(
+                (w_times <= 3) & (ch[2:-1:2] <= (shipping_crit[0] * nph))
+            )[0]
             ship_end = nonzero(
                 (w_times <= 3) & (ch[1:-1:2] >= ch[-1] - (shipping_crit[1] * nph))
             )[0]

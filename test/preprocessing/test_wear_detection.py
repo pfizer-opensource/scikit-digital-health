@@ -40,7 +40,9 @@ class TestDetectWearAccelThreshold:
 
         nonwear, true_wear = simple_nonwear_data(case, wskip, setup, ship)
 
-        starts, stops = AccelThresholdWearDetection._modify_wear_times(nonwear, wskip, setup, ship)
+        starts, stops = AccelThresholdWearDetection._modify_wear_times(
+            nonwear, wskip, setup, ship
+        )
 
         assert allclose(starts, true_wear[:, 0])
         assert allclose(stops, true_wear[:, 1])
