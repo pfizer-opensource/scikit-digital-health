@@ -3,6 +3,8 @@ Wear detection algorithms
 
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
+
+DETACH algorithm: Copyright (c) 2022 Adam Vert
 """
 from warnings import warn
 
@@ -62,6 +64,10 @@ class DETACH(BaseProcess):
     This algorithm was based on work done with GENEActiv devices. While efforts
     were made to keep the algorithm device-agnostic, this should be kept in mind
     when deploying in alternative devices.
+
+    Copyright (c) 2022 Adam Vert. Implementation here courtesy of release under
+    an MIT license. The original implementation, and license can be found on
+    `GitHub <https://github.com/nimbal/vertdetach>`.
     """
 
     def __init__(
