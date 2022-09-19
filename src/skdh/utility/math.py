@@ -15,6 +15,8 @@ __all__ = [
     "moving_skewness",
     "moving_kurtosis",
     "moving_median",
+    "moving_max",
+    "moving_min",
 ]
 
 
@@ -515,3 +517,169 @@ def moving_median(a, w_len, skip=1, axis=-1):
 
     # move computation axis back to original place and return
     return moveaxis(rmed, -1, axis)
+
+
+def moving_max(a, w_len, skip, axis=-1):
+    r"""
+    Compute the moving maximum value.
+
+    Parameters
+    ----------
+    a : array-like
+        Signal to compute moving max for.
+    w_len : int
+        Window length in number of samples.
+    skip : int
+        Window start location skip in number of samples.
+    axis : int, optional
+        Axis to compute the moving max along. Default is -1.
+
+    Returns
+    -------
+    mmax : numpy.ndarray
+        Moving max. Note that if the moving axis is not the last axis, then the result
+        will *not* be c-contiguous.
+
+    Notes
+    -----
+    On the moving axis, the output length can be computed as follows:
+
+    .. math:: \frac{n - w_{len}}{skip} + 1
+
+    where `n` is the length of the moving axis.
+
+    Examples
+    --------
+    Compute the with non-overlapping windows:
+
+    >>> import numpy as np
+    >>> x = np.arange(10)
+    >>> moving_max(x, 3, 3)
+    array([3., 6., 9.])
+
+    Compute with overlapping windows:
+
+    >>> moving_max(x, 3, 1)
+    array([3., 4., 5., 6., 7., 8., 9.])
+
+    Compute on a nd-array to see output shape. On the moving axis, the output should be equal to
+    :math:`(n - w_{len}) / skip + 1`.
+
+    >>> n = 500
+    >>> window_length = 100
+    >>> window_skip = 50
+    >>> shape = (3, n, 5, 10)
+    >>> y = np.random.random(shape)
+    >>> res = moving_max(y, window_length, window_skip, axis=1)
+    >>> print(res.shape)
+    (3, 9, 5, 10)
+
+    Check flags for different axis output
+
+    >>> z = np.random.random((10, 10, 10))
+    >>> moving_max(z, 3, 3, axis=0).flags['C_CONTIGUOUS']
+    False
+
+    >>> moving_max(z, 3, 3, axis=1).flags['C_CONTIGUOUS']
+    False
+
+    >>> moving_max(z, 3, 3, axis=2).flags['C_CONTIGUOUS']
+    True
+    """
+    if w_len <= 0 or skip <= 0:
+        raise ValueError("`wlen` and `skip` cannot be less than or equal to 0.")
+
+    # move computation axis to end
+    x = moveaxis(a, axis, -1)
+
+    # check that there are enough samples
+    if w_len > x.shape[-1]:
+        raise ValueError("Window length is larger than the computation axis.")
+
+    rmax = _extensions.moving_max(x, w_len, skip)
+
+    # move computation axis back to original place and return
+    return moveaxis(rmax, -1, axis)
+
+
+def moving_min(a, w_len, skip, axis=-1):
+    r"""
+    Compute the moving maximum value.
+
+    Parameters
+    ----------
+    a : array-like
+        Signal to compute moving max for.
+    w_len : int
+        Window length in number of samples.
+    skip : int
+        Window start location skip in number of samples.
+    axis : int, optional
+        Axis to compute the moving max along. Default is -1.
+
+    Returns
+    -------
+    mmax : numpy.ndarray
+        Moving max. Note that if the moving axis is not the last axis, then the result
+        will *not* be c-contiguous.
+
+    Notes
+    -----
+    On the moving axis, the output length can be computed as follows:
+
+    .. math:: \frac{n - w_{len}}{skip} + 1
+
+    where `n` is the length of the moving axis.
+
+    Examples
+    --------
+    Compute the with non-overlapping windows:
+
+    >>> import numpy as np
+    >>> x = np.arange(10)
+    >>> moving_min(x, 3, 3)
+    array([1., 4., 7.])
+
+    Compute with overlapping windows:
+
+    >>> moving_min(x, 3, 1)
+    array([1., 2., 3., 4., 5., 6., 7.])
+
+    Compute on a nd-array to see output shape. On the moving axis, the output should be equal to
+    :math:`(n - w_{len}) / skip + 1`.
+
+    >>> n = 500
+    >>> window_length = 100
+    >>> window_skip = 50
+    >>> shape = (3, n, 5, 10)
+    >>> y = np.random.random(shape)
+    >>> res = moving_min(y, window_length, window_skip, axis=1)
+    >>> print(res.shape)
+    (3, 9, 5, 10)
+
+    Check flags for different axis output
+
+    >>> z = np.random.random((10, 10, 10))
+    >>> moving_min(z, 3, 3, axis=0).flags['C_CONTIGUOUS']
+    False
+
+    >>> moving_min(z, 3, 3, axis=1).flags['C_CONTIGUOUS']
+    False
+
+    >>> moving_min(z, 3, 3, axis=2).flags['C_CONTIGUOUS']
+    True
+    """
+    if w_len <= 0 or skip <= 0:
+        raise ValueError("`wlen` and `skip` cannot be less than or equal to 0.")
+
+    # move computation axis to end
+    x = moveaxis(a, axis, -1)
+
+    # check that there are enough samples
+    if w_len > x.shape[-1]:
+        raise ValueError("Window length is larger than the computation axis.")
+
+    rmin = _extensions.moving_min(x, w_len, skip)
+
+    # move computation axis back to original place and return
+    return moveaxis(rmin, -1, axis)

@@ -4,6 +4,8 @@ from .moving_statistics import (
     moving_skewness,
     moving_kurtosis,
     moving_median,
+    moving_max,
+    moving_min,
 )
 
 __all__ = [
@@ -12,4 +14,6 @@ __all__ = [
     "moving_skewness",
     "moving_kurtosis",
     "moving_median",
+    "moving_max",
+    "moving_min",
 ]
