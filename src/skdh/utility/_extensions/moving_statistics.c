@@ -537,7 +537,7 @@ PyObject * moving_min(PyObject *NPY_UNUSED(self), PyObject *args)
 
     for (int i = 0; i < nrepeats; ++i)
     {
-        fmoving_max(&npts, dptr, &wlen, &skip, rmin_ptr);
+        fmoving_min(&npts, dptr, &wlen, &skip, rmin_ptr);
         dptr += npts; // increment by number of points in last dimension
         rmin_ptr += res_stride;
     }

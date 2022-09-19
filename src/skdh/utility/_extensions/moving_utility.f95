@@ -15,14 +15,14 @@ subroutine fmoving_max(n, x, wlen, skip, res) bind(C, name="fmoving_max")
     if (skip == 1) then  ! full overlap
         res(1) = MAXVAL(x(1:wlen))
         j = 2_c_long
-        do i=1 + skip, n, skip
+        do i=1 + skip, n - wlen + 1, skip
             res(j) = MAX(res(j - 1), x(i + wlen - 1))
             j = j + 1
         end do
     else if (skip < wlen) then  ! overlapping windows
         res(1) = MAXVAL(x(1:wlen))  ! get the first value
         j = 2_c_long
-        do i=1 + skip, n, skip
+        do i=1 + skip, n - wlen + 1, skip
             ! i1 = (i - skip) + wlen
             ! i2 = i + wlen - 1
             res(j) = MAX(res(j - 1), MAXVAL(x(i - skip + wlen:i + wlen - 1)))
@@ -31,8 +31,8 @@ subroutine fmoving_max(n, x, wlen, skip, res) bind(C, name="fmoving_max")
     else
         ! no overlapping, so no benefits gained here
         j = 1_c_long
-        do i=1, n, skip
-            res(j) = MAXVAL(i:i + wlen - 1)
+        do i=1, n - wlen + 1, skip
+            res(j) = MAXVAL(x(i:i + wlen - 1))
             j = j + 1_c_long
         end do
     end if
@@ -50,14 +50,14 @@ subroutine fmoving_min(n, x, wlen, skip, res) bind(C, name="fmoving_min")
     if (skip == 1) then  ! full overlap
         res(1) = MINVAL(x(1:wlen))
         j = 2_c_long
-        do i=1 + skip, n, skip
+        do i=1 + skip, n - wlen + 1, skip
             res(j) = MIN(res(j - 1), x(i + wlen - 1))
             j = j + 1
         end do
     else if (skip < wlen) then  ! overlapping windows
         res(1) = MINVAL(x(1:wlen))  ! get the first value
         j = 2_c_long
-        do i=1 + skip, n, skip
+        do i=1 + skip, n - wlen + 1, skip
             ! i1 = (i - skip) + wlen
             ! i2 = i + wlen - 1
             res(j) = MIN(res(j - 1), MINVAL(x(i - skip + wlen:i + wlen - 1)))
@@ -66,8 +66,8 @@ subroutine fmoving_min(n, x, wlen, skip, res) bind(C, name="fmoving_min")
     else
         ! no overlapping, so no benefits gained here
         j = 1_c_long
-        do i=1, n, skip
-            res(j) = MINVAL(i:i + wlen - 1)
+        do i=1, n - wlen + 1, skip
+            res(j) = MINVAL(x(i:i + wlen - 1))
             j = j + 1_c_long
         end do
     end if
