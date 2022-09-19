@@ -22,6 +22,7 @@ from numpy import (
     sort,
     unique,
     asarray,
+    ascontiguousarray,
 )
 from scipy.signal import butter, sosfiltfilt
 
@@ -170,7 +171,7 @@ class DETACH(BaseProcess):
 
         # filter the temperature data.
         sos = butter(2, 2 * 0.005 / fs, btype="low", output="sos")
-        temp_f = sosfiltfilt(sos, temperature)
+        temp_f = ascontiguousarray(sosfiltfilt(sos, temperature))
 
         # convert to a slope (per minute)
         delta_temp_f = diff(temp_f, prepend=1) * 60 * fs
