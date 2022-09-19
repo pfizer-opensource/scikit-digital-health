@@ -12,6 +12,7 @@ movstat_lib = static_library(
         'sort.f95',
         'moving_moments.f95',
         'median_heap.f95',
+        'moving_utility.f95',
     ],
     c_args: numpy_nodepr_api,
     include_directories: [inc_np],
