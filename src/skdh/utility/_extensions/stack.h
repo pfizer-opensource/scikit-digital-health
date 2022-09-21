@@ -32,7 +32,7 @@ int isFull(stack *stk);
 // interface with the stack
 void push(stack *stk, double val);
 double pop(stack *stk);
-double *peek(stack *stk);
+int peek(stack *stk, double **res);
 
 
 #endif  // STACK_H_

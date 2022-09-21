@@ -99,17 +99,17 @@ double pop(stack *stk)
  * Get the topmost element from a stack
  *
  * @param stk Stack to get value from
- * @param val Storage for the topmost value
+ * @param res Storage for the topmost value
  */
-double *peek(stack *stk)
+int peek(stack *stk, double **res)
 {
     if (!isEmpty(stk))
     {
-        return &(stk->items[stk->top]);
+        *res = &(stk->items[stk->top]);
+        return 1;
     }
     else
     {
-        fprintf(stderr, "Stack is empty, cannot peek.\n");
-        exit(0);
+        return 0;
     }
 }

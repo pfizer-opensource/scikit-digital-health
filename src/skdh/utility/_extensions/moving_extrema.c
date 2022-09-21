@@ -92,7 +92,8 @@ void enqueue_max(Queue *q, double data)
     {
         push(q->eqStack, data);
         // check if we need to update the maximum value in the dq stack
-        double *next = peek(q->dqStack_ext);
+        double *next;
+        peek(q->dqStack_ext, &next);
         if (data > *next)  // if larger than, update
         {
             // *next = data;  // for rolling cant just update one item, have to update all
@@ -121,7 +122,8 @@ void enqueue_min(Queue *q, double data)
     {
         push(q->eqStack, data);
         // check if we need to update the minimum values in the dq stack
-        double *next = peek(q->dqStack_ext);
+        double *next;
+        peek(q->dqStack_ext, &next);
         if (data < *next) // if smaller than
         {
             // for rolling update all the items so that this minimum is carried for an entire window
@@ -145,7 +147,8 @@ void move_all_enqueue_to_dequeue_max(Queue *q)
 
     // until enqueue stack is empty
     double data;
-    while (peek(q->eqStack))
+    double *pr;
+    while (peek(q->eqStack, &pr))
     {
         data = pop(q->eqStack);
         max = data > max ? data : max;  // update max if we need to
@@ -166,7 +169,8 @@ void move_all_enqueue_to_dequeue_min(Queue *q)
     double min = 9.9E250;  // just make very large number instead of infinity
     // until enqueue stack is empty
     double data;
-    while (peek(q->eqStack))
+    double *pr;
+    while (peek(q->eqStack, &pr))
     {
         data = pop(q->eqStack);
         min = data < min ? data : min;  // update min if we need to
@@ -229,7 +233,8 @@ double dequeue_min(Queue *q)
  */
 double get_extrema(Queue *q)
 {
-    double *next = peek(q->dqStack_ext);
+    double *next;
+    peek(q->dqStack_ext, &next);
     return *next;
 }
 
@@ -265,7 +270,7 @@ void moving_max_c(long *n, double x[], long *wlen, long *skip, double res[])
 
     // iterate over the windows
     long ii = *wlen;  // keep track of the last element +1 inserted into the stack
-    for (long i = *skip; i < n - wlen + 1; i += *skip)
+    for (long i = *skip; i < (*n - *wlen + 1); i += *skip)
     {
         for (int j = limax(ii, i); j < i + *wlen - 1; ++j)
         {
@@ -309,7 +314,7 @@ void moving_min_c(long *n, double x[], long *wlen, long *skip, double res[])
 
     // iterate over the windows
     long ii = *wlen;  // keep track of the last element +1 inserted into the stack
-    for (long i = *skip; i < n - *wlen + 1; i += *skip)
+    for (long i = *skip; i < (*n - *wlen + 1); i += *skip)
     {
         for (int j = limax(ii, i); j < i + *wlen - 1; ++j)
         {
@@ -355,14 +360,14 @@ int main()
     enqueue_max(q, x[2]);
     enqueue_max(q, x[3]);
     enqueue_max(q, x[4]);
-    fprintf(stdout, "[ 1] max: %1.0f [%1.0f]\n", get_max(q), exp[0]);
+    fprintf(stdout, "[ 1] max: %1.0f [%1.0f]\n", get_extrema(q), exp[0]);
 
     double res;
     for (int i = 5; i < 17; ++i)
     {
-        dequeue_max(q, &res);
+        res = dequeue_max(q);
         enqueue_max(q, x[i]);
-        fprintf(stdout, "[%2i] max: %1.0f [%1.0f]   popped: %f\n", i - 3, get_max(q), exp[i - 4], res);
+        fprintf(stdout, "[%2i] max: %1.0f [%1.0f]   popped: %f\n", i - 3, get_extrema(q), exp[i - 4], res);
     }
 }
 */
