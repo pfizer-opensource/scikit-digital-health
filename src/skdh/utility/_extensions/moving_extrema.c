@@ -33,6 +33,7 @@ typedef struct
     stack *dqStack;  // dequeue stack
     stack *dqStack_ext;  // dequeue stack extrema storage
     stack *eqStack;  // enqueue stack
+    stack *eqStack_ext;  // enqueue stack current extrema storage
 } Queue;
 
 /**
@@ -48,6 +49,7 @@ Queue *newQueue(int n_items)
     q->dqStack = newStack(n_items);
     q->dqStack_ext = newStack(n_items);
     q->eqStack = newStack(n_items);
+    q->eqStack_ext = newStack(n_items);
 
     return q;
 }
@@ -62,6 +64,7 @@ void freeQueue(Queue *q)
     free(q->dqStack);
     free(q->dqStack_ext);
     free(q->eqStack);
+    free(q->eqStack_ext);
     free(q);
 }
 
@@ -88,20 +91,20 @@ void enqueue_max(Queue *q, double data)
         push(q->dqStack, data);
         push(q->dqStack_ext, data);  // current maximum value
     }
+    else if (isEmpty(q->eqStack))
+    {
+        push(q->eqStack, data);
+        push(q->eqStack_ext, data);
+    }
     else
     {
         push(q->eqStack, data);
-        // check if we need to update the maximum value in the dq stack
-        double *next;
-        peek(q->dqStack_ext, &next);
-        if (data > *next)  // if larger than, update
-        {
-            // *next = data;  // for rolling cant just update one item, have to update all
-            for (int i = 0; i < size(q->dqStack_ext); i++)
-            {
-                q->dqStack_ext->items[i] = data;
-            }
-        }
+        // check what value extrema should take
+        double *top;
+        peek(q->eqStack_ext, &top);
+
+        // push the current largest value to the extrema stack
+        push(q->eqStack_ext, data > *top ? data : *top);
     }
 }
 
@@ -118,20 +121,20 @@ void enqueue_min(Queue *q, double data)
         push(q->dqStack, data);
         push(q->dqStack_ext, data);  // current minimum value
     }
+    else if (isEmpty(q->eqStack))
+    {
+        push(q->eqStack, data);
+        push(q->eqStack_ext, data);
+    }
     else
     {
         push(q->eqStack, data);
-        // check if we need to update the minimum values in the dq stack
-        double *next;
-        peek(q->dqStack_ext, &next);
-        if (data < *next) // if smaller than
-        {
-            // for rolling update all the items so that this minimum is carried for an entire window
-            for (int i = 0; i < size(q->dqStack_ext); i++)
-            {
-                q->dqStack_ext->items[i] = data;
-            }
-        }
+        // check what value extrema should take
+        double *top;
+        peek(q->eqStack_ext, &top);
+
+        // push the current smallest value to the extrema stack
+        push(q->eqStack_ext, data < *top ? data : *top);
     }
 }
 
@@ -143,14 +146,15 @@ void enqueue_min(Queue *q, double data)
  */
 void move_all_enqueue_to_dequeue_max(Queue *q)
 {
-    double max = -9.9E250;  // just make it a very large negative
+    double max = -9.9E250;  // just make it a very large negative;
 
-    // until enqueue stack is empty
     double data;
     double *pr;
+    // until enqueue stack is empty
     while (peek(q->eqStack, &pr))
     {
         data = pop(q->eqStack);
+        pop(q->eqStack_ext);
         max = data > max ? data : max;  // update max if we need to
         // push data & current maximum
         push(q->dqStack, data);
@@ -166,13 +170,16 @@ void move_all_enqueue_to_dequeue_max(Queue *q)
  */
 void move_all_enqueue_to_dequeue_min(Queue *q)
 {
-    double min = 9.9E250;  // just make very large number instead of infinity
-    // until enqueue stack is empty
+    double min = 9.9E250;  // make it a very large positive
+
     double data;
+    double min;
     double *pr;
+    // until enqueue stack is empty
     while (peek(q->eqStack, &pr))
     {
         data = pop(q->eqStack);
+        pop(q->eqStack_ext);
         min = data < min ? data : min;  // update min if we need to
         // push data & current minimum
         push(q->dqStack, data);
@@ -227,15 +234,29 @@ double dequeue_min(Queue *q)
 }
 
 /**
- * Get the current maximum/minimum from a queue
+ * Get the current maximum from a queue
  *
- * @param q Queue to get the extrema value from
+ * @param q Queue to get the maximum value from
  */
-double get_extrema(Queue *q)
+double get_max(Queue *q)
 {
-    double *next;
-    peek(q->dqStack_ext, &next);
-    return *next;
+    double *dq_max, *eq_max;
+    peek(q->dqStack_ext, &dq_max);
+    peek(q->eqStack_ext, &eq_max);
+    return *dq_max > *eq_max ? *dq_max : *eq_max;
+}
+
+/**
+ * Get the current minimum from a queue
+ *
+ * @param q Queue to get the minimum value from
+ */
+double get_min(Queue *q)
+{
+    double *dq_min, *eq_min;
+    peek(q->dqStack_ext, &dq_min);
+    peek(q->eqStack_ext, &eq_min);
+    return *dq_min < *eq_min ? *dq_min : *eq_min;
 }
 
 // ======================================================================
@@ -272,14 +293,15 @@ void moving_max_c(long *n, double x[], long *wlen, long *skip, double res[])
     long ii = *wlen;  // keep track of the last element +1 inserted into the stack
     for (long i = *skip; i < (*n - *wlen + 1); i += *skip)
     {
-        for (int j = limax(ii, i); j < i + *wlen - 1; ++j)
+        for (int j = limax(ii, i); j < i + *wlen; ++j)
         {
             dequeue_max(q);
             enqueue_max(q, x[j]);
         }
+        ii = i + *wlen; // update to latest taken element (+1)
 
         // get the new maximum
-        res[++k] = get_extrema(q);
+        res[++k] = get_max(q);
     }
 
     // cleanup the queue
@@ -316,14 +338,15 @@ void moving_min_c(long *n, double x[], long *wlen, long *skip, double res[])
     long ii = *wlen;  // keep track of the last element +1 inserted into the stack
     for (long i = *skip; i < (*n - *wlen + 1); i += *skip)
     {
-        for (int j = limax(ii, i); j < i + *wlen - 1; ++j)
+        for (int j = limax(ii, i); j < i + *wlen; ++j)
         {
             dequeue_min(q);
             enqueue_min(q, x[j]);
         }
+        ii = i + *wlen; // update to latest taken element (+1)
 
         // get the new maximum
-        res[++k] = get_extrema(q);
+        res[++k] = get_min(q);
     }
 
     // cleanup the queue
@@ -336,38 +359,73 @@ void moving_min_c(long *n, double x[], long *wlen, long *skip, double res[])
 /*
 int main()
 {
-    Queue *q = newQueue(5);
+    Queue *q = newQueue(10);
 
-    double x[17] = {4., 5., 2., 1., 3., 6., 2., 2., 8., 7., 5., 1., 4., 4., 3., 4., 2.};
-    // 4, 5, 2, 1, 3 -> 5
-    // 5, 2, 1, 3, 6 -> 6
-    // 2, 1, 3, 6, 2 -> 6
-    // 1, 3, 6, 2, 2 -> 6
-    // 3, 6, 2, 2, 8 -> 8
-    // 6, 2, 2, 8, 7 -> 8
-    // 2, 2, 8, 7, 5 -> 8
-    // 2, 8, 7, 5, 1 -> 8
-    // 8, 7, 5, 1, 4 -> 8
-    // 7, 5, 1, 4, 4 -> 7
-    // 5, 1, 4, 4, 3 -> 5
-    // 1, 4, 4, 3, 4 -> 4
-    // 4, 4, 3, 4, 2 -> 4
-    double exp[13] = {5., 6., 6., 6., 8., 8., 8., 8., 8., 7., 5., 4., 4.};
-
-    // first window
-    enqueue_max(q, x[0]);
-    enqueue_max(q, x[1]);
-    enqueue_max(q, x[2]);
-    enqueue_max(q, x[3]);
-    enqueue_max(q, x[4]);
-    fprintf(stdout, "[ 1] max: %1.0f [%1.0f]\n", get_extrema(q), exp[0]);
-
-    double res;
-    for (int i = 5; i < 17; ++i)
+    double x[30];
+    srand(50);
+    for (int i = 0; i < 30; ++i)
     {
-        res = dequeue_max(q);
-        enqueue_max(q, x[i]);
-        fprintf(stdout, "[%2i] max: %1.0f [%1.0f]   popped: %f\n", i - 3, get_extrema(q), exp[i - 4], res);
+        x[i] = (double)(rand() % 20 + 1);  // between 0 and 19
     }
+    // manually generate results
+    // wlen = 10
+    // skip = 1
+    double exp[21];
+    for (int j=0; j < 21; ++j)
+    {
+        exp[j] = x[j];
+        for (int i = 0; i < 10; ++i)
+        {
+            exp[j] = x[j + i] > exp[j] ? x[j + i] : exp[j];
+        }
+    }
+
+    // prediction
+    double pred[21];
+    long wlen = 10;
+    long skip = 1;
+    long n = 30;
+
+    int k = -1;
+    for (long i = 0; i < wlen; ++i){
+        enqueue_max(q, x[i]);
+    }
+    pred[++k] = get_extrema(q);
+
+    // iterate windows
+    long ii = wlen;
+    for (long i = skip; i < (n - wlen + 1); i += skip)
+    {
+        fprintf(stdout, "[%i] i=%li ii=%li i + wlen=%li\n", k + 1, i, ii, i + wlen);
+        for (long j = limax(ii, i); j < i + wlen; ++j)
+        {
+            fprintf(stdout, "\n");
+            dequeue_max(q);
+            enqueue_max(q, x[j]);
+        }
+        ii = i + wlen;  // update the latest taken sample (+ 1)
+
+        // get the new maximum
+        pred[++k] = get_extrema(q);
+        if (pred[k] != exp[k]){
+            fprintf(stdout, "[%i] %f  %f\n", k, pred[k], exp[k]);
+            for (int i2 = 0; i2 < wlen; ++i2) {
+                fprintf(stdout, "%2.0f, ", x[i + i2]);
+            }
+            fprintf(stdout, "\n");
+            for (int i2 = size(q->dqStack) - 1; i2 >= 0; --i2){
+                fprintf(stdout, "%2.0f, ", q->dqStack->items[i2]);
+            }
+            fprintf(stdout, "|");
+            for (int i2 = 0; i2 < size(q->eqStack); ++i2){
+                fprintf(stdout, "%2.0f, ", q->eqStack->items[i2]);
+            }
+            fprintf(stdout, "\n\n");
+        }
+    }
+
+    // cleanup the queue
+    freeQueue(q);
+
 }
 */
