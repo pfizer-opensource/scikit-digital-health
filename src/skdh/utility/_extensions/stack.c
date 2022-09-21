@@ -6,23 +6,17 @@
  */
 
 // ======================================================================
-// Data structure for the stack
+// Stack interface methods
 // ======================================================================
-struct stack
-{
-    int maxsize;  // max capacity of the stack
-    int top;      // Keep track of where in the stack we are
-    double *items;  // items in the stack
-};
 
 /**
  * Create and initialize a new stack object
  *
  * @param n_items Maximum number of items in the stack
  */
-Stack* newStack(int n_items)
+stack* newStack(int n_items)
 {
-    Stack *stk = (Stack*)malloc(sizeof(Stack));
+    stack *stk = (stack*)malloc(sizeof(stack));
 
     stk->maxsize = n_items;
     stk->top = -1;
@@ -36,7 +30,7 @@ Stack* newStack(int n_items)
  *
  * @param stk Stack to free associated memory for
  */
-void freeStack(Stack *stk)
+void freeStack(stack *stk)
 {
     free(stk->items);
     free(stk);
@@ -47,7 +41,7 @@ void freeStack(Stack *stk)
  *
  * @param stk Stack to compute size for
  */
-int size(Stack *stk)
+int size(stack *stk)
 {
     return stk->top + 1;
 }
@@ -57,7 +51,7 @@ int size(Stack *stk)
  *
  * @param stk Stack to check if empty
  */
-int isEmpty(Stack *stk)
+int isEmpty(stack *stk)
 {
     return stk->top == -1;
 }
@@ -67,7 +61,7 @@ int isEmpty(Stack *stk)
  *
  * @param stk Stack to check if full
  */
-int isFull(Stack *stk)
+int isFull(stack *stk)
 {
     return stk->top == stk->maxsize - 1;
 }
@@ -78,15 +72,16 @@ int isFull(Stack *stk)
  * @param stk Stack to add the element to
  * @param val Value to add to the stack
  */
-void push(Stack *stk, double val)
+void push(stack *stk, double val)
 {
     if (!isFull(stk))
     {
-        stk->items[++stk->top] = x;
+        stk->items[++stk->top] = val;
     }
     else
     {
-        exit(EXIT_FAILURE);
+        fprintf(stderr, "Stack is full, cannot push.\n");
+        exit(0);
     }
 }
 
@@ -95,16 +90,9 @@ void push(Stack *stk, double val)
  *
  * @param stk Stack to remove an element from
  */
-double pop(Stack *stk)
+double pop(stack *stk)
 {
-    if (!isEmpty(stk))
-    {
-        return stk->items[stk->top--];
-    }
-    else
-    {
-        exit(EXIT_FAILURE);
-    }
+    return stk->items[stk->top--];
 }
 
 /**
@@ -113,15 +101,15 @@ double pop(Stack *stk)
  * @param stk Stack to get value from
  * @param val Storage for the topmost value
  */
-int peek(Stack *stk, double **val)
+double *peek(stack *stk)
 {
     if (!isEmpty(stk))
     {
-        *val = &(stk->items[stk->top]);
-        return 1;
+        return &(stk->items[stk->top]);
     }
     else
     {
-        return 0;
+        fprintf(stderr, "Stack is empty, cannot peek.\n");
+        exit(0);
     }
 }

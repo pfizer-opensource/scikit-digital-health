@@ -1,22 +1,38 @@
 #ifndef STACK_H_  // guard
 #define STACK_H_
 
+#include <stdio.h>
+#include <stdlib.h>
 
-typedef struct stack Stack;
+enum stack_errors
+{
+    STACK_NO_ERROR,
+    STACK_ERROR_PUSH,
+    STACK_ERROR_POP,
+    STACK_ERROR_PEEK
+};
+
+
+typedef struct
+{
+    int maxsize;  // max capacity of the stack
+    int top;      // Keep track of where in the stack we are
+    double *items;  // items in the stack
+} stack;
 
 // initialization and teardown
-Stack *newStack(int n_items);
-void freeStack(Stack *stk);
+stack *newStack(int n_items);
+void freeStack(stack *stk);
 
 // utility
-int size(Stack *stk);
-int isEmpty(Stack *stk);
-int isFull(Stack *stk);
+int size(stack *stk);
+int isEmpty(stack *stk);
+int isFull(stack *stk);
 
 // interface with the stack
-void push(Stack *stk, double val);
-double pop(Stack *stk);
-int peek(Stack *stk, double **val);
+void push(stack *stk, double val);
+double pop(stack *stk);
+double *peek(stack *stk);
 
 
 #endif  // STACK_H_
