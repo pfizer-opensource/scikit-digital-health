@@ -287,7 +287,7 @@ void moving_max_c(long *n, double x[], long *wlen, long *skip, double res[])
         enqueue_max(q, x[i]);
     }
     // get the maximum of the first window
-    res[++k] = get_extrema(q);
+    res[++k] = get_max(q);
 
     // iterate over the windows
     long ii = *wlen;  // keep track of the last element +1 inserted into the stack
@@ -332,7 +332,7 @@ void moving_min_c(long *n, double x[], long *wlen, long *skip, double res[])
         enqueue_min(q, x[i]);
     }
     // get the maximum of the first window
-    res[++k] = get_extrema(q);
+    res[++k] = get_min(q);
 
     // iterate over the windows
     long ii = *wlen;  // keep track of the last element +1 inserted into the stack
