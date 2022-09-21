@@ -4,14 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-enum stack_errors
-{
-    STACK_NO_ERROR,
-    STACK_ERROR_PUSH,
-    STACK_ERROR_POP,
-    STACK_ERROR_PEEK
-};
-
 
 typedef struct
 {
