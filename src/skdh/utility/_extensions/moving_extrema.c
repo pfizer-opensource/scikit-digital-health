@@ -173,7 +173,6 @@ void move_all_enqueue_to_dequeue_min(Queue *q)
     double min = 9.9E250;  // make it a very large positive
 
     double data;
-    double min;
     double *pr;
     // until enqueue stack is empty
     while (peek(q->eqStack, &pr))
