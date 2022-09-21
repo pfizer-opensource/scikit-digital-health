@@ -7,6 +7,9 @@
 #include <stdlib.h>
 #include <math.h>
 
+/* moving max/min */
+#include "moving_extrema.h"
+
 /* moving moments */
 extern void mov_moments_1(long *, double *, long *, long *, double *);
 extern void moving_moments_1(long *, double *, long *, long *, double *);
@@ -16,9 +19,6 @@ extern void moving_moments_3(long *, double *, long *, long *, double *, double 
 extern void moving_moments_4(long *, double *, long *, long *, double *, double *, double *, double *);
 /* moving median */
 extern void fmoving_median(int *, double *, int *, int *, double *);
-/* moving max/min */
-extern void fmoving_max(int *, double *, int *, int *, double *);
-extern void fmoving_min(int *, double *, int *, int *, double *);
 
 
 PyObject * moving_mean(PyObject *NPY_UNUSED(self), PyObject *args){
@@ -471,7 +471,7 @@ PyObject * moving_max(PyObject *NPY_UNUSED(self), PyObject *args)
 
     for (int i = 0; i < nrepeats; ++i)
     {
-        fmoving_max(&npts, dptr, &wlen, &skip, rmax_ptr);
+        moving_max_c(&npts, dptr, &wlen, &skip, rmax_ptr);
         dptr += npts; // increment by number of points in last dimension
         rmax_ptr += res_stride;
     }
@@ -537,7 +537,7 @@ PyObject * moving_min(PyObject *NPY_UNUSED(self), PyObject *args)
 
     for (int i = 0; i < nrepeats; ++i)
     {
-        fmoving_min(&npts, dptr, &wlen, &skip, rmin_ptr);
+        moving_min_c(&npts, dptr, &wlen, &skip, rmin_ptr);
         dptr += npts; // increment by number of points in last dimension
         rmin_ptr += res_stride;
     }
