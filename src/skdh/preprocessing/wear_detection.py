@@ -27,7 +27,7 @@ from numpy import (
 from scipy.signal import butter, sosfiltfilt
 
 from skdh.base import BaseProcess
-from skdh.utility import moving_mean, moving_sd, get_windowed_view
+from skdh.utility import moving_mean, moving_sd, moving_max, moving_min
 from skdh.utility.internal import rle
 
 
@@ -191,9 +191,8 @@ class DETACH(BaseProcess):
         # accel and temperater by downsampling accel to temperature
 
         # Get the maximum & minimum temperature in 5 minute windows
-        tmp_w = get_windowed_view(temp_f, wlen_5min, 1)
-        max_temp_5min = tmp_w.max(axis=1)
-        min_temp_5min = tmp_w.min(axis=1)
+        max_temp_5min = moving_max(temp_f, wlen_5min, 1)
+        min_temp_5min = moving_min(temp_f, wlen_5min, 1)
 
         # get the average temperature change in the next 5 minutes
         avg_temp_delta_5min = moving_mean(delta_temp_f, wlen_5min, 1)
