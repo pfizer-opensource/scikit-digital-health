@@ -14,8 +14,6 @@ movstat_lib = static_library(
         'median_heap.f95',
         'stack.c',
         'moving_extrema.c',
-        'stack.f95',
-        'moving_extrema.f95'
     ],
     c_args: numpy_nodepr_api,
     include_directories: [inc_np],

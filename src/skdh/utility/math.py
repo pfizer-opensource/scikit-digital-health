@@ -4,9 +4,10 @@ Utility math functions
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
-from numpy import moveaxis, nan
+from numpy import moveaxis, ascontiguousarray
 
 from skdh.utility import _extensions
+from skdh.utility.windowing import get_windowed_view
 
 
 __all__ = [
@@ -589,17 +590,31 @@ def moving_max(a, w_len, skip, axis=-1):
     if w_len <= 0 or skip <= 0:
         raise ValueError("`wlen` and `skip` cannot be less than or equal to 0.")
 
-    # move computation axis to end
-    x = moveaxis(a, axis, -1)
+    # Numpy uses SIMD instructions for max/min, so it will likely be faster
+    # unless there is a lot of overlap
+    cond1 = a.ndim == 1 and (skip / w_len) < 0.005
+    cond2 = a.ndim > 1 and (skip / w_len) < 0.3  # due to c-contiguity?
+    cond3 = a.ndim > 2  # windowing doesnt handle more than 2 dimensions currently
+    if any([cond1, cond2, cond3]):
+        # move computation axis to end
+        x = moveaxis(a, axis, -1)
 
-    # check that there are enough samples
-    if w_len > x.shape[-1]:
-        raise ValueError("Window length is larger than the computation axis.")
+        # check that there are enough samples
+        if w_len > x.shape[-1]:
+            raise ValueError("Window length is larger than the computation axis.")
 
-    rmax = _extensions.moving_max(x, w_len, skip)
+        rmax = _extensions.moving_max(x, w_len, skip)
 
-    # move computation axis back to original place and return
-    return moveaxis(rmax, -1, axis)
+        # move computation axis back to original place and return
+        return moveaxis(rmax, -1, axis)
+    else:
+        if a.ndim == 2 and axis == 0:
+            xw = get_windowed_view(ascontiguousarray(a), w_len, skip)
+            return xw.max(axis=1)
+        else:
+            xw = get_windowed_view(ascontiguousarray(moveaxis(a, axis, -1)), w_len, skip)
+            rmax = xw.max(axis=1)
+            return moveaxis(rmax, -1, axis)
 
 
 def moving_min(a, w_len, skip, axis=-1):
@@ -672,14 +687,28 @@ def moving_min(a, w_len, skip, axis=-1):
     if w_len <= 0 or skip <= 0:
         raise ValueError("`wlen` and `skip` cannot be less than or equal to 0.")
 
-    # move computation axis to end
-    x = moveaxis(a, axis, -1)
+    # Numpy uses SIMD instructions for max/min, so it will likely be faster
+    # unless there is a lot of overlap
+    cond1 = a.ndim == 1 and (skip / w_len) < 0.005
+    cond2 = a.ndim > 1 and (skip / w_len) < 0.3  # due to c-contiguity?
+    cond3 = a.ndim > 2  # windowing doesnt handle more than 2 dimensions currently
+    if any([cond1, cond2, cond3]):
+        # move computation axis to end
+        x = moveaxis(a, axis, -1)
 
-    # check that there are enough samples
-    if w_len > x.shape[-1]:
-        raise ValueError("Window length is larger than the computation axis.")
+        # check that there are enough samples
+        if w_len > x.shape[-1]:
+            raise ValueError("Window length is larger than the computation axis.")
 
-    rmin = _extensions.moving_min(x, w_len, skip)
+        rmin = _extensions.moving_min(x, w_len, skip)
 
-    # move computation axis back to original place and return
-    return moveaxis(rmin, -1, axis)
+        # move computation axis back to original place and return
+        return moveaxis(rmin, -1, axis)
+    else:
+        if a.ndim == 2 and axis == 0:
+            xw = get_windowed_view(ascontiguousarray(a), w_len, skip)
+            return xw.min(axis=1)
+        else:
+            xw = get_windowed_view(ascontiguousarray(moveaxis(a, axis, -1)), w_len, skip)
+            rmin = xw.min(axis=1)
+            return moveaxis(rmin, -1, axis)
