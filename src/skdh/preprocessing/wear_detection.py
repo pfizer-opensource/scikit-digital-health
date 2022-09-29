@@ -182,7 +182,7 @@ class DETACH(BaseProcess):
 
         # calculate default window lengths
         wlen_ds = int(fs * wsize)
-        fs_ds = 1 / wlen_ds
+        fs_ds = 1 / wsize
         wlen = int(fs * 60)  # at original sampling frequency
         wlen_ds_5min = int(fs_ds * 60 * 5)
 
@@ -190,7 +190,7 @@ class DETACH(BaseProcess):
         # this can be both forward and backwards looking with the correct indexing
         # current implementation matches the "forwards" looking from pandas
         # get only every `window_size` sample
-        rsd_acc = moving_sd(accel, wlen, wlen_ds, axis=0, return_previous=False)
+        rsd_acc = moving_sd(accel, wlen, wlen_ds, axis=0, trim=False, return_previous=False)
 
         # In the original algorithm they keep one temperature sample per GENEActiv
         # block (300 samples), resulting in a temperature sampling rate of 0.25hz
@@ -203,7 +203,7 @@ class DETACH(BaseProcess):
         # "down-sample" the temperature by taking a moving mean. If using `scaled` for
         # window-size this would bring back the 1 temperature value per block, but it
         # should also handle data coming from other devices better
-        temp_ds = moving_mean(temperature, wlen_ds, wlen_ds)
+        temp_ds = moving_mean(temperature, wlen_ds, wlen_ds, trim=False)
         # filter the temperature data. make sure to use down-sampled frequency
         sos = butter(2, 2 * 0.005 * wlen_ds, btype="low", output="sos")
         temp_f = ascontiguousarray(sosfiltfilt(sos, temp_ds))
@@ -220,17 +220,18 @@ class DETACH(BaseProcess):
             n_ax_under_accel_sd >= self.n_ax,  # if more than N axes under StD Thresh
             wlen_ds_5min,
             1,  # 1 sample skip
+            trim=False,
         )
 
         # in the Python package, next step is to match the number of points between
         # accel and temperature by down-sampling accel to temperature
 
         # Get the maximum & minimum temperature in 5 minute windows
-        max_temp_5min = moving_max(temp_f, wlen_ds_5min, 1)
-        min_temp_5min = moving_min(temp_f, wlen_ds_5min, 1)
+        max_temp_5min = moving_max(temp_f, wlen_ds_5min, 1, trim=False)
+        min_temp_5min = moving_min(temp_f, wlen_ds_5min, 1, trim=False)
 
         # get the average temperature change in the next 5 minutes
-        avg_temp_delta_5min = moving_mean(delta_temp_f, wlen_ds_5min, 1)
+        avg_temp_delta_5min = moving_mean(delta_temp_f, wlen_ds_5min, 1, trim=False)
 
         # get candidate non-wear start times. 90% criteria next 5 minutes comes here
         candidate_nw_starts = nonzero(
@@ -317,7 +318,7 @@ class DETACH(BaseProcess):
         if nonwear_starts[0] > 0:
             wear_starts = insert(wear_starts, 0, 0)
 
-        wear = concatenate((wear_starts, wear_stops)).reshape((-2, 1)).T
+        wear = concatenate((wear_starts, wear_stops)).reshape((2, -1)).T
 
         kwargs.update(
             {self._time: time, self._acc: accel, self._temp: temperature, "wear": wear}
@@ -467,7 +468,7 @@ class CtaWearDetection(BaseProcess):
         if wear[-1]:
             wear_stops = append(wear_stops, accel.size)
 
-        wear_idx = concatenate((wear_starts, wear_stops)).reshape((-2, 1)).T
+        wear_idx = concatenate((wear_starts, wear_stops)).reshape((2, -1)).T
 
         kwargs.update(
             {
@@ -633,8 +634,7 @@ class AccelThresholdWearDetection(BaseProcess):
         acc_rsd = moving_sd(accel, n_wlen, n_wskip, axis=0, return_previous=False)
 
         # get the accelerometer range in each 60min window
-        acc_w = get_windowed_view(accel, n_wlen, n_wskip)
-        acc_w_range = acc_w.max(axis=1) - acc_w.min(axis=1)
+        acc_w_range = moving_max(accel, n_wlen, n_wskip) - moving_min(accel, n_wlen, n_wskip)
 
         nonwear = (
             sum((acc_rsd < self.sd_crit) & (acc_w_range < self.range_crit), axis=1) >= 2
