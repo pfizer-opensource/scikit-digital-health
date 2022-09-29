@@ -1,7 +1,7 @@
 from collections.abc import Iterable
 
 import pytest
-from numpy import allclose, mean, std, median, all, isnan
+from numpy import allclose, mean, std, median, full, nan
 from scipy.stats import skew, kurtosis
 
 from skdh.utility.windowing import get_windowed_view
@@ -19,48 +19,64 @@ class BaseMovingStatsTester:
     truth_function = staticmethod(lambda x: None)
     truth_kw = {}
 
+    @staticmethod
+    def get_truth(fn, x, xw, wlen, skip, trim, tkw):
+        if trim:
+            return fn(xw, axis=-1, **tkw)
+        else:
+            tshape = x.shape
+            tshape[0] = int(x.shape[0] / skip)
+            fill = int((x.shape[0] - wlen) / skip + 1)
+            truth = full(tshape, nan)
+            truth[:fill] = fn(xw, axis=-1, **tkw)
+            return truth
+
+    @pytest.mark.parametrize("trim", (True, False))
     @pytest.mark.parametrize("skip", (1, 2, 7, 150, 300))
-    def test(self, skip, np_rng):
+    def test(self, skip, trim, np_rng):
+        wlen = 150  # constant
         x = np_rng.random(2000)
-        xw = get_windowed_view(x, 150, skip)
+        xw = get_windowed_view(x, wlen, skip)
 
         if isinstance(self.truth_function, Iterable):
             truth = []
             for tf, tkw in zip(self.truth_function, self.truth_kw):
-                truth.append(tf(xw, axis=-1, **tkw))
+                truth.append(self.get_truth(tf, x, xw, wlen, skip, trim, tkw))
 
-            pred = self.function(x, 150, skip)
+            pred = self.function(x, wlen, skip, trim=trim)
 
             for p, t in zip(pred, truth):
                 assert allclose(p, t)
         else:
-            truth = self.truth_function(xw, axis=-1, **self.truth_kw)
+            truth = self.get_truth(self.truth_function, x, xw, wlen, skip, trim, self.truth_kw)
 
-            pred = self.function(x, 150, skip)
+            pred = self.function(x, wlen, skip, trim=trim)
 
             assert allclose(pred, truth)
 
+    @pytest.mark.parametrize("trim", (True, False))
     @pytest.mark.parametrize("skip", (1, 2, 7, 150, 300))
-    def test_2d(self, skip, np_rng):
+    def test_2d(self, skip, trim, np_rng):
+        wlen = 150  # constant
         x = np_rng.random((2000, 3))
-        xw = get_windowed_view(x, 150, skip)
+        xw = get_windowed_view(x, wlen, skip)
 
         if isinstance(self.truth_function, Iterable):
             truth = []
             for tf, tkw in zip(self.truth_function, self.truth_kw):
-                truth.append(tf(xw, axis=1, **tkw))
+                truth.append(self.get_truth(tf, x, xw, wlen, skip, trim, tkw))
 
-            pred = self.function(x, 150, skip, axis=0)
-            pred1 = self.function(x, 150, skip, axis=0, return_previous=False)
+            pred = self.function(x, wlen, skip, trim=trim, axis=0)
+            pred1 = self.function(x, wlen, skip, trim=trim, axis=0, return_previous=False)
 
             for p, t in zip(pred, truth):
                 assert allclose(p, t)
 
             assert allclose(pred1, truth[0])
         else:
-            truth = self.truth_function(xw, axis=1, **self.truth_kw)
+            truth = self.get_truth(self.truth_function, x, xw, wlen, skip, trim, self.truth_kw)
 
-            pred = self.function(x, 150, skip, axis=0)
+            pred = self.function(x, wlen, skip, trim=trim, axis=0)
 
             assert allclose(pred, truth)
 
