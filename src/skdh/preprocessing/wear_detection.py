@@ -318,7 +318,9 @@ class DETACH(BaseProcess):
         if nonwear_starts[0] > 0:
             wear_starts = insert(wear_starts, 0, 0)
 
-        wear = concatenate((wear_starts, wear_stops)).reshape((2, -1)).T
+        # create a single wear array, and put it back into the correct
+        # units for indexing
+        wear = concatenate((wear_starts, wear_stops)).reshape((2, -1)).T * wlen_ds
 
         kwargs.update(
             {self._time: time, self._acc: accel, self._temp: temperature, "wear": wear}
