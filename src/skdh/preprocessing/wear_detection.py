@@ -190,7 +190,7 @@ class DETACH(BaseProcess):
         # this can be both forward and backwards looking with the correct indexing
         # current implementation matches the "forwards" looking from pandas
         # get only every `window_size` sample
-        rsd_acc = moving_sd(accel, wlen, wlen_ds, axis=0, trim=False, return_previous=False)
+        rsd_acc = moving_sd(accel, wlen, wlen_ds, axis=0, trim=True, return_previous=False)
 
         # In the original algorithm they keep one temperature sample per GENEActiv
         # block (300 samples), resulting in a temperature sampling rate of 0.25hz
@@ -203,7 +203,10 @@ class DETACH(BaseProcess):
         # "down-sample" the temperature by taking a moving mean. If using `scaled` for
         # window-size this would bring back the 1 temperature value per block, but it
         # should also handle data coming from other devices better
-        temp_ds = moving_mean(temperature, wlen_ds, wlen_ds, trim=False)
+        temp_ds = moving_mean(temperature, wlen_ds, wlen_ds, trim=True)
+        # trim rolling SD of accel to same size as temperature
+        rsd_acc = rsd_acc[:temp_ds.size]
+
         # filter the temperature data. make sure to use down-sampled frequency
         sos = butter(2, 2 * 0.005 * wlen_ds, btype="low", output="sos")
         temp_f = ascontiguousarray(sosfiltfilt(sos, temp_ds))
