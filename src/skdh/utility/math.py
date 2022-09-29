@@ -4,7 +4,7 @@ Utility math functions
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
-from numpy import moveaxis, nan
+from numpy import moveaxis, intc
 
 from skdh.utility import _extensions
 
@@ -18,7 +18,7 @@ __all__ = [
 ]
 
 
-def moving_mean(a, w_len, skip, axis=-1):
+def moving_mean(a, w_len, skip, trim=True, axis=-1):
     r"""
     Compute the moving mean.
 
@@ -30,6 +30,9 @@ def moving_mean(a, w_len, skip, axis=-1):
         Window length in number of samples.
     skip : int
         Window start location skip in number of samples.
+    trim : bool, optional
+        Trim the ends of the result, where a value cannot be calculated. If False,
+        these values will be set to NaN. Default is True.
     axis : int, optional
         Axis to compute the moving mean along. Default is -1.
 
@@ -41,21 +44,24 @@ def moving_mean(a, w_len, skip, axis=-1):
 
     Notes
     -----
-    On the moving axis, the output length can be computed as follows:
+    On the moving axis if `trim=True`, the output length can be computed as follows:
 
     .. math:: \frac{n - w_{len}}{skip} + 1
 
-    where `n` is the length of the moving axis.
+    where `n` is the length of the moving axis. For cases where `skip != 1` and
+    `trim=False`, the length of the return on the moving axis can be calculated as:
 
-    Most efficient computations are for `skip` values that are either factors of `wlen`, or greater
-    or equal to `wlen`.
+    .. math:: \frac{n}{skip}
+
+    Most efficient computations are for `skip` values that are either factors of
+    `wlen`, or greater or equal to `wlen`.
 
     Warnings
     --------
-    Catastropic cancellation is a concern when `skip` is less than `wlen` due to the cumulative
-    sum-type algorithm being used, when input values are very very large, or very very small. With
-    typical IMU data values this should not be an issue, even for very long data series (multiple
-    days worth of data)
+    Catastropic cancellation is a concern when `skip` is less than `wlen` due to
+    the cumulative sum-type algorithm being used, when input values are very very
+    large, or very very small. With typical IMU data values this should not be an
+    issue, even for very long data series (multiple days worth of data)
 
     Examples
     --------
@@ -71,8 +77,13 @@ def moving_mean(a, w_len, skip, axis=-1):
     >>> moving_mean(x, 3, 1)
     array([1., 2., 3., 4., 5., 6., 7., 8.])
 
-    Compute on a nd-array to see output shape. On the moving axis, the output should be equal to
-    :math:`(n - w_{len}) / skip + 1`.
+    Compute without trimming the result
+
+    >>> moving_mean(x, 3, 1, trim=False)
+    array([1., 2., 3., 4., 5., 6., 7., 8., nan, nan])
+
+    Compute on a nd-array to see output shape. On the moving axis, the output
+    should be equal to :math:`(n - w_{len}) / skip + 1`.
 
     >>> n = 500
     >>> window_length = 100
@@ -105,13 +116,13 @@ def moving_mean(a, w_len, skip, axis=-1):
     if w_len > x.shape[-1]:
         raise ValueError("Window length is larger than the computation axis.")
 
-    rmean = _extensions.moving_mean(x, w_len, skip)
+    rmean = _extensions.moving_mean(x, w_len, skip, trim)
 
     # move computation axis back to original place and return
     return moveaxis(rmean, -1, axis)
 
 
-def moving_sd(a, w_len, skip, axis=-1, return_previous=True):
+def moving_sd(a, w_len, skip, trim=True, axis=-1, return_previous=True):
     r"""
     Compute the moving sample standard deviation.
 
@@ -123,6 +134,9 @@ def moving_sd(a, w_len, skip, axis=-1, return_previous=True):
         Window length in number of samples.
     skip : int
         Window start location skip in number of samples.
+    trim : bool, optional
+        Trim the ends of the result, where a value cannot be calculated. If False,
+        these values will be set to NaN. Default is True.
     axis : int, optional
         Axis to compute the moving mean along. Default is -1.
     return_previous : bool, optional
@@ -144,7 +158,10 @@ def moving_sd(a, w_len, skip, axis=-1, return_previous=True):
 
     .. math:: \frac{n - w_{len}}{skip} + 1
 
-    where `n` is the length of the moving axis.
+    where `n` is the length of the moving axis. For cases where `skip != 1` and
+    `trim=False`, the length of the return on the moving axis can be calculated as:
+
+    .. math:: \frac{n}{skip}
 
     Most efficient computations are for `skip` values that are either factors of `wlen`, or greater
     or equal to `wlen`.
@@ -171,6 +188,12 @@ def moving_sd(a, w_len, skip, axis=-1, return_previous=True):
     >>> moving_mean(x, 3, 1, return_previous=False)
     array([ 2.081666  ,  4.04145188,  6.02771377,  8.02080628, 10.0166528 ,
            12.01388086, 14.0118997 , 16.01041328])
+
+    Compute without trimming:
+
+    >>> moving_mean(x, 3, 1, trim=False, return_previous=False)
+    array([ 2.081666  ,  4.04145188,  6.02771377,  8.02080628, 10.0166528 ,
+           12.01388086, 14.0118997 , 16.01041328, nan, nan])
 
     Compute on a nd-array to see output shape. On the moving axis, the output should be equal to
     :math:`(n - w_{len}) / skip + 1`.
@@ -208,7 +231,7 @@ def moving_sd(a, w_len, skip, axis=-1, return_previous=True):
             "Cannot have a window length larger than the computation axis."
         )
 
-    res = _extensions.moving_sd(x, w_len, skip, return_previous)
+    res = _extensions.moving_sd(x, w_len, skip, trim, return_previous)
 
     # move computation axis back to original place and return
     if return_previous:
@@ -217,7 +240,7 @@ def moving_sd(a, w_len, skip, axis=-1, return_previous=True):
         return moveaxis(res, -1, axis)
 
 
-def moving_skewness(a, w_len, skip, axis=-1, return_previous=True):
+def moving_skewness(a, w_len, skip, trim=True, axis=-1, return_previous=True):
     r"""
     Compute the moving sample skewness.
 
@@ -229,6 +252,9 @@ def moving_skewness(a, w_len, skip, axis=-1, return_previous=True):
         Window length in number of samples.
     skip : int
         Window start location skip in number of samples.
+    trim : bool, optional
+        Trim the ends of the result, where a value cannot be calculated. If False,
+        these values will be set to NaN. Default is True.
     axis : int, optional
         Axis to compute the moving mean along. Default is -1.
     return_previous : bool, optional
@@ -253,7 +279,10 @@ def moving_skewness(a, w_len, skip, axis=-1, return_previous=True):
 
     .. math:: \frac{n - w_{len}}{skip} + 1
 
-    where `n` is the length of the moving axis.
+    where `n` is the length of the moving axis. For cases where `skip != 1` and
+    `trim=False`, the length of the return on the moving axis can be calculated as:
+
+    .. math:: \frac{n}{skip}
 
     Warnings
     --------
@@ -277,6 +306,12 @@ def moving_skewness(a, w_len, skip, axis=-1, return_previous=True):
     >>> moving_skewness(x, 3, 1, return_previous=False)
     array([0.52800497, 0.29479961, 0.20070018, 0.15164108, 0.12172925,
            0.10163023, 0.08720961, 0.07636413])
+
+    Compute without trimming:
+
+    >>> moving_skewness(x, 3, 1, trim=False, return_previous=False)
+    array([0.52800497, 0.29479961, 0.20070018, 0.15164108, 0.12172925,
+           0.10163023, 0.08720961, 0.07636413, nan, nan])
 
     Compute on a nd-array to see output shape. On the moving axis, the output should be equal to
     :math:`(n - w_{len}) / skip + 1`.
@@ -314,7 +349,7 @@ def moving_skewness(a, w_len, skip, axis=-1, return_previous=True):
             "Cannot have a window length larger than the computation axis."
         )
 
-    res = _extensions.moving_skewness(x, w_len, skip, return_previous)
+    res = _extensions.moving_skewness(x, w_len, skip, trim, return_previous)
 
     # move computation axis back to original place and return
     if return_previous:
@@ -323,7 +358,7 @@ def moving_skewness(a, w_len, skip, axis=-1, return_previous=True):
         return moveaxis(res, -1, axis)
 
 
-def moving_kurtosis(a, w_len, skip, axis=-1, return_previous=True):
+def moving_kurtosis(a, w_len, skip, trim=True, axis=-1, return_previous=True):
     r"""
     Compute the moving sample kurtosis.
 
@@ -335,6 +370,9 @@ def moving_kurtosis(a, w_len, skip, axis=-1, return_previous=True):
         Window length in number of samples.
     skip : int
         Window start location skip in number of samples.
+    trim : bool, optional
+        Trim the ends of the result, where a value cannot be calculated. If False,
+        these values will be set to NaN. Default is True.
     axis : int, optional
         Axis to compute the moving mean along. Default is -1.
     return_previous : bool, optional
@@ -362,7 +400,10 @@ def moving_kurtosis(a, w_len, skip, axis=-1, return_previous=True):
 
     .. math:: \frac{n - w_{len}}{skip} + 1
 
-    where `n` is the length of the moving axis.
+    where `n` is the length of the moving axis. For cases where `skip != 1` and
+    `trim=False`, the length of the return on the moving axis can be calculated as:
+
+    .. math:: \frac{n}{skip}
 
     Warnings
     --------
@@ -386,6 +427,11 @@ def moving_kurtosis(a, w_len, skip, axis=-1, return_previous=True):
 
     >>> moving_kurtosis(np.random.random(100), 50, 20, return_previous=False)
     array([-1.10155074, -1.20785479, -1.24363625])  # random
+
+    Compute without trimming:
+
+    >>> moving_kurtosis(np.random.random(100), 50, 20, return_previous=False)
+    array([-1.10155074, -1.20785479, -1.24363625, nan, nan])  # random
 
     Compute on a nd-array to see output shape. On the moving axis, the output should be equal to
     :math:`(n - w_{len}) / skip + 1`.
@@ -423,7 +469,7 @@ def moving_kurtosis(a, w_len, skip, axis=-1, return_previous=True):
             "Cannot have a window length larger than the computation axis."
         )
 
-    res = _extensions.moving_kurtosis(x, w_len, skip, return_previous)
+    res = _extensions.moving_kurtosis(x, w_len, skip, trim, return_previous)
 
     # move computation axis back to original place and return
     if return_previous:
@@ -432,7 +478,7 @@ def moving_kurtosis(a, w_len, skip, axis=-1, return_previous=True):
         return moveaxis(res, -1, axis)
 
 
-def moving_median(a, w_len, skip=1, axis=-1):
+def moving_median(a, w_len, skip=1, trim=True, axis=-1):
     r"""
     Compute the moving mean.
 
@@ -444,6 +490,9 @@ def moving_median(a, w_len, skip=1, axis=-1):
         Window length in number of samples.
     skip : int
         Window start location skip in number of samples. Default is 1.
+    trim : bool, optional
+        Trim the ends of the result, where a value cannot be calculated. If False,
+        these values will be set to NaN. Default is True.
     axis : int, optional
         Axis to compute the moving mean along. Default is -1.
 
@@ -459,7 +508,10 @@ def moving_median(a, w_len, skip=1, axis=-1):
 
     .. math:: \frac{n - w_{len}}{skip} + 1
 
-    where `n` is the length of the moving axis.
+    where `n` is the length of the moving axis. For cases where `skip != 1` and
+    `trim=False`, the length of the return on the moving axis can be calculated as:
+
+    .. math:: \frac{n}{skip}
 
     Examples
     --------
@@ -474,6 +526,11 @@ def moving_median(a, w_len, skip=1, axis=-1):
 
     >>> moving_median(x, 3, 1)
     array([1., 2., 3., 4., 5., 6., 7., 8.])
+
+    Compute without trimming:
+
+    >>> moving_median(x, 3, 1)
+    array([1., 2., 3., 4., 5., 6., 7., 8., nan, nan])
 
     Compute on a nd-array to see output shape. On the moving axis, the output should be equal to
     :math:`(n - w_{len}) / skip + 1`.
@@ -511,7 +568,7 @@ def moving_median(a, w_len, skip=1, axis=-1):
             "Cannot have a window length larger than the computation axis."
         )
 
-    rmed = _extensions.moving_median(x, w_len, skip)
+    rmed = _extensions.moving_median(x, w_len, skip, trim)
 
     # move computation axis back to original place and return
     return moveaxis(rmed, -1, axis)

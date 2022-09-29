@@ -2,6 +2,7 @@
 #define PY_SSIZE_T_CLEAN
 #include "Python.h"
 #include "numpy/arrayobject.h"
+#include "numpy/npy_math.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,8 +21,9 @@ extern void fmoving_median(int *, double *, int *, int *, double *);
 PyObject * moving_mean(PyObject *NPY_UNUSED(self), PyObject *args){
     PyObject *x_;
     long wlen, skip;
+    int trim;
 
-    if (!PyArg_ParseTuple(args, "Oll:moving_mean", &x_, &wlen, &skip))
+    if (!PyArg_ParseTuple(args, "Ollp:moving_mean", &x_, &wlen, &skip, &trim))
         return NULL;
 
     PyArrayObject *data = (PyArrayObject *)PyArray_FromAny(
@@ -39,6 +41,7 @@ PyObject * moving_mean(PyObject *NPY_UNUSED(self), PyObject *args){
     int ndim = PyArray_NDIM(data);
     const npy_intp *ddims = PyArray_DIMS(data);
     long npts = ddims[ndim - 1];
+    long trim_pts = (npts - wlen) / skip + 1;
     npy_intp *rdims = (npy_intp *)malloc(ndim * sizeof(npy_intp));
     if (!rdims)
     {
@@ -50,7 +53,13 @@ PyObject * moving_mean(PyObject *NPY_UNUSED(self), PyObject *args){
     {
         rdims[i] = ddims[i];
     }
-    rdims[ndim-1] = (npts - wlen) / skip + 1;  // dimension of the roll
+    // dimension of the roll
+    if (trim)
+    {
+        rdims[ndim - 1] = trim_pts;
+    } else {
+        rdims[ndim - 1] = (npts - 1) / skip + 1;
+    }
 
     PyArrayObject *rmean = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
     free(rdims);
@@ -71,6 +80,10 @@ PyObject * moving_mean(PyObject *NPY_UNUSED(self), PyObject *args){
 
     for (int i = 0; i < nrepeats; ++i)
     {
+        for (int j = trim_pts; j < res_stride; ++j)
+        {
+            rmean_ptr[j] = NPY_NAN;
+        }
         mov_moments_1(&npts, dptr, &wlen, &skip, rmean_ptr);
         dptr += npts;  // increment by number of points in last dimension
         rmean_ptr += res_stride;
@@ -85,9 +98,9 @@ PyObject * moving_mean(PyObject *NPY_UNUSED(self), PyObject *args){
 PyObject * moving_sd(PyObject *NPY_UNUSED(self), PyObject *args){
     PyObject *x_;
     long wlen, skip;
-    int return_others;
+    int trim, return_others;
 
-    if (!PyArg_ParseTuple(args, "Ollp:moving_sd", &x_, &wlen, &skip, &return_others))
+    if (!PyArg_ParseTuple(args, "Ollpp:moving_sd", &x_, &wlen, &skip, &trim, &return_others))
         return NULL;
 
     PyArrayObject *data = (PyArrayObject *)PyArray_FromAny(
@@ -105,6 +118,8 @@ PyObject * moving_sd(PyObject *NPY_UNUSED(self), PyObject *args){
     int ndim = PyArray_NDIM(data);
     npy_intp *ddims = PyArray_DIMS(data);
     npy_intp *rdims = (npy_intp *)malloc(ndim * sizeof(ddims));
+    long npts = ddims[ndim - 1];
+    long trim_pts = (npts - wlen) / skip + 1;
     if (!rdims)
     {
         Py_XDECREF(data);
@@ -115,7 +130,13 @@ PyObject * moving_sd(PyObject *NPY_UNUSED(self), PyObject *args){
     {
         rdims[i] = ddims[i];
     }
-    rdims[ndim-1] = (ddims[ndim-1] - wlen) / skip + 1;  // dimension of the roll
+    // dimension of the roll
+    if (trim)
+    {
+        rdims[ndim - 1] = trim_pts;
+    } else {
+        rdims[ndim - 1] = (npts - 1) / skip + 1;
+    }
 
     PyArrayObject *rsd   = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
     PyArrayObject *rmean = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
@@ -142,6 +163,14 @@ PyObject * moving_sd(PyObject *NPY_UNUSED(self), PyObject *args){
 
     for (int i = 0; i < nrepeats; ++i)
     {
+        for (int j = trim_pts; j < res_stride; ++j)
+        {
+            rmean_ptr[j] = NPY_NAN;
+        }
+        for (int j = trim_pts; j < res_stride; ++j)
+        {
+            rsd_ptr[j] = NPY_NAN;
+        }
         mov_moments_2(&stride, dptr, &wlen, &skip, rmean_ptr, rsd_ptr);
         dptr += stride;
         rmean_ptr += res_stride;
@@ -169,9 +198,9 @@ PyObject * moving_sd(PyObject *NPY_UNUSED(self), PyObject *args){
 PyObject * moving_skewness(PyObject *NPY_UNUSED(self), PyObject *args){
     PyObject *x_;
     long wlen, skip;
-    int return_others;
+    int trim, return_others;
 
-    if (!PyArg_ParseTuple(args, "Ollp:moving_skewness", &x_, &wlen, &skip, &return_others))
+    if (!PyArg_ParseTuple(args, "Ollpp:moving_skewness", &x_, &wlen, &skip, &trim, &return_others))
         return NULL;
 
     PyArrayObject *data = (PyArrayObject *)PyArray_FromAny(
@@ -189,6 +218,8 @@ PyObject * moving_skewness(PyObject *NPY_UNUSED(self), PyObject *args){
     int ndim = PyArray_NDIM(data);
     npy_intp *ddims = PyArray_DIMS(data);
     npy_intp *rdims = (npy_intp *)malloc(ndim * sizeof(ddims));
+    long npts = ddims[ndim - 1];
+    long trim_pts = (npts - wlen) / skip + 1;
     if (!rdims)
     {
         Py_XDECREF(data);
@@ -199,7 +230,13 @@ PyObject * moving_skewness(PyObject *NPY_UNUSED(self), PyObject *args){
     {
         rdims[i] = ddims[i];
     }
-    rdims[ndim-1] = (ddims[ndim-1] - wlen) / skip + 1;  // dimension of the roll
+    // dimension of the roll
+    if (trim)
+    {
+        rdims[ndim - 1] = trim_pts;
+    } else {
+        rdims[ndim - 1] = (npts - 1) / skip + 1;
+    }
 
     PyArrayObject *rsd   = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
     PyArrayObject *rmean = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
@@ -229,6 +266,13 @@ PyObject * moving_skewness(PyObject *NPY_UNUSED(self), PyObject *args){
 
     for (int i = 0; i < nrepeats; ++i)
     {
+        // splitting up so we are accessing contiguous memory each time
+        for (int j = trim_pts; j < res_stride; ++j)
+        {
+            rmean_ptr[j] = NPY_NAN;
+            rsd_ptr[j] = NPY_NAN;
+            rskew_ptr[j] = NPY_NAN;
+        }
         moving_moments_3(&stride, dptr, &wlen, &skip, rmean_ptr, rsd_ptr, rskew_ptr);
         dptr += stride;
         rmean_ptr += res_stride;
@@ -259,9 +303,9 @@ PyObject * moving_skewness(PyObject *NPY_UNUSED(self), PyObject *args){
 PyObject * moving_kurtosis(PyObject *NPY_UNUSED(self), PyObject *args){
     PyObject *x_;
     long wlen, skip;
-    int return_others;
+    int trim, return_others;
 
-    if (!PyArg_ParseTuple(args, "Ollp:moving_kurtosis", &x_, &wlen, &skip, &return_others))
+    if (!PyArg_ParseTuple(args, "Ollpp:moving_kurtosis", &x_, &wlen, &skip, &trim, &return_others))
         return NULL;
 
     PyArrayObject *data = (PyArrayObject *)PyArray_FromAny(
@@ -278,6 +322,8 @@ PyObject * moving_kurtosis(PyObject *NPY_UNUSED(self), PyObject *args){
     int ndim = PyArray_NDIM(data);
     npy_intp *ddims = PyArray_DIMS(data);
     npy_intp *rdims = (npy_intp *)malloc(ndim * sizeof(ddims));
+    long npts = ddims[ndim - 1];
+    long trim_pts = (npts - wlen) / skip + 1;
     if (!rdims)
     {
         Py_XDECREF(data);
@@ -288,7 +334,13 @@ PyObject * moving_kurtosis(PyObject *NPY_UNUSED(self), PyObject *args){
     {
         rdims[i] = ddims[i];
     }
-    rdims[ndim-1] = (ddims[ndim-1] - wlen) / skip + 1;  // dimension of the roll
+    // dimension of the roll
+    if (trim)
+    {
+        rdims[ndim - 1] = trim_pts;
+    } else {
+        rdims[ndim - 1] = (npts - 1) / skip + 1;
+    }
 
     PyArrayObject *rsd   = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
     PyArrayObject *rmean = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
@@ -321,6 +373,13 @@ PyObject * moving_kurtosis(PyObject *NPY_UNUSED(self), PyObject *args){
 
     for (int i = 0; i < nrepeats; ++i)
     {
+        for (int j = trim_pts; j < res_stride; ++j)
+        {
+            rmean_ptr[j] = NPY_NAN;
+            rsd_ptr[j] = NPY_NAN;
+            rskew_ptr[j] = NPY_NAN;
+            rkurt_ptr[j] = NPY_NAN;
+        }
         moving_moments_4(&stride, dptr, &wlen, &skip, rmean_ptr, rsd_ptr, rskew_ptr, rkurt_ptr);
         dptr += stride;
         rmean_ptr += res_stride;
@@ -354,9 +413,10 @@ PyObject * moving_kurtosis(PyObject *NPY_UNUSED(self), PyObject *args){
 PyObject * moving_median(PyObject *NPY_UNUSED(self), PyObject *args)
 {
     PyObject *x_;
-    int wlen, skip;
+    long wlen, skip;
+    int trim;
 
-    if (!PyArg_ParseTuple(args, "Oii:moving_median", &x_, &wlen, &skip)) return NULL;
+    if (!PyArg_ParseTuple(args, "Ollp:moving_median", &x_, &wlen, &skip, &trim)) return NULL;
 
     PyArrayObject *data = (PyArrayObject *)PyArray_FromAny(
       x_,
@@ -372,14 +432,21 @@ PyObject * moving_median(PyObject *NPY_UNUSED(self), PyObject *args)
     int ndim = PyArray_NDIM(data);
     const npy_intp *ddims = PyArray_DIMS(data);
     npy_intp *rdims = (npy_intp *)malloc(ndim * sizeof(npy_intp));
-    int npts = (int)ddims[ndim - 1];
+    long npts = ddims[ndim - 1];
+    long trim_pts = (npts - wlen) / skip + 1;
 
     // create the return shape
     for (int i = 0; i < (ndim - 1); ++i)
     {
         rdims[i] = ddims[i];
     }
-    rdims[ndim - 1] = ((long)npts - wlen) / skip + 1;  // dimension of the roll
+    // dimension of the roll
+    if (trim)
+    {
+        rdims[ndim - 1] = trim_pts;
+    } else {
+        rdims[ndim - 1] = (npts - 1) / skip + 1;
+    }
 
     // allocate the return
     PyArrayObject *rmed = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
@@ -401,6 +468,10 @@ PyObject * moving_median(PyObject *NPY_UNUSED(self), PyObject *args)
     // iterate
     for (int i = 0; i < nrepeats; ++i)
     {
+        for (int j = trim_pts; j < res_stride; ++j)
+        {
+            rptr[j] = NPY_NAN;
+        }
         fmoving_median(&npts, dptr, &wlen, &skip, rptr);
         dptr += npts;  // increment by number of points in the last dimension
         rptr += res_stride;
@@ -421,7 +492,9 @@ static const char rmean_doc[] = "moving_mean(a, wlen, skip)\n\n"
 "wlen : int\n"
 "    Window size in samples.\n"
 "skip : int\n"
-"    Samples between window starts. `skip=wlen` would result in non-overlapping sequential windows.\n\n"
+"    Samples between window starts. `skip=wlen` would result in non-overlapping sequential windows.\n"
+"trim : bool\n"
+"    Trim the ends of the result, where a value cannot be calculated. If False, these values will be set to NaN. Default is True.\n\n"
 "Returns\n"
 "-------\n"
 "rmean : numpy.ndarray\n"
@@ -439,6 +512,8 @@ static const char rsd_doc[] = "moving_sd(a, wlen, skip, return_previous)\n\n"
 "    Window size in samples.\n"
 "skip : int\n"
 "    Samples between window starts. `skip=wlen` would result in non-overlapping sequential windows.\n"
+"trim : bool\n"
+"    Trim the ends of the result, where a value cannot be calculated. If False, these values will be set to NaN. Default is True.\n\n"
 "return_previous : bool\n"
 "    Return the previous rolling moments."
 "Returns\n"
@@ -460,6 +535,8 @@ static const char rskew_doc[] = "moving_skewness(a, wlen, skip, return_previous)
 "    Window size in samples.\n"
 "skip : int\n"
 "    Samples between window starts. `skip=wlen` would result in non-overlapping sequential windows.\n"
+"trim : bool\n"
+"    Trim the ends of the result, where a value cannot be calculated. If False, these values will be set to NaN. Default is True.\n\n"
 "return_previous : bool\n"
 "    Return the previous rolling moments."
 "Returns\n"
@@ -483,6 +560,8 @@ static const char rkurt_doc[] = "moving_kurtosis(a, wlen, skip, return_previous)
 "    Window size in samples.\n"
 "skip : int\n"
 "    Samples between window starts. `skip=wlen` would result in non-overlapping sequential windows.\n"
+"trim : bool\n"
+"    Trim the ends of the result, where a value cannot be calculated. If False, these values will be set to NaN. Default is True.\n\n"
 "return_previous : bool\n"
 "    Return the previous rolling moments."
 "Returns\n"
@@ -507,6 +586,8 @@ static const char rmed_doc[] = "moving_median(a, wlen, skip)\n\n"
 "    Window size in samples.\n"
 "skip : int\n"
 "    Samples between window starts. `skip=wlen` would result in non-overlapping sequential windows.\n"
+"trim : bool\n"
+"    Trim the ends of the result, where a value cannot be calculated. If False, these values will be set to NaN. Default is True.\n\n"
 "Returns\n"
 "-------\n"
 "rmed : numpy.ndarray\n"

@@ -22,13 +22,13 @@ class BaseMovingStatsTester:
     @staticmethod
     def get_truth(fn, x, xw, wlen, skip, trim, tkw):
         if trim:
-            return fn(xw, axis=-1, **tkw)
+            return fn(xw, axis=1, **tkw)
         else:
-            tshape = x.shape
-            tshape[0] = int(x.shape[0] / skip)
-            fill = int((x.shape[0] - wlen) / skip + 1)
+            tshape = list(x.shape)
+            tshape[0] = int((x.shape[0] - 1) // skip + 1)
+            fill = int((x.shape[0] - wlen) // skip + 1)
             truth = full(tshape, nan)
-            truth[:fill] = fn(xw, axis=-1, **tkw)
+            truth[:fill] = fn(xw, axis=1, **tkw)
             return truth
 
     @pytest.mark.parametrize("trim", (True, False))
@@ -46,13 +46,13 @@ class BaseMovingStatsTester:
             pred = self.function(x, wlen, skip, trim=trim)
 
             for p, t in zip(pred, truth):
-                assert allclose(p, t)
+                assert allclose(p, t, equal_nan=True)
         else:
             truth = self.get_truth(self.truth_function, x, xw, wlen, skip, trim, self.truth_kw)
 
             pred = self.function(x, wlen, skip, trim=trim)
 
-            assert allclose(pred, truth)
+            assert allclose(pred, truth, equal_nan=True)
 
     @pytest.mark.parametrize("trim", (True, False))
     @pytest.mark.parametrize("skip", (1, 2, 7, 150, 300))
@@ -70,15 +70,15 @@ class BaseMovingStatsTester:
             pred1 = self.function(x, wlen, skip, trim=trim, axis=0, return_previous=False)
 
             for p, t in zip(pred, truth):
-                assert allclose(p, t)
+                assert allclose(p, t, equal_nan=True)
 
-            assert allclose(pred1, truth[0])
+            assert allclose(pred1, truth[0], equal_nan=True)
         else:
             truth = self.get_truth(self.truth_function, x, xw, wlen, skip, trim, self.truth_kw)
 
             pred = self.function(x, wlen, skip, trim=trim, axis=0)
 
-            assert allclose(pred, truth)
+            assert allclose(pred, truth, equal_nan=True)
 
     @pytest.mark.parametrize(
         ("in_shape", "out_shape", "kwargs"),
