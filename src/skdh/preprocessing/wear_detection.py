@@ -326,7 +326,7 @@ class DETACH(BaseProcess):
         wear = concatenate((wear_starts, wear_stops)).reshape((2, -1)).T * wlen_ds
 
         kwargs.update(
-            {self._time: time, self._acc: accel, self._temp: temperature, "wear": wear}
+            {self._time: time, self._acc: accel, self._temp: temperature, "wear": wear, "fs": fs}
         )
 
         return (kwargs, None) if self._in_pipeline else kwargs
