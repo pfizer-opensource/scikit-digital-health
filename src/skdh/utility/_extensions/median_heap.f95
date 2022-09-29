@@ -1,20 +1,20 @@
 ! -*- f95 -*-
 
 module median_heap
-    use sort, only: quick_argsort_, quick_argsort_int_
+    use sort, only: quick_argsort_, quick_argsort_long_
     use, intrinsic :: iso_c_binding
     implicit none
 
     ! the workspace for the heap
     real(c_double), dimension(:), allocatable :: heap  ! actual heap data values
-    integer(c_int), dimension(:), allocatable :: oldest  ! keeps track of which element is oldest
-    integer(c_int), dimension(:), allocatable :: pos  ! intermediate step to maintain oldest
+    integer(c_long), dimension(:), allocatable :: oldest  ! keeps track of which element is oldest
+    integer(c_long), dimension(:), allocatable :: pos  ! intermediate step to maintain oldest
 
     ! private local attributes to keep track of
-    integer(c_int), private :: state  ! keeps track of where in `oldest` we are
-    integer(c_int), private :: N  ! number of elements in the heap
-    integer(c_int), private :: n_max_heap  ! number of elements in the max heap
-    integer(c_int), private :: n_min_heap  ! number of elements in the min heap
+    integer(c_long), private :: state  ! keeps track of where in `oldest` we are
+    integer(c_long), private :: N  ! number of elements in the heap
+    integer(c_long), private :: n_max_heap  ! number of elements in the max heap
+    integer(c_long), private :: n_min_heap  ! number of elements in the min heap
     integer, private :: is_even  ! keep track of if the median is an avg of 2 values
 
     ! label some of the methods as private
@@ -26,11 +26,11 @@ module median_heap
 contains
     ! Subroutine to handle the full moving median on a 1D array
     subroutine fmoving_median(k, x, wlen, skip, res) bind(C, name="fmoving_median")
-        integer(c_int), intent(in) :: k, wlen, skip
+        integer(c_long), intent(in) :: k, wlen, skip
         real(c_double), intent(in) :: x(k)
         real(c_double), intent(out) :: res((k - wlen) / skip + 1)
         ! local
-        integer(c_int) :: i, ii, j
+        integer(c_long) :: i, ii, j
 
         ! first allocate the variables for the heap
         call allocate_heap(wlen)
@@ -64,14 +64,14 @@ contains
     ! Subroutine to allocate the heap workspace
     subroutine allocate_heap(k)
         ! k : number of elements in the heap. equivalent to window length
-        integer(c_int), intent(in) :: k
+        integer(c_long), intent(in) :: k
 
         ! set the # of elements
         N = k
 
         ! compute the number of elements in each part of the min/max heap
-        n_min_heap = k / 2_c_int
-        n_max_heap = n_min_heap + mod(k, 2_c_int)  ! 1 longer if odd # of elements
+        n_min_heap = k / 2_c_long
+        n_max_heap = n_min_heap + mod(k, 2_c_long)  ! 1 longer if odd # of elements
 
         ! transfer logical response to an integer (0/1)
         is_even = transfer(n_min_heap == n_max_heap, 1)
@@ -93,11 +93,11 @@ contains
         ! must match the number of elements provided in `allocate_heap`
         real(c_double), intent(in) :: vals(N)
         ! local variables
-        integer(c_int) :: i
-        integer(c_int) :: itemp(N)  ! temporary storage so that we dont lose the sorted position
+        integer(c_long) :: i
+        integer(c_long) :: itemp(N)  ! temporary storage so that we dont lose the sorted position
 
         ! set state to start at the first element
-        state = 0_c_int
+        state = 0_c_long
         ! set the temporary values for the position tracking that will be part of argsort
         itemp = (/ (i, i=-n_max_heap + 1, n_min_heap) /)
         oldest = itemp  ! same values
@@ -110,7 +110,7 @@ contains
         ! save the sorted array since sorting itemp will revert it to its original values
         pos = itemp
         ! sort the sorted index to get the corresponding order of oldest elements
-        call quick_argsort_int_(N, itemp, oldest)
+        call quick_argsort_long_(N, itemp, oldest)
     end subroutine initialize_heap
 
     ! subroutine to quickly cleanup the heap workspace
@@ -141,7 +141,7 @@ contains
     subroutine insert_elements(vals)
         real(c_double), intent(in) :: vals(:)
         ! local
-        integer(c_int) :: nn, i
+        integer(c_long) :: nn, i
 
         nn = size(vals)
 
@@ -160,7 +160,7 @@ contains
     subroutine insert_element(val)
         real(c_double), intent(in) :: val
         ! local
-        integer(c_int) :: i
+        integer(c_long) :: i
 
         ! get the oldest element's position
         i = oldest(state)
@@ -183,10 +183,10 @@ contains
 
     ! subroutine to swap 2 elements in the heap workspace
     subroutine swap(i1, i2)
-        integer(c_int), intent(in) :: i1, i2
+        integer(c_long), intent(in) :: i1, i2
         ! local
         real(c_double) :: temp
-        integer(c_int) :: itemp
+        integer(c_long) :: itemp
 
         temp = heap(i1)
         heap(i1) = heap(i2)
@@ -204,9 +204,9 @@ contains
     ! NOTE: should always be called with an EVEN index, which corresponds with the
     ! left child node, and allows it to easily find the right node
     subroutine min_sift_away(index)
-        integer(c_int), intent(in) :: index
+        integer(c_long), intent(in) :: index
         ! local
-        integer(c_int) :: i
+        integer(c_long) :: i
 
         i = index  ! so we dont modify index
 
@@ -240,9 +240,9 @@ contains
     ! NOTE: should always be called with an ODD index (negative), which will correspond to the
     ! left child node, and allows it to easily find the right node
     subroutine max_sift_away(index)
-        integer(c_int), intent(in) :: index
+        integer(c_long), intent(in) :: index
         ! local
-        integer(c_int) :: i
+        integer(c_long) :: i
 
         i = index
 
@@ -272,9 +272,9 @@ contains
     end subroutine max_sift_away
 
     subroutine min_sift_towards(index)
-        integer(c_int), intent(in) :: index
+        integer(c_long), intent(in) :: index
         ! local
-        integer(c_int) :: i
+        integer(c_long) :: i
 
         i = index
 
@@ -283,15 +283,15 @@ contains
             i = i / 2
         end do
         ! handle crossing into the max heap
-        if (i == 0_c_int) then
-            call max_sift_away(-1_c_int)  ! set to odd node below the root
+        if (i == 0_c_long) then
+            call max_sift_away(-1_c_long)  ! set to odd node below the root
         end if
     end subroutine min_sift_towards
 
     subroutine max_sift_towards(index)
-        integer(c_int), intent(in) :: index
+        integer(c_long), intent(in) :: index
         ! local
-        integer(c_int) :: i
+        integer(c_long) :: i
 
         i = index
 
@@ -301,8 +301,8 @@ contains
         end do
         ! handle crossing into the min heap
         if ((i == 0) .and. (heap(0) > heap(1))) then
-            call swap(0_c_int, 1_c_int)
-            call min_sift_away(2_c_int)  ! set to even node below the root
+            call swap(0_c_long, 1_c_long)
+            call min_sift_away(2_c_long)  ! set to even node below the root
         end if
     end subroutine max_sift_towards
 end module median_heap
