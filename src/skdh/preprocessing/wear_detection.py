@@ -53,6 +53,14 @@ class DETACH(BaseProcess):
     n_axes_threshold : {1, 2, 3}
         Number of axes that must be below `sd_thresh` to be considered non-wear.
         Default is 2.
+    window_size : {int, 'scaled', 'original'}, optional
+        Window size in seconds, 'original', or 'scaled'. 'Original' uses the
+        original 4-second long windows from [1]_, which was developed at a sampling
+        frequency of 75hz for GeneActiv devices. 'scaled' uses the same principal
+        as in [1]_ but will scale the window length to match the input sampling
+        frequency (by a factor of 300, which is the block size for GeneActiv devices).
+        Maximum if providing an integer is 15 seconds. Default is a window size
+        of 1 second.
 
     References
     ----------
@@ -79,6 +87,7 @@ class DETACH(BaseProcess):
         decrease_threshold=-0.2,
         increase_threshold=0.1,
         n_axes_threshold=2,
+        window_size=1,
     ):
         if n_axes_threshold not in [1, 2, 3]:
             n_axes_threshold = max(min(n_axes_threshold, 3), 1)
@@ -87,6 +96,13 @@ class DETACH(BaseProcess):
                 UserWarning,
             )
 
+        if not isinstance(window_size, int) and window_size not in ['scaled', 'original']:
+            raise ValueError("`window_size` must be an int, or 'scaled' or 'original'")
+        if isinstance(window_size, int):
+            if window_size > 15:
+                warn("`window_size` above 15 seconds. Setting to 15 seconds")
+                window_size = 15
+
         super().__init__(
             sd_thresh=sd_thresh,
             low_temperature_threshold=low_temperature_threshold,
@@ -94,6 +110,7 @@ class DETACH(BaseProcess):
             decrease_threshold=decrease_threshold,
             increase_threshold=increase_threshold,
             n_axes_threshold=n_axes_threshold,
+            window_size=window_size,
         )
 
         self.sd_thresh = sd_thresh
@@ -102,6 +119,7 @@ class DETACH(BaseProcess):
         self.decr_thresh = decrease_threshold
         self.incr_thresh = increase_threshold
         self.n_ax = n_axes_threshold
+        self.wsize = window_size
 
     def predict(self, time=None, accel=None, temperature=None, *, fs=None, **kwargs):
         """
@@ -150,16 +168,29 @@ class DETACH(BaseProcess):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
         """
-
         # dont start at 0 due to timestamp weirdness with some devices
         fs = 1 / mean(diff(time[1000:5000])) if fs is None else fs
-        wlen = int(fs * 60)
-        wlen_5min = int(fs * 60 * 5)
 
-        # compute a minute long rolling standard deviation
+        if isinstance(self.wsize, (int, float)):
+            wsize = int(self.wsize)
+        elif self.wsize.lower() == 'scaled':
+            wsize = int(300 / fs)
+        elif self.wsize.lower() == 'original':
+            wsize = 4
+        else:
+            raise ValueError('Specified `window_size` in initialization not understood')
+
+        # calculate default window lengths
+        wlen_ds = int(fs * wsize)
+        fs_ds = 1 / wlen_ds
+        wlen = int(fs * 60)  # at original sampling frequency
+        wlen_ds_5min = int(fs_ds * 60 * 5)
+
+        # compute a minute-long rolling standard deviation
         # this can be both forward and backwards looking with the correct indexing
         # current implementation matches the "forwards" looking from pandas
-        rsd_acc = moving_sd(accel, wlen, 1, axis=0, return_previous=False)
+        # get only every `window_size` sample
+        rsd_acc = moving_sd(accel, wlen, wlen_ds, axis=0, return_previous=False)
 
         # In the original algorithm they keep one temperature sample per GENEActiv
         # block (300 samples), resulting in a temperature sampling rate of 0.25hz
@@ -169,12 +200,16 @@ class DETACH(BaseProcess):
         # in theory, this will make a difference in the end result, however in practice
         # it does not seem to make a significant enough difference
 
-        # filter the temperature data.
-        sos = butter(2, 2 * 0.005 / fs, btype="low", output="sos")
-        temp_f = ascontiguousarray(sosfiltfilt(sos, temperature))
+        # "down-sample" the temperature by taking a moving mean. If using `scaled` for
+        # window-size this would bring back the 1 temperature value per block, but it
+        # should also handle data coming from other devices better
+        temp_ds = moving_mean(temperature, wlen_ds, wlen_ds)
+        # filter the temperature data. make sure to use down-sampled frequency
+        sos = butter(2, 2 * 0.005 * wlen_ds, btype="low", output="sos")
+        temp_f = ascontiguousarray(sosfiltfilt(sos, temp_ds))
 
-        # convert to a slope (per minute)
-        delta_temp_f = diff(temp_f, prepend=1) * 60 * fs
+        # convert to a slope (per minute). make sure to use down-sampled frequency
+        delta_temp_f = diff(temp_f, prepend=1) * 60 / wlen_ds
 
         # get the number of axes that are less than std_thresh
         n_ax_under_accel_sd = sum(rsd_acc < self.sd_thresh, axis=1)
@@ -183,19 +218,19 @@ class DETACH(BaseProcess):
         # least 90% of the next 5 minutes  (90% criteria below)
         perc_under_sd_thresh_5min = moving_mean(
             n_ax_under_accel_sd >= self.n_ax,  # if more than N axes under StD Thresh
-            wlen_5min,
+            wlen_ds_5min,
             1,  # 1 sample skip
         )
 
         # in the Python package, next step is to match the number of points between
-        # accel and temperater by downsampling accel to temperature
+        # accel and temperature by down-sampling accel to temperature
 
         # Get the maximum & minimum temperature in 5 minute windows
-        max_temp_5min = moving_max(temp_f, wlen_5min, 1)
-        min_temp_5min = moving_min(temp_f, wlen_5min, 1)
+        max_temp_5min = moving_max(temp_f, wlen_ds_5min, 1)
+        min_temp_5min = moving_min(temp_f, wlen_ds_5min, 1)
 
         # get the average temperature change in the next 5 minutes
-        avg_temp_delta_5min = moving_mean(delta_temp_f, wlen_5min, 1)
+        avg_temp_delta_5min = moving_mean(delta_temp_f, wlen_ds_5min, 1)
 
         # get candidate non-wear start times. 90% criteria next 5 minutes comes here
         candidate_nw_starts = nonzero(
