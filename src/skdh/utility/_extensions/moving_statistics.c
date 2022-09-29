@@ -491,8 +491,9 @@ PyObject * moving_max(PyObject *NPY_UNUSED(self), PyObject *args)
 {
     PyObject *x_;
     long wlen, skip;
+    int trim;
 
-    if (!PyArg_ParseTuple(args, "Oll:moving_max", &x_, &wlen, &skip))
+    if (!PyArg_ParseTuple(args, "Ollp:moving_max", &x_, &wlen, &skip, &trim))
         return NULL;
 
     PyArrayObject *data = (PyArrayObject *)PyArray_FromAny(
@@ -510,6 +511,7 @@ PyObject * moving_max(PyObject *NPY_UNUSED(self), PyObject *args)
     int ndim = PyArray_NDIM(data);
     const npy_intp *ddims = PyArray_DIMS(data);
     long npts = ddims[ndim - 1];
+    long trim_pts = (npts - wlen) / skip + 1;
     npy_intp *rdims = (npy_intp *)malloc(ndim * sizeof(npy_intp));
     if (!rdims)
     {
@@ -521,7 +523,13 @@ PyObject * moving_max(PyObject *NPY_UNUSED(self), PyObject *args)
     {
         rdims[i] = ddims[i];
     }
-    rdims[ndim-1] = (npts - wlen) / skip + 1;  // dimension of the roll
+    // dimension of the roll
+    if (trim)
+    {
+        rdims[ndim - 1] = trim_pts;
+    } else {
+        rdims[ndim - 1] = (npts - 1) / skip + 1;
+    }
 
     PyArrayObject *rmax = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
     free(rdims);
@@ -542,6 +550,10 @@ PyObject * moving_max(PyObject *NPY_UNUSED(self), PyObject *args)
 
     for (int i = 0; i < nrepeats; ++i)
     {
+        for (int j = trim_pts; j < res_stride; ++j)
+        {
+            rmax_ptr[j] = NPY_NAN;
+        }
         moving_max_c(&npts, dptr, &wlen, &skip, rmax_ptr);
         dptr += npts; // increment by number of points in last dimension
         rmax_ptr += res_stride;
@@ -557,8 +569,9 @@ PyObject * moving_min(PyObject *NPY_UNUSED(self), PyObject *args)
 {
     PyObject *x_;
     long wlen, skip;
+    int trim;
 
-    if (!PyArg_ParseTuple(args, "Oll:moving_min", &x_, &wlen, &skip))
+    if (!PyArg_ParseTuple(args, "Ollp:moving_min", &x_, &wlen, &skip, &trim))
         return NULL;
 
     PyArrayObject *data = (PyArrayObject *)PyArray_FromAny(
@@ -576,6 +589,7 @@ PyObject * moving_min(PyObject *NPY_UNUSED(self), PyObject *args)
     int ndim = PyArray_NDIM(data);
     const npy_intp *ddims = PyArray_DIMS(data);
     long npts = ddims[ndim - 1];
+    long trim_pts = (npts - wlen) / skip + 1;
     npy_intp *rdims = (npy_intp *)malloc(ndim * sizeof(npy_intp));
     if (!rdims)
     {
@@ -587,7 +601,13 @@ PyObject * moving_min(PyObject *NPY_UNUSED(self), PyObject *args)
     {
         rdims[i] = ddims[i];
     }
-    rdims[ndim-1] = (npts - wlen) / skip + 1;  // dimension of the roll
+    // dimension of the roll
+    if (trim)
+    {
+        rdims[ndim - 1] = trim_pts;
+    } else {
+        rdims[ndim - 1] = (npts - 1) / skip + 1;
+    }
 
     PyArrayObject *rmin = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
     free(rdims);
@@ -608,6 +628,10 @@ PyObject * moving_min(PyObject *NPY_UNUSED(self), PyObject *args)
 
     for (int i = 0; i < nrepeats; ++i)
     {
+        for (int j = trim_pts; j < res_stride; ++j)
+        {
+            rmin_ptr[j] = NPY_NAN;
+        }
         moving_min_c(&npts, dptr, &wlen, &skip, rmin_ptr);
         dptr += npts; // increment by number of points in last dimension
         rmin_ptr += res_stride;
