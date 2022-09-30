@@ -1,7 +1,19 @@
 import pytest
-from numpy import allclose
+from numpy import allclose, array
 
-from skdh.preprocessing.wear_detection import AccelThresholdWearDetection
+from skdh.preprocessing.wear_detection import AccelThresholdWearDetection, DETACH
+
+
+class TestDETACH:
+    def test(self, dummy_imu_data):
+        time, accel, temperature, fs = dummy_imu_data
+
+        detach = DETACH()
+
+        res = detach.predict(time=time, accel=accel, temperature=temperature, fs=fs)
+
+        # wear is only off by a little-bit from middle 3rd of data (120000 - 240000)
+        assert allclose(res['wear'], array([[0, 119600], [240500, 360000]]))
 
 
 class TestDetectWearAccelThreshold:
@@ -40,7 +52,9 @@ class TestDetectWearAccelThreshold:
 
         nonwear, true_wear = simple_nonwear_data(case, wskip, setup, ship)
 
-        starts, stops = AccelThresholdWearDetection._modify_wear_times(nonwear, wskip, setup, ship)
+        starts, stops = AccelThresholdWearDetection._modify_wear_times(
+            nonwear, wskip, setup, ship
+        )
 
         assert allclose(starts, true_wear[:, 0])
         assert allclose(stops, true_wear[:, 1])

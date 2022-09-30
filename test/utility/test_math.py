@@ -1,7 +1,7 @@
 from collections.abc import Iterable
 
 import pytest
-from numpy import allclose, mean, std, median, full, nan
+from numpy import allclose, mean, std, median, max, min, nan, full
 from scipy.stats import skew, kurtosis
 
 from skdh.utility.windowing import get_windowed_view
@@ -11,6 +11,8 @@ from skdh.utility.math import (
     moving_skewness,
     moving_kurtosis,
     moving_median,
+    moving_max,
+    moving_min,
 )
 
 
@@ -34,7 +36,7 @@ class BaseMovingStatsTester:
     @pytest.mark.parametrize("trim", (True, False))
     @pytest.mark.parametrize("skip", (1, 2, 7, 150, 300))
     def test(self, skip, trim, np_rng):
-        wlen = 150  # constant
+        wlen = 250  # constant
         x = np_rng.random(2000)
         xw = get_windowed_view(x, wlen, skip)
 
@@ -153,4 +155,16 @@ class TestMovingKurtosis(BaseMovingStatsTester):
 class TestMovingMedian(BaseMovingStatsTester):
     function = staticmethod(moving_median)
     truth_function = staticmethod(median)
+    truth_kw = {}
+
+
+class TestMovingMax(BaseMovingStatsTester):
+    function = staticmethod(moving_max)
+    truth_function = staticmethod(max)
+    truth_kw = {}
+
+
+class TestMovingMin(BaseMovingStatsTester):
+    function = staticmethod(moving_min)
+    truth_function = staticmethod(min)
     truth_kw = {}

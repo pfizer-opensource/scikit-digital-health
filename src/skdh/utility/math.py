@@ -4,9 +4,10 @@ Utility math functions
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
-from numpy import moveaxis, intc
+from numpy import moveaxis, ascontiguousarray, full, nan
 
 from skdh.utility import _extensions
+from skdh.utility.windowing import get_windowed_view
 
 
 __all__ = [
@@ -15,6 +16,8 @@ __all__ = [
     "moving_skewness",
     "moving_kurtosis",
     "moving_median",
+    "moving_max",
+    "moving_min",
 ]
 
 
@@ -572,3 +575,230 @@ def moving_median(a, w_len, skip=1, trim=True, axis=-1):
 
     # move computation axis back to original place and return
     return moveaxis(rmed, -1, axis)
+
+
+def moving_max(a, w_len, skip, trim=True, axis=-1):
+    r"""
+    Compute the moving maximum value.
+
+    Parameters
+    ----------
+    a : array-like
+        Signal to compute moving max for.
+    w_len : int
+        Window length in number of samples.
+    skip : int
+        Window start location skip in number of samples.
+    trim : bool, optional
+        Trim the ends of the result, where a value cannot be calculated. If False,
+        these values will be set to NaN. Default is True.
+    axis : int, optional
+        Axis to compute the moving max along. Default is -1.
+
+    Returns
+    -------
+    mmax : numpy.ndarray
+        Moving max. Note that if the moving axis is not the last axis, then the result
+        will *not* be c-contiguous.
+
+    Notes
+    -----
+    On the moving axis, the output length can be computed as follows:
+
+    .. math:: \frac{n - w_{len}}{skip} + 1
+
+    where `n` is the length of the moving axis. For cases where `skip != 1` and
+    `trim=False`, the length of the return on the moving axis can be calculated as:
+
+    .. math:: \frac{n}{skip}
+
+    Examples
+    --------
+    Compute the with non-overlapping windows:
+
+    >>> import numpy as np
+    >>> x = np.arange(10)
+    >>> moving_max(x, 3, 3)
+    array([2., 5., 8.])
+
+    Compute with overlapping windows:
+
+    >>> moving_max(x, 3, 1)
+    array([2., 3., 4., 5., 6., 7., 8.])
+
+    Compute without triming:
+
+    >>> moving_max(x, 3, 1)
+    array([2., 3., 4., 5., 6., 7., 8., nan, nan])
+
+    Compute on a nd-array to see output shape. On the moving axis, the output should be equal to
+    :math:`(n - w_{len}) / skip + 1`.
+
+    >>> n = 500
+    >>> window_length = 100
+    >>> window_skip = 50
+    >>> shape = (3, n, 5, 10)
+    >>> y = np.random.random(shape)
+    >>> res = moving_max(y, window_length, window_skip, axis=1)
+    >>> print(res.shape)
+    (3, 9, 5, 10)
+
+    Check flags for different axis output
+
+    >>> z = np.random.random((10, 10, 10))
+    >>> moving_max(z, 3, 3, axis=0).flags['C_CONTIGUOUS']
+    False
+
+    >>> moving_max(z, 3, 3, axis=1).flags['C_CONTIGUOUS']
+    False
+
+    >>> moving_max(z, 3, 3, axis=2).flags['C_CONTIGUOUS']
+    True
+    """
+    if w_len <= 0 or skip <= 0:
+        raise ValueError("`wlen` and `skip` cannot be less than or equal to 0.")
+
+    # Numpy uses SIMD instructions for max/min, so it will likely be faster
+    # unless there is a lot of overlap
+    cond1 = a.ndim == 1 and (skip / w_len) < 0.005
+    cond2 = a.ndim > 1 and (skip / w_len) < 0.3  # due to c-contiguity?
+    cond3 = a.ndim > 2  # windowing doesnt handle more than 2 dimensions currently
+    if any([cond1, cond2, cond3]):
+        # move computation axis to end
+        x = moveaxis(a, axis, -1)
+
+        # check that there are enough samples
+        if w_len > x.shape[-1]:
+            raise ValueError("Window length is larger than the computation axis.")
+
+        rmax = _extensions.moving_max(x, w_len, skip, trim)
+
+        # move computation axis back to original place and return
+        return moveaxis(rmax, -1, axis)
+    else:
+        x = ascontiguousarray(moveaxis(a, axis, 0))  # need to move axis to the front for windowing
+        xw = get_windowed_view(x, w_len, skip)
+        if trim:
+            res = xw.max(axis=1)  # computation axis is still the second axis
+        else:
+            nfill = (x.shape[0] - w_len) // skip + 1
+            rshape = list(x.shape)
+            rshape[0] = (x.shape[0] - 1) // skip + 1
+            res = full(rshape, nan)
+            res[:nfill] = xw.max(axis=1)
+
+        return moveaxis(res, 0, axis)
+
+
+def moving_min(a, w_len, skip, trim=True, axis=-1):
+    r"""
+    Compute the moving maximum value.
+
+    Parameters
+    ----------
+    a : array-like
+        Signal to compute moving max for.
+    w_len : int
+        Window length in number of samples.
+    skip : int
+        Window start location skip in number of samples.
+    trim : bool, optional
+        Trim the ends of the result, where a value cannot be calculated. If False,
+        these values will be set to NaN. Default is True.
+    axis : int, optional
+        Axis to compute the moving max along. Default is -1.
+
+    Returns
+    -------
+    mmax : numpy.ndarray
+        Moving max. Note that if the moving axis is not the last axis, then the result
+        will *not* be c-contiguous.
+
+    Notes
+    -----
+    On the moving axis, the output length can be computed as follows:
+
+    .. math:: \frac{n - w_{len}}{skip} + 1
+
+    where `n` is the length of the moving axis. For cases where `skip != 1` and
+    `trim=False`, the length of the return on the moving axis can be calculated as:
+
+    .. math:: \frac{n}{skip}
+
+    Examples
+    --------
+    Compute the with non-overlapping windows:
+
+    >>> import numpy as np
+    >>> x = np.arange(10)
+    >>> moving_min(x, 3, 3)
+    array([1., 4., 7.])
+
+    Compute with overlapping windows:
+
+    >>> moving_min(x, 3, 1)
+    array([1., 2., 3., 4., 5., 6., 7.])
+
+    Compute without trimming:
+
+    >>> moving_min(x, 3, 1)
+    array([1., 2., 3., 4., 5., 6., 7., nan, nan])
+
+
+    Compute on a nd-array to see output shape. On the moving axis, the output should be equal to
+    :math:`(n - w_{len}) / skip + 1`.
+
+    >>> n = 500
+    >>> window_length = 100
+    >>> window_skip = 50
+    >>> shape = (3, n, 5, 10)
+    >>> y = np.random.random(shape)
+    >>> res = moving_min(y, window_length, window_skip, axis=1)
+    >>> print(res.shape)
+    (3, 9, 5, 10)
+
+    Check flags for different axis output
+
+    >>> z = np.random.random((10, 10, 10))
+    >>> moving_min(z, 3, 3, axis=0).flags['C_CONTIGUOUS']
+    False
+
+    >>> moving_min(z, 3, 3, axis=1).flags['C_CONTIGUOUS']
+    False
+
+    >>> moving_min(z, 3, 3, axis=2).flags['C_CONTIGUOUS']
+    True
+    """
+    if w_len <= 0 or skip <= 0:
+        raise ValueError("`wlen` and `skip` cannot be less than or equal to 0.")
+
+    # Numpy uses SIMD instructions for max/min, so it will likely be faster
+    # unless there is a lot of overlap
+    cond1 = a.ndim == 1 and (skip / w_len) < 0.005
+    cond2 = a.ndim > 1 and (skip / w_len) < 0.3  # due to c-contiguity?
+    cond3 = a.ndim > 2  # windowing doesnt handle more than 2 dimensions currently
+    if any([cond1, cond2, cond3]):
+        # move computation axis to end
+        x = moveaxis(a, axis, -1)
+
+        # check that there are enough samples
+        if w_len > x.shape[-1]:
+            raise ValueError("Window length is larger than the computation axis.")
+
+        rmin = _extensions.moving_min(x, w_len, skip, trim)
+
+        # move computation axis back to original place and return
+        return moveaxis(rmin, -1, axis)
+    else:
+        x = ascontiguousarray(moveaxis(a, axis, 0))  # need to move axis to the front for windowing
+        xw = get_windowed_view(x, w_len, skip)
+        if trim:
+            res = xw.min(axis=1)  # computation axis is still the second axis
+        else:
+            nfill = (x.shape[0] - w_len) // skip + 1
+            rshape = list(x.shape)
+            rshape[0] = (x.shape[0] - 1) // skip + 1
+            res = full(rshape, nan)
+            res[:nfill] = xw.min(axis=1)
+
+        return moveaxis(res, 0, axis)
