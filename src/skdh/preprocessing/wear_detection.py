@@ -313,25 +313,27 @@ class DETACH(BaseProcess):
             # reset the last end index
             prev_end = end
 
-        # make nonwear indices into an array
-        nonwear_starts = asarray(nonwear_starts)
-        nonwear_stops = asarray(nonwear_stops)
+        # make nonwear indices into an array, and convert back to original indices
+        nonwear_starts = asarray(nonwear_starts) * wlen_ds
+        nonwear_stops = asarray(nonwear_stops) * wlen_ds
 
         # invert nonwear to wear
-        wear_starts = nonwear_stops[nonwear_stops < avg_temp_delta_5min.size]
+        wear_starts = nonwear_stops[nonwear_stops < time.size]
         wear_stops = nonwear_starts[nonwear_starts > 0]
 
-        # last case to deal with for inversion
+        # handle a wear start at zero
         if nonwear_starts[0] > 0:
             wear_starts = insert(wear_starts, 0, 0)
+        # handle a wear end at the end of the array
+        if nonwear_stops[-1] < time.size:
+            wear_stops = append(wear_stops, time.size)
 
         # create a single wear array, and put it back into the correct
         # units for indexing
-        wear = concatenate((wear_starts, wear_stops)).reshape((2, -1)).T * wlen_ds
-        nonwear_ = concatenate((nonwear_starts, nonwear_stops)).reshape((2, -1)).T * wlen_ds
+        wear = concatenate((wear_starts, wear_stops)).reshape((2, -1)).T
 
         kwargs.update(
-            {self._time: time, self._acc: accel, self._temp: temperature, "wear": wear, "nonwear": nonwear_, "fs": fs}
+            {self._time: time, self._acc: accel, self._temp: temperature, "wear": wear, "fs": fs}
         )
 
         return (kwargs, None) if self._in_pipeline else kwargs
