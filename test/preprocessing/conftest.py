@@ -1,6 +1,60 @@
 from pytest import fixture
 import numpy as np
-from scipy.signal import butter, sosfiltfilt
+from scipy.signal import butter, sosfiltfilt, square
+
+
+@fixture(scope='class')
+def dummy_imu_data():
+    rng = np.random.default_rng(24089752)
+    # make 2 hours of data
+    fs = 50
+    t = np.arange(0, 7200, 1 / fs)
+    x = np.zeros((t.size, 3))
+
+    # create 3 regions of data
+    i1 = int(t.size / 3)
+    i2 = int(t.size * 2 / 3)
+
+    # general shape
+    duty = np.maximum(np.minimum(rng.normal(scale=0.1, size=i1), 0.75), 0.25)
+    base = square(t[:i1] / 225, duty=duty) * 0.5
+    noise1 = rng.normal(scale=0.05, size=i1)
+    noise2 = rng.normal(scale=0.05, size=i1)
+    noise3 = rng.normal(scale=0.05, size=i1)
+
+    # part 1
+    x[:i1, 0] = base + 0.5 + noise1
+    x[:i1, 1] = base - 0.5 + noise2
+    x[:i1, 2] = noise3
+    # part 2
+    x[i1:i2, 0] = 0.01 * noise3
+    x[i1:i2, 1] = 0.005 * noise1 + 0.005 * noise3
+    x[i1:i2, 2] = 0.01 * noise2
+    # part 3
+    x[i2:, 1] = base + 0.5 + noise2
+    x[i2:, 2] = base - 0.5 + noise3
+    x[i2:, 0] = noise1
+
+    # make some temperature data
+    tt = np.arange(0, 7200, 300 / fs)
+    i1t = int(tt.size / 3)
+    i2t = int(tt.size * 2 / 3)
+    temp = np.zeros(tt.size) + 28
+    temp[:i1t] += noise1[:i1t] * 20
+    temp[i2t:] += noise3[:i1t] * 20
+
+    temp[i1t:i2t] = - np.sin(tt[:i1t] / 800) * 18 + 27
+    temp[i1t:i2t] = np.maximum(temp[i1t:i2t], 20) + noise2[:i1t] * 3
+
+    # do some filtering
+    sos_acc = butter(1, 2 * 5 / 50, output='sos', btype='low')
+    sos_temp = butter(4, 0.15, output='sos', btype='low')
+
+    x = sosfiltfilt(sos_acc, x, axis=0)
+    temp = sosfiltfilt(sos_temp, temp)
+    temp = np.repeat(temp, 300)
+
+    return t, x, temp, fs
 
 
 @fixture(scope="class")
