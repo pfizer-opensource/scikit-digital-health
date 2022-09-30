@@ -646,7 +646,7 @@ class AccelThresholdWearDetection(BaseProcess):
         acc_rsd = moving_sd(accel, n_wlen, n_wskip, axis=0, return_previous=False)
 
         # get the accelerometer range in each 60min window
-        acc_w_range = moving_max(accel, n_wlen, n_wskip) - moving_min(accel, n_wlen, n_wskip)
+        acc_w_range = moving_max(accel, n_wlen, n_wskip, axis=0) - moving_min(accel, n_wlen, n_wskip, axis=0)
 
         nonwear = (
             sum((acc_rsd < self.sd_crit) & (acc_w_range < self.range_crit), axis=1) >= 2
