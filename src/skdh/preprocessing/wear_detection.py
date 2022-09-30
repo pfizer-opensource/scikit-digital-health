@@ -12,6 +12,7 @@ from numpy import (
     mean,
     diff,
     sum,
+    roll,
     insert,
     append,
     nonzero,
@@ -184,13 +185,14 @@ class DETACH(BaseProcess):
         wlen_ds = int(fs * wsize)
         fs_ds = 1 / wsize
         wlen = int(fs * 60)  # at original sampling frequency
+        wlen_5min = int(fs * 60 * 5)  # original sampling frequency
         wlen_ds_5min = int(fs_ds * 60 * 5)
 
         # compute a minute-long rolling standard deviation
         # this can be both forward and backwards looking with the correct indexing
         # current implementation matches the "forwards" looking from pandas
-        # get only every `window_size` sample
-        rsd_acc = moving_sd(accel, wlen, wlen_ds, axis=0, trim=True, return_previous=False)
+        rsd_acc = moving_sd(accel, wlen, 1, axis=0, trim=False, return_previous=False)
+        # to get "backwards" looking, roll by `wlen - 1`
 
         # In the original algorithm they keep one temperature sample per GENEActiv
         # block (300 samples), resulting in a temperature sampling rate of 0.25hz
@@ -204,30 +206,40 @@ class DETACH(BaseProcess):
         # window-size this would bring back the 1 temperature value per block, but it
         # should also handle data coming from other devices better
         temp_ds = moving_mean(temperature, wlen_ds, wlen_ds, trim=True)
-        # trim rolling SD of accel to same size as temperature
-        rsd_acc = rsd_acc[:temp_ds.size]
 
         # filter the temperature data. make sure to use down-sampled frequency
-        sos = butter(2, 2 * 0.005 * wlen_ds, btype="low", output="sos")
+        sos = butter(2, 2 * 0.005 / fs_ds, btype="low", output="sos")
         temp_f = ascontiguousarray(sosfiltfilt(sos, temp_ds))
 
         # convert to a slope (per minute). make sure to use down-sampled frequency
-        delta_temp_f = diff(temp_f, prepend=1) * 60 / wlen_ds
+        delta_temp_f = diff(temp_f, prepend=1) * 60 * fs_ds
 
-        # get the number of axes that are less than std_thresh
-        n_ax_under_accel_sd = sum(rsd_acc < self.sd_thresh, axis=1)
+        # get the number of axes that are less than std_thresh, both forwards and backwards
+        n_ax_under_sd_range_fwd = sum(rsd_acc < self.sd_thresh, axis=1)
+        n_ax_under_sd_range_bwd = roll(n_ax_under_sd_range_fwd, wlen - 1)
 
         # find spots where at least N axes are below the StD threshold for at
         # least 90% of the next 5 minutes  (90% criteria below)
-        perc_under_sd_thresh_5min = moving_mean(
-            n_ax_under_accel_sd >= self.n_ax,  # if more than N axes under StD Thresh
-            wlen_ds_5min,
-            1,  # 1 sample skip
+        perc_under_sd_range_5min_fwd = moving_mean(
+            n_ax_under_sd_range_fwd >= self.n_ax,  # if more than N axes under StD Thresh
+            wlen_5min,
+            wlen_ds,
+            trim=False,
+        )
+        perc_under_sd_range_5min_bwd = moving_mean(
+            n_ax_under_sd_range_bwd >= self.n_ax,  # if more than N axes under StD Thresh
+            wlen_5min,
+            wlen_ds,
             trim=False,
         )
 
-        # in the Python package, next step is to match the number of points between
-        # accel and temperature by down-sampling accel to temperature
+        # match the number of points between accel and temperature by down-sampling
+        # accel to temperature
+        # rsd_acc not used anymore
+        n_ax_under_sd_range_fwd = n_ax_under_sd_range_fwd[::wlen_ds][:temp_ds.size]
+        n_ax_under_sd_range_bwd = n_ax_under_sd_range_bwd[::wlen_ds][:temp_ds.size]
+        perc_under_sd_range_5min_fwd = perc_under_sd_range_5min_fwd[:temp_ds.size]
+        perc_under_sd_range_5min_bwd = perc_under_sd_range_5min_bwd[:temp_ds.size]
 
         # Get the maximum & minimum temperature in 5 minute windows
         max_temp_5min = moving_max(temp_f, wlen_ds_5min, 1, trim=False)
@@ -238,7 +250,7 @@ class DETACH(BaseProcess):
 
         # get candidate non-wear start times. 90% criteria next 5 minutes comes here
         candidate_nw_starts = nonzero(
-            (n_ax_under_accel_sd >= self.n_ax) & (perc_under_sd_thresh_5min >= 0.9)
+            (n_ax_under_sd_range_fwd >= self.n_ax) & (perc_under_sd_range_5min_fwd >= 0.9)
         )[0]
 
         # create the arrays of possible non-wear bout endings
@@ -246,26 +258,18 @@ class DETACH(BaseProcess):
         # wlen - 1 to the index
 
         # criteria 1: Rate of Change
-        stops1 = (
-            nonzero(
-                (n_ax_under_accel_sd == 0)
-                & (perc_under_sd_thresh_5min <= 0.50)
-                & (avg_temp_delta_5min > self.incr_thresh)
-            )[0]
-            + wlen
-            - 1
-        )
+        stops1 = nonzero(
+            (n_ax_under_sd_range_bwd == 0)
+            & (perc_under_sd_range_5min_bwd <= 0.50)
+            & (avg_temp_delta_5min > self.incr_thresh)
+        )[0]
 
         # criteria 2: absolute temperature
-        stops2 = (
-            nonzero(
-                (n_ax_under_accel_sd == 0)
-                & (perc_under_sd_thresh_5min <= 0.50)
-                & (min_temp_5min > self.low_temp)
-            )[0]
-            + wlen
-            - 1
-        )
+        stops2 = nonzero(
+            (n_ax_under_sd_range_bwd == 0)
+            & (perc_under_sd_range_5min_bwd <= 0.50)
+            & (min_temp_5min > self.low_temp)
+        )[0]
 
         candidate_nw_stops = sort(unique(concatenate((stops1, stops2))))
 
@@ -278,7 +282,7 @@ class DETACH(BaseProcess):
                 continue  # skip because we are already past the current start
 
             valid_start = False
-            end_initial = start + int(fs * 60 * 5)  # add 5 minutes to start
+            end_initial = start + int(fs_ds * 60 * 5)  # add 5 minutes to start
 
             # start criteria 1: rate of change of temperature
             if (max_temp_5min[start] < self.high_temp) & (
@@ -324,9 +328,10 @@ class DETACH(BaseProcess):
         # create a single wear array, and put it back into the correct
         # units for indexing
         wear = concatenate((wear_starts, wear_stops)).reshape((2, -1)).T * wlen_ds
+        nonwear_ = concatenate((nonwear_starts, nonwear_stops)).reshape((2, -1)).T * wlen_ds
 
         kwargs.update(
-            {self._time: time, self._acc: accel, self._temp: temperature, "wear": wear, "fs": fs}
+            {self._time: time, self._acc: accel, self._temp: temperature, "wear": wear, "nonwear": nonwear_, "fs": fs}
         )
 
         return (kwargs, None) if self._in_pipeline else kwargs
