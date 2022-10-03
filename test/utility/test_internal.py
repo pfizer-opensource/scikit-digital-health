@@ -90,6 +90,14 @@ class TestGetDayIndexIntersection:
         assert allclose(starts, array([0], dtype=int))
         assert allclose(stops, array([123456], dtype=int))
 
+    def test_full(self):
+        starts, stops = get_day_index_intersection(array([0]), array([4000]), (True,), 0, 4000)
+
+        assert starts.size == 1
+        assert stops.size == 1
+        assert starts[0] == 0
+        assert stops[0] == 4000
+
 
 class TestApplyDownsample:
     def test(self, dummy_time, dummy_idx_1d, dummy_idx_2d, np_rng):
