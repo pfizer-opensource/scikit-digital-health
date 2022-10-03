@@ -36,7 +36,7 @@ def get_day_index_intersection(starts, stops, for_inclusion, day_start, day_stop
         Single ndarray or tuple of ndarrays indicating the starts of events to either include or
         exclude from during the day.
     stops : numpy.ndarray, tuple
-    Single ndarray or tuple of ndarrays indicating the stops of events to either include or
+        Single ndarray or tuple of ndarrays indicating the stops of events to either include or
         exclude from during the day.
     for_inclusion : bool, tuple
         Single or tuple of booleans indicating if the corresponding start & stop indices are
@@ -92,6 +92,8 @@ def get_day_index_intersection(starts, stops, for_inclusion, day_start, day_stop
     all_stops = (
         concatenate(stops_subset) if len(starts_subset) > 0 else asarray(starts_subset)
     )
+    if all_starts.size == 0:
+        return asarray([], dtype=int), asarray([], dtype=int)
 
     valid_starts, valid_stops = [day_start], [day_stop]
 
