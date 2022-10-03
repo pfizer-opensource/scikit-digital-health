@@ -60,6 +60,13 @@ class TestGetDayIndexIntersection:
                 day_stop,
             )
 
+    def test_empty(self):
+        starts, stops = get_day_index_intersection(array([]), array([]), (True,), 0, 1409821)
+
+        # should have no overlapping/intersection
+        assert starts.size == 0
+        assert stops.size == 0
+
 
 class TestApplyDownsample:
     def test(self, dummy_time, dummy_idx_1d, dummy_idx_2d, np_rng):
