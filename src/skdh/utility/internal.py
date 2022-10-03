@@ -92,7 +92,7 @@ def get_day_index_intersection(starts, stops, for_inclusion, day_start, day_stop
     all_stops = (
         concatenate(stops_subset) if len(starts_subset) > 0 else asarray(starts_subset)
     )
-    if all_starts.size == 0:
+    if all_starts.size == 0 and all(for_inclusion):
         return asarray([], dtype=int), asarray([], dtype=int)
 
     valid_starts, valid_stops = [day_start], [day_stop]
