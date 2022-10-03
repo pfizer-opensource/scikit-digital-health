@@ -61,11 +61,34 @@ class TestGetDayIndexIntersection:
             )
 
     def test_empty(self):
-        starts, stops = get_day_index_intersection(array([]), array([]), (True,), 0, 1409821)
+        starts, stops = get_day_index_intersection(array([]), array([]), (True,), 0, 123456)
 
         # should have no overlapping/intersection
         assert starts.size == 0
         assert stops.size == 0
+
+        # check if false we want the whole time however
+        starts, stops = get_day_index_intersection(array([]), array([]), (False,), 0, 123456)
+
+        # should be full day
+        assert starts.size == 1
+        assert stops.size == 1
+        assert allclose(starts, array([0], dtype=int))
+        assert allclose(stops, array([123456], dtype=int))
+
+        # check when we have both empty
+        starts, stops = get_day_index_intersection(
+            (array([]), array([])),
+            (array([]), array([])),
+            (True, False),
+            0,
+            123456
+        )
+
+        assert starts.size == 1
+        assert stops.size == 1
+        assert allclose(starts, array([0], dtype=int))
+        assert allclose(stops, array([123456], dtype=int))
 
 
 class TestApplyDownsample:
