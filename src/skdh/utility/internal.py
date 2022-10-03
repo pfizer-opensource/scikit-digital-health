@@ -66,6 +66,10 @@ def get_day_index_intersection(starts, stops, for_inclusion, day_start, day_stop
     if isinstance(for_inclusion, bool):
         for_inclusion = (for_inclusion,) * len(starts)
 
+    # check if we should just return empty
+    if all([i.size == 0 and j.size == 0 and k for i, j, k in zip(starts, stops, for_inclusion)]):
+        return asarray([], dtype=int), asarray([], dtype=int)
+
     # get the subset that intersect the day in a roundabout way
     starts_tmp = list(minimum(maximum(i, day_start), day_stop) for i in starts)
     stops_tmp = list(minimum(maximum(i, day_start), day_stop) for i in stops)
@@ -92,8 +96,6 @@ def get_day_index_intersection(starts, stops, for_inclusion, day_start, day_stop
     all_stops = (
         concatenate(stops_subset) if len(starts_subset) > 0 else asarray(starts_subset)
     )
-    if all_starts.size == 0 and all(for_inclusion):
-        return asarray([], dtype=int), asarray([], dtype=int)
 
     valid_starts, valid_stops = [day_start], [day_stop]
 
