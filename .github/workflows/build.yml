@@ -38,5 +38,5 @@ jobs:
         run: delocate-wheel -v dist/*.whl
       - name: Upload to twine
         env:
-          TESTPYPI: ${{ secrets.TESTPYPI }}
-        run: python -m twine upload --skip-existing -u __token__ -p $TESTPYPI dist/*
+          PYPI: ${{ secrets.PYPI }}
+        run: python -m twine upload --skip-existing -u __token__ -p PYPI dist/*
