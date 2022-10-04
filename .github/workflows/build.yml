@@ -39,4 +39,4 @@ jobs:
       - name: Upload to twine
         env:
           PYPI: ${{ secrets.PYPI }}
-        run: python -m twine upload --skip-existing --repository https://upload.pypi.org/legacy/ --verbose -u __token__ -p $PYPI dist/*
+        run: python -m twine upload --skip-existing --verbose -u __token__ -p $PYPI dist/*
