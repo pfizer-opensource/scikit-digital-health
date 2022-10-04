@@ -32,7 +32,7 @@ jobs:
           fi
           python -m build
       - name: Run Delocate on wheels
-        run: delocate-wheel -v --require-archs=intel dist/*.whl
+        run: delocate-wheel -v dist/*.whl
       - name: Upload to twine
         env:
           TESTPYPI: ${{ secrets.TESTPYPI }}
