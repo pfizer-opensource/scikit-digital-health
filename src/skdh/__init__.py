@@ -13,11 +13,14 @@ Pipeline Processing
     Pipeline
 """
 from sys import version_info
+
 if version_info >= (3, 8):
     import importlib.metadata
+
     __version__ = importlib.metadata.version("scikit-digital-health")
 else:  # pragma: no cover
     import importlib_metadata
+
     __version__ = importlib_metadata.version("scikit-digital-health")
 
 __minimum_version__ = "0.9.10"

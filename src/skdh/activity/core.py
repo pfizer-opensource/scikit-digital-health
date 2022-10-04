@@ -448,7 +448,7 @@ class ActivityLevelClassification(BaseProcess):
         # finalize plots
         self._finalize_plots()
 
-        kwargs.update({self._time: time, self._acc: accel, 'fs': fs, 'wear': wear})
+        kwargs.update({self._time: time, self._acc: accel, "fs": fs, "wear": wear})
 
         return (kwargs, res) if self._in_pipeline else res
 

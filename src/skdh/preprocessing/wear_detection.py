@@ -3,11 +3,16 @@ Wear detection algorithms
 
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
+
+DETACH algorithm: Copyright (c) 2022 Adam Vert
 """
+from warnings import warn
+
 from numpy import (
     mean,
     diff,
     sum,
+    roll,
     insert,
     append,
     nonzero,
@@ -15,11 +20,323 @@ from numpy import (
     concatenate,
     int_,
     full,
+    sort,
+    unique,
+    asarray,
+    ascontiguousarray,
 )
+from scipy.signal import butter, sosfiltfilt
 
 from skdh.base import BaseProcess
-from skdh.utility import moving_mean, moving_sd, get_windowed_view
+from skdh.utility import moving_mean, moving_sd, moving_max, moving_min
 from skdh.utility.internal import rle
+
+
+class DETACH(BaseProcess):
+    r"""
+    DEvice Temperature and Acceleration CHange algorithm for detecting wear/non-wear.
+
+    Parameters
+    ----------
+    sd_thresh : float, optional
+        Standard deviation threshold for an acceleration axis to trigger non-wear.
+        Default is 0.008 g (8 milli-g).
+    low_temperature_threshold : float, optional
+        Low temperature threshold for non-wear classification. Default is 26.0 deg C.
+    high_temperature_threshold : float, optional
+        High temperature threshold for non-wear classification. Default is 30.0 deg C.
+    decrease_threshold : float, optional.
+        Temperature decrease rate-of-change threshold for non-wear classification.
+        Default is -0.2.
+    increase_threshold : float, optional
+        Temperature increase rate-of-change threshold for non-wear classification.
+        Default is 0.1
+    n_axes_threshold : {1, 2, 3}
+        Number of axes that must be below `sd_thresh` to be considered non-wear.
+        Default is 2.
+    window_size : {int, 'scaled', 'original'}, optional
+        Window size in seconds, 'original', or 'scaled'. 'Original' uses the
+        original 4-second long windows from [1]_, which was developed at a sampling
+        frequency of 75hz for GeneActiv devices. 'scaled' uses the same principal
+        as in [1]_ but will scale the window length to match the input sampling
+        frequency (by a factor of 300, which is the block size for GeneActiv devices).
+        Maximum if providing an integer is 15 seconds. Default is a window size
+        of 1 second.
+
+    References
+    ----------
+    .. [1] A. Vert et al., “Detecting accelerometer non-wear periods using change
+        in acceleration combined with rate-of-change in temperature,” BMC Medical
+        Research Methodology, vol. 22, no. 1, p. 147, May 2022, doi: 10.1186/s12874-022-01633-6.
+
+    Notes
+    -----
+    This algorithm was based on work done with GENEActiv devices. While efforts
+    were made to keep the algorithm device-agnostic, this should be kept in mind
+    when deploying in alternative devices.
+
+    Copyright (c) 2022 Adam Vert. Implementation here courtesy of release under
+    an MIT license. The original implementation, and license can be found on
+    `GitHub <https://github.com/nimbal/vertdetach>`.
+    """
+
+    def __init__(
+        self,
+        sd_thresh=0.008,
+        low_temperature_threshold=26.0,
+        high_temperature_threshold=30.0,
+        decrease_threshold=-0.2,
+        increase_threshold=0.1,
+        n_axes_threshold=2,
+        window_size=1,
+    ):
+        if n_axes_threshold not in [1, 2, 3]:
+            n_axes_threshold = max(min(n_axes_threshold, 3), 1)
+            warn(
+                f"n_axes_threshold must be in {1, 2, 3}. Setting to {n_axes_threshold}",
+                UserWarning,
+            )
+
+        if not isinstance(window_size, int) and window_size not in ['scaled', 'original']:
+            raise ValueError("`window_size` must be an int, or 'scaled' or 'original'")
+        if isinstance(window_size, int):
+            if window_size > 15:
+                warn("`window_size` above 15 seconds. Setting to 15 seconds")
+                window_size = 15
+
+        super().__init__(
+            sd_thresh=sd_thresh,
+            low_temperature_threshold=low_temperature_threshold,
+            high_temperature_threshold=high_temperature_threshold,
+            decrease_threshold=decrease_threshold,
+            increase_threshold=increase_threshold,
+            n_axes_threshold=n_axes_threshold,
+            window_size=window_size,
+        )
+
+        self.sd_thresh = sd_thresh
+        self.low_temp = low_temperature_threshold
+        self.high_temp = high_temperature_threshold
+        self.decr_thresh = decrease_threshold
+        self.incr_thresh = increase_threshold
+        self.n_ax = n_axes_threshold
+        self.wsize = window_size
+
+    def predict(self, time=None, accel=None, temperature=None, *, fs=None, **kwargs):
+        """
+        Detect periods of non-wear.
+
+        Parameters
+        ----------
+        time : numpy.ndarray
+            (N, ) array of unix timestamps (in seconds) since 1970-01-01.
+        accel : numpy.ndarray
+            (N, 3) array of measured acceleration values in units of g.
+        temperature : numpy.ndarray
+            (N,) array of measured temperature values during recording in deg C.
+        fs : float, optional
+            Sampling frequency, in Hz. If not provided, will be computed from
+            `time`.
+
+        Returns
+        -------
+        results : dictionary
+            Dictionary of inputs, plus the key `wear` which is an array-like (N, 2)
+            indicating the start and stop indices of wear.
+        """
+        # this implementation was aided by code released by the authors:
+        # https://github.com/nimbal/vertdetach
+        """
+        MIT License
+
+        Copyright (c) 2022 Adam Vert
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+        
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+        """
+        # dont start at 0 due to timestamp weirdness with some devices
+        fs = 1 / mean(diff(time[1000:5000])) if fs is None else fs
+
+        if isinstance(self.wsize, (int, float)):
+            wsize = int(self.wsize)
+        elif self.wsize.lower() == 'scaled':
+            wsize = int(300 / fs)
+        elif self.wsize.lower() == 'original':
+            wsize = 4
+        else:
+            raise ValueError('Specified `window_size` in initialization not understood')
+
+        # calculate default window lengths
+        wlen_ds = int(fs * wsize)
+        fs_ds = 1 / wsize
+        wlen = int(fs * 60)  # at original sampling frequency
+        wlen_5min = int(fs * 60 * 5)  # original sampling frequency
+        wlen_ds_5min = int(fs_ds * 60 * 5)
+
+        # compute a minute-long rolling standard deviation
+        # this can be both forward and backwards looking with the correct indexing
+        # current implementation matches the "forwards" looking from pandas
+        rsd_acc = moving_sd(accel, wlen, 1, axis=0, trim=False, return_previous=False)
+        # to get "backwards" looking, roll by `wlen - 1`
+
+        # In the original algorithm they keep one temperature sample per GENEActiv
+        # block (300 samples), resulting in a temperature sampling rate of 0.25hz
+        # (accel fs=75). Here, temperature is expected to have the same sampling
+        # frequency as the acceleration (ie temperature values are duplicated)
+
+        # in theory, this will make a difference in the end result, however in practice
+        # it does not seem to make a significant enough difference
+
+        # "down-sample" the temperature by taking a moving mean. If using `scaled` for
+        # window-size this would bring back the 1 temperature value per block, but it
+        # should also handle data coming from other devices better
+        temp_ds = moving_mean(temperature, wlen_ds, wlen_ds, trim=True)
+
+        # filter the temperature data. make sure to use down-sampled frequency
+        sos = butter(2, 2 * 0.005 / fs_ds, btype="low", output="sos")
+        temp_f = ascontiguousarray(sosfiltfilt(sos, temp_ds))
+
+        # convert to a slope (per minute). make sure to use down-sampled frequency
+        delta_temp_f = diff(temp_f, prepend=1) * 60 * fs_ds
+
+        # get the number of axes that are less than std_thresh, both forwards and backwards
+        n_ax_under_sd_range_fwd = sum(rsd_acc < self.sd_thresh, axis=1)
+        n_ax_under_sd_range_bwd = roll(n_ax_under_sd_range_fwd, wlen - 1)
+
+        # find spots where at least N axes are below the StD threshold for at
+        # least 90% of the next 5 minutes  (90% criteria below)
+        perc_under_sd_range_5min_fwd = moving_mean(
+            n_ax_under_sd_range_fwd >= self.n_ax,  # if more than N axes under StD Thresh
+            wlen_5min,
+            wlen_ds,
+            trim=False,
+        )
+        perc_under_sd_range_5min_bwd = moving_mean(
+            n_ax_under_sd_range_bwd >= self.n_ax,  # if more than N axes under StD Thresh
+            wlen_5min,
+            wlen_ds,
+            trim=False,
+        )
+
+        # match the number of points between accel and temperature by down-sampling
+        # accel to temperature
+        # rsd_acc not used anymore
+        n_ax_under_sd_range_fwd = n_ax_under_sd_range_fwd[::wlen_ds][:temp_ds.size]
+        n_ax_under_sd_range_bwd = n_ax_under_sd_range_bwd[::wlen_ds][:temp_ds.size]
+        perc_under_sd_range_5min_fwd = perc_under_sd_range_5min_fwd[:temp_ds.size]
+        perc_under_sd_range_5min_bwd = perc_under_sd_range_5min_bwd[:temp_ds.size]
+
+        # Get the maximum & minimum temperature in 5 minute windows
+        max_temp_5min = moving_max(temp_f, wlen_ds_5min, 1, trim=False)
+        min_temp_5min = moving_min(temp_f, wlen_ds_5min, 1, trim=False)
+
+        # get the average temperature change in the next 5 minutes
+        avg_temp_delta_5min = moving_mean(delta_temp_f, wlen_ds_5min, 1, trim=False)
+
+        # get candidate non-wear start times. 90% criteria next 5 minutes comes here
+        candidate_nw_starts = nonzero(
+            (n_ax_under_sd_range_fwd >= self.n_ax) & (perc_under_sd_range_5min_fwd >= 0.9)
+        )[0]
+
+        # create the arrays of possible non-wear bout endings
+        # to get a "backwards" looking window, take the moving windows, and add
+        # wlen - 1 to the index
+
+        # criteria 1: Rate of Change
+        stops1 = nonzero(
+            (n_ax_under_sd_range_bwd == 0)
+            & (perc_under_sd_range_5min_bwd <= 0.50)
+            & (avg_temp_delta_5min > self.incr_thresh)
+        )[0]
+
+        # criteria 2: absolute temperature
+        stops2 = nonzero(
+            (n_ax_under_sd_range_bwd == 0)
+            & (perc_under_sd_range_5min_bwd <= 0.50)
+            & (min_temp_5min > self.low_temp)
+        )[0]
+
+        candidate_nw_stops = sort(unique(concatenate((stops1, stops2))))
+
+        # loop through the starts to identify valid starts, and find their stops
+        prev_end = 0  # keep track of the last bout
+        nonwear_starts = []  # store nonwear bout starts and stops
+        nonwear_stops = []
+        for start in candidate_nw_starts:
+            if start < prev_end:
+                continue  # skip because we are already past the current start
+
+            valid_start = False
+            end_initial = start + int(fs_ds * 60 * 5)  # add 5 minutes to start
+
+            # start criteria 1: rate of change of temperature
+            if (max_temp_5min[start] < self.high_temp) & (
+                avg_temp_delta_5min[start] < self.decr_thresh
+            ):
+                valid_start = True
+
+            # start criteria 2: absolute temperature path
+            elif max_temp_5min[start] < self.low_temp:
+                valid_start = True
+
+            # check if we met either of the start criteria
+            if not valid_start:
+                continue  # if we did not, continue to next possible start
+
+            # get all the end points after the initial guess
+            fwd_ends = candidate_nw_stops[candidate_nw_stops > end_initial]
+
+            try:
+                end = fwd_ends[0]
+            except IndexError:
+                end = avg_temp_delta_5min.size
+
+            # add to list
+            nonwear_starts.append(start)
+            nonwear_stops.append(end)
+
+            # reset the last end index
+            prev_end = end
+
+        # make nonwear indices into an array, and convert back to original indices
+        nonwear_starts = asarray(nonwear_starts) * wlen_ds
+        nonwear_stops = asarray(nonwear_stops) * wlen_ds
+
+        # invert nonwear to wear
+        wear_starts = nonwear_stops[nonwear_stops < time.size]
+        wear_stops = nonwear_starts[nonwear_starts > 0]
+
+        # handle a wear start at zero
+        if nonwear_starts[0] > 0:
+            wear_starts = insert(wear_starts, 0, 0)
+        # handle a wear end at the end of the array
+        if nonwear_stops[-1] < time.size:
+            wear_stops = append(wear_stops, time.size)
+
+        # create a single wear array, and put it back into the correct
+        # units for indexing
+        wear = concatenate((wear_starts, wear_stops)).reshape((2, -1)).T
+
+        kwargs.update(
+            {self._time: time, self._acc: accel, self._temp: temperature, "wear": wear, "fs": fs}
+        )
+
+        return (kwargs, None) if self._in_pipeline else kwargs
 
 
 class CtaWearDetection(BaseProcess):
@@ -59,12 +376,9 @@ class CtaWearDetection(BaseProcess):
     as minute-level resolution is already going to be more than enough resolution
     into wear times.
     """
+
     def __init__(
-            self,
-            temp_threshold=26.0,
-            sd_crit=0.003,
-            window_length=1,
-            window_skip=1
+        self, temp_threshold=26.0, sd_crit=0.003, window_length=1, window_skip=1
     ):
         window_length = int(window_length)
         window_skip = int(window_skip)
@@ -73,7 +387,7 @@ class CtaWearDetection(BaseProcess):
             temp_thresh=temp_threshold,
             sd_crit=sd_crit,
             window_length=window_length,
-            window_skip=window_skip
+            window_skip=window_skip,
         )
 
         self.temp_thresh = temp_threshold
@@ -109,7 +423,7 @@ class CtaWearDetection(BaseProcess):
             time=time,
             accel=accel,
             temperature=temperature,
-            **kwargs
+            **kwargs,
         )
         if temperature is None:
             raise ValueError("Temperature is required for this wear algorithm.")
@@ -132,7 +446,9 @@ class CtaWearDetection(BaseProcess):
         wear[temp_mean >= self.temp_thresh] = 1  # wear if temp is above threshold
 
         # non-wear - temperature threshold and at least 2 axes have less than sd_crit StDev.
-        mask = (temp_mean < self.temp_thresh) & (sum(accel_sd < self.sd_crit, axis=1) >= 2)
+        mask = (temp_mean < self.temp_thresh) & (
+            sum(accel_sd < self.sd_crit, axis=1) >= 2
+        )
         wear[mask] = 0
 
         # cases using increasing/decreasing temperature
@@ -164,7 +480,7 @@ class CtaWearDetection(BaseProcess):
         if wear[-1]:
             wear_stops = append(wear_stops, accel.size)
 
-        wear_idx = concatenate((wear_starts, wear_stops)).reshape((-2, 1)).T
+        wear_idx = concatenate((wear_starts, wear_stops)).reshape((2, -1)).T
 
         kwargs.update(
             {
@@ -317,7 +633,7 @@ class AccelThresholdWearDetection(BaseProcess):
             time=time,
             accel=accel,
             temperature=temperature,
-            **kwargs
+            **kwargs,
         )
         # dont start at zero due to timestamp weirdness with some devices
         fs = 1 / mean(diff(time[1000:5000]))
@@ -330,8 +646,7 @@ class AccelThresholdWearDetection(BaseProcess):
         acc_rsd = moving_sd(accel, n_wlen, n_wskip, axis=0, return_previous=False)
 
         # get the accelerometer range in each 60min window
-        acc_w = get_windowed_view(accel, n_wlen, n_wskip)
-        acc_w_range = acc_w.max(axis=1) - acc_w.min(axis=1)
+        acc_w_range = moving_max(accel, n_wlen, n_wskip, axis=0) - moving_min(accel, n_wlen, n_wskip, axis=0)
 
         nonwear = (
             sum((acc_rsd < self.sd_crit) & (acc_w_range < self.range_crit), axis=1) >= 2
@@ -344,7 +659,14 @@ class AccelThresholdWearDetection(BaseProcess):
 
         wear = concatenate((wear_starts, wear_stops)).reshape((2, -1)).T * n_wskip
 
-        kwargs.update({self._time: time, self._acc: accel, "wear": wear, 'temperature': temperature})
+        kwargs.update(
+            {
+                self._time: time,
+                self._acc: accel,
+                "wear": wear,
+                "temperature": temperature,
+            }
+        )
         return (kwargs, None) if self._in_pipeline else kwargs
 
     @staticmethod
@@ -373,7 +695,9 @@ class AccelThresholdWearDetection(BaseProcess):
         nph = int(60 / wskip)  # number of blocks per hour
         # get the changes in nonwear status
         ch = nonzero(diff(nonwear.astype(int_)))[0] + 1
-        ch = insert(ch, [0, ch.size], [0, nonwear.size])  # make sure ends are accounted for
+        ch = insert(
+            ch, [0, ch.size], [0, nonwear.size]
+        )  # make sure ends are accounted for
         start_with_wear = not nonwear[0]  # does data start with wear period
         end_with_wear = not nonwear[-1]  # does data end with wear period
 
@@ -405,9 +729,9 @@ class AccelThresholdWearDetection(BaseProcess):
             NOTE: shipping at the start is applied the opposite of shipping at the end, 
             requiring a 1+ hour nonwear period following wear periods less than 3 hours
             """
-            ship_start = nonzero((w_times <= 3) & (ch[2:-1:2] <= (shipping_crit[0] * nph)))[
-                0
-            ]
+            ship_start = nonzero(
+                (w_times <= 3) & (ch[2:-1:2] <= (shipping_crit[0] * nph))
+            )[0]
             ship_end = nonzero(
                 (w_times <= 3) & (ch[1:-1:2] >= ch[-1] - (shipping_crit[1] * nph))
             )[0]

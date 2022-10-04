@@ -36,7 +36,7 @@ def get_day_index_intersection(starts, stops, for_inclusion, day_start, day_stop
         Single ndarray or tuple of ndarrays indicating the starts of events to either include or
         exclude from during the day.
     stops : numpy.ndarray, tuple
-    Single ndarray or tuple of ndarrays indicating the stops of events to either include or
+        Single ndarray or tuple of ndarrays indicating the stops of events to either include or
         exclude from during the day.
     for_inclusion : bool, tuple
         Single or tuple of booleans indicating if the corresponding start & stop indices are
@@ -65,6 +65,10 @@ def get_day_index_intersection(starts, stops, for_inclusion, day_start, day_stop
         raise ValueError("Number of start arrays does not match number of stop arrays.")
     if isinstance(for_inclusion, bool):
         for_inclusion = (for_inclusion,) * len(starts)
+
+    # check if we should just return empty
+    if all([i.size == 0 and j.size == 0 and k for i, j, k in zip(starts, stops, for_inclusion)]):
+        return asarray([], dtype=int), asarray([], dtype=int)
 
     # get the subset that intersect the day in a roundabout way
     starts_tmp = list(minimum(maximum(i, day_start), day_stop) for i in starts)

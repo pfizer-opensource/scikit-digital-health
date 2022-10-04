@@ -126,7 +126,9 @@ html_title = f"{project} Documentation"
 # 'searchbox.html']``.
 #
 # html_sidebars = {"**": ["globaltoc.html", "relations.html", "searchbox.html"]}
-html_sidebars = {"**": ["search-field.html", "sidebar-nav-bs.html", "sidebar-ethical-ads.html"]}
+html_sidebars = {
+    "**": ["search-field.html", "sidebar-nav-bs.html", "sidebar-ethical-ads.html"]
+}
 
 # -- Options for HTMLHelp output ---------------------------------------------
 

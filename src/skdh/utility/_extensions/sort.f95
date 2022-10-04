@@ -21,11 +21,11 @@ contains
     !     idx(m, order)  : integer(8), index of values to be rearranged (inplace) to match the sorting of x
     ! --------------------------------------------------------------------
     subroutine insertion_sort_2d(m, order, x, idx) bind(C, name="insertion_sort_2d")
-        integer(c_int), intent(in) :: m, order
+        integer(c_long), intent(in) :: m, order
         real(c_double), intent(inout) :: x(m, order)
-        integer(c_int), intent(inout) :: idx(m, order)
+        integer(c_long), intent(inout) :: idx(m, order)
         !
-        integer(c_int) :: i, j, jj, itemp(m)
+        integer(c_long) :: i, j, jj, itemp(m)
         real(c_double) :: temp(m)
 
         if ( order .LT. 40) then
@@ -48,7 +48,7 @@ contains
     end subroutine
 
     ! --------------------------------------------------------------------
-    ! SUBROUTINE  quick_argsort_int_
+    ! SUBROUTINE  quick_argsort_long_
     !     Perform a double pivot quicksort, inplace, on a 1d array of integers and its indices
     !
     !     adapted from https://www.mjr19.org.uk/IT/sorts/
@@ -60,12 +60,12 @@ contains
     !     x(n)    : integer(8), array of values to sort (inplace)
     !     idx(n)  : integer(8), index of values to be rearranged (inplace) to match the sorting of x
     ! --------------------------------------------------------------------
-    recursive subroutine quick_argsort_int_(n, x, idx) bind(C, name="quick_argsort_int_")
-        integer(c_int), intent(in) :: n
-        integer(c_int), intent(inout) :: x(n)
-        integer(c_int), intent(inout) :: idx(n)
+    recursive subroutine quick_argsort_long_(n, x, idx) bind(C, name="quick_argsort_long_")
+        integer(c_long), intent(in) :: n
+        integer(c_long), intent(inout) :: x(n)
+        integer(c_long), intent(inout) :: idx(n)
         ! local
-        integer(c_int) :: i, j, k, l, g, itemp, ip1, ip2, temp, p1, p2
+        integer(c_long) :: i, j, k, l, g, itemp, ip1, ip2, temp, p1, p2
 
         ! use insertion sort on small arrays
         if (n .lt. 40) then
@@ -162,15 +162,15 @@ contains
             ! index
             idx(1) = idx(l - 1)
             idx(l - 1) = ip1
-            call quick_argsort_int_(l-2, x(1:l-2), idx(1:l-2))
+            call quick_argsort_long_(l-2, x(1:l-2), idx(1:l-2))
         end if
-        call quick_argsort_int_(g-l, x(l:g-1), idx(l:g-1))
+        call quick_argsort_long_(g-l, x(l:g-1), idx(l:g-1))
         if (g .lt. n) then
             x(n) = x(g)
             x(g) = p2
             idx(n) = idx(g)
             idx(g) = ip2
-            call quick_argsort_int_(n-g, x(g+1:n), idx(g+1:n))
+            call quick_argsort_long_(n-g, x(g+1:n), idx(g+1:n))
         end if
     end subroutine
     ! --------------------------------------------------------------------
@@ -187,11 +187,11 @@ contains
     !     idx(n)  : integer(8), index of values to be rearranged (inplace) to match the sorting of x
     ! --------------------------------------------------------------------
     recursive subroutine quick_argsort_(n, x, idx) bind(C, name="quick_argsort_")
-        integer(c_int), intent(in) :: n
+        integer(c_long), intent(in) :: n
         real(c_double), intent(inout) :: x(n)
-        integer(c_int), intent(inout) :: idx(n)
+        integer(c_long), intent(inout) :: idx(n)
         ! local
-        integer(c_int) :: i, j, k, l, g, itemp, ip1, ip2
+        integer(c_long) :: i, j, k, l, g, itemp, ip1, ip2
         real(c_double) :: temp, p1, p2
         
         ! use insertion sort on small arrays
@@ -315,10 +315,10 @@ contains
     !     x(n)  : real(8), array of values to sort (inplace)
     ! --------------------------------------------------------------------
     recursive subroutine quick_sort_(n, x) bind(C, name="quick_sort_")
-        integer(c_int), intent(in) :: n
+        integer(c_long), intent(in) :: n
         real(c_double), intent(inout) :: x(n)
     !f2py intent(hide) :: n
-        integer(c_int) :: i, j, k, l, g
+        integer(c_long) :: i, j, k, l, g
         real(c_double) :: temp, p1, p2
         
         ! use insertion sort on small arrays
