@@ -13,7 +13,10 @@ jobs:
       matrix:
         python-version: [3.8]  #, 3.7, 3.9, '3.10']
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          ref: "0.10.0"
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
@@ -36,4 +39,4 @@ jobs:
       - name: Upload to twine
         env:
           TESTPYPI: ${{ secrets.TESTPYPI }}
-        run: python -m twine upload --repository testpypi -u __token__ -p $TESTPYPI dist/*
+        run: python -m twine upload --skip-existing -u __token__ -p $TESTPYPI dist/*
