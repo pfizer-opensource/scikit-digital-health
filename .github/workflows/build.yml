@@ -2,8 +2,10 @@ name: build_skdh
 on:
   push:
     # pattern match tags
-    tags:
-      - '*'
+#    tags:
+#      - '*'
+    branches:
+      - "development"
 jobs:
   build_macosx_x86:
     runs-on: macos-latest
