@@ -1,7 +1,7 @@
 import pytest
 from numpy import allclose, array
 
-from skdh.preprocessing.wear_detection import AccelThresholdWearDetection, DETACH
+from skdh.preprocessing.wear_detection import AccelThresholdWearDetection, DETACH, CountWearDetection
 
 
 class TestDETACH:
@@ -14,6 +14,17 @@ class TestDETACH:
 
         # wear is only off by a little-bit from middle 3rd of data (120000 - 240000)
         assert allclose(res['wear'], array([[0, 119600], [240500, 360000]]))
+
+
+class TestCountWearDetection:
+    def test(self, dummy_imu_data):
+        time, accel, _, fs = dummy_imu_data
+
+        cwd = CountWearDetection()
+
+        res = cwd.predict(time=time, accel=accel, fs=fs)
+
+        assert True
 
 
 class TestDetectWearAccelThreshold:
