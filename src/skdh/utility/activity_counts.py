@@ -68,6 +68,11 @@ def get_activity_counts(fs, time, accel, epoch_seconds=60):
         in ActiGraph wearable,” Sci Rep, vol. 12, no. 1, Art. no. 1, Jul. 2022,
         doi: 10.1038/s41598-022-16003-x.
 
+    Notes
+    -----
+    This implementation is still slightly different than that provided in [1]_.
+    Foremost is that the down-sampling is different to accommodate other sensor types
+    that have different sampling frequencies than what might be provided by ActiGraph.
     """
     # 3. down-sample to 30hz
     time_ds, (acc_ds,) = apply_downsample(
