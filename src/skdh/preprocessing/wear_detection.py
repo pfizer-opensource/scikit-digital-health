@@ -140,7 +140,7 @@ class DETACH(BaseProcess):
 
         Returns
         -------
-        results : dictionary
+        results : dict
             Dictionary of inputs, plus the key `wear` which is an array-like (N, 2)
             indicating the start and stop indices of wear.
         """
@@ -169,6 +169,15 @@ class DETACH(BaseProcess):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
         """
+        super().predict(
+            expect_days=False,
+            expect_wear=False,
+            time=time,
+            accel=accel,
+            temperature=temperature,
+            fs=fs,
+            **kwargs
+        )
         # dont start at 0 due to timestamp weirdness with some devices
         fs = 1 / mean(diff(time[1000:5000])) if fs is None else fs
 
@@ -413,7 +422,7 @@ class CtaWearDetection(BaseProcess):
 
         Returns
         -------
-        results : dictionary
+        results : dict
             Dictionary of inputs, plus the key `wear` which is an array-like (N, 2)
             indicating the start and stop indices of wear.
         """
@@ -423,6 +432,7 @@ class CtaWearDetection(BaseProcess):
             time=time,
             accel=accel,
             temperature=temperature,
+            fs=fs,
             **kwargs,
         )
         if temperature is None:
@@ -488,6 +498,7 @@ class CtaWearDetection(BaseProcess):
                 self._acc: accel,
                 "temperature": temperature,
                 "wear": wear_idx,
+                'fs': 'fs',
             }
         )
 
@@ -608,7 +619,7 @@ class AccelThresholdWearDetection(BaseProcess):
         self.wlen = window_length
         self.wskip = window_skip
 
-    def predict(self, time=None, accel=None, temperature=None, **kwargs):
+    def predict(self, time=None, accel=None, *, fs=None, temperature=None, **kwargs):
         """
         Detect the periods of non-wear
 
@@ -618,12 +629,15 @@ class AccelThresholdWearDetection(BaseProcess):
             (N, ) array of unix timestamps (in seconds) since 1970-01-01.
         accel : numpy.ndarray
             (N, 3) array of measured acceleration values in units of g.
+        fs : float, optional
+            Sampling frequency, in Hz. If not provided, will be computed from
+            `time`.
         temperature : numpy.ndarray
             (N,) array of measured temperature values during recording in deg C.
 
         Returns
         -------
-        results : dictionary
+        results : dict
             Dictionary of inputs, plus the key `wear` which is an array-like (N, 2)
             indicating the start and stop indices of wear.
         """
@@ -632,6 +646,7 @@ class AccelThresholdWearDetection(BaseProcess):
             expect_wear=False,
             time=time,
             accel=accel,
+            fs=fs,
             temperature=temperature,
             **kwargs,
         )
@@ -665,6 +680,7 @@ class AccelThresholdWearDetection(BaseProcess):
                 self._acc: accel,
                 "wear": wear,
                 "temperature": temperature,
+                'fs': "fs",
             }
         )
         return (kwargs, None) if self._in_pipeline else kwargs
