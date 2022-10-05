@@ -619,7 +619,7 @@ class AccelThresholdWearDetection(BaseProcess):
         self.wlen = window_length
         self.wskip = window_skip
 
-    def predict(self, time=None, accel=None, *, fs=None, temperature=None, **kwargs):
+    def predict(self, time=None, accel=None, *, fs=None, **kwargs):
         """
         Detect the periods of non-wear
 
@@ -632,8 +632,6 @@ class AccelThresholdWearDetection(BaseProcess):
         fs : float, optional
             Sampling frequency, in Hz. If not provided, will be computed from
             `time`.
-        temperature : numpy.ndarray
-            (N,) array of measured temperature values during recording in deg C.
 
         Returns
         -------
@@ -647,7 +645,6 @@ class AccelThresholdWearDetection(BaseProcess):
             time=time,
             accel=accel,
             fs=fs,
-            temperature=temperature,
             **kwargs,
         )
         # dont start at zero due to timestamp weirdness with some devices
@@ -679,7 +676,6 @@ class AccelThresholdWearDetection(BaseProcess):
                 self._time: time,
                 self._acc: accel,
                 "wear": wear,
-                "temperature": temperature,
                 'fs': "fs",
             }
         )
