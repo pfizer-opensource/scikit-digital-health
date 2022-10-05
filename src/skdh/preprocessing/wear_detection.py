@@ -339,6 +339,72 @@ class DETACH(BaseProcess):
         return (kwargs, None) if self._in_pipeline else kwargs
 
 
+class CountWearDetection(BaseProcess):
+    r"""
+    Detect periods of wear/non-wear from acceleromter data using an implementation
+    similar to the ActiGraph counts metric. Consecutive periods of zero activity
+    counts are classified as non-wear.
+
+    Parameters
+    ----------
+    nonwear_window_min : int, optional
+        Minutes of zero count to consider nonwear. Default is 90 [2]_.
+    epoch_seconds : int, optional
+        Number of seconds to accumulate counts for. Default is 60 seconds.
+
+    References
+    ----------
+    .. [1] C. E. Matthews et al., “Amount of Time Spent in Sedentary Behaviors in
+        the United States, 2003–2004,” American Journal of Epidemiology,
+        vol. 167, no. 7, pp. 875–881, Apr. 2008, doi: 10.1093/aje/kwm390.
+    .. [2] L. Choi, Z. Liu, C. E. Matthews, and M. S. Buchowski, “Validation of
+        Accelerometer Wear and Nonwear Time Classification Algorithm,”
+        Medicine & Science in Sports & Exercise, vol. 43, no. 2, pp. 357–364,
+        Feb. 2011, doi: 10.1249/MSS.0b013e3181ed61a3.
+
+    Notes
+    -----
+
+    """
+    def __init__(self, nonwear_window_min=90, epoch_seconds=60):
+        nonwear_window_min = int(nonwear_window_min)
+        epoch_seconds = int(epoch_seconds)
+
+        super().__init__(nonwear_window_min=nonwear_window_min, epoch_seconds=epoch_seconds)
+
+        self.nonwear_window_min = nonwear_window_min
+        self.epoch_seconds = epoch_seconds
+
+    def predict(self, time=None, accel=None, *, fs=None, **kwargs):
+        """
+        Detect periods of non-wear.
+
+        Parameters
+        ----------
+        time : numpy.ndarray
+            (N, ) array of unix timestamps (in seconds) since 1970-01-01.
+        accel : numpy.ndarray
+            (N, 3) array of measured acceleration values in units of g.
+        fs : float, optional
+            Sampling frequency, in Hz. If not provided, will be computed from
+            `time`.
+
+        Returns
+        -------
+        results : dict
+            Dictionary of inputs, plus the key `wear` which is an array (N, 2)
+            indicating the start and stop indices of wear.
+        """
+        super().predict(
+            expect_days=False,
+            expect_wear=False,
+            time=time,
+            accel=accel,
+            fs=fs,
+            **kwargs
+        )
+
+
 class CtaWearDetection(BaseProcess):
     r"""
     Detect periods of wear/non-wear from accelerometer and temperature data. CTA
