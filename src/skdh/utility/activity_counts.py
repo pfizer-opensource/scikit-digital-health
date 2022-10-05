@@ -46,7 +46,7 @@ output_coef = array(
 )
 
 
-def get_activity_counts(fs, time, accel, epoch_seconds=60, round=False):
+def get_activity_counts(fs, time, accel, epoch_seconds=60):
     """
     Compute the activity counts from acceleration.
 
@@ -60,8 +60,6 @@ def get_activity_counts(fs, time, accel, epoch_seconds=60, round=False):
         Nx3 array of measured acceleration values, in units of g.
     epoch_seconds : int, optional
         Number of seconds in an epoch (time unit for counts). Default is 60 seconds.
-    round : bool, optional
-        Round down-sampled data to 3 decimal places. Default is False.
 
     Returns
     -------
@@ -77,8 +75,7 @@ def get_activity_counts(fs, time, accel, epoch_seconds=60, round=False):
         fs=fs,
     )
 
-    if round:
-        acc_ds = around(acc_ds, decimals=3)
+    acc_ds = around(acc_ds, decimals=3)
 
     # filter the data
     # NOTE: this is the actigraph implementation - they specifically use
