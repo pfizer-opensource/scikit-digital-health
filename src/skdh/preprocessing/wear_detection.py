@@ -22,14 +22,17 @@ from numpy import (
     full,
     sort,
     unique,
+    zeros,
     asarray,
     ascontiguousarray,
 )
+from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt
 
 from skdh.base import BaseProcess
-from skdh.utility import moving_mean, moving_sd, moving_max, moving_min
+from skdh.utility import moving_mean, moving_sd, moving_max, moving_min, get_windowed_view
 from skdh.utility.internal import rle
+from skdh.utility.activity_counts import get_activity_counts
 
 
 class DETACH(BaseProcess):
@@ -412,6 +415,87 @@ class CountWearDetection(BaseProcess):
             fs=fs,
             **kwargs
         )
+
+        # don't start at 0 due to timestamp weirdness with some devices
+        fs = 1 / mean(diff(time[1000:5000])) if fs is None else fs
+
+        # compute the activity counts
+        axis_counts = get_activity_counts(fs, time, accel, epoch_seconds=self.epoch_seconds)
+        # compute single counts vector
+        counts = norm(axis_counts, axis=1)
+
+        # get values for specified non-wear window time
+        epoch_min = self.epoch_seconds / 60
+        wlen = int(self.nonwear_window_min / epoch_min)
+        wlen_2 = int(2 / epoch_min)
+        wlen_30 = int(30 / epoch_min)
+
+        # get run length encoding of counts above 0
+        lengths, starts, values = rle(counts > 0)
+
+        # get starts and stops of periods longer than 90min
+        mask = (values == 0) & (lengths >= wlen)
+        nonwear_starts = starts[mask]
+        nonwear_stops = starts[mask] + lengths[mask]
+
+        # account for up to 2 min blocks with activity surrounded by +-30min of count=0
+        # add "+ 1" to account for not starting with 1st block
+        idx_lt2 = nonzero((lengths[1:-1] <= wlen_2) & (values[1:-1] == 0))[0] + 1
+
+        # get locations of "valid" nonwear interrupt
+        interrupt_mask = (lengths[idx_lt2 - 1] >= wlen_30) & (lengths[idx_lt2 + 1] >= wlen_30)
+        idx_interrupt = idx_lt2[interrupt_mask]
+
+        # get the starts of nonwear interrupts
+        nonwear_interrupt_starts = starts[idx_interrupt]
+        # check how far into the future/pas we have to search to ensure we have 90 minutes
+        idx_fwd = zeros(nonwear_interrupt_starts.size)
+        idx_bkw = zeros(nonwear_interrupt_starts.size)
+        for i, st in enumerate(nonwear_interrupt_starts):
+            # get number of interrupt starts in next 90min (always be at least 1)
+            starts_fwd = (nonwear_interrupt_starts[i:] < (st + wlen)).sum()
+            idx_fwd[i] = starts_fwd * 2 - 1  # 1: +1, 2: +3, etc
+            # can be 0
+            starts_bkw = (nonwear_interrupt_starts[:i] > (st - wlen)).sum()
+            idx_bkw[i] = -starts_bkw * 2 - 1  # 0: -1, 1: -3, etc
+
+        # remove any interrupts that are not in a 90min period of zero counts
+        interrupt_mask &= sum(lengths[idx_lt2 + idx_bkw:idx_lt2 + idx_fwd]) > wlen
+
+        # get final nonwear interrupt starts & ends
+        nonwear_int_starts = starts[idx_lt2[interrupt_mask]]
+        nonwear_int_stops = nonwear_int_starts + lengths[idx_lt2[interrupt_mask]]
+
+        # combine normal & interrupt starts
+        nonwear_starts = concatenate((nonwear_starts, nonwear_int_starts))
+        nonwear_stops = concatenate((nonwear_stops, nonwear_int_stops))
+
+        # invert nonwear to wear
+        wear_starts = nonwear_stops[nonwear_stops < time.size]
+        wear_stops = nonwear_starts[nonwear_starts > 0]
+
+        # handle a wear start at zero
+        if nonwear_starts[0] > 0:
+            wear_starts = insert(wear_starts, 0, 0)
+        # handle a wear end at the end of the array
+        if nonwear_stops[-1] < time.size:
+            wear_stops = append(wear_stops, time.size)
+
+        # create a single wear array, and put it back into the correct
+        # units for indexing
+        wear = concatenate((wear_starts, wear_stops)).reshape((2, -1)).T
+
+        # update kwargs
+        kwargs.update(
+            {
+                self._time: time,
+                self._acc: accel,
+                "fs": fs,
+                "wear": wear,
+            }
+        )
+
+        return (kwargs, None) if self._in_pipeline else kwargs
 
 
 class CtaWearDetection(BaseProcess):
