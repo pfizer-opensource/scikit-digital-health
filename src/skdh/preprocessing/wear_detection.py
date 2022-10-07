@@ -100,7 +100,10 @@ class DETACH(BaseProcess):
                 UserWarning,
             )
 
-        if not isinstance(window_size, int) and window_size not in ['scaled', 'original']:
+        if not isinstance(window_size, int) and window_size not in [
+            "scaled",
+            "original",
+        ]:
             raise ValueError("`window_size` must be an int, or 'scaled' or 'original'")
         if isinstance(window_size, int):
             if window_size > 15:
@@ -179,19 +182,19 @@ class DETACH(BaseProcess):
             accel=accel,
             temperature=temperature,
             fs=fs,
-            **kwargs
+            **kwargs,
         )
         # dont start at 0 due to timestamp weirdness with some devices
         fs = 1 / mean(diff(time[1000:5000])) if fs is None else fs
 
         if isinstance(self.wsize, (int, float)):
             wsize = int(self.wsize)
-        elif self.wsize.lower() == 'scaled':
+        elif self.wsize.lower() == "scaled":
             wsize = int(300 / fs)
-        elif self.wsize.lower() == 'original':
+        elif self.wsize.lower() == "original":
             wsize = 4
         else:
-            raise ValueError('Specified `window_size` in initialization not understood')
+            raise ValueError("Specified `window_size` in initialization not understood")
 
         # calculate default window lengths
         wlen_ds = int(fs * wsize)
@@ -233,13 +236,15 @@ class DETACH(BaseProcess):
         # find spots where at least N axes are below the StD threshold for at
         # least 90% of the next 5 minutes  (90% criteria below)
         perc_under_sd_range_5min_fwd = moving_mean(
-            n_ax_under_sd_range_fwd >= self.n_ax,  # if more than N axes under StD Thresh
+            n_ax_under_sd_range_fwd
+            >= self.n_ax,  # if more than N axes under StD Thresh
             wlen_5min,
             wlen_ds,
             trim=False,
         )
         perc_under_sd_range_5min_bwd = moving_mean(
-            n_ax_under_sd_range_bwd >= self.n_ax,  # if more than N axes under StD Thresh
+            n_ax_under_sd_range_bwd
+            >= self.n_ax,  # if more than N axes under StD Thresh
             wlen_5min,
             wlen_ds,
             trim=False,
@@ -248,10 +253,10 @@ class DETACH(BaseProcess):
         # match the number of points between accel and temperature by down-sampling
         # accel to temperature
         # rsd_acc not used anymore
-        n_ax_under_sd_range_fwd = n_ax_under_sd_range_fwd[::wlen_ds][:temp_ds.size]
-        n_ax_under_sd_range_bwd = n_ax_under_sd_range_bwd[::wlen_ds][:temp_ds.size]
-        perc_under_sd_range_5min_fwd = perc_under_sd_range_5min_fwd[:temp_ds.size]
-        perc_under_sd_range_5min_bwd = perc_under_sd_range_5min_bwd[:temp_ds.size]
+        n_ax_under_sd_range_fwd = n_ax_under_sd_range_fwd[::wlen_ds][: temp_ds.size]
+        n_ax_under_sd_range_bwd = n_ax_under_sd_range_bwd[::wlen_ds][: temp_ds.size]
+        perc_under_sd_range_5min_fwd = perc_under_sd_range_5min_fwd[: temp_ds.size]
+        perc_under_sd_range_5min_bwd = perc_under_sd_range_5min_bwd[: temp_ds.size]
 
         # Get the maximum & minimum temperature in 5 minute windows
         max_temp_5min = moving_max(temp_f, wlen_ds_5min, 1, trim=False)
@@ -262,7 +267,8 @@ class DETACH(BaseProcess):
 
         # get candidate non-wear start times. 90% criteria next 5 minutes comes here
         candidate_nw_starts = nonzero(
-            (n_ax_under_sd_range_fwd >= self.n_ax) & (perc_under_sd_range_5min_fwd >= 0.9)
+            (n_ax_under_sd_range_fwd >= self.n_ax)
+            & (perc_under_sd_range_5min_fwd >= 0.9)
         )[0]
 
         # create the arrays of possible non-wear bout endings
@@ -345,7 +351,13 @@ class DETACH(BaseProcess):
         wear = concatenate((wear_starts, wear_stops)).reshape((2, -1)).T
 
         kwargs.update(
-            {self._time: time, self._acc: accel, self._temp: temperature, "wear": wear, "fs": fs}
+            {
+                self._time: time,
+                self._acc: accel,
+                self._temp: temperature,
+                "wear": wear,
+                "fs": fs,
+            }
         )
 
         return (kwargs, None) if self._in_pipeline else kwargs
@@ -388,11 +400,18 @@ class CountWearDetection(BaseProcess):
         Medicine & Science in Sports & Exercise, vol. 43, no. 2, pp. 357–364,
         Feb. 2011, doi: 10.1249/MSS.0b013e3181ed61a3.
     """
-    def __init__(self, nonwear_window_min=90, epoch_seconds=60, use_actigraph_package=False):
+
+    def __init__(
+        self, nonwear_window_min=90, epoch_seconds=60, use_actigraph_package=False
+    ):
         nonwear_window_min = int(nonwear_window_min)
         epoch_seconds = int(epoch_seconds)
 
-        super().__init__(nonwear_window_min=nonwear_window_min, epoch_seconds=epoch_seconds, use_actigraph_package=use_actigraph_package)
+        super().__init__(
+            nonwear_window_min=nonwear_window_min,
+            epoch_seconds=epoch_seconds,
+            use_actigraph_package=use_actigraph_package,
+        )
 
         self.nonwear_window_min = nonwear_window_min
         self.epoch_seconds = epoch_seconds
@@ -424,7 +443,7 @@ class CountWearDetection(BaseProcess):
             time=time,
             accel=accel,
             fs=fs,
-            **kwargs
+            **kwargs,
         )
 
         # don't start at 0 due to timestamp weirdness with some devices
@@ -434,11 +453,17 @@ class CountWearDetection(BaseProcess):
             try:
                 from agcounts.extract import get_counts
             except ImportError:
-                raise ImportError("Optional dependency `agcounts` not found. Install using `pip install agcounts`.")
-            axis_counts = get_counts(accel, freq=int(fs), epoch=self.epoch_seconds, fast=True, verbose=False)
+                raise ImportError(
+                    "Optional dependency `agcounts` not found. Install using `pip install agcounts`."
+                )
+            axis_counts = get_counts(
+                accel, freq=int(fs), epoch=self.epoch_seconds, fast=True, verbose=False
+            )
         else:
             # compute the activity counts
-            axis_counts = get_activity_counts(fs, time, accel, epoch_seconds=self.epoch_seconds)
+            axis_counts = get_activity_counts(
+                fs, time, accel, epoch_seconds=self.epoch_seconds
+            )
 
         # compute single counts vector
         counts = norm(axis_counts, axis=1)
@@ -462,7 +487,7 @@ class CountWearDetection(BaseProcess):
         idx_lt2 = idx_lt2[mask]
 
         for s, l in zip(starts[idx_lt2], lengths[idx_lt2]):
-            nonwear_counts[s:s + l] = -1
+            nonwear_counts[s : s + l] = -1
 
         # get run length encoding again, with modified values for interrupts
         lengths, starts, values = rle(nonwear_counts > 0)
@@ -654,7 +679,7 @@ class CtaWearDetection(BaseProcess):
                 self._acc: accel,
                 "temperature": temperature,
                 "wear": wear_idx,
-                'fs': 'fs',
+                "fs": "fs",
             }
         )
 
@@ -814,7 +839,9 @@ class AccelThresholdWearDetection(BaseProcess):
         acc_rsd = moving_sd(accel, n_wlen, n_wskip, axis=0, return_previous=False)
 
         # get the accelerometer range in each 60min window
-        acc_w_range = moving_max(accel, n_wlen, n_wskip, axis=0) - moving_min(accel, n_wlen, n_wskip, axis=0)
+        acc_w_range = moving_max(accel, n_wlen, n_wskip, axis=0) - moving_min(
+            accel, n_wlen, n_wskip, axis=0
+        )
 
         nonwear = (
             sum((acc_rsd < self.sd_crit) & (acc_w_range < self.range_crit), axis=1) >= 2
@@ -832,7 +859,7 @@ class AccelThresholdWearDetection(BaseProcess):
                 self._time: time,
                 self._acc: accel,
                 "wear": wear,
-                'fs': "fs",
+                "fs": "fs",
             }
         )
         return (kwargs, None) if self._in_pipeline else kwargs

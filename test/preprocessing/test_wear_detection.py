@@ -1,7 +1,11 @@
 import pytest
 from numpy import allclose, array, arange, zeros
 
-from skdh.preprocessing.wear_detection import AccelThresholdWearDetection, DETACH, CountWearDetection
+from skdh.preprocessing.wear_detection import (
+    AccelThresholdWearDetection,
+    DETACH,
+    CountWearDetection,
+)
 
 
 class TestDETACH:
@@ -13,13 +17,13 @@ class TestDETACH:
         res = detach.predict(time=time, accel=accel, temperature=temperature, fs=fs)
 
         # wear is only off by a little-bit from middle 3rd of data (120000 - 240000)
-        assert allclose(res['wear'], array([[0, 119600], [240500, 360000]]))
+        assert allclose(res["wear"], array([[0, 119600], [240500, 360000]]))
 
 
 class TestCountWearDetection:
     def test_nonwear_ends(self, np_rng):
         # generate some sample data
-        fs = 30.
+        fs = 30.0
         # make 7 hours of data
         t = arange(0, 3600 * 7, 1 / fs)
         x = zeros((t.size, 3))
@@ -28,20 +32,23 @@ class TestCountWearDetection:
         # count = 0 with an interrupt but less than 90min total
         idx = (array([2, 3, 3.5, 4, 5, 5.4]) * 3600 * fs).astype(int)
 
-        x[:, 2] = 1.
+        x[:, 2] = 1.0
         # noise
-        x[idx[0]:idx[1], :] = np_rng.normal(scale=0.1, size=(idx[1] - idx[0], 3))
-        x[idx[3]:idx[4], :] = np_rng.normal(scale=0.1, size=(idx[4] - idx[3], 3))
+        x[idx[0] : idx[1], :] = np_rng.normal(scale=0.1, size=(idx[1] - idx[0], 3))
+        x[idx[3] : idx[4], :] = np_rng.normal(scale=0.1, size=(idx[4] - idx[3], 3))
 
         # zero count interrupts
         n = int(60 * fs)
-        x[idx[2]:idx[2] + n] = np_rng.normal(scale=0.05, size=(n, 3))
-        x[idx[5]:idx[5] + n] = np_rng.normal(scale=0.05, size=(n, 3))
+        x[idx[2] : idx[2] + n] = np_rng.normal(scale=0.05, size=(n, 3))
+        x[idx[5] : idx[5] + n] = np_rng.normal(scale=0.05, size=(n, 3))
 
         # true wear array
         wear_true = array(
             [
-                [idx[0], idx[-1] + n + n],  # need an extra minute of index because of windowing
+                [
+                    idx[0],
+                    idx[-1] + n + n,
+                ],  # need an extra minute of index because of windowing
             ]
         )
 
@@ -49,11 +56,11 @@ class TestCountWearDetection:
 
         res = cwd.predict(time=t, accel=x, fs=fs)
 
-        assert allclose(res['wear'], wear_true)
+        assert allclose(res["wear"], wear_true)
 
     def test_nonwear_middle(self, np_rng):
         # generate some sample data
-        fs = 30.
+        fs = 30.0
         # make 7 hours of data
         t = arange(0, 3600 * 7, 1 / fs)
         x = zeros((t.size, 3))
@@ -73,21 +80,24 @@ class TestCountWearDetection:
         n = int(60 * fs)
         i = int(3600 * 3 * fs)
         # minute spike of data
-        x[i:i + n, 0] = np_rng.normal(scale=0.15, size=n)
+        x[i : i + n, 0] = np_rng.normal(scale=0.15, size=n)
 
         # 34 min later (just outside 30min window)
         i = i + int(34 * 60 * fs)
-        x[i:i + n, 1] = np_rng.normal(scale=0.15, size=n)
+        x[i : i + n, 1] = np_rng.normal(scale=0.15, size=n)
 
         # movement less than 30min before wear at end
         i3 = int(3600 * 5.6 * fs)
-        x[i3:i3 + n, 0] = np_rng.normal(scale=0.15, size=n)
+        x[i3 : i3 + n, 0] = np_rng.normal(scale=0.15, size=n)
 
         # create true wear array
         wear_true = array(
             [
-                [0, i1 + int(60 * fs)],  # have to add a second due to the way the windowing works
-                [i3, t.size]
+                [
+                    0,
+                    i1 + int(60 * fs),
+                ],  # have to add a second due to the way the windowing works
+                [i3, t.size],
             ]
         )
 
@@ -95,7 +105,7 @@ class TestCountWearDetection:
 
         res = cwd.predict(time=t, accel=x, fs=fs)
 
-        assert allclose(res['wear'], wear_true)
+        assert allclose(res["wear"], wear_true)
 
 
 class TestDetectWearAccelThreshold:

@@ -40,7 +40,7 @@ output_coef = array(
         0.01949130205890000000,
         0.00000000000000000000,
     ],
-    dtype=float_
+    dtype=float_,
 )
 
 

@@ -3,7 +3,7 @@ import numpy as np
 from scipy.signal import butter, sosfiltfilt, square
 
 
-@fixture(scope='class')
+@fixture(scope="class")
 def dummy_imu_data():
     rng = np.random.default_rng(24089752)
     # make 2 hours of data
@@ -43,12 +43,12 @@ def dummy_imu_data():
     temp[:i1t] += noise1[:i1t] * 20
     temp[i2t:] += noise3[:i1t] * 20
 
-    temp[i1t:i2t] = - np.sin(tt[:i1t] / 800) * 18 + 27
+    temp[i1t:i2t] = -np.sin(tt[:i1t] / 800) * 18 + 27
     temp[i1t:i2t] = np.maximum(temp[i1t:i2t], 20) + noise2[:i1t] * 3
 
     # do some filtering
-    sos_acc = butter(1, 2 * 5 / 50, output='sos', btype='low')
-    sos_temp = butter(4, 0.15, output='sos', btype='low')
+    sos_acc = butter(1, 2 * 5 / 50, output="sos", btype="low")
+    sos_temp = butter(4, 0.15, output="sos", btype="low")
 
     x = sosfiltfilt(sos_acc, x, axis=0)
     temp = sosfiltfilt(sos_temp, temp)

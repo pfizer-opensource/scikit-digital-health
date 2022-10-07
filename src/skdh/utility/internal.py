@@ -67,7 +67,12 @@ def get_day_index_intersection(starts, stops, for_inclusion, day_start, day_stop
         for_inclusion = (for_inclusion,) * len(starts)
 
     # check if we should just return empty
-    if all([i.size == 0 and j.size == 0 and k for i, j, k in zip(starts, stops, for_inclusion)]):
+    if all(
+        [
+            i.size == 0 and j.size == 0 and k
+            for i, j, k in zip(starts, stops, for_inclusion)
+        ]
+    ):
         return asarray([], dtype=int), asarray([], dtype=int)
 
     # get the subset that intersect the day in a roundabout way
