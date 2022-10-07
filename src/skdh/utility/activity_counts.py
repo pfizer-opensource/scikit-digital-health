@@ -4,12 +4,14 @@ Computation of activity counts.
 Lukas Adamowicz
 Copyright (c) 2022. Pfizer Inc. All rights reserved.
 """
-from numpy import array, around, repeat, abs, minimum, floor, float_
+from numpy import array, repeat, abs, minimum, floor, float_
 from scipy.signal import lfilter_zi, lfilter
 
 from skdh.utility.internal import apply_downsample
 from skdh.utility import moving_mean
 
+
+__all__ = ["get_activity_counts"]
 
 input_coef = array(
     [
