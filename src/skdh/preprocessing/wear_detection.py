@@ -430,48 +430,28 @@ class CountWearDetection(BaseProcess):
         wlen_2 = int(2 / epoch_min)
         wlen_30 = int(30 / epoch_min)
 
-        # get run length encoding of counts above 0
-        lengths, starts, values = rle(counts > 0)
+        # 1  : counts > 0
+        # 0  : counts == 0
+        # -1 : valid nonwear interrupt
+        nonwear_counts = (counts > 0).astype(int)
+        lengths, starts, values = rle(nonwear_counts)
 
-        # get starts and stops of periods longer than 90min
-        mask = (values == 0) & (lengths >= wlen)
-        nonwear_starts = starts[mask]
-        nonwear_stops = starts[mask] + lengths[mask]
-
-        # account for up to 2 min blocks with activity surrounded by +-30min of count=0
-        # add "+ 1" to account for not starting with 1st block
+        # get all instances of less than 2 min windows of interrupts
         idx_lt2 = nonzero((lengths[1:-1] <= wlen_2) & (values[1:-1] == 1))[0] + 1
+        # get interrupts with +-30min counts == 0
+        mask = (lengths[idx_lt2 - 1] >= wlen_30) & (lengths[idx_lt2 + 1] >= wlen_30)
+        idx_lt2 = idx_lt2[mask]
 
-        # get locations of "valid" nonwear interrupt
-        interrupt_mask = (lengths[idx_lt2 - 1] >= wlen_30) & (lengths[idx_lt2 + 1] >= wlen_30)
-        idx_interrupt = idx_lt2[interrupt_mask]
+        for s, l in zip(starts[idx_lt2], lengths[idx_lt2]):
+            nonwear_counts[s:s + l] = -1
 
-        # get the starts of nonwear interrupts
-        nonwear_interrupt_starts = starts[idx_interrupt]
-        # check how far into the future/pas we have to search to ensure we have 90 minutes
-        idx_fwd = zeros(nonwear_interrupt_starts.size, dtype=int)
-        idx_bkw = zeros(nonwear_interrupt_starts.size, dtype=int)
-        for i, st in enumerate(nonwear_interrupt_starts):
-            # get number of interrupt starts in next 90min (always be at least 1)
-            starts_fwd = (nonwear_interrupt_starts[i:] < (st + wlen)).sum()
-            idx_fwd[i] = starts_fwd * 2 - 1  # 1: +1, 2: +3, etc
-            # can be 0
-            starts_bkw = (nonwear_interrupt_starts[:i] > (st - wlen)).sum()
-            idx_bkw[i] = -starts_bkw * 2 - 1  # 0: -1, 1: -3, etc
+        # get run length encoding again, with modified values for interrupts
+        lengths, starts, values = rle(nonwear_counts > 0)
 
-        # remove any interrupts that are not in a 90min period of zero counts
-        for i, (bk, fw) in enumerate(zip(idx_bkw, idx_fwd)):
-            i1 = idx_interrupt[i] + bk
-            i2 = idx_interrupt[i] + fw
-            interrupt_mask[i] &= (sum(lengths[i1:i2]) > wlen)
-
-        # get final nonwear interrupt starts & ends
-        nonwear_int_starts = starts[idx_lt2[interrupt_mask]]
-        nonwear_int_stops = nonwear_int_starts + lengths[idx_lt2[interrupt_mask]]
-
-        # combine normal & interrupt starts
-        nonwear_starts = concatenate((nonwear_starts, nonwear_int_starts))
-        nonwear_stops = concatenate((nonwear_stops, nonwear_int_stops))
+        # get nonwear starts and stops
+        mask = (lengths > wlen) & (values == 0)
+        nonwear_starts = starts[mask]
+        nonwear_stops = nonwear_starts + lengths[mask]
 
         # invert nonwear to wear
         wear_starts = nonwear_stops[nonwear_stops < time.size]
