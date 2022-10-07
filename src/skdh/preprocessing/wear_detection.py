@@ -474,6 +474,10 @@ class CountWearDetection(BaseProcess):
         wear_starts = nonwear_stops[nonwear_stops < time.size]
         wear_stops = nonwear_starts[nonwear_starts > 0]
 
+        # convert back to original indices
+        wear_starts *= int(self.epoch_seconds * fs)
+        wear_stops *= int(self.epoch_seconds * fs)
+
         # handle a wear start at zero
         if nonwear_starts[0] > 0:
             wear_starts = insert(wear_starts, 0, 0)
