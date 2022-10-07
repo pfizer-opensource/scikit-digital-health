@@ -440,7 +440,7 @@ class CountWearDetection(BaseProcess):
 
         # account for up to 2 min blocks with activity surrounded by +-30min of count=0
         # add "+ 1" to account for not starting with 1st block
-        idx_lt2 = nonzero((lengths[1:-1] <= wlen_2) & (values[1:-1] == 0))[0] + 1
+        idx_lt2 = nonzero((lengths[1:-1] <= wlen_2) & (values[1:-1] == 1))[0] + 1
 
         # get locations of "valid" nonwear interrupt
         interrupt_mask = (lengths[idx_lt2 - 1] >= wlen_30) & (lengths[idx_lt2 + 1] >= wlen_30)
@@ -449,8 +449,8 @@ class CountWearDetection(BaseProcess):
         # get the starts of nonwear interrupts
         nonwear_interrupt_starts = starts[idx_interrupt]
         # check how far into the future/pas we have to search to ensure we have 90 minutes
-        idx_fwd = zeros(nonwear_interrupt_starts.size)
-        idx_bkw = zeros(nonwear_interrupt_starts.size)
+        idx_fwd = zeros(nonwear_interrupt_starts.size, dtype=int)
+        idx_bkw = zeros(nonwear_interrupt_starts.size, dtype=int)
         for i, st in enumerate(nonwear_interrupt_starts):
             # get number of interrupt starts in next 90min (always be at least 1)
             starts_fwd = (nonwear_interrupt_starts[i:] < (st + wlen)).sum()
@@ -460,7 +460,10 @@ class CountWearDetection(BaseProcess):
             idx_bkw[i] = -starts_bkw * 2 - 1  # 0: -1, 1: -3, etc
 
         # remove any interrupts that are not in a 90min period of zero counts
-        interrupt_mask &= sum(lengths[idx_lt2 + idx_bkw:idx_lt2 + idx_fwd]) > wlen
+        for i, (bk, fw) in enumerate(zip(idx_bkw, idx_fwd)):
+            i1 = idx_interrupt[i] + bk
+            i2 = idx_interrupt[i] + fw
+            interrupt_mask[i] &= (sum(lengths[i1:i2]) > wlen)
 
         # get final nonwear interrupt starts & ends
         nonwear_int_starts = starts[idx_lt2[interrupt_mask]]
