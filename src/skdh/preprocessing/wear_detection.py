@@ -454,7 +454,7 @@ class CountWearDetection(BaseProcess):
         nonwear_stops = nonwear_starts + lengths[mask]
 
         # invert nonwear to wear
-        wear_starts = nonwear_stops[nonwear_stops < time.size]
+        wear_starts = nonwear_stops[nonwear_stops < nonwear_counts.size]
         wear_stops = nonwear_starts[nonwear_starts > 0]
 
         # convert back to original indices
@@ -465,7 +465,7 @@ class CountWearDetection(BaseProcess):
         if nonwear_starts[0] > 0:
             wear_starts = insert(wear_starts, 0, 0)
         # handle a wear end at the end of the array
-        if nonwear_stops[-1] < time.size:
+        if nonwear_stops[-1] < nonwear_counts.size:
             wear_stops = append(wear_stops, time.size)
 
         # create a single wear array, and put it back into the correct
