@@ -30,7 +30,7 @@ from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt
 
 from skdh.base import BaseProcess
-from skdh.utility import moving_mean, moving_sd, moving_max, moving_min, get_windowed_view
+from skdh.utility import moving_mean, moving_sd, moving_max, moving_min
 from skdh.utility.internal import rle
 from skdh.utility.activity_counts import get_activity_counts
 
@@ -363,6 +363,20 @@ class CountWearDetection(BaseProcess):
         Minutes of zero count to consider nonwear. Default is 90 [2]_.
     epoch_seconds : int, optional
         Number of seconds to accumulate counts for. Default is 60 seconds.
+    use_actigraph_package : bool, optional
+        Use the internal calculation of activity counts
+        (:meth:`skdh.utility.get_activity_counts`), or the Python package published
+        by ActiGraph.
+
+    See Also
+    --------
+    utility.get_activity_counts : activity count calculation
+
+    Notes
+    -----
+    Note that the internal method for calculating activity counts will give slightly
+    different results than the package by ActiGraph, due to handling down-sampling
+    differently to handle different devices better.
 
     References
     ----------
@@ -373,19 +387,16 @@ class CountWearDetection(BaseProcess):
         Accelerometer Wear and Nonwear Time Classification Algorithm,”
         Medicine & Science in Sports & Exercise, vol. 43, no. 2, pp. 357–364,
         Feb. 2011, doi: 10.1249/MSS.0b013e3181ed61a3.
-
-    Notes
-    -----
-
     """
-    def __init__(self, nonwear_window_min=90, epoch_seconds=60):
+    def __init__(self, nonwear_window_min=90, epoch_seconds=60, use_actigraph_package=False):
         nonwear_window_min = int(nonwear_window_min)
         epoch_seconds = int(epoch_seconds)
 
-        super().__init__(nonwear_window_min=nonwear_window_min, epoch_seconds=epoch_seconds)
+        super().__init__(nonwear_window_min=nonwear_window_min, epoch_seconds=epoch_seconds, use_actigraph_package=use_actigraph_package)
 
         self.nonwear_window_min = nonwear_window_min
         self.epoch_seconds = epoch_seconds
+        self.use_ag_package = use_actigraph_package
 
     def predict(self, time=None, accel=None, *, fs=None, **kwargs):
         """
@@ -419,16 +430,24 @@ class CountWearDetection(BaseProcess):
         # don't start at 0 due to timestamp weirdness with some devices
         fs = 1 / mean(diff(time[1000:5000])) if fs is None else fs
 
-        # compute the activity counts
-        axis_counts = get_activity_counts(fs, time, accel, epoch_seconds=self.epoch_seconds)
+        if self.use_ag_package:
+            try:
+                from agcounts.extract import get_counts
+            except ImportError:
+                raise ImportError("Optional dependency `agcounts` not found. Install using `pip install agcounts`.")
+            axis_counts = get_counts(accel, freq=int(fs), epoch=self.epoch_seconds, fast=True, verbose=False)
+        else:
+            # compute the activity counts
+            axis_counts = get_activity_counts(fs, time, accel, epoch_seconds=self.epoch_seconds)
+
         # compute single counts vector
         counts = norm(axis_counts, axis=1)
 
         # get values for specified non-wear window time
         epoch_min = self.epoch_seconds / 60
         wlen = int(self.nonwear_window_min / epoch_min)
-        wlen_2 = int(2 / epoch_min)
-        wlen_30 = int(30 / epoch_min)
+        wlen_2 = int(2 / epoch_min)  # TODO make this a parameter?
+        wlen_30 = int(30 / epoch_min)  # TODO make this a parameter?
 
         # 1  : counts > 0
         # 0  : counts == 0
