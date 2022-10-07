@@ -1,5 +1,5 @@
 import pytest
-from numpy import allclose, array
+from numpy import allclose, array, arange, zeros
 
 from skdh.preprocessing.wear_detection import AccelThresholdWearDetection, DETACH, CountWearDetection
 
@@ -17,14 +17,55 @@ class TestDETACH:
 
 
 class TestCountWearDetection:
-    def test(self, dummy_imu_data):
-        time, accel, _, fs = dummy_imu_data
+    def test_nonwear_middle(self, np_rng):
+        # generate some sample data
+        fs = 20
+        # make 7 hours of data
+        t = arange(0, 3600 * 7, 1 / fs)
+        x = zeros((t.size, 3))
+
+        # 3hr block in middle of nonwear
+        i1 = int(3600 * fs)
+        i2 = int(3600 * 6 * fs)
+
+        # set baseline accel values
+        x[:, 2] = 1.0
+        # add some noise
+        x[:i1, 0] = np_rng.normal(scale=0.1, size=i1)
+        x[:i1, 1] = np_rng.normal(scale=0.1, size=i1)
+        x[:i1, 2] = np_rng.normal(scale=0.1, size=i1)
+
+        x[i2:, 0] = np_rng.normal(scale=0.1, size=t.size - i2)
+        x[i2:, 1] = np_rng.normal(scale=0.1, size=t.size - i2)
+        x[i2:, 2] = np_rng.normal(scale=0.1, size=t.size - i2)
+
+        # add some motion artefacts/<2min sensor knocks in the nonwear
+        n = int(60 * fs)
+        i = int(3600 * 3 * fs)
+        # minute spike of data
+        x[i:i + n, :] = np_rng.normal(scale=0.05, size=n)
+
+        # 34 min later (just outside 30min window)
+        i = i + int(34 * 60 * fs)
+        x[i:i + n, :] = np_rng.normal(scale=0.05, size=n)
+
+        # movement less than 30min before wear at end
+        i3 = int(3600 * 5.6 * fs)
+        x[i3:i3 + n, :] = np_rng.normal(scale=0.05, size=n)
+
+        # create true wear array
+        wear_true = array(
+            [
+                [0, i1],
+                [i3, t.size]
+            ]
+        )
 
         cwd = CountWearDetection()
 
-        res = cwd.predict(time=time, accel=accel, fs=fs)
+        res = cwd.predict(time=t, accel=x, fs=fs)
 
-        assert True
+        assert allclose(res['wear'], wear_true)
 
 
 class TestDetectWearAccelThreshold:
