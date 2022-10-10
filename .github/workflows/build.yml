@@ -1,9 +1,7 @@
 name: build_skdh
 on:
-  push:
-    # pattern match tags
-    tags:
-      - '*'
+  release:
+    types: [published]
 jobs:
   build_macosx_x86:
     runs-on: macos-latest
@@ -14,7 +12,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
-          ref: "0.10.0"
+          ref: ${{ github.ref_name }}
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
