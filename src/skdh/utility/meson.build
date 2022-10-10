@@ -1,6 +1,7 @@
 py3.install_sources(
     [
         '__init__.py',
+        'activity_counts.py',
         'fragmentation_endpoints.py',
         'internal.py',
         'math.py',

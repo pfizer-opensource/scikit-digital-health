@@ -50,7 +50,9 @@ class BaseMovingStatsTester:
             for p, t in zip(pred, truth):
                 assert allclose(p, t, equal_nan=True)
         else:
-            truth = self.get_truth(self.truth_function, x, xw, wlen, skip, trim, self.truth_kw)
+            truth = self.get_truth(
+                self.truth_function, x, xw, wlen, skip, trim, self.truth_kw
+            )
 
             pred = self.function(x, wlen, skip, trim=trim)
 
@@ -69,14 +71,18 @@ class BaseMovingStatsTester:
                 truth.append(self.get_truth(tf, x, xw, wlen, skip, trim, tkw))
 
             pred = self.function(x, wlen, skip, trim=trim, axis=0)
-            pred1 = self.function(x, wlen, skip, trim=trim, axis=0, return_previous=False)
+            pred1 = self.function(
+                x, wlen, skip, trim=trim, axis=0, return_previous=False
+            )
 
             for p, t in zip(pred, truth):
                 assert allclose(p, t, equal_nan=True)
 
             assert allclose(pred1, truth[0], equal_nan=True)
         else:
-            truth = self.get_truth(self.truth_function, x, xw, wlen, skip, trim, self.truth_kw)
+            truth = self.get_truth(
+                self.truth_function, x, xw, wlen, skip, trim, self.truth_kw
+            )
 
             pred = self.function(x, wlen, skip, trim=trim, axis=0)
 

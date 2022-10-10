@@ -55,6 +55,8 @@ from skdh.utility.orientation import correct_accelerometer_orientation
 from skdh.utility import orientation
 from skdh.utility.windowing import compute_window_samples, get_windowed_view
 from skdh.utility import windowing
+from skdh.utility import activity_counts
+from skdh.utility.activity_counts import *
 
 
 __all__ = (
@@ -63,4 +65,5 @@ __all__ = (
     + math.__all__
     + windowing.__all__
     + orientation.__all__
+    + activity_counts.__all__
 )

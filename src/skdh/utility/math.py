@@ -676,7 +676,9 @@ def moving_max(a, w_len, skip, trim=True, axis=-1):
         # move computation axis back to original place and return
         return moveaxis(rmax, -1, axis)
     else:
-        x = ascontiguousarray(moveaxis(a, axis, 0))  # need to move axis to the front for windowing
+        x = ascontiguousarray(
+            moveaxis(a, axis, 0)
+        )  # need to move axis to the front for windowing
         xw = get_windowed_view(x, w_len, skip)
         if trim:
             res = xw.max(axis=1)  # computation axis is still the second axis
@@ -790,7 +792,9 @@ def moving_min(a, w_len, skip, trim=True, axis=-1):
         # move computation axis back to original place and return
         return moveaxis(rmin, -1, axis)
     else:
-        x = ascontiguousarray(moveaxis(a, axis, 0))  # need to move axis to the front for windowing
+        x = ascontiguousarray(
+            moveaxis(a, axis, 0)
+        )  # need to move axis to the front for windowing
         xw = get_windowed_view(x, w_len, skip)
         if trim:
             res = xw.min(axis=1)  # computation axis is still the second axis
