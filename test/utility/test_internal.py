@@ -187,5 +187,5 @@ class TestInvertIndices:
         # 0       900
         pred_inv_starts, pred_inv_stops = invert_indices(array([]), array([]), 0, 900)
 
-        assert allclose(pred_inv_stops, array([0]))
+        assert allclose(pred_inv_starts, array([0]))
         assert allclose(pred_inv_stops, array([900]))
