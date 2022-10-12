@@ -344,7 +344,8 @@ class DETACH(BaseProcess):
             wear_starts = insert(wear_starts, 0, 0)
         # handle a wear end at the end of the array
         if nonwear_stops[-1] < time.size:
-            wear_stops = append(wear_stops, time.size)
+            # subtract one so can index this properly
+            wear_stops = append(wear_stops, time.size - 1)
 
         # create a single wear array, and put it back into the correct
         # units for indexing
@@ -510,7 +511,7 @@ class CountWearDetection(BaseProcess):
             wear_starts = insert(wear_starts, 0, 0)
         # handle a wear end at the end of the array
         if nonwear_stops[-1] < nonwear_counts.size:
-            wear_stops = append(wear_stops, time.size)
+            wear_stops = append(wear_stops, time.size - 1)
 
         # create a single wear array, and put it back into the correct
         # units for indexing
@@ -669,7 +670,7 @@ class CtaWearDetection(BaseProcess):
         if not wear[0]:
             wear_stops = wear_stops[1:]
         if wear[-1]:
-            wear_stops = append(wear_stops, accel.size)
+            wear_stops = append(wear_stops, time.size - 1)
 
         wear_idx = concatenate((wear_starts, wear_stops)).reshape((2, -1)).T
 
