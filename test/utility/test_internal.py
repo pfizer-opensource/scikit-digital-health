@@ -1,7 +1,7 @@
 import pytest
 from numpy import allclose, array, arange
 
-from skdh.utility.internal import get_day_index_intersection, apply_downsample, rle
+from skdh.utility.internal import get_day_index_intersection, apply_downsample, rle, invert_indices
 
 
 class TestGetDayIndexIntersection:
@@ -143,3 +143,49 @@ class TestRLE:
         assert allclose(lengths, [50])
         assert allclose(starts, [0])
         assert allclose(vals, [0])
+
+
+class TestInvertIndices:
+    def test(self):
+        # ||  |-------|       |-------|        |---------|        |----------|   ||
+        #  0  50     75      100     110      600       675      800        900  1000
+        starts = array([50, 100, 600, 800])
+        stops = array([75, 110, 675, 900])
+
+        true_inv_starts = array([0, 75, 110, 675, 900])
+        true_inv_stops = array([50, 100, 600, 800, 1000])
+
+        pred_inv_starts, pred_inv_stops = invert_indices(starts, stops, 0, 1000)
+
+        assert allclose(pred_inv_starts, true_inv_starts)
+        assert allclose(pred_inv_stops, true_inv_stops)
+
+        # ||-------|       |-------|        |---------|        |----------||
+        #  0      75      100     110      600       675      800        900
+        starts = array([0, 100, 600, 800])
+        stops = array([75, 110, 675, 900])
+
+        true_inv_starts = array([75, 110, 675])
+        true_inv_stops = array([100, 600, 800])
+
+        pred_inv_starts, pred_inv_stops = invert_indices(starts, stops, 0, 900)
+
+        assert allclose(pred_inv_starts, true_inv_starts)
+        assert allclose(pred_inv_stops, true_inv_stops)
+
+        # ||----------------||
+        #  0                900
+        starts = array([0])
+        stops = array([900])
+
+        pred_inv_starts, pred_inv_stops = invert_indices(starts, stops, 0, 900)
+
+        assert pred_inv_starts.size == 0
+        assert pred_inv_stops.size == 0
+
+        # ||       ||
+        # 0       900
+        pred_inv_starts, pred_inv_stops = invert_indices(array([]), array([]), 0, 900)
+
+        assert allclose(pred_inv_stops, array([0]))
+        assert allclose(pred_inv_stops, array([900]))
