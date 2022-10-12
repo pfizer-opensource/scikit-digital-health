@@ -6,6 +6,7 @@ Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from numpy import (
     asarray,
+    array,
     nonzero,
     insert,
     arange,
@@ -256,3 +257,52 @@ def rle(to_encode):
     values = asarray(to_encode)[starts]
 
     return lengths, starts, values
+
+
+def invert_indices(starts, stops, zero_index, end_index):
+    """
+    Invert indices from one set of starts and stops, to the opposite
+
+    Parameters
+    ----------
+    starts : numpy.ndarray
+        Array of start indices
+    stops : numpy.ndarray
+        Array of stop indices
+    zero_index : int
+        Start index for the array indexing into
+    end_index : int
+        End index for the array indexing into
+
+    Returns
+    -------
+    inv_starts : numpy.ndarray
+        Inverted array of start indices
+    inv_stops : numpy.ndarray
+        Inverted array of stop indices
+    """
+    if starts.size != stops.size:
+        raise ValueError("starts and stops indices arrays must be the same size")
+    if starts.size == 0:
+        return array([zero_index]), array([end_index])
+
+    """
+    if fi:  # flip everything to being an "exclude" window
+        tmp = insert(roll(start, -1), 0, start[0])
+        tmp[-1] = day_stop
+    
+        tmp_stop = insert(stop, 0, 0)
+    
+        starts_subset.append(tmp_stop[tmp_stop != tmp])
+        stops_subset.append(tmp[tmp_stop != tmp])
+    """
+    # in general, stops become starts, and starts become stops
+    inv_stops = insert(roll(starts, -1), 0, starts[0])
+    inv_stops[-1] = end_index
+
+    inv_starts = insert(stops, 0, 0)
+
+    # check for 0 length windows
+    mask = inv_starts != inv_stops
+
+    return inv_starts[mask], inv_stops[mask]
