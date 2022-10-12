@@ -22,7 +22,7 @@ from numpy import (
     full,
     sort,
     unique,
-    zeros,
+    isclose,
     asarray,
     ascontiguousarray,
 )
@@ -332,11 +332,15 @@ class DETACH(BaseProcess):
             prev_end = end
 
         # make non-wear indices into arrays, and invert
-        wear_starts, wear_stops = invert_indices(asarray(nonwear_starts), asarray(nonwear_stops), 0, n_ax_under_sd_range_fwd.size - 1)
+        wear_starts, wear_stops = invert_indices(asarray(nonwear_starts), asarray(nonwear_stops), 0, n_ax_under_sd_range_fwd.size)
 
         # convert to original indices
         wear_starts *= wlen_ds
         wear_stops *= wlen_ds
+
+        # handle case where end is end of array
+        if isclose(wear_stops[-1], n_ax_under_sd_range_fwd.size * wlen_ds):
+            wear_stops[-1] = time.size - 1
 
         # create a single wear array, and put it back into the correct
         # units for indexing
@@ -490,11 +494,15 @@ class CountWearDetection(BaseProcess):
         nonwear_stops = nonwear_starts + lengths[mask]
 
         # invert nonwear to wear
-        wear_starts, wear_stops = invert_indices(nonwear_starts, nonwear_stops, 0, nonwear_counts.size - 1)
+        wear_starts, wear_stops = invert_indices(nonwear_starts, nonwear_stops, 0, nonwear_counts.size)
 
         # convert back to original indices
         wear_starts *= int(self.epoch_seconds * fs)
         wear_stops *= int(self.epoch_seconds * fs)
+
+        # handle case where end is end of array
+        if isclose(wear_stops[-1], nonwear_counts.size * int(self.epoch_seconds * fs)):
+            wear_stops[-1] = time.size - 1
 
         # create a single wear array, and put it back into the correct
         # units for indexing
