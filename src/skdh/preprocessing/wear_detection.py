@@ -31,7 +31,7 @@ from scipy.signal import butter, sosfiltfilt
 
 from skdh.base import BaseProcess
 from skdh.utility import moving_mean, moving_sd, moving_max, moving_min
-from skdh.utility.internal import rle
+from skdh.utility.internal import rle, invert_indices
 from skdh.utility.activity_counts import get_activity_counts
 
 
@@ -331,21 +331,12 @@ class DETACH(BaseProcess):
             # reset the last end index
             prev_end = end
 
-        # make nonwear indices into an array, and convert back to original indices
-        nonwear_starts = asarray(nonwear_starts) * wlen_ds
-        nonwear_stops = asarray(nonwear_stops) * wlen_ds
+        # make non-wear indices into arrays, and invert
+        wear_starts, wear_stops = invert_indices(asarray(nonwear_starts), asarray(nonwear_stops), 0, n_ax_under_sd_range_fwd.size - 1)
 
-        # invert nonwear to wear
-        wear_starts = nonwear_stops[nonwear_stops < time.size]
-        wear_stops = nonwear_starts[nonwear_starts > 0]
-
-        # handle a wear start at zero
-        if nonwear_starts[0] > 0:
-            wear_starts = insert(wear_starts, 0, 0)
-        # handle a wear end at the end of the array
-        if nonwear_stops[-1] < time.size:
-            # subtract one so can index this properly
-            wear_stops = append(wear_stops, time.size - 1)
+        # convert to original indices
+        wear_starts *= wlen_ds
+        wear_stops *= wlen_ds
 
         # create a single wear array, and put it back into the correct
         # units for indexing
@@ -499,19 +490,11 @@ class CountWearDetection(BaseProcess):
         nonwear_stops = nonwear_starts + lengths[mask]
 
         # invert nonwear to wear
-        wear_starts = nonwear_stops[nonwear_stops < nonwear_counts.size]
-        wear_stops = nonwear_starts[nonwear_starts > 0]
+        wear_starts, wear_stops = invert_indices(nonwear_starts, nonwear_stops, 0, nonwear_counts.size - 1)
 
         # convert back to original indices
         wear_starts *= int(self.epoch_seconds * fs)
         wear_stops *= int(self.epoch_seconds * fs)
-
-        # handle a wear start at zero
-        if nonwear_starts[0] > 0:
-            wear_starts = insert(wear_starts, 0, 0)
-        # handle a wear end at the end of the array
-        if nonwear_stops[-1] < nonwear_counts.size:
-            wear_stops = append(wear_stops, time.size - 1)
 
         # create a single wear array, and put it back into the correct
         # units for indexing
