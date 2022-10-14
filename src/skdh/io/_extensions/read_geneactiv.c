@@ -14,18 +14,22 @@ int geneactiv_read_header(FILE *fp, GN_Info_t *info)
     char *k = NULL, *v = NULL;
 
     /* read the first 19 lines */
+    DEBUG_PRINTF("reading first 19 lines\n");
     for (int i = 1; i < 20; ++i)
         GN_READLINE;
     
     /* sampling frequency */
+    DEBUG_PRINTF("getting sampling frequency\n");
     parseline(fp, buff, 255, &k, &v);
     info->fs = (double)strtol(v, NULL, 10);
 
     /* read another group of lines */
+    DEBUG_PRINTF("reading next batch of lines\n");
     for (int i = 21; i < 48; ++i)
         GN_READLINE;
     
     /* get the gain and offset values */
+    DEBUG_PRINTF("getting gain and offset\n");
     for (int i = 48, j = 0; i < 54; i += 2, ++j)
     {
         parseline(fp, buff, 255, &k, &v);
@@ -35,6 +39,7 @@ int geneactiv_read_header(FILE *fp, GN_Info_t *info)
     }
     
     /* get the volts and lux values */
+    DEBUG_PRINTF("getting volts and lux values\n");
     GN_READLINE;
     info->volts = (double)strtol(&buff[6], NULL, 10);
     GN_READLINE;
@@ -43,11 +48,13 @@ int geneactiv_read_header(FILE *fp, GN_Info_t *info)
     /* read and skip a few more lines. Last line read is 58 */
     for (int i = 56; i < 59; ++i)
         GN_READLINE;
-    
+
+    DEBUG_PRINTF("getting number of pages\n");
     info->npages = strtol(&buff[16], NULL, 10);  /* line 58 */
 
     GN_READLINE;  /* line 59, last line of the header */
 
+    DEBUG_PRINTF("finished with reading the header\n");
     return GN_READ_E_NONE;
 }
 
