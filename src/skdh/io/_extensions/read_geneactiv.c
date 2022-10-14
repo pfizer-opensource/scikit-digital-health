@@ -25,14 +25,21 @@ int geneactiv_read_header(FILE *fp, GN_Info_t *info)
 
     /* read another group of lines */
     DEBUG_PRINTF("reading next batch of lines\n");
-    for (int i = 21; i < 48; ++i)
+    /* this should read from line 21 to 48, but will also handle
+       cases where a subject comment spans multiple lines
+     */
+    while (strncmp(buff, "Calibration Data", 16) != 0)
+    {
         GN_READLINE;
+    }
     
     /* get the gain and offset values */
     DEBUG_PRINTF("getting gain and offset\n");
     for (int i = 48, j = 0; i < 54; i += 2, ++j)
     {
+        printf("%i\n", j);
         parseline(fp, buff, 255, &k, &v);
+        printf("%s\n", buff);
         info->gain[j] = (double)strtol(v, NULL, 10);
         parseline(fp, buff, 255, &k, &v);
         info->offset[j] = (double)strtol(v, NULL, 10);
