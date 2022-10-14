@@ -15,6 +15,6 @@ py3_dep = py3.dependency()
 add_languages('fortran', native: false)
 
 # debugging printing
-add_project_arguments('-DDEBUG', language: 'c')
+# add_project_arguments('-DDEBUG', language: 'c')
 
 subdir('src/skdh')
