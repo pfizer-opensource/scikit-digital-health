@@ -37,9 +37,7 @@ int geneactiv_read_header(FILE *fp, GN_Info_t *info)
     DEBUG_PRINTF("getting gain and offset\n");
     for (int i = 48, j = 0; i < 54; i += 2, ++j)
     {
-        printf("%i\n", j);
         parseline(fp, buff, 255, &k, &v);
-        printf("%s\n", buff);
         info->gain[j] = (double)strtol(v, NULL, 10);
         parseline(fp, buff, 255, &k, &v);
         info->offset[j] = (double)strtol(v, NULL, 10);
