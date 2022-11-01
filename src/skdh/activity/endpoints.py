@@ -4,8 +4,6 @@ Activity endpoint definitions
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
-from warnings import warn
-
 from numpy import (
     array,
     zeros,
@@ -17,7 +15,6 @@ from numpy import (
     sum,
     nonzero,
     maximum,
-    argmax,
     int_,
     floor,
     ceil,
