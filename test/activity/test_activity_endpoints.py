@@ -86,7 +86,9 @@ class TestIntensityGradient:
 
     def test_nan(self, act_results):
         ig = IntensityGradient()
-        ig.predict(act_results, 0, array([0.2, 0.2, 0.2, 0.2]), array([0.2, 0.2]), 5, 12)
+        ig.predict(
+            act_results, 0, array([0.2, 0.2, 0.2, 0.2]), array([0.2, 0.2]), 5, 12
+        )
 
         ig.reset_cached()
 
@@ -105,7 +107,9 @@ class TestMaxAcceleration:
 
         ma = MaxAcceleration(2)
         # check that it doesnt change if too little accel provided
-        ma.predict(act_results, 0, array([0.2, 0.2, 0.2, 0.2]), array([0.2, 0.2]), 5, 12)
+        ma.predict(
+            act_results, 0, array([0.2, 0.2, 0.2, 0.2]), array([0.2, 0.2]), 5, 12
+        )
         assert allclose(act_results["wake max acc 2min [g]"], 0)
 
         ma.predict(act_results, 0, a, a[::12], 5, 12)
@@ -163,7 +167,7 @@ class TestBoutIntensityTime:
             "kwargs": {},
             "sedentary": 0.25,
             "light": 0.5,
-            "moderate": 1.0
+            "moderate": 1.0,
         }
         e = BoutIntensityTime("MVPA", 6, 0.8, 4, False, c)
 
