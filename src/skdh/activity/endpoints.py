@@ -27,7 +27,8 @@ from scipy.stats import linregress
 from skdh.utility import moving_mean
 from skdh.utility import fragmentation_endpoints as fe
 from skdh.utility.internal import rle
-from skdh.activity.cutpoints import _base_cutpoints, get_level_thresholds
+from skdh.activity.cutpoints import get_level_thresholds
+from skdh.activity.utility import handle_cutpoints
 
 
 __all__ = [
@@ -433,17 +434,7 @@ class TotalIntensityTime(ActivityEndpoint):
         super().__init__(f"{level} {epoch_length}s epoch [min]", state)
         self.level = level
 
-        if cutpoints is None:
-            warn(f"Cutpoints not specified for {self!r}. Using `migueles_wrist_adult`")
-            cutpoints = _base_cutpoints["migueles_wrist_adult"]
-        elif isinstance(cutpoints, str):
-            cutpoints = _base_cutpoints[cutpoints]
-        elif isinstance(cutpoints, dict):
-            pass
-        else:
-            raise ValueError(
-                "cutpoints must be None, a string, or a dictionary of cutpoints"
-            )
+        cutpoints = handle_cutpoints(cutpoints)
 
         self.lthresh, self.uthresh = get_level_thresholds(self.level, cutpoints)
 
@@ -520,17 +511,7 @@ class BoutIntensityTime(ActivityEndpoint):
         self.bmetric = bout_metric
         self.cbout = closed_bout
 
-        if cutpoints is None:
-            warn(f"Cutpoints not specified for {self!r}. Using `migueles_wrist_adult`")
-            cutpoints = _base_cutpoints["migueles_wrist_adult"]
-        elif isinstance(cutpoints, str):
-            cutpoints = _base_cutpoints[cutpoints]
-        elif isinstance(cutpoints, dict):
-            pass
-        else:
-            raise ValueError(
-                "cutpoints must be None, a string, or a dictionary of cutpoints"
-            )
+        cutpoints = handle_cutpoints(cutpoints)
 
         self.lthresh, self.uthresh = get_level_thresholds(self.level, cutpoints)
 
@@ -596,17 +577,7 @@ class FragmentationEndpoints(ActivityEndpoint):
 
         self.level = level
 
-        if cutpoints is None:
-            warn(f"Cutpoints not specified for {self!r}. Using `migueles_wrist_adult`")
-            cutpoints = _base_cutpoints["migueles_wrist_adult"]
-        elif isinstance(cutpoints, str):
-            cutpoints = _base_cutpoints[cutpoints]
-        elif isinstance(cutpoints, dict):
-            pass
-        else:
-            raise ValueError(
-                "cutpoints must be None, a string, or a dictionary of cutpoints"
-            )
+        cutpoints = handle_cutpoints(cutpoints)
 
         self.lthresh, self.uthresh = get_level_thresholds(self.level, cutpoints)
 
