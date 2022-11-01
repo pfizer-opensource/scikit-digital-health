@@ -332,7 +332,12 @@ class DETACH(BaseProcess):
             prev_end = end
 
         # make non-wear indices into arrays, and invert
-        wear_starts, wear_stops = invert_indices(asarray(nonwear_starts), asarray(nonwear_stops), 0, n_ax_under_sd_range_fwd.size)
+        wear_starts, wear_stops = invert_indices(
+            asarray(nonwear_starts),
+            asarray(nonwear_stops),
+            0,
+            n_ax_under_sd_range_fwd.size,
+        )
 
         # convert to original indices
         wear_starts *= wlen_ds
@@ -494,7 +499,9 @@ class CountWearDetection(BaseProcess):
         nonwear_stops = nonwear_starts + lengths[mask]
 
         # invert nonwear to wear
-        wear_starts, wear_stops = invert_indices(nonwear_starts, nonwear_stops, 0, nonwear_counts.size)
+        wear_starts, wear_stops = invert_indices(
+            nonwear_starts, nonwear_stops, 0, nonwear_counts.size
+        )
 
         # convert back to original indices
         wear_starts *= int(self.epoch_seconds * fs)

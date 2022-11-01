@@ -25,13 +25,15 @@ def handle_cutpoints(cutpoints):
         Dictionary of cutpoints
     """
     if cutpoints is None or cutpoints not in _base_cutpoints:
-        warn(f"Specified cutpoints not found, or cutpoints undefined. Using `migueles_wrist_adult`.")
+        warn(
+            f"Specified cutpoints not found, or cutpoints undefined. Using `migueles_wrist_adult`."
+        )
         cp = _base_cutpoints["migueles_wrist_adult"]
     elif isinstance(cutpoints, str):
         cp = _base_cutpoints.get(cutpoints)
     elif isinstance(cutpoints, dict):
         # check that it has the appropriate entries
-        rq_keys = ['metric', 'kwargs', 'sedentary', 'light', 'moderate']
+        rq_keys = ["metric", "kwargs", "sedentary", "light", "moderate"]
         missing_keys = [i for i in rq_keys if i not in cutpoints]
         if len(missing_keys) != 0:
             raise ValueError(f"User defined cutpoints missing keys {missing_keys}")

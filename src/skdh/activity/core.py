@@ -435,7 +435,15 @@ class ActivityLevelClassification(BaseProcess):
             )
             # compute sleeping hours activity endpoints
             self._compute_sleep_activity_endpoints(
-                res, accel, fs, iday, sleep_wear_starts, sleep_wear_stops, nwlen, nwlen_60, epm
+                res,
+                accel,
+                fs,
+                iday,
+                sleep_wear_starts,
+                sleep_wear_stops,
+                nwlen,
+                nwlen_60,
+                epm,
             )
 
         # finalize plots
@@ -481,7 +489,9 @@ class ActivityLevelClassification(BaseProcess):
             )
 
             for endpoint in self.wake_endpoints:
-                endpoint.predict(results, day_n, acc_metric, acc_metric_60, self.wlen, epm)
+                endpoint.predict(
+                    results, day_n, acc_metric, acc_metric_60, self.wlen, epm
+                )
 
         # make sure that any endpoints that were caching values between runs are reset
         for endpoint in self.wake_endpoints:
@@ -515,7 +525,9 @@ class ActivityLevelClassification(BaseProcess):
                 continue
 
             for endpoint in self.sleep_endpoints:
-                endpoint.predict(results, day_n, acc_metric, acc_metric_60, self.wlen, epm)
+                endpoint.predict(
+                    results, day_n, acc_metric, acc_metric_60, self.wlen, epm
+                )
 
         # make sure that any endpoints that were caching values between runs are reset
         for endpoint in self.wake_endpoints:

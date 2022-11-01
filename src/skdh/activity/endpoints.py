@@ -290,7 +290,16 @@ class IntensityGradient(ActivityEndpoint):
         self.ig_r = None
         self.i = None
 
-    def predict(self, results, i, accel_metric, accel_metric_60, epoch_s, epochs_per_min, **kwargs):
+    def predict(
+        self,
+        results,
+        i,
+        accel_metric,
+        accel_metric_60,
+        epoch_s,
+        epochs_per_min,
+        **kwargs,
+    ):
         """
         Saves the histogram counts for each bin of acceleration intensities.
 
@@ -377,7 +386,16 @@ class MaxAcceleration(ActivityEndpoint):
 
         self.wlens = window_lengths
 
-    def predict(self, results, i, accel_metric, accel_metric_60, epoch_s, epochs_per_min, **kwargs):
+    def predict(
+        self,
+        results,
+        i,
+        accel_metric,
+        accel_metric_60,
+        epoch_s,
+        epochs_per_min,
+        **kwargs,
+    ):
         """
         Compute the maximum acceleration during this set of data, and compare it
         to the previous largest detected value.
@@ -439,7 +457,16 @@ class TotalIntensityTime(ActivityEndpoint):
 
         self.lthresh, self.uthresh = get_level_thresholds(self.level, cutpoints)
 
-    def predict(self, results, i, accel_metric, accel_metric_60, epoch_s, epochs_per_min, **kwargs):
+    def predict(
+        self,
+        results,
+        i,
+        accel_metric,
+        accel_metric_60,
+        epoch_s,
+        epochs_per_min,
+        **kwargs,
+    ):
         """
         Compute the time spent at the specified intensity level.
 
@@ -518,7 +545,16 @@ class BoutIntensityTime(ActivityEndpoint):
 
         self.lthresh, self.uthresh = get_level_thresholds(self.level, cutpoints)
 
-    def predict(self, results, i, accel_metric, accel_metric_60, epoch_s, epochs_per_min, **kwargs):
+    def predict(
+        self,
+        results,
+        i,
+        accel_metric,
+        accel_metric_60,
+        epoch_s,
+        epochs_per_min,
+        **kwargs,
+    ):
         """
         Compute the time spent in bouts at the specified intensity level.
 
@@ -596,7 +632,16 @@ class FragmentationEndpoints(ActivityEndpoint):
         self.r_pld = None  # power law dist
         self.i = None
 
-    def predict(self, results, i, accel_metric, accel_metric_60, epoch_s, epochs_per_min, **kwargs):
+    def predict(
+        self,
+        results,
+        i,
+        accel_metric,
+        accel_metric_60,
+        epoch_s,
+        epochs_per_min,
+        **kwargs,
+    ):
         """
         Compute and save the lengths of runs of the specified intensity level.
 
