@@ -290,7 +290,7 @@ class IntensityGradient(ActivityEndpoint):
         self.ig_r = None
         self.i = None
 
-    def predict(self, results, i, accel_metric, epoch_s, epochs_per_min, **kwargs):
+    def predict(self, results, i, accel_metric, accel_metric_60, epoch_s, epochs_per_min, **kwargs):
         """
         Saves the histogram counts for each bin of acceleration intensities.
 
@@ -304,6 +304,8 @@ class IntensityGradient(ActivityEndpoint):
             `results[self.name][i] = 5.0`
         accel_metric : numpy.ndarray
             Computed acceleration metric (e.g. ENMO).
+        accel_metric_60 : numpy.ndarray
+            Computed acceleration metric for a 60 second window.
         epoch_s : int
             Duration in seconds of each sample of `accel_metric`.
         epochs_per_min : int
@@ -375,7 +377,7 @@ class MaxAcceleration(ActivityEndpoint):
 
         self.wlens = window_lengths
 
-    def predict(self, results, i, accel_metric, epoch_s, epochs_per_min, **kwargs):
+    def predict(self, results, i, accel_metric, accel_metric_60, epoch_s, epochs_per_min, **kwargs):
         """
         Compute the maximum acceleration during this set of data, and compare it
         to the previous largest detected value.
@@ -390,6 +392,8 @@ class MaxAcceleration(ActivityEndpoint):
             `results[self.name][i] = 5.0`
         accel_metric : numpy.ndarray
             Computed acceleration metric (e.g. ENMO).
+        accel_metric_60 : numpy.ndarray
+            Computed acceleration metric for a 60 second window.
         epoch_s : int
             Duration in seconds of each sample of `accel_metric`.
         epochs_per_min : int
@@ -435,7 +439,7 @@ class TotalIntensityTime(ActivityEndpoint):
 
         self.lthresh, self.uthresh = get_level_thresholds(self.level, cutpoints)
 
-    def predict(self, results, i, accel_metric, epoch_s, epochs_per_min, **kwargs):
+    def predict(self, results, i, accel_metric, accel_metric_60, epoch_s, epochs_per_min, **kwargs):
         """
         Compute the time spent at the specified intensity level.
 
@@ -449,6 +453,8 @@ class TotalIntensityTime(ActivityEndpoint):
             `results[self.name][i] = 5.0`
         accel_metric : numpy.ndarray
             Computed acceleration metric (e.g. ENMO).
+        accel_metric_60 : numpy.ndarray
+            Computed acceleration metric for a 60 second window.
         epoch_s : int
             Duration in seconds of each sample of `accel_metric`.
         epochs_per_min : int
@@ -512,7 +518,7 @@ class BoutIntensityTime(ActivityEndpoint):
 
         self.lthresh, self.uthresh = get_level_thresholds(self.level, cutpoints)
 
-    def predict(self, results, i, accel_metric, epoch_s, epochs_per_min, **kwargs):
+    def predict(self, results, i, accel_metric, accel_metric_60, epoch_s, epochs_per_min, **kwargs):
         """
         Compute the time spent in bouts at the specified intensity level.
 
@@ -526,6 +532,8 @@ class BoutIntensityTime(ActivityEndpoint):
             `results[self.name][i] = 5.0`
         accel_metric : numpy.ndarray
             Computed acceleration metric (e.g. ENMO).
+        accel_metric_60 : numpy.ndarray
+            Computed acceleration metric for a 60 second window.
         epoch_s : int
             Duration in seconds of each sample of `accel_metric`.
         epochs_per_min : int
@@ -588,7 +596,7 @@ class FragmentationEndpoints(ActivityEndpoint):
         self.r_pld = None  # power law dist
         self.i = None
 
-    def predict(self, results, i, accel_metric, epoch_s, epochs_per_min, **kwargs):
+    def predict(self, results, i, accel_metric, accel_metric_60, epoch_s, epochs_per_min, **kwargs):
         """
         Compute and save the lengths of runs of the specified intensity level.
 
@@ -602,6 +610,8 @@ class FragmentationEndpoints(ActivityEndpoint):
             `results[self.name][i] = 5.0`
         accel_metric : numpy.ndarray
             Computed acceleration metric (e.g. ENMO).
+        accel_metric_60 : numpy.ndarray
+            Computed acceleration metric for a 60 second window.
         epoch_s : int
             Duration in seconds of each sample of `accel_metric`.
         epochs_per_min : int
@@ -609,7 +619,7 @@ class FragmentationEndpoints(ActivityEndpoint):
         """
         super().predict()
 
-        mask = (accel_metric >= self.lthresh) & (accel_metric < self.uthresh)
+        mask = (accel_metric_60 >= self.lthresh) & (accel_metric_60 < self.uthresh)
         lens, starts, vals = rle(mask)
         # save the lengths of the desired blocks
         self.lens.extend(lens[vals == 1].tolist())
