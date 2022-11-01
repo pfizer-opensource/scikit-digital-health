@@ -24,12 +24,7 @@ jobs:
           pip install build delocate twine
         shell: bash
       - name: Build SKDH
-        run: |
-          # if macOS, make sure to set the environment variables so that it can find gfortran-9
-          if [ "$RUNNER_OS" == "macOS" ]; then
-           export FC=gfortran-9
-          fi
-          python -m build
+        run: python -m build
       - name: Run Delocate on wheels
         run: delocate-wheel -v dist/*.whl
       - name: Upload to twine
