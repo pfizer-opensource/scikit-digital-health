@@ -89,7 +89,14 @@ class TestActivityLevelClassification:
         # dont have name so make sure that the values are correct
         assert a.cutpoints == _base_cutpoints["migueles_wrist_adult"]
 
-        c = {"light": 5, "sedentary": 2, "moderate": 10, "vigorous": 15}
+        c = {
+            "light": 5,
+            "sedentary": 2,
+            "moderate": 10,
+            "vigorous": 15,
+            "metric": lambda x: x,
+            "kwargs": {},
+        }
         a = ActivityLevelClassification(cutpoints=c, day_window=None)
         assert a.cutpoints == c
         assert a.day_key == (-1, -1)

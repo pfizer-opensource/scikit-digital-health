@@ -163,7 +163,7 @@ class CalibrateAccelerometer(BaseProcess):
         i_h = 0  # keep track of number of extra 12 hour blocks used
         if accel.shape[0] < nh:
             warn(
-                f"Less than {self.min_hours} hours of data ({accel.shape[0] / (fs * 3600)}. "
+                f"Less than {self.min_hours} hours of data ({accel.shape[0] / (fs * 3600)} hours). "
                 f"No Calibration performed",
                 UserWarning,
             )

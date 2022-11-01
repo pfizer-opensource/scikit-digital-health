@@ -4,8 +4,6 @@ Activity endpoint definitions
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
-from warnings import warn
-
 from numpy import (
     array,
     zeros,
@@ -17,7 +15,6 @@ from numpy import (
     sum,
     nonzero,
     maximum,
-    argmax,
     int_,
     floor,
     ceil,
@@ -27,7 +24,8 @@ from scipy.stats import linregress
 from skdh.utility import moving_mean
 from skdh.utility import fragmentation_endpoints as fe
 from skdh.utility.internal import rle
-from skdh.activity.cutpoints import _base_cutpoints, get_level_thresholds
+from skdh.activity.cutpoints import get_level_thresholds
+from skdh.activity.utility import handle_cutpoints
 
 
 __all__ = [
@@ -292,7 +290,16 @@ class IntensityGradient(ActivityEndpoint):
         self.ig_r = None
         self.i = None
 
-    def predict(self, results, i, accel_metric, epoch_s, epochs_per_min, **kwargs):
+    def predict(
+        self,
+        results,
+        i,
+        accel_metric,
+        accel_metric_60,
+        epoch_s,
+        epochs_per_min,
+        **kwargs,
+    ):
         """
         Saves the histogram counts for each bin of acceleration intensities.
 
@@ -306,6 +313,8 @@ class IntensityGradient(ActivityEndpoint):
             `results[self.name][i] = 5.0`
         accel_metric : numpy.ndarray
             Computed acceleration metric (e.g. ENMO).
+        accel_metric_60 : numpy.ndarray
+            Computed acceleration metric for a 60 second window.
         epoch_s : int
             Duration in seconds of each sample of `accel_metric`.
         epochs_per_min : int
@@ -377,7 +386,16 @@ class MaxAcceleration(ActivityEndpoint):
 
         self.wlens = window_lengths
 
-    def predict(self, results, i, accel_metric, epoch_s, epochs_per_min, **kwargs):
+    def predict(
+        self,
+        results,
+        i,
+        accel_metric,
+        accel_metric_60,
+        epoch_s,
+        epochs_per_min,
+        **kwargs,
+    ):
         """
         Compute the maximum acceleration during this set of data, and compare it
         to the previous largest detected value.
@@ -392,6 +410,8 @@ class MaxAcceleration(ActivityEndpoint):
             `results[self.name][i] = 5.0`
         accel_metric : numpy.ndarray
             Computed acceleration metric (e.g. ENMO).
+        accel_metric_60 : numpy.ndarray
+            Computed acceleration metric for a 60 second window.
         epoch_s : int
             Duration in seconds of each sample of `accel_metric`.
         epochs_per_min : int
@@ -433,21 +453,20 @@ class TotalIntensityTime(ActivityEndpoint):
         super().__init__(f"{level} {epoch_length}s epoch [min]", state)
         self.level = level
 
-        if cutpoints is None:
-            warn(f"Cutpoints not specified for {self!r}. Using `migueles_wrist_adult`")
-            cutpoints = _base_cutpoints["migueles_wrist_adult"]
-        elif isinstance(cutpoints, str):
-            cutpoints = _base_cutpoints[cutpoints]
-        elif isinstance(cutpoints, dict):
-            pass
-        else:
-            raise ValueError(
-                "cutpoints must be None, a string, or a dictionary of cutpoints"
-            )
+        cutpoints = handle_cutpoints(cutpoints)
 
         self.lthresh, self.uthresh = get_level_thresholds(self.level, cutpoints)
 
-    def predict(self, results, i, accel_metric, epoch_s, epochs_per_min, **kwargs):
+    def predict(
+        self,
+        results,
+        i,
+        accel_metric,
+        accel_metric_60,
+        epoch_s,
+        epochs_per_min,
+        **kwargs,
+    ):
         """
         Compute the time spent at the specified intensity level.
 
@@ -461,6 +480,8 @@ class TotalIntensityTime(ActivityEndpoint):
             `results[self.name][i] = 5.0`
         accel_metric : numpy.ndarray
             Computed acceleration metric (e.g. ENMO).
+        accel_metric_60 : numpy.ndarray
+            Computed acceleration metric for a 60 second window.
         epoch_s : int
             Duration in seconds of each sample of `accel_metric`.
         epochs_per_min : int
@@ -520,21 +541,20 @@ class BoutIntensityTime(ActivityEndpoint):
         self.bmetric = bout_metric
         self.cbout = closed_bout
 
-        if cutpoints is None:
-            warn(f"Cutpoints not specified for {self!r}. Using `migueles_wrist_adult`")
-            cutpoints = _base_cutpoints["migueles_wrist_adult"]
-        elif isinstance(cutpoints, str):
-            cutpoints = _base_cutpoints[cutpoints]
-        elif isinstance(cutpoints, dict):
-            pass
-        else:
-            raise ValueError(
-                "cutpoints must be None, a string, or a dictionary of cutpoints"
-            )
+        cutpoints = handle_cutpoints(cutpoints)
 
         self.lthresh, self.uthresh = get_level_thresholds(self.level, cutpoints)
 
-    def predict(self, results, i, accel_metric, epoch_s, epochs_per_min, **kwargs):
+    def predict(
+        self,
+        results,
+        i,
+        accel_metric,
+        accel_metric_60,
+        epoch_s,
+        epochs_per_min,
+        **kwargs,
+    ):
         """
         Compute the time spent in bouts at the specified intensity level.
 
@@ -548,6 +568,8 @@ class BoutIntensityTime(ActivityEndpoint):
             `results[self.name][i] = 5.0`
         accel_metric : numpy.ndarray
             Computed acceleration metric (e.g. ENMO).
+        accel_metric_60 : numpy.ndarray
+            Computed acceleration metric for a 60 second window.
         epoch_s : int
             Duration in seconds of each sample of `accel_metric`.
         epochs_per_min : int
@@ -570,7 +592,8 @@ class BoutIntensityTime(ActivityEndpoint):
 
 class FragmentationEndpoints(ActivityEndpoint):
     """
-    Compute fragmentation metrics for the desired intensity level.
+    Compute fragmentation metrics for the desired intensity level. Fragmentation
+    endpoints are computed on 1 minute windows of data.
 
     Parameters
     ----------
@@ -596,17 +619,7 @@ class FragmentationEndpoints(ActivityEndpoint):
 
         self.level = level
 
-        if cutpoints is None:
-            warn(f"Cutpoints not specified for {self!r}. Using `migueles_wrist_adult`")
-            cutpoints = _base_cutpoints["migueles_wrist_adult"]
-        elif isinstance(cutpoints, str):
-            cutpoints = _base_cutpoints[cutpoints]
-        elif isinstance(cutpoints, dict):
-            pass
-        else:
-            raise ValueError(
-                "cutpoints must be None, a string, or a dictionary of cutpoints"
-            )
+        cutpoints = handle_cutpoints(cutpoints)
 
         self.lthresh, self.uthresh = get_level_thresholds(self.level, cutpoints)
 
@@ -620,7 +633,16 @@ class FragmentationEndpoints(ActivityEndpoint):
         self.r_pld = None  # power law dist
         self.i = None
 
-    def predict(self, results, i, accel_metric, epoch_s, epochs_per_min, **kwargs):
+    def predict(
+        self,
+        results,
+        i,
+        accel_metric,
+        accel_metric_60,
+        epoch_s,
+        epochs_per_min,
+        **kwargs,
+    ):
         """
         Compute and save the lengths of runs of the specified intensity level.
 
@@ -634,6 +656,8 @@ class FragmentationEndpoints(ActivityEndpoint):
             `results[self.name][i] = 5.0`
         accel_metric : numpy.ndarray
             Computed acceleration metric (e.g. ENMO).
+        accel_metric_60 : numpy.ndarray
+            Computed acceleration metric for a 60 second window.
         epoch_s : int
             Duration in seconds of each sample of `accel_metric`.
         epochs_per_min : int
@@ -641,12 +665,12 @@ class FragmentationEndpoints(ActivityEndpoint):
         """
         super().predict()
 
-        mask = (accel_metric >= self.lthresh) & (accel_metric < self.uthresh)
+        mask = (accel_metric_60 >= self.lthresh) & (accel_metric_60 < self.uthresh)
         lens, starts, vals = rle(mask)
         # save the lengths of the desired blocks
         self.lens.extend(lens[vals == 1].tolist())
 
-        # save results/day info
+        # save pointers to the results/day info
         self.r_ad = results[f"{self.state} {self.level} avg duration"]
         self.r_tp = results[f"{self.state} {self.level} transition probability"]
         self.r_gi = results[f"{self.state} {self.level} gini index"]

@@ -282,6 +282,7 @@ static PyObject *read_geneactiv(PyObject *NPY_UNUSED(self), PyObject *args)
     }
 
     /* READ THE HEADER */
+    DEBUG_PRINTF("Reading header\n");
     geneactiv_read_header(fp, &info);
 
     if (info.npages == -1)
@@ -337,8 +338,10 @@ static PyObject *read_geneactiv(PyObject *NPY_UNUSED(self), PyObject *args)
     data.day_stops  = (long *)PyArray_DATA(stops);
     
     /* READ FILE */
+    DEBUG_PRINTF("Reading pages\n");
     for (int i = 0; i < info.npages; ++i)
     {
+        DEBUG_PRINTF("%i\n", i);
         ierr = geneactiv_read_block(fp, &winfo, &info, &data);
 
         /* check output of ierr */

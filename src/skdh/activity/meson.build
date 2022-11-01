@@ -5,6 +5,7 @@ py3.install_sources(
         'cutpoints.py',
         'endpoints.py',
         'metrics.py',
+        'utility.py',
     ],
     pure: false,
     subdir: 'skdh/activity',

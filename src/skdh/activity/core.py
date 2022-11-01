@@ -30,9 +30,10 @@ import matplotlib.pyplot as plt
 
 from skdh.base import BaseProcess
 from skdh.utility.internal import get_day_index_intersection
-from skdh.activity.cutpoints import _base_cutpoints, get_level_thresholds, get_metric
+from skdh.activity.cutpoints import get_level_thresholds, get_metric
 from skdh.activity import endpoints as ept
 from skdh.activity.endpoints import ActivityEndpoint
+from skdh.activity.utility import handle_cutpoints
 
 
 def _update_date_results(
@@ -165,16 +166,7 @@ class ActivityLevelClassification(BaseProcess):
         # make sure the minimum wear time is in whole hours
         min_wear_time = int(min_wear_time)
         # get the cutpoints if using provided cutpoints, or return the dictionary
-        if isinstance(cutpoints, str):
-            cutpoints_ = _base_cutpoints.get(cutpoints, None)
-            if cutpoints_ is None:
-                warn(
-                    f"Specified cutpoints [{cutpoints}] not found. "
-                    f"Using `migueles_wrist_adult`."
-                )
-                cutpoints_ = _base_cutpoints["migueles_wrist_adult"]
-        else:
-            cutpoints_ = cutpoints
+        cutpoints_ = handle_cutpoints(cutpoints)
 
         super().__init__(
             short_wlen=short_wlen,
@@ -229,9 +221,9 @@ class ActivityLevelClassification(BaseProcess):
             for lvl in self.act_levels
         ]
         self.wake_endpoints += [
-            ept.FragmentationEndpoints("sed", cutpoints="migueles_wrist_adult"),
-            ept.FragmentationEndpoints("SLPA", cutpoints="migueles_wrist_adult"),
-            ept.FragmentationEndpoints("MVPA", cutpoints="migueles_wrist_adult"),
+            ept.FragmentationEndpoints("sed", cutpoints=cutpoints),
+            ept.FragmentationEndpoints("SLPA", cutpoints=cutpoints),
+            ept.FragmentationEndpoints("MVPA", cutpoints=cutpoints),
         ]
 
         self.sleep_endpoints = [
@@ -348,6 +340,7 @@ class ActivityLevelClassification(BaseProcess):
             fs = 1 / mean(diff(time[:5000]))
 
         nwlen = int(self.wlen * fs)
+        nwlen_60 = int(60 * fs)  # minute long windows
         epm = int(60 / self.wlen)  # epochs per minute
 
         # check if sleep data is provided
@@ -438,11 +431,19 @@ class ActivityLevelClassification(BaseProcess):
 
             # compute waking hours activity endpoints
             self._compute_awake_activity_endpoints(
-                res, accel, fs, iday, dwear_starts, dwear_stops, nwlen, epm
+                res, accel, fs, iday, dwear_starts, dwear_stops, nwlen, nwlen_60, epm
             )
             # compute sleeping hours activity endpoints
             self._compute_sleep_activity_endpoints(
-                res, accel, fs, iday, sleep_wear_starts, sleep_wear_stops, nwlen, epm
+                res,
+                accel,
+                fs,
+                iday,
+                sleep_wear_starts,
+                sleep_wear_stops,
+                nwlen,
+                nwlen_60,
+                epm,
             )
 
         # finalize plots
@@ -471,7 +472,7 @@ class ActivityLevelClassification(BaseProcess):
                 results[endpt.name][day_n] = 0.0
 
     def _compute_awake_activity_endpoints(
-        self, results, accel, fs, day_n, starts, stops, n_wlen, epm
+        self, results, accel, fs, day_n, starts, stops, n_wlen, n_wlen_60, epm
     ):
         # initialize values from nan to 0.0. Do this here because days with less than
         # minimum hours should have nan values
@@ -483,16 +484,21 @@ class ActivityLevelClassification(BaseProcess):
             acc_metric = metric_fn(
                 accel[start:stop], n_wlen, fs, **self.cutpoints["kwargs"]
             )
+            acc_metric_60 = metric_fn(
+                accel[start:stop], n_wlen_60, fs, **self.cutpoints["kwargs"]
+            )
 
             for endpoint in self.wake_endpoints:
-                endpoint.predict(results, day_n, acc_metric, self.wlen, epm)
+                endpoint.predict(
+                    results, day_n, acc_metric, acc_metric_60, self.wlen, epm
+                )
 
         # make sure that any endpoints that were caching values between runs are reset
         for endpoint in self.wake_endpoints:
             endpoint.reset_cached()
 
     def _compute_sleep_activity_endpoints(
-        self, results, accel, fs, day_n, starts, stops, n_wlen, epm
+        self, results, accel, fs, day_n, starts, stops, n_wlen, n_wlen_60, epm
     ):
         if starts is None or stops is None:
             return  # don't initialize/compute any values if there is no sleep data
@@ -512,11 +518,16 @@ class ActivityLevelClassification(BaseProcess):
                 acc_metric = metric_fn(
                     accel[start:stop], n_wlen, fs, **self.cutpoints["kwargs"]
                 )
+                acc_metric_60 = metric_fn(
+                    accel[start:stop], n_wlen_60, fs, **self.cutpoints["kwargs"]
+                )
             except ValueError:  # if not enough points, just skip, value is already set
                 continue
 
             for endpoint in self.sleep_endpoints:
-                endpoint.predict(results, day_n, acc_metric, self.wlen, epm)
+                endpoint.predict(
+                    results, day_n, acc_metric, acc_metric_60, self.wlen, epm
+                )
 
         # make sure that any endpoints that were caching values between runs are reset
         for endpoint in self.wake_endpoints:

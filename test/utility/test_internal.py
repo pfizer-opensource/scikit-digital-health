@@ -1,7 +1,12 @@
 import pytest
 from numpy import allclose, array, arange
 
-from skdh.utility.internal import get_day_index_intersection, apply_downsample, rle, invert_indices
+from skdh.utility.internal import (
+    get_day_index_intersection,
+    apply_downsample,
+    rle,
+    invert_indices,
+)
 
 
 class TestGetDayIndexIntersection:
