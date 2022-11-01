@@ -592,7 +592,8 @@ class BoutIntensityTime(ActivityEndpoint):
 
 class FragmentationEndpoints(ActivityEndpoint):
     """
-    Compute fragmentation metrics for the desired intensity level.
+    Compute fragmentation metrics for the desired intensity level. Fragmentation
+    endpoints are computed on 1 minute windows of data.
 
     Parameters
     ----------
