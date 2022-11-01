@@ -33,6 +33,7 @@ from skdh.utility.internal import get_day_index_intersection
 from skdh.activity.cutpoints import _base_cutpoints, get_level_thresholds, get_metric
 from skdh.activity import endpoints as ept
 from skdh.activity.endpoints import ActivityEndpoint
+from skdh.activity.utility import handle_cutpoints
 
 
 def _update_date_results(
@@ -165,16 +166,7 @@ class ActivityLevelClassification(BaseProcess):
         # make sure the minimum wear time is in whole hours
         min_wear_time = int(min_wear_time)
         # get the cutpoints if using provided cutpoints, or return the dictionary
-        if isinstance(cutpoints, str):
-            cutpoints_ = _base_cutpoints.get(cutpoints, None)
-            if cutpoints_ is None:
-                warn(
-                    f"Specified cutpoints [{cutpoints}] not found. "
-                    f"Using `migueles_wrist_adult`."
-                )
-                cutpoints_ = _base_cutpoints["migueles_wrist_adult"]
-        else:
-            cutpoints_ = cutpoints
+        cutpoints_ = handle_cutpoints(cutpoints)
 
         super().__init__(
             short_wlen=short_wlen,
@@ -229,9 +221,9 @@ class ActivityLevelClassification(BaseProcess):
             for lvl in self.act_levels
         ]
         self.wake_endpoints += [
-            ept.FragmentationEndpoints("sed", cutpoints="migueles_wrist_adult"),
-            ept.FragmentationEndpoints("SLPA", cutpoints="migueles_wrist_adult"),
-            ept.FragmentationEndpoints("MVPA", cutpoints="migueles_wrist_adult"),
+            ept.FragmentationEndpoints("sed", cutpoints=cutpoints),
+            ept.FragmentationEndpoints("SLPA", cutpoints=cutpoints),
+            ept.FragmentationEndpoints("MVPA", cutpoints=cutpoints),
         ]
 
         self.sleep_endpoints = [
