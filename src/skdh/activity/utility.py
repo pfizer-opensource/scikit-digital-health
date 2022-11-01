@@ -24,7 +24,9 @@ def handle_cutpoints(cutpoints):
     cp : dict
         Dictionary of cutpoints
     """
-    if cutpoints is None or cutpoints not in _base_cutpoints:
+    c1 = cutpoints is None
+    c2 = cutpoints not in _base_cutpoints if isinstance(cutpoints, str) else False
+    if c1 or c2:
         warn(
             f"Specified cutpoints not found, or cutpoints undefined. Using `migueles_wrist_adult`."
         )
