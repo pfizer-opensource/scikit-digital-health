@@ -646,7 +646,7 @@ class FragmentationEndpoints(ActivityEndpoint):
         # save the lengths of the desired blocks
         self.lens.extend(lens[vals == 1].tolist())
 
-        # save results/day info
+        # save pointers to the results/day info
         self.r_ad = results[f"{self.state} {self.level} avg duration"]
         self.r_tp = results[f"{self.state} {self.level} transition probability"]
         self.r_gi = results[f"{self.state} {self.level} gini index"]
