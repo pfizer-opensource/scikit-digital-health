@@ -73,8 +73,9 @@ class TestIntensityGradient:
         a = default_rng(seed=5).uniform(0, 4.0, 20000)
         # add values between 4-8 so we get a flat line
         a = concatenate((a, [6.0] * 125))
+        b = a[::12]
 
-        ig.predict(act_results, 0, a, 5, 12)
+        ig.predict(act_results, 0, a, b, 5, 12)
 
         assert act_results["wake intensity gradient"] == [0.0]
         ig.reset_cached()
@@ -85,7 +86,7 @@ class TestIntensityGradient:
 
     def test_nan(self, act_results):
         ig = IntensityGradient()
-        ig.predict(act_results, 0, array([0.2, 0.2, 0.2, 0.2]), 5, 12)
+        ig.predict(act_results, 0, array([0.2, 0.2, 0.2, 0.2]), array([0.2, 0.2]), 5, 12)
 
         ig.reset_cached()
 
@@ -104,13 +105,13 @@ class TestMaxAcceleration:
 
         ma = MaxAcceleration(2)
         # check that it doesnt change if too little accel provided
-        ma.predict(act_results, 0, array([0.2, 0.2, 0.2, 0.2]), 5, 12)
+        ma.predict(act_results, 0, array([0.2, 0.2, 0.2, 0.2]), array([0.2, 0.2]), 5, 12)
         assert allclose(act_results["wake max acc 2min [g]"], 0)
 
-        ma.predict(act_results, 0, a, 5, 12)
+        ma.predict(act_results, 0, a, a[::12], 5, 12)
         assert allclose(act_results["wake max acc 2min [g]"], 0, atol=1)
 
-        ma.predict(act_results, 0, b, 5, 12)
+        ma.predict(act_results, 0, b, b[::12], 5, 12)
         assert allclose(act_results["wake max acc 2min [g]"], 30, atol=1)
 
 
@@ -123,8 +124,8 @@ class TestTotalIntensityTime:
         a = TotalIntensityTime("MVPA", 5, cutpoints="vaha-ypya_hip_adult")
         assert isclose(a.lthresh, 0.091)
 
-        a = TotalIntensityTime("MVPA", 5, cutpoints={"light": 0.5})
-        assert isclose(a.lthresh, 0.5)
+        with pytest.raises(ValueError):
+            TotalIntensityTime("MVPA", 5, cutpoints={"light": 0.5})
 
         with pytest.raises(ValueError):
             TotalIntensityTime("MVPA", 5, cutpoints=5.0)
@@ -134,10 +135,10 @@ class TestTotalIntensityTime:
         b = array([0.0, 0.0, 0.0, 0.0, 0.2, 0.2, 0.0, 1.5])
 
         e = TotalIntensityTime("MVPA", 5)
-        e.predict(act_results, 0, a, 5, 12)
+        e.predict(act_results, 0, a, a[::4], 5, 12)
         assert allclose(act_results["wake MVPA 5s epoch [min]"], 0.5)
 
-        e.predict(act_results, 0, b, 5, 12)
+        e.predict(act_results, 0, b, b[::4], 5, 12)
         assert allclose(act_results["wake MVPA 5s epoch [min]"], 0.75)
 
 
@@ -150,16 +151,23 @@ class TestBoutIntensityTime:
         a = BoutIntensityTime("MVPA", 6, 0.8, 4, False, cutpoints="vaha-ypya_hip_adult")
         assert isclose(a.lthresh, 0.091)
 
-        a = BoutIntensityTime("MVPA", 6, 0.8, 4, False, cutpoints={"light": 0.5})
-        assert isclose(a.lthresh, 0.5)
+        with pytest.raises(ValueError):
+            BoutIntensityTime("MVPA", 6, 0.8, 4, False, cutpoints={"light": 0.5})
 
         with pytest.raises(ValueError):
             BoutIntensityTime("MVPA", 6, 0.8, 4, False, cutpoints=5.0)
 
     def test(self, act_results, act_acc):
-        e = BoutIntensityTime("MVPA", 6, 0.8, 4, False, {"light": 0.5})
+        c = {
+            "metric": lambda x: x,
+            "kwargs": {},
+            "sedentary": 0.25,
+            "light": 0.5,
+            "moderate": 1.0
+        }
+        e = BoutIntensityTime("MVPA", 6, 0.8, 4, False, c)
 
-        e.predict(act_results, 0, act_acc, 60, 1)
+        e.predict(act_results, 0, act_acc, act_acc[::1], 60, 1)
 
         assert allclose(act_results["wake MVPA 6min bout [min]"], 22.0)
 
@@ -173,8 +181,8 @@ class TestFragmentationEndpoints:
         a = FragmentationEndpoints("MVPA", cutpoints="vaha-ypya_hip_adult")
         assert isclose(a.lthresh, 0.091)
 
-        a = FragmentationEndpoints("MVPA", cutpoints={"light": 0.5})
-        assert isclose(a.lthresh, 0.5)
+        with pytest.raises(ValueError):
+            a = FragmentationEndpoints("MVPA", cutpoints={"light": 0.5})
 
         with pytest.raises(ValueError):
             FragmentationEndpoints("MVPA", cutpoints=5.0)
@@ -182,7 +190,7 @@ class TestFragmentationEndpoints:
     def test(self, act_results, dummy_frag_predictions):
         e = FragmentationEndpoints("MVPA", cutpoints="migueles_wrist_adult")
 
-        e.predict(act_results, 0, dummy_frag_predictions, 5, 12)
+        e.predict(act_results, 0, dummy_frag_predictions, dummy_frag_predictions, 5, 12)
         e.reset_cached()
 
         assert allclose(act_results["wake MVPA avg duration"], 13 / 3)
