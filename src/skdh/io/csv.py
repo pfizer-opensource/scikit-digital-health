@@ -32,6 +32,8 @@ def handle_timestamps(time_series, is_seconds, to_datetime_kw):
         Array of epoch timestamps in seconds.
     fs : float
         Sampling frequency
+    time_dt : pandas.Series
+        Series of timestamps as pandas Timestamps. For use in windowing.
     """
     if is_seconds:
         time_dt = to_datetime(time_series, unit='s')
