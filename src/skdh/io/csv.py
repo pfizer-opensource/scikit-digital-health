@@ -83,8 +83,8 @@ def handle_timestamp_inconsistency(df, fill_gaps, accel_col_names, accel_in_g, g
         z_fill = 1.0 if accel_in_g else g
 
         df_full[accel_col_names[0]].fillna(value=0.0, inplace=True)
-        df_full[accel_col_names[0]].fillna(value=0.0, inplace=True)
-        df_full[accel_col_names[0]].fillna(value=z_fill, inplace=True)
+        df_full[accel_col_names[1]].fillna(value=0.0, inplace=True)
+        df_full[accel_col_names[2]].fillna(value=z_fill, inplace=True)
 
     return df_full, float(n_samples)
 
