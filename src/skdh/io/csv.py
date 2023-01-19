@@ -333,9 +333,6 @@ class ReadCSV(BaseProcess):
         # get the acceleration values and convert if necessary
         accel = handle_accel(raw, self.acc_col_names, self.accel_in_g, self.g_value)
 
-        # make sure that if we trimmed time, we trim acceleration
-        accel = accel[:time.size, :]
-
         kwargs.update(
             {
                 "file": file,
