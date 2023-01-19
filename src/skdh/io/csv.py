@@ -35,10 +35,8 @@ def handle_timestamp_inconsistency(df, fill_gaps, accel_col_names, accel_in_g, g
     -------
     df : pandas.DataFrame
         Dataframe with corrected timestamps.
-
-    Notes
-    -----
-    If there are data gaps, these will be filled with [0, 0, g] vectors.
+    fs : float
+        Number of samples per second.
     """
     # get a sampling rate. If non-unique timestamps, this will be updated
     n_samples = mean(1 / diff(df['_datetime_'][:2500]).astype(int)) * 1e9  # datetime diff is in ns
@@ -77,6 +75,9 @@ def handle_timestamp_inconsistency(df, fill_gaps, accel_col_names, accel_in_g, g
     # the sampling frequency. This will put nan values in any data gaps
     df_full = df.set_index('_datetime_').asfreq(f'{1 / n_samples}S')
 
+    # put the datetime array back in the dataframe
+    df_full = df_full.reset_index(drop=False)
+
     # check if we are filling gaps or not
     if fill_gaps:
         z_fill = 1.0 if accel_in_g else g
@@ -85,95 +86,10 @@ def handle_timestamp_inconsistency(df, fill_gaps, accel_col_names, accel_in_g, g
         df_full[accel_col_names[0]].fillna(value=0.0, inplace=True)
         df_full[accel_col_names[0]].fillna(value=z_fill, inplace=True)
 
-    return df_full
+    return df_full, float(n_samples)
 
 
-def handle_timestamps__(time_series, is_seconds, to_datetime_kw):
-    """
-    Handle converting time to unix seconds.
-
-    Parameters
-    ----------
-    time_series : pandas.Series
-        Series of timestamps.
-    is_seconds : bool
-        If the time values are already in unix seconds.
-    to_datetime_kw : dict
-        Key-word arguments to pass to :py:class:`pandas.to_datetime`.
-
-    Returns
-    -------
-    time : numpy.ndarray
-        Array of epoch timestamps in seconds.
-    fs : float
-        Sampling frequency
-    time_dt : pandas.Series
-        Series of timestamps as pandas Timestamps. For use in windowing.
-    """
-    if is_seconds:
-        time_dt = to_datetime(time_series, unit='s')
-        time = time_series.values
-    else:
-        # convert to datetime
-        time_dt = to_datetime(time_series, **to_datetime_kw)
-
-        # TODO add timezone conversion?
-        # change to epoch timestamps in seconds
-        time = time_dt.astype(int).values / 1e9  # int returns nanoseconds
-
-    # calculate the sampling frequency
-    fs = mean(1 / diff(time[:2500]))
-    # check if we have duplicated timestamps (ie 1 time value for multiple samples)
-    # this is common with actigraph timestamps
-    n_samples = (time[:2500] == time[0]).sum()
-    if n_samples != 1:
-        # set fs
-        fs = float(n_samples)
-        # check that there are an even number of blocks
-        n_blocks = time.size / n_samples
-
-        if int(n_samples) != n_samples:
-            warn("Non integer number of blocks. Trimming partial block.", UserWarning)
-            N = int(time.size // n_samples * n_samples)
-            # drop in-place
-            time = time[:N]
-
-        t_delta = tile(arange(0, 1, 1 / n_samples), int(n_blocks))
-
-        time += t_delta
-
-    return time, fs, time_dt
-
-
-def handle_accel__(df, accel_cols, acc_in_g, g):
-    """
-    Extract the acceleration columns from the dataframe.
-
-    Parameters
-    ----------
-    df : pandas.DataFrame
-        Pandas dataframe containing data from the CSV file.
-    accel_cols : list-like
-        List of acceleration column names in X/Y/Z axis order.
-    acc_in_g : bool
-        If the data is already in units of "g".
-    g : float
-        Gravitational acceleration.
-
-    Returns
-    -------
-    accel : numpy.ndarray
-        (N, 3) array of acceleration values in units of "g".
-    """
-    acc = df[accel_cols].values
-
-    if not acc_in_g:
-        acc /= g
-
-    return acc
-
-
-def handle_windows__(time_dt, bases, periods, run_windowing):
+def handle_windows(time_dt, bases, periods, run_windowing):
     """
     Handle computation of the indices for day windows.
 
@@ -229,6 +145,34 @@ def handle_windows__(time_dt, bases, periods, run_windowing):
     return days
 
 
+def handle_accel(df, accel_cols, acc_in_g, g):
+    """
+    Extract the acceleration columns from the dataframe.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Pandas dataframe containing data from the CSV file.
+    accel_cols : list-like
+        List of acceleration column names in X/Y/Z axis order.
+    acc_in_g : bool
+        If the data is already in units of "g".
+    g : float
+        Gravitational acceleration.
+
+    Returns
+    -------
+    accel : numpy.ndarray
+        (N, 3) array of acceleration values in units of "g".
+    """
+    acc = df[accel_cols].values
+
+    if not acc_in_g:
+        acc /= g
+
+    return acc
+
+
 class ReadCSV(BaseProcess):
     """
     Read a comma-separated value (CSV) file into memory.
@@ -241,10 +185,6 @@ class ReadCSV(BaseProcess):
         List-like of acceleration column names. Must be length 3, in X, Y, Z axis order.
     fill_gaps : bool, optional
         Fill any gaps in acceleration data with the vector [0, 0, 1]. Default is True.
-    time_is_seconds : bool, optional
-        Provided time data is already in unix seconds (ie seconds from 1970-01-01).
-        If false, will attempt to use :py:class:`pandas.to_datetime` to convert.
-        See Notes. Default is False.
     to_datetime_kwargs : dict, optional
         Dictionary of key-word arguments for :py:class:`pandas.to_datetime`.
     accel_in_g : bool, optional
@@ -282,7 +222,6 @@ class ReadCSV(BaseProcess):
             time_col_name,
             accel_col_names,
             fill_gaps=True,
-            time_is_seconds=False,
             to_datetime_kwargs=None,
             accel_in_g=True,
             g_value=9.81,
@@ -300,7 +239,6 @@ class ReadCSV(BaseProcess):
             time_col_name=time_col_name,
             accel_col_names=accel_col_names,
             fill_gaps=fill_gaps,
-            time_is_seconds=time_is_seconds,
             to_datetime_kwargs=to_datetime_kwargs,
             accel_in_g=accel_in_g,
             g_value=g_value,
@@ -313,7 +251,6 @@ class ReadCSV(BaseProcess):
         self.time_col_name = time_col_name
         self.acc_col_names = accel_col_names
         self.fill_gaps = fill_gaps
-        self.time_is_seconds = time_is_seconds
         self.to_datetime_kw = to_datetime_kwargs
         self.accel_in_g = accel_in_g
         self.g_value = g_value
@@ -385,20 +322,19 @@ class ReadCSV(BaseProcess):
         raw["_datetime_"] = to_datetime(raw[self.time_col_name], **self.to_datetime_kw)
 
         # now handle data gaps and second level timestamps, etc
-        raw = handle_timestamp_inconsistency(raw, self.fill_gaps, self.acc_col_names, self.accel_in_g, self.g_value)
+        raw, fs = handle_timestamp_inconsistency(raw, self.fill_gaps, self.acc_col_names, self.accel_in_g, self.g_value)
 
+        # first do the windowing
+        day_windows = handle_windows(raw["_datetime_"], self.bases, self.periods, self.window)
 
-        # get the time values and convert if necessary
-        time, fs, time_dt = handle_timestamps(raw[self.time_col_name], self.time_is_seconds, self.to_datetime_kw)
+        # get the time values and convert to seconds
+        time = raw["_datetime_"].astype(int).values / 1e9  # int gives ns, convert to s
 
         # get the acceleration values and convert if necessary
         accel = handle_accel(raw, self.acc_col_names, self.accel_in_g, self.g_value)
 
         # make sure that if we trimmed time, we trim acceleration
         accel = accel[:time.size, :]
-
-        # handle the windowing
-        day_windows = handle_windows(time_dt, self.bases, self.periods, self.window)
 
         kwargs.update(
             {
