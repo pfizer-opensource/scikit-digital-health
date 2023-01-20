@@ -7,6 +7,7 @@ py3.install_sources(
         'geneactiv.py',
         'get_window_start_stop.py',
         'numpy_compressed.py',
+        'csv.py',
         'utility.py',
     ],
     pure: false,
