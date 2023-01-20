@@ -71,20 +71,28 @@ def handle_timestamp_inconsistency(df, fill_gaps, accel_col_names, accel_in_g, g
         # add the time delta so that we have unique timestamps
         df['_datetime_'] += t_delta
 
-    # now fix any data gaps: set the index as the datetime, and then upsample to match
-    # the sampling frequency. This will put nan values in any data gaps
-    df_full = df.set_index('_datetime_').asfreq(f'{1 / n_samples}S')
-
-    # put the datetime array back in the dataframe
-    df_full = df_full.reset_index(drop=False)
-
     # check if we are filling gaps or not
     if fill_gaps:
+        # now fix any data gaps: set the index as the datetime, and then upsample to match
+        # the sampling frequency. This will put nan values in any data gaps
+        df_full = df.set_index('_datetime_').asfreq(f'{1 / n_samples}S')
+
+        # put the datetime array back in the dataframe
+        df_full = df_full.reset_index(drop=False)
+
         z_fill = 1.0 if accel_in_g else g
 
         df_full[accel_col_names[0]].fillna(value=0.0, inplace=True)
         df_full[accel_col_names[1]].fillna(value=0.0, inplace=True)
         df_full[accel_col_names[2]].fillna(value=z_fill, inplace=True)
+    else:
+        # if not filling data gaps, check that there are not gaps that would cause
+        # garbage outputs from downstream algorithms
+        time_deltas = diff(df['_datetime_']).astype(int) / 1e9  # convert to seconds
+        if (abs(time_deltas) > (1.5 / n_samples)).any():
+            raise ValueError("There are data gaps in the data, which could potentially result in garbage outputs from downstream algorithms.")
+
+        df_full = df.copy()
 
     return df_full, float(n_samples)
 
@@ -184,7 +192,8 @@ class ReadCSV(BaseProcess):
     accel_col_names : list-like
         List-like of acceleration column names. Must be length 3, in X, Y, Z axis order.
     fill_gaps : bool, optional
-        Fill any gaps in acceleration data with the vector [0, 0, 1]. Default is True.
+        Fill any gaps in acceleration data with the vector [0, 0, 1]. Default is True. If False
+        and data gaps are detected, then the reading will raise a `ValueError`.
     to_datetime_kwargs : dict, optional
         Dictionary of key-word arguments for :py:class:`pandas.to_datetime`.
     accel_in_g : bool, optional
