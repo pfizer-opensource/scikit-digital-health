@@ -171,26 +171,31 @@ def apdm_file():
 
 @fixture
 def dummy_csv_contents():
-    df = pd.DataFrame(columns=["ts", "ax", "ay", "az"])
+    def fn(drop=True):
+        df = pd.DataFrame(columns=["ts", "ax", "ay", "az"])
 
-    # generate 72hrs of data at 32hz
-    hours = 72
-    fs = 32.0
-    rng = random.default_rng(24089752)
+        # generate 72hrs of data at 32hz
+        hours = 72
+        fs = 32.0
+        rng = random.default_rng(24089752)
 
-    n = int(hours * 3600 * fs)  # number of samples
+        n = int(hours * 3600 * fs)  # number of samples
 
-    df[['ax', 'ay', 'az']] = rng.normal(size=(n, 3))
+        df[['ax', 'ay', 'az']] = rng.normal(size=(n, 3))
 
-    start = "2020-06-06 12:00:00.000"
-    tdelta = repeat(pd.to_timedelta(arange(0, hours * 3600), unit='s'), int(fs))
+        start = "2020-06-06 12:00:00.000"
+        tdelta = repeat(pd.to_timedelta(arange(0, hours * 3600), unit='s'), int(fs))
 
-    df['_datetime_'] = pd.to_datetime(start) + tdelta
+        df['_datetime_'] = pd.to_datetime(start) + tdelta
 
-    # drop a chunk of data out
-    i1 = int(13 * 3600 * fs)
-    i2 = int(19 * 3600 * fs)
+        # drop a chunk of data out
+        if drop:
+            i1 = int(13 * 3600 * fs)
+            i2 = int(19 * 3600 * fs)
 
-    df2 = pd.concat((df.iloc[:i1], df.iloc[i2:]), ignore_index=True)
+            df2 = df.drop(index=range(i1, i2)).reset_index(drop=True)
 
-    return df2, fs, n
+            return df2, fs, n
+        else:
+            return df, fs, n
+    return fn
