@@ -85,11 +85,13 @@ typedef enum {
     AX_READ_E_BAD_AXES_PACKED = 4,
     AX_READ_E_BAD_PACKING_CODE = 5,
     AX_READ_E_BAD_CHECKSUM = 6,
+    AX_READ_E_BAD_LENGTH_ZERO_TIMESTAMPS = 7,
 } Read_Cwa_Error_t;
 
 extern void axivity_read_header(long *, char[], AX_Info_t *, int *);
 extern void axivity_read_block(AX_Info_t *, long *, double *, double *, double *, long *, long *,
     long *, long *, long *, long *, int *);
+extern void adjust_timestamps(AX_Info_t *, double *, int *);
 extern void axivity_close(AX_Info_t *);
 
 /*

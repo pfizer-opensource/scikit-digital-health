@@ -71,6 +71,7 @@ module axivity
     integer(c_int), parameter :: AX_READ_E_BAD_AXES_PACKED = 4
     integer(c_int), parameter :: AX_READ_E_BAD_PACKING_CODE = 5
     integer(c_int), parameter :: AX_READ_E_BAD_CHECKSUM = 6
+    integer(c_int), parameter :: AX_READ_E_BAD_LENGTH_ZERO_TIMESTAMPS = 7
 
 contains
 
@@ -215,7 +216,11 @@ contains
 
         read(info%N, pos=pos) pkt
         if ((pkt%header /= HEADER_ACCEL) .or. (pkt%length /= 508_c_int16_t)) then
-            ierr = AX_READ_E_BAD_HEADER
+            ierr = AX_READ_E_NONE  ! no error just returning
+            info%n_bad_blocks = info%n_bad_blocks + 1_c_long
+            ! set the last time to 0 so that we dont use it to adjust timestamps for
+            ! the next block
+            info%tLast = -1.0
             return
         end if
 
@@ -269,6 +274,9 @@ contains
             if (wordsum /= 0) then
                 info%n_bad_blocks = info%n_bad_blocks + 1_c_long
                 ierr = AX_READ_E_NONE  ! no error, just skip populating the block with data
+                ! set the last time to 0 so that we dont use it to adjust timestamps for
+                ! the next block
+                info%tLast = -1.0
                 return
             end if
 
@@ -303,7 +311,11 @@ contains
             end if
         end if
 
-        i1 = (pkt%sequenceID - info%n_bad_blocks) * info%count + 1_c_int16_t
+        ! i1 = (pkt%sequenceID - info%n_bad_blocks) * info%count + 1_c_int16_t
+        ! above would result in data gaps that would result in bad timestamps
+        ! going forward bad blocks will be left as all 0 values, and timestamps
+        ! will be fixed later
+        i1 = pkt%sequenceID * info%count + 1_c_int16_t
         i2 = i1 + info%count
 
         ! set the temperature for the block, and convert to deg C
@@ -412,6 +424,68 @@ contains
             stops, &  ! storage for stop indices of windows
             i_stop &  ! keep track of where in stops we are
         )
+    end subroutine
+
+    ! =============================================================================================
+    ! adjust_timestamps : adjust timestamps for missing/bad data blocks
+    ! =============================================================================================
+    subroutine adjust_timestamps(info, timestamps, ierr) bind(C, name="adjust_timestamps")
+        type(FileInfo_t), intent(inout) :: info  ! file information storage structure
+        ! timestamp data array
+        real(c_double), intent(inout) :: timestamps(info%count * (info%nblocks - 2))
+        integer(c_int), intent(out) :: ierr  ! error recording and returning to calling function
+        ! local
+        ! for starts and lengths we can make some assumptions about that
+        ! only full blocks should have 0 values, so we can have smaller arrays
+        ! but add a little bit of buffer space
+        integer(c_int) :: starts(info%nblocks + 10)
+        integer(c_int) :: lengths(info%nblocks + 10)
+        integer(c_int) :: n, i, j, i_start, curr_len
+        real(c_double) :: t0, t1, ta, tb, delta_t
+
+        n = info%count * (info%nblocks - 2)  ! for easier referencing
+
+        i_start = 1  ! keep track of where we are
+        if (timestamps(1) == 0._c_double) then
+            starts(1) = 1
+            i_start = 2
+        end if
+        do i=2, n
+            if ((timestamps(i) == 0._c_double) .and. (timestamps(i - 1) /= 0._c_double)) then
+                starts(i_start) = i
+                i_start = i_start + 1
+                curr_len = 1
+            else if (timestamps(i) == 0._c_double) then
+                curr_len = curr_len + 1
+            else if ((timestamps(i) /= 0._c_double) .and. (timestamps(i - 1) == 0._c_double)) then
+                lengths(i_start - 1) = curr_len
+            end if
+        end do
+
+        ! iterate over starts and fill
+        do i=1, i_start - 1
+            if (mod(lengths(i), info%count) /= 0) then
+                ierr = AX_READ_E_BAD_LENGTH_ZERO_TIMESTAMPS
+                return
+            end if
+            ! start time
+            ta = timestamps(starts(i) - 1) + 1. / info%frequency  ! timestamp if this is NOT the first block
+            tb = timestamps(starts(i) + lengths(i)) - lengths(i) / info%frequency
+            t0 = merge(ta, tb, starts(i) > 1_c_int16_t)
+
+            ! end time
+            ta = timestamps(starts(i) + lengths(i))  ! - 1. / info%frequency
+            tb = timestamps(starts(i)) + lengths(i) / info%frequency
+            t1 = merge(ta, tb, starts(i) + lengths(i) <= n)
+
+            delta_t = (t1 - t0) / lengths(i)
+
+            timestamps(starts(i)) = t0
+            do j=1, lengths(i) - 1
+                timestamps(starts(i) + j) = t0 + j * delta_t
+            end do
+        end do
+
     end subroutine
 
     ! =============================================================================================

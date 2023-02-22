@@ -137,7 +137,8 @@ class ReadCwa(BaseProcess):
             file, self.bases, self.periods
         )
 
-        end = None if n_bad_samples == 0 else -n_bad_samples
+        # end = None if n_bad_samples == 0 else -n_bad_samples
+        end = None
 
         num_axes = imudata.shape[1]
         gyr_axes = mag_axes = None
