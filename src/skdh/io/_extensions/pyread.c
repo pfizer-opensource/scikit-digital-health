@@ -35,9 +35,9 @@ void axivity_set_error_message(int ierr)
 {
     switch(ierr)
     {
-        case AX_READ_E_BAD_HEADER :
-            PyErr_SetString(PyExc_RuntimeError, "Bad packet header value.");
-            break;
+//        case AX_READ_E_BAD_HEADER :
+//            PyErr_SetString(PyExc_RuntimeError, "Bad packet header value.");
+//            break;
         case AX_READ_E_MISMATCH_N_AXES :
             PyErr_SetString(PyExc_RuntimeError, "Incorrect number of axes given file configuration.");
             break;
@@ -53,8 +53,11 @@ void axivity_set_error_message(int ierr)
         case AX_READ_E_BAD_CHECKSUM :
             PyErr_SetString(PyExc_RuntimeError, "Checksum not equal to 0.");
             break;
+        case AX_READ_E_BAD_LENGTH_ZERO_TIMESTAMPS :
+            PyErr_SetString(PyExc_RuntimeError, "Bad block of timestamps not equal to data block sample size.");
+            break;
         default :
-            PyErr_SetString(PyExc_RuntimeError, "Unkown error reading Axivity file");
+            PyErr_SetString(PyExc_RuntimeError, "Unknown error reading Axivity file");
     }
 }
 
@@ -187,6 +190,28 @@ static PyObject *read_axivity(PyObject *NPY_UNUSED(self), PyObject *args)
             PyErr_SetString(PyExc_RuntimeError, "Error reading axivity data block.");
             fail = 1;
             break;
+        }
+    }
+
+    /* adjust timestamps if there were bad blocks */
+    if (info.n_bad_blocks > 0)
+    {
+        adjust_timestamps(&info, ts_p, &ierr);
+        if (ierr != 0)
+        {
+            fail = 1;
+        }
+    }
+
+    /* set a warning for the number of bad blocks */
+    if (info.n_bad_blocks > 0)
+    {
+        fprintf(stdout, "WARNING: %li bad blocks\n", info.n_bad_blocks);
+        int err_ret = PyErr_WarnEx(PyExc_RuntimeWarning, "Bad data blocks present", 1);
+
+        if (err_ret == -1)  /* warnings are being raised as exceptions */
+        {
+            fail = 1;
         }
     }
 

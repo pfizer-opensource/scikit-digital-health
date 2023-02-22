@@ -97,7 +97,11 @@ class ReadApdmH5(BaseProcess):
         with h5py.File(file, "r") as f:
             sid = None  # sensor id
             for sens in f["Sensors"]:
-                sname = f["Sensors"][sens]["Configuration"].attrs["Label 0"]
+                try:
+                    sname = f["Sensors"][sens]["Configuration"].attrs["Label 0"]
+                except RuntimeError:
+                    # if the sensor has issues, still try to find in other sensors
+                    continue
                 if sname.decode("utf-8") == self.sens:
                     sid = sens
             if sid is None:
