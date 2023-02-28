@@ -99,7 +99,7 @@ class ReadApdmH5(BaseProcess):
             for sens in f["Sensors"]:
                 try:
                     sname = f["Sensors"][sens]["Configuration"].attrs["Label 0"]
-                except RuntimeError:
+                except (RuntimeError, KeyError):
                     # if the sensor has issues, still try to find in other sensors
                     continue
                 if sname.decode("utf-8") == self.sens:
