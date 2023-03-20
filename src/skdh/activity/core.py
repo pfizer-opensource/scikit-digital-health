@@ -478,6 +478,11 @@ class ActivityLevelClassification(BaseProcess):
         # minimum hours should have nan values
         self._initialize_awake_values(results, day_n)
 
+        # get starts and stops for which we can actually compute values
+        mask = (stops - starts) > n_wlen_60
+        starts = starts[mask]
+        stops = stops[mask]
+
         for start, stop in zip(starts, stops):
             # compute the desired acceleration metric
             metric_fn = get_metric(self.cutpoints["metric"])
