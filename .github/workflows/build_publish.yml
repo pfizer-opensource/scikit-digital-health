@@ -1,0 +1,26 @@
+name: BuildAndPublish
+
+on: workflow_dispatch
+
+jobs:
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-20.04, macos-11]
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      # Used to host cibuildwheel
+      - uses: actions/setup-python@v3
+      
+      - name: Install cibuildwheel
+        run: python -m pip install cibuildwheel=2.12.1
+      
+      - name: Build wheels
+        run: python -m cibuildwheel --output-dir wheelhouse
+        
+      - name: Print for testing
+        run: ls ./wheelhouse
