@@ -22,7 +22,7 @@ jobs:
       - name: Build wheels
         env:
           CIBW_SKIP: pp* cp36-* cp37-* *musllinux*
-          CIBW_ARCHS_MACOS: x86_64 arm64
+          CIBW_ARCHS_MACOS: x86_64 universal2 arm64
           CIBW_ARCHS_LINUX: auto64
           FC: gfortran-12
         run: python -m cibuildwheel --output-dir wheelhouse
