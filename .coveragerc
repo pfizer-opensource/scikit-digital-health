@@ -7,7 +7,7 @@ omit =
     *__init__.py
     # version file
     *version.py
-# source = src/
+source = skdh
 
 [report]
 # regexes for lines to exclude from consideration
