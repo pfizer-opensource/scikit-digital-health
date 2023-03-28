@@ -445,6 +445,8 @@ contains
 
         n = info%count * (info%nblocks - 2)  ! for easier referencing
 
+        curr_len = 0  ! initialize to avoid warnings
+
         i_start = 1  ! keep track of where we are
         if (timestamps(1) == 0._c_double) then
             starts(1) = 1
