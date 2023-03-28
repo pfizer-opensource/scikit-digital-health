@@ -27,7 +27,11 @@ jobs:
           CIBW_ARCHS_LINUX: auto64
           CIBW_ARCHS_WINDOWS: auto64
           FC: gfortran-12
-        run: python -m cibuildwheel --output-dir wheelhouse
+        run: |
+          if [ "$RUNNER_OS" == "Windows" ]; then
+           export FC=gfortran
+          fi
+          python -m cibuildwheel --output-dir wheelhouse
         
       - name: Print for testing
         run: ls ./wheelhouse
