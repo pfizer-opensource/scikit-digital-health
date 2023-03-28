@@ -22,6 +22,7 @@ jobs:
       - name: Build wheels
         env:
           CIBW_SKIP: pp* cp36-* cp37-*
+          FC: gfortran-11
         run: python -m cibuildwheel --output-dir wheelhouse
         
       - name: Print for testing
