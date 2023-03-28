@@ -4,7 +4,7 @@ Read from a numpy compressed file.
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
-from numpy import load
+from numpy import load as np_load
 
 from skdh.base import BaseProcess
 from skdh.io.base import check_input_file
@@ -20,14 +20,19 @@ class ReadNumpyFile(BaseProcess):
 
     Parameters
     ----------
+    allow_pickle : bool, optional
+        Allow pickled objects in the NumPy file. Default is False, which is the safer option.
+        For more information see :py:meth:`numpy.load`.
     ext_error : {"warn", "raise", "skip"}, optional
         What to do if the file extension does not match the expected extension (.npz).
         Default is "warn". "raise" raises a ValueError. "skip" skips the file
         reading altogether and attempts to continue with the pipeline.
     """
 
-    def __init__(self, ext_error="warn"):
-        super(ReadNumpyFile, self).__init__(ext_error=ext_error)
+    def __init__(self, allow_pickle=False, ext_error="warn"):
+        super(ReadNumpyFile, self).__init__(allow_pickle=allow_pickle, ext_error=ext_error)
+
+        self.allow_pickle = allow_pickle
 
         if ext_error.lower() in ["warn", "raise", "skip"]:
             self.ext_error = ext_error.lower()
@@ -67,12 +72,17 @@ class ReadNumpyFile(BaseProcess):
         """
         super().predict(expect_days=False, expect_wear=False, file=file, **kwargs)
 
-        data = load(file)
+        with np_load(file, allow_pickle=self.allow_pickle) as data:
+            kwargs.update(data)  # pull everything in
+            # make sure that fs is saved properly
+            if "fs" in data:
+                kwargs["fs"] = data["fs"][()]
 
-        kwargs.update(
-            {self._time: data["time"], self._acc: data["accel"], "file": file}
-        )
-        if "fs" in data:
-            kwargs["fs"] = data["fs"][()]
+        # check that time and accel are in the correct names
+        if self._time not in kwargs or self._acc not in kwargs:
+            raise ValueError(f"Missing `{self._time}` or `{self._acc}` arrays in the file")
+
+        # make sure we return the file
+        kwargs.update({'file': file})
 
         return (kwargs, None) if self._in_pipeline else kwargs
