@@ -8,7 +8,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04, macos-12, windows-2019]
+        # os: [ubuntu-20.04, macos-12, windows-2019]
+        os: [windows-2019]
     
     steps:
       - uses: actions/checkout@v3
@@ -24,6 +25,7 @@ jobs:
           CIBW_SKIP: pp* cp36-* cp37-* *musllinux*
           CIBW_ARCHS_MACOS: x86_64
           CIBW_ARCHS_LINUX: auto64
+          CIBW_ARCHS_WINDOWS: auto64
           FC: gfortran-12
         run: python -m cibuildwheel --output-dir wheelhouse
         
