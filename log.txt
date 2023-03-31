@@ -1,0 +1,128 @@
+(skdh_john) samuej20@EMAL20BF902WG81 scikit-digital-health % pip install . > log.txt
+  error: subprocess-exited-with-error
+  
+  × Preparing metadata (pyproject.toml) did not run successfully.
+  │ exit code: 1
+  ╰─> [108 lines of output]
+      The Meson build system
+      Version: 0.63.0
+      Source dir: /Users/samuej20/git_repos/scikit-digital-health
+      Build dir: /Users/samuej20/git_repos/scikit-digital-health/.mesonpy-4ll78i8i/build
+      Build type: native build
+      Project name: scikit-digital-health
+      Project version: 0.9.16.post1
+      C compiler for the host machine: gcc (clang 13.1.6 "Apple clang version 13.1.6 (clang-1316.0.21.2.3)")
+      C linker for the host machine: gcc ld64 762
+      Host machine cpu family: x86_64
+      Host machine cpu: x86_64
+      Program python3 found: YES (/Users/samuej20/opt/anaconda3/envs/skdh_john/bin/python)
+      Found pkg-config: /Users/samuej20/opt/anaconda3/envs/skdh_john/bin/pkg-config (0.29.2)
+      Fortran compiler for the host machine: gfortran-12 (gcc 12.1.0 "GNU Fortran (Homebrew GCC 12.1.0_1) 12.1.0")
+      Fortran linker for the host machine: gfortran-12 ld64 762
+      Library m found: YES
+      Library zip found: NO
+      ../../src/skdh/io/_extensions/meson.build:62: WARNING: Library `zip` not found, not building the GT3x reader extension.
+      Build targets in project: 11
+      
+      scikit-digital-health 0.9.16.post1
+      
+        User defined options
+          Native files: /Users/samuej20/git_repos/scikit-digital-health/.mesonpy-native-file.ini
+          debug       : false
+          optimization: 2
+          prefix      : /Users/samuej20/opt/anaconda3/envs/skdh_john
+      
+      Found ninja-1.10.2.git.kitware.jobserver-1 at /private/var/folders/9f/_n5735dn3tg224w30317934w0000gn/T/pip-build-env-xcemxzpe/overlay/bin/ninja
+      [1/33] Compiling C object src/skdh/io/_extensions/libread.a.p/read_geneactiv.c.o
+      [2/33] Compiling C object src/skdh/features/lib/extensions/statistics.cpython-310-darwin.so.p/statistics.c.o
+      [3/33] Compiling C object src/skdh/features/lib/extensions/entropy.cpython-310-darwin.so.p/entropy.c.o
+      [4/33] Compiling C object src/skdh/io/_extensions/read.cpython-310-darwin.so.p/pyread.c.o
+      ../../src/skdh/io/_extensions/pyread.c:88:28: warning: incompatible pointer types passing 'PyArrayObject *' (aka 'struct tagPyArrayObject *') to parameter of type 'PyObject *' (aka 'struct _object *') [-Wincompatible-pointer-types]
+          winfo.n = PyArray_Size(bases);
+                                 ^~~~~
+      ../../src/skdh/io/_extensions/pyread.c:89:33: warning: incompatible pointer types passing 'PyArrayObject *' (aka 'struct tagPyArrayObject *') to parameter of type 'PyObject *' (aka 'struct _object *') [-Wincompatible-pointer-types]
+          if (winfo.n != PyArray_Size(periods))
+                                      ^~~~~~~
+      ../../src/skdh/io/_extensions/pyread.c:258:28: warning: incompatible pointer types passing 'PyArrayObject *' (aka 'struct tagPyArrayObject *') to parameter of type 'PyObject *' (aka 'struct _object *') [-Wincompatible-pointer-types]
+          winfo.n = PyArray_Size(bases);
+                                 ^~~~~
+      ../../src/skdh/io/_extensions/pyread.c:259:33: warning: incompatible pointer types passing 'PyArrayObject *' (aka 'struct tagPyArrayObject *') to parameter of type 'PyObject *' (aka 'struct _object *') [-Wincompatible-pointer-types]
+          if (winfo.n != PyArray_Size(periods))
+                                      ^~~~~~~
+      4 warnings generated.
+      [5/33] Compiling C object src/skdh/features/lib/extensions/_utility.cpython-310-darwin.so.p/_utility.c.o
+      [6/33] Compiling C object src/skdh/features/lib/extensions/misc_features.cpython-310-darwin.so.p/misc_features.c.o
+      [7/33] Compiling C object src/skdh/features/lib/extensions/smoothness.cpython-310-darwin.so.p/smoothness.c.o
+      [8/33] Compiling C object src/skdh/utility/_extensions/moving_statistics.cpython-310-darwin.so.p/moving_statistics.c.o
+      [9/33] Compiling C object src/skdh/features/lib/extensions/frequency.cpython-310-darwin.so.p/frequency.c.o
+      [10/33] Module scanner.
+      [11/33] Module scanner.
+      [12/33] Module scanner.
+      [13/33] Compiling Fortran object src/skdh/io/_extensions/libread.a.p/utility.f95.o
+      [14/33] Compiling Fortran object src/skdh/features/lib/extensions/libfort_features.a.p/sort.f95.o
+      [15/33] Compiling Fortran object src/skdh/utility/_extensions/libfmoving_statistics.a.p/sort.f95.o
+      [16/33] Compiling Fortran object src/skdh/utility/_extensions/libfmoving_statistics.a.p/moving_moments.f95.o
+      [17/33] Compiling Fortran object src/skdh/features/lib/extensions/libfort_features.a.p/utility.f95.o
+      [18/33] Compiling Fortran object src/skdh/features/lib/extensions/libfort_features.a.p/real_fft.f95.o
+      [19/33] Compiling Fortran object src/skdh/io/_extensions/libread.a.p/read_axivity.f95.o
+      ../../src/skdh/io/_extensions/read_axivity.f95:306:13:
+      
+        306 |         i1 = (pkt%sequenceID - info%n_bad_blocks) * info%count + 1_c_int16_t
+            |             1
+      Warning: Possible change of value in conversion from INTEGER(8) to INTEGER(4) at (1) [-Wconversion]
+      [20/33] Compiling Fortran object src/skdh/utility/_extensions/libfmoving_statistics.a.p/median_heap.f95.o
+      [21/33] Linking static target src/skdh/io/_extensions/libread.a
+      FAILED: src/skdh/io/_extensions/libread.a
+      rm -f src/skdh/io/_extensions/libread.a && ar csr src/skdh/io/_extensions/libread.a src/skdh/io/_extensions/libread.a.p/utility.f95.o src/skdh/io/_extensions/libread.a.p/read_axivity.f95.o src/skdh/io/_extensions/libread.a.p/read_geneactiv.c.o
+      /Library/Developer/CommandLineTools/usr/bin/ranlib: archive member: src/skdh/io/_extensions/libread.a(read_geneactiv.c.o) cputype (16777223) does not match previous archive members cputype (16777228) (all members must match)
+      warning: /Library/Developer/CommandLineTools/usr/bin/ranlib: archive library: src/skdh/io/_extensions/libread.a will be fat and ar(1) will not be able to operate on it
+      /Library/Developer/CommandLineTools/usr/bin/ar: internal ranlib command failed
+      [22/33] Linking static target src/skdh/utility/_extensions/libfmoving_statistics.a
+      [23/33] Compiling Fortran object src/skdh/features/lib/extensions/libfort_features.a.p/f_rfft.f95.o
+      [24/33] Compiling Fortran object src/skdh/features/lib/extensions/libfort_features.a.p/ffeatures.f95.o
+      ninja: build stopped: subcommand failed.
+      + meson setup --native-file=/Users/samuej20/git_repos/scikit-digital-health/.mesonpy-native-file.ini -Ddebug=false -Doptimization=2 --prefix=/Users/samuej20/opt/anaconda3/envs/skdh_john /Users/samuej20/git_repos/scikit-digital-health /Users/samuej20/git_repos/scikit-digital-health/.mesonpy-4ll78i8i/build
+      + meson compile
+      Traceback (most recent call last):
+        File "/Users/samuej20/opt/anaconda3/envs/skdh_john/lib/python3.10/site-packages/pip/_vendor/pep517/in_process/_in_process.py", line 156, in prepare_metadata_for_build_wheel
+          hook = backend.prepare_metadata_for_build_wheel
+      AttributeError: module 'mesonpy' has no attribute 'prepare_metadata_for_build_wheel'
+      
+      During handling of the above exception, another exception occurred:
+      
+      Traceback (most recent call last):
+        File "/Users/samuej20/opt/anaconda3/envs/skdh_john/lib/python3.10/site-packages/pip/_vendor/pep517/in_process/_in_process.py", line 363, in <module>
+          main()
+        File "/Users/samuej20/opt/anaconda3/envs/skdh_john/lib/python3.10/site-packages/pip/_vendor/pep517/in_process/_in_process.py", line 345, in main
+          json_out['return_val'] = hook(**hook_input['kwargs'])
+        File "/Users/samuej20/opt/anaconda3/envs/skdh_john/lib/python3.10/site-packages/pip/_vendor/pep517/in_process/_in_process.py", line 160, in prepare_metadata_for_build_wheel
+          whl_basename = backend.build_wheel(metadata_directory, config_settings)
+        File "/private/var/folders/9f/_n5735dn3tg224w30317934w0000gn/T/pip-build-env-xcemxzpe/overlay/lib/python3.10/site-packages/mesonpy/__init__.py", line 941, in build_wheel
+          return project.wheel(out).name
+        File "/private/var/folders/9f/_n5735dn3tg224w30317934w0000gn/T/pip-build-env-xcemxzpe/overlay/lib/python3.10/site-packages/mesonpy/__init__.py", line 889, in wheel
+          wheel = _WheelBuilder(self).build(self._install_plan, self._copy_files, self._build_dir)
+        File "/private/var/folders/9f/_n5735dn3tg224w30317934w0000gn/T/pip-build-env-xcemxzpe/overlay/lib/python3.10/site-packages/mesonpy/__init__.py", line 354, in build
+          self._project.build()  # ensure project is built
+        File "/private/var/folders/9f/_n5735dn3tg224w30317934w0000gn/T/pip-build-env-xcemxzpe/overlay/lib/python3.10/site-packages/mesonpy/__init__.py", line 535, in build
+          self._meson('compile')
+        File "/private/var/folders/9f/_n5735dn3tg224w30317934w0000gn/T/pip-build-env-xcemxzpe/overlay/lib/python3.10/site-packages/mesonpy/__init__.py", line 477, in _meson
+          return self._proc('meson', *args)
+        File "/private/var/folders/9f/_n5735dn3tg224w30317934w0000gn/T/pip-build-env-xcemxzpe/overlay/lib/python3.10/site-packages/mesonpy/__init__.py", line 472, in _proc
+          subprocess.check_call(list(args))
+        File "/Users/samuej20/opt/anaconda3/envs/skdh_john/lib/python3.10/subprocess.py", line 369, in check_call
+          raise CalledProcessError(retcode, cmd)
+      subprocess.CalledProcessError: Command '['meson', 'compile']' returned non-zero exit status 1.
+      [end of output]
+  
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: metadata-generation-failed
+
+
+
+× Encountered error while generating package metadata.
+╰─> See above for output.
+
+
+
+note: This is an issue with the package mentioned above, not pip.
+hint: See above for details.

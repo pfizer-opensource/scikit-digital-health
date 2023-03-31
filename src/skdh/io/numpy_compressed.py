@@ -4,7 +4,13 @@ Read from a numpy compressed file.
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+<<<<<<< HEAD
 from numpy import load as np_load
+=======
+from numpy import load
+import pandas as pd
+import numpy as np
+>>>>>>> dev_john
 
 from skdh.base import BaseProcess
 from skdh.io.base import check_input_file
@@ -28,11 +34,23 @@ class ReadNumpyFile(BaseProcess):
         Default is "warn". "raise" raises a ValueError. "skip" skips the file
         reading altogether and attempts to continue with the pipeline.
     """
+    # TODO: Add bases & periods to the docstring here
 
+<<<<<<< HEAD
     def __init__(self, allow_pickle=False, ext_error="warn"):
         super(ReadNumpyFile, self).__init__(allow_pickle=allow_pickle, ext_error=ext_error)
 
         self.allow_pickle = allow_pickle
+=======
+    def __init__(self, ext_error="warn", bases=None, periods=None):
+        super(ReadNumpyFile, self).__init__(
+            bases=bases,
+            periods=periods,
+            ext_error=ext_error
+        )
+        self.bases = bases
+        self.periods = periods
+>>>>>>> dev_john
 
         if ext_error.lower() in ["warn", "raise", "skip"]:
             self.ext_error = ext_error.lower()
@@ -78,11 +96,53 @@ class ReadNumpyFile(BaseProcess):
             if "fs" in data:
                 kwargs["fs"] = data["fs"][()]
 
+<<<<<<< HEAD
         # check that time and accel are in the correct names
         if self._time not in kwargs or self._acc not in kwargs:
             raise ValueError(f"Missing `{self._time}` or `{self._acc}` arrays in the file")
 
         # make sure we return the file
         kwargs.update({'file': file})
+=======
+        # TODO: this code is very slow for large amounts of data - needs to be sped up
+        # TODO: this code should be moved to its own function in `utility.py` for easier testing, etc
+        if self.bases is not None and self.periods is not None:
+            # day/windowing stuff - ADDED
+            time = pd.to_datetime(data["time"], unit='s')
+            start_date = time[0]
+            end_date = time[-1]
+            days = {}
+            day_dt = pd.Timedelta(1, unit='day')
+            for b, p in zip(self.bases, self.periods):
+                starts, stops = [], []
+
+                p2 = (b + p) % 24
+
+                tb = start_date.replace(hour=b, minute=0, second=0) - day_dt
+                tp = start_date.replace(hour=p2, minute=0, second=0) - day_dt
+                if tp <= tb:
+                    tp += day_dt
+                while tp < start_date:  # make sure at least one of the indices is during recording
+                    tb += day_dt
+                    tp += day_dt
+
+                # iterate over the times
+                while tb < end_date:
+                    starts.append(np.argmin(abs(time - tb)))
+                    stops.append(np.argmin(abs(time - tp)))
+
+                    tb += day_dt
+                    tp += day_dt
+
+                days[(b, p)] = np.vstack((starts, stops)).T
+
+            kwargs.update({self._days: days})
+
+        kwargs.update(
+            {self._time: data["time"], self._acc: data["accel"], self._temp: data['temperature'], "file": file}
+        )
+        if "fs" in data:
+            kwargs["fs"] = data["fs"][()]
+>>>>>>> dev_john
 
         return (kwargs, None) if self._in_pipeline else kwargs
