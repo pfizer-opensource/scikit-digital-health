@@ -4,13 +4,9 @@ Read from a numpy compressed file.
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
-<<<<<<< HEAD
 from numpy import load as np_load
-=======
-from numpy import load
 import pandas as pd
 import numpy as np
->>>>>>> dev_john
 
 from skdh.base import BaseProcess
 from skdh.io.base import check_input_file
@@ -36,21 +32,16 @@ class ReadNumpyFile(BaseProcess):
     """
     # TODO: Add bases & periods to the docstring here
 
-<<<<<<< HEAD
-    def __init__(self, allow_pickle=False, ext_error="warn"):
-        super(ReadNumpyFile, self).__init__(allow_pickle=allow_pickle, ext_error=ext_error)
-
-        self.allow_pickle = allow_pickle
-=======
-    def __init__(self, ext_error="warn", bases=None, periods=None):
+    def __init__(self, bases=None, periods=None, allow_pickle=False, ext_error="warn", ):
         super(ReadNumpyFile, self).__init__(
             bases=bases,
             periods=periods,
+            allow_pickle=allow_pickle,
             ext_error=ext_error
         )
         self.bases = bases
         self.periods = periods
->>>>>>> dev_john
+        self.allow_pickle = allow_pickle
 
         if ext_error.lower() in ["warn", "raise", "skip"]:
             self.ext_error = ext_error.lower()
@@ -96,14 +87,14 @@ class ReadNumpyFile(BaseProcess):
             if "fs" in data:
                 kwargs["fs"] = data["fs"][()]
 
-<<<<<<< HEAD
+
         # check that time and accel are in the correct names
         if self._time not in kwargs or self._acc not in kwargs:
             raise ValueError(f"Missing `{self._time}` or `{self._acc}` arrays in the file")
 
         # make sure we return the file
         kwargs.update({'file': file})
-=======
+
         # TODO: this code is very slow for large amounts of data - needs to be sped up
         # TODO: this code should be moved to its own function in `utility.py` for easier testing, etc
         if self.bases is not None and self.periods is not None:
@@ -143,6 +134,5 @@ class ReadNumpyFile(BaseProcess):
         )
         if "fs" in data:
             kwargs["fs"] = data["fs"][()]
->>>>>>> dev_john
 
         return (kwargs, None) if self._in_pipeline else kwargs
