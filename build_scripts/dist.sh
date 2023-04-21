@@ -11,7 +11,7 @@ python -m build --sdist
 # delocate for mac wheels
 # list dependencies
 delocate-listdeps --depending dist/*.whl
-# fix dependencies
+# fix dependencie
 delocate-wheel -w fixed_wheels -v dist/*.whl
 
 ##########

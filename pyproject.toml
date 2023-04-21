@@ -45,8 +45,9 @@ classifiers = [
     "Intended Audience :: Developers",
     "Topic :: Software Development",
     "Topic :: Scientific/Engineering",
-    "Operating System :: MacOS",
-    "Operating System :: POSIX :: Linux",
+#    "Operating System :: MacOS",
+	"Operating System :: OS Independent",
+#    "Operating System :: POSIX :: Linux",
 ]
 
 requires-python = ">=3.6"

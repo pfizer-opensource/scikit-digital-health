@@ -1,5 +1,6 @@
 // Copyright (c) 2021. Pfizer Inc. All rights reserved.
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
