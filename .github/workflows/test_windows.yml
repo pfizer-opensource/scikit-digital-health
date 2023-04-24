@@ -28,16 +28,14 @@ jobs:
         # install testing requirements
         pip install -r test_requirements.txt
       shell: bash
-    - uses: awvwgk/setup-fortran@main
-      id: setup-fortran
-      with:
-        compiler: gcc
-        version: 12
+    # - uses: awvwgk/setup-fortran@main
+    #   id: setup-fortran
+    #   with:
+    #     compiler: gcc
+    #     version: 12
     - name: check gfortran
       run: gfortran -v
     - name: Install skdh
-      env:
-        FC: gfortran
       run: |
         # install scikit-dh
         pip install . -v
