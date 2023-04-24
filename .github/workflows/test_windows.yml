@@ -33,8 +33,6 @@ jobs:
     - name: check gfortran
       run: gfortran -v
     - name: Install skdh
-      env:
-        FC: gfortran-11
       run: |
         # install scikit-dh
         pip install . -v
