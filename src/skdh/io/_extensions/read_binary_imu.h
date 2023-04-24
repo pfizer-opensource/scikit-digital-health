@@ -5,6 +5,7 @@
 #include <time.h>
 #include <math.h>
 #include <float.h>
+#include <stdint.h>
 
 #ifdef _WIN32
 #define timegm _mkgmtime
