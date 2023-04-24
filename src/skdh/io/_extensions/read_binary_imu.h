@@ -5,6 +5,10 @@
 #include <time.h>
 #include <math.h>
 #include <float.h>
+
+#ifdef _WIN32
+#define timegm _mkgmtime
+#endif
 /* for reading from ActiGraph files */
 //#include <zip.h>
 
