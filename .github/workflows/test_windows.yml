@@ -28,11 +28,13 @@ jobs:
         # install testing requirements
         pip install -r test_requirements.txt
       shell: bash
-    - name: Setup GNU Fortran
-      uses: modflowpy/install-gfortran-action@v1
+    # - name: Setup GNU Fortran
+    #   uses: modflowpy/install-gfortran-action@v1
     - name: check gfortran
       run: gfortran -v
     - name: Install skdh
+      env:
+        FC: gfortran
       run: |
         # install scikit-dh
         pip install . -v
