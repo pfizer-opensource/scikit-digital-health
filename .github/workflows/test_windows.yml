@@ -28,6 +28,8 @@ jobs:
         # install testing requirements
         pip install -r test_requirements.txt
       shell: bash
+    - name: check gfortran
+      run: gfortran -v
     - name: Install skdh
       run: |
         # install scikit-dh
