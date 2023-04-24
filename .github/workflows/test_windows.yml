@@ -40,7 +40,7 @@ jobs:
       shell: bash
     - name: print dir
       run: |
-        ls c:\hostedtoolcache\windows\python\3.10.11\x64\lib\site-packages
+        ls c:\hostedtoolcache\windows\python\3.10.11\x64\lib\site-packages\skdh\utility\_extensions
     - name: import skdh
       run: python -c "import skdh"
     - name: Test with pytest
