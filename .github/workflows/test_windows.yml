@@ -31,7 +31,7 @@ jobs:
     - name: Install skdh
       run: |
         # install scikit-dh
-        pip install .
+        pip install . -v
       shell: bash
     - name: Test with pytest
       run: |
