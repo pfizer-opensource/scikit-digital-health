@@ -15,6 +15,19 @@ SKDH provides the following:
 - Common time-series/inertial data analysis functions
 - Inertial data analysis algorithms (ie gait, sit-to-stand, sleep, activity)
 
+Availability
+############
+
+SKDH is available on both `conda-forge` and `PyPI`.
+
+`conda install scikit-digital-health -c conda-forge`
+
+or 
+
+`pip install scikit-digital-health`
+
+.. warning::
+    Windows pre-built wheels are provided as-is, with limited/no testing on changes made to compile extensions for Windows.
 
 Build Requirements
 ##################
