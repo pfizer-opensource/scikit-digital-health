@@ -36,6 +36,6 @@ jobs:
             export FC=gfortran-12
           fi
           python -m cibuildwheel --output-dir wheelhouse
-        
+        shell: bash
       - name: Print for testing
         run: ls ./wheelhouse
