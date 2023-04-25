@@ -30,7 +30,9 @@ class ReadNumpyFile(BaseProcess):
     """
 
     def __init__(self, allow_pickle=False, ext_error="warn"):
-        super(ReadNumpyFile, self).__init__(allow_pickle=allow_pickle, ext_error=ext_error)
+        super(ReadNumpyFile, self).__init__(
+            allow_pickle=allow_pickle, ext_error=ext_error
+        )
 
         self.allow_pickle = allow_pickle
 
@@ -80,9 +82,11 @@ class ReadNumpyFile(BaseProcess):
 
         # check that time and accel are in the correct names
         if self._time not in kwargs or self._acc not in kwargs:
-            raise ValueError(f"Missing `{self._time}` or `{self._acc}` arrays in the file")
+            raise ValueError(
+                f"Missing `{self._time}` or `{self._acc}` arrays in the file"
+            )
 
         # make sure we return the file
-        kwargs.update({'file': file})
+        kwargs.update({"file": file})
 
         return (kwargs, None) if self._in_pipeline else kwargs

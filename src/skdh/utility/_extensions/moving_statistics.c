@@ -19,7 +19,7 @@ extern void moving_moments_2(long *, double *, long *, long *, double *, double 
 extern void moving_moments_3(long *, double *, long *, long *, double *, double *, double *);
 extern void moving_moments_4(long *, double *, long *, long *, double *, double *, double *, double *);
 /* moving median */
-extern void fmoving_median(int *, double *, int *, int *, double *);
+extern void fmoving_median(long *, double *, long *, long *, double *);
 
 
 PyObject * moving_mean(PyObject *NPY_UNUSED(self), PyObject *args){

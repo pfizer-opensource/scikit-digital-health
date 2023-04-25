@@ -50,5 +50,5 @@ __all__ = (
     "geneactiv",
     "apdm",
     "numpy_compressed",
-    "csv"
+    "csv",
 )

@@ -6,7 +6,19 @@ Copyright (c) 2023. Pfizer Inc. All rights reserved
 """
 from warnings import warn
 
-from numpy import tile, arange, mean, diff, asarray, argmin, abs, vstack, unique, all as npall, int_
+from numpy import (
+    tile,
+    arange,
+    mean,
+    diff,
+    asarray,
+    argmin,
+    abs,
+    vstack,
+    unique,
+    all as npall,
+    int_,
+)
 from pandas import read_csv, to_datetime, to_timedelta, Timedelta
 
 from skdh.base import BaseProcess
@@ -39,7 +51,9 @@ def handle_timestamp_inconsistency(df, fill_gaps, accel_col_names, accel_in_g, g
         Number of samples per second.
     """
     # get a sampling rate. If non-unique timestamps, this will be updated
-    n_samples = mean(1 / diff(df['_datetime_'][:2500]).astype(int)) * 1e9  # datetime diff is in ns
+    n_samples = (
+        mean(1 / diff(df["_datetime_"][:2500]).astype(int)) * 1e9
+    )  # datetime diff is in ns
 
     # first check if we have non-unique timestamps
     nonuniq_ts = df["_datetime_"].iloc[1] == df["_datetime_"].iloc[0]
@@ -58,7 +72,7 @@ def handle_timestamp_inconsistency(df, fill_gaps, accel_col_names, accel_in_g, g
         if counts[-1] != counts[0]:
             # drop the last blocks worth of data
             warn("Non integer number of blocks. Trimming partial block.", UserWarning)
-            df = df.iloc[0:-counts[-1]]
+            df = df.iloc[0 : -counts[-1]]
 
         # get the number of samples, and the number of blocks
         n_samples = counts[0]
@@ -66,16 +80,16 @@ def handle_timestamp_inconsistency(df, fill_gaps, accel_col_names, accel_in_g, g
 
         # compute time delta to add
         t_delta = tile(arange(0, 1, 1 / n_samples), int(n_blocks))
-        t_delta = to_timedelta(t_delta, unit='s')
+        t_delta = to_timedelta(t_delta, unit="s")
 
         # add the time delta so that we have unique timestamps
-        df['_datetime_'] += t_delta
+        df["_datetime_"] += t_delta
 
     # check if we are filling gaps or not
     if fill_gaps:
         # now fix any data gaps: set the index as the datetime, and then upsample to match
         # the sampling frequency. This will put nan values in any data gaps
-        df_full = df.set_index('_datetime_').asfreq(f'{1 / n_samples}S')
+        df_full = df.set_index("_datetime_").asfreq(f"{1 / n_samples}S")
 
         # put the datetime array back in the dataframe
         df_full = df_full.reset_index(drop=False)
@@ -88,9 +102,11 @@ def handle_timestamp_inconsistency(df, fill_gaps, accel_col_names, accel_in_g, g
     else:
         # if not filling data gaps, check that there are not gaps that would cause
         # garbage outputs from downstream algorithms
-        time_deltas = diff(df['_datetime_']).astype(int) / 1e9  # convert to seconds
+        time_deltas = diff(df["_datetime_"]).astype(int) / 1e9  # convert to seconds
         if (abs(time_deltas) > (1.5 / n_samples)).any():
-            raise ValueError("There are data gaps in the data, which could potentially result in garbage outputs from downstream algorithms.")
+            raise ValueError(
+                "There are data gaps in the data, which could potentially result in garbage outputs from downstream algorithms."
+            )
 
         df_full = df.copy()
 
@@ -124,19 +140,25 @@ def handle_windows(time_dt, bases, periods, run_windowing):
     end_date = time_dt.iloc[-1]
 
     days = {}
-    day_dt = Timedelta(1, unit='day')
+    day_dt = Timedelta(1, unit="day")
 
     for base, period in zip(bases, periods):
         starts, stops = [], []
 
         period2 = (base + period) % 24
 
-        t_base = start_date.replace(hour=base, minute=0, second=0, microsecond=0) - day_dt
-        t_period = start_date.replace(hour=period2, minute=0, second=0, microsecond=0) - day_dt
+        t_base = (
+            start_date.replace(hour=base, minute=0, second=0, microsecond=0) - day_dt
+        )
+        t_period = (
+            start_date.replace(hour=period2, minute=0, second=0, microsecond=0) - day_dt
+        )
 
         if t_period <= t_base:
             t_period += day_dt
-        while t_period < start_date:  # make sure at least one of the indices is during recording
+        while (
+            t_period < start_date
+        ):  # make sure at least one of the indices is during recording
             t_base += day_dt
             t_period += day_dt
 
@@ -226,18 +248,19 @@ class ReadCSV(BaseProcess):
     specify whatever key-word arguments to `to_datetime_kwargs`. This includes specifying
     the unit (e.g. `s`, `ms`, `us`, `ns`, etc) if a unix timestamp integer is provided.
     """
+
     def __init__(
-            self,
-            time_col_name,
-            accel_col_names,
-            fill_gaps=True,
-            to_datetime_kwargs=None,
-            accel_in_g=True,
-            g_value=9.81,
-            read_csv_kwargs=None,
-            bases=None,
-            periods=None,
-            ext_error='warn'
+        self,
+        time_col_name,
+        accel_col_names,
+        fill_gaps=True,
+        to_datetime_kwargs=None,
+        accel_in_g=True,
+        g_value=9.81,
+        read_csv_kwargs=None,
+        bases=None,
+        periods=None,
+        ext_error="warn",
     ):
         if to_datetime_kwargs is None:
             to_datetime_kwargs = {}
@@ -331,10 +354,14 @@ class ReadCSV(BaseProcess):
         raw["_datetime_"] = to_datetime(raw[self.time_col_name], **self.to_datetime_kw)
 
         # now handle data gaps and second level timestamps, etc
-        raw, fs = handle_timestamp_inconsistency(raw, self.fill_gaps, self.acc_col_names, self.accel_in_g, self.g_value)
+        raw, fs = handle_timestamp_inconsistency(
+            raw, self.fill_gaps, self.acc_col_names, self.accel_in_g, self.g_value
+        )
 
         # first do the windowing
-        day_windows = handle_windows(raw["_datetime_"], self.bases, self.periods, self.window)
+        day_windows = handle_windows(
+            raw["_datetime_"], self.bases, self.periods, self.window
+        )
 
         # get the time values and convert to seconds
         time = raw["_datetime_"].astype(int).values / 1e9  # int gives ns, convert to s

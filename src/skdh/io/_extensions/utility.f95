@@ -44,7 +44,7 @@ contains
         integer(c_long), intent(inout) :: i_stops(n)  ! keeps track of where in stops we are
         ! local
         integer(c_long) :: i, idx_start, idx_stop
-        real(c_double) :: base_sec, period_sec, dtmp, dtmp2, curr, block_dt
+        real(c_double) :: base_sec, period_sec, dtmp, dtmp2, curr
         logical :: in_win1, in_win2
 
         curr = dtime%hour * SEC_HOUR + dtime%min * SEC_MIN + dtime%sec + real(dtime%msec, c_double) / 1000.
