@@ -30,7 +30,12 @@ jobs:
           CIBW_ARCHS_LINUX: auto64
           CIBW_ARCHS_WINDOWS: auto64
           # FC: gfortran-12
-        run: python -m cibuildwheel --output-dir wheelhouse
+        run: |
+          # if macOS, make sure to set the environment variables so that it can find gfortran-9
+          if [ "$RUNNER_OS" == "macOS" ]; then
+            export FC=gfortran-12
+          fi
+          python -m cibuildwheel --output-dir wheelhouse
         
       - name: Print for testing
         run: ls ./wheelhouse
