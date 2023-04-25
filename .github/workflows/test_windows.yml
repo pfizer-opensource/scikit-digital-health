@@ -1,9 +1,9 @@
 name: test_windows
 
-on:
-  push:
-    branches:
-      - development
+on: workflow_dispatch
+  # push:
+  #   branches:
+  #     - development
 jobs:
   build:
 
