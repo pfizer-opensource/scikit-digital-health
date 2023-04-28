@@ -69,5 +69,6 @@ jobs:
       - name: Upload to twine
         uses: pypa/gh-action-pypi-publish@v1.5.0
         with:
+          skip-existing: true
           user: __token__
           password: ${{ secrets.PYPI }}

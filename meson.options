@@ -1,0 +1,1 @@
+option('is_not_rtd_build', type : 'boolean', value : true)
