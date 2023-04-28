@@ -16,4 +16,6 @@ py3.install_sources(
     subdir: 'skdh/features/lib',
 )
 
-subdir('extensions')
+if is_not_rtd_build
+    subdir('extensions')
+endif

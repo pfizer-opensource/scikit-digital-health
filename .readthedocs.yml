@@ -30,3 +30,6 @@ build:
   os: ubuntu-20.04
   tools:
     python: "3"
+  jobs:
+    pre_install:
+      - echo "\n\n[tool.meson-python.args]\nsetup = ['-Dis_not_rtd_build=false']" >> pyproject.toml
