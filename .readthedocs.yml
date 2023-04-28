@@ -31,4 +31,3 @@ build:
   jobs:
     pre_install:
       - echo "\n\n[tool.meson-python.args]\nsetup = [\"-Dis_not_rtd_build=false\"]" >> pyproject.toml
-      - cat pyproject.toml
