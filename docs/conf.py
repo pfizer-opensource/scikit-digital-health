@@ -32,6 +32,8 @@ with open("../meson.build", "r") as f:
     for line in f.readlines():
         if "version" in line:
             version = line.split(": ")[-1].strip(""",'""")
+            break  # we want the first line with version
+
 # -- General configuration ---------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
