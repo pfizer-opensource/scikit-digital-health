@@ -72,9 +72,13 @@ subroutine mov_moments_2(n, x, wlen, skip, mean, sd) bind(C, name="mov_moments_2
         j = j + 1
     end do
 
+    where ((sd > -epsilon(sd(1))) .and. (sd < 0.0))
+        sd = -1.0 * sd
+    end where
+
     ! NOTE: currently, sd = M2, skew = M3, kurt = M4, so this order of computation matters
     mean = mean / wlen
-    sd = sqrt(sd / (wlen - 1))
+    sd = sqrt(sd / real(wlen - 1, c_double))
 
 end subroutine
 
