@@ -128,6 +128,31 @@ class BaseMovingStatsTester:
             self.function(x, 150, 3)
             self.function(x, 150, 151)
 
+    @pytest.mark.parametrize("trim", (True, False))
+    @pytest.mark.parametrize("skip", (1, 2, 7, 150, 300))
+    def test_constant(self, skip, trim, np_rng):
+        wlen = 250  # constant
+        x = full(2000, np_rng.random())
+        xw = get_windowed_view(x, wlen, skip)
+
+        if isinstance(self.truth_function, Iterable):
+            truth = []
+            for tf, tkw in zip(self.truth_function, self.truth_kw):
+                truth.append(self.get_truth(tf, x, xw, wlen, skip, trim, tkw))
+
+            pred = self.function(x, wlen, skip, trim=trim)
+
+            for p, t in zip(pred, truth):
+                assert allclose(p, t, equal_nan=True)
+        else:
+            truth = self.get_truth(
+                self.truth_function, x, xw, wlen, skip, trim, self.truth_kw
+            )
+
+            pred = self.function(x, wlen, skip, trim=trim)
+
+            assert allclose(pred, truth, equal_nan=True)
+
 
 class TestMovingMean(BaseMovingStatsTester):
     function = staticmethod(moving_mean)
