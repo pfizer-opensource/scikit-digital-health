@@ -72,9 +72,13 @@ subroutine mov_moments_2(n, x, wlen, skip, mean, sd) bind(C, name="mov_moments_2
         j = j + 1
     end do
 
+    where ((sd > -epsilon(sd(1))) .and. (sd < 0.0))
+        sd = -1.0 * sd
+    end where
+
     ! NOTE: currently, sd = M2, skew = M3, kurt = M4, so this order of computation matters
     mean = mean / wlen
-    sd = sqrt(sd / (wlen - 1))
+    sd = sqrt(sd / real(wlen - 1, c_double))
 
 end subroutine
 
@@ -307,6 +311,7 @@ end subroutine
 !    skew : array((n-wlen)/skip + 1)
 !         Computed moving skewness
 subroutine moving_moments_3(n, x, wlen, skip, mean, sd, skew) bind(C, name="moving_moments_3")
+    use, intrinsic :: ieee_arithmetic, only: IEEE_Value, IEEE_QUIET_NAN
     use, intrinsic :: iso_c_binding
     implicit none
     integer(c_long), intent(in) :: n, wlen, skip
@@ -354,9 +359,20 @@ subroutine moving_moments_3(n, x, wlen, skip, mean, sd, skew) bind(C, name="movi
         j = j + 1
     end do
 
+    where ((sd > -epsilon(sd(1))) .and. (sd < 0.0))
+        sd = -1.0 * sd
+    end where
+    where ((skew > -epsilon(sd(1))) .and. (skew < 0.0))
+        skew = -1.0 * skew
+    end where
+
     ! NOTE: currently, sd = M2, skew = M3, kurt = M4, so this order of computation matters
     mean = mean / wlen
     skew = sqrt(real(wlen)) * skew / sd**(3._c_double / 2._c_double)
+    ! set to NaN where we would be dividing by zero
+    where (sd < epsilon(sd(1)))
+        skew = IEEE_Value(skew(1), IEEE_QUIET_NAN)
+    end where
     sd = sqrt(sd / (wlen - 1))
 
 end subroutine
@@ -385,6 +401,7 @@ end subroutine
 !    kurt : array((n-wlen)/skip + 1)
 !         Computed moving kurtosis
 subroutine moving_moments_4(n, x, wlen, skip, mean, sd, skew, kurt) bind(C, name="moving_moments_4")
+    use, intrinsic :: ieee_arithmetic, only: IEEE_Value, IEEE_QUIET_NAN
     use, intrinsic :: iso_c_binding
     implicit none
     integer(c_long), intent(in) :: n, wlen, skip
@@ -439,10 +456,19 @@ subroutine moving_moments_4(n, x, wlen, skip, mean, sd, skew, kurt) bind(C, name
         j = j + 1
     end do
 
+    where ((sd > -epsilon(sd(1))) .and. (sd < 0.0))
+        sd = -1.0 * sd
+    end where
+
     ! NOTE: currently, sd = M2, skew = M3, kurt = M4, so this order of computation matters
     mean = mean / wlen
     skew = sqrt(real(wlen)) * skew / sd**(3._c_double / 2._c_double)
     kurt = wlen * kurt / sd**2 - 3
+    ! set to NaN where we would be dividing by zero
+    where (sd < epsilon(sd(1)))
+        skew = IEEE_Value(skew(1), IEEE_QUIET_NAN)
+        kurt = IEEE_Value(kurt(1), IEEE_QUIET_NAN)
+    end where
     sd = sqrt(sd / (wlen - 1))
 
 end subroutine

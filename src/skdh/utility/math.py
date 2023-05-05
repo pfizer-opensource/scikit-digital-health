@@ -4,7 +4,9 @@ Utility math functions
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
-from numpy import moveaxis, ascontiguousarray, full, nan
+from warnings import warn
+
+from numpy import moveaxis, ascontiguousarray, full, nan, isnan
 
 from skdh.utility import _extensions
 from skdh.utility.windowing import get_windowed_view
@@ -354,6 +356,9 @@ def moving_skewness(a, w_len, skip, trim=True, axis=-1, return_previous=True):
 
     res = _extensions.moving_skewness(x, w_len, skip, trim, return_previous)
 
+    if isnan(res).any():
+        warn("NaN values present in output, possibly due to catastrophic cancellation.")
+
     # move computation axis back to original place and return
     if return_previous:
         return tuple(moveaxis(i, -1, axis) for i in res)
@@ -473,6 +478,9 @@ def moving_kurtosis(a, w_len, skip, trim=True, axis=-1, return_previous=True):
         )
 
     res = _extensions.moving_kurtosis(x, w_len, skip, trim, return_previous)
+
+    if isnan(res).any():
+        warn("NaN values present in output, possibly due to catastrophic cancellation.")
 
     # move computation axis back to original place and return
     if return_previous:
