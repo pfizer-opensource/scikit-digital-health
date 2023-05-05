@@ -81,7 +81,7 @@ class TestNormalizeAxes:
 
 
 class TestBank:
-    def setup(self):
+    def setup_method(self):
         pass
 
     def test_dunder_methods(self):
