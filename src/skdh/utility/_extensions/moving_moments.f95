@@ -358,6 +358,13 @@ subroutine moving_moments_3(n, x, wlen, skip, mean, sd, skew) bind(C, name="movi
         j = j + 1
     end do
 
+    where ((sd > -epsilon(sd(1))) .and. (sd < 0.0))
+        sd = -1.0 * sd
+    end where
+    where ((skew > -epsilon(sd(1))) .and. (skew < 0.0))
+        skew = -1.0 * skew
+    end where
+
     ! NOTE: currently, sd = M2, skew = M3, kurt = M4, so this order of computation matters
     mean = mean / wlen
     skew = sqrt(real(wlen)) * skew / sd**(3._c_double / 2._c_double)
@@ -442,6 +449,13 @@ subroutine moving_moments_4(n, x, wlen, skip, mean, sd, skew, kurt) bind(C, name
         
         j = j + 1
     end do
+
+    where ((sd > -epsilon(sd(1))) .and. (sd < 0.0))
+        sd = -1.0 * sd
+    end where
+    where ((skew > -epsilon(sd(1))) .and. (skew < 0.0))
+        skew = -1.0 * skew
+    end where
 
     ! NOTE: currently, sd = M2, skew = M3, kurt = M4, so this order of computation matters
     mean = mean / wlen
