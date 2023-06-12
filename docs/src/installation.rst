@@ -1,10 +1,7 @@
 Installation
 ============
 
-Currently (March 2022), only source distributions are available. The plan is to
-provide packages on both PyPI and conda-forge, which will ideally have the necessary
-libraries provided with the wheel/installation. However, for now, all the requirements
-for building from source must be met.
+Both PyPI and Conda-Forge should have pre-built wheels for major distributions.
 
 .. tabbed:: conda
 
@@ -43,6 +40,17 @@ Run-time requirements
 - packaging
 - pyyaml
 - importlib_resources [Python < 3.7]
+
+Windows Notes
+^^^^^^^^^^^^^
+
+Windows users might need to install additional dependencies, even if not building from source.
+
+https://wiki.python.org/moin/WindowsCompilers has more details, but generally users should expect
+to have to install a Microsoft Visual C++ redistributable package. For Python >3.5 this should be
+14.0 or greater.
+
+The 2015 redistributable update 3 can be found here: https://www.microsoft.com/en-us/download/details.aspx?id=53587
 
 Building from Source
 ====================
