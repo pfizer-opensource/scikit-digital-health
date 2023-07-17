@@ -25,6 +25,9 @@ class TestGetDayIndexIntersection:
                 day_stop,
             )
 
+            assert p_starts.size == true_starts[i].size
+            assert p_stops.size == true_stops[i].size
+
             assert allclose(p_starts, true_starts[i])
             assert allclose(p_stops, true_stops[i])
 
@@ -38,8 +41,51 @@ class TestGetDayIndexIntersection:
                 sleep_starts[i], sleep_stops[i], False, day_start, day_stop
             )
 
+            assert p_starts.size == true_starts[i].size
+            assert p_stops.size == true_stops[i].size
+
             assert allclose(p_starts, true_starts[i])
             assert allclose(p_stops, true_stops[i])
+
+    def test_include(self):
+        day_start, day_stop = 0, 240
+
+        sleep_starts = array([-1, 200, 675, 1165, -1])
+        sleep_stops = array([-1, 400, 880, 1360, -1])
+
+        true_starts = array([200])
+        true_stops = array([240])
+
+        p_starts, p_stops = get_day_index_intersection(
+            sleep_starts, sleep_stops, True, day_start, day_stop)
+
+        assert p_starts.size == true_starts.size
+        assert p_stops.size == true_stops.size
+
+        assert allclose(p_starts, true_starts)
+        assert allclose(p_stops, true_stops)
+
+    def test_include_2(self):
+        day_start, day_stop = 200, 400
+
+        starts = array([50, 5, 115, 215, 395, 380, 450, 600])
+        stops = array([100, 110, 230, 220, 410, 397, 500, 700])
+
+        true_starts = array([200, 380])
+        true_stops = array([230, 400])
+
+        # FOR NOW, this will raise an error with unsupported behavior
+
+        with pytest.raises(NotImplementedError):
+            p_starts, p_stops = get_day_index_intersection(
+                starts, stops, True, day_start, day_stop
+            )
+
+        # assert p_starts.size == true_starts.size
+        # assert p_stops.size == true_stops.size
+        #
+        # assert allclose(p_starts, true_starts)
+        # assert allclose(p_stops, true_stops)
 
     def test_wear_only(self, day_ends, wear_ends):
         day_start, day_stop = day_ends
@@ -48,6 +94,9 @@ class TestGetDayIndexIntersection:
         p_starts, p_stops = get_day_index_intersection(
             wear_starts, wear_stops, True, 0, day_stop
         )
+
+        assert p_starts.size == wear_starts.size
+        assert p_stops.size == wear_stops.size
 
         assert allclose(p_starts, wear_starts)
         assert allclose(p_stops, wear_stops)

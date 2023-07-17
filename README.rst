@@ -29,6 +29,10 @@ or
 .. warning::
     Windows pre-built wheels are provided as-is, with limited/no testing on changes made to compile extensions for Windows.
 
+.. note::
+    Windows users may need to install an additional requirement: Microsoft Visual C++ redistributable >14.0.
+    The 2015 version can be found here: https://www.microsoft.com/en-us/download/details.aspx?id=53587
+
 Build Requirements
 ##################
 
