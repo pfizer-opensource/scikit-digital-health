@@ -5,10 +5,14 @@ Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from numpy import (
+    all,
     asarray,
+    argsort,
     array,
+    clip,
     nonzero,
     insert,
+    append,
     arange,
     interp,
     zeros,
@@ -77,21 +81,52 @@ def get_day_index_intersection(starts, stops, for_inclusion, day_start, day_stop
         return asarray([], dtype=int), asarray([], dtype=int)
 
     # get the subset that intersect the day in a roundabout way
-    starts_tmp = list(minimum(maximum(i, day_start), day_stop) for i in starts)
-    stops_tmp = list(minimum(maximum(i, day_start), day_stop) for i in stops)
     starts_subset, stops_subset = [], []
-    for start, stop, fi in zip(starts_tmp, stops_tmp, for_inclusion):
+    for start, stop, fi in zip(starts, stops, for_inclusion):
         if start.size == 0 or stop.size == 0:
             continue
         if fi:  # flip everything to being an "exclude" window
-            tmp = insert(roll(start, -1), 0, start[0])
-            tmp[-1] = day_stop
+            # # 1. sort based on the ends
+            # i_e = argsort(stop)
+            # start = start[i_e]
+            # stop = stop[i_e]
+            #
+            # # 2. create the temporary ends by appending day_stop to the starts
+            # tmp_stop = append(start, day_stop)
+            #
+            # # 3. sort based on the starts
+            # i_s = argsort(start)
+            # stop = stop[i_s]
+            #
+            # # 4. create the temp starts by inserting day_start to the stops
+            # tmp_start = insert(stop, 0, day_start)
 
-            tmp_stop = insert(stop, 0, 0)
+            # 1. sort based on starts
+            i_sort = argsort(start)
+            start = start[i_sort]
+            stop = stop[i_sort]
 
-            starts_subset.append(tmp_stop[tmp_stop != tmp])
-            stops_subset.append(tmp[tmp_stop != tmp])
+            # clip to day starts and stops
+            start = clip(start, day_start, day_stop)
+            stop = clip(stop, day_start, day_stop)
+
+            # 2. check that stops are increasing (ie sorted as well)
+            if not all(stop[1:] >= stop[:-1]):
+                raise NotImplementedError(
+                    "Window ends are not monotonically increasing after sorting by window starts. "
+                    "This behavior is not currently supported."
+                )
+
+            tmp_stop = append(start, day_stop)
+            tmp_start = insert(stop, 0, day_start)
+
+            starts_subset.append(tmp_start[tmp_stop != tmp_start])
+            stops_subset.append(tmp_stop[tmp_stop != tmp_start])
         else:
+            # clip to day starts and stops
+            start = clip(start, day_start, day_stop)
+            stop = clip(stop, day_start, day_stop)
+
             starts_subset.append(start[start != stop])
             stops_subset.append(stop[start != stop])
 
