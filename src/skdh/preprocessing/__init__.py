@@ -18,7 +18,10 @@ Wear Detection
 .. autosummary::
     :toctree: generated/
 
-    DetectWear
+    DETACH
+    CountWearDetection
+    CtaWearDetection
+    AccelThresholdWearDetection
 """
 from skdh.preprocessing.calibrate import CalibrateAccelerometer
 from skdh.preprocessing import calibrate
