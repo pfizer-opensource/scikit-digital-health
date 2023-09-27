@@ -64,7 +64,7 @@ class Ambulation(BaseProcess):
         """
         predict(time, accel)
 
-        Function to detect ambulation or gait-like activity from 20hz accelerometer data from the wrist.
+        Function to detect ambulation or gait-like activity from 20hz accelerometer data collected on the wrist.
 
         Parameters
         ----------
@@ -99,7 +99,7 @@ class Ambulation(BaseProcess):
             {
                 self._time: time,
                 self._acc: accel,
-                "ambulation": None,
+                "ambulation": None,  # TODO: update with episodic predictions (start&end timestamps)
             }
         )
         if self._in_pipeline:
