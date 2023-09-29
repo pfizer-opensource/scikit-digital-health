@@ -256,7 +256,7 @@ class Ambulation(BaseProcess):
                 "Frequency is > 20Hz. Downsampling to 20Hz.",
                 UserWarning,
             )
-            (time_ds, accel_ds,) = apply_downsample(
+            time_ds, (accel_ds,) = apply_downsample(
                 goal_fs=20.0,
                 time=time,
                 data=(accel,),
