@@ -56,8 +56,8 @@ class Ambulation(BaseProcess):
     detection module was designed to help exclude these activities and therefore improve the performance of the
     scratch module by minimizing false positives.
 
-    An additional use of this model has been as a base-level context detection tool for a step detection
-    algorithm. Unlike the gait-bout detection algorithm, the ambulation detection module is not built to detect
+    An additional use of this model has been as a base-level context detection tool for step detection. Unlike
+    the gait-bout detection algorithm, the ambulation detection module is not built to detect
     well-defined bouts of consistent gait for gait parameter estimation. It is rather a tool for detecting the
     presence of walking-similar activities, which makes it a good candidate for performing context detection for
     step counting.
@@ -97,6 +97,12 @@ class Ambulation(BaseProcess):
             (N, ) array of unix timestamps, in seconds.
         accel : numpy.ndarray
             (N, 3) array of acceleration, in units of 'g', collected at 20hz.
+
+        Returns
+        -------
+        results : dict
+            Results dictionary including 3s epoch level predictions, probabilities, and unix timestamps.
+
         """
         # check that input matches expectations, downsample to 20hz if necessary
         time_ds, accel_ds, fs = self._check_input(time, accel)
@@ -165,14 +171,15 @@ class Ambulation(BaseProcess):
     def _preprocess(accel):
         """
         Preprocess acceleration signal:
+
             1. Construct a non-overlapping 3-second-windowed view of the data.
-            2. Compute magnitude of signal.
+            2. Compute signal vector magnitude.
             3. High-pass filter with cutoff at 0.25hz.
 
         Parameters
         ----------
         accel : array-like
-            Numpy array of three axis accelerometer data. Frequency - 20hz. Units - G's.
+            Numpy array of triaxial accelerometer data. Frequency - 20hz. Units - G's.
 
         Returns
         -------
@@ -276,7 +283,7 @@ class Ambulation(BaseProcess):
         time : array-like
             Numpy array of unix timestamps. Units of seconds.
         accel : array-like
-            Numpy array of three axis accelerometer data.
+            Numpy array of triaxial accelerometer data.
 
         Returns
         -------
