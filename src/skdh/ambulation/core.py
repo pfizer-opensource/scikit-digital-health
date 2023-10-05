@@ -123,7 +123,7 @@ class Ambulation(BaseProcess):
 
         # get starts and stops of ambulation bouts
         # window size of each prediction in original sampling freq
-        win_len = fs * 3
+        win_len = int(fs * 3)
 
         # run length encoding of predictions @ 3s
         lengths_3s, starts_3s, values = rle(predictions)
@@ -138,12 +138,15 @@ class Ambulation(BaseProcess):
         starts *= win_len
         stops *= win_len
 
-        # handle case where end is end of array
-        if stops[-1] == time.size:
+        # handle cases: no bouts detected, or end is end of array
+        if len(starts) and stops[-1] == time.size:
             stops[-1] = time.size - 1
 
         # create a single ambulation bouts array with correct units for indexing
-        ambulation_bouts = np.concatenate((starts, stops)).reshape((2, -1)).T
+        if len(starts):
+            ambulation_bouts = np.concatenate((starts, stops)).reshape((2, -1)).T
+        else:
+            ambulation_bouts = None
 
         # update results for pipeline
         kwargs.update(
@@ -159,7 +162,7 @@ class Ambulation(BaseProcess):
             return results
 
     @staticmethod
-    def _preprocess(accel, windowed=False):
+    def _preprocess(accel):
         """
         Preprocess acceleration signal:
             1. Construct a non-overlapping 3-second-windowed view of the data.
@@ -170,8 +173,6 @@ class Ambulation(BaseProcess):
         ----------
         accel : array-like
             Numpy array of three axis accelerometer data. Frequency - 20hz. Units - G's.
-        windowed : bool
-            If true performs windowing of the data into 3s windows.
 
         Returns
         -------
@@ -179,11 +180,8 @@ class Ambulation(BaseProcess):
             Preprocessed signal.
 
         """
-        if not windowed:
-            c_contiguous = np.ascontiguousarray(accel)
-            windowed_accel = get_windowed_view(c_contiguous, 60, 60)
-        else:
-            windowed_accel = accel
+        c_contiguous = np.ascontiguousarray(accel)
+        windowed_accel = get_windowed_view(c_contiguous, 60, 60)
 
         # Vector magnitude
         x_mag = np.linalg.norm(windowed_accel, axis=2)
