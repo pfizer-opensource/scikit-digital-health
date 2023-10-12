@@ -15,3 +15,4 @@ SKDH Reference
     gait
     sit2stand
     utility
+    ambulation

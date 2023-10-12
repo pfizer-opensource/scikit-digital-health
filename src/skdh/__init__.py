@@ -36,6 +36,7 @@ from skdh import activity
 from skdh import gait
 from skdh import sit2stand
 from skdh import features
+from skdh import ambulation
 
 __skdh_version__ = __version__
 
@@ -51,5 +52,6 @@ __all__ = [
     "preprocessing",
     "features",
     "utility",
+    "ambulation",
     "__skdh_version__",
 ]
