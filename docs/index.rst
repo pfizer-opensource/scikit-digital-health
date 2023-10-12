@@ -101,6 +101,7 @@ Scikit Digital Health
    src/usage
    src/dev/contributing
    ref/index
+   src/research
 
 
 
