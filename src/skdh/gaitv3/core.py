@@ -11,13 +11,10 @@ from numpy import ndarray, asarray, mean, diff
 
 from skdh.base import BaseProcess
 from skdh.utility.internal import rle, apply_downsample
+from skdh.utility.exceptions import LowFrequencyError
 
 from skdh.gait.gait_endpoints import GaitEventEndpoint, GaitBoutEndpoint
 from skdh.gait.gait_endpoints import gait_endpoints
-
-
-class LowFrequencyError(Exception):
-    pass
 
 
 class GaitV3(BaseProcess):

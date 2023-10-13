@@ -1,0 +1,3 @@
+class LowFrequencyError(Exception):
+    pass
+

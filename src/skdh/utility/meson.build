@@ -7,6 +7,7 @@ py3.install_sources(
         'math.py',
         'orientation.py',
         'windowing.py',
+        'exceptions.py',
     ],
     pure: false,
     subdir: 'skdh/utility',
