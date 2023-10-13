@@ -45,30 +45,18 @@ class PredictGaitLumbarLgbm(BaseProcess):
 
     Parameters
     ----------
-    min_bout_time : float, optional
-        Minimum time in seconds for a gait bout. Default is 8s (making a minimum
-        of 3 3-second windows).
-    max_bout_separation_time : float, optional
-        Maximum time in seconds between two bouts of gait for them to be merged into
-        1 gait bout. Default is 0.5s.
     downsample_aa_filter : bool, optional
         Apply an anti-aliasing filter when downsampling accelerometer data. Default
         is True.
     """
     def __init__(
             self,
-            min_bout_time=8.0,
-            max_bout_separation_time=0.5,
             downsample_aa_filter=True
     ):
         super().__init__(
-            min_bout_time=min_bout_time,
-            max_bout_separation_time=max_bout_separation_time,
             downsample_aa_filter=downsample_aa_filter,
         )
 
-        self.min_bout_time = min_bout_time,
-        self.max_bout_sep_time = max_bout_separation_time
         self.downsample_aa_filter = downsample_aa_filter
 
     def predict(self, time=None, accel=None, *, fs=None, **kwargs):
