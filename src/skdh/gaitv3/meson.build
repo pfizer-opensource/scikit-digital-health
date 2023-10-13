@@ -6,3 +6,5 @@ py3.install_sources(
     pure: false,
     subdir: 'skdh/gaitv3',
 )
+
+subdir('model')
