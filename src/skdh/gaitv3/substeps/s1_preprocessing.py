@@ -130,10 +130,10 @@ class PreprocessGaitBout(BaseProcess):
         sos = butter(
             self.filter_order, 2 * self.filter_cutoff / fs, output="sos", btype="low"
         )
-        ap_acc_f = sosfiltfilt(sos, accel[:, ap_axis])
+        accel_filt = sosfiltfilt(sos, accel, axis=0)
 
         # detrend
-        ap_acc_f = detrend(ap_acc_f)
+        accel_filt = detrend(accel_filt, axis=0)
 
         # estimate step frequency
         sos = butter(4, 2 * 10.0 / fs, output="sos")
@@ -164,7 +164,7 @@ class PreprocessGaitBout(BaseProcess):
                 "ap_axis": ap_axis,
                 "ap_axis_sign": ap_axis_sign,
                 "mean_step_freq": mean_step_freq,
-                "ap_accel": ap_acc_f,
+                "accel_filt": accel_filt
             }
         )
 
