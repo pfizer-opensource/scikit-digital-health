@@ -18,6 +18,7 @@ import matplotlib.pyplot as plt
 
 from skdh.base import BaseProcess
 from skdh.utility.internal import apply_downsample, rle
+from skdh.utility.exceptions import LowFrequencyError
 
 from skdh.gait.get_gait_classification import (
     get_gait_classification_lgbm,
@@ -28,10 +29,6 @@ from skdh.gait.get_strides import get_strides
 from skdh.gait.get_turns import get_turns
 from skdh.gait.gait_endpoints import gait_endpoints
 from skdh.gait.gait_endpoints import GaitEventEndpoint, GaitBoutEndpoint
-
-
-class LowFrequencyError(Exception):
-    pass
 
 
 class Gait(BaseProcess):
