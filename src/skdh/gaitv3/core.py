@@ -349,8 +349,8 @@ class GaitLumbar(BaseProcess):
             )
 
             for ibout, bout in enumerate(gait_bouts):
-                # Step 1: signal processing, accelerometer orientation correction
-                # Step 2: cadence/mean step time estimation
+                # Step 1: signal processing, accelerometer orientation correction,
+                #       cadence/mean step time estimation
                 # Step 3: gait event estimation
                 # step 4: stride creation
                 # step 5: turn detection
