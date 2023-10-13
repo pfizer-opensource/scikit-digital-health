@@ -355,4 +355,5 @@ class GaitLumbar(BaseProcess):
                 # step 4: stride creation
                 # step 5: turn detection
                 # step 6: delta h estimation
+                pass
 
