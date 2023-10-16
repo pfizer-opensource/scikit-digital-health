@@ -7,9 +7,27 @@ Copyright (c) 2021. Pfizer Inc. All rights reserved.
 from datetime import date as dt_date
 import logging
 from pathlib import Path
+import functools
 
 from pandas import DataFrame
 from numpy import array
+
+
+def handle_process_returns(method):
+    """
+    Decorator method for handling returns properly
+    """
+    @functools.wraps(method)
+    def magic(self, **kwargs):
+        res = method(self, **kwargs)
+        if not isinstance(res, dict):
+            raise ValueError("Return value must be a dictionary")
+        if self._in_pipeline:
+            kwargs.update(res)
+        else:
+            return res
+
+    return magic
 
 
 class BaseProcess:
