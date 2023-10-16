@@ -1,6 +1,6 @@
 import pytest
 
-from skdh.base import BaseProcess
+from skdh.base import BaseProcess, handle_process_returns
 from skdh import __version__ as skdh_vers
 
 
@@ -32,6 +32,22 @@ def testprocess2():
             return {"kwa": self.kwa}, {"kwa": self.kwa}
 
     return TestProcess2
+
+
+@pytest.fixture(scope='module')
+def testprocess3():
+    class TestProcess3(BaseProcess):
+        def __init__(self, kwa=1):
+            super().__init__(kwa=kwa)
+            self.kwa = kwa
+
+        @handle_process_returns
+        def predict(self, a=None, b=None, *, c=None, **kwargs):
+            super().predict(expect_days=False, expect_wear=False, a=a, b=b, c=c, **kwargs)
+
+            return {'d': 5.5, 'e': 8}
+
+    return TestProcess3
 
 
 @pytest.fixture(scope="module")

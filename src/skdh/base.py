@@ -22,8 +22,9 @@ def handle_process_returns(method):
         res = method(self, **kwargs)
         if not isinstance(res, dict):
             raise ValueError("Return value must be a dictionary")
+        kwargs.update(res)  # always update the kwargs
         if self._in_pipeline:
-            kwargs.update(res)
+            return kwargs, res
         else:
             return res
 
