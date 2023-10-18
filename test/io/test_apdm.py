@@ -8,7 +8,7 @@ from skdh.io import ReadApdmH5
 from skdh.io.apdm import SensorNotFoundError
 
 
-class TestReadBin:
+class TestApdmReader:
     def test(self, apdm_file):
         res = ReadApdmH5("Lumbar", gravity_acceleration=9.81).predict(apdm_file)
 
