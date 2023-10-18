@@ -393,9 +393,9 @@ class Gait(BaseProcess):
     @handle_process_returns
     def predict(
         self,
-        time=None,
-        accel=None,
         *,
+        time,
+        accel,
         gyro=None,
         fs=None,
         height=None,
@@ -403,7 +403,7 @@ class Gait(BaseProcess):
         **kwargs,
     ):
         """
-        predict(time, accel, *, gyro=None, fs=None, height=None, gait_pred=None, day_ends={})
+        predict(*, time, accel, gyro=None, fs=None, height=None, gait_pred=None, day_ends={})
 
         Get the gait events and endpoints from a time series signal
 

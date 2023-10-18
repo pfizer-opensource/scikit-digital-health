@@ -773,8 +773,10 @@ class AccelThresholdWearDetection(BaseProcess):
         self.wskip = window_skip
 
     @handle_process_returns
-    def predict(self, time=None, accel=None, *, fs=None, **kwargs):
+    def predict(self, *, time, accel, fs=None, **kwargs):
         """
+        predict(*, time, accel, fs=None)
+
         Detect the periods of non-wear
 
         Parameters

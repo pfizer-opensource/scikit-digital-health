@@ -323,9 +323,9 @@ class ReadCSV(BaseProcess):
 
     @handle_process_returns
     @check_input_file(".csv")
-    def predict(self, file=None, **kwargs):
+    def predict(self, *, file, **kwargs):
         """
-        predict(file)
+        predict(*, file)
 
         Read the data from a comma-separated value (CSV) file.
 

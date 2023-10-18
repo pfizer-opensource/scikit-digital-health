@@ -299,9 +299,9 @@ class ActivityLevelClassification(BaseProcess):
         self._t60 = arange(0, 24.1, 1 / 60)
 
     @handle_process_returns
-    def predict(self, time=None, accel=None, *, fs=None, wear=None, **kwargs):
+    def predict(self, *, time, accel, fs=None, wear=None, **kwargs):
         """
-        predict(time, accel, *, fs=None, wear=None)
+        predict(*, time, accel, fs=None, wear=None)
 
         Compute the time spent in different activity levels.
 

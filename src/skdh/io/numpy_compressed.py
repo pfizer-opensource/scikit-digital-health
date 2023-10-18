@@ -43,9 +43,9 @@ class ReadNumpyFile(BaseProcess):
 
     @handle_process_returns
     @check_input_file(".npz", check_size=True)
-    def predict(self, file=None, **kwargs):
+    def predict(self, *, file, **kwargs):
         """
-        predict(file)
+        predict(*, file)
 
         Read the data from a numpy compressed file.
 

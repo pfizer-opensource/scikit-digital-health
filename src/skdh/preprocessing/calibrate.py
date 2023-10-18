@@ -99,9 +99,11 @@ class CalibrateAccelerometer(BaseProcess):
 
     @handle_process_returns
     def predict(
-        self, time=None, accel=None, *, fs=None, apply=True, temperature=None, **kwargs
+        self, *, time, accel, fs=None, apply=True, temperature=None, **kwargs
     ):
         r"""
+        predict(*, time, accel, fs=None, apply=True, temperature=None)
+
         Run the calibration on the accelerometer data.
 
         Parameters

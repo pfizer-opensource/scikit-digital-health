@@ -64,9 +64,9 @@ class ReadApdmH5(BaseProcess):
 
     @handle_process_returns
     @check_input_file(".h5", check_size=False)
-    def predict(self, file=None, **kwargs):
+    def predict(self, *, file, **kwargs):
         """
-        predict(file)
+        predict(*, file)
 
         Read the data from an APDM file, getting the data from the specified sensor.
 

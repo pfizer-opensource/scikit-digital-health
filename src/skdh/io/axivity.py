@@ -97,9 +97,9 @@ class ReadCwa(BaseProcess):
 
     @handle_process_returns
     @check_input_file(".cwa")
-    def predict(self, file=None, **kwargs):
+    def predict(self, *, file, **kwargs):
         """
-        predict(file)
+        predict(*, file)
 
         Read the data from the axivity file
 

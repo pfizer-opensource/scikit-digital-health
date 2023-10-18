@@ -193,9 +193,9 @@ class Sit2Stand(BaseProcess):
             self.day_key = tuple(day_window)
 
     @handle_process_returns
-    def predict(self, time=None, accel=None, **kwargs):
+    def predict(self, *, time, accel, **kwargs):
         """
-        predict(time, accel, *, day_ends={})
+        predict(*, time, accel, day_ends={})
 
         Predict the sit-to-stand transfers, and compute per-transition quantities
 
