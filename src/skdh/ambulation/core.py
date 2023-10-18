@@ -5,7 +5,7 @@ import numpy as np
 from scipy.signal import butter, sosfiltfilt
 import lightgbm as lgb
 
-from skdh.base import BaseProcess
+from skdh.base import BaseProcess, handle_process_returns
 from skdh.utility import get_windowed_view
 from skdh.utility.internal import apply_downsample, rle
 from skdh.features import (
@@ -85,6 +85,7 @@ class Ambulation(BaseProcess):
         super().__init__(pthresh=pthresh)
         self.pthresh = pthresh
 
+    @handle_process_returns
     def predict(self, time, accel, **kwargs):
         """
         predict(time, accel)
@@ -155,17 +156,11 @@ class Ambulation(BaseProcess):
             ambulation_bouts = None
 
         # update results for pipeline
-        kwargs.update(
-            {
-                self._time: time,
-                self._acc: accel,
-                "ambulation": ambulation_bouts,
-            }
-        )
-        if self._in_pipeline:
-            return kwargs, results
-        else:
-            return results
+        ambulation = {
+            "ambulation": ambulation_bouts
+        }
+
+        return ambulation
 
     @staticmethod
     def _preprocess(accel):

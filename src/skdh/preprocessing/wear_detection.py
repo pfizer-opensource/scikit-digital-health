@@ -29,7 +29,7 @@ from numpy import (
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt
 
-from skdh.base import BaseProcess
+from skdh.base import BaseProcess, handle_process_returns
 from skdh.utility import moving_mean, moving_sd, moving_max, moving_min
 from skdh.utility.internal import rle, invert_indices
 from skdh.utility.activity_counts import get_activity_counts
@@ -128,6 +128,7 @@ class DETACH(BaseProcess):
         self.n_ax = n_axes_threshold
         self.wsize = window_size
 
+    @handle_process_returns
     def predict(self, time=None, accel=None, temperature=None, *, fs=None, **kwargs):
         """
         Detect periods of non-wear.
@@ -351,17 +352,7 @@ class DETACH(BaseProcess):
         # units for indexing
         wear = concatenate((wear_starts, wear_stops)).reshape((2, -1)).T
 
-        kwargs.update(
-            {
-                self._time: time,
-                self._acc: accel,
-                self._temp: temperature,
-                "wear": wear,
-                "fs": fs,
-            }
-        )
-
-        return (kwargs, None) if self._in_pipeline else kwargs
+        return {"wear": wear}
 
 
 class CountWearDetection(BaseProcess):
@@ -418,6 +409,7 @@ class CountWearDetection(BaseProcess):
         self.epoch_seconds = epoch_seconds
         self.use_ag_package = use_actigraph_package
 
+    @handle_process_returns
     def predict(self, time=None, accel=None, *, fs=None, **kwargs):
         """
         Detect periods of non-wear.
@@ -515,17 +507,7 @@ class CountWearDetection(BaseProcess):
         # units for indexing
         wear = concatenate((wear_starts, wear_stops)).reshape((2, -1)).T
 
-        # update kwargs
-        kwargs.update(
-            {
-                self._time: time,
-                self._acc: accel,
-                "fs": fs,
-                "wear": wear,
-            }
-        )
-
-        return (kwargs, None) if self._in_pipeline else kwargs
+        return {"wear": wear}
 
 
 class CtaWearDetection(BaseProcess):
@@ -584,6 +566,7 @@ class CtaWearDetection(BaseProcess):
         self.wlen = window_length
         self.skip = window_skip
 
+    @handle_process_returns
     def predict(self, time=None, accel=None, temperature=None, *, fs=None, **kwargs):
         """
         Detect periods of non-wear.
@@ -672,17 +655,7 @@ class CtaWearDetection(BaseProcess):
 
         wear_idx = concatenate((wear_starts, wear_stops)).reshape((2, -1)).T
 
-        kwargs.update(
-            {
-                self._time: time,
-                self._acc: accel,
-                "temperature": temperature,
-                "wear": wear_idx,
-                "fs": "fs",
-            }
-        )
-
-        return (kwargs, None) if self._in_pipeline else kwargs
+        return {"wear": wear_idx}
 
 
 class AccelThresholdWearDetection(BaseProcess):
@@ -799,6 +772,7 @@ class AccelThresholdWearDetection(BaseProcess):
         self.wlen = window_length
         self.wskip = window_skip
 
+    @handle_process_returns
     def predict(self, time=None, accel=None, *, fs=None, **kwargs):
         """
         Detect the periods of non-wear
@@ -853,15 +827,7 @@ class AccelThresholdWearDetection(BaseProcess):
 
         wear = concatenate((wear_starts, wear_stops)).reshape((2, -1)).T * n_wskip
 
-        kwargs.update(
-            {
-                self._time: time,
-                self._acc: accel,
-                "wear": wear,
-                "fs": "fs",
-            }
-        )
-        return (kwargs, None) if self._in_pipeline else kwargs
+        return {"wear": wear}
 
     @staticmethod
     def _modify_wear_times(nonwear, wskip, apply_setup_rule, shipping_crit):

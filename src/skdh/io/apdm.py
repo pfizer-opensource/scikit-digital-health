@@ -6,7 +6,7 @@ Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 import h5py
 
-from skdh.base import BaseProcess
+from skdh.base import BaseProcess, handle_process_returns
 from skdh.io.base import check_input_file
 
 
@@ -62,6 +62,7 @@ class ReadApdmH5(BaseProcess):
         self.sens = sensor_location
         self.g = gravity_acceleration
 
+    @handle_process_returns
     @check_input_file(".h5", check_size=False)
     def predict(self, file=None, **kwargs):
         """
@@ -113,6 +114,5 @@ class ReadApdmH5(BaseProcess):
             res[self._temp] = f["Sensors"][sid]["Temperature"][()]
 
         res["file"] = file
-        kwargs.update(res)
 
-        return (kwargs, None) if self._in_pipeline else kwargs
+        return res

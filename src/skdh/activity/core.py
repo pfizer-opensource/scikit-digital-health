@@ -28,7 +28,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.lines as mlines
 import matplotlib.pyplot as plt
 
-from skdh.base import BaseProcess
+from skdh.base import BaseProcess, handle_process_returns
 from skdh.utility.internal import get_day_index_intersection
 from skdh.activity.cutpoints import get_level_thresholds, get_metric
 from skdh.activity import endpoints as ept
@@ -298,6 +298,7 @@ class ActivityLevelClassification(BaseProcess):
 
         self._t60 = arange(0, 24.1, 1 / 60)
 
+    @handle_process_returns
     def predict(self, time=None, accel=None, *, fs=None, wear=None, **kwargs):
         """
         predict(time, accel, *, fs=None, wear=None)
@@ -449,9 +450,10 @@ class ActivityLevelClassification(BaseProcess):
         # finalize plots
         self._finalize_plots()
 
-        kwargs.update({self._time: time, self._acc: accel, "fs": fs, "wear": wear})
-
-        return (kwargs, res) if self._in_pipeline else res
+        return_val = {
+            "wear": wear
+        }
+        return return_val
 
     def _initialize_awake_values(self, results, day_n):
         """

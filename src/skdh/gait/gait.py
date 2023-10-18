@@ -16,7 +16,7 @@ from numpy.linalg import norm
 import matplotlib
 import matplotlib.pyplot as plt
 
-from skdh.base import BaseProcess
+from skdh.base import BaseProcess, handle_process_returns
 from skdh.utility.internal import apply_downsample, rle
 from skdh.utility.exceptions import LowFrequencyError
 
@@ -390,6 +390,7 @@ class Gait(BaseProcess):
 
         self.plot_fname = save_file
 
+    @handle_process_returns
     def predict(
         self,
         time=None,
@@ -650,17 +651,7 @@ class Gait(BaseProcess):
         gait.pop("FC opp foot", None)
         gait.pop("forward cycles", None)
 
-        kwargs.update(
-            {
-                self._acc: accel,
-                self._time: time,
-                "fs": fs,
-                "height": height,
-                self._gyro: gyro,
-                "gait_pred": gait_pred,
-            }
-        )
-        return (kwargs, gait) if self._in_pipeline else gait
+        return gait
 
     def _initialize_plot(self, file):  # pragma: no cover
         """

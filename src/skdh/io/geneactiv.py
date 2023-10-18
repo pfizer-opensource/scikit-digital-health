@@ -8,7 +8,7 @@ from warnings import warn
 
 from numpy import vstack, asarray, int_
 
-from skdh.base import BaseProcess
+from skdh.base import BaseProcess, handle_process_returns
 from skdh.io.base import check_input_file
 from skdh.io._extensions import read_geneactiv
 
@@ -92,6 +92,7 @@ class ReadBin(BaseProcess):
                     "Base must be in [0, 23] and period must be in [1, 23]"
                 )
 
+    @handle_process_returns
     @check_input_file(".bin")
     def predict(self, file=None, **kwargs):
         """
@@ -138,7 +139,6 @@ class ReadBin(BaseProcess):
             self._temp: temp[:n_max],
             "light": light[:n_max],
             "fs": fs,
-            "file": file,
         }
 
         if self.window:
@@ -149,6 +149,4 @@ class ReadBin(BaseProcess):
 
                 results[self._days][(data[0], data[1])] = vstack((strt, stp)).T
 
-        kwargs.update(results)
-
-        return (kwargs, None) if self._in_pipeline else kwargs
+        return results

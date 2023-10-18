@@ -21,7 +21,7 @@ from numpy import (
 )
 from pandas import read_csv, to_datetime, to_timedelta, Timedelta
 
-from skdh.base import BaseProcess
+from skdh.base import BaseProcess, handle_process_returns
 from skdh.io.base import check_input_file
 
 
@@ -321,6 +321,7 @@ class ReadCSV(BaseProcess):
                     "Base must be in [0, 23] and period must be in [1, 23]"
                 )
 
+    @handle_process_returns
     @check_input_file(".csv")
     def predict(self, file=None, **kwargs):
         """
@@ -369,14 +370,11 @@ class ReadCSV(BaseProcess):
         # get the acceleration values and convert if necessary
         accel = handle_accel(raw, self.acc_col_names, self.accel_in_g, self.g_value)
 
-        kwargs.update(
-            {
-                "file": file,
-                self._time: time,
-                self._acc: accel,
-                self._days: day_windows,
-                "fs": fs,
-            }
-        )
+        results = {
+            self._time: time,
+            self._acc: accel,
+            self._days: day_windows,
+            "fs": fs,
+        }
 
-        return (kwargs, None) if self._in_pipeline else kwargs
+        return results
