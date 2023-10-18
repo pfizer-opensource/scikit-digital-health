@@ -450,10 +450,7 @@ class ActivityLevelClassification(BaseProcess):
         # finalize plots
         self._finalize_plots()
 
-        return_val = {
-            "wear": wear
-        }
-        return return_val
+        return res
 
     def _initialize_awake_values(self, results, day_n):
         """
