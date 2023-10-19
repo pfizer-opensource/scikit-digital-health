@@ -23,15 +23,15 @@ def handle_process_returns(update_kwargs=True):
             if len(updates) > 1:
                 raise ValueError("Too many values to update input with, updates should be a dictionary")
 
-            # case 1: res, with no updates
-            if not updates:  # equivalent to updates == []
-                if update_kwargs:
-                    try:
-                        kwargs.update(res)
-                    except TypeError as e:
-                        raise TypeError("Cannot update input  with non-dictionary output") from e
-            # case 2: we have updates
-            else:
+            # if we want to update the input with the results
+            if update_kwargs:
+                try:
+                    kwargs.update(res)
+                except TypeError as e:
+                    raise TypeError("Cannot update input  with non-dictionary output") from e
+
+            # We have updates
+            if updates:  # equivalent to len(updates) > 0 or updates != []
                 try:
                     kwargs.update(updates[0])
                 except TypeError as e:
