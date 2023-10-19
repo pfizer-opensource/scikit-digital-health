@@ -6,7 +6,7 @@ Copyright 2023 Pfizer Inc, All rights reserved
 """
 from numpy import ones, zeros, nonzero, array, int_
 
-from skdh.base import BaseProcess
+from skdh.base import BaseProcess, handle_process_returns
 
 
 class CreateStridesAndQc(BaseProcess):
@@ -55,6 +55,7 @@ class CreateStridesAndQc(BaseProcess):
         else:
             raise ValueError("`loading_factor` is not a callable or a float.")
 
+    @handle_process_returns(results_to_kwargs=True)
     def predict(self, time=None, initial_contacts=None, final_contacts=None, mean_step_freq=None, **kwargs):
         """
         predict(time, accel, initial_contacts, final_contacts, mean_step_freq)
@@ -125,17 +126,11 @@ class CreateStridesAndQc(BaseProcess):
         if forward_cycles.size > 1:
             forward_cycles[:-1] += qc_fc_of[1:] == qc_fc[:-1]
 
-        kwargs.update(
-            {
-                self._time: time,
-                "initial_contacts": initial_contacts,
-                "final_contacts": final_contacts,
-                "mean_step_freq": mean_step_freq,
-                "qc_initial_contacts": qc_ic,
-                "qc_final_contacts": qc_fc,
-                "qc_final_contacts_oppfoot": qc_fc_of,
-                "forward_cycles": forward_cycles,
-            }
-        )
+        res = {
+            "qc_initial_contacts": qc_ic,
+            "qc_final_contacts": qc_fc,
+            "qc_final_contacts_oppfoot": qc_fc_of,
+            "forward_cycles": forward_cycles,
+        }
 
-        return (kwargs, None) if self._in_pipeline else kwargs
+        return res

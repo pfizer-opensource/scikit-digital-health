@@ -7,7 +7,7 @@ Copyright (c) 2023, Pfizer Inc. All rights reserved
 from numpy import mean, std, median, argmax, sign, abs, argsort, corrcoef, diff, array
 from scipy.signal import detrend, butter, sosfiltfilt, find_peaks
 
-from skdh.base import BaseProcess
+from skdh.base import BaseProcess, handle_process_returns
 from skdh.utility import correct_accelerometer_orientation
 from skdh.gait.gait_endpoints import gait_endpoints
 
@@ -70,8 +70,9 @@ class PreprocessGaitBout(BaseProcess):
 
         return sign
 
+    @handle_process_returns(results_to_kwargs=True)
     def predict(
-        self, time=None, accel=None, *, fs=None, v_axis=None, ap_axis=None, **kwargs
+        self, *, time, accel, fs=None, v_axis=None, ap_axis=None, **kwargs
     ):
         """
         predict(time, accel, *, fs=None, v_axis=None, ap_axis=None)
@@ -154,18 +155,13 @@ class PreprocessGaitBout(BaseProcess):
         step_samples = pks[idx]
         mean_step_freq = 1 / (step_samples / fs)
 
-        kwargs.update(
-            {
-                self._time: time,
-                self._acc: accel,
-                "fs": fs,
-                "v_axis": v_axis,
-                "v_axis_sign": v_axis_sign,
-                "ap_axis": ap_axis,
-                "ap_axis_sign": ap_axis_sign,
-                "mean_step_freq": mean_step_freq,
-                "accel_filt": accel_filt
-            }
-        )
+        res = {
+            "v_axis": v_axis,
+            "v_axis_sign": v_axis_sign,
+            "ap_axis": ap_axis,
+            "ap_axis_sign": ap_axis_sign,
+            "mean_step_freq": mean_step_freq,
+            "accel_filt": accel_filt
+        }
 
-        return (kwargs, None) if self._in_pipeline else kwargs
+        return res

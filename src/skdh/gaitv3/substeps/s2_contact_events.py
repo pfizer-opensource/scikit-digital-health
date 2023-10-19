@@ -11,7 +11,7 @@ from scipy.signal import find_peaks
 from scipy.integrate import cumulative_trapezoid
 from pywt import cwt, frequency2scale
 
-from skdh.base import BaseProcess
+from skdh.base import BaseProcess, handle_process_returns
 
 
 class VerticalCwtGaitEvents(BaseProcess):
@@ -126,6 +126,7 @@ class VerticalCwtGaitEvents(BaseProcess):
 
         return scale1, scale2
 
+    @handle_process_returns(results_to_kwargs=True)
     def predict(
         self,
         time=None,
@@ -195,19 +196,12 @@ class VerticalCwtGaitEvents(BaseProcess):
             -v_axis_sign * coef2[0], height=0.5 * std(coef2[0])
         )
 
-        kwargs.update(
-            {
-                self._time: time,
-                self._acc: accel,
-                "v_axis": v_axis,
-                "v_axis_sign": v_axis_sign,
-                "fs": fs,
-                "initial_contacts": init_contact,
-                "final_contacts": final_contact,
-            }
-        )
+        res = {
+            "initial_contacts": init_contact,
+            "final_contacts": final_contact
+        }
 
-        return (kwargs, None) if self._in_pipeline else kwargs
+        return res
 
 
 class ApCwtGaitEvents(BaseProcess):
@@ -221,6 +215,7 @@ class ApCwtGaitEvents(BaseProcess):
     def __init__(self):
         super().__init__()
 
+    @handle_process_returns(results_to_kwargs=True)
     def predict(self, time=None, accel=None, accel_filt=None, ap_axis=None, ap_axis_sign=None, mean_step_freq=None, *, fs=None, **kwargs):
         """
         predict(time, accel, ap_axis, ap_axis_sign, mean_step_freq, *, fs=None)
@@ -281,18 +276,9 @@ class ApCwtGaitEvents(BaseProcess):
 
             ics.append(ic)
 
-        kwargs.update(
-            {
-                self._time: time,
-                self._acc: accel,
-                "accel_filt": accel_filt,
-                "ap_axis": ap_axis,
-                "ap_axis_sign": ap_axis_sign,
-                "mean_step_freq": mean_step_freq,
-                "fs": fs,
-                "initial_contacts": array(ics),
-                "final_contacts": fcs,
-            }
-        )
+        res = {
+            "initial_contacts": array(ics),
+            "final_contacts": fcs
+        }
 
-        return (kwargs, None) if self._in_pipeline else kwargs
+        return res
