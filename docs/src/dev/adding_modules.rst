@@ -27,10 +27,10 @@ Add a new module
         # src/skdh/preprocessing/preprocessing.py
         import ... 
 
-        from skdh.base import _BaseProcess  # import the base process class
+        from skdh.base import BaseProcess, handle_process_returns  # import the base process class
 
 
-        class Preprocessing(_BaseProcess):
+        class Preprocessing(BaseProcess):
             """
             Class to implement any processing steps
 
@@ -70,6 +70,7 @@ Add a new module
             'g', and 'deg/s' to match the pipeline implementation, and what other processes 
             are expecting.
             """
+            @handle_process_returns(results_to_kwargs=False)
             def predict(self, time=None, accel=None, *, gyro=None, **kwargs):
                 """
                 predict(time, accel, *, gyro=None)
@@ -94,18 +95,21 @@ Add a new module
                 # might be useful, retrieve it from  kwargs
                 opt_item = kwargs.get('opt_item', None)
 
-                
-                # FINALLY, the last few lines and return values should be standard!
-                kwargs.update({self._time: time, self._acc: accel, self._gyro: gyro})
                 """
-                update the kwargs with any of the variables passed in (in this case, time, 
-                accel, and gyro). This means that you should make a copy if you are 
-                significantly modifying any of these for your own function/purposes
+                NOTE that returns MUST be dictionaries!!!
+
+                Because we set `results_to_kwargs=False` in `@handle_process_returns`
+                above, `preproc_dict` values will NOT be included for future steps to
+                use in an easy way. If you want them to be included, set `results_to_kwargs=True`
+                If you need to return both results, and updates to inputs for future
+                stages, you can use `results_to_kwargs=False`, and then set the return to
+
+                `return results, updates`
+
+                where keys in `results` will not be available for later steps, but
+                keys in `updates` (which needs to be a dictionary) will be.
                 """
-                if self._in_pipeline:  # self._in_pipeline is taken care of in the base class
-                    return kwargs, preproc_dict  # return both the input, and output
-                else:
-                    return preproc_dict  # if outside pipeline, only return the results
+                return preproc_dict
 
 3. External file functions
 
