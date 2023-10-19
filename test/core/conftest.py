@@ -41,7 +41,7 @@ def testprocess3():
             super().__init__(kwa=kwa)
             self.kwa = kwa
 
-        @handle_process_returns
+        @handle_process_returns(results_to_kwargs=True)
         def predict(self, a=None, b=None, *, c=None, **kwargs):
             super().predict(expect_days=False, expect_wear=False, a=a, b=b, c=c, **kwargs)
 

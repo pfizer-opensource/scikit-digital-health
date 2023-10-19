@@ -102,7 +102,7 @@ def test_8_input_check_units():
 # Integration test 1: predict method on ambulation data
 def test_9_integration_ambulation(ambulation_positive_data):
     time, accel = ambulation_positive_data
-    res = Ambulation().predict(time, accel)
+    res = Ambulation().predict(time=time, accel=accel)
     prd = res["ambulation_3s_epochs_predictions"]
     assert (
         sum(prd) > len(prd) * 0.85
@@ -112,7 +112,7 @@ def test_9_integration_ambulation(ambulation_positive_data):
 # Integration test 2: predict method on non-ambulation data
 def test_10_integration_non_ambulation(ambulation_negative_data):
     time, accel = ambulation_negative_data
-    res = Ambulation().predict(time, accel)
+    res = Ambulation().predict(time=time, accel=accel)
     prd = res["ambulation_3s_epochs_predictions"]
     assert (
         sum(prd) < len(prd) * 0.15
@@ -122,7 +122,7 @@ def test_10_integration_non_ambulation(ambulation_negative_data):
 # Integration test 3: predict method on non ambulation data requiring downsampling
 def test_11_integration_ambulation_downsample(ambulation_negative_data_50hz):
     time, accel = ambulation_negative_data_50hz
-    res = Ambulation().predict(time, accel)
+    res = Ambulation().predict(time=time, accel=accel)
     prd = res["ambulation_3s_epochs_predictions"]
     assert (
         sum(prd) < len(prd) * 0.15

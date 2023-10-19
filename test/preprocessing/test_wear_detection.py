@@ -122,7 +122,7 @@ class TestDetectWearAccelThreshold:
 
         time, accel, wear = accel_with_nonwear(setup, ship)
 
-        res = dw.predict(time, accel)
+        res = dw.predict(time=time, accel=accel)
 
         assert allclose(res["wear"], wear)
 
