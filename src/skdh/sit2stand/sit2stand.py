@@ -192,7 +192,7 @@ class Sit2Stand(BaseProcess):
         else:
             self.day_key = tuple(day_window)
 
-    @handle_process_returns
+    @handle_process_returns(results_to_kwargs=False)
     def predict(self, *, time, accel, **kwargs):
         """
         predict(*, time, accel, day_ends={})

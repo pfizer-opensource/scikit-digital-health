@@ -128,7 +128,7 @@ class DETACH(BaseProcess):
         self.n_ax = n_axes_threshold
         self.wsize = window_size
 
-    @handle_process_returns
+    @handle_process_returns(results_to_kwargs=True)
     def predict(self, time=None, accel=None, temperature=None, *, fs=None, **kwargs):
         """
         Detect periods of non-wear.
@@ -409,7 +409,7 @@ class CountWearDetection(BaseProcess):
         self.epoch_seconds = epoch_seconds
         self.use_ag_package = use_actigraph_package
 
-    @handle_process_returns
+    @handle_process_returns(results_to_kwargs=True)
     def predict(self, time=None, accel=None, *, fs=None, **kwargs):
         """
         Detect periods of non-wear.
@@ -566,7 +566,7 @@ class CtaWearDetection(BaseProcess):
         self.wlen = window_length
         self.skip = window_skip
 
-    @handle_process_returns
+    @handle_process_returns(results_to_kwargs=True)
     def predict(self, time=None, accel=None, temperature=None, *, fs=None, **kwargs):
         """
         Detect periods of non-wear.
@@ -772,7 +772,7 @@ class AccelThresholdWearDetection(BaseProcess):
         self.wlen = window_length
         self.wskip = window_skip
 
-    @handle_process_returns
+    @handle_process_returns(results_to_kwargs=True)
     def predict(self, *, time, accel, fs=None, **kwargs):
         """
         predict(*, time, accel, fs=None)

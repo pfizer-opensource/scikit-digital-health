@@ -362,7 +362,7 @@ class Sleep(BaseProcess):
 
                 df.to_csv(rest_file, index=False)
 
-    @handle_process_returns
+    @handle_process_returns(results_to_kwargs=True)
     def predict(
         self, time=None, accel=None, *, temperature=None, fs=None, wear=None, **kwargs
     ):

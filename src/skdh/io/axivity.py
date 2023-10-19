@@ -95,7 +95,7 @@ class ReadCwa(BaseProcess):
                     "Base must be in [0, 23] and period must be in [1, 23]"
                 )
 
-    @handle_process_returns
+    @handle_process_returns(results_to_kwargs=True)
     @check_input_file(".cwa")
     def predict(self, *, file, **kwargs):
         """

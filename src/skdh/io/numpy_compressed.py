@@ -41,7 +41,7 @@ class ReadNumpyFile(BaseProcess):
         else:
             raise ValueError("`ext_error` must be one of 'raise', 'warn', 'skip'.")
 
-    @handle_process_returns
+    @handle_process_returns(results_to_kwargs=True)
     @check_input_file(".npz", check_size=True)
     def predict(self, *, file, **kwargs):
         """

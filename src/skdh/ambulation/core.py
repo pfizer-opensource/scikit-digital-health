@@ -85,7 +85,7 @@ class Ambulation(BaseProcess):
         super().__init__(pthresh=pthresh)
         self.pthresh = pthresh
 
-    @handle_process_returns
+    @handle_process_returns(results_to_kwargs=False)
     def predict(self, time, accel, **kwargs):
         """
         predict(time, accel)
@@ -155,12 +155,7 @@ class Ambulation(BaseProcess):
         else:
             ambulation_bouts = None
 
-        # update results for pipeline
-        ambulation = {
-            "ambulation": ambulation_bouts
-        }
-
-        return ambulation
+        return results, {"ambulation_bouts": ambulation_bouts}
 
     @staticmethod
     def _preprocess(accel):

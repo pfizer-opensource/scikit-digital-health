@@ -390,7 +390,7 @@ class Gait(BaseProcess):
 
         self.plot_fname = save_file
 
-    @handle_process_returns
+    @handle_process_returns(results_to_kwargs=False)
     def predict(
         self,
         *,

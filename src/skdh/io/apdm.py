@@ -62,7 +62,7 @@ class ReadApdmH5(BaseProcess):
         self.sens = sensor_location
         self.g = gravity_acceleration
 
-    @handle_process_returns
+    @handle_process_returns(results_to_kwargs=True)
     @check_input_file(".h5", check_size=False)
     def predict(self, *, file, **kwargs):
         """
@@ -112,7 +112,5 @@ class ReadApdmH5(BaseProcess):
             res[self._time] = f["Sensors"][sid]["Time"][()] / 1e6  # to seconds
             res[self._gyro] = f["Sensors"][sid]["Gyroscope"][()]
             res[self._temp] = f["Sensors"][sid]["Temperature"][()]
-
-        res["file"] = file
 
         return res

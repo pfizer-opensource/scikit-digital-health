@@ -298,7 +298,7 @@ class ActivityLevelClassification(BaseProcess):
 
         self._t60 = arange(0, 24.1, 1 / 60)
 
-    @handle_process_returns
+    @handle_process_returns(results_to_kwargs=False)
     def predict(self, *, time, accel, fs=None, wear=None, **kwargs):
         """
         predict(*, time, accel, fs=None, wear=None)

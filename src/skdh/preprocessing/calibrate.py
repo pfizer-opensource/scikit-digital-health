@@ -97,7 +97,7 @@ class CalibrateAccelerometer(BaseProcess):
         self.max_iter = max_iter
         self.tol = tol
 
-    @handle_process_returns
+    @handle_process_returns(results_to_kwargs=True)
     def predict(
         self, *, time, accel, fs=None, apply=True, temperature=None, **kwargs
     ):
