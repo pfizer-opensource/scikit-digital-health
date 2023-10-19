@@ -26,7 +26,15 @@ def handle_process_returns(*, results_to_kwargs):
     def internal_handler(method):
         @functools.wraps(method)
         def magic(self, **kwargs):
-            res, *updates = method(self, **kwargs)
+            return_vals = method(self, **kwargs)
+
+            # need an extra layer here due to how *return values handle returns
+            # of single dictionaries
+            if isinstance(return_vals, dict):
+                res = return_vals
+                updates = []
+            else:
+                res, *updates = return_vals
 
             # warnings for updates length
             if len(updates) > 1:
