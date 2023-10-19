@@ -13,22 +13,38 @@ from pandas import DataFrame
 from numpy import array
 
 
-def handle_process_returns(method):
-    """
-    Decorator method for handling returns properly
-    """
-    @functools.wraps(method)
-    def magic(self, **kwargs):
-        res = method(self, **kwargs)
-        if not isinstance(res, dict):
-            raise ValueError("Return value must be a dictionary")
-        kwargs.update(res)  # always update the kwargs
-        if self._in_pipeline:
-            return kwargs, res
-        else:
-            return res
+def handle_process_returns(update_kwargs=True):
+    def internal_handler(method):
+        @functools.wraps(method)
+        def magic(self, **kwargs):
+            res, *updates = method(self, **kwargs)
 
-    return magic
+            # warnings for updates length
+            if len(updates) > 1:
+                raise ValueError("Too many values to update input with, updates should be a dictionary")
+
+            # case 1: res, with no updates
+            if not updates:  # equivalent to updates == []
+                if update_kwargs:
+                    try:
+                        kwargs.update(res)
+                    except TypeError as e:
+                        raise TypeError("Cannot update input  with non-dictionary output") from e
+            # case 2: we have updates
+            else:
+                try:
+                    kwargs.update(updates[0])
+                except TypeError as e:
+                    raise TypeError("Cannot update input with non-dictionary output") from e
+
+            # return based on pipeline
+            if self._in_pipeline:
+                return kwargs, res
+            else:
+                return res
+
+        return magic
+    return internal_handler
 
 
 class BaseProcess:
