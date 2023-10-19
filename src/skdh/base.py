@@ -13,7 +13,16 @@ from pandas import DataFrame
 from numpy import array
 
 
-def handle_process_returns(update_kwargs=True):
+def handle_process_returns(results_to_kwargs=True):
+    """
+    Handle updating inputs (kwargs) with return values as appropriate for the
+    `process` methods of `BaseProcess` classes.
+
+    Parameters
+    ----------
+    results_to_kwargs : bool, optional
+        Put the first return (results) into the input kwargs. Default is True.
+    """
     def internal_handler(method):
         @functools.wraps(method)
         def magic(self, **kwargs):
@@ -24,7 +33,7 @@ def handle_process_returns(update_kwargs=True):
                 raise ValueError("Too many values to update input with, updates should be a dictionary")
 
             # if we want to update the input with the results
-            if update_kwargs:
+            if results_to_kwargs:
                 try:
                     kwargs.update(res)
                 except TypeError as e:
