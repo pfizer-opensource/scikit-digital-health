@@ -8,9 +8,9 @@ from skdh.io import ReadApdmH5
 from skdh.io.apdm import SensorNotFoundError
 
 
-class TestReadBin:
+class TestApdmReader:
     def test(self, apdm_file):
-        res = ReadApdmH5("Lumbar", gravity_acceleration=9.81).predict(apdm_file)
+        res = ReadApdmH5("Lumbar", gravity_acceleration=9.81).predict(file=apdm_file)
 
         lumbar_sens = "XI-010284"
         with h5py.File(apdm_file) as f:
@@ -28,8 +28,8 @@ class TestReadBin:
         with NamedTemporaryFile(suffix=".abc") as tmpf:
             with pytest.warns(UserWarning, match=r"expected \[.h5\]"):
                 with pytest.raises(Exception):
-                    ReadApdmH5("Lumbar").predict(tmpf.name)
+                    ReadApdmH5("Lumbar").predict(file=tmpf.name)
 
     def test_bad_sensor(self, apdm_file):
         with pytest.raises(SensorNotFoundError):
-            ReadApdmH5("badSensor", gravity_acceleration=9.81).predict(apdm_file)
+            ReadApdmH5("badSensor", gravity_acceleration=9.81).predict(file=apdm_file)

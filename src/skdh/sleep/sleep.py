@@ -19,7 +19,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.lines as mlines
 import matplotlib.pyplot as plt
 
-from skdh.base import BaseProcess  # import the base process class
+from skdh.base import BaseProcess, handle_process_returns
 from skdh.utility.internal import get_day_index_intersection, apply_downsample, rle
 from skdh.sleep.tso import get_total_sleep_opportunity
 from skdh.sleep.utility import compute_activity_index
@@ -362,6 +362,7 @@ class Sleep(BaseProcess):
 
                 df.to_csv(rest_file, index=False)
 
+    @handle_process_returns(results_to_kwargs=True)
     def predict(
         self, time=None, accel=None, *, temperature=None, fs=None, wear=None, **kwargs
     ):
@@ -590,18 +591,7 @@ class Sleep(BaseProcess):
         # finalize plotting
         self._finalize_plots()
 
-        kwargs.update(
-            {
-                self._acc: accel,
-                self._time: time,
-                "fs": fs,
-                "wear": wear,
-                "temperature": temperature,
-                "sleep": sleep_idx,
-            }
-        )
-
-        return (kwargs, sleep) if self._in_pipeline else sleep
+        return {"sleep": sleep_idx}
 
     def _setup_day_plot(self, iday, source_file, date_str, start_dt):
         if self.f is not None:

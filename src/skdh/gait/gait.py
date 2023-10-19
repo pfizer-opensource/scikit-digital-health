@@ -16,8 +16,9 @@ from numpy.linalg import norm
 import matplotlib
 import matplotlib.pyplot as plt
 
-from skdh.base import BaseProcess
+from skdh.base import BaseProcess, handle_process_returns
 from skdh.utility.internal import apply_downsample, rle
+from skdh.utility.exceptions import LowFrequencyError
 
 from skdh.gait.get_gait_classification import (
     get_gait_classification_lgbm,
@@ -28,10 +29,6 @@ from skdh.gait.get_strides import get_strides
 from skdh.gait.get_turns import get_turns
 from skdh.gait.gait_endpoints import gait_endpoints
 from skdh.gait.gait_endpoints import GaitEventEndpoint, GaitBoutEndpoint
-
-
-class LowFrequencyError(Exception):
-    pass
 
 
 class Gait(BaseProcess):
@@ -393,11 +390,12 @@ class Gait(BaseProcess):
 
         self.plot_fname = save_file
 
+    @handle_process_returns(results_to_kwargs=False)
     def predict(
         self,
-        time=None,
-        accel=None,
         *,
+        time,
+        accel,
         gyro=None,
         fs=None,
         height=None,
@@ -405,7 +403,7 @@ class Gait(BaseProcess):
         **kwargs,
     ):
         """
-        predict(time, accel, *, gyro=None, fs=None, height=None, gait_pred=None, day_ends={})
+        predict(*, time, accel, gyro=None, fs=None, height=None, gait_pred=None, day_ends={})
 
         Get the gait events and endpoints from a time series signal
 
@@ -653,17 +651,7 @@ class Gait(BaseProcess):
         gait.pop("FC opp foot", None)
         gait.pop("forward cycles", None)
 
-        kwargs.update(
-            {
-                self._acc: accel,
-                self._time: time,
-                "fs": fs,
-                "height": height,
-                self._gyro: gyro,
-                "gait_pred": gait_pred,
-            }
-        )
-        return (kwargs, gait) if self._in_pipeline else gait
+        return gait
 
     def _initialize_plot(self, file):  # pragma: no cover
         """

@@ -7,9 +7,61 @@ Copyright (c) 2021. Pfizer Inc. All rights reserved.
 from datetime import date as dt_date
 import logging
 from pathlib import Path
+import functools
 
 from pandas import DataFrame
 from numpy import array
+
+
+def handle_process_returns(*, results_to_kwargs):
+    """
+    Handle updating inputs (kwargs) with return values as appropriate for the
+    `process` methods of `BaseProcess` classes.
+
+    Parameters
+    ----------
+    results_to_kwargs : bool
+        Put the first return (results) into the input kwargs.
+    """
+    def internal_handler(method):
+        @functools.wraps(method)
+        def magic(self, **kwargs):
+            return_vals = method(self, **kwargs)
+
+            # need an extra layer here due to how *return values handle returns
+            # of single dictionaries
+            if isinstance(return_vals, dict):
+                res = return_vals
+                updates = []
+            else:
+                res, *updates = return_vals
+
+            # warnings for updates length
+            if len(updates) > 1:
+                raise ValueError("Too many values to update input with, updates should be a dictionary")
+
+            # if we want to update the input with the results
+            if results_to_kwargs:
+                try:
+                    kwargs.update(res)
+                except TypeError as e:
+                    raise TypeError("Cannot update input  with non-dictionary output") from e
+
+            # We have updates
+            if updates:  # equivalent to len(updates) > 0 or updates != []
+                try:
+                    kwargs.update(updates[0])
+                except TypeError as e:
+                    raise TypeError("Cannot update input with non-dictionary output") from e
+
+            # return based on pipeline
+            if self._in_pipeline:
+                return kwargs, res
+            else:
+                return res
+
+        return magic
+    return internal_handler
 
 
 class BaseProcess:

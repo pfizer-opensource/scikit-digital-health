@@ -6,7 +6,7 @@ Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from numpy import load as np_load
 
-from skdh.base import BaseProcess
+from skdh.base import BaseProcess, handle_process_returns
 from skdh.io.base import check_input_file
 
 
@@ -41,10 +41,11 @@ class ReadNumpyFile(BaseProcess):
         else:
             raise ValueError("`ext_error` must be one of 'raise', 'warn', 'skip'.")
 
+    @handle_process_returns(results_to_kwargs=True)
     @check_input_file(".npz", check_size=True)
-    def predict(self, file=None, **kwargs):
+    def predict(self, *, file, **kwargs):
         """
-        predict(file)
+        predict(*, file)
 
         Read the data from a numpy compressed file.
 
@@ -74,19 +75,18 @@ class ReadNumpyFile(BaseProcess):
         """
         super().predict(expect_days=False, expect_wear=False, file=file, **kwargs)
 
+        results = {}
+
         with np_load(file, allow_pickle=self.allow_pickle) as data:
-            kwargs.update(data)  # pull everything in
+            results.update(data)  # pull everything in
             # make sure that fs is saved properly
             if "fs" in data:
-                kwargs["fs"] = data["fs"][()]
+                results["fs"] = data["fs"][()]
 
         # check that time and accel are in the correct names
-        if self._time not in kwargs or self._acc not in kwargs:
+        if self._time not in results or self._acc not in results:
             raise ValueError(
                 f"Missing `{self._time}` or `{self._acc}` arrays in the file"
             )
 
-        # make sure we return the file
-        kwargs.update({"file": file})
-
-        return (kwargs, None) if self._in_pipeline else kwargs
+        return results

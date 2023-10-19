@@ -8,7 +8,7 @@ from warnings import warn
 
 from numpy import vstack, asarray, ascontiguousarray, minimum, int_
 
-from skdh.base import BaseProcess
+from skdh.base import BaseProcess, handle_process_returns
 from skdh.io.base import check_input_file
 from skdh.io._extensions import read_axivity
 
@@ -95,10 +95,11 @@ class ReadCwa(BaseProcess):
                     "Base must be in [0, 23] and period must be in [1, 23]"
                 )
 
+    @handle_process_returns(results_to_kwargs=True)
     @check_input_file(".cwa")
-    def predict(self, file=None, **kwargs):
+    def predict(self, *, file, **kwargs):
         """
-        predict(file)
+        predict(*, file)
 
         Read the data from the axivity file
 
@@ -156,7 +157,6 @@ class ReadCwa(BaseProcess):
 
         results = {
             self._time: ts[:end],
-            "file": file,
             "fs": fs,
             self._temp: temperature[:end],
         }
@@ -177,6 +177,4 @@ class ReadCwa(BaseProcess):
                     vstack((strt, stp)).T, results[self._time].size - 1
                 )
 
-        kwargs.update(results)
-
-        return (kwargs, None) if self._in_pipeline else kwargs
+        return results

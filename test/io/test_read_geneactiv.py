@@ -8,7 +8,7 @@ from skdh.io import ReadBin, FileSizeError
 
 class TestReadBin:
     def test(self, gnactv_file, gnactv_truth):
-        res = ReadBin(bases=8, periods=12).predict(gnactv_file)
+        res = ReadBin(bases=8, periods=12).predict(file=gnactv_file)
 
         # make sure it will catch small differences
         assert allclose(
@@ -46,7 +46,7 @@ class TestReadBin:
         with NamedTemporaryFile(suffix=".abc") as tmpf:
             with pytest.warns(UserWarning, match=r"expected \[.bin\]"):
                 with pytest.raises(FileSizeError):
-                    ReadBin().predict(tmpf.name)
+                    ReadBin().predict(file=tmpf.name)
 
     def test_small_size(self):
         ntf = NamedTemporaryFile(mode="w", suffix=".bin")
@@ -54,6 +54,6 @@ class TestReadBin:
         ntf.writelines(["a\n", "b\n", "c\n"])
 
         with pytest.raises(FileSizeError):
-            ReadBin().predict(ntf.name)
+            ReadBin().predict(file=ntf.name)
 
         ntf.close()

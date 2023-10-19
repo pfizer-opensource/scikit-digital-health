@@ -22,7 +22,7 @@ from numpy import (
 from numpy.linalg import norm
 from sklearn.linear_model import LinearRegression
 
-from skdh.base import BaseProcess
+from skdh.base import BaseProcess, handle_process_returns
 from skdh.utility import moving_mean, moving_sd
 
 
@@ -97,10 +97,13 @@ class CalibrateAccelerometer(BaseProcess):
         self.max_iter = max_iter
         self.tol = tol
 
+    @handle_process_returns(results_to_kwargs=True)
     def predict(
-        self, time=None, accel=None, *, fs=None, apply=True, temperature=None, **kwargs
+        self, *, time, accel, fs=None, apply=True, temperature=None, **kwargs
     ):
         r"""
+        predict(*, time, accel, fs=None, apply=True, temperature=None)
+
         Run the calibration on the accelerometer data.
 
         Parameters
@@ -148,11 +151,6 @@ class CalibrateAccelerometer(BaseProcess):
             **kwargs,
         )
 
-        # update before it might have to be returned early
-        kwargs.update(
-            {"fs": fs, self._time: time, self._acc: accel, self._temp: temperature}
-        )
-
         # calculate fs if necessary
         fs = 1 / mean(diff(time)) if fs is None else fs
         # parameters
@@ -167,8 +165,7 @@ class CalibrateAccelerometer(BaseProcess):
                 f"No Calibration performed",
                 UserWarning,
             )
-            kwargs.update({self._time: time, self._acc: accel, self._temp: temperature})
-            return (kwargs, None) if self._in_pipeline else kwargs
+            return {}
 
         finished = False
         valid_calibration = True
@@ -207,16 +204,14 @@ class CalibrateAccelerometer(BaseProcess):
                 ] * temp_scale
 
         # add the results to the returned values
-        kwargs.update(
-            {
-                self._acc: accel,
-                "offset": offset,
-                "scale": scale,
-                "temperature scale": temp_scale,
-            }
-        )
+        results = {
+            self._acc: accel,
+            "offset": offset,
+            "scale": scale,
+            "temperature scale": temp_scale,
+        }
 
-        return (kwargs, None) if self._in_pipeline else kwargs
+        return results
 
     def _do_iterative_closest_point_fit(self, store):
         """

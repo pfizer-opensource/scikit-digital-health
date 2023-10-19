@@ -15,7 +15,7 @@ class TestCalibrateAccelerometer:
         error_start = around(mean(abs(norm(acc, axis=1) - 1)), decimals=5)
 
         cal = CalibrateAccelerometer(min_hours=12)
-        cal_res = cal.predict(t, acc, apply=True)
+        cal_res = cal.predict(time=t, accel=acc, apply=True)
 
         error_end = around(mean(abs(norm(cal_res["accel"], axis=1) - 1)), decimals=5)
 
@@ -32,7 +32,7 @@ class TestCalibrateAccelerometer:
         error_start = around(mean(abs(norm(acc, axis=1) - 1)), decimals=5)
 
         cal = CalibrateAccelerometer(min_hours=12)
-        cal_res = cal.predict(t, acc, apply=True, temperature=temp)
+        cal_res = cal.predict(time=t, accel=acc, apply=True, temperature=temp)
 
         error_end = around(mean(abs(norm(cal_res["accel"], axis=1) - 1)), decimals=5)
 
@@ -52,7 +52,7 @@ class TestCalibrateAccelerometer:
         assert cal.min_hours == 12, "Hours not rounded up to multiple of 12"
 
         with pytest.warns(UserWarning) as record:
-            cal.predict(t, a)
+            cal.predict(time=t, accel=a)
 
         assert len(record) == 1  # only 1 warning before returning
         assert "Less than 12 hours of data" in record[0].message.args[0]
@@ -64,7 +64,7 @@ class TestCalibrateAccelerometer:
         cal = CalibrateAccelerometer(min_hours=12, sd_criteria=0.01)
 
         with pytest.warns(UserWarning) as record:
-            cal.predict(t, a)
+            cal.predict(time=t, accel=a)
 
         assert len(record) == 1
         assert "insufficient non-movement data available" in record[0].message.args[0]
@@ -79,7 +79,7 @@ class TestCalibrateAccelerometer:
         cal = CalibrateAccelerometer(min_hours=12)
 
         with pytest.warns(UserWarning) as record:
-            cal.predict(t, a)
+            cal.predict(time=t, accel=a)
 
         assert len(record) == 1
         assert "insufficient non-movement data available" in record[0].message.args[0]

@@ -19,7 +19,7 @@ from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt, find_peaks
 from pywt import cwt, scale2frequency
 
-from skdh.base import BaseProcess
+from skdh.base import BaseProcess, handle_process_returns
 from skdh.sit2stand.detector import Detector, pad_moving_sd
 
 
@@ -192,9 +192,10 @@ class Sit2Stand(BaseProcess):
         else:
             self.day_key = tuple(day_window)
 
-    def predict(self, time=None, accel=None, **kwargs):
+    @handle_process_returns(results_to_kwargs=False)
+    def predict(self, *, time, accel, **kwargs):
         """
-        predict(time, accel, *, day_ends={})
+        predict(*, time, accel, day_ends={})
 
         Predict the sit-to-stand transfers, and compute per-transition quantities
 
@@ -290,6 +291,4 @@ class Sit2Stand(BaseProcess):
 
         sts.pop("Partial")
 
-        kwargs.update({self._time: time, self._acc: accel})
-
-        return (kwargs, sts) if self._in_pipeline else sts
+        return sts

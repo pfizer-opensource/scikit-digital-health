@@ -8,7 +8,7 @@ from skdh.io import ReadCwa, FileSizeError
 
 class TestReadCwa:
     def test_ax3(self, ax3_file, ax3_truth):
-        res = ReadCwa(bases=8, periods=12).predict(ax3_file)
+        res = ReadCwa(bases=8, periods=12).predict(file=ax3_file)
 
         # make sure it will catch small differences
         assert allclose(
@@ -26,7 +26,7 @@ class TestReadCwa:
         assert allclose(res["day_ends"][(8, 12)], ax3_truth["day_ends"][(8, 12)])
 
     def test_ax6(self, ax6_file, ax6_truth):
-        res = ReadCwa(bases=8, periods=12).predict(ax6_file)
+        res = ReadCwa(bases=8, periods=12).predict(file=ax6_file)
 
         # make sure it will catch small differences
         assert allclose(
@@ -65,7 +65,7 @@ class TestReadCwa:
         with NamedTemporaryFile(suffix=".abc") as tmpf:
             with pytest.warns(UserWarning, match=r"expected \[.cwa\]"):
                 with pytest.raises(Exception):
-                    ReadCwa().predict(tmpf.name)
+                    ReadCwa().predict(file=tmpf.name)
 
     def test_small_size(self):
         ntf = NamedTemporaryFile(mode="w", suffix=".cwa")
@@ -73,6 +73,6 @@ class TestReadCwa:
         ntf.writelines(["a\n", "b\n", "c\n"])
 
         with pytest.raises(FileSizeError):
-            ReadCwa().predict(ntf.name)
+            ReadCwa().predict(file=ntf.name)
 
         ntf.close()

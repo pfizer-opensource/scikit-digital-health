@@ -144,7 +144,7 @@ class TestActivityLevelClassification:
 
         sleep = array([[int(0.8 * t.size), t.size - 1]])
 
-        res = a.predict(t, x, fs=None, wear=None, sleep=sleep)
+        res = a.predict(time=t, accel=x, fs=None, wear=None, sleep=sleep)
 
         for k in activity_res:
             assert allclose(res[k], activity_res[k], equal_nan=True)
