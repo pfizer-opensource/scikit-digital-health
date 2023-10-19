@@ -196,10 +196,7 @@ class VerticalCwtGaitEvents(BaseProcess):
             -v_axis_sign * coef2[0], height=0.5 * std(coef2[0])
         )
 
-        res = {
-            "initial_contacts": init_contact,
-            "final_contacts": final_contact
-        }
+        res = {"initial_contacts": init_contact, "final_contacts": final_contact}
 
         return res
 
@@ -212,11 +209,23 @@ class ApCwtGaitEvents(BaseProcess):
     Parameters
     ----------
     """
+
     def __init__(self):
         super().__init__()
 
     @handle_process_returns(results_to_kwargs=True)
-    def predict(self, time=None, accel=None, accel_filt=None, ap_axis=None, ap_axis_sign=None, mean_step_freq=None, *, fs=None, **kwargs):
+    def predict(
+        self,
+        time=None,
+        accel=None,
+        accel_filt=None,
+        ap_axis=None,
+        ap_axis_sign=None,
+        mean_step_freq=None,
+        *,
+        fs=None,
+        **kwargs,
+    ):
         """
         predict(time, accel, ap_axis, ap_axis_sign, mean_step_freq, *, fs=None)
 
@@ -238,20 +247,24 @@ class ApCwtGaitEvents(BaseProcess):
         # compute the estimates for the scales
         f_cwt_ic = 1.3 * mean_step_freq - 0.3
         f_cwt_fc = 1.17 * mean_step_freq - 0.3
-        scale_ic = frequency2scale('gaus1', f_cwt_ic / fs)
-        scale_fc = frequency2scale('gaus1', f_cwt_fc / fs)
+        scale_ic = frequency2scale("gaus1", f_cwt_ic / fs)
+        scale_fc = frequency2scale("gaus1", f_cwt_fc / fs)
 
         # FINAL CONTACTS
-        ap_vel = cumulative_trapezoid(accel_filt[:, ap_axis], dx=1/fs, initial=0)
-        coef_fc, _ = cwt(ap_vel, scale_fc, 'gaus1')
+        ap_vel = cumulative_trapezoid(accel_filt[:, ap_axis], dx=1 / fs, initial=0)
+        coef_fc, _ = cwt(ap_vel, scale_fc, "gaus1")
         fcs, _ = find_peaks(ap_axis_sign * coef_fc[0], prominence=0.1 * std(coef_fc[0]))
 
         # INITIAL CONTACT
-        coef_ic, _ = cwt(accel_filt[:, ap_axis], scale_ic, 'gaus1')
+        coef_ic, _ = cwt(accel_filt[:, ap_axis], scale_ic, "gaus1")
         # get the peaks
-        pks, _ = find_peaks(-ap_axis_sign * coef_ic[0], prominence=0.1 * std(coef_ic[0]))
+        pks, _ = find_peaks(
+            -ap_axis_sign * coef_ic[0], prominence=0.1 * std(coef_ic[0])
+        )
         # minima/negative peaks
-        npks, _ = find_peaks(ap_axis_sign * coef_ic[0], prominence=0.1 * std(coef_ic[0]))
+        npks, _ = find_peaks(
+            ap_axis_sign * coef_ic[0], prominence=0.1 * std(coef_ic[0])
+        )
 
         ics = []
         for fc in fcs:
@@ -276,9 +289,6 @@ class ApCwtGaitEvents(BaseProcess):
 
             ics.append(ic)
 
-        res = {
-            "initial_contacts": array(ics),
-            "final_contacts": fcs
-        }
+        res = {"initial_contacts": array(ics), "final_contacts": fcs}
 
         return res

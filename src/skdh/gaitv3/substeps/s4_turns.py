@@ -4,7 +4,26 @@ Functions for getting turns.
 Lukas Adamowicz
 Copyright 2023 Pfizer Inc, all rights reserved
 """
-from numpy import full, int_, nonzero, mean, sum, arccos, array, abs, sin, cos, cross, nan, arctan2, pi, unwrap, sign, diff, zeros
+from numpy import (
+    full,
+    int_,
+    nonzero,
+    mean,
+    sum,
+    arccos,
+    array,
+    abs,
+    sin,
+    cos,
+    cross,
+    nan,
+    arctan2,
+    pi,
+    unwrap,
+    sign,
+    diff,
+    zeros,
+)
 from numpy.linalg import norm
 
 from skdh.base import BaseProcess, handle_process_returns
@@ -33,11 +52,22 @@ class TurnDetection(BaseProcess):
         the Lower Back,” Front. Neurol., vol. 8, Apr. 2017,
         doi: 10.3389/fneur.2017.00135.
     """
+
     def __init__(self):
         super().__init__()
 
     @handle_process_returns(results_to_kwargs=True)
-    def predict(self, *, time=None, accel=None, gyro=None, qc_initial_contacts=None, qc_final_contacts=None, fs=None, **kwargs):
+    def predict(
+        self,
+        *,
+        time=None,
+        accel=None,
+        gyro=None,
+        qc_initial_contacts=None,
+        qc_final_contacts=None,
+        fs=None,
+        **kwargs,
+    ):
         """
         predict(time, accel, gyro, qc_initial_contacts, qc_final_contacts, *, fs=None)
 
@@ -64,14 +94,14 @@ class TurnDetection(BaseProcess):
 
         # get the first available still period to start the yaw tracking
         n = int(0.05 * fs)  # number of samples to use for still period
-        mmin = moving_min(norm(accel[:int(2 * fs)], axis=1), w_len=n, skip=1)
-        mmax = moving_max(norm(accel[:int(2 * fs)], axis=1), w_len=n, skip=1)
+        mmin = moving_min(norm(accel[: int(2 * fs)], axis=1), w_len=n, skip=1)
+        mmax = moving_max(norm(accel[: int(2 * fs)], axis=1), w_len=n, skip=1)
 
         acc_range = mmax - mmin
         mask = acc_range < (0.2 / 9.81)  # range defined by Pham paper
         try:
             idx = nonzero(mask)[0][0]
-            min_slice = accel[idx:idx + n]
+            min_slice = accel[idx : idx + n]
         except IndexError:
             min_slice = accel[:n]
 
@@ -107,9 +137,9 @@ class TurnDetection(BaseProcess):
 
             update_R = array(
                 [
-                    [t * wx ** 2 + c, t * wx * wy + s * wz, t * wx * wz - s * wy],
-                    [t * wx * wy - s * wz, t * wy ** 2 + c, t * wy * wz + s * wx],
-                    [t * wx * wz + s * wy, t * wy * wz - s * wx, t * wz ** 2 + c],
+                    [t * wx**2 + c, t * wx * wy + s * wz, t * wx * wz - s * wy],
+                    [t * wx * wy - s * wz, t * wy**2 + c, t * wy * wz + s * wx],
+                    [t * wx * wz + s * wy, t * wy * wz - s * wx, t * wz**2 + c],
                 ]
             )
 
@@ -139,14 +169,14 @@ class TurnDetection(BaseProcess):
 
         # set hesitation turns to match surrounding
         for l, s in zip(lengths[mask], starts[mask]):
-            turns[s:s + l] = turns[s - 1]
+            turns[s : s + l] = turns[s - 1]
 
         # enforce the time limit (0.1 - 10s) and angle limit (90 deg)
         lengths, starts, values = rle(turns == 1)
         mask = abs(alpha[starts + lengths] - alpha[starts]) < (pi / 2)  # exclusion mask
         mask |= ((lengths / fs) < 0.1) & ((lengths / fs) > 10)
         for l, s in zip(lengths[mask], starts[mask]):
-            turns[s:s + l] = 0
+            turns[s : s + l] = 0
 
         # final list of turns
         lengths, starts, values = rle(turns != 0)
@@ -154,7 +184,11 @@ class TurnDetection(BaseProcess):
         # mask for strides in turn
         in_turn = zeros(n_steps, dtype=int_)
         for l, s in zip(lengths[values == 1], starts[values == 1]):
-            in_turn += (qc_initial_contacts[-n_steps:] > s) & (qc_final_contacts[-n_steps:] < (s + l))
-            in_turn += (qc_final_contacts[-n_steps:] > s) & (qc_final_contacts[-n_steps:] < (s + l))
+            in_turn += (qc_initial_contacts[-n_steps:] > s) & (
+                qc_final_contacts[-n_steps:] < (s + l)
+            )
+            in_turn += (qc_final_contacts[-n_steps:] > s) & (
+                qc_final_contacts[-n_steps:] < (s + l)
+            )
 
         return {"turns": turns, "step_in_turn": in_turn}

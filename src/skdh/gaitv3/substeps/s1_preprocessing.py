@@ -71,9 +71,7 @@ class PreprocessGaitBout(BaseProcess):
         return sign
 
     @handle_process_returns(results_to_kwargs=True)
-    def predict(
-        self, *, time, accel, fs=None, v_axis=None, ap_axis=None, **kwargs
-    ):
+    def predict(self, *, time, accel, fs=None, v_axis=None, ap_axis=None, **kwargs):
         """
         predict(time, accel, *, fs=None, v_axis=None, ap_axis=None)
 
@@ -161,7 +159,7 @@ class PreprocessGaitBout(BaseProcess):
             "ap_axis": ap_axis,
             "ap_axis_sign": ap_axis_sign,
             "mean_step_freq": mean_step_freq,
-            "accel_filt": accel_filt
+            "accel_filt": accel_filt,
         }
 
         return res

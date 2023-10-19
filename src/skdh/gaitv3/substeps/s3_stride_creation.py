@@ -32,7 +32,12 @@ class CreateStridesAndQc(BaseProcess):
     values indicating the maximum initial double support and maximum stances times
     for strides to be deemed physiologically possible, and not discarded.
     """
-    def __init__(self, max_stride_time=lambda x: 2.0 * x + 1.0, loading_factor=lambda x: 0.17 * x + 0.05):
+
+    def __init__(
+        self,
+        max_stride_time=lambda x: 2.0 * x + 1.0,
+        loading_factor=lambda x: 0.17 * x + 0.05,
+    ):
         super().__init__(
             max_stride_time=max_stride_time,
             loading_factor=loading_factor,
@@ -56,7 +61,14 @@ class CreateStridesAndQc(BaseProcess):
             raise ValueError("`loading_factor` is not a callable or a float.")
 
     @handle_process_returns(results_to_kwargs=True)
-    def predict(self, time=None, initial_contacts=None, final_contacts=None, mean_step_freq=None, **kwargs):
+    def predict(
+        self,
+        time=None,
+        initial_contacts=None,
+        final_contacts=None,
+        mean_step_freq=None,
+        **kwargs,
+    ):
         """
         predict(time, accel, initial_contacts, final_contacts, mean_step_freq)
 
@@ -84,7 +96,7 @@ class CreateStridesAndQc(BaseProcess):
 
         # setup/tracking
         qc_ic, qc_fc, qc_fc_of = [], [], []
-        fc_unused = ones(fc_times.size, dtype='bool')
+        fc_unused = ones(fc_times.size, dtype="bool")
 
         # iterate over available IC times
         for i, curr_ict in enumerate(ic_times[:-1]):
