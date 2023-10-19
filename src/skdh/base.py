@@ -13,15 +13,15 @@ from pandas import DataFrame
 from numpy import array
 
 
-def handle_process_returns(results_to_kwargs=True):
+def handle_process_returns(*, results_to_kwargs):
     """
     Handle updating inputs (kwargs) with return values as appropriate for the
     `process` methods of `BaseProcess` classes.
 
     Parameters
     ----------
-    results_to_kwargs : bool, optional
-        Put the first return (results) into the input kwargs. Default is True.
+    results_to_kwargs : bool
+        Put the first return (results) into the input kwargs.
     """
     def internal_handler(method):
         @functools.wraps(method)
