@@ -102,3 +102,51 @@ def gait_res_50():
         path = Path("test/gaitv3/data/gait_results.npz")
 
     return load(path)
+
+
+@fixture(scope="module")
+def get_bgait_samples_truth():  # boolean gait classification
+    def get_stuff(case):
+        starts = array([0, 150, 165, 200, 225, 400, 770, 990])
+        stops = array([90, 160, 180, 210, 240, 760, 780, 1000])
+
+        if case == 1:
+            dt = 1 / 50
+            time = arange(0, 1000 * dt, dt)
+            n_max_sep = 25  # 0.5 seconds
+            n_min_time = 75  # 1.5 seconds
+
+            bouts = [slice(0, 90), slice(150, 240), slice(400, 780)]
+        elif case == 2:
+            dt = 1 / 100
+            time = arange(0, 1000 * dt, dt)
+            n_max_sep = 50  # 0.5 seconds
+            n_min_time = 200  # 2 seconds
+
+            bouts = [slice(400, 780)]
+
+        elif case == 3:
+            dt = 1 / 50
+            time = arange(0, 1000 * dt, dt)
+            n_max_sep = 75  # 1.5 seconds
+            n_min_time = 5  # 0.1 seconds
+
+            bouts = [slice(0, 240), slice(400, 780), slice(990, 1000)]
+        else:
+            dt = 1 / 50
+            time = arange(0, 1000 * dt, dt)
+            n_max_sep = 6  # 0.12 seconds
+            n_min_time = 5  # 0.1 seconds
+
+            bouts = [
+                slice(0, 90),
+                slice(150, 180),
+                slice(200, 210),
+                slice(225, 240),
+                slice(400, 760),
+                slice(770, 780),
+                slice(990, 1000),
+            ]
+        return starts, stops, time, n_max_sep * dt, n_min_time * dt, bouts
+
+    return get_stuff
