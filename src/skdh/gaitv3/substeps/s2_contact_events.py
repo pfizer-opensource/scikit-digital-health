@@ -161,6 +161,7 @@ class VerticalCwtGaitEvents(BaseProcess):
             expect_wear=False,
             time=time,
             accel=accel,
+            accel_filt=accel_filt,
             v_axis=v_axis,
             v_axis_sign=v_axis_sign,
             fs=fs,
