@@ -39,11 +39,11 @@ class GaitBoutEndpoint:
         """
         self.name = name
         self.logger = logging.getLogger(logname)
-        self.k_ = f"BOUTPARAM:{self.name}"
+        self.k_ = f"bout:{self.name}"
 
         self._depends = depends
 
-    def predict(self, fs, leg_length, gait, gait_aux):
+    def predict(self, *, fs, leg_length, gait, gait_aux):
         """
         Predict the bout level gait endpoint
 
@@ -87,7 +87,7 @@ class GaitEventEndpoint:
         """
         self.name = name
         self.logger = logging.getLogger(logname)
-        self.k_ = f"PARAM:{self.name}"
+        self.k_ = f"{self.name}"
 
         self._depends = depends
 
@@ -102,7 +102,7 @@ class GaitEventEndpoint:
 
         return mask
 
-    def predict(self, fs, leg_length, gait, gait_aux):
+    def predict(self, *, fs, leg_length, gait, gait_aux):
         """
         Predict the gait event-level endpoint
 
