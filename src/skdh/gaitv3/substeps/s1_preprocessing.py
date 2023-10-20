@@ -101,21 +101,25 @@ class PreprocessGaitBout(BaseProcess):
 
         # estimate accelerometer axes if necessary
         acc_mean = mean(accel, axis=0)
+        v_axis_est = argmax(abs(acc_mean))  # always estimate for testing purposes
         if v_axis is None:
-            v_axis = argmax(abs(acc_mean))
+            v_axis = v_axis_est
 
         # always compute the sign
         v_axis_sign = sign(acc_mean[v_axis])
 
+        # always estimate for testing purposes
+        sos = butter(4, 2 * 3.0 / fs, output="sos")
+        acc_f = sosfiltfilt(sos, accel, axis=0)
+
+        ac = gait_endpoints._autocovariancefn(
+            acc_f, min(accel.shape[0] - 1, int(10 * fs)), biased=True, axis=0
+        )
+
+        ap_axis_est = argsort(corrcoef(ac.T)[v_axis])[-2]
+
         if ap_axis is None:
-            sos = butter(4, 2 * 3.0 / fs, output="sos")
-            acc_f = sosfiltfilt(sos, accel, axis=0)
-
-            ac = gait_endpoints._autocovariancefn(
-                acc_f, min(accel.shape[0] - 1, int(10 * fs)), biased=True, axis=0
-            )
-
-            ap_axis = argsort(corrcoef(ac.T)[v_axis])[-2]
+            ap_axis = ap_axis_est
 
         # always compute the sign
         ap_axis_sign = self.get_ap_axis_sign(fs, accel, ap_axis)
@@ -155,8 +159,10 @@ class PreprocessGaitBout(BaseProcess):
 
         res = {
             "v_axis": v_axis,
+            "v_axis_est": v_axis_est,
             "v_axis_sign": v_axis_sign,
             "ap_axis": ap_axis,
+            "ap_axis_est": ap_axis_est,
             "ap_axis_sign": ap_axis_sign,
             "mean_step_freq": mean_step_freq,
             "accel_filt": accel_filt,
