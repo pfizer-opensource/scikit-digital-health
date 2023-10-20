@@ -436,6 +436,8 @@ class GaitLumbar(BaseProcess):
                 "delta h",
                 "IC Time",
                 "debug:mean step freq",
+                "debug:v axis est",
+                "debug:ap axis est",
                 "Turn",
             ]
         }
@@ -443,10 +445,9 @@ class GaitLumbar(BaseProcess):
         gait_aux = {
             i: []
             for i in [
-                "vert axis",
+                "v axis",
+                "ap_axis",
                 "accel",
-                "vert velocity",
-                "vert position",
                 "inertial data i",
             ]
         }
@@ -478,8 +479,6 @@ class GaitLumbar(BaseProcess):
                 )
 
                 # get the data we need
-                # TODO v_axis_est
-                # TODO ap_axis_est
                 n_strides = bout_res['qc_initial_contacts'].size
                 gait['IC'].extend(bout_res["qc_initial_contacts"])
                 gait['FC'].extend(bout_res['qc_final_contacts'])
@@ -488,6 +487,8 @@ class GaitLumbar(BaseProcess):
                 # optional
                 gait['Turn'].extend(bout_res.get('step_in_turn', [-1] * n_strides))
                 gait['debug:mean step freq'].extend([bout_res.get("mean_step_freq", nan)] * n_strides)
+                gait['debug:v axis est'].extend([bout_res.get("v_axis_est", -1)] * n_strides)
+                gait['debug:ap axis est'].extend([bout_res.get("ap_axis_est", -1)] * n_strides)
 
                 # metadata
                 gait['Bout N'].extend([ibout + 1] * n_strides)
@@ -497,5 +498,38 @@ class GaitLumbar(BaseProcess):
                 gait['Bout Steps'].extend([n_strides] * n_strides)
                 gait['Gait Cycles'].extend([sum(bout_res['forward cycles'] == 2)])
 
+                # gait auxiliary data
+                gait_aux['accel'].append(bout_res.get("accel_filt", accel_rs[bout]))
+                # add the index for the corresponding accel
+                gait_aux['inertial data i'].extend(
+                    [len(gait_aux['accel']) - 1] * n_strides
+                )
+                gait_aux['v axis'].extend([bout_res['v_axis']] * n_strides)
+                gait_aux['ap axis'].extend([bout_res['ap_axis']] * n_strides)
 
+            # add the day number
+            gait['Day N'].extend(
+                [iday + 1] * (len(gait['Bout N']) - len(gait['Day N']))
+            )
 
+        # convert to arrays
+        for key in gait:
+            gait[key] = asarray(gait[key])
+
+        # convert some gait aux data to arrays
+        gait_aux['inertial data i'] = asarray(gait_aux['inertial data i'])
+        gait_aux['v axis'] = asarray(gait_aux['v axis'])
+        gait_aux['ap axis'] = asarray(gait_aux['ap axis'])
+
+        # loop over endpoints and compute if there is data to compute on
+        if gait_aux['inertial data i'].size != 0:
+            for param in self._params:
+                param().predict(fs=goal_fs, leg_length=leg_length, gait=gait, gait_aux=gait_aux)
+
+        # remove unnecessary stuff from the gait dict
+        gait.pop("IC", None)
+        gait.pop("FC", None)
+        gait.pop("FC opp foot", None)
+        gait.pop("forward cycles", None)
+
+        return gait
