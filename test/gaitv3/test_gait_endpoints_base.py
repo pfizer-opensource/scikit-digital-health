@@ -83,7 +83,7 @@ class TestEventEndpoint:
         }
 
         tee1 = EventEndpoint1Test()
-        tee1._predict_asymmetry(50.0, 1.8, gait, {})
+        tee1._predict_asymmetry(fs=50.0, leg_length=1.8, gait=gait, gait_aux={})
 
         res = gait["test event ept 1 asymmetry"]
         exp = array([1, 1, nan, 1, 1, 1, nan, 1, 1, nan], dtype="float")

@@ -314,13 +314,13 @@ def test_HarmonicRatioV(d_gait, d_gait_aux):
     )
 
     # <= 10 harmonics
-    hrv.predict(10.0, None, d_gait, d_gait_aux)
+    hrv.predict(fs=10.0, leg_length=None, gait=d_gait, gait_aux=d_gait_aux)
     pred = d_gait.pop("harmonic ratio - V")
 
     assert isnan(pred).all()
 
     # test with less than 20 harmonics
-    hrv.predict(15.0, None, d_gait, d_gait_aux)
+    hrv.predict(fs=15.0, leg_length=None, gait=d_gait, gait_aux=d_gait_aux)
     pred = d_gait.pop("harmonic ratio - V")
 
     assert allclose(
