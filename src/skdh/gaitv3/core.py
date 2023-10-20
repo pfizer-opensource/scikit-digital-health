@@ -14,8 +14,8 @@ from skdh.base import BaseProcess, handle_process_returns
 from skdh.utility.internal import rle, apply_downsample
 from skdh.utility.exceptions import LowFrequencyError
 
-from skdh.gait.gait_endpoints import GaitEventEndpoint, GaitBoutEndpoint
-from skdh.gait.gait_endpoints import gait_endpoints
+from skdh.gaitv3.gait_endpoints import GaitEventEndpoint, GaitBoutEndpoint
+from skdh.gaitv3.gait_endpoints import gait_endpoints
 from skdh.gaitv3.utility import get_gait_bouts
 from skdh.gaitv3 import substeps
 
