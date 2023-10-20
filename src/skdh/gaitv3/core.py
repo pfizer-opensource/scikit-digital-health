@@ -7,15 +7,17 @@ Copyright (c) 2023, Pfizer Inc. All rights reserved.
 from collections.abc import Iterable
 from warnings import warn
 
-from numpy import ndarray, asarray, mean, diff
+from numpy import ndarray, asarray, mean, diff, sum, nan
 
-from skdh.base import BaseProcess
+from skdh import Pipeline
+from skdh.base import BaseProcess, handle_process_returns
 from skdh.utility.internal import rle, apply_downsample
 from skdh.utility.exceptions import LowFrequencyError
 
 from skdh.gait.gait_endpoints import GaitEventEndpoint, GaitBoutEndpoint
 from skdh.gait.gait_endpoints import gait_endpoints
 from skdh.gaitv3.utility import get_gait_bouts
+from skdh.gaitv3 import substeps
 
 
 class GaitLumbar(BaseProcess):
@@ -42,6 +44,52 @@ class GaitLumbar(BaseProcess):
     max_bout_separation_time : float, optional
         Maximum time in seconds between two bouts of gait for them to be merged into
         1 gait bout. Default is 0.5s.
+    gait_event_method : {"AP CWT", "Vertical CWT"}, optional
+        The method to use for gait event detection, case-insensitive. "AP CWT"
+        uses :meth:`skdh.gaitv3.substeps.ApCwtGaitEvents`, while "Vertical CWT"
+        uses :meth:`skdh.gaitv3.substeps.VerticalCwtGaitEvents`. Default is "AP CWT".
+    correct_orientation : bool, optional
+        Correct the accelerometer orientation if it is slightly mis-aligned
+        with the anatomical axes. Default is True. Used in the pre-processing
+        step of the bout processing pipeline.
+    filter_cutoff : float, optional
+        [:meth:`skdh.gaitv3.substeps.PreprocessGaitBout`] Low-pass filter cutoff
+        in Hz. Default is 20.0.
+    filter_order : int, optional
+        [:meth:`skdh.gaitv3.substeps.PreprocessGaitBout`] Low-pass filter order.
+        Default is 4.
+    use_cwt_scale_relation : bool, optional
+        [:meth:`skdh.gaitv3.substeps.VerticalCwtGaitEvents`] Use the optimal scale/frequency
+        relationship.
+    wavelet_scale : {"default", float, int}, optional
+        [:meth:`skdh.gaitv3.substeps.VerticalCwtGaitEvents`] The wavelet scale to use.
+    max_stride_time : {callable, float}, optional
+        [:meth:`skdh.gaitv3.substeps.CreateStridesAndQc`] Definition of how the maximum
+        stride time is calculated. Either a callable with the input of the mean step time,
+        or a float, which will be used as a static limit. Default is the function
+        `2.0 * mean_step_time + 1.0`.
+    loading_factor : {callable, float}, optional
+        [:meth:`skdh.gaitv3.substeps.CreateStridesAndQc`] Definition of the loading factor.
+        Either a callable with the input of mean step time, or a float (between 0.0
+        and 1.0) indicating a static factor. Default is the function
+        `0.17 * mean_step_time + 0.05`.
+
+    Other Parameters
+    ----------------
+    bout_processing_pipeline : {None, Pipeline}, optional
+        The processing pipeline to use on bouts of gait. Default is None, which
+        creates a standard pipeline (see Notes). If you need more than these
+        steps, you can provide your own pipeline. NOTE that you must set
+        `flatten_results=True` when creating the custom pipeline.
+
+    Notes
+    -----
+    The default pipeline is the following steps:
+    - :meth:`skdh.gaitv3.substeps.PreprocessGaitBout`
+    - :meth:`skdh.gaitv3.substeps.ApCwtGaitEvents` or
+    :meth:`skdh.gaitv3.substeps.VerticalCwtGaitEvents`
+    - :meth:`skdh.gaitv3.substeps.CreateStridesAndQc`
+    - :meth:`skdh.gaitv3.substeps.TurnDetection`
     """
     # gait parameters
     _params = [
@@ -78,6 +126,15 @@ class GaitLumbar(BaseProcess):
             provide_leg_length=False,
             min_bout_time=8.0,
             max_bout_separation_time=0.5,
+            gait_event_method='AP CWT',
+            correct_orientation=True,
+            filter_cutoff=20.0,
+            filter_order=4,
+            use_cwt_scale_relation=True,
+            wavelet_scale='default',
+            max_stride_time=lambda x: 2.0 * x + 1.0,
+            loading_factor=lambda x: 0.17 * x + 0.05,
+            bout_processing_pipeline=None,
     ):
         super().__init__(
             downsample=downsample,
@@ -85,6 +142,15 @@ class GaitLumbar(BaseProcess):
             provide_leg_length=provide_leg_length,
             min_bout_time=min_bout_time,
             max_bout_separation_time=max_bout_separation_time,
+            gait_event_method=gait_event_method,
+            correct_orientation=correct_orientation,
+            filter_cutoff=filter_cutoff,
+            filter_order=filter_order,
+            use_cwt_scale_relation=use_cwt_scale_relation,
+            wavelet_scale=wavelet_scale,
+            max_stride_time=max_stride_time,
+            loading_factor=loading_factor,
+            bout_processing_pipeline=bout_processing_pipeline,
         )
 
         self.downsample = downsample
@@ -96,6 +162,31 @@ class GaitLumbar(BaseProcess):
 
         self.min_bout_time = min_bout_time,
         self.max_bout_sep_time = max_bout_separation_time
+
+        if bout_processing_pipeline is None:
+            self.bout_pipeline = Pipeline(flatten_results=True)
+            self.bout_pipeline.add(substeps.PreprocessGaitBout(
+                correct_orientation=correct_orientation,
+                filter_cutoff=filter_cutoff,
+                filter_order=filter_order,
+            ))
+            if gait_event_method.lower() == "ap cwt":
+                self.bout_pipeline.add(substeps.ApCwtGaitEvents())
+            elif gait_event_method.lower() == "vertical cwt":
+                self.bout_pipeline.add(substeps.VerticalCwtGaitEvents(
+                    use_cwt_scale_relation=use_cwt_scale_relation,
+                    wavelet_scale=wavelet_scale
+                ))
+            self.bout_pipeline.add(substeps.CreateStridesAndQc(
+                max_stride_time=max_stride_time,
+                loading_factor=loading_factor,
+            ))
+            self.bout_pipeline.add(substeps.TurnDetection())
+        else:
+            if isinstance(bout_processing_pipeline, Pipeline):
+                self.bout_pipeline = bout_processing_pipeline
+            else:
+                raise ValueError("`bout_processing_pipeline` must be a `skdh.Pipeline` object.")
 
     def add_endpoints(self, endpoints):
         """
@@ -184,6 +275,7 @@ class GaitLumbar(BaseProcess):
 
         return bout_starts, bout_stops
 
+    @handle_process_returns(results_to_kwargs=False)
     def predict(
             self,
             time=None,
@@ -194,10 +286,12 @@ class GaitLumbar(BaseProcess):
             height=None,
             gait_bouts=None,
             gait_pred=True,
+            v_axis=None,
+            ap_axis=None,
             **kwargs,
     ):
         """
-        predict(time, accel, *, gyro=None, fs=None, height=None, gait_pred=None, day_ends={})
+        predict(time, accel, *, gyro=None, fs=None, height=None, gait_pred=None, v_axis=None, ap_axis=None, day_ends={})
 
         Get the gait events and endpoints from a time series signal
 
@@ -228,6 +322,12 @@ class GaitLumbar(BaseProcess):
             None. If not a ndarray but not None, the entire recording will be
             taken as gait. If not provided (or None), gait classification will
             be performed on the acceleration data. Default is True.
+        v_axis : {None, 0, 1, 2}, optional
+            Vertical axis index. Default is None, which indicates it will be estimated
+            from the acceleration data each gait bout.
+        ap_axis : {None, 0, 1, 2}, optional
+            AP axis index. Default is None, which indicates that it will be estimated
+            from the acceleration data each bout.
         day_ends : dict, optional
             Optional dictionary containing (N, 2) arrays of start and stop
             indices for invididual days. Dictionary keys are in the format
@@ -247,6 +347,23 @@ class GaitLumbar(BaseProcess):
             If both `gait_bouts` and `gait_pred` are None.
         LowFrequencyError
             If the sampling frequency is less than 20Hz
+
+        Notes
+        -----
+        Axis estimation
+        ^^^^^^^^^^^^^^^
+        The vertical axis is estimated as the axis with the highest absolute
+        average acceleration during a gait bout. Since the acceleromter should be
+        approximately aligned with the anatomical axes, this is a fairly easy estimation
+        to perform
+
+        The AP axis estimation is a little trickier, and depending on how the observed
+        accelerometer wearer was walking, the AP and ML axes can be confused. The AP
+        axis is estimated by first applying a butterworth filter (4th order, 3.0hz cutoff)
+        to the acceleration data, and then computing the auto-covariance function 10 seconds
+        or the bout length, whichever is shorter. The axis that has the closest autocorrelation
+        with the vertical axis is then chosen as the AP axis.
+
         """
         super().predict(
             expect_days=True,
@@ -318,6 +435,7 @@ class GaitLumbar(BaseProcess):
                 "forward cycles",
                 "delta h",
                 "IC Time",
+                "debug:mean step freq",
                 "Turn",
             ]
         }
@@ -349,11 +467,35 @@ class GaitLumbar(BaseProcess):
             )
 
             for ibout, bout in enumerate(gait_bouts):
-                # Step 1: signal processing, accelerometer orientation correction,
-                #       cadence/mean step time estimation
-                # Step 3: gait event estimation
-                # step 4: stride creation
-                # step 5: turn detection
-                # step 6: delta h estimation
-                pass
+                # run the bout processing pipeline
+                bout_res = self.bout_pipeline.run(
+                    time=time_rs[bout],
+                    accel=accel_rs[bout],
+                    gyro=gyro_rs[bout] if gyro_rs is not None else None,
+                    fs=goal_fs,
+                    v_axis=v_axis,
+                    ap_axis=ap_axis,
+                )
+
+                # get the data we need
+                # TODO v_axis_est
+                # TODO ap_axis_est
+                n_strides = bout_res['qc_initial_contacts'].size
+                gait['IC'].extend(bout_res["qc_initial_contacts"])
+                gait['FC'].extend(bout_res['qc_final_contacts'])
+                gait['FC opp foot'].extend(bout_res['qc_final_contacts_oppfoot'])
+                gait['forward cycles'].extend(bout_res['forward cycles'])
+                # optional
+                gait['Turn'].extend(bout_res.get('step_in_turn', [-1] * n_strides))
+                gait['debug:mean step freq'].extend([bout_res.get("mean_step_freq", nan)] * n_strides)
+
+                # metadata
+                gait['Bout N'].extend([ibout + 1] * n_strides)
+                gait['Bout Starts'].extend([time_rs[bout.start]] * n_strides)
+                gait['Bout Duration'].extend([(bout.stop - bout.start) / goal_fs] * n_strides)
+
+                gait['Bout Steps'].extend([n_strides] * n_strides)
+                gait['Gait Cycles'].extend([sum(bout_res['forward cycles'] == 2)])
+
+
 
