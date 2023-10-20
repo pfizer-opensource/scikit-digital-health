@@ -153,6 +153,27 @@ def test_StepLengthModel1(d_gait, d_gait_aux):
     assert isnan(d_gait["step length m1"]).all()
 
 
+def test_StepLengthModel2(d_gait, d_gait_aux):
+    sl = StepLengthModel2()
+    sl.predict(fs=50.0, leg_length=1.8, gait=d_gait, gait_aux=d_gait_aux)
+
+    lprime = array([0.8352, 0.8352, 0.8352, 0.49095, 0.49095, 0.49095, 0.49095, 0.49095])
+
+    exp = 2 * 1.8 * d_gait['m2 delta h']
+    exp -= d_gait['m2 delta h']**2
+    exp = 2 * sqrt(exp)
+    exp += 2 * sqrt(2 * lprime * d_gait['m2 delta h prime'] - d_gait['m2 delta h prime']**2)
+
+    pred = d_gait.pop("step length")
+
+    assert allclose(pred, exp)
+
+    # test with no leg length provided
+    sl.predict(fs=50.0, leg_length=None, gait=d_gait, gait_aux=d_gait_aux)
+
+    assert isnan(d_gait['step length']).all()
+
+
 def test_StrideLengthModel1(d_gait, d_gait_aux):
     sl = StrideLengthModel1()
     sl.predict(fs=50.0, leg_length=1.8, gait=d_gait, gait_aux=d_gait_aux)
@@ -176,6 +197,31 @@ def test_StrideLengthModel1(d_gait, d_gait_aux):
     assert isnan(d_gait["stride length m1"]).all()
 
 
+def test_StrideLengthModel2(d_gait, d_gait_aux):
+    sl = StrideLengthModel2()
+    sl.predict(fs=50.0, leg_length=1.8, gait=d_gait, gait_aux=d_gait_aux)
+
+    lprime = array([0.8352, 0.8352, 0.8352, 0.49095, 0.49095, 0.49095, 0.49095, 0.49095])
+    a = 2 * 1.8 * d_gait['m2 delta h']
+    a -= d_gait['m2 delta h'] ** 2
+    a = 2 * sqrt(a)
+    a += 2 * sqrt(2 * lprime * d_gait['m2 delta h prime'] - d_gait['m2 delta h prime'] ** 2)
+
+    exp = a
+    exp[0:2] += exp[1:3]
+    exp[3:-1] += exp[4:]
+    exp[[2, 7]] = nan
+    # get predicted values and reset dictionary for another test
+    pred = d_gait.pop("stride length")
+
+    assert allclose(pred, exp, equal_nan=True)
+
+    # test with no leg length provided
+    sl.predict(fs=50.0, leg_length=None, gait=d_gait, gait_aux=d_gait_aux)
+
+    assert isnan(d_gait["stride length"]).all()
+
+
 def test_GaitSpeedModel1(d_gait, d_gait_aux):
     a = 2 * 1.8 * array([0.1, 0.2, 0.1, 0.2, 0.2, 0.2, 0.1, 0.1])
     a -= array([0.01, 0.04, 0.01, 0.04, 0.04, 0.04, 0.01, 0.01])
@@ -195,6 +241,29 @@ def test_GaitSpeedModel1(d_gait, d_gait_aux):
 
     gs.predict(fs=50.0, leg_length=None, gait=d_gait, gait_aux=d_gait_aux)
     assert isnan(d_gait["gait speed m1"]).all()
+
+
+def test_GaitSpeedModel2(d_gait, d_gait_aux):
+    lprime = array([0.8352, 0.8352, 0.8352, 0.49095, 0.49095, 0.49095, 0.49095, 0.49095])
+    a = 2 * 1.8 * d_gait['m2 delta h']
+    a -= d_gait['m2 delta h'] ** 2
+    a = 2 * sqrt(a)
+    a += 2 * sqrt(2 * lprime * d_gait['m2 delta h prime'] - d_gait['m2 delta h prime'] ** 2)
+
+    exp = a
+    exp[0:2] += exp[1:3]
+    exp[3:-1] += exp[4:]
+    exp[[2, 7]] = nan
+    exp /= array([2.0, nan, nan, 2.0, 2.0, 2.0, nan, nan])
+
+    gs = GaitSpeedModel2()
+    gs.predict(fs=50.0, leg_length=1.8, gait=d_gait, gait_aux=d_gait_aux)
+    pred = d_gait.pop("gait speed")
+
+    assert allclose(pred, exp, equal_nan=True)
+
+    gs.predict(fs=50.0, leg_length=None, gait=d_gait, gait_aux=d_gait_aux)
+    assert isnan(d_gait["gait speed"]).all()
 
 
 def test_Cadence(d_gait):
