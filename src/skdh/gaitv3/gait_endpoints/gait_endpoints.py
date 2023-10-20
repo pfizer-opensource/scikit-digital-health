@@ -561,7 +561,7 @@ class IntraStrideCovarianceV(GaitEventEndpoint):
 
         for i, idx in enumerate(nonzero(mask)[0]):
             j_ = gait_aux["inertial data i"][idx]
-            x = gait_aux["accel"][j_][i1[i] : i3[i], gait_aux["vert axis"][idx]]
+            x = gait_aux["accel"][j_][i1[i] : i3[i], gait_aux["v axis"][idx]]
 
             if (i3[i] - i1[i]) > x.size or x.size == 0:
                 gait[self.k_][idx] = nan
@@ -598,7 +598,7 @@ class IntraStepCovarianceV(GaitEventEndpoint):
 
         for i, idx in enumerate(nonzero(mask)[0]):
             j_ = gait_aux["inertial data i"][idx]
-            x = gait_aux["accel"][j_][i1[i] : i3[i], gait_aux["vert axis"][idx]]
+            x = gait_aux["accel"][j_][i1[i] : i3[i], gait_aux["v axis"][idx]]
 
             if (i3[i] - i1[i]) > x.size or x.size == 0:
                 gait[self.k_][idx] = nan
@@ -649,7 +649,7 @@ class HarmonicRatioV(GaitEventEndpoint):
         i2 = gait["IC"][mask_ofst]
 
         for i, idx in enumerate(nonzero(mask)[0]):
-            va = gait_aux["vert axis"][idx]  # shorthand
+            va = gait_aux["v axis"][idx]  # shorthand
             F = abs(
                 fft.rfft(
                     gait_aux["accel"][gait_aux["inertial data i"][idx]][
@@ -928,7 +928,7 @@ class StepRegularityV(GaitBoutEndpoint):
             acc = gait_aux["accel"][i]
             mask = gait_aux["inertial data i"] == i
 
-            va = gait_aux["vert axis"][mask][0]
+            va = gait_aux["v axis"][mask][0]
             lag_ = nanmedian(gait["step time"][mask]) * fs
             if isnan(lag_):  # if only nan values in the bout
                 stepreg[i] = nan
@@ -988,7 +988,7 @@ class StrideRegularityV(GaitBoutEndpoint):
             acc = gait_aux["accel"][i]
             mask = gait_aux["inertial data i"] == i
 
-            va = gait_aux["vert axis"][mask][0]
+            va = gait_aux["v axis"][mask][0]
             lag_ = nanmedian(gait["stride time"][mask]) * fs
             if isnan(lag_):  # if only nan values in the bout
                 stridereg[i] = nan
