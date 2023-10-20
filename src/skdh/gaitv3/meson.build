@@ -11,3 +11,4 @@ py3.install_sources(
 
 subdir('model')
 subdir('substeps')
+subdir('gait_endpoints')
