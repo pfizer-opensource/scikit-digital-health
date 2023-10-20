@@ -449,7 +449,7 @@ class GaitLumbar(BaseProcess):
             i: []
             for i in [
                 "v axis",
-                "ap_axis",
+                "ap axis",
                 "accel",
                 "inertial data i",
             ]
@@ -486,7 +486,7 @@ class GaitLumbar(BaseProcess):
                 gait['IC'].extend(bout_res["qc_initial_contacts"])
                 gait['FC'].extend(bout_res['qc_final_contacts'])
                 gait['FC opp foot'].extend(bout_res['qc_final_contacts_oppfoot'])
-                gait['forward cycles'].extend(bout_res['forward cycles'])
+                gait['forward cycles'].extend(bout_res['forward_cycles'])
                 # optional
                 gait['Turn'].extend(bout_res.get('step_in_turn', [-1] * n_strides))
                 gait['debug:mean step freq'].extend([bout_res.get("mean_step_freq", nan)] * n_strides)
@@ -499,7 +499,7 @@ class GaitLumbar(BaseProcess):
                 gait['Bout Duration'].extend([(bout.stop - bout.start) / goal_fs] * n_strides)
 
                 gait['Bout Steps'].extend([n_strides] * n_strides)
-                gait['Gait Cycles'].extend([sum(bout_res['forward cycles'] == 2)])
+                gait['Gait Cycles'].extend([sum(bout_res['forward_cycles'] == 2)])
 
                 # gait auxiliary data
                 gait_aux['accel'].append(bout_res.get("accel_filt", accel_rs[bout]))
@@ -508,7 +508,7 @@ class GaitLumbar(BaseProcess):
                     [len(gait_aux['accel']) - 1] * n_strides
                 )
                 gait_aux['v axis'].extend([bout_res['v_axis']] * n_strides)
-                gait_aux['ap axis'].extend([bout_res['ap_axis']] * n_strides)
+                gait_aux['ap axis'].extend([bout_res.get('ap_axis', None)] * n_strides)
 
             # add the day number
             gait['Day N'].extend(
