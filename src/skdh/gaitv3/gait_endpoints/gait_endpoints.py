@@ -53,7 +53,8 @@ from numpy import (
     ascontiguousarray,
 )
 from numpy.linalg import norm
-from scipy.signal import butter, sosfiltfilt, find_peaks
+from scipy.signal import butter, sosfiltfilt, find_peaks, detrend
+from scipy.integrate import cumulative_trapezoid
 
 
 from skdh.gait.gait_endpoints.base import (
@@ -74,7 +75,8 @@ __all__ = [
     "TerminalDoubleSupport",
     "DoubleSupport",
     "SingleSupport",
-    "StepLength",
+    "StepLengthModel1",
+    "StepLengthModel2",
     "StrideLength",
     "GaitSpeed",
     "Cadence",
@@ -107,6 +109,65 @@ def _autocovariancefn(x, max_lag, biased=False, axis=0):
         ac *= (y.shape[-1] - arange(0, max_lag)) / y.shape[-1]
 
     return moveaxis(ac, axis, -1)
+
+
+# ===========================================================
+#     GAIT PREREQUISITE ESTIMATIONS
+# ===========================================================
+class DeltaHModel1(GaitEventEndpoint):
+    """
+    Estimate the change in vertical position of the center of mass, in order
+    to use the inverted pendulum model (model 1) to estimate step length.
+    """
+    def __init__(self):
+        super().__init__("delta h model 1", __name__)
+
+    def _predict(self, *, fs, leg_length, gait, gait_aux):
+        mask, mask_ofst = self._predict_init(gait, init=False, offset=1)
+
+        delta_h = full(gait['IC'].size, nan)
+        indices = nonzero(mask)[0]
+        for idx, i1, i2 in zip(indices, gait['IC'][mask], gait['IC'][mask_ofst]):
+            vacc = gait_aux['accel'][gait_aux['inertial data i'][idx]][i1:i2, gait_aux['v axis'][idx]]
+            vvel = cumulative_trapezoid(vacc, dx=1/fs, initial=0)
+            vpos = cumulative_trapezoid(vvel, dx=1/fs, initial=0)
+
+            delta_h[idx] = (vpos.max() - vpos.min()) * 9.81
+
+        gait['m1 delta h'] = delta_h
+
+
+class DeltaHModel2(GaitEventEndpoint):
+    """
+    Estimate the change in vertical position of the center of mass, in order to
+    use the inverted pendulum model (model 2) to estimate step length
+    """
+    def __init__(self):
+        super().__init__("delta h model 2", __name__)
+
+    def _predict(self, *, fs, leg_length, gait, gait_aux):
+        mask, mask_ofst = self._predict_init(gait, init=False, offset=1)
+
+        delta_h = full(gait['IC'].size, nan)
+        delta_h_prime = full(gait['IC'].size, nan)
+        indices = nonzero(mask)[0]
+
+        for idx, i1, i2, ifc in zip(indices, gait['IC'][mask], gait['IC'][mask_ofst], gait['FC opp foot'][mask]):
+            vacc = gait_aux['accel'][gait_aux['inertial data i'][idx]][:, gait_aux['v axis'][idx]]
+
+            # integrate in a wider range
+            i0 = max(0, i1 - (i2 - i1))
+            i3 = min(vacc.size - 1, i2 + (i2 - i1))
+
+            vvel = cumulative_trapezoid(vacc[i0:i3], dx=1/fs, initial=0)
+            vvel = detrend(vvel)
+            vpos = cumulative_trapezoid(vvel, dx=1/fs, initial=0)
+
+            delta_h_prime[idx] = (vpos[i1 - i0:ifc - i0].max() - vpos[i1 - i0:ifc - i0].min()) * 9.81
+            delta_h[idx] = (vpos[ifc - i0:i2 - i0].max() - vpos[ifc - i0:i2 - i0].min()) * 9.81
+
+        gait['m2 delta h'] = delta_h
+        gait['m2 delta h prime'] = delta_h_prime
 
 
 # ===========================================================
@@ -248,7 +309,7 @@ class SingleSupport(GaitEventEndpoint):
         gait[self.k_][mask] = (gait["IC"][mask_ofst] - gait["FC opp foot"][mask]) / fs
 
 
-class StepLength(GaitEventEndpoint):
+class StepLengthModel1(GaitEventEndpoint):
     """
     The distance traveled during a step (heel-strike to opposite foot heel-strike). A basic
     asymmetry measure is also computed as the difference between sequential step lengths of
@@ -272,16 +333,91 @@ class StepLength(GaitEventEndpoint):
     """
 
     def __init__(self):
-        super().__init__("step length", __name__)
+        super().__init__("step length m1", __name__, depends=[DeltaHModel1])
 
     @basic_asymmetry
     def _predict(self, *, fs, leg_length, gait, gait_aux):
         if leg_length is not None:
             gait[self.k_] = 2 * sqrt(
-                2 * leg_length * gait["delta h"] - gait["delta h"] ** 2
+                2 * leg_length * gait["m1 delta h"] - gait["m1 delta h"] ** 2
             )
         else:
             self._predict_init(gait, True, None)  # don't generate masks
+
+
+class StepLengthModel2(GaitEventEndpoint):
+    """
+    The distance traveled during a step (heel-strike to opposite foot heel-strike).
+    A basic asymmetry measure is also computed as the difference between sequential
+    step lengths of opposite feet.
+
+    Notes
+    -----
+    The step length for model 2 is computed using the double inverted pendulum model
+    from [1]_ per
+
+    .. math:: L_{step} = 2 \\sqrt{2l_{leg}h - h^2} + 2\\sqrt{2l'h' - h'^2}
+
+    where :math:`L_{step}` is the step length, :math:`l_{leg}` is the leg length,
+    :math:`h` is the center of mass (COM) change in height during the single support
+    phase of a step, :math:`l'` is the double support pendulum length, and
+    :math:`h'` is the change in height of the COM during the initial double
+    support phase of a step.
+
+    However, now because we don't have an exact measurement of :math:`l'`, we have
+    to estimate it. From [2]_, the actual estimation would rely on the distance
+    covered during initial double support (ids) and single support (ss) phases, per
+
+    .. math:: \\frac{L_{ids}}{L_{ss}} = \\frac{l'}{l_{leg}}
+
+    However, since the distances are what we are trying to estimate, we have to
+    approximate this. The most obvious would be to see if the ratio of time
+    in ids and ss would work:
+
+    .. math:: \\frac{T_{ids}}{T_{ss}} \\approx \\frac{l'}{l_{leg}}
+
+    And from experimental results, this approximation is close, but needs to be
+    scaled slightly on a quadratic:
+
+    .. math:: 1.12 \\left(\\frac{T_{ids}}{T_{ss}}\\right)^2 + 0.547\\frac{T_{ids}}{T_{ss}} + 0.066
+
+    References
+    ----------
+    .. [1] W. Zijlstra and A. L. Hof, “Assessment of spatio-temporal gait parameters from
+        trunk accelerations during human walking,” Gait & Posture, vol. 18, no. 2, pp. 1–10,
+        Oct. 2003, doi: 10.1016/S0966-6362(02)00190-X.
+    .. [2] W. Zijlstra and A. L. Hof, “Displacement of the pelvis during human walking:
+        experimental data and model predictions,” Gait & Posture, vol. 6, no. 3,
+        pp. 249–262, Dec. 1997, doi: 10.1016/S0966-6362(97)00021-0.
+    """
+    def __init__(self):
+        super().__init__("step length", __name__, depends=[DeltaHModel2, InitialDoubleSupport, SingleSupport])
+
+    @basic_asymmetry
+    def _predict(self, *, fs, leg_length, gait, gait_aux):
+        if leg_length is None:
+            self._predict_init(gait, True, None)  # don't generate masks
+            return
+
+        l_prime = full(gait['IC'].size, nan)
+        # iterate over bouts
+        for bn in unique(gait['Bout N']):
+            bmask = gait['Bout N'] == bn
+
+            med_ids = nanmedian(gait['initial double support'][bmask])
+            med_ss = nanmedian(gait['single support'][bmask])
+            t_ratio = med_ids / med_ss
+
+            l_ratio = 1.12 * t_ratio**2 + 0.547 * t_ratio + 0.066
+            lp = l_ratio * leg_length
+
+            l_prime[bmask] = lp
+
+        # compute the step length estimation
+        L_ids = 2 * sqrt(2 * l_prime * gait['m2 delta h prime'] - gait['m2 delta h prime']**2)
+        L_ss = 2 * sqrt(2 * leg_length * gait['m2 delta h'] - gait['m2 delta h']**2)
+
+        gait[self.k_] = L_ids + L_ss
 
 
 class StrideLength(GaitEventEndpoint):
