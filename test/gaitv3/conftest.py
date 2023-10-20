@@ -4,6 +4,8 @@ from pytest import fixture
 
 from numpy import arange, zeros, sin, pi, load, array
 
+from skdh.utility.internal import apply_downsample
+
 
 @fixture(scope='module')
 def t_and_x():
@@ -66,3 +68,37 @@ def d_gait_aux():
     }
 
     return gait_aux
+
+
+@fixture(scope="module")
+def gait_input_50():
+    cwd = Path.cwd().parts
+
+    if cwd[-1] == "gaitv3":
+        path = Path("data/gait_input.npz")
+    elif cwd[-1] == "test":
+        path = Path("gaitv3/data/gait_input.npz")
+    elif cwd[-1] == "scikit-digital-health":
+        path = Path("test/gaitv3/data/gait_input.npz")
+
+    data = load(path)
+    t = data["time"]
+    acc = data["accel"]
+
+    t50, (acc50,) = apply_downsample(50.0, t, (acc,), (), aa_filter=True)
+
+    return t50, acc50
+
+
+@fixture
+def gait_res_50():
+    cwd = Path.cwd().parts
+
+    if cwd[-1] == "gaitv3":
+        path = Path("data/gait_results.npz")
+    elif cwd[-1] == "test":
+        path = Path("gaitv3/data/gait_results.npz")
+    elif cwd[-1] == "scikit-digital-health":
+        path = Path("test/gaitv3/data/gait_results.npz")
+
+    return load(path)

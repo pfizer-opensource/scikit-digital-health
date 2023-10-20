@@ -12,7 +12,7 @@ from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt
 import lightgbm as lgb
 
-from skdh.base import BaseProcess
+from skdh.base import BaseProcess, handle_process_returns
 from skdh.utility.exceptions import LowFrequencyError
 from skdh.utility.internal import apply_downsample, rle
 from skdh.utility.windowing import get_windowed_view
@@ -59,9 +59,10 @@ class PredictGaitLumbarLgbm(BaseProcess):
 
         self.downsample_aa_filter = downsample_aa_filter
 
-    def predict(self, time=None, accel=None, *, fs=None, **kwargs):
+    @handle_process_returns(results_to_kwargs=False)
+    def predict(self, *, time, accel, fs=None, **kwargs):
         """
-        predict(time, accel, *, fs=None)
+        predict(*, time, accel, fs=None)
 
         Predict gait bouts.
 
@@ -182,16 +183,6 @@ class PredictGaitLumbarLgbm(BaseProcess):
 
         bouts = concatenate((bout_starts, bout_stops)).reshape((2, -1)).T
 
-        # handle returns
-        kwargs.update(
-            {
-                self._time: time,
-                self._acc: accel,
-                "fs": fs,
-                "gait_bouts": bouts,
-            }
-        )
-
         results = {
             "Gait Bout Start": time[bout_starts],
             "Gait Bout Stop": time[bout_stops],
@@ -199,4 +190,4 @@ class PredictGaitLumbarLgbm(BaseProcess):
             "Gait Bout Stop Index": bout_stops,
         }
 
-        return (kwargs, results) if self._in_pipeline else results
+        return results, {'gait_bouts': bouts}
