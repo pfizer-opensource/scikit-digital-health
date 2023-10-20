@@ -123,7 +123,7 @@ class StrideTime(GaitEventEndpoint):
         super().__init__("stride time", __name__)
 
     @basic_asymmetry
-    def _predict(self, fs, leg_length, gait, gait_aux):
+    def _predict(self, *, fs, leg_length, gait, gait_aux):
         mask, mask_ofst = self._predict_init(gait, True, 2)
         gait[self.k_][mask] = (gait["IC"][mask_ofst] - gait["IC"][mask]) / fs
 
@@ -139,7 +139,7 @@ class StanceTime(GaitEventEndpoint):
         super().__init__("stance time", __name__)
 
     @basic_asymmetry
-    def _predict(self, fs, leg_length, gait, gait_aux):
+    def _predict(self, *, fs, leg_length, gait, gait_aux):
         gait[self.k_] = (gait["FC"] - gait["IC"]) / fs
 
 
@@ -154,7 +154,7 @@ class SwingTime(GaitEventEndpoint):
         super().__init__("swing time", __name__)
 
     @basic_asymmetry
-    def _predict(self, fs, leg_length, gait, gait_aux):
+    def _predict(self, *, fs, leg_length, gait, gait_aux):
         mask, mask_ofst = self._predict_init(gait, True, 2)
         gait[self.k_][mask] = (gait["IC"][mask_ofst] - gait["FC"][mask]) / fs
 
@@ -170,7 +170,7 @@ class StepTime(GaitEventEndpoint):
         super().__init__("step time", __name__)
 
     @basic_asymmetry
-    def _predict(self, fs, leg_length, gait, gait_aux):
+    def _predict(self, *, fs, leg_length, gait, gait_aux):
         mask, mask_ofst = self._predict_init(gait, True, 1)
         gait[self.k_][mask] = (gait["IC"][mask_ofst] - gait["IC"][mask]) / fs
 
@@ -187,7 +187,7 @@ class InitialDoubleSupport(GaitEventEndpoint):
         super().__init__("initial double support", __name__)
 
     @basic_asymmetry
-    def _predict(self, fs, leg_length, gait, gait_aux):
+    def _predict(self, *, fs, leg_length, gait, gait_aux):
         gait[self.k_] = (gait["FC opp foot"] - gait["IC"]) / fs
 
 
@@ -203,7 +203,7 @@ class TerminalDoubleSupport(GaitEventEndpoint):
         super().__init__("terminal double support", __name__)
 
     @basic_asymmetry
-    def _predict(self, fs, leg_length, gait, gait_aux):
+    def _predict(self, *, fs, leg_length, gait, gait_aux):
         mask, mask_ofst = self._predict_init(gait, True, 1)
         gait[self.k_][mask] = (
             gait["FC opp foot"][mask_ofst] - gait["IC"][mask_ofst]
@@ -225,7 +225,7 @@ class DoubleSupport(GaitEventEndpoint):
         )
 
     @basic_asymmetry
-    def _predict(self, fs, leg_length, gait, gait_aux):
+    def _predict(self, *, fs, leg_length, gait, gait_aux):
         gait[self.k_] = (
             gait["PARAM:initial double support"] + gait["PARAM:terminal double support"]
         )
@@ -243,7 +243,7 @@ class SingleSupport(GaitEventEndpoint):
         super().__init__("single support", __name__)
 
     @basic_asymmetry
-    def _predict(self, fs, leg_length, gait, gait_aux):
+    def _predict(self, *, fs, leg_length, gait, gait_aux):
         mask, mask_ofst = self._predict_init(gait, True, 1)
         gait[self.k_][mask] = (gait["IC"][mask_ofst] - gait["FC opp foot"][mask]) / fs
 
@@ -275,7 +275,7 @@ class StepLength(GaitEventEndpoint):
         super().__init__("step length", __name__)
 
     @basic_asymmetry
-    def _predict(self, fs, leg_length, gait, gait_aux):
+    def _predict(self, *, fs, leg_length, gait, gait_aux):
         if leg_length is not None:
             gait[self.k_] = 2 * sqrt(
                 2 * leg_length * gait["delta h"] - gait["delta h"] ** 2
@@ -312,7 +312,7 @@ class StrideLength(GaitEventEndpoint):
         super().__init__("stride length", __name__, depends=[StepLength])
 
     @basic_asymmetry
-    def _predict(self, fs, leg_length, gait, gait_aux):
+    def _predict(self, *, fs, leg_length, gait, gait_aux):
         mask, mask_ofst = self._predict_init(gait, True, 1)
         if leg_length is not None:
             gait[self.k_][mask] = (
@@ -331,7 +331,7 @@ class GaitSpeed(GaitEventEndpoint):
         super().__init__("gait speed", __name__, depends=[StrideLength, StrideTime])
 
     @basic_asymmetry
-    def _predict(self, fs, leg_length, gait, gait_aux):
+    def _predict(self, *, fs, leg_length, gait, gait_aux):
         if leg_length is not None:
             gait[self.k_] = gait["PARAM:stride length"] / gait["PARAM:stride time"]
         else:
@@ -346,7 +346,7 @@ class Cadence(GaitEventEndpoint):
     def __init__(self):
         super().__init__("cadence", __name__, depends=[StepTime])
 
-    def _predict(self, fs, leg_length, gait, gait_aux):
+    def _predict(self, *, fs, leg_length, gait, gait_aux):
         gait[self.k_] = 60.0 / gait["PARAM:step time"]
 
 
@@ -370,7 +370,7 @@ class IntraStrideCovarianceV(GaitEventEndpoint):
     def __init__(self):
         super().__init__("intra-stride covariance - V", __name__)
 
-    def _predict(self, fs, leg_length, gait, gait_aux):
+    def _predict(self, *, fs, leg_length, gait, gait_aux):
         mask, mask_ofst = self._predict_init(gait, True, 2)
 
         i1 = gait["IC"][mask]
@@ -407,7 +407,7 @@ class IntraStepCovarianceV(GaitEventEndpoint):
     def __init__(self):
         super().__init__("intra-step covariance - V", __name__)
 
-    def _predict(self, fs, leg_length, gait, gait_aux):
+    def _predict(self, *, fs, leg_length, gait, gait_aux):
         mask, mask_ofst = self._predict_init(gait, True, 1)
 
         i1 = gait["IC"][mask]
@@ -460,7 +460,7 @@ class HarmonicRatioV(GaitEventEndpoint):
         # TODO add check for stride frequency, if too low, bump this up higher?
         self._harmonics = arange(1, 21, dtype=int_)
 
-    def _predict(self, fs, leg_length, gait, gait_aux):
+    def _predict(self, *, fs, leg_length, gait, gait_aux):
         mask, mask_ofst = self._predict_init(gait, init=True, offset=2)
 
         i1 = gait["IC"][mask]
@@ -520,7 +520,7 @@ class StrideSPARC(GaitEventEndpoint):
     def __init__(self):
         super().__init__("stride SPARC", __name__)
 
-    def _predict(self, fs, leg_length, gait, gait_aux):
+    def _predict(self, *, fs, leg_length, gait, gait_aux):
         mask, mask_ofst = self._predict_init(gait, True, offset=2)
 
         i1 = gait["IC"][mask]
@@ -590,7 +590,7 @@ class PhaseCoordinationIndex(GaitBoutEndpoint):
             "phase coordination index", __name__, depends=[StrideTime, StepTime]
         )
 
-    def _predict(self, fs, leg_length, gait, gait_aux):
+    def _predict(self, *, fs, leg_length, gait, gait_aux):
         pci = zeros(len(gait_aux["accel"]), dtype=float_)
 
         phase = gait["PARAM:step time"] / gait["PARAM:stride time"]  # %, not degrees
@@ -663,7 +663,7 @@ class GaitSymmetryIndex(GaitBoutEndpoint):
     def __init__(self):
         super().__init__("gait symmetry index", __name__, depends=[StrideTime])
 
-    def _predict(self, fs, leg_length, gait, gait_aux):
+    def _predict(self, *, fs, leg_length, gait, gait_aux):
         gsi = zeros(len(gait_aux["accel"]), dtype=float_)
 
         # setup acceleration filter if its possible to use
@@ -739,7 +739,7 @@ class StepRegularityV(GaitBoutEndpoint):
     def __init__(self):
         super().__init__("step regularity - V", __name__, depends=[StepTime])
 
-    def _predict(self, fs, leg_length, gait, gait_aux):
+    def _predict(self, *, fs, leg_length, gait, gait_aux):
         stepreg = full(len(gait_aux["accel"]), nan, dtype=float_)
 
         for i in unique(gait_aux["inertial data i"]):
@@ -799,7 +799,7 @@ class StrideRegularityV(GaitBoutEndpoint):
     def __init__(self):
         super().__init__("stride regularity - V", __name__, depends=[StrideTime])
 
-    def _predict(self, fs, leg_length, gait, gait_aux):
+    def _predict(self, *, fs, leg_length, gait, gait_aux):
         stridereg = full(len(gait_aux["accel"]), nan, dtype=float_)
 
         for i in unique(gait_aux["inertial data i"]):
@@ -850,7 +850,7 @@ class AutocovarianceSymmetryV(GaitBoutEndpoint):
             depends=[StepRegularityV, StrideRegularityV],
         )
 
-    def _predict(self, fs, leg_length, gait, gait_aux):
+    def _predict(self, *, fs, leg_length, gait, gait_aux):
         gait[self.k_] = abs(
             gait["BOUTPARAM:step regularity - V"]
             - gait["BOUTPARAM:stride regularity - V"]
@@ -898,7 +898,7 @@ class RegularityIndexV(GaitBoutEndpoint):
             depends=[StepRegularityV, StrideRegularityV],
         )
 
-    def _predict(self, fs, leg_length, gait, gait_aux):
+    def _predict(self, *, fs, leg_length, gait, gait_aux):
         str_v = "BOUTPARAM:stride regularity - V"
         ste_v = "BOUTPARAM:step regularity - V"
 
