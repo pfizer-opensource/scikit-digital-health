@@ -34,6 +34,8 @@ class VerticalCwtGaitEvents(BaseProcess):
         If a float, this is the value in Hz that the desired wavelet decomposition
         happens. For reference, [1]_ used a frequency of 1.25Hz. If an integer,
         uses that value as the scale.
+    round_scale : bool, optional
+        Round the CWT scales to integers. Default is False.
 
     Notes
     -----
@@ -57,6 +59,7 @@ class VerticalCwtGaitEvents(BaseProcess):
         self,
         use_cwt_scale_relation=True,
         wavelet_scale="default",
+        round_scale=False,
     ):
         super().__init__(
             use_cwt_scale_relation=use_cwt_scale_relation,
@@ -65,6 +68,7 @@ class VerticalCwtGaitEvents(BaseProcess):
 
         self.use_cwt_scale_relation = use_cwt_scale_relation
         self.wavelet_scale = wavelet_scale
+        self.round = round_scale
 
     def handle_wavelet_scale(self, original_scale, fs):
         if self.wavelet_scale == "default":
@@ -118,9 +122,14 @@ class VerticalCwtGaitEvents(BaseProcess):
             # TODO: verify the FC scale equation. This is not in the paper (typo?) but
             # but is a guess from the graph
             # original fs was 250 hz, hence the conversion
-            scale1 = min(max((-10 * mean_step_freq + 56) * (fs / 250.0), 1), 90)
-            scale2 = min(max((-52 * mean_step_freq + 131) * (fs / 250.0), 1), 90)
+            scale1 = (-10 * mean_step_freq + 56) * (fs / 250.0)
+            scale2 = (-52 * mean_step_freq + 131) * (fs / 250.0)
+            if self.round:
+                scale1 = round(scale1)
+                scale2 = round(scale2)
             # scale is range between 1 and 90
+            scale1 = min(max(scale1, 1), 90)
+            scale2 = min(max(scale2, 1), 90)
         else:
             scale1 = scale2 = scale
 

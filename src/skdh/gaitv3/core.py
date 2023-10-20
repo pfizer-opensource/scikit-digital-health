@@ -63,6 +63,9 @@ class GaitLumbar(BaseProcess):
         relationship.
     wavelet_scale : {"default", float, int}, optional
         [:meth:`skdh.gaitv3.substeps.VerticalCwtGaitEvents`] The wavelet scale to use.
+    round_scale : bool, optional
+        [:meth:`skdh.gaitv3.substeps.VerticalCwtGaitEvents`] Round the wavelet scale.
+        Default is False.
     max_stride_time : {callable, float}, optional
         [:meth:`skdh.gaitv3.substeps.CreateStridesAndQc`] Definition of how the maximum
         stride time is calculated. Either a callable with the input of the mean step time,
@@ -135,6 +138,7 @@ class GaitLumbar(BaseProcess):
             filter_order=4,
             use_cwt_scale_relation=True,
             wavelet_scale='default',
+            round_scale=False,
             max_stride_time=lambda x: 2.0 * x + 1.0,
             loading_factor=lambda x: 0.17 * x + 0.05,
             bout_processing_pipeline=None,
@@ -151,6 +155,7 @@ class GaitLumbar(BaseProcess):
             filter_order=filter_order,
             use_cwt_scale_relation=use_cwt_scale_relation,
             wavelet_scale=wavelet_scale,
+            round_scale=round_scale,
             max_stride_time=max_stride_time,
             loading_factor=loading_factor,
             bout_processing_pipeline=bout_processing_pipeline,
@@ -175,11 +180,14 @@ class GaitLumbar(BaseProcess):
             ))
             if gait_event_method.lower() == "ap cwt":
                 self.bout_pipeline.add(substeps.ApCwtGaitEvents())
-            elif gait_event_method.lower() == "vertical cwt":
+            elif gait_event_method.lower() in ["vertical cwt", 'v cwt']:
                 self.bout_pipeline.add(substeps.VerticalCwtGaitEvents(
                     use_cwt_scale_relation=use_cwt_scale_relation,
-                    wavelet_scale=wavelet_scale
+                    wavelet_scale=wavelet_scale,
+                    round_scale=round_scale,
                 ))
+            else:
+                raise ValueError(f"`gait_event_method` ({gait_event_method}) not a valid option.")
             self.bout_pipeline.add(substeps.CreateStridesAndQc(
                 max_stride_time=max_stride_time,
                 loading_factor=loading_factor,
@@ -499,7 +507,7 @@ class GaitLumbar(BaseProcess):
                 gait['Bout Duration'].extend([(bout.stop - bout.start) / goal_fs] * n_strides)
 
                 gait['Bout Steps'].extend([n_strides] * n_strides)
-                gait['Gait Cycles'].extend([sum(bout_res['forward_cycles'] == 2)])
+                gait['Gait Cycles'].extend([sum(bout_res['forward_cycles'] == 2)] * n_strides)
 
                 # gait auxiliary data
                 gait_aux['accel'].append(bout_res.get("accel_filt", accel_rs[bout]))
