@@ -97,7 +97,7 @@ class PreprocessGaitBout(BaseProcess):
 
         """
         # calculate fs if we need to
-        fs = 1 / mean(diff(time)) if fs is not None else fs
+        fs = 1 / mean(diff(time)) if fs is None else fs
 
         # estimate accelerometer axes if necessary
         acc_mean = mean(accel, axis=0)
