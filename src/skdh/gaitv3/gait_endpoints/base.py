@@ -12,9 +12,9 @@ from numpy import zeros, roll, full, nan, bool_, float_
 
 def basic_asymmetry(f):
     @functools.wraps(f)
-    def run_basic_asymmetry(self, *args, **kwargs):
-        f(self, *args, **kwargs)
-        self._predict_asymmetry(*args, **kwargs)
+    def run_basic_asymmetry(self, **kwargs):
+        f(self, **kwargs)
+        self._predict_asymmetry(**kwargs)
 
     return run_basic_asymmetry
 
@@ -127,7 +127,7 @@ class GaitEventEndpoint:
 
         self._predict(fs=fs, leg_length=leg_length, gait=gait, gait_aux=gait_aux)
 
-    def _predict_asymmetry(self, dt, leg_length, gait, gait_aux):
+    def _predict_asymmetry(self, *, fs, leg_length, gait, gait_aux):
         asy_name = f"{self.k_} asymmetry"
         gait[asy_name] = full(gait["IC"].size, nan, dtype=float_)
 
