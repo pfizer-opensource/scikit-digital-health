@@ -102,7 +102,8 @@ class GaitLumbar(BaseProcess):
         gait_endpoints.TerminalDoubleSupport,
         gait_endpoints.DoubleSupport,
         gait_endpoints.SingleSupport,
-        gait_endpoints.StepLength,
+        gait_endpoints.StepLengthModel1,
+        gait_endpoints.StepLengthModel2,
         gait_endpoints.StrideLength,
         gait_endpoints.GaitSpeed,
         gait_endpoints.Cadence,
@@ -433,7 +434,7 @@ class GaitLumbar(BaseProcess):
                 "FC",
                 "FC opp foot",
                 "forward cycles",
-                "delta h",
+                # "delta h",  # handled in gait endpoints now
                 "IC Time",
                 "debug:mean step freq",
                 "debug:v axis est",
