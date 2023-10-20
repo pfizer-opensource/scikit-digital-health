@@ -122,7 +122,7 @@ class DeltaHModel1(GaitEventEndpoint):
     to use the inverted pendulum model (model 1) to estimate step length.
     """
     def __init__(self):
-        super().__init__("delta h model 1", __name__)
+        super().__init__("m1 delta h", __name__)
 
     def _predict(self, *, fs, leg_length, gait, gait_aux):
         mask, mask_ofst = self._predict_init(gait, init=False, offset=1)
@@ -136,7 +136,7 @@ class DeltaHModel1(GaitEventEndpoint):
 
             delta_h[idx] = (vpos.max() - vpos.min()) * 9.81
 
-        gait['m1 delta h'] = delta_h
+        gait[self.k_] = delta_h
 
 
 class DeltaHModel2(GaitEventEndpoint):
@@ -145,7 +145,7 @@ class DeltaHModel2(GaitEventEndpoint):
     use the inverted pendulum model (model 2) to estimate step length
     """
     def __init__(self):
-        super().__init__("delta h model 2", __name__)
+        super().__init__("m2 delta h", __name__)
 
     def _predict(self, *, fs, leg_length, gait, gait_aux):
         mask, mask_ofst = self._predict_init(gait, init=False, offset=1)
@@ -168,8 +168,8 @@ class DeltaHModel2(GaitEventEndpoint):
             delta_h_prime[idx] = (vpos[i1 - i0:ifc - i0].max() - vpos[i1 - i0:ifc - i0].min()) * 9.81
             delta_h[idx] = (vpos[ifc - i0:i2 - i0].max() - vpos[ifc - i0:i2 - i0].min()) * 9.81
 
-        gait['m2 delta h'] = delta_h
-        gait['m2 delta h prime'] = delta_h_prime
+        gait[self.k_] = delta_h
+        gait[f'{self.k_} prime'] = delta_h_prime
 
 
 # ===========================================================
@@ -492,7 +492,7 @@ class GaitSpeedModel1(GaitEventEndpoint):
     """
 
     def __init__(self):
-        super().__init__("gait speed", __name__, depends=[StrideLengthModel2, StrideTime])
+        super().__init__("gait speed m1", __name__, depends=[StrideLengthModel1, StrideTime])
 
     @basic_asymmetry
     def _predict(self, *, fs, leg_length, gait, gait_aux):

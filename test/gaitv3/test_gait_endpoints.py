@@ -1,7 +1,7 @@
 import pytest
 from numpy import allclose, isclose, zeros, arange, sin, pi, nan, array, sqrt, isnan
 
-from skdh.gait.gait_endpoints.gait_endpoints import (
+from skdh.gaitv3.gait_endpoints.gait_endpoints import (
     _autocovariancefn,
     StrideTime,
     StanceTime,
@@ -11,10 +11,13 @@ from skdh.gait.gait_endpoints.gait_endpoints import (
     TerminalDoubleSupport,
     DoubleSupport,
     SingleSupport,
-    StepLength,
-    StrideLength,
-    GaitSpeed,
+    StepLengthModel2,
+    StrideLengthModel2,
+    GaitSpeedModel2,
     Cadence,
+    StepLengthModel1,
+    StrideLengthModel1,
+    GaitSpeedModel1,
     GaitSymmetryIndex,
     IntraStepCovarianceV,
     IntraStrideCovarianceV,
@@ -49,10 +52,10 @@ def test__autocovariancefn():
 def test_StrideTime(d_gait):
     st = StrideTime()
 
-    st.predict(50.0, 1.8, d_gait, {})
+    st.predict(fs=50.0, leg_length=1.8, gait=d_gait, gait_aux={})
 
     assert allclose(
-        d_gait["PARAM:stride time"],
+        d_gait["stride time"],
         [2.0, nan, nan, 2.0, 2.0, 2.0, nan, nan],
         equal_nan=True,
     )
@@ -61,20 +64,20 @@ def test_StrideTime(d_gait):
 def test_StanceTime(d_gait):
     st = StanceTime()
 
-    st.predict(50.0, 1.8, d_gait, {})
+    st.predict(fs=50.0, leg_length=1.8, gait=d_gait, gait_aux={})
 
     assert allclose(
-        d_gait["PARAM:stance time"], [1.2, 1.3, 1.2, 1.3, 1.2, 1.3, 1.3, 1.1]
+        d_gait["stance time"], [1.2, 1.3, 1.2, 1.3, 1.2, 1.3, 1.3, 1.1]
     )
 
 
 def test_SwingTime(d_gait):
     st = SwingTime()
 
-    st.predict(50.0, 1.8, d_gait, {})
+    st.predict(fs=50.0, leg_length=1.8, gait=d_gait, gait_aux={})
 
     assert allclose(
-        d_gait["PARAM:swing time"],
+        d_gait["swing time"],
         [0.8, nan, nan, 0.7, 0.8, 0.7, nan, nan],
         equal_nan=True,
     )
@@ -82,10 +85,10 @@ def test_SwingTime(d_gait):
 
 def test_StepTime(d_gait):
     st = StepTime()
-    st.predict(50.0, 1.8, d_gait, {})
+    st.predict(fs=50.0, leg_length=1.8, gait=d_gait, gait_aux={})
 
     assert allclose(
-        d_gait["PARAM:step time"],
+        d_gait["step time"],
         [1.0, 1.0, nan, 1.0, 1.0, 1.0, 1.0, nan],
         equal_nan=True,
     )
@@ -93,19 +96,19 @@ def test_StepTime(d_gait):
 
 def test_InitialDoubleSupport(d_gait):
     ids = InitialDoubleSupport()
-    ids.predict(50.0, 1.8, d_gait, {})
+    ids.predict(fs=50.0, leg_length=1.8, gait=d_gait, gait_aux={})
 
     assert allclose(
-        d_gait["PARAM:initial double support"], [0.3, 0.2, 0.3, 0.2, 0.2, 0.3, 0.2, 0.1]
+        d_gait["initial double support"], [0.3, 0.2, 0.3, 0.2, 0.2, 0.3, 0.2, 0.1]
     )
 
 
 def test_TerminalDoubleSupport(d_gait):
     tds = TerminalDoubleSupport()
-    tds.predict(50.0, 1.8, d_gait, {})
+    tds.predict(fs=50.0, leg_length=1.8, gait=d_gait, gait_aux={})
 
     assert allclose(
-        d_gait["PARAM:terminal double support"],
+        d_gait["terminal double support"],
         [0.2, 0.3, nan, 0.2, 0.3, 0.2, 0.1, nan],
         equal_nan=True,
     )
@@ -113,10 +116,10 @@ def test_TerminalDoubleSupport(d_gait):
 
 def test_DoubleSupport(d_gait):
     ds = DoubleSupport()
-    ds.predict(50.0, 1.8, d_gait, {})
+    ds.predict(fs=50.0, leg_length=1.8, gait=d_gait, gait_aux={})
 
     assert allclose(
-        d_gait["PARAM:double support"],
+        d_gait["double support"],
         [0.5, 0.5, nan, 0.4, 0.5, 0.5, 0.3, nan],
         equal_nan=True,
     )
@@ -124,35 +127,35 @@ def test_DoubleSupport(d_gait):
 
 def test_SingleSupport(d_gait):
     ss = SingleSupport()
-    ss.predict(50.0, 1.8, d_gait, {})
+    ss.predict(fs=50.0, leg_length=1.8, gait=d_gait, gait_aux={})
 
     assert allclose(
-        d_gait["PARAM:single support"],
+        d_gait["single support"],
         [0.7, 0.8, nan, 0.8, 0.8, 0.7, 0.8, nan],
         equal_nan=True,
     )
 
 
-def test_StepLength(d_gait):
-    sl = StepLength()
-    sl.predict(50.0, 1.8, d_gait, {})
+def test_StepLengthModel1(d_gait, d_gait_aux):
+    sl = StepLengthModel1()
+    sl.predict(fs=50.0, leg_length=1.8, gait=d_gait, gait_aux=d_gait_aux)
 
     exp = 2 * 1.8 * array([0.1, 0.2, 0.1, 0.2, 0.2, 0.2, 0.1, 0.1])
     exp -= array([0.01, 0.04, 0.01, 0.04, 0.04, 0.04, 0.01, 0.01])
     exp = 2 * sqrt(exp)
     # get predicted values and reset dictionary for another test
-    pred = d_gait.pop("PARAM:step length")
+    pred = d_gait.pop("step length m1")
     assert allclose(pred, exp)
 
     # test with no leg length provided
-    sl.predict(50.0, None, d_gait, {})
+    sl.predict(fs=50.0, leg_length=None, gait=d_gait, gait_aux=d_gait_aux)
 
-    assert isnan(d_gait["PARAM:step length"]).all()
+    assert isnan(d_gait["step length m1"]).all()
 
 
-def test_StrideLength(d_gait):
-    sl = StrideLength()
-    sl.predict(50.0, 1.8, d_gait, {})
+def test_StrideLengthModel1(d_gait, d_gait_aux):
+    sl = StrideLengthModel1()
+    sl.predict(fs=50.0, leg_length=1.8, gait=d_gait, gait_aux=d_gait_aux)
 
     a = 2 * 1.8 * array([0.1, 0.2, 0.1, 0.2, 0.2, 0.2, 0.1, 0.1])
     a -= array([0.01, 0.04, 0.01, 0.04, 0.04, 0.04, 0.01, 0.01])
@@ -163,17 +166,17 @@ def test_StrideLength(d_gait):
     exp[3:-1] += exp[4:]
     exp[[2, 7]] = nan
     # get predicted values and reset dictionary for another test
-    pred = d_gait.pop("PARAM:stride length")
+    pred = d_gait.pop("stride length m1")
 
     assert allclose(pred, exp, equal_nan=True)
 
     # test with no leg length provided
-    sl.predict(50.0, None, d_gait, {})
+    sl.predict(fs=50.0, leg_length=None, gait=d_gait, gait_aux=d_gait_aux)
 
-    assert isnan(d_gait["PARAM:stride length"]).all()
+    assert isnan(d_gait["stride length m1"]).all()
 
 
-def test_GaitSpeed(d_gait):
+def test_GaitSpeedModel1(d_gait, d_gait_aux):
     a = 2 * 1.8 * array([0.1, 0.2, 0.1, 0.2, 0.2, 0.2, 0.1, 0.1])
     a -= array([0.01, 0.04, 0.01, 0.04, 0.04, 0.04, 0.01, 0.01])
     a = 2 * sqrt(a)
@@ -184,22 +187,22 @@ def test_GaitSpeed(d_gait):
     exp[[2, 7]] = nan
     exp /= array([2.0, nan, nan, 2.0, 2.0, 2.0, nan, nan])
 
-    gs = GaitSpeed()
-    gs.predict(50.0, 1.8, d_gait, {})
-    pred = d_gait.pop("PARAM:gait speed")
+    gs = GaitSpeedModel1()
+    gs.predict(fs=50.0, leg_length=1.8, gait=d_gait, gait_aux=d_gait_aux)
+    pred = d_gait.pop("gait speed m1")
 
     assert allclose(pred, exp, equal_nan=True)
 
-    gs.predict(50.0, None, d_gait, {})
-    assert isnan(d_gait["PARAM:gait speed"]).all()
+    gs.predict(fs=50.0, leg_length=None, gait=d_gait, gait_aux=d_gait_aux)
+    assert isnan(d_gait["gait speed m1"]).all()
 
 
 def test_Cadence(d_gait):
     c = Cadence()
-    c.predict(50.0, 1.8, d_gait, {})
+    c.predict(fs=50.0, leg_length=1.8, gait=d_gait, gait_aux={})
 
     assert allclose(
-        d_gait["PARAM:cadence"],
+        d_gait["cadence"],
         [60.0, 60.0, nan, 60.0, 60.0, 60.0, 60.0, nan],
         equal_nan=True,
     )
@@ -207,10 +210,10 @@ def test_Cadence(d_gait):
 
 def test_IntraStrideCovarianceV(d_gait, d_gait_aux):
     iscv = IntraStrideCovarianceV()
-    iscv.predict(50.0, None, d_gait, d_gait_aux)
+    iscv.predict(fs=50.0, leg_length=None, gait=d_gait, gait_aux=d_gait_aux)
 
     assert allclose(
-        d_gait["PARAM:intra-stride covariance - V"],
+        d_gait["intra-stride covariance - V"],
         [nan, nan, nan, 1.0, 1.0, 1.0, nan, nan],
         equal_nan=True,
     )
@@ -218,10 +221,10 @@ def test_IntraStrideCovarianceV(d_gait, d_gait_aux):
 
 def test_IntraStepCovarianceV(d_gait, d_gait_aux):
     iscv = IntraStepCovarianceV()
-    iscv.predict(50.0, None, d_gait, d_gait_aux)
+    iscv.predict(fs=50.0, leg_length=None, gait=d_gait, gait_aux=d_gait_aux)
 
     assert allclose(
-        d_gait["PARAM:intra-step covariance - V"],
+        d_gait["intra-step covariance - V"],
         [1.0, nan, nan, 1.0, 1.0, 1.0, 1.0, nan],
         equal_nan=True,
     )
@@ -229,9 +232,9 @@ def test_IntraStepCovarianceV(d_gait, d_gait_aux):
 
 def test_HarmonicRatioV(d_gait, d_gait_aux):
     hrv = HarmonicRatioV()
-    hrv.predict(50.0, None, d_gait, d_gait_aux)
+    hrv.predict(fs=50.0, leg_length=None, gait=d_gait, gait_aux=d_gait_aux)
     # get predicted values and reset d_gait for another run
-    pred = d_gait.pop("PARAM:harmonic ratio - V")
+    pred = d_gait.pop("harmonic ratio - V")
 
     # values are somewhat weird because stride frequency is different than
     # the frequency used to create the "acceleration" data
@@ -243,13 +246,13 @@ def test_HarmonicRatioV(d_gait, d_gait_aux):
 
     # <= 10 harmonics
     hrv.predict(10.0, None, d_gait, d_gait_aux)
-    pred = d_gait.pop("PARAM:harmonic ratio - V")
+    pred = d_gait.pop("harmonic ratio - V")
 
     assert isnan(pred).all()
 
     # test with less than 20 harmonics
     hrv.predict(15.0, None, d_gait, d_gait_aux)
-    pred = d_gait.pop("PARAM:harmonic ratio - V")
+    pred = d_gait.pop("harmonic ratio - V")
 
     assert allclose(
         pred,
@@ -260,10 +263,10 @@ def test_HarmonicRatioV(d_gait, d_gait_aux):
 
 def test_StrideSPARC(d_gait, d_gait_aux):
     ss = StrideSPARC()
-    ss.predict(50.0, None, d_gait, d_gait_aux)
+    ss.predict(fs=50.0, leg_length=None, gait=d_gait, gait_aux=d_gait_aux)
 
     assert allclose(
-        d_gait["PARAM:stride SPARC"],
+        d_gait["stride SPARC"],
         [-3.27853883, nan, nan, -3.27853883, -3.27853883, -3.27853883, nan, nan],
         equal_nan=True,
     )
@@ -272,11 +275,11 @@ def test_StrideSPARC(d_gait, d_gait_aux):
 def test_PhaseCoordinationIndex(d_gait, d_gait_aux):
     pci = PhaseCoordinationIndex()
     with pytest.warns(RuntimeWarning):
-        pci.predict(50.0, None, d_gait, d_gait_aux)
+        pci.predict(fs=50.0, leg_length=None, gait=d_gait, gait_aux=d_gait_aux)
 
     # 0 values since the phase mean - 0.5 is 0.0
     assert allclose(
-        d_gait["BOUTPARAM:phase coordination index"],
+        d_gait["bout:phase coordination index"],
         [nan, nan, nan, 0.0, 0.0, 0.0, 0.0, 0.0],
         equal_nan=True,
     )
@@ -284,14 +287,14 @@ def test_PhaseCoordinationIndex(d_gait, d_gait_aux):
 
 def test_GaitSymmetryIndex(d_gait, d_gait_aux):
     # set manually so one of the bouts doesnt have a median step time
-    d_gait["PARAM:stride time"] = array([nan, nan, nan, 2.0, 2.0, 2.0, nan, nan])
+    d_gait["stride time"] = array([nan, nan, nan, 2.0, 2.0, 2.0, nan, nan])
 
     gsi = GaitSymmetryIndex()
     with pytest.warns(RuntimeWarning):  # all nan slice
-        gsi.predict(50.0, None, d_gait, d_gait_aux)
+        gsi.predict(fs=50.0, leg_length=None, gait=d_gait, gait_aux=d_gait_aux)
 
     assert allclose(
-        d_gait["BOUTPARAM:gait symmetry index"],
+        d_gait["bout:gait symmetry index"],
         [nan, nan, nan, 0.97467939, 0.97467939, 0.97467939, 0.97467939, 0.97467939],
         equal_nan=True,
     )
@@ -299,14 +302,14 @@ def test_GaitSymmetryIndex(d_gait, d_gait_aux):
 
 def test_StepRegularityV(d_gait, d_gait_aux):
     # set manually so one of the bouts doesnt have a median step time
-    d_gait["PARAM:step time"] = array([nan, nan, nan, 1.0, 1.0, 1.0, 1.0, nan])
+    d_gait["step time"] = array([nan, nan, nan, 1.0, 1.0, 1.0, 1.0, nan])
 
     srv = StepRegularityV()
     with pytest.warns(RuntimeWarning):  # all nan slice
-        srv.predict(50.0, None, d_gait, d_gait_aux)
+        srv.predict(fs=50.0, leg_length=None, gait=d_gait, gait_aux=d_gait_aux)
 
     assert allclose(
-        d_gait["BOUTPARAM:step regularity - V"],
+        d_gait["bout:step regularity - V"],
         [nan, nan, nan, 1.0, 1.0, 1.0, 1.0, 1.0],
         equal_nan=True,
     )
@@ -314,14 +317,14 @@ def test_StepRegularityV(d_gait, d_gait_aux):
 
 def test_StrideRegularityV(d_gait, d_gait_aux):
     # set manually so one of the bouts doesnt have a median step time
-    d_gait["PARAM:stride time"] = array([nan, nan, nan, 2.0, 2.0, 2.0, nan, nan])
+    d_gait["stride time"] = array([nan, nan, nan, 2.0, 2.0, 2.0, nan, nan])
 
     srv = StrideRegularityV()
     with pytest.warns(RuntimeWarning):  # all nan slice
-        srv.predict(50.0, None, d_gait, d_gait_aux)
+        srv.predict(fs=50.0, leg_length=None, gait=d_gait, gait_aux=d_gait_aux)
 
     assert allclose(
-        d_gait["BOUTPARAM:stride regularity - V"],
+        d_gait["bout:stride regularity - V"],
         [nan, nan, nan, 1.0, 1.0, 1.0, 1.0, 1.0],
         equal_nan=True,
     )
@@ -329,15 +332,15 @@ def test_StrideRegularityV(d_gait, d_gait_aux):
 
 def test_AutocovarianceSymmetryV(d_gait, d_gait_aux):
     acsv = AutocovarianceSymmetryV()
-    acsv.predict(50.0, None, d_gait, d_gait_aux)
+    acsv.predict(fs=50.0, leg_length=None, gait=d_gait, gait_aux=d_gait_aux)
 
     # simple difference between stride and step regularity: 1 - 1 = 0
-    assert allclose(d_gait["BOUTPARAM:autocovariance symmetry - V"], 0.0)
+    assert allclose(d_gait["bout:autocovariance symmetry - V"], 0.0)
 
 
 def test_RegularityIndexV(d_gait, d_gait_aux):
     riv = RegularityIndexV()
-    riv.predict(50.0, None, d_gait, d_gait_aux)
+    riv.predict(fs=50.0, leg_length=None, gait=d_gait, gait_aux=d_gait_aux)
 
     # 1 - 0 = 1
-    assert allclose(d_gait["BOUTPARAM:regularity index - V"], 1.0)
+    assert allclose(d_gait["bout:regularity index - V"], 1.0)
