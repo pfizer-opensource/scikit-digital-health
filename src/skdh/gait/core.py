@@ -559,6 +559,7 @@ class GaitLumbar(BaseProcess):
                 # get the data we need
                 n_strides = bout_res["qc_initial_contacts"].size
                 gait["IC"].extend(bout_res["qc_initial_contacts"])
+                gait["IC Time"].extend(time_rs[bout][bout_res["qc_initial_contacts"]])
                 gait["FC"].extend(bout_res["qc_final_contacts"])
                 gait["FC opp foot"].extend(bout_res["qc_final_contacts_oppfoot"])
                 gait["forward cycles"].extend(bout_res["forward_cycles"])
