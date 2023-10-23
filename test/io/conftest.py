@@ -4,7 +4,7 @@ from pytest import fixture
 from numpy import load, random, arange, repeat
 import pandas as pd
 
-from skdh import BaseProcess
+from skdh import BaseProcess, handle_process_returns
 from skdh.io.base import check_input_file
 
 
@@ -23,14 +23,27 @@ def dummy_reader_class():
             else:
                 raise ValueError("`ext_error` must be one of 'raise', 'warn', 'skip'.")
 
+        @handle_process_returns(results_to_kwargs=True)
         @check_input_file(".abc", check_size=False)
         def predict(self, file=None, **kwargs):
             super().predict(expect_wear=False, expect_days=False, file=file, **kwargs)
 
-            kwargs.update({"file": file, "in_predict": True})
-            return (kwargs, None) if self._in_pipeline else kwargs
+            return {"in_predict": True, 'test_input': 5}
 
     return Rdr
+
+
+@fixture
+def dummy_process():
+    class dummyprocess(BaseProcess):
+        def __init__(self):
+            super().__init__()
+
+        @handle_process_returns(results_to_kwargs=False)
+        def predict(self, *, test_input=None, **kwargs):
+            return {"a": 5, 'test_output': test_input * 2.0}
+
+    return dummyprocess
 
 
 @fixture

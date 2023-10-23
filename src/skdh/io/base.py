@@ -33,7 +33,8 @@ def check_input_file(
 
     def decorator_check_input_file(func):
         @functools.wraps(func)
-        def wrapper_check_input_file(self, file=None, **kwargs):
+        def wrapper_check_input_file(self, **kwargs):
+            file = kwargs.get("file")
             # check if the file is provided
             if file is None:
                 raise ValueError("`file` must not be None.")
@@ -51,18 +52,14 @@ def check_input_file(
                 elif self.ext_error == "raise":
                     raise ValueError(ext_message.format(pfile.suffix, extension))
                 elif self.ext_error == "skip":
-                    kwargs.update({"file": str(file)})
-                    return (kwargs, None) if self._in_pipeline else kwargs
+                    return kwargs
 
             # check file size if desired
             if check_size:
                 if pfile.stat().st_size < 1000:
                     raise FileSizeError("File is less than 1kb, nothing to read.")
 
-            # cast to a string
-            file = str(file)
-
-            return func(self, file=file, **kwargs)
+            return func(self, **kwargs)
 
         return wrapper_check_input_file
 

@@ -2,6 +2,25 @@ from tempfile import NamedTemporaryFile
 
 import pytest
 
+from skdh import Pipeline
+
+
+def test_in_pipeline(dummy_reader_class, dummy_process):
+    rdr = dummy_reader_class()
+    proc = dummy_process()
+
+    p = Pipeline()
+    p.add(rdr)
+    p.add(proc)
+
+    with NamedTemporaryFile(suffix=".abc") as tmpf:
+        res = p.run(file=tmpf.name)
+
+    assert res == {
+        "Rdr": {'in_predict': True, 'test_input': 5},
+        'dummyprocess': {'a': 5, 'test_output': 10.0}
+    }
+
 
 class TestCheckInputFile:
     def test_none(self, dummy_reader_class):
