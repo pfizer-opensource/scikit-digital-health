@@ -1,16 +1,14 @@
 py3.install_sources(
     [
         '__init__.py',
-        'gait.py',
-        'get_gait_bouts.py',
-        'get_gait_classification.py',
-        'get_gait_events.py',
-        'get_strides.py',
-        'get_turns.py',
+        'core.py',
+        'gait_classification.py',
+        'utility.py',
     ],
     pure: false,
     subdir: 'skdh/gait',
 )
 
-subdir('gait_endpoints')
 subdir('model')
+subdir('substeps')
+subdir('gait_metrics')

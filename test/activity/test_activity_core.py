@@ -10,7 +10,7 @@ from skdh.activity.core import (
     ActivityLevelClassification,
 )
 from skdh.activity import endpoints as epts
-from skdh.gait import gait_endpoints as gait_epts
+from skdh.gait import gait_metrics
 
 
 class Test_update_date_results:
@@ -121,7 +121,7 @@ class TestActivityLevelClassification:
             a.add(epts.MaxAcceleration(5, state="test"))
 
         with pytest.warns(UserWarning):
-            a.add(gait_epts.GaitSpeed())
+            a.add(gait_metrics.GaitSpeedModel2())
 
         assert len(a.wake_endpoints) == 2
         assert len(a.sleep_endpoints) == 2

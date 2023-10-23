@@ -60,6 +60,11 @@ class Pipeline:
     load_kwargs : {None, dict}, optional
         Dictionary of key-word arguments that will get directly passed to the
         `Pipeline.load()` function. If None, no pipeline will be loaded (default).
+    flatten_results : bool, optional
+        Flatten the results of the processing steps in the return dictionary. By
+        default (False), results of a step will be stored under a key of the step's
+        class name. If True, all results will be on the same level, and an exception
+        will be raised if keys would be overwritten.
 
     Examples
     --------
@@ -80,7 +85,7 @@ class Pipeline:
         ret += "]"
         return ret
 
-    def __init__(self, load_kwargs=None):
+    def __init__(self, load_kwargs=None, flatten_results=False):
         self._steps = []
         self._save = []
         self._current = -1  # iteration tracking
@@ -91,6 +96,8 @@ class Pipeline:
 
         if load_kwargs is not None:
             self.load(**load_kwargs)
+
+        self.flatten_results = flatten_results
 
     def save(self, file):
         """
@@ -403,6 +410,14 @@ class Pipeline:
                     proc.pipe_save_file,
                 )
             if step_result is not None:
-                results[proc._name] = step_result
+                if self.flatten_results:
+                    if any(i in results for i in step_result):
+                        raise IndexError(
+                            "Results dictionary already contains values in the results, "
+                            "cannot create a flat dictionary. Try setting `flatten_results=False`."
+                        )
+                    results.update(step_result)
+                else:
+                    results[proc._name] = step_result
 
         return results
