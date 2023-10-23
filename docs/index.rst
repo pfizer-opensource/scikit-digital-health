@@ -39,7 +39,7 @@ Scikit Digital Health
     :img-top: _static/skdh_gait.svg
     :badge:`skdh.gait,badge-primary`
     +++
-    .. link-button:: skdh gait
+    .. link-button:: skdh gaitv3
         :type: ref
         :text: Gait detection and analysis from lumbar inertial data.
         :classes: btn-outline-primary stretched-link btn-block

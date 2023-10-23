@@ -163,7 +163,11 @@ class VerticalCwtGaitEvents(BaseProcess):
 
         Returns
         -------
-
+        results : dict
+            Dictionary of the results, with the following items that can be used
+            as inputs to downstream processing steps:
+            - `initial_contacts`: detected initial contact events (heel-strikes).
+            - `final_contacts`: detected final contact events (toe-offs).
         """
         super().predict(
             expect_days=False,
@@ -215,9 +219,6 @@ class ApCwtGaitEvents(BaseProcess):
     """
     Predict gait events from a lumbar sensor based on AP acceleration and using
     a Continuous Wavelet Transform to smooth the raw signal.
-
-    Parameters
-    ----------
     """
 
     def __init__(self):
@@ -252,7 +253,12 @@ class ApCwtGaitEvents(BaseProcess):
 
         Returns
         -------
+        results : dict
+            Dictionary of the results, with the following items that can be used
+            as inputs to downstream processing steps:
 
+            - `initial_contacts`: detected initial contact events (heel-strikes).
+            - `final_contacts`: detected final contact events (toe-offs).
         """
         # compute the estimates for the scales
         f_cwt_ic = 1.3 * mean_step_freq - 0.3

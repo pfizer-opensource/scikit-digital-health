@@ -82,7 +82,13 @@ class TurnDetection(BaseProcess):
 
         Returns
         -------
+        results : dict
+            Dictionary of the results, with the following items that can be used
+            as inputs to downstream processing steps:
 
+            - `turns`: array indicting if a turn is occuring.
+            - `step_in_turn`: array for each QC'ed initial contact indicating
+              which or if both IC/FC events overlap with a turn.
         """
         # get the number of strides
         n_steps = qc_initial_contacts.size

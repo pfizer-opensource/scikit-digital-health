@@ -70,12 +70,12 @@ class GaitLumbar(BaseProcess):
         [:meth:`skdh.gaitv3.substeps.CreateStridesAndQc`] Definition of how the maximum
         stride time is calculated. Either a callable with the input of the mean step time,
         or a float, which will be used as a static limit. Default is the function
-        `2.0 * mean_step_time + 1.0`.
+        :math:`2.0 * mean\\_step\\_time + 1.0`.
     loading_factor : {callable, float}, optional
         [:meth:`skdh.gaitv3.substeps.CreateStridesAndQc`] Definition of the loading factor.
         Either a callable with the input of mean step time, or a float (between 0.0
         and 1.0) indicating a static factor. Default is the function
-        `0.17 * mean_step_time + 0.05`.
+        :math:`0.17 * mean\\_step\\_time + 0.05`.
 
     Other Parameters
     ----------------
@@ -88,11 +88,63 @@ class GaitLumbar(BaseProcess):
     Notes
     -----
     The default pipeline is the following steps:
+
     - :meth:`skdh.gaitv3.substeps.PreprocessGaitBout`
-    - :meth:`skdh.gaitv3.substeps.ApCwtGaitEvents` or
-    :meth:`skdh.gaitv3.substeps.VerticalCwtGaitEvents`
+    - :meth:`skdh.gaitv3.substeps.ApCwtGaitEvents`
+      or :meth:`skdh.gaitv3.substeps.VerticalCwtGaitEvents`
     - :meth:`skdh.gaitv3.substeps.CreateStridesAndQc`
     - :meth:`skdh.gaitv3.substeps.TurnDetection`
+
+    3 optimizations are performed on the detected events to minimize false positives.
+
+    1. Loading time (initial double support) must be less than
+    :math:`loading\\_factor * max\\_stride\\_time`
+
+    2. Stance time must be less than
+    :math:`(max\\_stride\\_time/2) + loading\\_factor * max\\_stride\\_time`
+
+    3. Stride time must be less than `max\\_stride\\_time`
+
+    If angular velocity data is provided, turns are detected [8]_, and steps during
+    turns are noted in the results. Values are assigned as follows:
+
+    - -1: Turns not detected (lacking angular velocity data)
+    - 0: No turn found
+    - 1: Turn overlaps with either Initial or Final contact
+    - 2: Turn overlaps with both Initial and Final contact
+
+    References
+    ----------
+    .. [1] B. Najafi, K. Aminian, A. Paraschiv-Ionescu, F. Loew, C. J. Bula, and P. Robert,
+        “Ambulatory system for human motion analysis using a kinematic sensor: monitoring of
+        daily physical activity in the elderly,” IEEE Transactions on Biomedical Engineering,
+        vol. 50, no. 6, pp. 711–723, Jun. 2003, doi: 10.1109/TBME.2003.812189.
+    .. [2] W. Zijlstra and A. L. Hof, “Assessment of spatio-temporal gait parameters from
+        trunk accelerations during human walking,” Gait & Posture, vol. 18, no. 2, pp. 1–10,
+        Oct. 2003, doi: 10.1016/S0966-6362(02)00190-X.
+    .. [3] J. McCamley, M. Donati, E. Grimpampi, and C. Mazzà, “An enhanced estimate of initial
+        contact and final contact instants of time using lower trunk inertial sensor data,”
+        Gait & Posture, vol. 36, no. 2, pp. 316–318, Jun. 2012,
+        doi: 10.1016/j.gaitpost.2012.02.019.
+    .. [4] S. Del Din, A. Godfrey, and L. Rochester, “Validation of an Accelerometer to
+        Quantify a Comprehensive Battery of Gait Characteristics in Healthy Older Adults and
+        Parkinson’s Disease: Toward Clinical and at Home Use,” IEEE J. Biomed. Health Inform.,
+        vol. 20, no. 3, pp. 838–847, May 2016, doi: 10.1109/JBHI.2015.2419317.
+    .. [5] C. Caramia, C. De Marchis, and M. Schmid, “Optimizing the Scale of a Wavelet-Based
+        Method for the Detection of Gait Events from a Waist-Mounted Accelerometer under
+        Different Walking Speeds,” Sensors, vol. 19, no. 8, p. 1869, Jan. 2019,
+        doi: 10.3390/s19081869.
+    .. [6] C. Buckley et al., “Gait Asymmetry Post-Stroke: Determining Valid and Reliable
+        Methods Using a Single Accelerometer Located on the Trunk,” Sensors, vol. 20, no. 1,
+        Art. no. 1, Jan. 2020, doi: 10.3390/s20010037.
+    .. [7] R. Moe-Nilssen, “A new method for evaluating motor control in gait under real-life
+        environmental conditions. Part 1: The instrument,” Clinical Biomechanics, vol. 13, no.
+        4–5, pp. 320–327, Jun. 1998, doi: 10.1016/S0268-0033(98)00089-8.
+    .. [8] M. H. Pham et al., “Algorithm for Turning Detection and Analysis
+        Validated under Home-Like Conditions in Patients with Parkinson’s Disease
+        and Older Adults using a 6 Degree-of-Freedom Inertial Measurement Unit at
+        the Lower Back,” Front. Neurol., vol. 8, Apr. 2017,
+        doi: 10.3389/fneur.2017.00135.
     """
     # gait parameters
     _params = [
@@ -361,8 +413,6 @@ class GaitLumbar(BaseProcess):
 
         Notes
         -----
-        Axis estimation
-        ^^^^^^^^^^^^^^^
         The vertical axis is estimated as the axis with the highest absolute
         average acceleration during a gait bout. Since the acceleromter should be
         approximately aligned with the anatomical axes, this is a fairly easy estimation

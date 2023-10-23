@@ -94,7 +94,18 @@ class PreprocessGaitBout(BaseProcess):
 
         Returns
         -------
+        results : dict
+            Dictionary with the following items that can be used for future
+            processing steps:
 
+            - `v_axis`: provided or estimated vertical axis index.
+            - `v_axis_est`: estimated vertical axis index.
+            - `v_axis_sign`: sign of the vertical axis.
+            - `ap_axis`: provided or estimated AP axis index.
+            - `ap_axis_est`: estimated AP axis index.
+            - `ap_axis_sign`: estimated sign of the AP axis.
+            - `mean_step_freq`: estimated mean step frequency during this gait bout.
+            - `accel_filt`: filtered and detrended acceleration for this gait bout.
         """
         # calculate fs if we need to
         fs = 1 / mean(diff(time)) if fs is None else fs

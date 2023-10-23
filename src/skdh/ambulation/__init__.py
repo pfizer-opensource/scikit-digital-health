@@ -1,6 +1,6 @@
 """
 Ambulation Detection (Wrist) (:mod:`skdh.ambulation`)
-=======================================================
+=====================================================
 
 .. currentmodule:: skdh.ambulation
 

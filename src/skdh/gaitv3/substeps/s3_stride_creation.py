@@ -10,27 +10,22 @@ from skdh.base import BaseProcess, handle_process_returns
 
 
 class CreateStridesAndQc(BaseProcess):
-    """
+    r"""
     Create strides from initial and final contacts. Perform a set of
     QC rules on the strides to eliminate strides that are not physiologically possible.
 
     Parameters
     ----------
     max_stride_time : {callable, float}, optional
-        Definition of how the maximum stride time is calculated. Either a callable
+        The maximum stride time possible for a single stride. Either a callable
         with the input of the mean step time, or a float, which will be used as a
-        static limit. Default is the function `2.0 * mean_step_time + 1.0`.
+        static limit. Default is the function :math:`2.0 * mean\_step\_time + 1.0`.
     loading_factor : {callable, float}, optional
-        Definition of the loading factor. Either a callable with the input of mean
-        step time, or a float (between 0.0 and 1.0) indicating a static factor.
-        Default is the function `0.17 * mean_step_time + 0.05`.
-
-    Notes
-    -----
-    - `max_stride_time` provides the maximum stride time possible for a single stride.
-    - `loading_factor` is a factor that is multiplied by the `max_stride_time` to obtain
-    values indicating the maximum initial double support and maximum stances times
-    for strides to be deemed physiologically possible, and not discarded.
+        A factor that is multiplied by the `max_stride_time` to obtain values indicating
+        the maximum initial double support and maximum stances times for strides to
+        be deemed physiologically possible, and not discarded. Either a callable
+        with the input of mean step time, or a float (between 0.0 and 1.0) indicating
+        a static factor. Default is the function :math:`0.17 * mean\_step\_time + 0.05`.
     """
 
     def __init__(
@@ -81,7 +76,16 @@ class CreateStridesAndQc(BaseProcess):
 
         Returns
         -------
+        results : dict
+            Dictionary of the results, with the following items that can be used
+            as inputs to downstream processing steps:
 
+            - `qc_initial_contacts`: QC'ed initial contacts
+            - `qc_final_contacts`: QC'ed final contacts, corresponding to `qc_initial_contacts`
+            - `qc_final_contacts_oppfoot`: QC'ed final contacts of the opposite foot, corresponding
+              to those in `qc_initial_contacts`
+            - `forward_cycles`: Number of complete forward cycles that are available,
+              corresponding to `qc_initial_contacts`.
         """
         # get the QC limits for this bout
         mean_step_time = 1 / mean_step_freq
