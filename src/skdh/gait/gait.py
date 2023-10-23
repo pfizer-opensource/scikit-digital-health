@@ -38,6 +38,9 @@ class Gait(BaseProcess):
     from a lumbar mounted wearable inertial measurement unit. If angular velocity
     data is provided, turns are detected, and steps during turns are noted.
 
+    .. deprecated:: 0.13.0
+        `skdh.gait.Gait` has been superseded by `skdh.gaitv3.LumbarGait`
+
     Parameters
     ----------
     correct_accel_orient : bool, optional
@@ -205,6 +208,8 @@ class Gait(BaseProcess):
             downsample_aa_filter=downsample_aa_filter,
             day_window=day_window,
         )
+
+        warn("Deprecated in version 0.13.0. Use `skdh.gaitv3.LumbarGait` instead.", DeprecationWarning)
 
         self.corr_accel_orient = correct_accel_orient
         self.use_opt_scale = use_cwt_scale_relation
@@ -459,6 +464,8 @@ class Gait(BaseProcess):
             gait_pred=gait_pred,
             **kwargs,
         )
+        warn("Deprecated in version 0.13.0. Use `skdh.gaitv3.LumbarGait` instead.",
+             DeprecationWarning)
 
         if height is None:
             warn("height not provided, not computing spatial endpoints", UserWarning)

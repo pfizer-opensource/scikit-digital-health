@@ -13,8 +13,6 @@ Pipeline gait processing
     PredictGaitLumbarLgbm
     GaitLumbar
 
-
-
 Gait Bout Processing
 --------------------
 
@@ -62,6 +60,47 @@ Bout Level Gait Endpoints
     StrideRegularityV
     AutocovarianceSymmetryV
     RegularityIndexV
+
+
+Matching `skdh.gait.Gait`
+-------------------------
+
+Gaitv3 provides an updated interface for predicting gait. However, there is still
+backwards compatability with the original gait module:
+
+.. code-block:: python
+
+    g = GaitLumbar(
+        downsample=True,  # match original always downsampling
+        height_factor=0.53,
+        provide_leg_length=False,
+        min_bout_time=8.0,
+        max_bout_separation_time=0.5,
+        gait_event_method='v cwt',  # match original IC/FC estimation
+        correct_orientation=True,
+        filter_cutoff=20.0,
+        filter_order=4,
+        use_cwt_scale_relation=False,  # True or False
+        wavelet_scale='default',  # default or float or int
+        round_scale=True,  # originally rounded scale to integer, not required though
+        max_stride_time=2.25,  # original QC threshold
+        loading_factor=0.2,  # original QC factor for thresholds
+    )
+
+Note that `GaitLumbar` no longer provides gait classification, this must be added
+via another process:
+
+.. code-block:: python
+
+    from skdh import Pipeline
+    from skdh.gaitv3 import GaitLumbar, PredictGaitLumbarLgbm
+
+    p = Pipeline()
+    p.add(PredictGaitLumbarLgbm())
+    p.add(g)  # from above
+
+    p.run(**data)
+
 
 Background Information
 ----------------------
