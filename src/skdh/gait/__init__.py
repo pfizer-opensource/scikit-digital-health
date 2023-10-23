@@ -1,6 +1,6 @@
 r"""
 IMU Gait Analysis (:mod:`skdh.gait`)
-======================================
+====================================
 
 .. currentmodule:: skdh.gait
 
@@ -22,7 +22,7 @@ Gait Bout Processing
 .. _event-level-gait-endpoints:
 
 Event Level Gait Metrics
---------------------------
+------------------------
 
 .. autosummary::
     :toctree: generated/
@@ -49,7 +49,7 @@ Event Level Gait Metrics
 .. _bout-level-gait-endpoints:
 
 Bout Level Gait Metrics
--------------------------
+-----------------------
 
 .. autosummary::
     :toctree: generated/
@@ -63,7 +63,7 @@ Bout Level Gait Metrics
 
 
 Matching `skdh.gait_old.Gait`
--------------------------
+-----------------------------
 
 Gait provides an updated interface for predicting gait. However, there is still
 backwards compatability with the original gait module (now `gait_old`:

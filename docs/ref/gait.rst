@@ -1,4 +1,4 @@
-.. _skdh gaitv3:
+.. _skdh gait:
 
-.. automodule:: skdh.gaitv3
+.. automodule:: skdh.gait
     :ignore-module-all:
