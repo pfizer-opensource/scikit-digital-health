@@ -76,6 +76,10 @@ class GaitLumbar(BaseProcess):
         Either a callable with the input of mean step time, or a float (between 0.0
         and 1.0) indicating a static factor. Default ("default") is the function
         :math:`0.17 * mean\\_step\\_time + 0.05`.
+    day_window : array-like
+        Two (2) element array-like of the base and period of the window to use for determining
+        days. Default is (0, 24), which will look for days starting at midnight and lasting 24
+        hours. None removes any day-based windowing.
 
     Other Parameters
     ----------------
@@ -195,6 +199,7 @@ class GaitLumbar(BaseProcess):
         max_stride_time="default",
         loading_factor="default",
         bout_processing_pipeline=None,
+        day_window=(0, 24),
     ):
         super().__init__(
             downsample=downsample,
@@ -212,6 +217,7 @@ class GaitLumbar(BaseProcess):
             max_stride_time=max_stride_time,
             loading_factor=loading_factor,
             bout_processing_pipeline=bout_processing_pipeline,
+            day_window=day_window,
         )
 
         self.downsample = downsample
