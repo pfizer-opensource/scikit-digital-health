@@ -85,8 +85,8 @@ if __name__ == "__main__":
     keys_turn = keys + ['Turn']
 
     # old data file
-    old = np.load("gait_results_vcwt.npz")
-    old_turn = np.load("gait_results2_vcwt.npz")
+    # old = np.load("gait_results_vcwt.npz")
+    # old_turn = np.load("gait_results2_vcwt.npz")
 
     tmp = {k: df.loc[:, k].values for k in keys}
     # tmp.update(
