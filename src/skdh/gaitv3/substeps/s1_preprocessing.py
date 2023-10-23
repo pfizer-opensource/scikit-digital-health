@@ -9,7 +9,7 @@ from scipy.signal import detrend, butter, sosfiltfilt, find_peaks
 
 from skdh.base import BaseProcess, handle_process_returns
 from skdh.utility import correct_accelerometer_orientation
-from skdh.gait.gait_endpoints import gait_endpoints
+from skdh.gaitv3.gait_endpoints import gait_endpoints
 
 
 class PreprocessGaitBout(BaseProcess):
