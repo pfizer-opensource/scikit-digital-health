@@ -1,6 +1,6 @@
 import pytest
 
-from skdh.gaitv3.utility import get_gait_bouts
+from skdh.gait.utility import get_gait_bouts
 
 
 @pytest.mark.parametrize("case", (1, 2, 3, 4))

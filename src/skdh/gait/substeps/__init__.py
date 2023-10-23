@@ -1,10 +1,10 @@
 r"""
 .. _bout processing:
 
-Gait Bout Processing (:mod:`skdh.gaitv3.substeps`)
+Gait Bout Processing (:mod:`skdh.gait.substeps`)
 ==================================================
 
-.. currentmodule:: skdh.gaitv3.substeps
+.. currentmodule:: skdh.gait.substeps
 
 .. autosummary::
     :toctree: generated/
@@ -72,13 +72,13 @@ Example code is below (from `CreateStridesAndQc`):
     
             return res
 """
-from skdh.gaitv3.substeps.s1_preprocessing import PreprocessGaitBout
-from skdh.gaitv3.substeps.s2_contact_events import (
+from skdh.gait.substeps.s1_preprocessing import PreprocessGaitBout
+from skdh.gait.substeps.s2_contact_events import (
     VerticalCwtGaitEvents,
     ApCwtGaitEvents,
 )
-from skdh.gaitv3.substeps.s3_stride_creation import CreateStridesAndQc
-from skdh.gaitv3.substeps.s4_turns import TurnDetection
+from skdh.gait.substeps.s3_stride_creation import CreateStridesAndQc
+from skdh.gait.substeps.s4_turns import TurnDetection
 
 __all__ = [
     "PreprocessGaitBout",

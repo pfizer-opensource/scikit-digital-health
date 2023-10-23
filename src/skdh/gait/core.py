@@ -14,10 +14,10 @@ from skdh.base import BaseProcess, handle_process_returns
 from skdh.utility.internal import rle, apply_downsample
 from skdh.utility.exceptions import LowFrequencyError
 
-from skdh.gaitv3.gait_metrics import GaitEventEndpoint, GaitBoutEndpoint
-from skdh.gaitv3.gait_metrics import gait_metrics
-from skdh.gaitv3.utility import get_gait_bouts
-from skdh.gaitv3 import substeps
+from skdh.gait.gait_metrics import GaitEventEndpoint, GaitBoutEndpoint
+from skdh.gait.gait_metrics import gait_metrics
+from skdh.gait.utility import get_gait_bouts
+from skdh.gait import substeps
 
 
 class GaitLumbar(BaseProcess):

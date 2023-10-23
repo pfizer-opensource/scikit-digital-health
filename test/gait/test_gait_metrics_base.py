@@ -1,7 +1,7 @@
 import pytest
 from numpy import array, allclose, arange, nan, isnan
 
-from skdh.gaitv3 import gait_metrics
+from skdh.gait import gait_metrics
 
 
 class EventEndpoint1Test(gait_metrics.GaitEventEndpoint):

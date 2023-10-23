@@ -10,7 +10,7 @@ from skdh.activity.core import (
     ActivityLevelClassification,
 )
 from skdh.activity import endpoints as epts
-from skdh.gaitv3 import gait_metrics
+from skdh.gait import gait_metrics
 
 
 class Test_update_date_results:

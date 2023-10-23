@@ -2,9 +2,9 @@ import pytest
 from numpy import allclose, array
 
 from skdh import Pipeline
-from skdh.gaitv3.core import GaitLumbar
-from skdh.gaitv3 import substeps
-from skdh.gaitv3 import gait_metrics, PredictGaitLumbarLgbm
+from skdh.gait.core import GaitLumbar
+from skdh.gait import substeps
+from skdh.gait import gait_metrics, PredictGaitLumbarLgbm
 from skdh.utility.exceptions import LowFrequencyError
 
 

@@ -140,7 +140,7 @@ class PredictGaitLumbarLgbm(BaseProcess):
         # get the feature bank
         feat_bank = Bank()  # data is already windowed
         feat_bank.load(
-            _resolve_path("skdh.gaitv3.model", "final_features.json")
+            _resolve_path("skdh.gait.model", "final_features.json")
         )
 
         # compute the features
@@ -150,7 +150,7 @@ class PredictGaitLumbarLgbm(BaseProcess):
         # load the classification model
         lgb_file = str(
             _resolve_path(
-                "skdh.gaitv3.model", f"lgbm_gait_classifier_no-stairs_{suffix}.lgbm"
+                "skdh.gait.model", f"lgbm_gait_classifier_no-stairs_{suffix}.lgbm"
             )
         )
         bst = lgb.Booster(model_file=lgb_file)

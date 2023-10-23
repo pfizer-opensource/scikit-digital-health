@@ -5,5 +5,5 @@ py3.install_sources(
         'gait_metrics.py',
     ],
     pure: false,
-    subdir: 'skdh/gaitv3/gait_metrics',
+    subdir: 'skdh/gait/gait_metrics',
 )

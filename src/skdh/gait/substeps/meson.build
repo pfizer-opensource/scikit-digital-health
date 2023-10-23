@@ -7,5 +7,5 @@ py3.install_sources(
         's4_turns.py',
     ],
     pure: false,
-    subdir: 'skdh/gaitv3/substeps',
+    subdir: 'skdh/gait/substeps',
 )

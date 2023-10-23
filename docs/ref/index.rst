@@ -12,7 +12,7 @@ SKDH Reference
     features
     sleep
     activity
-    gaitv3
+    gait
     gait_old
     sit2stand
     utility

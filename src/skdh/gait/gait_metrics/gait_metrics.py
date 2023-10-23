@@ -57,7 +57,7 @@ from scipy.signal import butter, sosfiltfilt, find_peaks, detrend
 from scipy.integrate import cumulative_trapezoid
 
 
-from skdh.gaitv3.gait_metrics.base import (
+from skdh.gait.gait_metrics.base import (
     GaitEventEndpoint,
     GaitBoutEndpoint,
     basic_asymmetry,

@@ -1,8 +1,8 @@
 r"""
-IMU Gait Analysis (:mod:`skdh.gaitv3`)
+IMU Gait Analysis (:mod:`skdh.gait`)
 ======================================
 
-.. currentmodule:: skdh.gaitv3
+.. currentmodule:: skdh.gait
 
 Pipeline gait processing
 ------------------------
@@ -16,10 +16,10 @@ Pipeline gait processing
 Gait Bout Processing
 --------------------
 
-*See Below:* :mod:`skdh.gaitv3.substeps`
+*See Below:* :mod:`skdh.gait.substeps`
 
 
-.. _event-level-gaitv3-endpoints:
+.. _event-level-gait-endpoints:
 
 Event Level Gait Metrics
 --------------------------
@@ -46,7 +46,7 @@ Event Level Gait Metrics
     IntraStrideCovarianceV
     HarmonicRatioV
 
-.. _bout-level-gaitv3-endpoints:
+.. _bout-level-gait-endpoints:
 
 Bout Level Gait Metrics
 -------------------------
@@ -62,11 +62,11 @@ Bout Level Gait Metrics
     RegularityIndexV
 
 
-Matching `skdh.gait.Gait`
+Matching `skdh.gait_old.Gait`
 -------------------------
 
-Gaitv3 provides an updated interface for predicting gait. However, there is still
-backwards compatability with the original gait module:
+Gait provides an updated interface for predicting gait. However, there is still
+backwards compatability with the original gait module (now `gait_old`:
 
 .. code-block:: python
 
@@ -93,7 +93,7 @@ via another process:
 .. code-block:: python
 
     from skdh import Pipeline
-    from skdh.gaitv3 import GaitLumbar, PredictGaitLumbarLgbm
+    from skdh.gait import GaitLumbar, PredictGaitLumbarLgbm
 
     p = Pipeline()
     p.add(PredictGaitLumbarLgbm())
@@ -242,12 +242,12 @@ defined on a per-event level):
 
 
 
-.. automodule:: skdh.gaitv3.substeps
+.. automodule:: skdh.gait.substeps
     :ignore-module-all:
 """
-from skdh.gaitv3.core import GaitLumbar
-from skdh.gaitv3.gait_classification import PredictGaitLumbarLgbm
-from skdh.gaitv3 import substeps
-from skdh.gaitv3.substeps import *
-from skdh.gaitv3.gait_metrics import *
-from skdh.gaitv3 import gait_metrics
+from skdh.gait.core import GaitLumbar
+from skdh.gait.gait_classification import PredictGaitLumbarLgbm
+from skdh.gait import substeps
+from skdh.gait.substeps import *
+from skdh.gait.gait_metrics import *
+from skdh.gait import gait_metrics

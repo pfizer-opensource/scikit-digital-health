@@ -1,7 +1,7 @@
 from numpy import allclose, arange, sin, pi, array
 from scipy.signal import butter, sosfiltfilt, detrend
 
-from skdh.gaitv3.substeps import PreprocessGaitBout, VerticalCwtGaitEvents, ApCwtGaitEvents, CreateStridesAndQc, TurnDetection
+from skdh.gait.substeps import PreprocessGaitBout, VerticalCwtGaitEvents, ApCwtGaitEvents, CreateStridesAndQc, TurnDetection
 
 
 def test_preprocessing(t_and_x):

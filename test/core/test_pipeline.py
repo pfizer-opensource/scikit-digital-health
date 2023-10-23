@@ -8,7 +8,7 @@ import pytest
 import yaml
 
 from skdh.pipeline import Pipeline, NotAProcessError, ProcessNotFoundError, VersionError
-from skdh.gaitv3 import GaitLumbar
+from skdh.gait import GaitLumbar
 from skdh import __version__ as skdh_vers
 
 

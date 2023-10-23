@@ -1,7 +1,7 @@
 import pytest
 from numpy import allclose, array
 
-from skdh.gaitv3 import PredictGaitLumbarLgbm
+from skdh.gait import PredictGaitLumbarLgbm
 from skdh.utility.exceptions import LowFrequencyError
 
 

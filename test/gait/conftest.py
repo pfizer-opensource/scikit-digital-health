@@ -55,12 +55,12 @@ def d_gait_aux():
 def gait_input_50():
     cwd = Path.cwd().parts
 
-    if cwd[-1] == "gaitv3":
+    if cwd[-1] == "gait":
         path = Path("data/gait_input.npz")
     elif cwd[-1] == "test":
-        path = Path("gaitv3/data/gait_input.npz")
+        path = Path("gait/data/gait_input.npz")
     elif cwd[-1] == "scikit-digital-health":
-        path = Path("test/gaitv3/data/gait_input.npz")
+        path = Path("test/gait/data/gait_input.npz")
 
     data = load(path)
     t = data["time"]
@@ -75,12 +75,12 @@ def gait_input_50():
 def gait_res_50_apcwt():
     cwd = Path.cwd().parts
 
-    if cwd[-1] == "gaitv3":
+    if cwd[-1] == "gait":
         path = Path("data/gait_results_apcwt.npz")
     elif cwd[-1] == "test":
-        path = Path("gaitv3/data/gait_results_apcwt.npz")
+        path = Path("gait/data/gait_results_apcwt.npz")
     elif cwd[-1] == "scikit-digital-health":
-        path = Path("test/gaitv3/data/gait_results_apcwt.npz")
+        path = Path("test/gait/data/gait_results_apcwt.npz")
 
     return load(path)
 
@@ -89,12 +89,12 @@ def gait_res_50_apcwt():
 def gait_res_50_vcwt():
     cwd = Path.cwd().parts
 
-    if cwd[-1] == "gaitv3":
+    if cwd[-1] == "gait":
         path = Path("data/gait_results_vcwt.npz")
     elif cwd[-1] == "test":
-        path = Path("gaitv3/data/gait_results_vcwt.npz")
+        path = Path("gait/data/gait_results_vcwt.npz")
     elif cwd[-1] == "scikit-digital-health":
-        path = Path("test/gaitv3/data/gait_results_vcwt.npz")
+        path = Path("test/gait/data/gait_results_vcwt.npz")
 
     return load(path)
 
@@ -103,12 +103,12 @@ def gait_res_50_vcwt():
 def gait_input_gyro():
     cwd = Path.cwd().parts
 
-    if cwd[-1] == "gaitv3":
+    if cwd[-1] == "gait":
         path = Path("data/gait_input2.npz")
     elif cwd[-1] == "test":
-        path = Path("gaitv3/data/gait_input2.npz")
+        path = Path("gait/data/gait_input2.npz")
     elif cwd[-1] == "scikit-digital-health":
-        path = Path("test/gaitv3/data/gait_input2.npz")
+        path = Path("test/gait/data/gait_input2.npz")
 
     data = load(path)
     t = data["time"]
@@ -122,12 +122,12 @@ def gait_input_gyro():
 def gait_res_gyro_apcwt():
     cwd = Path.cwd().parts
 
-    if cwd[-1] == "gaitv3":
+    if cwd[-1] == "gait":
         path = Path("data/gait_results2_apcwt.npz")
     elif cwd[-1] == "test":
-        path = Path("gaitv3/data/gait_results2_apcwt.npz")
+        path = Path("gait/data/gait_results2_apcwt.npz")
     elif cwd[-1] == "scikit-digital-health":
-        path = Path("test/gaitv3/data/gait_results2_apcwt.npz")
+        path = Path("test/gait/data/gait_results2_apcwt.npz")
 
     return load(path)
 
@@ -136,12 +136,12 @@ def gait_res_gyro_apcwt():
 def gait_res_gyro_vcwt():
     cwd = Path.cwd().parts
 
-    if cwd[-1] == "gaitv3":
+    if cwd[-1] == "gait":
         path = Path("data/gait_results2_vcwt.npz")
     elif cwd[-1] == "test":
-        path = Path("gaitv3/data/gait_results2_vcwt.npz")
+        path = Path("gait/data/gait_results2_vcwt.npz")
     elif cwd[-1] == "scikit-digital-health":
-        path = Path("test/gaitv3/data/gait_results2_vcwt.npz")
+        path = Path("test/gait/data/gait_results2_vcwt.npz")
 
     return load(path)
 

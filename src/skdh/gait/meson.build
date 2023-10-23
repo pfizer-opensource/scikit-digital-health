@@ -6,7 +6,7 @@ py3.install_sources(
         'utility.py',
     ],
     pure: false,
-    subdir: 'skdh/gaitv3',
+    subdir: 'skdh/gait',
 )
 
 subdir('model')

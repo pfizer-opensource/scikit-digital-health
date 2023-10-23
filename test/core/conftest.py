@@ -57,7 +57,7 @@ def dummy_pipeline():
             {
                 "GaitLumbar": {
                     "package": "skdh",
-                    "module": "gaitv3.core",
+                    "module": "gait.core",
                     "parameters": {},
                     "save_file": "gait_results.csv",
                     "plot_file": None,
