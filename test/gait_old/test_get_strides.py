@@ -1,6 +1,6 @@
 from numpy import allclose, array, arange, pi, sin, sum, unique
 
-from skdh.gait.get_strides import get_strides
+from skdh.gait_old.get_strides import get_strides
 
 
 def test_get_strides():

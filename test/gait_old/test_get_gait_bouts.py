@@ -1,6 +1,6 @@
 import pytest
 
-from skdh.gait.get_gait_bouts import get_gait_bouts
+from skdh.gait_old.get_gait_bouts import get_gait_bouts
 
 
 @pytest.mark.parametrize("case", (1, 2, 3, 4))

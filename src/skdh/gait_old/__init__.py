@@ -1,8 +1,8 @@
 r"""
-IMU Gait Analysis (:mod:`skdh.gait`)
+IMU Gait Analysis [Old] (:mod:`skdh.gait_old`)
 ====================================
 
-.. currentmodule:: skdh.gait
+.. currentmodule:: skdh.gait_old
 
 Pipeline gait processing
 ------------------------
@@ -12,7 +12,7 @@ Pipeline gait processing
 
     Gait
 
-.. _event-level-gait-endpoints:
+.. _event-level-gait_old-endpoints:
 
 Event Level Gait Endpoints
 --------------------------
@@ -36,7 +36,7 @@ Event Level Gait Endpoints
     IntraStrideCovarianceV
     HarmonicRatioV
 
-.. _bout-level-gait-endpoints:
+.. _bout-level-gait_old-endpoints:
 
 Bout Level Gait Endpoints
 -------------------------
@@ -85,7 +85,7 @@ Adding Custom Gait Endpoints
 A modular system for computing gait endpoints is employed to aid in the addition of custom gait
 endpoints. Two base classes exist depending on what type of endpoint is being added:
 
-- `gait_endpoints.GaitEventEndpoint` for per- step/stride endpoints
+- `gait_endpoints.GaitEventEndpoint` for per-step/-stride endpoints
 - `gait_endpoints.GaitBoutEndpoint` for per-bout endpoints
 
 New endpoints should be subclasses of either of these base classes, which provide some basic
@@ -93,7 +93,7 @@ functionality behind the scenes. The definition and initialization is very strai
 
 .. code-block:: python
 
-    from skdh.gait.gait_endspoints import GaitEventEndpoint, basic_symmetry
+    from skdh.gait_old.gait_endpoints import GaitEventEndpoint, basic_symmetry
 
 
     class NewEndpoint(GaitEventEndpoint):
@@ -109,7 +109,7 @@ To implement the feature computation, the `_predict` method should be defined
 
 .. code-block:: python
 
-    from skdh.gait.gait_endpoints import GaitEventEndpoint
+    from skdh.gait_old.gait_endpoints import GaitEventEndpoint
 
 
     class NewEndpoint(GaitEventEndpoint):
@@ -149,7 +149,7 @@ above the `_predict` definition:
 
 .. code-block:: python
 
-    from skdh.gait.gait_endpoints import GaitEventEndpoint, basic_symmetry
+    from skdh.gait_old.gait_endpoints import GaitEventEndpoint, basic_symmetry
 
 
     class NewEndpoint(GaitEventEndpoint):
@@ -165,7 +165,7 @@ defined on a per-event level):
 
 .. code-block:: python
 
-    from skdh.gait.gait_endpoints import GaitBoutEndpoint
+    from skdh.gait_old.gait_endpoints import GaitBoutEndpoint
 
 
     class StepRegularityV(GaitBoutEndpoint):
@@ -189,7 +189,7 @@ defined on a per-event level):
             # broadcast step regularity into gait for each step
             gait[self.k_] = stepreg[gait_aux['inertial data i']]
 """
-from skdh.gait.gait import Gait
-from skdh.gait import gait
-from skdh.gait.gait_endpoints import *
-from skdh.gait import gait_endpoints
+from skdh.gait_old.gait import Gait
+from skdh.gait_old import gait
+from skdh.gait_old.gait_endpoints import *
+from skdh.gait_old import gait_endpoints

@@ -1,7 +1,7 @@
 import pytest
 from numpy import allclose, array
 
-from skdh.gait.get_gait_classification import get_gait_classification_lgbm
+from skdh.gait_old.get_gait_classification import get_gait_classification_lgbm
 
 
 class Test_get_gait_classification_lgbm:

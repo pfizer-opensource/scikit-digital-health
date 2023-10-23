@@ -19,25 +19,6 @@ def t_and_x():
 
 
 @fixture(scope='module')
-def gait_input_gyro():
-    cwd = Path.cwd().parts
-
-    if cwd[-1] == "gaitv3":
-        path = Path("data/gait_input2.npz")
-    elif cwd[-1] == "test":
-        path = Path("gaitv3/data/gait_input2.npz")
-    elif cwd[-1] == "scikit-digital-health":
-        path = Path("test/gaitv3/data/gait_input2.npz")
-
-    data = load(path)
-    t = data["time"]
-    acc = data["accel"]
-    gyr = data["gyro"]
-
-    return t, acc, gyr
-
-
-@fixture(scope='module')
 def d_gait():
     gait = {
         "IC": array([50, 100, 150, 200, 250, 300, 350, 400]),

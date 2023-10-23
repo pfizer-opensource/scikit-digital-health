@@ -72,7 +72,7 @@ def get_gait_classification_lgbm(gait_starts, gait_stops, accel, fs):
 
         # get the feature bank
         feat_bank = Bank()  # data is already windowed
-        feat_bank.load(_resolve_path("skdh.gait.model", "final_features.json"))
+        feat_bank.load(_resolve_path("skdh.gait_old.model", "final_features.json"))
 
         # compute the features
         accel_feats = feat_bank.compute(accel_w, fs=fs, axis=1, index_axis=None)
@@ -81,7 +81,7 @@ def get_gait_classification_lgbm(gait_starts, gait_stops, accel, fs):
         # load the classification model
         lgb_file = str(
             _resolve_path(
-                "skdh.gait.model", f"lgbm_gait_classifier_no-stairs_{suffix}.lgbm"
+                "skdh.gait_old.model", f"lgbm_gait_classifier_no-stairs_{suffix}.lgbm"
             )
         )
         bst = lgb.Booster(model_file=lgb_file)

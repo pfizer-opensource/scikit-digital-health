@@ -56,7 +56,7 @@ from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt, find_peaks
 
 
-from skdh.gait.gait_endpoints.base import (
+from skdh.gait_old.gait_endpoints.base import (
     GaitEventEndpoint,
     GaitBoutEndpoint,
     basic_asymmetry,

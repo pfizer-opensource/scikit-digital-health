@@ -1,6 +1,6 @@
 from numpy import isclose, allclose, arange, sin, pi, zeros
 
-from skdh.gait.get_gait_events import get_cwt_scales, get_gait_events
+from skdh.gait_old.get_gait_events import get_cwt_scales, get_gait_events
 
 
 def test_get_cwt_scales():

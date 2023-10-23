@@ -33,7 +33,7 @@ from skdh import io
 from skdh import preprocessing
 from skdh import sleep
 from skdh import activity
-from skdh import gait
+from skdh import gait_old
 from skdh import gaitv3
 from skdh import sit2stand
 from skdh import features
@@ -46,7 +46,7 @@ __all__ = [
     "Pipeline",
     "BaseProcess",
     "activity",
-    "gait",
+    "gait_old",
     "gaitv3",
     "sit2stand",
     "io",

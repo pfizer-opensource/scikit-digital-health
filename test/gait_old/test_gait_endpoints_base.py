@@ -1,7 +1,7 @@
 import pytest
 from numpy import array, allclose, arange, nan, isnan
 
-from skdh.gait import gait_endpoints as endpoints
+from skdh.gait_old import gait_endpoints as endpoints
 
 
 class EventEndpoint1Test(endpoints.GaitEventEndpoint):

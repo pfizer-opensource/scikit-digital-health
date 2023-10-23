@@ -5,5 +5,5 @@ py3.install_sources(
         'gait_endpoints.py',
     ],
     pure: false,
-    subdir: 'skdh/gait/gait_endpoints',
+    subdir: 'skdh/gait_old/gait_endpoints',
 )

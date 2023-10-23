@@ -8,7 +8,7 @@ import pytest
 import yaml
 
 from skdh.pipeline import Pipeline, NotAProcessError, ProcessNotFoundError, VersionError
-from skdh.gait import Gait
+from skdh.gaitv3 import GaitLumbar
 from skdh import __version__ as skdh_vers
 
 
@@ -149,13 +149,13 @@ class TestPipeline:
             with pytest.warns(UserWarning):
                 p = Pipeline(dict(file=str(fname)))
 
-        assert p._steps == [Gait()]
+        assert p._steps == [GaitLumbar()]
 
         # Test loading from a yaml string
         dummy_pipe_str = yaml.dump(dummy_pipeline)
         p2 = Pipeline(dict(yaml_str=dummy_pipe_str))
 
-        assert p2._steps == [Gait()]
+        assert p2._steps == [GaitLumbar()]
 
     def test_load_function(self, dummy_pipeline):
         p = Pipeline()
@@ -173,12 +173,12 @@ class TestPipeline:
             ):
                 p.load(str(fname))
 
-        assert p._steps == [Gait()]
+        assert p._steps == [GaitLumbar()]
 
         pipe_str = yaml.dump(dummy_pipeline)
         p2.load(yaml_str=pipe_str)
 
-        assert p2._steps == [Gait()]
+        assert p2._steps == [GaitLumbar()]
 
         # check for the deprecation warning for json input
         pipe_str_json = json.dumps(dummy_pipeline)

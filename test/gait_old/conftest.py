@@ -89,12 +89,12 @@ def get_bgait_samples_truth():  # boolean gait classification
 def gait_input_50():
     cwd = Path.cwd().parts
 
-    if cwd[-1] == "gait":
+    if cwd[-1] == "gait_old":
         path = Path("data/gait_input.npz")
     elif cwd[-1] == "test":
-        path = Path("gait/data/gait_input.npz")
+        path = Path("gait_old/data/gait_input.npz")
     elif cwd[-1] == "scikit-digital-health":
-        path = Path("test/gait/data/gait_input.npz")
+        path = Path("test/gait_old/data/gait_input.npz")
 
     data = load(path)
     t = data["time"]
@@ -109,12 +109,12 @@ def gait_input_50():
 def gait_res_50():
     cwd = Path.cwd().parts
 
-    if cwd[-1] == "gait":
+    if cwd[-1] == "gait_old":
         path = Path("data/gait_results.npz")
     elif cwd[-1] == "test":
-        path = Path("gait/data/gait_results.npz")
+        path = Path("gait_old/data/gait_results.npz")
     elif cwd[-1] == "scikit-digital-health":
-        path = Path("test/gait/data/gait_results.npz")
+        path = Path("test/gait_old/data/gait_results.npz")
 
     return load(path)
 
@@ -123,12 +123,12 @@ def gait_res_50():
 def gait_input_gyro():
     cwd = Path.cwd().parts
 
-    if cwd[-1] == "gait":
+    if cwd[-1] == "gait_old":
         path = Path("data/gait_input2.npz")
     elif cwd[-1] == "test":
-        path = Path("gait/data/gait_input2.npz")
+        path = Path("gait_old/data/gait_input2.npz")
     elif cwd[-1] == "scikit-digital-health":
-        path = Path("test/gait/data/gait_input2.npz")
+        path = Path("test/gait_old/data/gait_input2.npz")
 
     data = load(path)
     t = data["time"]
@@ -142,11 +142,11 @@ def gait_input_gyro():
 def gait_res_gyro():
     cwd = Path.cwd().parts
 
-    if cwd[-1] == "gait":
+    if cwd[-1] == "gait_old":
         path = Path("data/gait_results2.npz")
     elif cwd[-1] == "test":
-        path = Path("gait/data/gait_results2.npz")
+        path = Path("gait_old/data/gait_results2.npz")
     elif cwd[-1] == "scikit-digital-health":
-        path = Path("test/gait/data/gait_results2.npz")
+        path = Path("test/gait_old/data/gait_results2.npz")
 
     return load(path)

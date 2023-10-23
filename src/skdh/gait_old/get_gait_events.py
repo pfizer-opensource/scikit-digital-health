@@ -10,7 +10,7 @@ from scipy.integrate import cumtrapz
 from pywt import cwt
 
 from skdh.utility import correct_accelerometer_orientation
-from skdh.gait.gait_endpoints import gait_endpoints
+from skdh.gait_old.gait_endpoints import gait_endpoints
 
 
 def get_cwt_scales(use_optimal_scale, vertical_velocity, original_scale, fs):

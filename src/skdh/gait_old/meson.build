@@ -9,7 +9,7 @@ py3.install_sources(
         'get_turns.py',
     ],
     pure: false,
-    subdir: 'skdh/gait',
+    subdir: 'skdh/gait_old',
 )
 
 subdir('gait_endpoints')

@@ -6,5 +6,5 @@ py3.install_sources(
         'lgbm_gait_classifier_no-stairs_50hz.lgbm',
     ],
     pure: false,
-    subdir: 'skdh/gait/model',
+    subdir: 'skdh/gait_old/model',
 )

@@ -20,15 +20,15 @@ from skdh.base import BaseProcess, handle_process_returns
 from skdh.utility.internal import apply_downsample, rle
 from skdh.utility.exceptions import LowFrequencyError
 
-from skdh.gait.get_gait_classification import (
+from skdh.gait_old.get_gait_classification import (
     get_gait_classification_lgbm,
 )
-from skdh.gait.get_gait_bouts import get_gait_bouts
-from skdh.gait.get_gait_events import get_gait_events
-from skdh.gait.get_strides import get_strides
-from skdh.gait.get_turns import get_turns
-from skdh.gait.gait_endpoints import gait_endpoints
-from skdh.gait.gait_endpoints import GaitEventEndpoint, GaitBoutEndpoint
+from skdh.gait_old.get_gait_bouts import get_gait_bouts
+from skdh.gait_old.get_gait_events import get_gait_events
+from skdh.gait_old.get_strides import get_strides
+from skdh.gait_old.get_turns import get_turns
+from skdh.gait_old.gait_endpoints import gait_endpoints
+from skdh.gait_old.gait_endpoints import GaitEventEndpoint, GaitBoutEndpoint
 
 
 class Gait(BaseProcess):
