@@ -18,7 +18,7 @@ class TestGait:
             provide_leg_length=False,
             min_bout_time=8.0,
             max_bout_separation_time=0.5,
-            gait_event_method='AP CWT',
+            gait_event_method="AP CWT",
             correct_orientation=True,
             filter_cutoff=20.0,
             filter_order=4,
@@ -49,7 +49,7 @@ class TestGait:
             filter_cutoff=20.0,
             filter_order=4,
             use_cwt_scale_relation=True,
-            wavelet_scale='default',
+            wavelet_scale="default",
             round_scale=True,
             max_stride_time=2.25,
             loading_factor=0.2,
@@ -73,7 +73,7 @@ class TestGait:
             provide_leg_length=False,
             min_bout_time=8.0,
             max_bout_separation_time=0.5,
-            gait_event_method='AP CWT',
+            gait_event_method="AP CWT",
             correct_orientation=True,
             filter_cutoff=20.0,
             filter_order=4,
@@ -97,7 +97,7 @@ class TestGait:
             provide_leg_length=False,
             min_bout_time=8.0,
             max_bout_separation_time=0.5,
-            gait_event_method='v cwt',
+            gait_event_method="v cwt",
             correct_orientation=True,
             filter_cutoff=20.0,
             filter_order=4,
@@ -117,7 +117,7 @@ class TestGait:
 
     def test_event_method_input_error(self):
         with pytest.raises(ValueError):
-            g = GaitLumbar(gait_event_method='test')
+            g = GaitLumbar(gait_event_method="test")
 
     def test_bout_pipeline_input(self):
         b = Pipeline()
@@ -171,15 +171,21 @@ class TestGait:
         assert allclose(stops, [9, 11])
 
         with pytest.raises(ValueError):
-            GaitLumbar._handle_input_gait_predictions(None, array([1, 1, 1, 0, 0, 1]), 15)
+            GaitLumbar._handle_input_gait_predictions(
+                None, array([1, 1, 1, 0, 0, 1]), 15
+            )
 
         # ====================================
         # gait_bout values
-        starts, stops = GaitLumbar._handle_input_gait_predictions(array([[0, 4], [6, 8]]), None, 10)
+        starts, stops = GaitLumbar._handle_input_gait_predictions(
+            array([[0, 4], [6, 8]]), None, 10
+        )
         assert allclose(starts, [0, 6])
         assert allclose(stops, [4, 8])
 
-        starts, stops = GaitLumbar._handle_input_gait_predictions(array([[0, 4], [6, 8]]), True, 10)
+        starts, stops = GaitLumbar._handle_input_gait_predictions(
+            array([[0, 4], [6, 8]]), True, 10
+        )
         assert allclose(starts, [0, 6])
         assert allclose(stops, [4, 8])
 

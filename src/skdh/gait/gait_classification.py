@@ -7,7 +7,16 @@ Copyright (c) 2023, Pfizer Inc. All rights reserved.
 from sys import version_info
 from warnings import warn
 
-from numpy import mean, diff, ascontiguousarray, int_, around, interp, arange, concatenate
+from numpy import (
+    mean,
+    diff,
+    ascontiguousarray,
+    int_,
+    around,
+    interp,
+    arange,
+    concatenate,
+)
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt
 import lightgbm as lgb
@@ -49,10 +58,8 @@ class PredictGaitLumbarLgbm(BaseProcess):
         Apply an anti-aliasing filter when downsampling accelerometer data. Default
         is True.
     """
-    def __init__(
-            self,
-            downsample_aa_filter=True
-    ):
+
+    def __init__(self, downsample_aa_filter=True):
         super().__init__(
             downsample_aa_filter=downsample_aa_filter,
         )
@@ -131,7 +138,7 @@ class PredictGaitLumbarLgbm(BaseProcess):
         # used to try to minimize false positives
 
         # band pass filter
-        sos = butter(1, [2 * 0.25 / fs, 2 * 5.0 / fs], btype='band', output='sos')
+        sos = butter(1, [2 * 0.25 / fs, 2 * 5.0 / fs], btype="band", output="sos")
         accel_filt = ascontiguousarray(sosfiltfilt(sos, norm(accel_ds, axis=1)))
 
         # window data, data will already be c-contiguous
@@ -139,9 +146,7 @@ class PredictGaitLumbarLgbm(BaseProcess):
 
         # get the feature bank
         feat_bank = Bank()  # data is already windowed
-        feat_bank.load(
-            _resolve_path("skdh.gait.model", "final_features.json")
-        )
+        feat_bank.load(_resolve_path("skdh.gait.model", "final_features.json"))
 
         # compute the features
         accel_feats = feat_bank.compute(accel_w, fs=goal_fs, axis=1, index_axis=None)
@@ -171,14 +176,10 @@ class PredictGaitLumbarLgbm(BaseProcess):
 
         # upsample indices back to original data
         bout_starts = around(
-            interp(
-                time_ds[bout_starts_ds], time, arange(time.size)
-            )
+            interp(time_ds[bout_starts_ds], time, arange(time.size))
         ).astype(int_)
         bout_stops = around(
-            interp(
-                time_ds[bout_stops_ds], time, arange(time.size)
-            )
+            interp(time_ds[bout_stops_ds], time, arange(time.size))
         ).astype(int_)
 
         bouts = concatenate((bout_starts, bout_stops)).reshape((2, -1)).T
@@ -190,4 +191,4 @@ class PredictGaitLumbarLgbm(BaseProcess):
             "Gait Bout Stop Index": bout_stops,
         }
 
-        return results, {'gait_bouts': bouts}
+        return results, {"gait_bouts": bouts}

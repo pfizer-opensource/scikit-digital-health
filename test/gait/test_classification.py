@@ -15,14 +15,14 @@ class TestPredictGaitLumbarLgbm:
         kw, res = proc.predict(time=t, accel=acc, fs=50.0)
 
         # make sure they are starting on 3s window multiples
-        assert allclose(res['Gait Bout Start Index'] % 150, 0)
-        assert allclose(res['Gait Bout Stop Index'] % 150, 0)
+        assert allclose(res["Gait Bout Start Index"] % 150, 0)
+        assert allclose(res["Gait Bout Stop Index"] % 150, 0)
 
-        assert allclose(res['Gait Bout Start Index'], [600, 900, 2550])
-        assert allclose(res['Gait Bout Stop Index'], [750, 2400, 3450])
+        assert allclose(res["Gait Bout Start Index"], [600, 900, 2550])
+        assert allclose(res["Gait Bout Stop Index"], [750, 2400, 3450])
 
         # check kw shape
-        assert kw['gait_bouts'].shape == (3, 2)
+        assert kw["gait_bouts"].shape == (3, 2)
 
     def test_warnings_errors(self, gait_input_50):
         t, acc = gait_input_50

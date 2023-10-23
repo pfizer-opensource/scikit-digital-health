@@ -66,9 +66,7 @@ def test_StanceTime(d_gait):
 
     st.predict(fs=50.0, leg_length=1.8, gait=d_gait, gait_aux={})
 
-    assert allclose(
-        d_gait["stance time"], [1.2, 1.3, 1.2, 1.3, 1.2, 1.3, 1.3, 1.1]
-    )
+    assert allclose(d_gait["stance time"], [1.2, 1.3, 1.2, 1.3, 1.2, 1.3, 1.3, 1.1])
 
 
 def test_SwingTime(d_gait):
@@ -157,12 +155,16 @@ def test_StepLengthModel2(d_gait, d_gait_aux):
     sl = StepLengthModel2()
     sl.predict(fs=50.0, leg_length=1.8, gait=d_gait, gait_aux=d_gait_aux)
 
-    lprime = array([0.8352, 0.8352, 0.8352, 0.49095, 0.49095, 0.49095, 0.49095, 0.49095])
+    lprime = array(
+        [0.8352, 0.8352, 0.8352, 0.49095, 0.49095, 0.49095, 0.49095, 0.49095]
+    )
 
-    exp = 2 * 1.8 * d_gait['m2 delta h']
-    exp -= d_gait['m2 delta h']**2
+    exp = 2 * 1.8 * d_gait["m2 delta h"]
+    exp -= d_gait["m2 delta h"] ** 2
     exp = 2 * sqrt(exp)
-    exp += 2 * sqrt(2 * lprime * d_gait['m2 delta h prime'] - d_gait['m2 delta h prime']**2)
+    exp += 2 * sqrt(
+        2 * lprime * d_gait["m2 delta h prime"] - d_gait["m2 delta h prime"] ** 2
+    )
 
     pred = d_gait.pop("step length")
 
@@ -171,7 +173,7 @@ def test_StepLengthModel2(d_gait, d_gait_aux):
     # test with no leg length provided
     sl.predict(fs=50.0, leg_length=None, gait=d_gait, gait_aux=d_gait_aux)
 
-    assert isnan(d_gait['step length']).all()
+    assert isnan(d_gait["step length"]).all()
 
 
 def test_StrideLengthModel1(d_gait, d_gait_aux):
@@ -201,11 +203,15 @@ def test_StrideLengthModel2(d_gait, d_gait_aux):
     sl = StrideLengthModel2()
     sl.predict(fs=50.0, leg_length=1.8, gait=d_gait, gait_aux=d_gait_aux)
 
-    lprime = array([0.8352, 0.8352, 0.8352, 0.49095, 0.49095, 0.49095, 0.49095, 0.49095])
-    a = 2 * 1.8 * d_gait['m2 delta h']
-    a -= d_gait['m2 delta h'] ** 2
+    lprime = array(
+        [0.8352, 0.8352, 0.8352, 0.49095, 0.49095, 0.49095, 0.49095, 0.49095]
+    )
+    a = 2 * 1.8 * d_gait["m2 delta h"]
+    a -= d_gait["m2 delta h"] ** 2
     a = 2 * sqrt(a)
-    a += 2 * sqrt(2 * lprime * d_gait['m2 delta h prime'] - d_gait['m2 delta h prime'] ** 2)
+    a += 2 * sqrt(
+        2 * lprime * d_gait["m2 delta h prime"] - d_gait["m2 delta h prime"] ** 2
+    )
 
     exp = a
     exp[0:2] += exp[1:3]
@@ -244,11 +250,15 @@ def test_GaitSpeedModel1(d_gait, d_gait_aux):
 
 
 def test_GaitSpeedModel2(d_gait, d_gait_aux):
-    lprime = array([0.8352, 0.8352, 0.8352, 0.49095, 0.49095, 0.49095, 0.49095, 0.49095])
-    a = 2 * 1.8 * d_gait['m2 delta h']
-    a -= d_gait['m2 delta h'] ** 2
+    lprime = array(
+        [0.8352, 0.8352, 0.8352, 0.49095, 0.49095, 0.49095, 0.49095, 0.49095]
+    )
+    a = 2 * 1.8 * d_gait["m2 delta h"]
+    a -= d_gait["m2 delta h"] ** 2
     a = 2 * sqrt(a)
-    a += 2 * sqrt(2 * lprime * d_gait['m2 delta h prime'] - d_gait['m2 delta h prime'] ** 2)
+    a += 2 * sqrt(
+        2 * lprime * d_gait["m2 delta h prime"] - d_gait["m2 delta h prime"] ** 2
+    )
 
     exp = a
     exp[0:2] += exp[1:3]

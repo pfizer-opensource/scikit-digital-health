@@ -4,7 +4,7 @@ from pytest import fixture
 from numpy import load, random, arange, repeat
 import pandas as pd
 
-from skdh import BaseProcess
+from skdh import BaseProcess, handle_process_returns
 from skdh.io.base import check_input_file
 
 
@@ -23,14 +23,27 @@ def dummy_reader_class():
             else:
                 raise ValueError("`ext_error` must be one of 'raise', 'warn', 'skip'.")
 
+        @handle_process_returns(results_to_kwargs=True)
         @check_input_file(".abc", check_size=False)
         def predict(self, file=None, **kwargs):
             super().predict(expect_wear=False, expect_days=False, file=file, **kwargs)
 
-            kwargs.update({"file": file, "in_predict": True})
-            return (kwargs, None) if self._in_pipeline else kwargs
+            return {"in_predict": True, "test_input": 5}
 
     return Rdr
+
+
+@fixture
+def dummy_process():
+    class dummyprocess(BaseProcess):
+        def __init__(self):
+            super().__init__()
+
+        @handle_process_returns(results_to_kwargs=False)
+        def predict(self, *, test_input=None, **kwargs):
+            return {"a": 5, "test_output": test_input * 2.0}
+
+    return dummyprocess
 
 
 @fixture
@@ -38,11 +51,11 @@ def gnactv_file():
     cwd = Path.cwd().parts
 
     if cwd[-1] == "io":
-        return Path("data/gnactv_sample.bin")
+        return "data/gnactv_sample.bin"
     elif cwd[-1] == "test":
-        return Path("io/data/gnactv_sample.bin")
+        return "io/data/gnactv_sample.bin"
     elif cwd[-1] == "scikit-digital-health":
-        return Path("test/io/data/gnactv_sample.bin")
+        return "test/io/data/gnactv_sample.bin"
 
 
 @fixture
@@ -69,11 +82,11 @@ def ax3_file():
     cwd = Path.cwd().parts
 
     if cwd[-1] == "io":
-        return Path("data/ax3_sample.cwa")
+        return "data/ax3_sample.cwa"
     elif cwd[-1] == "test":
-        return Path("io/data/ax3_sample.cwa")
+        return "io/data/ax3_sample.cwa"
     elif cwd[-1] == "scikit-digital-health":
-        return Path("test/io/data/ax3_sample.cwa")
+        return "test/io/data/ax3_sample.cwa"
 
 
 @fixture
@@ -100,11 +113,11 @@ def ax6_file():
     cwd = Path.cwd().parts
 
     if cwd[-1] == "io":
-        return Path("data/ax6_sample.cwa")
+        return "data/ax6_sample.cwa"
     elif cwd[-1] == "test":
-        return Path("io/data/ax6_sample.cwa")
+        return "io/data/ax6_sample.cwa"
     elif cwd[-1] == "scikit-digital-health":
-        return Path("test/io/data/ax6_sample.cwa")
+        return "test/io/data/ax6_sample.cwa"
 
 
 @fixture
@@ -131,11 +144,11 @@ def gt3x_file():
     cwd = Path.cwd().parts
 
     if cwd[-1] == "io":
-        return Path("data/gt3x_sample.gt3x")
+        return "data/gt3x_sample.gt3x"
     elif cwd[-1] == "test":
-        return Path("io/data/gt3x_sample.gt3x")
+        return "io/data/gt3x_sample.gt3x"
     elif cwd[-1] == "scikit-digital-health":
-        return Path("test/io/data/gt3x_sample.gt3x")
+        return "test/io/data/gt3x_sample.gt3x"
 
 
 @fixture
@@ -162,11 +175,11 @@ def apdm_file():
     cwd = Path.cwd().parts
 
     if cwd[-1] == "io":
-        return Path("data/apdm_sample.h5")
+        return "data/apdm_sample.h5"
     elif cwd[-1] == "test":
-        return Path("io/data/apdm_sample.h5")
+        return "io/data/apdm_sample.h5"
     elif cwd[-1] == "scikit-digital-health":
-        return Path("test/io/data/apdm_sample.h5")
+        return "test/io/data/apdm_sample.h5"
 
 
 @fixture
@@ -181,12 +194,12 @@ def dummy_csv_contents():
 
         n = int(hours * 3600 * fs)  # number of samples
 
-        df[['ax', 'ay', 'az']] = rng.normal(size=(n, 3))
+        df[["ax", "ay", "az"]] = rng.normal(size=(n, 3))
 
         start = "2020-06-06 12:00:00.000"
-        tdelta = repeat(pd.to_timedelta(arange(0, hours * 3600), unit='s'), int(fs))
+        tdelta = repeat(pd.to_timedelta(arange(0, hours * 3600), unit="s"), int(fs))
 
-        df['_datetime_'] = pd.to_datetime(start) + tdelta
+        df["_datetime_"] = pd.to_datetime(start) + tdelta
 
         # drop a chunk of data out
         if drop:
@@ -198,4 +211,5 @@ def dummy_csv_contents():
             return df2, fs, n
         else:
             return df, fs, n
+
     return fn

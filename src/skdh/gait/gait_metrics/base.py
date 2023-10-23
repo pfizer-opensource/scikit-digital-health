@@ -64,7 +64,9 @@ class GaitBoutEndpoint:
             return
         if self._depends is not None:
             for param in self._depends:
-                param().predict(fs=fs, leg_length=leg_length, gait=gait, gait_aux=gait_aux)
+                param().predict(
+                    fs=fs, leg_length=leg_length, gait=gait, gait_aux=gait_aux
+                )
 
         self._predict(fs=fs, leg_length=leg_length, gait=gait, gait_aux=gait_aux)
 
@@ -123,7 +125,9 @@ class GaitEventEndpoint:
             return
         if self._depends is not None:
             for param in self._depends:
-                param().predict(fs=fs, leg_length=leg_length, gait=gait, gait_aux=gait_aux)
+                param().predict(
+                    fs=fs, leg_length=leg_length, gait=gait, gait_aux=gait_aux
+                )
 
         self._predict(fs=fs, leg_length=leg_length, gait=gait, gait_aux=gait_aux)
 

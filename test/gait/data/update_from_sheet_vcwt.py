@@ -82,7 +82,7 @@ if __name__ == "__main__":
         df_turn.loc[df_turn["forward cycles"] < 3, k] = np.nan
 
     # get keys to update results for
-    keys_turn = keys + ['Turn']
+    keys_turn = keys + ["Turn"]
 
     # old data file
     # old = np.load("gait_results_vcwt.npz")

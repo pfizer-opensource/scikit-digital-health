@@ -16,36 +16,44 @@ class CreateStridesAndQc(BaseProcess):
 
     Parameters
     ----------
-    max_stride_time : {callable, float}, optional
+    max_stride_time : {"default", callable, float}, optional
         The maximum stride time possible for a single stride. Either a callable
         with the input of the mean step time, or a float, which will be used as a
-        static limit. Default is the function :math:`2.0 * mean\_step\_time + 1.0`.
-    loading_factor : {callable, float}, optional
+        static limit. Default ("default") is the function
+        :math:`2.0 * mean\_step\_time + 1.0`.
+    loading_factor : {"default", callable, float}, optional
         A factor that is multiplied by the `max_stride_time` to obtain values indicating
         the maximum initial double support and maximum stances times for strides to
         be deemed physiologically possible, and not discarded. Either a callable
         with the input of mean step time, or a float (between 0.0 and 1.0) indicating
-        a static factor. Default is the function :math:`0.17 * mean\_step\_time + 0.05`.
+        a static factor. Default ("default") is the function
+        :math:`0.17 * mean\_step\_time + 0.05`.
     """
 
     def __init__(
         self,
-        max_stride_time=lambda x: 2.0 * x + 1.0,
-        loading_factor=lambda x: 0.17 * x + 0.05,
+        max_stride_time="default",
+        loading_factor="default",
     ):
         super().__init__(
             max_stride_time=max_stride_time,
             loading_factor=loading_factor,
         )
 
-        if callable(max_stride_time):
+        if max_stride_time == "default":
+            self.max_stride_time_fn = lambda x: 2.0 * x + 1.0
+        elif callable(max_stride_time):
             self.max_stride_time_fn = max_stride_time
         elif isinstance(max_stride_time, float):
             self.max_stride_time_fn = lambda x: max_stride_time
         else:
-            raise ValueError("`max_stride_time` is not a callable or a float.")
+            raise ValueError(
+                "`max_stride_time` is not a callable or a float, or 'default'."
+            )
 
-        if callable(loading_factor):
+        if loading_factor == "default":
+            self.loading_factor_fn = lambda x: 0.17 * x + 0.05
+        elif callable(loading_factor):
             self.loading_factor_fn = loading_factor
         elif isinstance(loading_factor, float):
             if 0.0 < loading_factor < 1.0:
@@ -53,7 +61,9 @@ class CreateStridesAndQc(BaseProcess):
             else:
                 raise ValueError("`loading_factor` must be between 0.0 and 1.0")
         else:
-            raise ValueError("`loading_factor` is not a callable or a float.")
+            raise ValueError(
+                "`loading_factor` is not a callable or a float, or 'default'."
+            )
 
     @handle_process_returns(results_to_kwargs=True)
     def predict(

@@ -23,6 +23,7 @@ def handle_process_returns(*, results_to_kwargs):
     results_to_kwargs : bool
         Put the first return (results) into the input kwargs.
     """
+
     def internal_handler(method):
         @functools.wraps(method)
         def magic(self, **kwargs):
@@ -38,21 +39,27 @@ def handle_process_returns(*, results_to_kwargs):
 
             # warnings for updates length
             if len(updates) > 1:
-                raise ValueError("Too many values to update input with, updates should be a dictionary")
+                raise ValueError(
+                    "Too many values to update input with, updates should be a dictionary"
+                )
 
             # if we want to update the input with the results
             if results_to_kwargs:
                 try:
                     kwargs.update(res)
                 except TypeError as e:
-                    raise TypeError("Cannot update input  with non-dictionary output") from e
+                    raise TypeError(
+                        "Cannot update input  with non-dictionary output"
+                    ) from e
 
             # We have updates
             if updates:  # equivalent to len(updates) > 0 or updates != []
                 try:
                     kwargs.update(updates[0])
                 except TypeError as e:
-                    raise TypeError("Cannot update input with non-dictionary output") from e
+                    raise TypeError(
+                        "Cannot update input with non-dictionary output"
+                    ) from e
 
             # return based on pipeline
             if self._in_pipeline:
@@ -61,6 +68,7 @@ def handle_process_returns(*, results_to_kwargs):
                 return res
 
         return magic
+
     return internal_handler
 
 

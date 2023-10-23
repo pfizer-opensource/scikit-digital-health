@@ -103,10 +103,10 @@ class TestPredictReturns:
 
         kw, res = tp.predict(a=5, b=10, c=15)
 
-        assert res == {"d": 5.5, 'e': 8}
+        assert res == {"d": 5.5, "e": 8}
         assert kw == {"a": 5, "b": 10, "c": 15, "d": 5.5, "e": 8}
 
         kw1, res1 = tp.predict(aa=500, c1="test")
 
-        assert res1 == {"d": 5.5, 'e': 8}
+        assert res1 == {"d": 5.5, "e": 8}
         assert kw1 == {"d": 5.5, "e": 8, "aa": 500, "c1": "test"}

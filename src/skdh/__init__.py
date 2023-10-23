@@ -26,7 +26,7 @@ else:  # pragma: no cover
 __minimum_version__ = "0.9.10"
 
 from skdh.pipeline import Pipeline
-from skdh.base import BaseProcess
+from skdh.base import BaseProcess, handle_process_returns
 
 from skdh import utility
 from skdh import io
