@@ -1,10 +1,10 @@
 import pytest
 from numpy import array, allclose, arange, nan, isnan
 
-from skdh.gaitv3 import gait_endpoints as endpoints
+from skdh.gaitv3 import gait_metrics
 
 
-class EventEndpoint1Test(endpoints.GaitEventEndpoint):
+class EventEndpoint1Test(gait_metrics.GaitEventEndpoint):
     def __init__(self):
         super().__init__("test event ept 1", __name__, depends=None)
 
@@ -12,7 +12,7 @@ class EventEndpoint1Test(endpoints.GaitEventEndpoint):
         print("inside event endpoint 1")
 
 
-class EventEndpoint2Test(endpoints.GaitEventEndpoint):
+class EventEndpoint2Test(gait_metrics.GaitEventEndpoint):
     def __init__(self):
         super().__init__("test event ept 2", __name__, depends=[EventEndpoint1Test])
 
@@ -20,7 +20,7 @@ class EventEndpoint2Test(endpoints.GaitEventEndpoint):
         print("inside event endpoint 2")
 
 
-class BoutEndpoint1Test(endpoints.GaitBoutEndpoint):
+class BoutEndpoint1Test(gait_metrics.GaitBoutEndpoint):
     def __init__(self):
         super().__init__("test bout ept 1", __name__, depends=[EventEndpoint2Test])
 
@@ -65,14 +65,14 @@ class TestEventEndpoint:
             "forward cycles": array([2, 1, 0, 2, 2, 1, 0, 2, 1, 0]),
         }
 
-        mask_1 = endpoints.GaitEventEndpoint._get_mask(gait, 1)
-        mask_2 = endpoints.GaitEventEndpoint._get_mask(gait, 2)
+        mask_1 = gait_metrics.GaitEventEndpoint._get_mask(gait, 1)
+        mask_2 = gait_metrics.GaitEventEndpoint._get_mask(gait, 2)
 
         assert allclose(mask_1, [1, 1, 0, 1, 1, 1, 0, 1, 1, 0])
         assert allclose(mask_2, [1, 0, 0, 1, 1, 0, 0, 1, 0, 0])
 
         with pytest.raises(ValueError):
-            endpoints.GaitEventEndpoint._get_mask(gait, 5)
+            gait_metrics.GaitEventEndpoint._get_mask(gait, 5)
 
     def test__predict_asymmetry(self):
         gait = {

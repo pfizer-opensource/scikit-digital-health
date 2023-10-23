@@ -4,7 +4,7 @@ from numpy import allclose, array
 from skdh import Pipeline
 from skdh.gaitv3.core import GaitLumbar
 from skdh.gaitv3 import substeps
-from skdh.gaitv3 import gait_endpoints, PredictGaitLumbarLgbm
+from skdh.gaitv3 import gait_metrics, PredictGaitLumbarLgbm
 from skdh.utility.exceptions import LowFrequencyError
 
 
@@ -134,13 +134,13 @@ class TestGait:
         g = GaitLumbar()
         g._params = []  # reset for easy testing
 
-        g.add_endpoints([gait_endpoints.StrideTime, gait_endpoints.StepTime])
-        g.add_endpoints(gait_endpoints.PhaseCoordinationIndex)
+        g.add_endpoints([gait_metrics.StrideTime, gait_metrics.StepTime])
+        g.add_endpoints(gait_metrics.PhaseCoordinationIndex)
 
         assert g._params == [
-            gait_endpoints.StrideTime,
-            gait_endpoints.StepTime,
-            gait_endpoints.PhaseCoordinationIndex,
+            gait_metrics.StrideTime,
+            gait_metrics.StepTime,
+            gait_metrics.PhaseCoordinationIndex,
         ]
 
     def test_add_metrics_error(self):

@@ -14,8 +14,8 @@ from skdh.base import BaseProcess, handle_process_returns
 from skdh.utility.internal import rle, apply_downsample
 from skdh.utility.exceptions import LowFrequencyError
 
-from skdh.gaitv3.gait_endpoints import GaitEventEndpoint, GaitBoutEndpoint
-from skdh.gaitv3.gait_endpoints import gait_endpoints
+from skdh.gaitv3.gait_metrics import GaitEventEndpoint, GaitBoutEndpoint
+from skdh.gaitv3.gait_metrics import gait_metrics
 from skdh.gaitv3.utility import get_gait_bouts
 from skdh.gaitv3 import substeps
 
@@ -149,32 +149,32 @@ class GaitLumbar(BaseProcess):
     # gait parameters
     _params = [
         # event level endpoints
-        gait_endpoints.StrideTime,
-        gait_endpoints.StanceTime,
-        gait_endpoints.SwingTime,
-        gait_endpoints.StepTime,
-        gait_endpoints.InitialDoubleSupport,
-        gait_endpoints.TerminalDoubleSupport,
-        gait_endpoints.DoubleSupport,
-        gait_endpoints.SingleSupport,
-        gait_endpoints.StepLengthModel2,
-        gait_endpoints.StrideLengthModel2,
-        gait_endpoints.GaitSpeedModel2,
-        gait_endpoints.Cadence,
-        gait_endpoints.StepLengthModel1,
-        gait_endpoints.StrideLengthModel1,
-        gait_endpoints.GaitSpeedModel1,
-        gait_endpoints.IntraStepCovarianceV,
-        gait_endpoints.IntraStrideCovarianceV,
-        gait_endpoints.HarmonicRatioV,
-        gait_endpoints.StrideSPARC,
+        gait_metrics.StrideTime,
+        gait_metrics.StanceTime,
+        gait_metrics.SwingTime,
+        gait_metrics.StepTime,
+        gait_metrics.InitialDoubleSupport,
+        gait_metrics.TerminalDoubleSupport,
+        gait_metrics.DoubleSupport,
+        gait_metrics.SingleSupport,
+        gait_metrics.StepLengthModel2,
+        gait_metrics.StrideLengthModel2,
+        gait_metrics.GaitSpeedModel2,
+        gait_metrics.Cadence,
+        gait_metrics.StepLengthModel1,
+        gait_metrics.StrideLengthModel1,
+        gait_metrics.GaitSpeedModel1,
+        gait_metrics.IntraStepCovarianceV,
+        gait_metrics.IntraStrideCovarianceV,
+        gait_metrics.HarmonicRatioV,
+        gait_metrics.StrideSPARC,
         # bout level endpoints
-        gait_endpoints.PhaseCoordinationIndex,
-        gait_endpoints.GaitSymmetryIndex,
-        gait_endpoints.StepRegularityV,
-        gait_endpoints.StrideRegularityV,
-        gait_endpoints.AutocovarianceSymmetryV,
-        gait_endpoints.RegularityIndexV,
+        gait_metrics.PhaseCoordinationIndex,
+        gait_metrics.GaitSymmetryIndex,
+        gait_metrics.StepRegularityV,
+        gait_metrics.StrideRegularityV,
+        gait_metrics.AutocovarianceSymmetryV,
+        gait_metrics.RegularityIndexV,
     ]
 
     def __init__(
@@ -264,15 +264,15 @@ class GaitLumbar(BaseProcess):
 
         Examples
         --------
-        >>> class NewGaitEndpoint(gait_endpoints.GaitEventEndpoint):
+        >>> class NewGaitEndpoint(gait_metrics.GaitEventEndpoint):
         >>>     pass
         >>>
         >>> gait = GaitV3()
         >>> gait.add_endpoints(NewGaitEndpoint)
 
-        >>> class NewGaitEndpoint(gait_endpoints.GaitEventEndpoint):
+        >>> class NewGaitEndpoint(gait_metrics.GaitEventEndpoint):
         >>>     pass
-        >>> class NewGaitEndpoint2(gait_endpoints.GaitEventEndpoint):
+        >>> class NewGaitEndpoint2(gait_metrics.GaitEventEndpoint):
         >>>     pass
         >>>
         >>> gait = GaitV3()

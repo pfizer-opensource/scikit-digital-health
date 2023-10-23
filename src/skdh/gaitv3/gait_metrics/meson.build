@@ -2,8 +2,8 @@ py3.install_sources(
     [
         '__init__.py',
         'base.py',
-        'gait_endpoints.py',
+        'gait_metrics.py',
     ],
     pure: false,
-    subdir: 'skdh/gaitv3/gait_endpoints',
+    subdir: 'skdh/gaitv3/gait_metrics',
 )

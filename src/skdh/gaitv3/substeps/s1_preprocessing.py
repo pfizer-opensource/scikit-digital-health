@@ -9,7 +9,7 @@ from scipy.signal import detrend, butter, sosfiltfilt, find_peaks
 
 from skdh.base import BaseProcess, handle_process_returns
 from skdh.utility import correct_accelerometer_orientation
-from skdh.gaitv3.gait_endpoints import gait_endpoints
+from skdh.gaitv3.gait_metrics import gait_metrics
 
 
 class PreprocessGaitBout(BaseProcess):
@@ -123,7 +123,7 @@ class PreprocessGaitBout(BaseProcess):
         sos = butter(4, 2 * 3.0 / fs, output="sos")
         acc_f = sosfiltfilt(sos, accel, axis=0)
 
-        ac = gait_endpoints._autocovariancefn(
+        ac = gait_metrics._autocovariancefn(
             acc_f, min(accel.shape[0] - 1, int(10 * fs)), biased=True, axis=0
         )
 
@@ -153,7 +153,7 @@ class PreprocessGaitBout(BaseProcess):
         sos = butter(4, 2 * 10.0 / fs, output="sos")
         sf_acc_f = sosfiltfilt(sos, accel, axis=0)
 
-        ac = gait_endpoints._autocovariancefn(
+        ac = gait_metrics._autocovariancefn(
             sf_acc_f, min(sf_acc_f.shape[0] - 1, int(4 * fs)), biased=True, axis=0
         )
 

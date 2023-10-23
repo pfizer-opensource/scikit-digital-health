@@ -21,7 +21,7 @@ Gait Bout Processing
 
 .. _event-level-gaitv3-endpoints:
 
-Event Level Gait Endpoints
+Event Level Gait Metrics
 --------------------------
 
 .. autosummary::
@@ -48,7 +48,7 @@ Event Level Gait Endpoints
 
 .. _bout-level-gaitv3-endpoints:
 
-Bout Level Gait Endpoints
+Bout Level Gait Metrics
 -------------------------
 
 .. autosummary::
@@ -136,8 +136,8 @@ Adding Custom Gait Endpoints
 A modular system for computing gait endpoints is employed to aid in the addition of custom gait
 endpoints. Two base classes exist depending on what type of endpoint is being added:
 
-- `gait_endpoints.GaitEventEndpoint` for per- step/stride endpoints
-- `gait_endpoints.GaitBoutEndpoint` for per-bout endpoints
+- `gait_metrics.GaitEventEndpoint` for per- step/stride endpoints
+- `gait_metrics.GaitBoutEndpoint` for per-bout endpoints
 
 New endpoints should be subclasses of either of these base classes, which provide some basic
 functionality behind the scenes. The definition and initialization is very straight-forward
@@ -149,7 +149,7 @@ functionality behind the scenes. The definition and initialization is very strai
 
     class NewEndpoint(GaitEventEndpoint):
         def __init__(self):
-            super().__init__('new endpoint', depends=[gait_endpoints.StrideTime])
+            super().__init__('new endpoint', depends=[gait_metrics.StrideTime])
 
 `__init__` should take no arguments, and its call to the super method has 1 required and 1
 optional argument: the name for the endpoint (this will appear in the output as "{name}"
@@ -160,7 +160,7 @@ To implement the feature computation, the `_predict` method should be defined
 
 .. code-block:: python
 
-    from skdh.gait.gait_endpoints import GaitEventEndpoint
+    from skdh.gait.gait_metrics import GaitEventEndpoint
 
 
     class NewEndpoint(GaitEventEndpoint):
@@ -195,12 +195,12 @@ There are a few convenience functionalities, namely the `_predict_init` function
 
 The `self.k_` attribute simply stores the full name of the endpoint for easy/shorthand access.
 Finally, if the custom endpoint has a basic symmetry value computed by subtracting sequential
-values, this can be quickly implemented by adding the decorator `gait_endpoints.basic_symmetry`
+values, this can be quickly implemented by adding the decorator `gait_metrics.basic_symmetry`
 above the `_predict` definition:
 
 .. code-block:: python
 
-    from skdh.gait.gait_endpoints import GaitEventEndpoint, basic_symmetry
+    from skdh.gait.gait_metrics import GaitEventEndpoint, basic_symmetry
 
 
     class NewEndpoint(GaitEventEndpoint):
@@ -216,7 +216,7 @@ defined on a per-event level):
 
 .. code-block:: python
 
-    from skdh.gait.gait_endpoints import GaitBoutEndpoint
+    from skdh.gait.gait_metrics import GaitBoutEndpoint
 
 
     class StepRegularityV(GaitBoutEndpoint):
@@ -249,5 +249,5 @@ from skdh.gaitv3.core import GaitLumbar
 from skdh.gaitv3.gait_classification import PredictGaitLumbarLgbm
 from skdh.gaitv3 import substeps
 from skdh.gaitv3.substeps import *
-from skdh.gaitv3.gait_endpoints import *
-from skdh.gaitv3 import gait_endpoints
+from skdh.gaitv3.gait_metrics import *
+from skdh.gaitv3 import gait_metrics
