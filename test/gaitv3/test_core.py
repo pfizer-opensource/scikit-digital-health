@@ -9,7 +9,7 @@ from skdh.utility.exceptions import LowFrequencyError
 
 
 class TestGait:
-    def test(self, gait_input_50, gait_res_50):
+    def test_vcwt(self, gait_input_50, gait_res_50_vcwt):
         t, acc = gait_input_50
 
         g = GaitLumbar(
@@ -35,10 +35,10 @@ class TestGait:
 
         res = g.predict(height=1.88, **kw)
 
-        for key in gait_res_50.files:
-            assert allclose(res[key], gait_res_50[key], equal_nan=True), key
+        for key in gait_res_50_vcwt.files:
+            assert allclose(res[key], gait_res_50_vcwt[key], equal_nan=True), key
 
-    def test_with_turns(self, gait_input_gyro, gait_res_gyro):
+    def test_with_turns_vcwt(self, gait_input_gyro, gait_res_gyro_vcwt):
         t, acc, gyr = gait_input_gyro
 
         g = GaitLumbar(
@@ -62,8 +62,8 @@ class TestGait:
             time=t, accel=acc, gyro=gyr, fs=128.0, height=1.88, gait_pred=True
         )
 
-        for key in gait_res_gyro.files:
-            assert allclose(res[key], gait_res_gyro[key], equal_nan=True), key
+        for key in gait_res_gyro_vcwt.files:
+            assert allclose(res[key], gait_res_gyro_vcwt[key], equal_nan=True), key
 
     def test_event_method_input_error(self):
         with pytest.raises(ValueError):

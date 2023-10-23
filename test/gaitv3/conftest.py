@@ -91,15 +91,15 @@ def gait_input_50():
 
 
 @fixture
-def gait_res_50():
+def gait_res_50_vcwt():
     cwd = Path.cwd().parts
 
     if cwd[-1] == "gaitv3":
-        path = Path("data/gait_results.npz")
+        path = Path("data/gait_results_vcwt.npz")
     elif cwd[-1] == "test":
-        path = Path("gaitv3/data/gait_results.npz")
+        path = Path("gaitv3/data/gait_results_vcwt.npz")
     elif cwd[-1] == "scikit-digital-health":
-        path = Path("test/gaitv3/data/gait_results.npz")
+        path = Path("test/gaitv3/data/gait_results_vcwt.npz")
 
     return load(path)
 
@@ -124,15 +124,15 @@ def gait_input_gyro():
 
 
 @fixture
-def gait_res_gyro():
+def gait_res_gyro_vcwt():
     cwd = Path.cwd().parts
 
     if cwd[-1] == "gaitv3":
-        path = Path("data/gait_results2.npz")
+        path = Path("data/gait_results2_vcwt.npz")
     elif cwd[-1] == "test":
-        path = Path("gaitv3/data/gait_results2.npz")
+        path = Path("gaitv3/data/gait_results2_vcwt.npz")
     elif cwd[-1] == "scikit-digital-health":
-        path = Path("test/gaitv3/data/gait_results2.npz")
+        path = Path("test/gaitv3/data/gait_results2_vcwt.npz")
 
     return load(path)
 

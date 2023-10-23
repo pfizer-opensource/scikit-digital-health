@@ -22,12 +22,12 @@ keys = [
     "double support asymmetry",
     "single support",
     "single support asymmetry",
-    "step length",
-    "step length asymmetry",
-    "stride length",
-    "stride length asymmetry",
-    "gait speed",
-    "gait speed asymmetry",
+    "step length m1",
+    "step length m1 asymmetry",
+    "stride length m1",
+    "stride length m1 asymmetry",
+    "gait speed m1",
+    "gait speed m1 asymmetry",
     "cadence",
 ]
 
