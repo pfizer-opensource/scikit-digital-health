@@ -104,6 +104,39 @@ def gait_res_50():
     return load(path)
 
 
+@fixture
+def gait_input_gyro():
+    cwd = Path.cwd().parts
+
+    if cwd[-1] == "gaitv3":
+        path = Path("data/gait_input2.npz")
+    elif cwd[-1] == "test":
+        path = Path("gaitv3/data/gait_input2.npz")
+    elif cwd[-1] == "scikit-digital-health":
+        path = Path("test/gaitv3/data/gait_input2.npz")
+
+    data = load(path)
+    t = data["time"]
+    acc = data["accel"]
+    gyr = data["gyro"]
+
+    return t, acc, gyr
+
+
+@fixture
+def gait_res_gyro():
+    cwd = Path.cwd().parts
+
+    if cwd[-1] == "gaitv3":
+        path = Path("data/gait_results2.npz")
+    elif cwd[-1] == "test":
+        path = Path("gaitv3/data/gait_results2.npz")
+    elif cwd[-1] == "scikit-digital-health":
+        path = Path("test/gaitv3/data/gait_results2.npz")
+
+    return load(path)
+
+
 @fixture(scope="module")
 def get_bgait_samples_truth():  # boolean gait classification
     def get_stuff(case):
