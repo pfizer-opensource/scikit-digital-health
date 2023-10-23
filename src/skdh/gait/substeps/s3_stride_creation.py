@@ -42,7 +42,7 @@ class CreateStridesAndQc(BaseProcess):
 
         if max_stride_time == "default":
             self.max_stride_time_fn = lambda x: 2.0 * x + 1.0
-        if callable(max_stride_time):
+        elif callable(max_stride_time):
             self.max_stride_time_fn = max_stride_time
         elif isinstance(max_stride_time, float):
             self.max_stride_time_fn = lambda x: max_stride_time
