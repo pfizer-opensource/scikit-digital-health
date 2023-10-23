@@ -146,6 +146,7 @@ class GaitLumbar(BaseProcess):
         the Lower Back,” Front. Neurol., vol. 8, Apr. 2017,
         doi: 10.3389/fneur.2017.00135.
     """
+
     # gait parameters
     _params = [
         # event level endpoints
@@ -178,22 +179,22 @@ class GaitLumbar(BaseProcess):
     ]
 
     def __init__(
-            self,
-            downsample=False,
-            height_factor=0.53,
-            provide_leg_length=False,
-            min_bout_time=8.0,
-            max_bout_separation_time=0.5,
-            gait_event_method='AP CWT',
-            correct_orientation=True,
-            filter_cutoff=20.0,
-            filter_order=4,
-            use_cwt_scale_relation=True,
-            wavelet_scale='default',
-            round_scale=False,
-            max_stride_time="default",
-            loading_factor="default",
-            bout_processing_pipeline=None,
+        self,
+        downsample=False,
+        height_factor=0.53,
+        provide_leg_length=False,
+        min_bout_time=8.0,
+        max_bout_separation_time=0.5,
+        gait_event_method="AP CWT",
+        correct_orientation=True,
+        filter_cutoff=20.0,
+        filter_order=4,
+        use_cwt_scale_relation=True,
+        wavelet_scale="default",
+        round_scale=False,
+        max_stride_time="default",
+        loading_factor="default",
+        bout_processing_pipeline=None,
     ):
         super().__init__(
             downsample=downsample,
@@ -220,36 +221,46 @@ class GaitLumbar(BaseProcess):
         else:
             self.height_factor = height_factor
 
-        self.min_bout_time = min_bout_time,
+        self.min_bout_time = (min_bout_time,)
         self.max_bout_sep_time = max_bout_separation_time
 
         if bout_processing_pipeline is None:
             self.bout_pipeline = Pipeline(flatten_results=True)
-            self.bout_pipeline.add(substeps.PreprocessGaitBout(
-                correct_orientation=correct_orientation,
-                filter_cutoff=filter_cutoff,
-                filter_order=filter_order,
-            ))
+            self.bout_pipeline.add(
+                substeps.PreprocessGaitBout(
+                    correct_orientation=correct_orientation,
+                    filter_cutoff=filter_cutoff,
+                    filter_order=filter_order,
+                )
+            )
             if gait_event_method.lower() == "ap cwt":
                 self.bout_pipeline.add(substeps.ApCwtGaitEvents())
-            elif gait_event_method.lower() in ["vertical cwt", 'v cwt']:
-                self.bout_pipeline.add(substeps.VerticalCwtGaitEvents(
-                    use_cwt_scale_relation=use_cwt_scale_relation,
-                    wavelet_scale=wavelet_scale,
-                    round_scale=round_scale,
-                ))
+            elif gait_event_method.lower() in ["vertical cwt", "v cwt"]:
+                self.bout_pipeline.add(
+                    substeps.VerticalCwtGaitEvents(
+                        use_cwt_scale_relation=use_cwt_scale_relation,
+                        wavelet_scale=wavelet_scale,
+                        round_scale=round_scale,
+                    )
+                )
             else:
-                raise ValueError(f"`gait_event_method` ({gait_event_method}) not a valid option.")
-            self.bout_pipeline.add(substeps.CreateStridesAndQc(
-                max_stride_time=max_stride_time,
-                loading_factor=loading_factor,
-            ))
+                raise ValueError(
+                    f"`gait_event_method` ({gait_event_method}) not a valid option."
+                )
+            self.bout_pipeline.add(
+                substeps.CreateStridesAndQc(
+                    max_stride_time=max_stride_time,
+                    loading_factor=loading_factor,
+                )
+            )
             self.bout_pipeline.add(substeps.TurnDetection())
         else:
             if isinstance(bout_processing_pipeline, Pipeline):
                 self.bout_pipeline = bout_processing_pipeline
             else:
-                raise ValueError("`bout_processing_pipeline` must be a `skdh.Pipeline` object.")
+                raise ValueError(
+                    "`bout_processing_pipeline` must be a `skdh.Pipeline` object."
+                )
 
     def add_endpoints(self, endpoints):
         """
@@ -279,10 +290,15 @@ class GaitLumbar(BaseProcess):
         >>> gait.add_endpoints([NewGaitEndpoint, NewGaitEndpoint2])
         """
         if isinstance(endpoints, Iterable):
-            if all(isinstance(i(), (GaitEventEndpoint, GaitBoutEndpoint)) for i in endpoints):
+            if all(
+                isinstance(i(), (GaitEventEndpoint, GaitBoutEndpoint))
+                for i in endpoints
+            ):
                 self._params.extend(endpoints)
             else:
-                raise ValueError("Not all objects are GaitEventEndpoints or GaitBoutEndpoints")
+                raise ValueError(
+                    "Not all objects are GaitEventEndpoints or GaitBoutEndpoints"
+                )
         else:
             if isinstance(endpoints(), (GaitEventEndpoint, GaitBoutEndpoint)):
                 self._params.append(endpoints)
@@ -340,18 +356,18 @@ class GaitLumbar(BaseProcess):
 
     @handle_process_returns(results_to_kwargs=False)
     def predict(
-            self,
-            time=None,
-            accel=None,
-            *,
-            gyro=None,
-            fs=None,
-            height=None,
-            gait_bouts=None,
-            gait_pred=True,
-            v_axis=None,
-            ap_axis=None,
-            **kwargs,
+        self,
+        time=None,
+        accel=None,
+        *,
+        gyro=None,
+        fs=None,
+        height=None,
+        gait_bouts=None,
+        gait_pred=True,
+        v_axis=None,
+        ap_axis=None,
+        **kwargs,
     ):
         """
         predict(time, accel, *, gyro=None, fs=None, height=None, gait_pred=None, v_axis=None, ap_axis=None, day_ends={})
@@ -453,7 +469,8 @@ class GaitLumbar(BaseProcess):
 
         # handle gait_pred input types
         gait_starts, gait_stops = self._handle_input_gait_predictions(
-            gait_bouts, gait_pred, time.size)
+            gait_bouts, gait_pred, time.size
+        )
 
         # get alternative names, that will be overwritten if downsampling
         goal_fs = fs
@@ -540,37 +557,47 @@ class GaitLumbar(BaseProcess):
                 )
 
                 # get the data we need
-                n_strides = bout_res['qc_initial_contacts'].size
-                gait['IC'].extend(bout_res["qc_initial_contacts"])
-                gait['FC'].extend(bout_res['qc_final_contacts'])
-                gait['FC opp foot'].extend(bout_res['qc_final_contacts_oppfoot'])
-                gait['forward cycles'].extend(bout_res['forward_cycles'])
+                n_strides = bout_res["qc_initial_contacts"].size
+                gait["IC"].extend(bout_res["qc_initial_contacts"])
+                gait["FC"].extend(bout_res["qc_final_contacts"])
+                gait["FC opp foot"].extend(bout_res["qc_final_contacts_oppfoot"])
+                gait["forward cycles"].extend(bout_res["forward_cycles"])
                 # optional
-                gait['Turn'].extend(bout_res.get('step_in_turn', [-1] * n_strides))
-                gait['debug:mean step freq'].extend([bout_res.get("mean_step_freq", nan)] * n_strides)
-                gait['debug:v axis est'].extend([bout_res.get("v_axis_est", -1)] * n_strides)
-                gait['debug:ap axis est'].extend([bout_res.get("ap_axis_est", -1)] * n_strides)
+                gait["Turn"].extend(bout_res.get("step_in_turn", [-1] * n_strides))
+                gait["debug:mean step freq"].extend(
+                    [bout_res.get("mean_step_freq", nan)] * n_strides
+                )
+                gait["debug:v axis est"].extend(
+                    [bout_res.get("v_axis_est", -1)] * n_strides
+                )
+                gait["debug:ap axis est"].extend(
+                    [bout_res.get("ap_axis_est", -1)] * n_strides
+                )
 
                 # metadata
-                gait['Bout N'].extend([ibout + 1] * n_strides)
-                gait['Bout Starts'].extend([time_rs[bout.start]] * n_strides)
-                gait['Bout Duration'].extend([(bout.stop - bout.start) / goal_fs] * n_strides)
+                gait["Bout N"].extend([ibout + 1] * n_strides)
+                gait["Bout Starts"].extend([time_rs[bout.start]] * n_strides)
+                gait["Bout Duration"].extend(
+                    [(bout.stop - bout.start) / goal_fs] * n_strides
+                )
 
-                gait['Bout Steps'].extend([n_strides] * n_strides)
-                gait['Gait Cycles'].extend([sum(bout_res['forward_cycles'] == 2)] * n_strides)
+                gait["Bout Steps"].extend([n_strides] * n_strides)
+                gait["Gait Cycles"].extend(
+                    [sum(bout_res["forward_cycles"] == 2)] * n_strides
+                )
 
                 # gait auxiliary data
-                gait_aux['accel'].append(bout_res.get("accel_filt", accel_rs[bout]))
+                gait_aux["accel"].append(bout_res.get("accel_filt", accel_rs[bout]))
                 # add the index for the corresponding accel
-                gait_aux['inertial data i'].extend(
-                    [len(gait_aux['accel']) - 1] * n_strides
+                gait_aux["inertial data i"].extend(
+                    [len(gait_aux["accel"]) - 1] * n_strides
                 )
-                gait_aux['v axis'].extend([bout_res['v_axis']] * n_strides)
-                gait_aux['ap axis'].extend([bout_res.get('ap_axis', None)] * n_strides)
+                gait_aux["v axis"].extend([bout_res["v_axis"]] * n_strides)
+                gait_aux["ap axis"].extend([bout_res.get("ap_axis", None)] * n_strides)
 
             # add the day number
-            gait['Day N'].extend(
-                [iday + 1] * (len(gait['Bout N']) - len(gait['Day N']))
+            gait["Day N"].extend(
+                [iday + 1] * (len(gait["Bout N"]) - len(gait["Day N"]))
             )
 
         # convert to arrays
@@ -578,14 +605,16 @@ class GaitLumbar(BaseProcess):
             gait[key] = asarray(gait[key])
 
         # convert some gait aux data to arrays
-        gait_aux['inertial data i'] = asarray(gait_aux['inertial data i'])
-        gait_aux['v axis'] = asarray(gait_aux['v axis'])
-        gait_aux['ap axis'] = asarray(gait_aux['ap axis'])
+        gait_aux["inertial data i"] = asarray(gait_aux["inertial data i"])
+        gait_aux["v axis"] = asarray(gait_aux["v axis"])
+        gait_aux["ap axis"] = asarray(gait_aux["ap axis"])
 
         # loop over endpoints and compute if there is data to compute on
-        if gait_aux['inertial data i'].size != 0:
+        if gait_aux["inertial data i"].size != 0:
             for param in self._params:
-                param().predict(fs=goal_fs, leg_length=leg_length, gait=gait, gait_aux=gait_aux)
+                param().predict(
+                    fs=goal_fs, leg_length=leg_length, gait=gait, gait_aux=gait_aux
+                )
 
         # remove unnecessary stuff from the gait dict
         gait.pop("IC", None)

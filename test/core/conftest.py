@@ -34,7 +34,7 @@ def testprocess2():
     return TestProcess2
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def testprocess3():
     class TestProcess3(BaseProcess):
         def __init__(self, kwa=1):
@@ -43,9 +43,11 @@ def testprocess3():
 
         @handle_process_returns(results_to_kwargs=True)
         def predict(self, a=None, b=None, *, c=None, **kwargs):
-            super().predict(expect_days=False, expect_wear=False, a=a, b=b, c=c, **kwargs)
+            super().predict(
+                expect_days=False, expect_wear=False, a=a, b=b, c=c, **kwargs
+            )
 
-            return {'d': 5.5, 'e': 8}
+            return {"d": 5.5, "e": 8}
 
     return TestProcess3
 

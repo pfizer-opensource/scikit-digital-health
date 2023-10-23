@@ -28,7 +28,7 @@ def dummy_reader_class():
         def predict(self, file=None, **kwargs):
             super().predict(expect_wear=False, expect_days=False, file=file, **kwargs)
 
-            return {"in_predict": True, 'test_input': 5}
+            return {"in_predict": True, "test_input": 5}
 
     return Rdr
 
@@ -41,7 +41,7 @@ def dummy_process():
 
         @handle_process_returns(results_to_kwargs=False)
         def predict(self, *, test_input=None, **kwargs):
-            return {"a": 5, 'test_output': test_input * 2.0}
+            return {"a": 5, "test_output": test_input * 2.0}
 
     return dummyprocess
 
@@ -194,12 +194,12 @@ def dummy_csv_contents():
 
         n = int(hours * 3600 * fs)  # number of samples
 
-        df[['ax', 'ay', 'az']] = rng.normal(size=(n, 3))
+        df[["ax", "ay", "az"]] = rng.normal(size=(n, 3))
 
         start = "2020-06-06 12:00:00.000"
-        tdelta = repeat(pd.to_timedelta(arange(0, hours * 3600), unit='s'), int(fs))
+        tdelta = repeat(pd.to_timedelta(arange(0, hours * 3600), unit="s"), int(fs))
 
-        df['_datetime_'] = pd.to_datetime(start) + tdelta
+        df["_datetime_"] = pd.to_datetime(start) + tdelta
 
         # drop a chunk of data out
         if drop:
@@ -211,4 +211,5 @@ def dummy_csv_contents():
             return df2, fs, n
         else:
             return df, fs, n
+
     return fn

@@ -47,7 +47,9 @@ class CreateStridesAndQc(BaseProcess):
         elif isinstance(max_stride_time, float):
             self.max_stride_time_fn = lambda x: max_stride_time
         else:
-            raise ValueError("`max_stride_time` is not a callable or a float, or 'default'.")
+            raise ValueError(
+                "`max_stride_time` is not a callable or a float, or 'default'."
+            )
 
         if loading_factor == "default":
             self.loading_factor_fn = lambda x: 0.17 * x + 0.05
@@ -59,7 +61,9 @@ class CreateStridesAndQc(BaseProcess):
             else:
                 raise ValueError("`loading_factor` must be between 0.0 and 1.0")
         else:
-            raise ValueError("`loading_factor` is not a callable or a float, or 'default'.")
+            raise ValueError(
+                "`loading_factor` is not a callable or a float, or 'default'."
+            )
 
     @handle_process_returns(results_to_kwargs=True)
     def predict(

@@ -54,7 +54,7 @@ if __name__ == "__main__":
         # df_turn.loc[df_turn["forward cycles"] < 2, k] = np.nan
 
     # get keys to update results for
-    keys_turn = keys + ['Turn']
+    keys_turn = keys + ["Turn"]
 
     tmp = {k: df.loc[:, k].values for k in keys}
     tmp_turn = {k: df_turn.loc[:, k].values for k in keys_turn}

@@ -6,7 +6,7 @@ from numpy import array, zeros, arange, sin, pi, load
 from skdh.utility.internal import apply_downsample
 
 
-@fixture(scope='function')
+@fixture(scope="function")
 def d_gait():
     gait = {
         "IC": array([50, 100, 150, 200, 250, 300, 350, 400]),
@@ -19,7 +19,7 @@ def d_gait():
     return gait
 
 
-@fixture(scope='function')
+@fixture(scope="function")
 def d_gait_aux():
     t = arange(0, 20, 0.02)  # 50hz
 
@@ -105,7 +105,7 @@ def gait_input_50():
     return t50, acc50
 
 
-@fixture(scope='module')
+@fixture(scope="module")
 def gait_res_50():
     cwd = Path.cwd().parts
 
@@ -119,7 +119,7 @@ def gait_res_50():
     return load(path)
 
 
-@fixture(scope='module')
+@fixture(scope="module")
 def gait_input_gyro():
     cwd = Path.cwd().parts
 
@@ -138,7 +138,7 @@ def gait_input_gyro():
     return t, acc, gyr
 
 
-@fixture(scope='module')
+@fixture(scope="module")
 def gait_res_gyro():
     cwd = Path.cwd().parts
 

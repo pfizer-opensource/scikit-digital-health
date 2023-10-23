@@ -57,7 +57,8 @@ class TestGetDayIndexIntersection:
         true_stops = array([240])
 
         p_starts, p_stops = get_day_index_intersection(
-            sleep_starts, sleep_stops, True, day_start, day_stop)
+            sleep_starts, sleep_stops, True, day_start, day_stop
+        )
 
         assert p_starts.size == true_starts.size
         assert p_stops.size == true_stops.size

@@ -209,7 +209,10 @@ class Gait(BaseProcess):
             day_window=day_window,
         )
 
-        warn("Deprecated in version 0.13.0. Use `skdh.gaitv3.LumbarGait` instead.", DeprecationWarning)
+        warn(
+            "Deprecated in version 0.13.0. Use `skdh.gaitv3.LumbarGait` instead.",
+            DeprecationWarning,
+        )
 
         self.corr_accel_orient = correct_accel_orient
         self.use_opt_scale = use_cwt_scale_relation
@@ -464,8 +467,10 @@ class Gait(BaseProcess):
             gait_pred=gait_pred,
             **kwargs,
         )
-        warn("Deprecated in version 0.13.0. Use `skdh.gaitv3.LumbarGait` instead.",
-             DeprecationWarning)
+        warn(
+            "Deprecated in version 0.13.0. Use `skdh.gaitv3.LumbarGait` instead.",
+            DeprecationWarning,
+        )
 
         if height is None:
             warn("height not provided, not computing spatial endpoints", UserWarning)
@@ -558,7 +563,6 @@ class Gait(BaseProcess):
         gait_i = 0  # keep track of where everything is in the loops
 
         for iday, (start, stop) in enumerate(zip(day_starts_ds, day_stops_ds)):
-
             # GET GAIT BOUTS
             # ==============
             gait_bouts = get_gait_bouts(

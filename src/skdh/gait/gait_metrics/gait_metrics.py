@@ -121,18 +121,21 @@ class DeltaHModel1(GaitEventEndpoint):
     Estimate the change in vertical position of the center of mass, in order
     to use the inverted pendulum model (model 1) to estimate step length.
     """
+
     def __init__(self):
         super().__init__("m1 delta h", __name__)
 
     def _predict(self, *, fs, leg_length, gait, gait_aux):
         mask, mask_ofst = self._predict_init(gait, init=False, offset=1)
 
-        delta_h = full(gait['IC'].size, nan)
+        delta_h = full(gait["IC"].size, nan)
         indices = nonzero(mask)[0]
-        for idx, i1, i2 in zip(indices, gait['IC'][mask], gait['IC'][mask_ofst]):
-            vacc = gait_aux['accel'][gait_aux['inertial data i'][idx]][i1:i2, gait_aux['v axis'][idx]]
-            vvel = cumulative_trapezoid(vacc, dx=1/fs, initial=0)
-            vpos = cumulative_trapezoid(vvel, dx=1/fs, initial=0)
+        for idx, i1, i2 in zip(indices, gait["IC"][mask], gait["IC"][mask_ofst]):
+            vacc = gait_aux["accel"][gait_aux["inertial data i"][idx]][
+                i1:i2, gait_aux["v axis"][idx]
+            ]
+            vvel = cumulative_trapezoid(vacc, dx=1 / fs, initial=0)
+            vpos = cumulative_trapezoid(vvel, dx=1 / fs, initial=0)
 
             delta_h[idx] = (vpos.max() - vpos.min()) * 9.81
 
@@ -144,32 +147,41 @@ class DeltaHModel2(GaitEventEndpoint):
     Estimate the change in vertical position of the center of mass, in order to
     use the inverted pendulum model (model 2) to estimate step length
     """
+
     def __init__(self):
         super().__init__("m2 delta h", __name__)
 
     def _predict(self, *, fs, leg_length, gait, gait_aux):
         mask, mask_ofst = self._predict_init(gait, init=False, offset=1)
 
-        delta_h = full(gait['IC'].size, nan)
-        delta_h_prime = full(gait['IC'].size, nan)
+        delta_h = full(gait["IC"].size, nan)
+        delta_h_prime = full(gait["IC"].size, nan)
         indices = nonzero(mask)[0]
 
-        for idx, i1, i2, ifc in zip(indices, gait['IC'][mask], gait['IC'][mask_ofst], gait['FC opp foot'][mask]):
-            vacc = gait_aux['accel'][gait_aux['inertial data i'][idx]][:, gait_aux['v axis'][idx]]
+        for idx, i1, i2, ifc in zip(
+            indices, gait["IC"][mask], gait["IC"][mask_ofst], gait["FC opp foot"][mask]
+        ):
+            vacc = gait_aux["accel"][gait_aux["inertial data i"][idx]][
+                :, gait_aux["v axis"][idx]
+            ]
 
             # integrate in a wider range
             i0 = max(0, i1 - (i2 - i1))
             i3 = min(vacc.size - 1, i2 + (i2 - i1))
 
-            vvel = cumulative_trapezoid(vacc[i0:i3], dx=1/fs, initial=0)
+            vvel = cumulative_trapezoid(vacc[i0:i3], dx=1 / fs, initial=0)
             vvel = detrend(vvel)
-            vpos = cumulative_trapezoid(vvel, dx=1/fs, initial=0)
+            vpos = cumulative_trapezoid(vvel, dx=1 / fs, initial=0)
 
-            delta_h_prime[idx] = (vpos[i1 - i0:ifc - i0].max() - vpos[i1 - i0:ifc - i0].min()) * 9.81
-            delta_h[idx] = (vpos[ifc - i0:i2 - i0].max() - vpos[ifc - i0:i2 - i0].min()) * 9.81
+            delta_h_prime[idx] = (
+                vpos[i1 - i0 : ifc - i0].max() - vpos[i1 - i0 : ifc - i0].min()
+            ) * 9.81
+            delta_h[idx] = (
+                vpos[ifc - i0 : i2 - i0].max() - vpos[ifc - i0 : i2 - i0].min()
+            ) * 9.81
 
         gait[self.k_] = delta_h
-        gait[f'{self.k_} prime'] = delta_h_prime
+        gait[f"{self.k_} prime"] = delta_h_prime
 
 
 # ===========================================================
@@ -289,9 +301,7 @@ class DoubleSupport(GaitEventEndpoint):
 
     @basic_asymmetry
     def _predict(self, *, fs, leg_length, gait, gait_aux):
-        gait[self.k_] = (
-            gait["initial double support"] + gait["terminal double support"]
-        )
+        gait[self.k_] = gait["initial double support"] + gait["terminal double support"]
 
 
 class SingleSupport(GaitEventEndpoint):
@@ -392,8 +402,13 @@ class StepLengthModel2(GaitEventEndpoint):
         experimental data and model predictions,” Gait & Posture, vol. 6, no. 3,
         pp. 249–262, Dec. 1997, doi: 10.1016/S0966-6362(97)00021-0.
     """
+
     def __init__(self):
-        super().__init__("step length", __name__, depends=[DeltaHModel2, InitialDoubleSupport, SingleSupport])
+        super().__init__(
+            "step length",
+            __name__,
+            depends=[DeltaHModel2, InitialDoubleSupport, SingleSupport],
+        )
 
     @basic_asymmetry
     def _predict(self, *, fs, leg_length, gait, gait_aux):
@@ -401,13 +416,13 @@ class StepLengthModel2(GaitEventEndpoint):
             self._predict_init(gait, True, None)  # don't generate masks
             return
 
-        l_prime = full(gait['IC'].size, nan)
+        l_prime = full(gait["IC"].size, nan)
         # iterate over bouts
-        for bn in unique(gait['Bout N']):
-            bmask = gait['Bout N'] == bn
+        for bn in unique(gait["Bout N"]):
+            bmask = gait["Bout N"] == bn
 
-            med_ids = nanmedian(gait['initial double support'][bmask])
-            med_ss = nanmedian(gait['single support'][bmask])
+            med_ids = nanmedian(gait["initial double support"][bmask])
+            med_ss = nanmedian(gait["single support"][bmask])
             t_ratio = med_ids / med_ss
 
             l_ratio = 1.12 * t_ratio**2 + 0.547 * t_ratio + 0.066
@@ -416,8 +431,10 @@ class StepLengthModel2(GaitEventEndpoint):
             l_prime[bmask] = lp
 
         # compute the step length estimation
-        L_ids = 2 * sqrt(2 * l_prime * gait['m2 delta h prime'] - gait['m2 delta h prime']**2)
-        L_ss = 2 * sqrt(2 * leg_length * gait['m2 delta h'] - gait['m2 delta h']**2)
+        L_ids = 2 * sqrt(
+            2 * l_prime * gait["m2 delta h prime"] - gait["m2 delta h prime"] ** 2
+        )
+        L_ss = 2 * sqrt(2 * leg_length * gait["m2 delta h"] - gait["m2 delta h"] ** 2)
 
         gait[self.k_] = L_ids + L_ss
 
@@ -492,7 +509,9 @@ class GaitSpeedModel1(GaitEventEndpoint):
     """
 
     def __init__(self):
-        super().__init__("gait speed m1", __name__, depends=[StrideLengthModel1, StrideTime])
+        super().__init__(
+            "gait speed m1", __name__, depends=[StrideLengthModel1, StrideTime]
+        )
 
     @basic_asymmetry
     def _predict(self, *, fs, leg_length, gait, gait_aux):
@@ -510,7 +529,9 @@ class GaitSpeedModel2(GaitEventEndpoint):
     """
 
     def __init__(self):
-        super().__init__("gait speed", __name__, depends=[StrideLengthModel2, StrideTime])
+        super().__init__(
+            "gait speed", __name__, depends=[StrideLengthModel2, StrideTime]
+        )
 
     @basic_asymmetry
     def _predict(self, *, fs, leg_length, gait, gait_aux):
@@ -855,10 +876,7 @@ class GaitSymmetryIndex(GaitBoutEndpoint):
             sos = None
 
         for i, acc in enumerate(gait_aux["accel"]):
-            lag_ = (
-                nanmedian(gait["stride time"][gait_aux["inertial data i"] == i])
-                * fs
-            )
+            lag_ = nanmedian(gait["stride time"][gait_aux["inertial data i"] == i]) * fs
             if isnan(lag_):  # if only nan values in the bout
                 gsi[i] = nan
                 continue
@@ -1034,8 +1052,7 @@ class AutocovarianceSymmetryV(GaitBoutEndpoint):
 
     def _predict(self, *, fs, leg_length, gait, gait_aux):
         gait[self.k_] = abs(
-            gait["bout:step regularity - V"]
-            - gait["bout:stride regularity - V"]
+            gait["bout:step regularity - V"] - gait["bout:stride regularity - V"]
         )
 
 

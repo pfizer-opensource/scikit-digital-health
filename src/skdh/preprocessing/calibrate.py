@@ -98,9 +98,7 @@ class CalibrateAccelerometer(BaseProcess):
         self.tol = tol
 
     @handle_process_returns(results_to_kwargs=True)
-    def predict(
-        self, *, time, accel, fs=None, apply=True, temperature=None, **kwargs
-    ):
+    def predict(self, *, time, accel, fs=None, apply=True, temperature=None, **kwargs):
         r"""
         predict(*, time, accel, fs=None, apply=True, temperature=None)
 

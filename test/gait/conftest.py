@@ -7,7 +7,7 @@ from numpy import arange, zeros, sin, pi, load, array
 from skdh.utility.internal import apply_downsample
 
 
-@fixture(scope='module')
+@fixture(scope="module")
 def t_and_x():
     t = arange(0, 5.01, 0.02)
     x = zeros((t.size, 3))
@@ -18,7 +18,7 @@ def t_and_x():
     return t, x
 
 
-@fixture(scope='function')
+@fixture(scope="function")
 def d_gait():
     gait = {
         "IC": array([50, 100, 150, 200, 250, 300, 350, 400]),
@@ -33,7 +33,7 @@ def d_gait():
     return gait
 
 
-@fixture(scope='function')
+@fixture(scope="function")
 def d_gait_aux():
     t = arange(0, 20, 0.02)  # 50hz
 
@@ -71,7 +71,7 @@ def gait_input_50():
     return t50, acc50
 
 
-@fixture(scope='module')
+@fixture(scope="module")
 def gait_res_50_apcwt():
     cwd = Path.cwd().parts
 
@@ -85,7 +85,7 @@ def gait_res_50_apcwt():
     return load(path)
 
 
-@fixture(scope='module')
+@fixture(scope="module")
 def gait_res_50_vcwt():
     cwd = Path.cwd().parts
 
@@ -99,7 +99,7 @@ def gait_res_50_vcwt():
     return load(path)
 
 
-@fixture(scope='module')
+@fixture(scope="module")
 def gait_input_gyro():
     cwd = Path.cwd().parts
 
@@ -118,7 +118,7 @@ def gait_input_gyro():
     return t, acc, gyr
 
 
-@fixture(scope='module')
+@fixture(scope="module")
 def gait_res_gyro_apcwt():
     cwd = Path.cwd().parts
 
@@ -132,7 +132,7 @@ def gait_res_gyro_apcwt():
     return load(path)
 
 
-@fixture(scope='module')
+@fixture(scope="module")
 def gait_res_gyro_vcwt():
     cwd = Path.cwd().parts
 

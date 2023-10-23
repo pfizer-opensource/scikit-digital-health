@@ -17,8 +17,8 @@ def test_in_pipeline(dummy_reader_class, dummy_process):
         res = p.run(file=tmpf.name)
 
     assert res == {
-        "Rdr": {'in_predict': True, 'test_input': 5},
-        'dummyprocess': {'a': 5, 'test_output': 10.0}
+        "Rdr": {"in_predict": True, "test_input": 5},
+        "dummyprocess": {"a": 5, "test_output": 10.0},
     }
 
 
