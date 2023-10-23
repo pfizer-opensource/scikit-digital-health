@@ -18,7 +18,7 @@ def t_and_x():
     return t, x
 
 
-@fixture(scope='module')
+@fixture(scope='function')
 def d_gait():
     gait = {
         "IC": array([50, 100, 150, 200, 250, 300, 350, 400]),
@@ -33,7 +33,7 @@ def d_gait():
     return gait
 
 
-@fixture(scope='module')
+@fixture(scope='function')
 def d_gait_aux():
     t = arange(0, 20, 0.02)  # 50hz
 
