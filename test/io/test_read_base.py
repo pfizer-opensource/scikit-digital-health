@@ -71,13 +71,14 @@ class TestCheckInputFile:
 
     def test_pass_through_decorator(self, dummy_reader_class):
         rdr = dummy_reader_class(ext_error="raise")
+        rdr._in_pipeline = True
         # due to self in the predict method, dummy predict must be wrapped in conftest
 
         with NamedTemporaryFile(suffix=".abc") as tmpf:
-            kw = rdr.predict(file=tmpf.name, testkw="testkw")
+            kw, res = rdr.predict(file=tmpf.name, testkw="testkw")
 
             assert kw["file"] == tmpf.name
             assert kw["testkw"] == "testkw"
             # make sure the value in predict IS set
-            assert "in_predict" in kw
-            assert kw["in_predict"]
+            assert "in_predict" in res
+            assert res["in_predict"]

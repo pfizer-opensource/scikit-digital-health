@@ -51,11 +51,11 @@ def gnactv_file():
     cwd = Path.cwd().parts
 
     if cwd[-1] == "io":
-        return Path("data/gnactv_sample.bin")
+        return "data/gnactv_sample.bin"
     elif cwd[-1] == "test":
-        return Path("io/data/gnactv_sample.bin")
+        return "io/data/gnactv_sample.bin"
     elif cwd[-1] == "scikit-digital-health":
-        return Path("test/io/data/gnactv_sample.bin")
+        return "test/io/data/gnactv_sample.bin"
 
 
 @fixture
@@ -82,11 +82,11 @@ def ax3_file():
     cwd = Path.cwd().parts
 
     if cwd[-1] == "io":
-        return Path("data/ax3_sample.cwa")
+        return "data/ax3_sample.cwa"
     elif cwd[-1] == "test":
-        return Path("io/data/ax3_sample.cwa")
+        return "io/data/ax3_sample.cwa"
     elif cwd[-1] == "scikit-digital-health":
-        return Path("test/io/data/ax3_sample.cwa")
+        return "test/io/data/ax3_sample.cwa"
 
 
 @fixture
@@ -113,11 +113,11 @@ def ax6_file():
     cwd = Path.cwd().parts
 
     if cwd[-1] == "io":
-        return Path("data/ax6_sample.cwa")
+        return "data/ax6_sample.cwa"
     elif cwd[-1] == "test":
-        return Path("io/data/ax6_sample.cwa")
+        return "io/data/ax6_sample.cwa"
     elif cwd[-1] == "scikit-digital-health":
-        return Path("test/io/data/ax6_sample.cwa")
+        return "test/io/data/ax6_sample.cwa"
 
 
 @fixture
@@ -144,11 +144,11 @@ def gt3x_file():
     cwd = Path.cwd().parts
 
     if cwd[-1] == "io":
-        return Path("data/gt3x_sample.gt3x")
+        return "data/gt3x_sample.gt3x"
     elif cwd[-1] == "test":
-        return Path("io/data/gt3x_sample.gt3x")
+        return "io/data/gt3x_sample.gt3x"
     elif cwd[-1] == "scikit-digital-health":
-        return Path("test/io/data/gt3x_sample.gt3x")
+        return "test/io/data/gt3x_sample.gt3x"
 
 
 @fixture
@@ -175,11 +175,11 @@ def apdm_file():
     cwd = Path.cwd().parts
 
     if cwd[-1] == "io":
-        return Path("data/apdm_sample.h5")
+        return "data/apdm_sample.h5"
     elif cwd[-1] == "test":
-        return Path("io/data/apdm_sample.h5")
+        return "io/data/apdm_sample.h5"
     elif cwd[-1] == "scikit-digital-health":
-        return Path("test/io/data/apdm_sample.h5")
+        return "test/io/data/apdm_sample.h5"
 
 
 @fixture
