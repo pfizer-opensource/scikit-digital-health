@@ -37,7 +37,7 @@ def gait_input_gyro():
     return t, acc, gyr
 
 
-@fixture
+@fixture(scope='module')
 def d_gait():
     gait = {
         "IC": array([50, 100, 150, 200, 250, 300, 350, 400]),
@@ -52,7 +52,7 @@ def d_gait():
     return gait
 
 
-@fixture
+@fixture(scope='module')
 def d_gait_aux():
     t = arange(0, 20, 0.02)  # 50hz
 
@@ -90,7 +90,21 @@ def gait_input_50():
     return t50, acc50
 
 
-@fixture
+@fixture(scope='module')
+def gait_res_50_apcwt():
+    cwd = Path.cwd().parts
+
+    if cwd[-1] == "gaitv3":
+        path = Path("data/gait_results_apcwt.npz")
+    elif cwd[-1] == "test":
+        path = Path("gaitv3/data/gait_results_apcwt.npz")
+    elif cwd[-1] == "scikit-digital-health":
+        path = Path("test/gaitv3/data/gait_results_apcwt.npz")
+
+    return load(path)
+
+
+@fixture(scope='module')
 def gait_res_50_vcwt():
     cwd = Path.cwd().parts
 
@@ -104,7 +118,7 @@ def gait_res_50_vcwt():
     return load(path)
 
 
-@fixture
+@fixture(scope='module')
 def gait_input_gyro():
     cwd = Path.cwd().parts
 
@@ -123,7 +137,21 @@ def gait_input_gyro():
     return t, acc, gyr
 
 
-@fixture
+@fixture(scope='module')
+def gait_res_gyro_apcwt():
+    cwd = Path.cwd().parts
+
+    if cwd[-1] == "gaitv3":
+        path = Path("data/gait_results2_apcwt.npz")
+    elif cwd[-1] == "test":
+        path = Path("gaitv3/data/gait_results2_apcwt.npz")
+    elif cwd[-1] == "scikit-digital-health":
+        path = Path("test/gaitv3/data/gait_results2_apcwt.npz")
+
+    return load(path)
+
+
+@fixture(scope='module')
 def gait_res_gyro_vcwt():
     cwd = Path.cwd().parts
 

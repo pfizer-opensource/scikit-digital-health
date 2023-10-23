@@ -9,6 +9,32 @@ from skdh.utility.exceptions import LowFrequencyError
 
 
 class TestGait:
+    def test_apcwt(self, gait_input_50, gait_res_50_apcwt):
+        t, acc = gait_input_50
+
+        g = GaitLumbar(
+            downsample=False,
+            height_factor=0.53,
+            provide_leg_length=False,
+            min_bout_time=8.0,
+            max_bout_separation_time=0.5,
+            gait_event_method='AP CWT',
+            correct_orientation=True,
+            filter_cutoff=20.0,
+            filter_order=4,
+            max_stride_time=lambda x: 2.0 * x + 1.0,
+            loading_factor=lambda x: 0.17 * x + 0.05,
+        )
+
+        cls = PredictGaitLumbarLgbm()
+        cls._in_pipeline = True
+        kw, bouts = cls.predict(time=t, accel=acc, fs=50.0)
+
+        res = g.predict(height=1.88, **kw)
+
+        for key in gait_res_50_apcwt:
+            assert allclose(res[key], gait_res_50_apcwt[key], equal_nan=True), key
+
     def test_vcwt(self, gait_input_50, gait_res_50_vcwt):
         t, acc = gait_input_50
 
@@ -37,6 +63,30 @@ class TestGait:
 
         for key in gait_res_50_vcwt.files:
             assert allclose(res[key], gait_res_50_vcwt[key], equal_nan=True), key
+
+    def test_with_turns_apcwt(self, gait_input_gyro, gait_res_gyro_apcwt):
+        t, acc, gyr = gait_input_gyro
+
+        g = GaitLumbar(
+            downsample=False,
+            height_factor=0.53,
+            provide_leg_length=False,
+            min_bout_time=8.0,
+            max_bout_separation_time=0.5,
+            gait_event_method='AP CWT',
+            correct_orientation=True,
+            filter_cutoff=20.0,
+            filter_order=4,
+            max_stride_time=lambda x: 2.0 * x + 1.0,
+            loading_factor=lambda x: 0.17 * x + 0.05,
+        )
+
+        res = g.predict(
+            time=t, accel=acc, gyro=gyr, fs=128.0, height=1.88, gait_pred=True
+        )
+
+        for key in gait_res_gyro_apcwt:
+            assert allclose(res[key], gait_res_gyro_apcwt[key], equal_nan=True), key
 
     def test_with_turns_vcwt(self, gait_input_gyro, gait_res_gyro_vcwt):
         t, acc, gyr = gait_input_gyro
