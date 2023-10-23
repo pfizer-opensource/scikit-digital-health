@@ -1,7 +1,9 @@
 import pytest
 from numpy import allclose, array
 
+from skdh import Pipeline
 from skdh.gaitv3.core import GaitLumbar
+from skdh.gaitv3 import substeps
 from skdh.gaitv3 import gait_endpoints, PredictGaitLumbarLgbm
 from skdh.utility.exceptions import LowFrequencyError
 
@@ -62,6 +64,21 @@ class TestGait:
 
         for key in gait_res_gyro.files:
             assert allclose(res[key], gait_res_gyro[key], equal_nan=True), key
+
+    def test_event_method_input_error(self):
+        with pytest.raises(ValueError):
+            g = GaitLumbar(gait_event_method='test')
+
+    def test_bout_pipeline_input(self):
+        b = Pipeline()
+        b.add(substeps.PreprocessGaitBout())
+
+        g = GaitLumbar(bout_processing_pipeline=b)
+
+        assert g.bout_pipeline == b
+
+        with pytest.raises(ValueError):
+            g = GaitLumbar(bout_processing_pipeline="test")
 
     def test_add_metrics(self):
         g = GaitLumbar()
