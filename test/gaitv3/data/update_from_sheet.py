@@ -1,41 +1,71 @@
 import numpy as np
 import pandas as pd
 
+keys = [
+    "Bout N",
+    "Bout Steps",
+    "Gait Cycles",
+    "m1 delta h",
+    "step time",
+    "step time asymmetry",
+    "stride time",
+    "stride time asymmetry",
+    "stance time",
+    "stance time asymmetry",
+    "swing time",
+    "swing time asymmetry",
+    "initial double support",
+    "initial double support asymmetry",
+    "terminal double support",
+    "terminal double support asymmetry",
+    "double support",
+    "double support asymmetry",
+    "single support",
+    "single support asymmetry",
+    "step length",
+    "step length asymmetry",
+    "stride length",
+    "stride length asymmetry",
+    "gait speed",
+    "gait speed asymmetry",
+    "cadence",
+]
+
 
 if __name__ == "__main__":
-    df = pd.read_excel("manual_gait_results.xlsx")
-    df_turn = pd.read_excel("manual_gait_turn_results.xlsx")
+    df = pd.read_excel("manual_gait_results_vcwt.xlsx")
+    df_turn = pd.read_excel("manual_gait_turn_results_vcwt.xlsx")
 
     # list of values requiring only 1 forward cycle
     offset_1 = [
-        "PARAM:step time",
-        "PARAM:terminal double support",
-        "PARAM:double support",
-        "PARAM:single support",
-        "PARAM:step length",
-        "PARAM:cadence",
-        "PARAM:stance time asymmetry",
-        "PARAM:initial double support asymmetry",
+        "step time",
+        "terminal double support",
+        "double support",
+        "single support",
+        "step length m1",
+        "cadence",
+        "stance time asymmetry",
+        "initial double support asymmetry",
     ]
     # 2 forward cycles required
     offset_2 = [
-        "PARAM:stride time",
-        "PARAM:swing time",
-        "PARAM:stride length",
-        "PARAM:gait speed",
-        "PARAM:step time asymmetry",
-        "PARAM:terminal double support asymmetry",
-        "PARAM:double support asymmetry",
-        "PARAM:single support asymmetry",
-        "PARAM:step length asymmetry",
+        "stride time",
+        "swing time",
+        "stride length m1",
+        "gait speed m1",
+        "step time asymmetry",
+        "terminal double support asymmetry",
+        "double support asymmetry",
+        "single support asymmetry",
+        "step length m1 asymmetry",
     ]
 
     # 3 forward cycles required
     offset_3 = [
-        "PARAM:stride time asymmetry",
-        "PARAM:swing time asymmetry",
-        "PARAM:stride length asymmetry",
-        "PARAM:gait speed asymmetry",
+        "stride time asymmetry",
+        "swing time asymmetry",
+        "stride length m1 asymmetry",
+        "gait speed m1 asymmetry",
     ]
 
     # set these values to nan where appropriate
@@ -52,15 +82,11 @@ if __name__ == "__main__":
         df_turn.loc[df_turn["forward cycles"] < 3, k] = np.nan
 
     # get keys to update results for
-    keys = [i for i in df.columns if "PARAM" in i]
-    keys = ["Bout N", "Bout Steps", "Gait Cycles", "delta h"] + keys
-
-    keys_turn = [i for i in df_turn.columns if "PARAM" in i]
-    keys_turn = ["Bout N", "Bout Steps", "Gait Cycles", "delta h", "Turn"] + keys_turn
+    keys_turn = keys + ['Turn']
 
     # old data file
-    old = np.load("gait_results.npz")
-    old_turn = np.load("gait_results2.npz")
+    old = np.load("gait_results_vcwt.npz")
+    old_turn = np.load("gait_results2_vcwt.npz")
 
     tmp = {k: df.loc[:, k].values for k in keys}
     # tmp.update(
@@ -76,5 +102,5 @@ if __name__ == "__main__":
     #     }
     # )
 
-    np.savez("gait_results.npz", **tmp)
-    np.savez("gait_results2.npz", **tmp_turn)
+    np.savez("gait_results_vcwt.npz", **tmp)
+    np.savez("gait_results2_vcwt.npz", **tmp_turn)
