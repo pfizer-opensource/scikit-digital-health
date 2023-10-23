@@ -66,15 +66,15 @@ class GaitLumbar(BaseProcess):
     round_scale : bool, optional
         [:meth:`skdh.gaitv3.substeps.VerticalCwtGaitEvents`] Round the wavelet scale.
         Default is False.
-    max_stride_time : {callable, float}, optional
+    max_stride_time : {"default", callable, float}, optional
         [:meth:`skdh.gaitv3.substeps.CreateStridesAndQc`] Definition of how the maximum
         stride time is calculated. Either a callable with the input of the mean step time,
-        or a float, which will be used as a static limit. Default is the function
+        or a float, which will be used as a static limit. Default ("default") is the function
         :math:`2.0 * mean\\_step\\_time + 1.0`.
-    loading_factor : {callable, float}, optional
+    loading_factor : {"default", callable, float}, optional
         [:meth:`skdh.gaitv3.substeps.CreateStridesAndQc`] Definition of the loading factor.
         Either a callable with the input of mean step time, or a float (between 0.0
-        and 1.0) indicating a static factor. Default is the function
+        and 1.0) indicating a static factor. Default ("default") is the function
         :math:`0.17 * mean\\_step\\_time + 0.05`.
 
     Other Parameters
@@ -191,8 +191,8 @@ class GaitLumbar(BaseProcess):
             use_cwt_scale_relation=True,
             wavelet_scale='default',
             round_scale=False,
-            max_stride_time=lambda x: 2.0 * x + 1.0,
-            loading_factor=lambda x: 0.17 * x + 0.05,
+            max_stride_time="default",
+            loading_factor="default",
             bout_processing_pipeline=None,
     ):
         super().__init__(
