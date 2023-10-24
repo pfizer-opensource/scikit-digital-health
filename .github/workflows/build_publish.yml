@@ -10,8 +10,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]  # use windows-2019 because it still has a working fortran compiler installed
-
+#        os: [ubuntu-latest, macos-latest, windows-latest]  # use windows-2019 because it still has a working fortran compiler installed
+        os: [windows-latest]
     steps:
       - uses: actions/checkout@v3
         with:
