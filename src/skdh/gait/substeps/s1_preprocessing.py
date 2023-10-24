@@ -25,9 +25,20 @@ class PreprocessGaitBout(BaseProcess):
         Low-pass filter cutoff in Hz. Default is 20.0
     filter_order : int, optional
         Low-pass filter order. Default is 4.
+    step_freq_filter_kw : {None, dict}, optional
+        Key-word arguments for the filter applied to the acceleration data before
+        autocorrelation when estimating the mean step frequency of the gait bout.
+        If None (default), the following are used:
+
+        - `N`: 4
+        - `Wn`: [2 * 0.5, 2 * 5.0] - NOTE this will be multiplied by fs at computation time
+        - `btype`: band
+        - `output`: sos - NOTE that this will always be set/overriden
+
+        See :scipy-signal:func:`scipy.signal.butter` for full options.
     """
 
-    def __init__(self, correct_orientation=True, filter_cutoff=20.0, filter_order=4):
+    def __init__(self, correct_orientation=True, filter_cutoff=20.0, filter_order=4, step_freq_filter_kw=None):
         super().__init__(
             correct_orientation=correct_orientation,
             filter_cutoff=filter_cutoff,
@@ -37,6 +48,16 @@ class PreprocessGaitBout(BaseProcess):
         self.corr_orient = correct_orientation
         self.filter_cutoff = filter_cutoff
         self.filter_order = filter_order
+
+        if step_freq_filter_kw is None:
+            step_freq_filter_kw = {
+                'N': 4,
+                'Wn': array([2 * 0.5, 2 * 5.0]),
+                'btype': 'band',
+            }
+
+        step_freq_filter_kw.update({'output': 'sos'})
+        self.sf_filter_kw = step_freq_filter_kw
 
     @staticmethod
     def get_ap_axis_sign(fs, accel, ap_axis):
@@ -150,7 +171,9 @@ class PreprocessGaitBout(BaseProcess):
         accel_filt = detrend(accel_filt, axis=0)
 
         # estimate step frequency
-        sos = butter(4, 2 * 10.0 / fs, output="sos")
+        # update the filter cutoffs with frequency
+        self.sf_filter_kw['Wn'] /= fs
+        sos = butter(**self.sf_filter_kw)
         sf_acc_f = sosfiltfilt(sos, accel, axis=0)
 
         ac = gait_metrics._autocovariancefn(
