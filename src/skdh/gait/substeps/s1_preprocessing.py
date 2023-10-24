@@ -31,7 +31,8 @@ class PreprocessGaitBout(BaseProcess):
         If None (default), the following are used:
 
         - `N`: 4
-        - `Wn`: [2 * 0.5, 2 * 5.0] - NOTE this will be multiplied by fs at computation time
+        - `Wn`: [2 * 0.5, 2 * 5.0] - NOTE, this should be in Hz, not radians.
+          fs will be passed into the filter setup at filter creation time.
         - `btype`: band
         - `output`: sos - NOTE that this will always be set/overriden
 
@@ -171,9 +172,7 @@ class PreprocessGaitBout(BaseProcess):
         accel_filt = detrend(accel_filt, axis=0)
 
         # estimate step frequency
-        # update the filter cutoffs with frequency
-        self.sf_filter_kw['Wn'] /= fs
-        sos = butter(**self.sf_filter_kw)
+        sos = butter(**self.sf_filter_kw, fs=fs)
         sf_acc_f = sosfiltfilt(sos, accel, axis=0)
 
         ac = gait_metrics._autocovariancefn(
