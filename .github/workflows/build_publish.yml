@@ -13,10 +13,10 @@ jobs:
 #        os: [ubuntu-latest, macos-latest, windows-latest]  # use windows-2019 because it still has a working fortran compiler installed
         os: [windows-latest]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.ref_name }}
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v4
       - uses: fortran-lang/setup-fortran@v1
         if: runner.os == 'Windows'
         id: setup-fortran
