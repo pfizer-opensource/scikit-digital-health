@@ -1,8 +1,8 @@
 name: Build_and_Publish
 
-on:
-  release:
-    types: [published]
+on: workflow_dispatch
+#  release:
+#    types: [published]
 
 jobs:
   build_wheels:
@@ -10,7 +10,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-2019]  # use windows-2019 because it still has a working fortran compiler installed
+        os: [ubuntu-latest, macos-latest, windows-latest]  # use windows-2019 because it still has a working fortran compiler installed
     
     steps:
       - uses: actions/checkout@v3
