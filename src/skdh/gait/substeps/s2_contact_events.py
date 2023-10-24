@@ -6,7 +6,7 @@ Copyright 2023, Pfizer Inc. All rights reserved
 """
 from warnings import warn
 
-from numpy import std, argmax, diff, sign, array
+from numpy import std, argmax, diff, sign, array, int_
 from scipy.signal import find_peaks
 from scipy.integrate import cumulative_trapezoid
 from pywt import cwt, frequency2scale
@@ -210,7 +210,10 @@ class VerticalCwtGaitEvents(BaseProcess):
             -v_axis_sign * coef2[0], height=0.5 * std(coef2[0])
         )
 
-        res = {"initial_contacts": init_contact, "final_contacts": final_contact}
+        res = {
+            "initial_contacts": init_contact.astype(int_),
+            "final_contacts": final_contact.astype(int_)
+        }
 
         return res
 
@@ -305,6 +308,9 @@ class ApCwtGaitEvents(BaseProcess):
 
             ics.append(ic)
 
-        res = {"initial_contacts": array(ics), "final_contacts": fcs}
+        res = {
+            "initial_contacts": array(ics).astype(int_),
+            "final_contacts": fcs.astype(int_)
+        }
 
         return res
