@@ -18,11 +18,13 @@ jobs:
           ref: ${{ github.ref_name }}
       - uses: actions/setup-python@v3
       - uses: fortran-lang/setup-fortran@v1
+        if: runner.os == 'Windows'
         id: setup-fortran
         with:
           compiler: gcc
           version: 11
       - run: ${{ env.FC }} --version
+        if: runner.os == 'Windows'
         env:
           FC: ${{ steps.setup-fortran.outputs.fc }}
       - name: Install cibuildwheel
