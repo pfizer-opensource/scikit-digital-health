@@ -17,9 +17,16 @@ jobs:
         with:
           ref: ${{ github.ref_name }}
       - uses: actions/setup-python@v3
+      - name: Provide gfortran (Windows)
+        if: runner.os == 'Windows'
+        uses: msys2/setup-msys2@v2
+
+      - name: Tell distutils to use mingw (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          echo "[build]`ncompiler=mingw32" | Out-File -Encoding ASCII ~/pydistutils.cfg
       - name: Install cibuildwheel
         run: python -m pip install cibuildwheel
-      
       - name: Build wheels
         env:
           CIBW_SKIP: pp* cp36-* cp37-* *musllinux*
@@ -27,6 +34,8 @@ jobs:
           CIBW_ARCHS_LINUX: auto64
           CIBW_ARCHS_WINDOWS: auto64
           # FC: gfortran-12
+          CIBW_BEFORE_BUILD_WINDOWS: pip install delvewheel
+          CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "delvewheel show {wheel} && delvewheel repair -w {dest_dir} {wheel} --no-mangle-all"
         run: |
           # if macOS, make sure to set the environment variables so that it can find gfortran-9
           if [ "$RUNNER_OS" == "macOS" ]; then
@@ -54,21 +63,21 @@ jobs:
         with:
           path: dist/*.tar.gz
   
-  upload_pypi:
-    needs: [build_wheels, build_sdist]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/download-artifact@v3
-        with:
-          # unpacks default artifact into dist/
-          # if `name: artifact` is omitted, the action will create extra parent dir
-          name: artifact
-          path: dist
-      - name: Print for info
-        run: ls dist/
-      - name: Upload to twine
-        uses: pypa/gh-action-pypi-publish@v1.5.0
-        with:
-          skip-existing: true
-          user: __token__
-          password: ${{ secrets.PYPI }}
+#  upload_pypi:
+#    needs: [build_wheels, build_sdist]
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/download-artifact@v3
+#        with:
+#          # unpacks default artifact into dist/
+#          # if `name: artifact` is omitted, the action will create extra parent dir
+#          name: artifact
+#          path: dist
+#      - name: Print for info
+#        run: ls dist/
+#      - name: Upload to twine
+#        uses: pypa/gh-action-pypi-publish@v1.5.0
+#        with:
+#          skip-existing: true
+#          user: __token__
+#          password: ${{ secrets.PYPI }}
