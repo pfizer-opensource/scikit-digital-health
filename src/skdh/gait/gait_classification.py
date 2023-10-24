@@ -174,6 +174,9 @@ class PredictGaitLumbarLgbm(BaseProcess):
         # account for edges, if windows overlap
         bout_stops_ds = bout_stops_ds * wstep + (wlen - wstep)
 
+        # make sure that we dont go over the array limits
+        bout_stops_ds[-1] = min(bout_stops_ds[-1], time_ds.size - 1)
+
         # upsample indices back to original data
         bout_starts = around(
             interp(time_ds[bout_starts_ds], time, arange(time.size))
