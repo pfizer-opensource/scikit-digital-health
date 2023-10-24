@@ -308,6 +308,9 @@ class ApCwtGaitEvents(BaseProcess):
 
             ics.append(ic)
 
-        res = {"initial_contacts": array(ics), "final_contacts": fcs}
+        res = {
+            "initial_contacts": array(ics).astype(int_),
+            "final_contacts": fcs.astype(int_)
+        }
 
         return res
