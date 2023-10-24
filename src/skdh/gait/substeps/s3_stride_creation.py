@@ -119,6 +119,9 @@ class CreateStridesAndQc(BaseProcess):
             fc_forward = final_contacts[forward_idx]
             fc_forward_times = fc_times[forward_idx]
 
+            if fc_forward.size == 0:
+                continue
+
             # QC 0 :: can't have a second IC before the first FC
             if (ic_times[i + 1] - curr_ict) < (fc_forward_times[0] - curr_ict):
                 continue
