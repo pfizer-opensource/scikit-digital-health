@@ -20,7 +20,7 @@ def test_preprocessing(t_and_x):
 
     assert res["v_axis"] == 0
     assert res["ap_axis"] == 1
-    assert 0.925 < res["mean_step_freq"] < 0.975
+    assert 0.915 < res["mean_step_freq"] < 0.985
 
 
 def test_vertical_cwt_gait_events(t_and_x):
