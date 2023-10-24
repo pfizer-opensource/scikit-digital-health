@@ -112,12 +112,20 @@ class CreateStridesAndQc(BaseProcess):
         qc_ic, qc_fc, qc_fc_of = [], [], []
         fc_unused = ones(fc_times.size, dtype="bool")
 
+        # check for any overlapping IC/FC events
+        overlap = set(initial_contacts).intersection(set(final_contacts))
+        for idx in overlap:
+            fc_unused[final_contacts == idx] = False
+
         # iterate over available IC times
         for i, curr_ict in enumerate(ic_times[:-1]):
             # forward FC
             forward_idx = nonzero((fc_times > curr_ict) & fc_unused)[0]
             fc_forward = final_contacts[forward_idx]
             fc_forward_times = fc_times[forward_idx]
+
+            if fc_forward.size == 0:
+                continue
 
             # QC 0 :: can't have a second IC before the first FC
             if (ic_times[i + 1] - curr_ict) < (fc_forward_times[0] - curr_ict):

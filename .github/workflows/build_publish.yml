@@ -2,7 +2,7 @@ name: Build_and_Publish
 
 on:
   release:
-    types: [published]
+    types: [released]
 
 jobs:
   build_wheels:
@@ -10,16 +10,24 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-2019]  # use windows-2019 because it still has a working fortran compiler installed
-    
+        os: [ubuntu-latest, macos-latest, windows-latest]  # use windows-2019 because it still has a working fortran compiler installed
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.ref_name }}
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v4
+      - uses: fortran-lang/setup-fortran@v1
+        if: runner.os == 'Windows'
+        id: setup-fortran
+        with:
+          compiler: gcc
+          version: 12
+      - run: ${{ env.FC }} --version
+        if: runner.os == 'Windows'
+        env:
+          FC: ${{ steps.setup-fortran.outputs.fc }}
       - name: Install cibuildwheel
         run: python -m pip install cibuildwheel
-      
       - name: Build wheels
         env:
           CIBW_SKIP: pp* cp36-* cp37-* *musllinux*
@@ -40,7 +48,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           path: ./wheelhouse/*.whl
-  
+
   build_sdist:
     name: Build Source Distribution
     runs-on: ubuntu-latest
@@ -53,7 +61,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           path: dist/*.tar.gz
-  
+
   upload_pypi:
     needs: [build_wheels, build_sdist]
     runs-on: ubuntu-latest

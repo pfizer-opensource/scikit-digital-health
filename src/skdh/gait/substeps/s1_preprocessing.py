@@ -189,6 +189,8 @@ class PreprocessGaitBout(BaseProcess):
 
         step_samples = pks[idx]
         mean_step_freq = 1 / (step_samples / fs)
+        # constrain the step frequency
+        mean_step_freq = max(min(mean_step_freq, 5.0), 0.4)
 
         res = {
             "v_axis": v_axis,
