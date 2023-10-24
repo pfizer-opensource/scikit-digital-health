@@ -31,7 +31,7 @@ class PreprocessGaitBout(BaseProcess):
         If None (default), the following are used:
 
         - `N`: 4
-        - `Wn`: [2 * 0.5, 2 * 5.0] - NOTE, this should be in Hz, not radians.
+        - `Wn`: [0.5, 5.0] - NOTE, this should be in Hz, not radians.
           fs will be passed into the filter setup at filter creation time.
         - `btype`: band
         - `output`: sos - NOTE that this will always be set/overriden
@@ -53,7 +53,7 @@ class PreprocessGaitBout(BaseProcess):
         if step_freq_filter_kw is None:
             step_freq_filter_kw = {
                 'N': 4,
-                'Wn': array([2 * 0.5, 2 * 5.0]),
+                'Wn': array([0.5, 5.0]),
                 'btype': 'band',
             }
 
