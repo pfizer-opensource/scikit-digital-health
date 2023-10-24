@@ -72,7 +72,7 @@ class GaitLumbar(BaseProcess):
         the following are used:
 
         - `N`: 4
-        - `Wn`: [2 * 0.5, 2 * 5.0] - NOTE this will be multiplied by fs at computation time
+        - `Wn`: [0.5, 5.0] - NOTE this will be multiplied by fs at computation time
         - `btype`: band
         - `output`: sos - NOTE that this will always be set/overriden
 
