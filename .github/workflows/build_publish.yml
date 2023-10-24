@@ -17,11 +17,16 @@ jobs:
         with:
           ref: ${{ github.ref_name }}
       - uses: actions/setup-python@v3
+      - uses: fortran-lang/setup-fortran@v1
+        id: setup-fortran
+        with:
+          compiler: gcc
+          version: 11
+      - run: ${{ env.FC }} --version
+        env:
+          FC: ${{ steps.setup-fortran.outputs.fc }}
       - name: Install cibuildwheel
         run: python -m pip install cibuildwheel
-      - name: Setup GNU Fortran
-        if: runner.os == 'Windows'
-        uses: modflowpy/install-gfortran-action@v1
       - name: Build wheels
         env:
           CIBW_SKIP: pp* cp36-* cp37-* *musllinux*
