@@ -114,6 +114,9 @@ class CreateStridesAndQc(BaseProcess):
 
         # iterate over available IC times
         for i, curr_ict in enumerate(ic_times[:-1]):
+            # check if any of the FC's match the IC, and drop them
+            if initial_contacts[i] in final_contacts:
+                fc_unused[final_contacts == initial_contacts[i]] = False
             # forward FC
             forward_idx = nonzero((fc_times > curr_ict) & fc_unused)[0]
             fc_forward = final_contacts[forward_idx]
