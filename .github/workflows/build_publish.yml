@@ -22,6 +22,9 @@ jobs:
       - name: Provide gfortran (Windows)
         if: runner.os == 'Windows'
         uses: msys2/setup-msys2@v2
+      - name: Look for f951
+        if: runner.os == 'Windows'
+        run: find . -name f951
       - name: Build wheels
         env:
           CIBW_SKIP: pp* cp36-* cp37-* *musllinux*
