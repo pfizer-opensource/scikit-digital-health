@@ -48,16 +48,35 @@ class GaitLumbar(BaseProcess):
         The method to use for gait event detection, case-insensitive. "AP CWT"
         uses :meth:`skdh.gaitv3.substeps.ApCwtGaitEvents`, while "Vertical CWT"
         uses :meth:`skdh.gaitv3.substeps.VerticalCwtGaitEvents`. Default is "AP CWT".
+    day_window : array-like
+        Two (2) element array-like of the base and period of the window to use for determining
+        days. Default is (0, 24), which will look for days starting at midnight and lasting 24
+        hours. None removes any day-based windowing.
+
+    Other Parameters
+    ----------------
     correct_orientation : bool, optional
-        Correct the accelerometer orientation if it is slightly mis-aligned
-        with the anatomical axes. Default is True. Used in the pre-processing
-        step of the bout processing pipeline.
+        [:meth:`skdh.gaitv3.substeps.PreprocessGaitBout`] Correct the accelerometer
+        orientation if it is slightly mis-aligned with the anatomical axes. Default
+        is True. Used in the pre-processing step of the bout processing pipeline.
     filter_cutoff : float, optional
         [:meth:`skdh.gaitv3.substeps.PreprocessGaitBout`] Low-pass filter cutoff
-        in Hz. Default is 20.0.
+        in Hz for the acceleration data for future use in bout processing. Default is 20.0.
     filter_order : int, optional
         [:meth:`skdh.gaitv3.substeps.PreprocessGaitBout`] Low-pass filter order.
         Default is 4.
+    step_freq_filter_kw : {None, dict}, optional
+        [:meth:`skdh.gaitv3.substeps.PreprocessGaitBout`] Key-word arguments for
+        the filter applied to the acceleration data before autocorrelation when
+        estimating the mean step frequency of the gait bout. If None (default),
+        the following are used:
+
+        - `N`: 4
+        - `Wn`: [2 * 0.5, 2 * 5.0] - NOTE this will be multiplied by fs at computation time
+        - `btype`: band
+        - `output`: sos - NOTE that this will always be set/overriden
+
+        See :scipy-signal:func:`scipy.signal.butter` for full options.
     use_cwt_scale_relation : bool, optional
         [:meth:`skdh.gaitv3.substeps.VerticalCwtGaitEvents`] Use the optimal scale/frequency
         relationship.
@@ -76,13 +95,6 @@ class GaitLumbar(BaseProcess):
         Either a callable with the input of mean step time, or a float (between 0.0
         and 1.0) indicating a static factor. Default ("default") is the function
         :math:`0.17 * mean\\_step\\_time + 0.05`.
-    day_window : array-like
-        Two (2) element array-like of the base and period of the window to use for determining
-        days. Default is (0, 24), which will look for days starting at midnight and lasting 24
-        hours. None removes any day-based windowing.
-
-    Other Parameters
-    ----------------
     bout_processing_pipeline : {None, Pipeline}, optional
         The processing pipeline to use on bouts of gait. Default is None, which
         creates a standard pipeline (see Notes). If you need more than these
@@ -193,6 +205,7 @@ class GaitLumbar(BaseProcess):
         correct_orientation=True,
         filter_cutoff=20.0,
         filter_order=4,
+        step_freq_filter_kw=None,
         use_cwt_scale_relation=True,
         wavelet_scale="default",
         round_scale=False,
@@ -211,6 +224,7 @@ class GaitLumbar(BaseProcess):
             correct_orientation=correct_orientation,
             filter_cutoff=filter_cutoff,
             filter_order=filter_order,
+            step_freq_filter_kw=step_freq_filter_kw,
             use_cwt_scale_relation=use_cwt_scale_relation,
             wavelet_scale=wavelet_scale,
             round_scale=round_scale,
@@ -237,6 +251,7 @@ class GaitLumbar(BaseProcess):
                     correct_orientation=correct_orientation,
                     filter_cutoff=filter_cutoff,
                     filter_order=filter_order,
+                    step_freq_filter_kw=step_freq_filter_kw,
                 )
             )
             if gait_event_method.lower() == "ap cwt":
