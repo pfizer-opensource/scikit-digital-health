@@ -175,7 +175,10 @@ class PredictGaitLumbarLgbm(BaseProcess):
         bout_stops_ds = bout_stops_ds * wstep + (wlen - wstep)
 
         # make sure that we dont go over the array limits
-        bout_stops_ds[-1] = min(bout_stops_ds[-1], time_ds.size - 1)
+        try:
+            bout_stops_ds[-1] = min(bout_stops_ds[-1], time_ds.size - 1)
+        except IndexError:
+            pass
 
         # upsample indices back to original data
         bout_starts = around(
