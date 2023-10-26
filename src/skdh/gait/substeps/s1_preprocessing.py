@@ -4,7 +4,21 @@ Gait bout acceleration pre-processing functions.
 Lukas Adamowicz
 Copyright (c) 2023, Pfizer Inc. All rights reserved
 """
-from numpy import mean, std, median, argmax, sign, abs, argsort, corrcoef, diff, array, logspace, log, exp, sum
+from numpy import (
+    mean,
+    median,
+    argmax,
+    sign,
+    abs,
+    argsort,
+    corrcoef,
+    diff,
+    array,
+    logspace,
+    log,
+    exp,
+    sum,
+)
 from scipy.signal import detrend, butter, sosfiltfilt, find_peaks
 import pywt
 
@@ -40,7 +54,13 @@ class PreprocessGaitBout(BaseProcess):
         See :scipy-signal:func:`scipy.signal.butter` for full options.
     """
 
-    def __init__(self, correct_orientation=True, filter_cutoff=20.0, filter_order=4, step_freq_filter_kw=None):
+    def __init__(
+        self,
+        correct_orientation=True,
+        filter_cutoff=20.0,
+        filter_order=4,
+        step_freq_filter_kw=None,
+    ):
         super().__init__(
             correct_orientation=correct_orientation,
             filter_cutoff=filter_cutoff,
@@ -53,12 +73,12 @@ class PreprocessGaitBout(BaseProcess):
 
         if step_freq_filter_kw is None:
             step_freq_filter_kw = {
-                'N': 4,
-                'Wn': array([0.5, 5.0]),
-                'btype': 'band',
+                "N": 4,
+                "Wn": array([0.5, 5.0]),
+                "btype": "band",
             }
 
-        step_freq_filter_kw.update({'output': 'sos'})
+        step_freq_filter_kw.update({"output": "sos"})
         self.sf_filter_kw = step_freq_filter_kw
 
     @staticmethod
@@ -93,7 +113,8 @@ class PreprocessGaitBout(BaseProcess):
 
         return sign
 
-    def get_step_time(self, fs, accel, ap_axis):
+    @staticmethod
+    def get_step_time(fs, accel, ap_axis):
         """
         Estimate the average step time for the walking bout.
 
@@ -109,15 +130,17 @@ class PreprocessGaitBout(BaseProcess):
             Mean step time for the walking bout
         """
         # span a range of scales
-        scale1 = pywt.frequency2scale('gaus1', 0.5 / fs)
-        scale2 = pywt.frequency2scale('gaus1', 5.0 / fs)
+        scale1 = pywt.frequency2scale("gaus1", 0.5 / fs)
+        scale2 = pywt.frequency2scale("gaus1", 5.0 / fs)
         scales = logspace(log(scale1), log(scale2), 10, base=exp(1))
 
-        coefs, _ = pywt.cwt(accel[:, ap_axis], scales, 'gaus1')
+        coefs, _ = pywt.cwt(accel[:, ap_axis], scales, "gaus1")
         coefsum = sum(coefs, axis=0)  # "power" in that frequency band
 
         # auto covariance
-        ac = gait_metrics._autocovariancefn(coefsum, min(int(60 * fs), coefsum.size), biased=True)
+        ac = gait_metrics._autocovariancefn(
+            coefsum, min(int(60 * fs), coefsum.size), biased=True
+        )
 
         pks, _ = find_peaks(ac)
         step_samples = pks[0]
