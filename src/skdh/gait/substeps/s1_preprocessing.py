@@ -4,8 +4,9 @@ Gait bout acceleration pre-processing functions.
 Lukas Adamowicz
 Copyright (c) 2023, Pfizer Inc. All rights reserved
 """
-from numpy import mean, std, median, argmax, sign, abs, argsort, corrcoef, diff, array
+from numpy import mean, std, median, argmax, sign, abs, argsort, corrcoef, diff, array, logspace, log, exp, sum
 from scipy.signal import detrend, butter, sosfiltfilt, find_peaks
+import pywt
 
 from skdh.base import BaseProcess, handle_process_returns
 from skdh.utility import correct_accelerometer_orientation
@@ -92,6 +93,37 @@ class PreprocessGaitBout(BaseProcess):
 
         return sign
 
+    def get_step_time(self, fs, accel, ap_axis):
+        """
+        Estimate the average step time for the walking bout.
+
+        Parameters
+        ----------
+        fs
+        accel
+        ap_axis
+
+        Returns
+        -------
+        mean_step_time : float
+            Mean step time for the walking bout
+        """
+        # span a range of scales
+        scale1 = pywt.frequency2scale('gaus1', 0.5 / fs)
+        scale2 = pywt.frequency2scale('gaus1', 5.0 / fs)
+        scales = logspace(log(scale1), log(scale2), 10, base=exp(1))
+
+        coefs, _ = pywt.cwt(accel[:, ap_axis], scales, 'gaus1')
+        coefsum = sum(coefs, axis=0)  # "power" in that frequency band
+
+        # auto covariance
+        ac = gait_metrics._autocovariancefn(coefsum, min(int(60 * fs), coefsum.size), biased=True)
+
+        pks, _ = find_peaks(ac)
+        step_samples = pks[0]
+
+        return step_samples / fs
+
     @handle_process_returns(results_to_kwargs=True)
     def predict(self, *, time, accel, fs=None, v_axis=None, ap_axis=None, **kwargs):
         """
@@ -172,23 +204,8 @@ class PreprocessGaitBout(BaseProcess):
         accel_filt = detrend(accel_filt, axis=0)
 
         # estimate step frequency
-        sos = butter(**self.sf_filter_kw, fs=fs)
-        sf_acc_f = sosfiltfilt(sos, accel, axis=0)
-
-        ac = gait_metrics._autocovariancefn(
-            sf_acc_f, min(sf_acc_f.shape[0] - 1, int(4 * fs)), biased=True, axis=0
-        )
-
-        factor = 1.0
-        pks = array([])
-        while factor > 0.5 and pks.size == 0:
-            pks, _ = find_peaks(ac[:, ap_axis], prominence=factor * std(ac[:, ap_axis]))
-            factor -= 0.05
-
-        idx = argsort(ac[pks, ap_axis])[-1]
-
-        step_samples = pks[idx]
-        mean_step_freq = 1 / (step_samples / fs)
+        step_time = self.get_step_time(fs, accel, ap_axis)
+        mean_step_freq = 1 / step_time
         # constrain the step frequency
         mean_step_freq = max(min(mean_step_freq, 5.0), 0.4)
 
