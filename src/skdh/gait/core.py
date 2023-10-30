@@ -473,6 +473,8 @@ class GaitLumbar(BaseProcess):
             height=height,
             gait_bouts=gait_bouts,
             gait_pred=gait_pred,
+            v_axis=v_axis,
+            ap_axis=ap_axis,
             **kwargs,
         )
 
