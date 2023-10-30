@@ -19,7 +19,7 @@ from numpy import (
     exp,
     sum,
 )
-from scipy.signal import detrend, butter, sosfiltfilt, find_peaks
+from scipy.signal import detrend, butter, sosfiltfilt, find_peaks, correlate
 import pywt
 
 from skdh.base import BaseProcess, handle_process_returns
@@ -80,6 +80,32 @@ class PreprocessGaitBout(BaseProcess):
 
         step_freq_filter_kw.update({"output": "sos"})
         self.sf_filter_kw = step_freq_filter_kw
+
+    @staticmethod
+    def get_ap_axis(accel, v_axis):
+        """
+        Estimate the AP axis index
+
+        Parameters
+        ----------
+        accel
+        v_axis
+
+        Returns
+        -------
+        ap_axis : {0, 1, 2}
+            Index of the AP axis in the acceleration data
+        """
+        axes = {0, 1, 2}
+        # drop v-axis
+        a1, a2 = axes.difference([v_axis])
+
+        c_v1 = correlate(accel[:, v_axis], accel[:, a1])
+        c_v2 = correlate(accel[:, v_axis], accel[:, a2])
+
+        idx = argmax([max(abs(c_v1)), max(abs(c_v2))])
+
+        return [a1, a2][idx]  # index into the remaining axes
 
     @staticmethod
     def get_ap_axis_sign(fs, accel, ap_axis):
@@ -200,6 +226,15 @@ class PreprocessGaitBout(BaseProcess):
         # calculate fs if we need to
         fs = 1 / mean(diff(time)) if fs is None else fs
 
+        # filter
+        sos = butter(
+            self.filter_order, 2 * self.filter_cutoff / fs, output="sos", btype="low"
+        )
+        accel_filt = sosfiltfilt(sos, accel, axis=0)
+
+        # detrend
+        accel_filt = detrend(accel_filt, axis=0)
+
         # estimate accelerometer axes if necessary
         acc_mean = mean(accel, axis=0)
         v_axis_est = argmax(abs(acc_mean))  # always estimate for testing purposes
@@ -210,14 +245,7 @@ class PreprocessGaitBout(BaseProcess):
         v_axis_sign = sign(acc_mean[v_axis])
 
         # always estimate for testing purposes
-        sos = butter(4, 2 * 3.0 / fs, output="sos")
-        acc_f = sosfiltfilt(sos, accel, axis=0)
-
-        ac = gait_metrics._autocovariancefn(
-            acc_f, min(accel.shape[0] - 1, int(10 * fs)), biased=True, axis=0
-        )
-
-        ap_axis_est = argsort(corrcoef(ac.T)[v_axis])[-2]
+        ap_axis_est = self.get_ap_axis(accel_filt, v_axis)
 
         if ap_axis is None:
             ap_axis = ap_axis_est
@@ -229,15 +257,6 @@ class PreprocessGaitBout(BaseProcess):
             accel = correct_accelerometer_orientation(
                 accel, v_axis=v_axis, ap_axis=ap_axis
             )
-
-        # filter
-        sos = butter(
-            self.filter_order, 2 * self.filter_cutoff / fs, output="sos", btype="low"
-        )
-        accel_filt = sosfiltfilt(sos, accel, axis=0)
-
-        # detrend
-        accel_filt = detrend(accel_filt, axis=0)
 
         # estimate step frequency
         step_time = self.get_step_time(fs, accel, ap_axis)
