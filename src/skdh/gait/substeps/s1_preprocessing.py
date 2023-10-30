@@ -23,7 +23,7 @@ from scipy.signal import detrend, butter, sosfiltfilt, find_peaks
 import pywt
 
 from skdh.base import BaseProcess, handle_process_returns
-from skdh.utility import correct_accelerometer_orientation
+from skdh.utility import correct_accelerometer_orientation, compute_window_samples, get_windowed_view
 from skdh.gait.gait_metrics import gait_metrics
 
 
@@ -137,13 +137,21 @@ class PreprocessGaitBout(BaseProcess):
         coefs, _ = pywt.cwt(accel[:, ap_axis], scales, "gaus1")
         coefsum = sum(coefs, axis=0)  # "power" in that frequency band
 
+        # window - 5 second windows, 50% overlap
+        samp, step = compute_window_samples(fs, 5.0, 0.5)
+        coefsum_w = get_windowed_view(coefsum, samp, step, ensure_c_contiguity=True)
+
         # auto covariance
-        ac = gait_metrics._autocovariancefn(
-            coefsum, min(int(60 * fs), coefsum.size), biased=True
+        ac_w = gait_metrics._autocovariancefn(
+            coefsum, samp-10, biased=True, axis=1
         )
 
-        pks, _ = find_peaks(ac)
-        step_samples = pks[0]
+        first_peaks = []
+        for i in range(ac_w.shape[0]):
+            pks, _ = find_peaks(ac_w[i, :])
+            first_peaks.append(pks[0])
+
+        step_samples = median(first_peaks)
 
         return step_samples / fs
 
