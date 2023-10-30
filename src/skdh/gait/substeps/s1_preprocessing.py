@@ -135,15 +135,15 @@ class PreprocessGaitBout(BaseProcess):
         scales = logspace(log(scale1), log(scale2), 10, base=exp(1))
 
         coefs, _ = pywt.cwt(accel[:, ap_axis], scales, "gaus1")
-        coefsum = sum(coefs, axis=0)  # "power" in that frequency band
+        csum = sum(coefs, axis=0)  # "power" in that frequency band
 
         # window - 5 second windows, 50% overlap
         samp, step = compute_window_samples(fs, 5.0, 0.5)
-        coefsum_w = get_windowed_view(coefsum, samp, step, ensure_c_contiguity=True)
+        coefsum_w = get_windowed_view(csum, samp, step, ensure_c_contiguity=True)
 
         # auto covariance
         ac_w = gait_metrics._autocovariancefn(
-            coefsum, samp-10, biased=True, axis=1
+            coefsum_w, samp-10, biased=True, axis=1
         )
 
         first_peaks = []
