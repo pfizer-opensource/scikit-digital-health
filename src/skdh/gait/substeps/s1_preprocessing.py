@@ -238,7 +238,7 @@ class PreprocessGaitBout(BaseProcess):
         v_axis_sign = sign(acc_mean[v_axis])
 
         # always estimate for testing purposes
-        ap_axis_est = self.get_ap_axis(accel, v_axis)
+        ap_axis_est = self.get_ap_axis(fs, accel, v_axis)
 
         if ap_axis is None:
             ap_axis = ap_axis_est
