@@ -10,13 +10,13 @@ from numpy import (
     argmax,
     sign,
     abs,
-    max,
     diff,
     array,
     logspace,
     log,
     exp,
     sum,
+    max as npmax,
 )
 from scipy.signal import detrend, butter, sosfiltfilt, find_peaks, correlate
 import pywt
@@ -102,7 +102,7 @@ class PreprocessGaitBout(BaseProcess):
         c_v1 = correlate(accel[:, v_axis], accel[:, a1])
         c_v2 = correlate(accel[:, v_axis], accel[:, a2])
 
-        idx = argmax([max(abs(c_v1)), max(abs(c_v2))])
+        idx = argmax([npmax(abs(c_v1)), npmax(abs(c_v2))])
 
         return [a1, a2][idx]  # index into the remaining axes
 
