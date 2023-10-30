@@ -154,7 +154,7 @@ class PreprocessGaitBout(BaseProcess):
             except IndexError:
                 continue
 
-        if len(first_peaks) < 2:
+        if len(first_peaks) < (0.25 * ac_w.shape[0]):
             raise ValueError("Not enough valid autocovariance windows to estimate step frequency.")
         step_samples = median(first_peaks)
 
