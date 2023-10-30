@@ -148,9 +148,14 @@ class PreprocessGaitBout(BaseProcess):
 
         first_peaks = []
         for i in range(ac_w.shape[0]):
-            pks, _ = find_peaks(ac_w[i, :])
-            first_peaks.append(pks[0])
+            pks, _ = find_peaks(ac_w[i, :], height=0.0)
+            try:
+                first_peaks.append(pks[0])
+            except IndexError:
+                continue
 
+        if len(first_peaks) < 2:
+            raise ValueError("Not enough valid autocovariance windows to estimate step frequency.")
         step_samples = median(first_peaks)
 
         return step_samples / fs
