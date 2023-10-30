@@ -10,16 +10,15 @@ from numpy import (
     argmax,
     sign,
     abs,
-    argsort,
-    corrcoef,
     diff,
     array,
     logspace,
     log,
     exp,
     sum,
+    max as npmax,
 )
-from scipy.signal import detrend, butter, sosfiltfilt, find_peaks
+from scipy.signal import detrend, butter, sosfiltfilt, find_peaks, correlate
 import pywt
 
 from skdh.base import BaseProcess, handle_process_returns
@@ -40,13 +39,13 @@ class PreprocessGaitBout(BaseProcess):
         Low-pass filter cutoff in Hz. Default is 20.0
     filter_order : int, optional
         Low-pass filter order. Default is 4.
-    step_freq_filter_kw : {None, dict}, optional
+    ap_axis_filter_kw : {None, dict}, optional
         Key-word arguments for the filter applied to the acceleration data before
-        autocorrelation when estimating the mean step frequency of the gait bout.
+        cross-correlation when estimating the AP axis.
         If None (default), the following are used:
 
         - `N`: 4
-        - `Wn`: [0.5, 5.0] - NOTE, this should be in Hz, not radians.
+        - `Wn`: [0.25, 7.5] - NOTE, this should be in Hz, not radians.
           fs will be passed into the filter setup at filter creation time.
         - `btype`: band
         - `output`: sos - NOTE that this will always be set/overriden
@@ -59,7 +58,7 @@ class PreprocessGaitBout(BaseProcess):
         correct_orientation=True,
         filter_cutoff=20.0,
         filter_order=4,
-        step_freq_filter_kw=None,
+        ap_axis_filter_kw=None,
     ):
         super().__init__(
             correct_orientation=correct_orientation,
@@ -71,15 +70,44 @@ class PreprocessGaitBout(BaseProcess):
         self.filter_cutoff = filter_cutoff
         self.filter_order = filter_order
 
-        if step_freq_filter_kw is None:
-            step_freq_filter_kw = {
+        if ap_axis_filter_kw is None:
+            ap_axis_filter_kw = {
                 "N": 4,
-                "Wn": array([0.5, 5.0]),
+                "Wn": array([0.25, 7.5]),
                 "btype": "band",
             }
 
-        step_freq_filter_kw.update({"output": "sos"})
-        self.sf_filter_kw = step_freq_filter_kw
+        ap_axis_filter_kw.update({"output": "sos"})  # ALWAYS set this
+        self.ap_axis_filter_kw = ap_axis_filter_kw
+
+    def get_ap_axis(self, fs, accel, v_axis):
+        """
+        Estimate the AP axis index
+
+        Parameters
+        ----------
+        fs
+        accel
+        v_axis
+
+        Returns
+        -------
+        ap_axis : {0, 1, 2}
+            Index of the AP axis in the acceleration data
+        """
+        # filter acceleration
+        sos = butter(fs=fs, **self.ap_axis_filter_kw)
+        accel_filt = sosfiltfilt(sos, accel, axis=0)
+        axes = {0, 1, 2}
+        # drop v-axis
+        a1, a2 = axes.difference([v_axis])
+
+        c_v1 = correlate(accel_filt[:, v_axis], accel_filt[:, a1])
+        c_v2 = correlate(accel_filt[:, v_axis], accel_filt[:, a2])
+
+        idx = argmax([npmax(abs(c_v1)), npmax(abs(c_v2))])
+
+        return [a1, a2][idx]  # index into the remaining axes
 
     @staticmethod
     def get_ap_axis_sign(fs, accel, ap_axis):
@@ -210,14 +238,7 @@ class PreprocessGaitBout(BaseProcess):
         v_axis_sign = sign(acc_mean[v_axis])
 
         # always estimate for testing purposes
-        sos = butter(4, 2 * 3.0 / fs, output="sos")
-        acc_f = sosfiltfilt(sos, accel, axis=0)
-
-        ac = gait_metrics._autocovariancefn(
-            acc_f, min(accel.shape[0] - 1, int(10 * fs)), biased=True, axis=0
-        )
-
-        ap_axis_est = argsort(corrcoef(ac.T)[v_axis])[-2]
+        ap_axis_est = self.get_ap_axis(fs, accel, v_axis)
 
         if ap_axis is None:
             ap_axis = ap_axis_est

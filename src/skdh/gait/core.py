@@ -65,14 +65,14 @@ class GaitLumbar(BaseProcess):
     filter_order : int, optional
         [:meth:`skdh.gaitv3.substeps.PreprocessGaitBout`] Low-pass filter order.
         Default is 4.
-    step_freq_filter_kw : {None, dict}, optional
-        [:meth:`skdh.gaitv3.substeps.PreprocessGaitBout`] Key-word arguments for
-        the filter applied to the acceleration data before autocorrelation when
-        estimating the mean step frequency of the gait bout. If None (default),
-        the following are used:
+    ap_axis_filter_kw : {None, dict}, optional
+        Key-word arguments for the filter applied to the acceleration data before
+        cross-correlation when estimating the AP axis.
+        If None (default), the following are used:
 
         - `N`: 4
-        - `Wn`: [0.5, 5.0] - NOTE this will be multiplied by fs at computation time
+        - `Wn`: [0.25, 7.5] - NOTE, this should be in Hz, not radians.
+          fs will be passed into the filter setup at filter creation time.
         - `btype`: band
         - `output`: sos - NOTE that this will always be set/overriden
 
@@ -205,7 +205,7 @@ class GaitLumbar(BaseProcess):
         correct_orientation=True,
         filter_cutoff=20.0,
         filter_order=4,
-        step_freq_filter_kw=None,
+        ap_axis_filter_kw=None,
         use_cwt_scale_relation=True,
         wavelet_scale="default",
         round_scale=False,
@@ -224,7 +224,7 @@ class GaitLumbar(BaseProcess):
             correct_orientation=correct_orientation,
             filter_cutoff=filter_cutoff,
             filter_order=filter_order,
-            step_freq_filter_kw=step_freq_filter_kw,
+            ap_axis_filter_kw=ap_axis_filter_kw,
             use_cwt_scale_relation=use_cwt_scale_relation,
             wavelet_scale=wavelet_scale,
             round_scale=round_scale,
@@ -251,7 +251,7 @@ class GaitLumbar(BaseProcess):
                     correct_orientation=correct_orientation,
                     filter_cutoff=filter_cutoff,
                     filter_order=filter_order,
-                    step_freq_filter_kw=step_freq_filter_kw,
+                    ap_axis_filter_kw=ap_axis_filter_kw,
                 )
             )
             if gait_event_method.lower() == "ap cwt":
