@@ -22,6 +22,10 @@ class TestGait:
             correct_orientation=True,
             filter_cutoff=20.0,
             filter_order=4,
+            ic_prom_factor=0.1,  # match original processing for testing
+            ic_dist_factor=0.0,
+            fc_prom_factor=0.1,
+            fc_dist_factor=0.0,
             max_stride_time=lambda x: 2.0 * x + 1.0,
             loading_factor=lambda x: 0.17 * x + 0.05,
         )
@@ -77,6 +81,10 @@ class TestGait:
             correct_orientation=True,
             filter_cutoff=20.0,
             filter_order=4,
+            ic_prom_factor=0.1,  # match original processing for testing
+            ic_dist_factor=0.0,
+            fc_prom_factor=0.1,
+            fc_dist_factor=0.0,
             max_stride_time=lambda x: 2.0 * x + 1.0,
             loading_factor=lambda x: 0.17 * x + 0.05,
         )

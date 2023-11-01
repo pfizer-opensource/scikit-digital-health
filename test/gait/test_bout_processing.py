@@ -47,7 +47,12 @@ def test_vertical_cwt_gait_events(t_and_x):
 def test_ap_cwt_gait_events(t_and_x):
     t, x = t_and_x
 
-    proc = ApCwtGaitEvents()
+    proc = ApCwtGaitEvents(
+        ic_prom_factor=0.1,
+        ic_dist_factor=0.0,
+        fc_prom_factor=0.1,
+        fc_dist_factor=0.0,
+    )
     res = proc.predict(
         time=t,
         accel_filt=x,
