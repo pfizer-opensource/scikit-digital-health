@@ -77,6 +77,22 @@ class GaitLumbar(BaseProcess):
         - `output`: sos - NOTE that this will always be set/overriden
 
         See :scipy-signal:func:`scipy.signal.butter` for full options.
+    ic_prom_factor : float, optional
+        [:meth:`skdh.gaitv3.substeps.ApCwtGaitEvents`] Factor multiplied by the
+        standard deviation of the CWT coefficients to obtain a minimum prominence
+        for IC peak detection. Default is 0.6.
+    ic_dist_factor : float, optional
+        [:meth:`skdh.gaitv3.substeps.ApCwtGaitEvents`] Factor multiplying the mean
+        step samples to obtain a minimum distance (in # of samples) between IC peaks.
+        Default is 0.5.
+    fc_prom_factor : float, optional
+        [:meth:`skdh.gaitv3.substeps.ApCwtGaitEvents`] Factor multiplying the standard
+        deviation of the CWT coefficients to obtain a minimum prominence for FC peak
+        detection. Default is 0.6
+    fc_dist_factor : float, optional
+        [:meth:`skdh.gaitv3.substeps.ApCwtGaitEvents`] Factor multiplying the mean
+        step samples to obtain a minimum distance (in # of samples) between FC peaks.
+        Default is 0.6.
     use_cwt_scale_relation : bool, optional
         [:meth:`skdh.gaitv3.substeps.VerticalCwtGaitEvents`] Use the optimal scale/frequency
         relationship.
@@ -206,6 +222,10 @@ class GaitLumbar(BaseProcess):
         filter_cutoff=20.0,
         filter_order=4,
         ap_axis_filter_kw=None,
+        ic_prom_factor=0.6,
+        ic_dist_factor=0.5,
+        fc_prom_factor=0.6,
+        fc_dist_factor=0.6,
         use_cwt_scale_relation=True,
         wavelet_scale="default",
         round_scale=False,
@@ -225,6 +245,10 @@ class GaitLumbar(BaseProcess):
             filter_cutoff=filter_cutoff,
             filter_order=filter_order,
             ap_axis_filter_kw=ap_axis_filter_kw,
+            ic_prom_factor=ic_prom_factor,
+            ic_dist_factor=ic_dist_factor,
+            fc_prom_factor=fc_prom_factor,
+            fc_dist_factor=fc_dist_factor,
             use_cwt_scale_relation=use_cwt_scale_relation,
             wavelet_scale=wavelet_scale,
             round_scale=round_scale,
@@ -255,7 +279,12 @@ class GaitLumbar(BaseProcess):
                 )
             )
             if gait_event_method.lower() == "ap cwt":
-                self.bout_pipeline.add(substeps.ApCwtGaitEvents())
+                self.bout_pipeline.add(substeps.ApCwtGaitEvents(
+                    ic_prom_factor=ic_prom_factor,
+                    ic_dist_factor=ic_dist_factor,
+                    fc_prom_factor=fc_prom_factor,
+                    fc_dist_factor=fc_dist_factor,
+                ))
             elif gait_event_method.lower() in ["vertical cwt", "v cwt"]:
                 self.bout_pipeline.add(
                     substeps.VerticalCwtGaitEvents(

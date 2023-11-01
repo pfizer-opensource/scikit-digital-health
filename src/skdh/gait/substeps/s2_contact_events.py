@@ -222,10 +222,41 @@ class ApCwtGaitEvents(BaseProcess):
     """
     Predict gait events from a lumbar sensor based on AP acceleration and using
     a Continuous Wavelet Transform to smooth the raw signal.
+
+    Parameters
+    ----------
+    ic_prom_factor : float, optional
+        Factor multiplied by the standard deviation of the CWT coefficients to
+        obtain a minimum prominence for IC peak detection. Default is 0.6.
+    ic_dist_factor : float, optional
+        Factor multiplying the mean step samples to obtain a minimum distance
+        (in # of samples) between IC peaks. Default is 0.5.
+    fc_prom_factor : float, optional
+        Factor multiplying the standard deviation of the CWT coefficients to
+        obtain a minimum prominence for FC peak detection. Default is 0.6
+    fc_dist_factor : float, optional
+        Factor multiplying the mean step samples to obtain a minimum distance
+        (in # of samples) between FC peaks. Default is 0.6.
     """
 
-    def __init__(self):
-        super().__init__()
+    def __init__(
+            self,
+            ic_prom_factor=0.6,
+            ic_dist_factor=0.5,
+            fc_prom_factor=0.6,
+            fc_dist_factor=0.6,
+    ):
+        super().__init__(
+            ic_prom_factor=ic_prom_factor,
+            ic_dist_factor=ic_dist_factor,
+            fc_prom_factor=fc_prom_factor,
+            fc_dist_factor=fc_dist_factor,
+        )
+
+        self.ic_pf = ic_prom_factor
+        self.ic_df = ic_dist_factor
+        self.fc_pf = fc_prom_factor
+        self.fc_df = fc_dist_factor
 
     @handle_process_returns(results_to_kwargs=True)
     def predict(
@@ -272,17 +303,25 @@ class ApCwtGaitEvents(BaseProcess):
         # FINAL CONTACTS
         ap_vel = cumulative_trapezoid(accel_filt[:, ap_axis], dx=1 / fs, initial=0)
         coef_fc, _ = cwt(ap_vel, scale_fc, "gaus1")
-        fcs, _ = find_peaks(ap_axis_sign * coef_fc[0], prominence=0.1 * std(coef_fc[0]))
+        fcs, _ = find_peaks(
+            ap_axis_sign * coef_fc[0],
+            prominence=self.fc_pf * std(coef_fc[0]),
+            distance=max(int(self.fc_df * fs / mean_step_freq), 1),
+        )
 
         # INITIAL CONTACT
         coef_ic, _ = cwt(accel_filt[:, ap_axis], scale_ic, "gaus1")
         # get the peaks
         pks, _ = find_peaks(
-            -ap_axis_sign * coef_ic[0], prominence=0.1 * std(coef_ic[0])
+            -ap_axis_sign * coef_ic[0],
+            prominence=self.ic_pf * std(coef_ic[0]),
+            distance=max(int(self.ic_df * fs / mean_step_freq), 1)
         )
         # minima/negative peaks
         npks, _ = find_peaks(
-            ap_axis_sign * coef_ic[0], prominence=0.1 * std(coef_ic[0])
+            ap_axis_sign * coef_ic[0],
+            prominence=self.ic_pf * std(coef_ic[0]),
+            distance=max(int(self.ic_df * fs / mean_step_freq), 1)
         )
 
         ics = []
