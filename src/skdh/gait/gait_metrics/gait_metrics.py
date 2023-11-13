@@ -425,7 +425,8 @@ class StepLengthModel2(GaitEventEndpoint):
             med_ss = nanmedian(gait["single support"][bmask])
             t_ratio = med_ids / med_ss
 
-            l_ratio = 1.12 * t_ratio**2 + 0.547 * t_ratio + 0.066
+            # l_ratio = 1.12 * t_ratio**2 + 0.547 * t_ratio + 0.066  # OLD
+            l_ratio = 1.1 * t_ratio
             lp = l_ratio * leg_length
 
             l_prime[bmask] = lp
