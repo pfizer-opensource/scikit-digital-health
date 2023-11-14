@@ -130,6 +130,62 @@ Per stride terminology:
 - Double Support: when both feet are in contact with the ground simultaneously
 - Single Support: when only 1 foot is in contact with the ground
 
+Updating Code to the New Gait Module
+------------------------------------
+Since version 0.13.0, this module (`gait`) now by default uses a new gait algorithm, and the
+original gait algorithm is in the `gait_old` module of SKDH. To convert the `gait_old`
+to this new module, and achieve very similar results (slight implementation differences may
+result in values differing very small values):
+
+.. code-block :: python
+
+    import skdh
+
+    # gait_old.py
+    g = skdh.gait_old.Gait(
+        correct_accel_orient=True,
+        use_cwt_scale_relation=True,
+        min_bout_time=8.0,
+        max_bout_separation_time=0.25,
+        max_stride_time=2.25,
+        loading_factor=0.2,
+        height_factor=0.53,
+        prov_leg_length=False,
+        filter_order=4,
+        filter_cutoff=20.0,
+        downsample_aa_filter=True,
+        day_window=(0, 24),
+    )
+
+    res = g.predict(time=t, accel=acc, fs=50.0, height=1.88)
+
+    # gait_new.py
+    g = skdh.gait.GaitLumbar(
+            downsample=True,
+            height_factor=0.53,
+            provide_leg_length=False,
+            min_bout_time=8.0,
+            max_bout_separation_time=0.5,
+            gait_event_method="v cwt",
+            correct_orientation=True,
+            filter_cutoff=20.0,
+            filter_order=4,
+            use_cwt_scale_relation=True,
+            wavelet_scale="default",
+            round_scale=True,
+            max_stride_time=2.25,
+            loading_factor=0.2,
+        )
+
+        # NOTE that this gait module does not automatically predict gait bouts,
+        # and this is now a separate module.
+        cls = PredictGaitLumbarLgbm()
+        cls._in_pipeline = True
+        kw, bouts = cls.predict(time=t, accel=acc, fs=50.0)
+
+        res = g.predict(height=1.88, **kw)
+
+
 Adding Custom Gait Endpoints
 ----------------------------
 
@@ -251,3 +307,12 @@ from skdh.gait import substeps
 from skdh.gait.substeps import *
 from skdh.gait.gait_metrics import *
 from skdh.gait import gait_metrics
+
+
+def __getattr__(name):
+    if name == "Gait":
+        raise AttributeError(
+            "The gait module has been updated with a new interface under `gait.GaitLumbar`, "
+            "and a different underlying default gait algorithm. For the old (pre 0.13.0) "
+            "gait algorithm, see `gait_old.Gait`"
+        )
