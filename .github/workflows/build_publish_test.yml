@@ -8,7 +8,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest]
+        os: [windows-latest]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -28,9 +28,11 @@ jobs:
         uses: pypa/cibuildwheel@v2.16.2
         env:
           CIBW_SKIP: pp* cp36-* cp37-* cp38-* *musllinux*
-          CIBW_ARCHS_MACOS: x86_64 arm64
+          CIBW_ARCHS_MACOS: x86_64
           CIBW_ARCHS_LINUX: auto64
           CIBW_ARCHES_WINDOWS: auto64
+          CIBW_BEFORE_BUILD_WINDOWS: "pip install delvewheel"
+          CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "delvewheel repair -w {dest_dir} {wheel}"
           FC: gfortran-12
         with:
           output-dir: wheelhouse
