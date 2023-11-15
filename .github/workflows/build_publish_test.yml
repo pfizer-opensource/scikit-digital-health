@@ -28,7 +28,7 @@ jobs:
         uses: pypa/cibuildwheel@v2.16.2
         env:
           CIBW_SKIP: pp* cp36-* cp37-* *musllinux*
-          CIBW_ARCHS_MACOS: x86_64
+          CIBW_ARCHS_MACOS: x86_64 arm64
           CIBW_ARCHS_LINUX: auto64
           CIBW_ARCHES_WINDOWS: auto64
           FC: gfortran-12
@@ -36,7 +36,7 @@ jobs:
           output-dir: wheelhouse
           config-file: "{package}/pyproject.toml"
       - name: Print for debugging
-        run: ls ./wheelhose
+        run: ls ./wheelhouse
       - name: Upload wheels
         uses: actions/upload-artifact@v3
         with:
