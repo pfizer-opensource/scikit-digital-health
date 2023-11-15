@@ -28,6 +28,12 @@ jobs:
         uses: pypa/cibuildwheel@v2.16.2
         env:
           FC: gfortran-12
+          CIBW_SKIP: "pp* cp36-* cp37-* *musllinux*"
+          CIBW_ARCHS_LINUX: "auto64"
+          CIBW_ARCHS_MACOS: "x86_64"
+          CIBW_ARCHS_WINDOWS: "auto64"
+          CIBW_BEFORE_BUILD_WINDOWS: "pip install delvewheel"
+          CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "delvewheel repair -w {dest_dir} {wheel}"
         with:
           output-dir: wheelhouse
           config-file: "{package}/pyproject.toml"
