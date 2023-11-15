@@ -1,0 +1,43 @@
+name: Build_and_Publish_test
+
+on: workflow_dispatch
+
+jobs:
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 0.13.0
+      - uses: actions/setup-python@v4
+      - uses: fortran-lang/setup-fortran@v1
+        if: runner.os == 'Windows'
+        id: setup-fortran
+        with:
+          compiler: gcc
+          version: 12
+      - run: ${{ env.FC }} --version
+        if: runner.os == 'Windows'
+        env:
+          FC: ${{ steps.setup-fortran.outputs.fc }}
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.16.2
+        env:
+          CIBW_SKIP: pp* cp36-* cp37-* *musllinux*
+          CIBW_ARCHS_MACOS: x86_64
+          CIBW_ARCHS_LINUX: auto64
+          CIBW_ARCHES_WINDOWS: auto64
+          FC: gfortran-12
+        with:
+          output-dir: wheelhouse
+          config-file: "{package}/pyproject.toml"
+      - name: Print for debugging
+        run: ls ./wheelhose
+      - name: Upload wheels
+        uses: actions/upload-artifact@v3
+        with:
+          path: ./wheelhouse/*.whl
