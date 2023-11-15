@@ -23,10 +23,6 @@ jobs:
         if: runner.os == 'Windows'
         env:
           FC: ${{ steps.setup-fortran.outputs.fc }}
-      - name: Set macos FC
-        if: runner.os == 'macOS'
-        env:
-          FC: gfortran-12
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.16.2
         env:
@@ -35,6 +31,7 @@ jobs:
           CIBW_ARCHS_LINUX: auto64
           CIBW_ARCHS_WINDOWS: auto64
           CIBW_BEFORE_BUILD_WINDOWS: "pip install delvewheel"
+          CIBW_BEFORE_BUILD_MACOS: "export FC=gfortran-12"
           CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "delvewheel repair -w {dest_dir} {wheel}"
           # FC: gfortran-12
         with:
