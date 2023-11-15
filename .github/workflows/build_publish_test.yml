@@ -23,6 +23,10 @@ jobs:
         if: runner.os == 'Windows'
         env:
           FC: ${{ steps.setup-fortran.outputs.fc }}
+      - name: Set macos FC
+        if: runner.os == 'macOS'
+        env:
+          FC: gfortran-12
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.16.2
         env:
