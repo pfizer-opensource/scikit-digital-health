@@ -27,8 +27,8 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.16.2
         env:
-          CIBW_SKIP: pp* cp36-* cp37-* *musllinux*
-          CIBW_ARCHS_MACOS: x86_64 universal2
+          CIBW_SKIP: pp* cp36-* cp37-* cp38-* *musllinux*
+          CIBW_ARCHS_MACOS: x86_64 arm64
           CIBW_ARCHS_LINUX: auto64
           CIBW_ARCHES_WINDOWS: auto64
           FC: gfortran-12
