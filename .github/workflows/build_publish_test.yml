@@ -19,6 +19,12 @@ jobs:
         with:
           compiler: gcc
           version: 12
+      - uses: fortran-lang/setup-fortran@v1
+        if: runner.os == 'macOS'
+        id: setup-fortran-macos
+        with:
+          compiler: gcc
+          version: 12
       - run: ${{ env.FC }} --version
         if: runner.os == 'Windows'
         env:
@@ -31,7 +37,6 @@ jobs:
           CIBW_ARCHS_LINUX: auto64
           CIBW_ARCHS_WINDOWS: auto64
           CIBW_BEFORE_BUILD_WINDOWS: "pip install delvewheel"
-          CIBW_BEFORE_BUILD_MACOS: "export FC=gfortran-12"
           CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "delvewheel repair -w {dest_dir} {wheel}"
           # FC: gfortran-12
         with:
