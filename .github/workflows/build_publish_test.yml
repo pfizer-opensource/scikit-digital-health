@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.ref_name }}
+          ref: 0.13.0
       - uses: fortran-lang/setup-fortran@v1
         if: runner.os == 'Windows'
         id: setup-fortran
@@ -47,3 +47,34 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           path: ./wheelhouse/*.whl
+  build_sdist:
+    name: Build Source Distribution
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: 0.13.0
+      - name: Build sdist
+        run: pipx run build --sdist
+      - uses: actions/upload-artifact@v3
+        with:
+          path: dist/*.tar.gz
+  
+  upload_pypi:
+    needs: [build_wheels, build_sdist]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          # unpacks default artifact into dist/
+          # if `name: artifact` is omitted, the action will create extra parent dir
+          name: artifact
+          path: dist
+      - name: Print for info
+        run: ls dist/
+      - name: Upload to twine
+        uses: pypa/gh-action-pypi-publish@v1.5.0
+        with:
+          skip-existing: true
+          user: __token__
+          password: ${{ secrets.PYPI }}
