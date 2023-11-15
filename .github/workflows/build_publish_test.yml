@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: 0.13.0
+          ref: ${{ github.ref_name }}
       - uses: fortran-lang/setup-fortran@v1
         if: runner.os == 'Windows'
         id: setup-fortran
@@ -53,7 +53,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: 0.13.0
+          ref: ${{ github.ref_name }}
       - name: Build sdist
         run: pipx run build --sdist
       - uses: actions/upload-artifact@v3
