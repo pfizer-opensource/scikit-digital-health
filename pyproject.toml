@@ -78,15 +78,15 @@ homepage = "https://github.com/PfizerRD/scikit-digital-health"
 documentation = "https://scikit-digital-health.readthedocs.io/en/latest/"
 
 [tool.cibuildwheel]
-skip = "pp* cp36-* cp37-* cp38-* *musllinux*"
+skip = ["pp*", "cp36-*", "cp37-*", "cp38-*", "*musllinux*"]
 
 [tool.cibuildwheel.linux]
-arches = ["auto64"]
+archs = ["auto64"]
 
 [tool.cibuildwheel.macos]
-arches = ["x86_64"]
+archs = ["x86_64"]
 
 [tool.cibuildwheel.windows]
-arches = ["auto64"]
+archs = ["auto64"]
 before-build = "pip install delvewheel"
 repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel}"
