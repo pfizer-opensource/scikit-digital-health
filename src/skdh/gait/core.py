@@ -6,6 +6,7 @@ Copyright (c) 2023, Pfizer Inc. All rights reserved.
 """
 from collections.abc import Iterable
 from warnings import warn
+from datetime import datetime, timedelta
 
 from numpy import ndarray, asarray, mean, diff, sum, nan
 
@@ -554,6 +555,7 @@ class GaitLumbar(BaseProcess):
             i: []
             for i in [
                 "Day N",
+                "Date",
                 "Bout N",
                 "Bout Starts",
                 "Bout Duration",
@@ -582,9 +584,6 @@ class GaitLumbar(BaseProcess):
             ]
         }
 
-        # keep track of where everything is in the loops
-        gait_i = 0
-
         for iday, (dstart, dstop) in enumerate(zip(day_starts_rs, day_stops_rs)):
             # GET GAIT BOUTS
             gait_bouts = get_gait_bouts(
@@ -596,6 +595,10 @@ class GaitLumbar(BaseProcess):
                 self.max_bout_sep_time,
                 self.min_bout_time,
             )
+
+            # keep track of the date - get the date of the first timestamp
+            # add a few samples to make sure we aren't catching the last sample of the previous day
+            dtime = datetime.utcfromtimestamp(time_rs[dstart + 10])
 
             for ibout, bout in enumerate(gait_bouts):
                 # run the bout processing pipeline
@@ -651,6 +654,10 @@ class GaitLumbar(BaseProcess):
             # add the day number
             gait["Day N"].extend(
                 [iday + 1] * (len(gait["Bout N"]) - len(gait["Day N"]))
+            )
+            # add date
+            gait['Date'].extend(
+                [dtime.strftime("%Y-%m-%d")] * (len(gait["Bout N"]) - len(gait["Day N"]))
             )
 
         # convert to arrays
