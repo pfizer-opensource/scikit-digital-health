@@ -49,7 +49,9 @@ def _update_date_results(
 
     results["Date"][day_n] = window_start_dt.strftime("%Y-%m-%d")
     results["Day Start Timestamp"][day_n] = start_dt.strftime("%Y-%m-%d %H:%M:%S.%f")
-    results["Day End Timestamp"][day_n] = datetime.utcfromtimestamp(time[day_stop_idx]).strftime("%Y-%m-%d %H:%M:%S.%f")
+    results["Day End Timestamp"][day_n] = datetime.utcfromtimestamp(
+        time[day_stop_idx]
+    ).strftime("%Y-%m-%d %H:%M:%S.%f")
     results["Weekday"][day_n] = window_start_dt.strftime("%A")
     results["Day N"][day_n] = day_n + 1
     results["N hours"][day_n] = around(

@@ -280,12 +280,14 @@ class GaitLumbar(BaseProcess):
                 )
             )
             if gait_event_method.lower() == "ap cwt":
-                self.bout_pipeline.add(substeps.ApCwtGaitEvents(
-                    ic_prom_factor=ic_prom_factor,
-                    ic_dist_factor=ic_dist_factor,
-                    fc_prom_factor=fc_prom_factor,
-                    fc_dist_factor=fc_dist_factor,
-                ))
+                self.bout_pipeline.add(
+                    substeps.ApCwtGaitEvents(
+                        ic_prom_factor=ic_prom_factor,
+                        ic_dist_factor=ic_dist_factor,
+                        fc_prom_factor=fc_prom_factor,
+                        fc_dist_factor=fc_dist_factor,
+                    )
+                )
             elif gait_event_method.lower() in ["vertical cwt", "v cwt"]:
                 self.bout_pipeline.add(
                     substeps.VerticalCwtGaitEvents(
@@ -656,8 +658,9 @@ class GaitLumbar(BaseProcess):
                 [iday + 1] * (len(gait["Bout N"]) - len(gait["Day N"]))
             )
             # add date
-            gait['Date'].extend(
-                [dtime.strftime("%Y-%m-%d")] * (len(gait["Bout N"]) - len(gait["Day N"]))
+            gait["Date"].extend(
+                [dtime.strftime("%Y-%m-%d")]
+                * (len(gait["Bout N"]) - len(gait["Day N"]))
             )
 
         # convert to arrays

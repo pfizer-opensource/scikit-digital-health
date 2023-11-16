@@ -492,8 +492,12 @@ class Sleep(BaseProcess):
                 time_ds[start], self.day_key[0]
             )
             # set the exact time of start/end of the day being used
-            sleep["Day Start Timestamp"][-1] = datetime.utcfromtimestamp(time_ds[start]).strftime("%Y-%m-%d %H:%M:%S.%f")
-            sleep["Day End Timestamp"][-1] = datetime.utcfromtimestamp(time_ds[stop]).strftime("%Y-%m-%d %H:%M:%S.%f")
+            sleep["Day Start Timestamp"][-1] = datetime.utcfromtimestamp(
+                time_ds[start]
+            ).strftime("%Y-%m-%d %H:%M:%S.%f")
+            sleep["Day End Timestamp"][-1] = datetime.utcfromtimestamp(
+                time_ds[stop]
+            ).strftime("%Y-%m-%d %H:%M:%S.%f")
 
             # plotting
             source_f = kwargs.get("file", self.plot_fname)
