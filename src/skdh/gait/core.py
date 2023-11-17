@@ -428,7 +428,7 @@ class GaitLumbar(BaseProcess):
         **kwargs,
     ):
         """
-        predict(time, accel, *, gyro=None, fs=None, height=None, gait_pred=None, v_axis=None, ap_axis=None, day_ends={})
+        predict(time, accel, *, gyro=None, fs=None, height=None, gait_pred=None, v_axis=None, ap_axis=None)
 
         Get the gait events and endpoints from a time series signal
 
@@ -465,11 +465,6 @@ class GaitLumbar(BaseProcess):
         ap_axis : {None, 0, 1, 2}, optional
             AP axis index. Default is None, which indicates that it will be estimated
             from the acceleration data each bout.
-        day_ends : dict, optional
-            Optional dictionary containing (N, 2) arrays of start and stop
-            indices for invididual days. Dictionary keys are in the format
-            ({base}, {period}). If not provided, or the key specified by `day_window`
-            is not found, no day-based windowing will be done.
 
         Returns
         -------
