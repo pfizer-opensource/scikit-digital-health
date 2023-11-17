@@ -558,6 +558,10 @@ class GaitLumbar(BaseProcess):
             for i in [
                 "Day N",
                 "Date",
+                "Day Start Hour",
+                "Day End Hour",
+                "Day Start Timestamp",
+                "Day End Timestamp",
                 "Bout N",
                 "Bout Starts",
                 "Bout Duration",
@@ -654,14 +658,17 @@ class GaitLumbar(BaseProcess):
                 gait_aux["ap axis"].extend([bout_res.get("ap_axis", None)] * n_strides)
 
             # add the day number
-            gait["Day N"].extend(
-                [iday + 1] * (len(gait["Bout N"]) - len(gait["Day N"]))
-            )
+            nvals = (len(gait["Bout N"]) - len(gait["Day N"]))
+            gait["Day N"].extend([iday + 1] * nvals)
             # add date
-            gait["Date"].extend(
-                [dtime.strftime("%Y-%m-%d")]
-                * (len(gait["Bout N"]) - len(gait["Day N"]))
-            )
+            gait["Date"].extend([dtime.strftime("%Y-%m-%d")] * nvals)
+            # add day start/end timestamps
+            gait["Day Start Timestamp"].extend([str(datetime.utcfromtimestamp(time_rs[dstart]))] * nvals)
+            gait["Day End Timestamp"].extend([str(datetime.utcfromtimestamp(time_rs[dstop]))] * nvals)
+
+        # add day start/stop hours
+        gait["Day Start Hour"] = [self.day_idx[0]] * len(gait['Date'])
+        gait["Day End Hour"] = [self.day_idx[0] + self.day_idx[1]] * len(gait['Date'])
 
         # convert to arrays
         for key in gait:
