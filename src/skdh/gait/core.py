@@ -269,6 +269,11 @@ class GaitLumbar(BaseProcess):
         self.min_bout_time = (min_bout_time,)
         self.max_bout_sep_time = max_bout_separation_time
 
+        if day_window is None:
+            self.day_key = (-1, -1)
+        else:
+            self.day_key = tuple(day_window)
+
         if bout_processing_pipeline is None:
             self.bout_pipeline = Pipeline(flatten_results=True)
             self.bout_pipeline.add(
