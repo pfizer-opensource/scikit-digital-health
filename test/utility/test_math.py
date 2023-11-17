@@ -1,7 +1,7 @@
 from collections.abc import Iterable
 
 import pytest
-from numpy import allclose, mean, std, median, max, min, nan, full
+from numpy import allclose, isclose, mean, std, median, max, min, nan, full, random
 from scipy.stats import skew, kurtosis
 
 from skdh.utility.windowing import get_windowed_view
@@ -13,6 +13,7 @@ from skdh.utility.math import (
     moving_median,
     moving_max,
     moving_min,
+    DFA,
 )
 
 
@@ -199,3 +200,20 @@ class TestMovingMin(BaseMovingStatsTester):
     function = staticmethod(moving_min)
     truth_function = staticmethod(min)
     truth_kw = {}
+
+
+def test_DFA(np_rng):
+    # get 1 axis from acc
+    xacc = random.default_rng(seed=1313871834).random(500)
+
+    box_sizes, dfa, alpha = DFA(xacc, scale=4)
+
+    assert allclose(box_sizes, [4, 16, 64, 256])
+    assert allclose(dfa, [0.12859269, 0.3036594 , 0.66000571, 1.00018071])
+    assert isclose(alpha, 0.4999082494319027)
+
+    box_sizes, dfa, alpha = DFA(xacc, scale=2**(1/8), box_sizes=[4, 8, 12])
+
+    assert allclose(box_sizes, [4, 8, 12])
+    assert allclose(dfa, [0.12859269, 0.20931833, 0.25553007])
+    assert allclose(alpha, 0.6334340246131107)

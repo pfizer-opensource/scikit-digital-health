@@ -6,7 +6,8 @@ Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from warnings import warn
 
-from numpy import moveaxis, ascontiguousarray, full, nan, isnan
+from numpy import moveaxis, ascontiguousarray, full, nan, isnan, ceil, asarray, cumsum, mean, zeros, arange, sqrt, log, float_
+from scipy.stats import linregress
 
 from skdh.utility import _extensions
 from skdh.utility.windowing import get_windowed_view
@@ -20,6 +21,7 @@ __all__ = [
     "moving_median",
     "moving_max",
     "moving_min",
+    "DFA",
 ]
 
 
@@ -814,3 +816,76 @@ def moving_min(a, w_len, skip, trim=True, axis=-1):
             res[:nfill] = xw.min(axis=1)
 
         return moveaxis(res, 0, axis)
+
+
+def DFA(a, scale=2**(1/8), box_sizes=None):
+    """
+    Detrended Fluctuation Analysis
+
+    Parameters
+    ----------
+    a : numpy.ndarray
+        1d array to compute DFA on
+    scale : {float, optional}, optional
+        Ratio between succesive box sizes. Default is 2**(1/8). Overwritten by
+        `box_sizes` if provided.
+    box_sizes : None, array-like, optional
+        List/array of box sizes (in samples) to use.
+
+    Returns
+    -------
+    box_sizes : numpy.ndarray
+        Array of box sizes.
+    dfa : numpy.ndarray
+        DFA values for each box size.
+    alpha : float
+        Log-log relationship slope of the dfa values
+
+    References
+    ----------
+    .. [1] Victor Barreto Mesquita, Florêncio Mendes Oliveira Filho, Paulo Canas Rodrigues,
+        "Detection of crossover points in detrended fluctuation analysis: an application
+        to EEG signals of patients with epilepsy", Bioinformatics, Volume 37, Issue 9,
+        May 2021, Pages 1278–1284, https://doi.org/10.1093/bioinformatics/btaa955
+    .. [2] Ian Meneghel Danilevicz, Vincent Theodoor van Hees, Frank van der Heide et al.
+        "Measures of fragmentation of rest activity patterns: mathematical properties
+        and interpretability based on accelerometer real life data", 06 November 2023, PREPRINT
+    .. [3] C.-K. Peng, S. V. Buldyrev, S. Havlin, M. Simons, H. E. Stanley, and A. L.
+        Goldberger, “Mosaic organization of DNA nucleotides,” Phys. Rev. E, vol. 49,
+        no. 2, pp. 1685–1689, Feb. 1994, doi: 10.1103/PhysRevE.49.1685.
+    """
+    if box_sizes is None:
+        if scale is None:
+            raise ValueError("One of `scale` or `box_sizes` must be provided.")
+        box_sizes = [4]
+        while box_sizes[-1] < round(a.size / 4):
+            box_sizes += [int(ceil(box_sizes[-1] * scale))]
+
+    box_sizes = asarray(box_sizes)
+
+    # subtract the mean and compute cumulative sum
+    y = cumsum(a - mean(a))
+    # allocate results
+    dfa = zeros(box_sizes.size, dtype=float_)
+
+    # iterate over window sizes
+    for i, wlen in enumerate(box_sizes):
+        # get a windowed view of y
+        yw = get_windowed_view(y, wlen, wlen)
+        # allocate results
+        f1w = zeros(yw.shape, dtype=float_)
+        # allocate x array for LM fit
+        x = arange(wlen)
+        # iterate over windows
+        for j, dat in enumerate(yw):
+            lr = linregress(x, dat)
+            f1w[j, :] = dat - (lr.slope * x + lr.intercept)
+        # make result 1d
+        f1 = f1w.ravel()
+
+        dfa[i] = sqrt(mean(f1**2))
+
+    # compute alpha
+    lr_dfa = linregress(log(box_sizes), log(dfa))
+
+    return box_sizes, dfa, lr_dfa.slope
