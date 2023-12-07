@@ -750,7 +750,10 @@ class AccelThresholdWearDetection(BaseProcess):
         if isinstance(shipping_criteria, (list, tuple)):
             shipping_criteria = [int(shipping_criteria[i]) for i in range(2)]
         elif isinstance(shipping_criteria, bool):
-            shipping_criteria = [24, 24]
+            if shipping_criteria:
+                shipping_criteria = [24, 24]
+            else:
+                shipping_criteria = [0, 0]
         elif isinstance(shipping_criteria, int):
             shipping_criteria = [shipping_criteria, shipping_criteria]
 

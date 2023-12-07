@@ -8,6 +8,7 @@ from warnings import warn
 
 from numpy import (
     mean,
+    std,
     diff,
     zeros,
     ones,
@@ -188,8 +189,9 @@ class CalibrateAccelerometer(BaseProcess):
                 finished = True
                 valid_calibration = False
                 warn(
-                    f"Recalibration not done with {self.min_hours + i_h * 12} hours due to "
-                    f"insufficient non-movement data available"
+                    f"Recalibration not done with {self.min_hours + (i_h - 1) * 12} - "
+                    f"{self.min_hours + i_h * 12} hours due to insufficient non-movement "
+                    f"data available"
                 )
             i_h += 1
 
@@ -349,9 +351,14 @@ class Store:
             )
             self._n = int((value.shape[0] // self.wlen) * self.wlen)
         else:
-            _rsd, _rm = moving_sd(
-                value[self._n :], self.wlen, self.wlen, axis=0, return_previous=True
-            )
+            if (value.shape[0] - self._n) > self.wlen:
+                _rsd, _rm = moving_sd(
+                    value[self._n :], self.wlen, self.wlen, axis=0, return_previous=True
+                )
+            else:
+                _rm = mean(value[self._n:], axis=0, keepdims=True)
+                _rsd = std(value[self._n:], axis=0, keepdims=True)
+
             self._acc_rsd = concatenate((self._acc_rsd, _rsd), axis=0)
             self._acc_rm = concatenate((self._acc_rm, _rm), axis=0)
             self._n += int((value[self._n :].shape[0] // self.wlen) * self.wlen)

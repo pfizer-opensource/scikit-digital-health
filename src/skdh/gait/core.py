@@ -6,6 +6,7 @@ Copyright (c) 2023, Pfizer Inc. All rights reserved.
 """
 from collections.abc import Iterable
 from warnings import warn
+from datetime import datetime, timedelta
 
 from numpy import ndarray, asarray, mean, diff, sum, nan
 
@@ -268,6 +269,11 @@ class GaitLumbar(BaseProcess):
         self.min_bout_time = (min_bout_time,)
         self.max_bout_sep_time = max_bout_separation_time
 
+        if day_window is None:
+            self.day_key = (-1, -1)
+        else:
+            self.day_key = tuple(day_window)
+
         if bout_processing_pipeline is None:
             self.bout_pipeline = Pipeline(flatten_results=True)
             self.bout_pipeline.add(
@@ -279,12 +285,14 @@ class GaitLumbar(BaseProcess):
                 )
             )
             if gait_event_method.lower() == "ap cwt":
-                self.bout_pipeline.add(substeps.ApCwtGaitEvents(
-                    ic_prom_factor=ic_prom_factor,
-                    ic_dist_factor=ic_dist_factor,
-                    fc_prom_factor=fc_prom_factor,
-                    fc_dist_factor=fc_dist_factor,
-                ))
+                self.bout_pipeline.add(
+                    substeps.ApCwtGaitEvents(
+                        ic_prom_factor=ic_prom_factor,
+                        ic_dist_factor=ic_dist_factor,
+                        fc_prom_factor=fc_prom_factor,
+                        fc_dist_factor=fc_dist_factor,
+                    )
+                )
             elif gait_event_method.lower() in ["vertical cwt", "v cwt"]:
                 self.bout_pipeline.add(
                     substeps.VerticalCwtGaitEvents(
@@ -420,7 +428,7 @@ class GaitLumbar(BaseProcess):
         **kwargs,
     ):
         """
-        predict(time, accel, *, gyro=None, fs=None, height=None, gait_pred=None, v_axis=None, ap_axis=None, day_ends={})
+        predict(time, accel, *, gyro=None, fs=None, height=None, gait_pred=None, v_axis=None, ap_axis=None)
 
         Get the gait events and endpoints from a time series signal
 
@@ -457,11 +465,6 @@ class GaitLumbar(BaseProcess):
         ap_axis : {None, 0, 1, 2}, optional
             AP axis index. Default is None, which indicates that it will be estimated
             from the acceleration data each bout.
-        day_ends : dict, optional
-            Optional dictionary containing (N, 2) arrays of start and stop
-            indices for invididual days. Dictionary keys are in the format
-            ({base}, {period}). If not provided, or the key specified by `day_window`
-            is not found, no day-based windowing will be done.
 
         Returns
         -------
@@ -554,6 +557,11 @@ class GaitLumbar(BaseProcess):
             i: []
             for i in [
                 "Day N",
+                "Date",
+                "Processing Start Hour",
+                "Processing End Hour",
+                "Day Start Timestamp",
+                "Day End Timestamp",
                 "Bout N",
                 "Bout Starts",
                 "Bout Duration",
@@ -582,9 +590,6 @@ class GaitLumbar(BaseProcess):
             ]
         }
 
-        # keep track of where everything is in the loops
-        gait_i = 0
-
         for iday, (dstart, dstop) in enumerate(zip(day_starts_rs, day_stops_rs)):
             # GET GAIT BOUTS
             gait_bouts = get_gait_bouts(
@@ -596,6 +601,10 @@ class GaitLumbar(BaseProcess):
                 self.max_bout_sep_time,
                 self.min_bout_time,
             )
+
+            # keep track of the date - get the date of the first timestamp
+            # add a few samples to make sure we aren't catching the last sample of the previous day
+            dtime = datetime.utcfromtimestamp(time_rs[dstart + 10])
 
             for ibout, bout in enumerate(gait_bouts):
                 # run the bout processing pipeline
@@ -649,9 +658,17 @@ class GaitLumbar(BaseProcess):
                 gait_aux["ap axis"].extend([bout_res.get("ap_axis", None)] * n_strides)
 
             # add the day number
-            gait["Day N"].extend(
-                [iday + 1] * (len(gait["Bout N"]) - len(gait["Day N"]))
-            )
+            nvals = (len(gait["Bout N"]) - len(gait["Day N"]))
+            gait["Day N"].extend([iday + 1] * nvals)
+            # add date
+            gait["Date"].extend([dtime.strftime("%Y-%m-%d")] * nvals)
+            # add day start/end timestamps
+            gait["Day Start Timestamp"].extend([str(datetime.utcfromtimestamp(time_rs[dstart]))] * nvals)
+            gait["Day End Timestamp"].extend([str(datetime.utcfromtimestamp(time_rs[dstop]))] * nvals)
+
+        # add day start/stop hours
+        gait["Processing Start Hour"] = [self.day_key[0]] * len(gait['Date'])
+        gait["Processing End Hour"] = [self.day_key[0] + self.day_key[1]] * len(gait['Date'])
 
         # convert to arrays
         for key in gait:

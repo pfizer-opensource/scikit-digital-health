@@ -48,6 +48,10 @@ def _update_date_results(
         window_start_dt -= timedelta(days=1)
 
     results["Date"][day_n] = window_start_dt.strftime("%Y-%m-%d")
+    results["Day Start Timestamp"][day_n] = start_dt.strftime("%Y-%m-%d %H:%M:%S.%f")
+    results["Day End Timestamp"][day_n] = datetime.utcfromtimestamp(
+        time[day_stop_idx]
+    ).strftime("%Y-%m-%d %H:%M:%S.%f")
     results["Weekday"][day_n] = window_start_dt.strftime("%A")
     results["Day N"][day_n] = day_n + 1
     results["N hours"][day_n] = around(
@@ -357,6 +361,8 @@ class ActivityLevelClassification(BaseProcess):
         n_ = self.day_idx[0].size
         res = {
             "Date": full(n_, "", dtype="U11"),
+            "Day Start Timestamp": full(n_, "", dtype="U26"),
+            "Day End Timestamp": full(n_, "", dtype="U26"),
             "Weekday": full(n_, "", dtype="U11"),
             "Day N": full(n_, -1, dtype="int"),
             "N hours": full(n_, nan, dtype="float"),

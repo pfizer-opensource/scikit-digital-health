@@ -22,7 +22,11 @@ from scipy.signal import detrend, butter, sosfiltfilt, find_peaks, correlate
 import pywt
 
 from skdh.base import BaseProcess, handle_process_returns
-from skdh.utility import correct_accelerometer_orientation, compute_window_samples, get_windowed_view
+from skdh.utility import (
+    correct_accelerometer_orientation,
+    compute_window_samples,
+    get_windowed_view,
+)
 from skdh.gait.gait_metrics import gait_metrics
 
 
@@ -170,9 +174,7 @@ class PreprocessGaitBout(BaseProcess):
         coefsum_w = get_windowed_view(csum, samp, step, ensure_c_contiguity=True)
 
         # auto covariance
-        ac_w = gait_metrics._autocovariancefn(
-            coefsum_w, samp-10, biased=True, axis=1
-        )
+        ac_w = gait_metrics._autocovariancefn(coefsum_w, samp - 10, biased=True, axis=1)
 
         first_peaks = []
         for i in range(ac_w.shape[0]):
@@ -183,7 +185,9 @@ class PreprocessGaitBout(BaseProcess):
                 continue
 
         if len(first_peaks) < (0.25 * ac_w.shape[0]):
-            raise ValueError("Not enough valid autocovariance windows to estimate step frequency.")
+            raise ValueError(
+                "Not enough valid autocovariance windows to estimate step frequency."
+            )
         step_samples = median(first_peaks)
 
         return step_samples / fs
@@ -251,11 +255,14 @@ class PreprocessGaitBout(BaseProcess):
                 accel, v_axis=v_axis, ap_axis=ap_axis
             )
 
-        # filter
-        sos = butter(
-            self.filter_order, 2 * self.filter_cutoff / fs, output="sos", btype="low"
-        )
-        accel_filt = sosfiltfilt(sos, accel, axis=0)
+        # filter if possible
+        if fs > (2 * self.filter_cutoff):
+            sos = butter(
+                self.filter_order, 2 * self.filter_cutoff / fs, output="sos", btype="low"
+            )
+            accel_filt = sosfiltfilt(sos, accel, axis=0)
+        else:
+            accel_filt = accel
 
         # detrend
         accel_filt = detrend(accel_filt, axis=0)

@@ -1,8 +1,6 @@
 name: Build_and_Publish
 
-on:
-  release:
-    types: [released]
+on: workflow_dispatch
 
 jobs:
   build_wheels:
@@ -10,15 +8,20 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]  # use windows-2019 because it still has a working fortran compiler installed
+        os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.ref_name }}
-      - uses: actions/setup-python@v4
       - uses: fortran-lang/setup-fortran@v1
         if: runner.os == 'Windows'
         id: setup-fortran
+        with:
+          compiler: gcc
+          version: 12
+      - uses: fortran-lang/setup-fortran@v1
+        if: runner.os == 'macOS'
+        id: setup-fortran-macos
         with:
           compiler: gcc
           version: 12
@@ -26,29 +29,28 @@ jobs:
         if: runner.os == 'Windows'
         env:
           FC: ${{ steps.setup-fortran.outputs.fc }}
-      - name: Install cibuildwheel
-        run: python -m pip install cibuildwheel
+      - run: ${{ env.FC }} --version
+        if: runner.os == 'macOS'
+        env:
+          FC: ${{ steps.setup-fortran-macos.outputs.fc }}
       - name: Build wheels
+        uses: pypa/cibuildwheel@v2.16.2
         env:
           CIBW_SKIP: pp* cp36-* cp37-* *musllinux*
           CIBW_ARCHS_MACOS: x86_64
           CIBW_ARCHS_LINUX: auto64
           CIBW_ARCHS_WINDOWS: auto64
-          # FC: gfortran-12
-        run: |
-          # if macOS, make sure to set the environment variables so that it can find gfortran-9
-          if [ "$RUNNER_OS" == "macOS" ]; then
-            export FC=gfortran-12
-          fi
-          python -m cibuildwheel --output-dir wheelhouse
-        shell: bash
+          CIBW_BEFORE_BUILD_WINDOWS: "pip install delvewheel"
+          CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "delvewheel repair -w {dest_dir} {wheel}"
+        with:
+          output-dir: wheelhouse
+          config-file: "{package}/pyproject.toml"
       - name: Print for Debugging
         run: ls ./wheelhouse
       - name: Upload wheels
         uses: actions/upload-artifact@v3
         with:
           path: ./wheelhouse/*.whl
-
   build_sdist:
     name: Build Source Distribution
     runs-on: ubuntu-latest
@@ -77,6 +79,6 @@ jobs:
       - name: Upload to twine
         uses: pypa/gh-action-pypi-publish@v1.5.0
         with:
-          skip-existing: true
+          skip_existing: true
           user: __token__
           password: ${{ secrets.PYPI }}

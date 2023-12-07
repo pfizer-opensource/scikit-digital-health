@@ -212,7 +212,7 @@ class VerticalCwtGaitEvents(BaseProcess):
 
         res = {
             "initial_contacts": init_contact.astype(int_),
-            "final_contacts": final_contact.astype(int_)
+            "final_contacts": final_contact.astype(int_),
         }
 
         return res
@@ -240,11 +240,11 @@ class ApCwtGaitEvents(BaseProcess):
     """
 
     def __init__(
-            self,
-            ic_prom_factor=0.6,
-            ic_dist_factor=0.5,
-            fc_prom_factor=0.6,
-            fc_dist_factor=0.6,
+        self,
+        ic_prom_factor=0.6,
+        ic_dist_factor=0.5,
+        fc_prom_factor=0.6,
+        fc_dist_factor=0.6,
     ):
         super().__init__(
             ic_prom_factor=ic_prom_factor,
@@ -315,13 +315,13 @@ class ApCwtGaitEvents(BaseProcess):
         pks, _ = find_peaks(
             -ap_axis_sign * coef_ic[0],
             prominence=self.ic_pf * std(coef_ic[0]),
-            distance=max(int(self.ic_df * fs / mean_step_freq), 1)
+            distance=max(int(self.ic_df * fs / mean_step_freq), 1),
         )
         # minima/negative peaks
         npks, _ = find_peaks(
             ap_axis_sign * coef_ic[0],
             prominence=self.ic_pf * std(coef_ic[0]),
-            distance=max(int(self.ic_df * fs / mean_step_freq), 1)
+            distance=max(int(self.ic_df * fs / mean_step_freq), 1),
         )
 
         ics = []
@@ -349,7 +349,7 @@ class ApCwtGaitEvents(BaseProcess):
 
         res = {
             "initial_contacts": array(ics).astype(int_),
-            "final_contacts": fcs.astype(int_)
+            "final_contacts": fcs.astype(int_),
         }
 
         return res
