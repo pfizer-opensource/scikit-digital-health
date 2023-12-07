@@ -558,8 +558,8 @@ class GaitLumbar(BaseProcess):
             for i in [
                 "Day N",
                 "Date",
-                "Day Start Hour",
-                "Day End Hour",
+                "Processing Start Hour",
+                "Processing End Hour",
                 "Day Start Timestamp",
                 "Day End Timestamp",
                 "Bout N",
@@ -667,8 +667,8 @@ class GaitLumbar(BaseProcess):
             gait["Day End Timestamp"].extend([str(datetime.utcfromtimestamp(time_rs[dstop]))] * nvals)
 
         # add day start/stop hours
-        gait["Day Start Hour"] = [self.day_idx[0]] * len(gait['Date'])
-        gait["Day End Hour"] = [self.day_idx[0] + self.day_idx[1]] * len(gait['Date'])
+        gait["Processing Start Hour"] = [self.day_key[0]] * len(gait['Date'])
+        gait["Processing End Hour"] = [self.day_key[0] + self.day_key[1]] * len(gait['Date'])
 
         # convert to arrays
         for key in gait:
