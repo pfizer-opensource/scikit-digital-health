@@ -255,11 +255,14 @@ class PreprocessGaitBout(BaseProcess):
                 accel, v_axis=v_axis, ap_axis=ap_axis
             )
 
-        # filter
-        sos = butter(
-            self.filter_order, 2 * self.filter_cutoff / fs, output="sos", btype="low"
-        )
-        accel_filt = sosfiltfilt(sos, accel, axis=0)
+        # filter if possible
+        if fs > (2 * self.filter_cutoff):
+            sos = butter(
+                self.filter_order, 2 * self.filter_cutoff / fs, output="sos", btype="low"
+            )
+            accel_filt = sosfiltfilt(sos, accel, axis=0)
+        else:
+            accel_filt = accel
 
         # detrend
         accel_filt = detrend(accel_filt, axis=0)
