@@ -74,5 +74,5 @@ test = [
 ]
 
 [project.urls]
-homepage = "https://github.com/PfizerRD/scikit-digital-health"
+homepage = "https://github.com/pfizer-opensource/scikit-digital-health"
 documentation = "https://scikit-digital-health.readthedocs.io/en/latest/"
