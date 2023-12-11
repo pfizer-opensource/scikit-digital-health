@@ -737,7 +737,7 @@ class EqualAverageDurationThreshold(ActivityEndpoint):
     """
     def __init__(self, min_threshold=0.0001, max_threshold=0.1, skip_threshold=0.0001, state='wake'):
         super().__init__(
-            ["Threshold Equal Bouts", "Duration Equal Bouts"],
+            ["Threshold Equal Bouts [g]", "Duration Equal Bouts [min]"],
             state,
         )
 
@@ -779,8 +779,8 @@ class EqualAverageDurationThreshold(ActivityEndpoint):
         """
         super().predict()
 
-        self.eq_thresh = results[f"{self.state} Threshold Equal Bouts"]
-        self.eq_dur = results[f"{self.state} Duration Equal Bouts"]
+        self.eq_thresh = results[f"{self.state} Threshold Equal Bouts [g]"]
+        self.eq_dur = results[f"{self.state} Duration Equal Bouts [min]"]
         self.i = i
 
         # mu_le = full(self.thresholds.size, nan)
