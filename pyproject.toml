@@ -1,5 +1,4 @@
 [build-system]
-# TODO: unpin from github download for meson-python. currently required to remove the "strip" command which does not work on macs
 requires = [
     "meson-python",
     "wheel",
