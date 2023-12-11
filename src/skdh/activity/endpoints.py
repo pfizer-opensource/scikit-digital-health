@@ -6,7 +6,9 @@ Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from numpy import (
     array,
+    arange,
     zeros,
+    full,
     max,
     nanmax,
     histogram,
@@ -18,6 +20,9 @@ from numpy import (
     int_,
     floor,
     ceil,
+    isnan,
+    argmin,
+    abs,
 )
 from scipy.stats import linregress
 
@@ -711,4 +716,104 @@ class FragmentationEndpoints(ActivityEndpoint):
         self.r_gi = None
         self.r_ah = None
         self.r_pld = None
+        self.i = None
+
+
+class EqualAverageDurationThreshold(ActivityEndpoint):
+    """
+    Compute the threshold such that the bouts are of equal duration on
+    either side of the threshold.
+
+    Parameters
+    ----------
+    min_threshold : float, optional
+        Minimum threshold to use for the search. Default is 0.0001
+    max_threshold : float, optional
+        Maximum threshold to use for the search. Default is 0.1
+    skip_threshold : float, optional
+        Value to jump in the threshold grid for the search. Default is 0.0001
+    state : {'wake', 'sleep'}, optional
+        State during which the endpoint is being computed.
+    """
+    def __init__(self, min_threshold=0.0001, max_threshold=0.1, skip_threshold=0.0001, state='wake'):
+        super().__init__(
+            ["Threshold Equal Bouts", "Duration Equal Bouts"],
+            state,
+        )
+
+        self.thresholds = arange(min_threshold, max_threshold, skip_threshold)
+
+        # caching results
+        self.lens_le = None
+        self.lens_gt = None
+        self.set_length_lists()
+
+        self.eq_thresh = None
+        self.eq_dur = None
+        self.i = None
+
+    def set_length_lists(self):
+        self.lens_le = [[]] * self.thresholds
+        self.lens_gt = [[]] * self.thresholds
+
+    def predict(self, results, i, accel_metric, accel_metric_60, epoch_s, epochs_per_min, **kwargs):
+        """
+        Compute the equal average duration threshold.
+
+        Parameters
+        ----------
+        results : dict
+            Dictionary containing the initialized results arrays. Keys in `results`
+            are taken from the names of endpoints.
+        i : int
+            Index of the day, used to index into individual result arrays, e.g.
+            `results[self.name][i] = 5.0`
+        accel_metric : numpy.ndarray
+            Computed acceleration metric (e.g. ENMO).
+        accel_metric_60 : numpy.ndarray
+            Computed acceleration metric for a 60 second window.
+        epoch_s : int
+            Duration in seconds of each sample of `accel_metric`.
+        epochs_per_min : int
+            Number of epochs per minute.
+        """
+        super().predict()
+
+        self.eq_thresh = results[f"{self.state} Threshold Equal Bouts"]
+        self.eq_dur = results[f"{self.state} Duration Equal Bouts"]
+        self.i = i
+
+        # mu_le = full(self.thresholds.size, nan)
+        # mu_gt = full(self.thresholds.size, nan)
+        for i, thresh in self.thresholds:
+            mask = accel_metric_60 <= thresh
+
+            lens, starts, vals = rle(mask)
+
+            self.lens_le[i].extend(lens[vals == 1].tolist())
+            self.lens_gt[i].extend(lens[vals == 0].tolist())
+
+    def reset_cached(self):
+        super().reset_cached()
+
+        if all([i is not None for i in [self.eq_thresh, self.eq_dur, self.i]]):
+
+            mu_le = full(self.thresholds.size, nan)
+            mu_gt = full(self.thresholds.size, nan)
+
+            for i, thresh in self.thresholds:
+                mu_le[i] = fe.average_duration(lengths=self.lens_le[i])
+                mu_gt[i] = fe.average_duration(lengths=self.lens_gt[i])
+
+            # make sure we are comparing only non-nan values
+            mask = ~(isnan(mu_le) | isnan(mu_gt))
+            idx = argmin(abs(mu_le[mask] - mu_gt[mask]))
+
+            self.eq_thresh[self.i] = self.thresholds[mask][idx]
+            self.eq_dur[self.i] = mu_le[mask][idx]
+
+        # reset attributes
+        self.set_length_lists()
+        self.eq_thresh = None
+        self.eq_dur = None
         self.i = None
