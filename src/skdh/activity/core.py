@@ -441,7 +441,9 @@ class ActivityLevelClassification(BaseProcess):
                 res["N wear wake hours"][iday] = around(
                     sum(dwear_stops - dwear_starts) / fs / 3600, 1
                 )
-                res["Wear Wake Minutes"][iday] = sum(dwear_stops - dwear_starts) / fs / 60
+                res["Wear Wake Minutes"][iday] = (
+                    sum(dwear_stops - dwear_starts) / fs / 60
+                )
             else:
                 sleep_wear_starts = sleep_wear_stops = None
 

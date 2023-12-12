@@ -26,6 +26,8 @@ Activity Endpoints
     TotalIntensityTime
     BoutIntensityTime
     FragmentationEndpoints
+    EqualAverageDurationThreshold
+    SignalFeatures
 
 Accelerometer Metrics
 ---------------------

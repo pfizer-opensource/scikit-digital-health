@@ -6,7 +6,22 @@ Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from warnings import warn
 
-from numpy import moveaxis, ascontiguousarray, full, nan, isnan, ceil, asarray, cumsum, mean, zeros, arange, sqrt, log, float_
+from numpy import (
+    moveaxis,
+    ascontiguousarray,
+    full,
+    nan,
+    isnan,
+    ceil,
+    asarray,
+    cumsum,
+    mean,
+    zeros,
+    arange,
+    sqrt,
+    log,
+    float_,
+)
 from scipy.stats import linregress
 
 from skdh.utility import _extensions
@@ -818,7 +833,7 @@ def moving_min(a, w_len, skip, trim=True, axis=-1):
         return moveaxis(res, 0, axis)
 
 
-def DFA(a, scale=2**(1/8), box_sizes=None):
+def DFA(a, scale=2 ** (1 / 8), box_sizes=None):
     """
     Detrended Fluctuation Analysis
 

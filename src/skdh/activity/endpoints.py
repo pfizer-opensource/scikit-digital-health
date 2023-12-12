@@ -6,7 +6,9 @@ Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from numpy import (
     array,
+    arange,
     zeros,
+    full,
     max,
     nanmax,
     histogram,
@@ -15,17 +17,24 @@ from numpy import (
     sum,
     nonzero,
     maximum,
+    minimum,
+    mean,
     int_,
     floor,
     ceil,
+    isnan,
+    argmin,
+    abs,
+    concatenate,
 )
 from scipy.stats import linregress
 
-from skdh.utility import moving_mean
+from skdh.utility import moving_mean, get_windowed_view
 from skdh.utility import fragmentation_endpoints as fe
 from skdh.utility.internal import rle
 from skdh.activity.cutpoints import get_level_thresholds
 from skdh.activity.utility import handle_cutpoints
+from skdh import features
 
 
 __all__ = [
@@ -35,6 +44,8 @@ __all__ = [
     "TotalIntensityTime",
     "BoutIntensityTime",
     "FragmentationEndpoints",
+    "EqualAverageDurationThreshold",
+    "SignalFeatures",
 ]
 
 
@@ -712,3 +723,254 @@ class FragmentationEndpoints(ActivityEndpoint):
         self.r_ah = None
         self.r_pld = None
         self.i = None
+
+
+class EqualAverageDurationThreshold(ActivityEndpoint):
+    """
+    Compute the threshold such that the bouts are of equal duration on
+    either side of the threshold.
+
+    Parameters
+    ----------
+    min_threshold : float, optional
+        Minimum threshold to use for the search. Default is 0.0001
+    max_threshold : float, optional
+        Maximum threshold to use for the search. Default is 0.1
+    skip_threshold : float, optional
+        Value to jump in the threshold grid for the search. Default is 0.0001
+    state : {'wake', 'sleep'}, optional
+        State during which the endpoint is being computed.
+    """
+
+    def __init__(
+        self,
+        min_threshold=0.0001,
+        max_threshold=0.1,
+        skip_threshold=0.0001,
+        state="wake",
+    ):
+        super().__init__(
+            ["threshold equal avg duration [g]", "duration equal avg duration [min]"],
+            state,
+        )
+
+        self.thresholds = arange(min_threshold, max_threshold, skip_threshold)
+
+        # caching results
+        self.lens_le = None
+        self.lens_gt = None
+        self.set_length_lists()
+
+        self.eq_thresh = None
+        self.eq_dur = None
+        self.i = None
+
+    def set_length_lists(self):
+        self.lens_le = [[] for i in range(self.thresholds.size)]
+        self.lens_gt = [[] for i in range(self.thresholds.size)]
+
+    def predict(
+        self,
+        results,
+        i,
+        accel_metric,
+        accel_metric_60,
+        epoch_s,
+        epochs_per_min,
+        **kwargs,
+    ):
+        """
+        Compute the equal average duration threshold.
+
+        Parameters
+        ----------
+        results : dict
+            Dictionary containing the initialized results arrays. Keys in `results`
+            are taken from the names of endpoints.
+        i : int
+            Index of the day, used to index into individual result arrays, e.g.
+            `results[self.name][i] = 5.0`
+        accel_metric : numpy.ndarray
+            Computed acceleration metric (e.g. ENMO).
+        accel_metric_60 : numpy.ndarray
+            Computed acceleration metric for a 60 second window.
+        epoch_s : int
+            Duration in seconds of each sample of `accel_metric`.
+        epochs_per_min : int
+            Number of epochs per minute.
+        """
+        super().predict()
+
+        self.eq_thresh = results[f"{self.state} threshold equal avg duration [g]"]
+        self.eq_dur = results[f"{self.state} duration equal avg duration [min]"]
+        self.i = i
+
+        # mu_le = full(self.thresholds.size, nan)
+        # mu_gt = full(self.thresholds.size, nan)
+        for j, thresh in enumerate(self.thresholds):
+            mask = accel_metric_60 <= thresh
+
+            lens, starts, vals = rle(mask)
+
+            self.lens_le[j].extend(lens[vals == 1].tolist())
+            self.lens_gt[j].extend(lens[vals == 0].tolist())
+
+    def reset_cached(self):
+        super().reset_cached()
+
+        if all([i is not None for i in [self.eq_thresh, self.eq_dur, self.i]]):
+            mu_le = full(self.thresholds.size, nan)
+            mu_gt = full(self.thresholds.size, nan)
+
+            for i, thresh in enumerate(self.thresholds):
+                mu_le[i] = fe.average_duration(lengths=self.lens_le[i])
+                mu_gt[i] = fe.average_duration(lengths=self.lens_gt[i])
+
+            # make sure we are comparing only non-nan values
+            mask = ~(isnan(mu_le) | isnan(mu_gt))
+            idx = argmin(abs(mu_le[mask] - mu_gt[mask]))
+
+            self.eq_thresh[self.i] = self.thresholds[mask][idx]
+            self.eq_dur[self.i] = mu_le[mask][idx]
+
+        # reset attributes
+        self.set_length_lists()
+        self.eq_thresh = None
+        self.eq_dur = None
+        self.i = None
+
+
+class SignalFeatures(ActivityEndpoint):
+    """
+    Compute various signal features on the raw acceleration metric.
+
+    Parameters
+    ----------
+    window_minutes : int, optional
+        Number of minutes for each window. Default is 15.
+    window_skip_percentage : float, optional
+        Skip percentage of the window. Values between 0 and 1. Default is 0.5. Will
+        be trimmed between 0.01 and 0.99.
+    state : {'wake', 'sleep'}
+        State during which the endpoint is being computed.
+    """
+
+    def __init__(self, window_minutes=15, window_skip_percentage=0.5, state="wake"):
+        super().__init__(
+            [
+                "signal entropy",
+                "sample entropy",
+                "permutation entropy",
+                "power spectral sum",
+                "spectral flatness",
+                "spectral entropy",
+                "sparc",
+            ],
+            state,
+        )
+
+        self.wlen_min = window_minutes
+        self.wskip_p = maximum(minimum(window_skip_percentage, 0.99), 0.01)
+
+        freq_kw = dict(padlevel=2, low_cutoff=0.0, high_cutoff=10.0)
+
+        self.bank = features.Bank()
+        self.bank.add(
+            [
+                features.SignalEntropy(),
+                features.SampleEntropy(m=4, r=1.0),
+                features.PermutationEntropy(order=3, delay=1, normalize=True),
+                features.PowerSpectralSum(**freq_kw),
+                features.SpectralFlatness(**freq_kw),
+                features.SpectralEntropy(**freq_kw),
+                features.SPARC(padlevel=4, fc=10.0, amplitude_threshold=0.05),
+            ]
+        )
+
+        # caching results
+        self.i = None
+        self.r_sig_ent, self.r_samp_ent, self.r_perm_ent = None, None, None
+        self.r_pss, self.r_spec_flat, self.r_spec_ent = None, None, None
+        self.r_sparc = None
+        self.vals = []
+
+    def predict(
+        self, results, i, accel_metric, accel_metric_60, epoch_s, epochs_per_min
+    ):
+        """
+        Saves the signal features values.
+
+        Parameters
+        ----------
+        results : dict
+            Dictionary containing the initialized results arrays. Keys in `results`
+            are taken from the names of endpoints.
+        i : int
+            Index of the day, used to index into individual result arrays, e.g.
+            `results[self.name][i] = 5.0`
+        accel_metric : numpy.ndarray
+            Computed acceleration metric (e.g. ENMO).
+        accel_metric_60 : numpy.ndarray
+            Computed acceleration metric for a 60 second window.
+        epoch_s : int
+            Duration in seconds of each sample of `accel_metric`.
+        epochs_per_min : int
+            Number of epochs per minute.
+        """
+        super().predict()
+
+        # get "pointers" to the results values
+        self.r_sig_ent = results[self.name[0]]
+        self.r_samp_ent = results[self.name[1]]
+        self.r_perm_ent = results[self.name[2]]
+        self.r_pss = results[self.name[3]]
+        self.r_spec_flat = results[self.name[4]]
+        self.r_spec_ent = results[self.name[5]]
+        self.r_sparc = results[self.name[6]]
+        self.i = i
+
+        # compute values for the data we have
+        wlen = int(self.wlen_min * (60 / epoch_s))
+        skip = int(wlen * self.wskip_p)
+        # get a windowed view of the acceleration metric
+        metric_w = get_windowed_view(accel_metric, wlen, skip, ensure_c_contiguity=True)
+
+        # compute the features
+        feats = self.bank.compute(metric_w, fs=1 / epoch_s, axis=1)
+
+        self.vals.append(feats)
+
+    def reset_cached(self):
+        super().reset_cached()
+
+        if all(
+            [
+                i is not None
+                for i in [
+                    self.r_sig_ent,
+                    self.r_samp_ent,
+                    self.r_perm_ent,
+                    self.r_pss,
+                    self.r_spec_flat,
+                    self.r_spec_ent,
+                    self.r_sparc,
+                    self.i,
+                ]
+            ]
+        ):
+            # combine values
+            values = concatenate(self.vals, axis=1)
+            self.r_sig_ent[self.i] = mean(values[0])
+            self.r_samp_ent[self.i] = mean(values[1])
+            self.r_perm_ent[self.i] = mean(values[2])
+            self.r_pss[self.i] = mean(values[3])
+            self.r_spec_flat[self.i] = mean(values[4])
+            self.r_spec_ent[self.i] = mean(values[5])
+            self.r_sparc[self.i] = mean(values[6])
+
+        # reset values
+        self.i = None
+        self.r_sig_ent, self.r_samp_ent, self.r_perm_ent = None, None, None
+        self.r_pss, self.r_spec_flat, self.r_spec_ent = None, None, None
+        self.r_sparc = None
+        self.vals = []
