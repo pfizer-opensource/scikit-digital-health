@@ -759,8 +759,8 @@ class EqualAverageDurationThreshold(ActivityEndpoint):
         self.i = None
 
     def set_length_lists(self):
-        self.lens_le = [[]] * self.thresholds
-        self.lens_gt = [[]] * self.thresholds
+        self.lens_le = [[] for i in range(self.thresholds.size)]
+        self.lens_gt = [[] for i in range(self.thresholds.size)]
 
     def predict(self, results, i, accel_metric, accel_metric_60, epoch_s, epochs_per_min, **kwargs):
         """
@@ -791,13 +791,13 @@ class EqualAverageDurationThreshold(ActivityEndpoint):
 
         # mu_le = full(self.thresholds.size, nan)
         # mu_gt = full(self.thresholds.size, nan)
-        for i, thresh in self.thresholds:
+        for j, thresh in enumerate(self.thresholds):
             mask = accel_metric_60 <= thresh
 
             lens, starts, vals = rle(mask)
 
-            self.lens_le[i].extend(lens[vals == 1].tolist())
-            self.lens_gt[i].extend(lens[vals == 0].tolist())
+            self.lens_le[j].extend(lens[vals == 1].tolist())
+            self.lens_gt[j].extend(lens[vals == 0].tolist())
 
     def reset_cached(self):
         super().reset_cached()
@@ -807,7 +807,7 @@ class EqualAverageDurationThreshold(ActivityEndpoint):
             mu_le = full(self.thresholds.size, nan)
             mu_gt = full(self.thresholds.size, nan)
 
-            for i, thresh in self.thresholds:
+            for i, thresh in enumerate(self.thresholds):
                 mu_le[i] = fe.average_duration(lengths=self.lens_le[i])
                 mu_gt[i] = fe.average_duration(lengths=self.lens_gt[i])
 
@@ -942,13 +942,13 @@ class SignalFeatures(ActivityEndpoint):
         ):
             # combine values
             values = concatenate(self.vals, axis=1)
-            self.r_sig_ent[self.i] = mean(values[:, 0])
-            self.r_samp_ent[self.i] = mean(values[:, 1])
-            self.r_perm_ent[self.i] = mean(values[:, 2])
-            self.r_pss[self.i] = mean(values[:, 3])
-            self.r_spec_flat[self.i] = mean(values[:, 4])
-            self.r_spec_ent[self.i] = mean(values[:, 5])
-            self.r_sparc[self.i] = mean(values[:, 6])
+            self.r_sig_ent[self.i] = mean(values[0])
+            self.r_samp_ent[self.i] = mean(values[1])
+            self.r_perm_ent[self.i] = mean(values[2])
+            self.r_pss[self.i] = mean(values[3])
+            self.r_spec_flat[self.i] = mean(values[4])
+            self.r_spec_ent[self.i] = mean(values[5])
+            self.r_sparc[self.i] = mean(values[6])
 
         # reset values
         self.i = None
