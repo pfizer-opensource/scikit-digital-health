@@ -6,7 +6,23 @@ Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from warnings import warn
 
-from numpy import moveaxis, ascontiguousarray, full, nan, isnan, ceil, asarray, cumsum, mean, zeros, arange, sqrt, log, float_
+from numpy import (
+    moveaxis,
+    ascontiguousarray,
+    full,
+    nan,
+    isnan,
+    ceil,
+    asarray,
+    cumsum,
+    mean,
+    zeros,
+    arange,
+    sqrt,
+    log,
+    exp,
+    float_,
+)
 from scipy.stats import linregress
 
 from skdh.utility import _extensions
@@ -818,7 +834,7 @@ def moving_min(a, w_len, skip, trim=True, axis=-1):
         return moveaxis(res, 0, axis)
 
 
-def DFA(a, scale=2**(1/8), box_sizes=None):
+def DFA(a, scale=2 ** (1 / 8), box_sizes=None):
     """
     Detrended Fluctuation Analysis
 
@@ -839,7 +855,11 @@ def DFA(a, scale=2**(1/8), box_sizes=None):
     dfa : numpy.ndarray
         DFA values for each box size.
     alpha : float
-        Log-log relationship slope of the dfa values
+        Log-log relationship slope of the dfa values.
+    abi : float
+        Activity Balance Index [2]_. Values are re-scaled from `alpha` to (0, 1].
+        The theory is that higher values present as more healthy (ie activity
+        is close to fractal noise) [2]_.
 
     References
     ----------
@@ -887,5 +907,8 @@ def DFA(a, scale=2**(1/8), box_sizes=None):
 
     # compute alpha
     lr_dfa = linregress(log(box_sizes), log(dfa))
+    alpha = lr_dfa.slope
 
-    return box_sizes, dfa, lr_dfa.slope
+    abi = exp((-abs(alpha - 1)) / exp(-2))
+
+    return box_sizes, dfa, alpha, abi

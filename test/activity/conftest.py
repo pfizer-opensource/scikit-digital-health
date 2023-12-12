@@ -68,6 +68,17 @@ def act_results():
         "wake MVPA gini index",
         "wake MVPA avg hazard",
         "wake MVPA power law distribution",
+        "wake dfa alpha",
+        "wake dfa activity balance index",
+        "wake threshold equal avg duration [g]",
+        "wake duration equal avg duration [min]",
+        "wake 15min signal entropy",
+        "wake 15min sample entropy",
+        "wake 15min permutation entropy",
+        "wake 15min power spectral sum",
+        "wake 15min spectral flatness",
+        "wake 15min spectral entropy",
+        "wake 15min sparc",
     ]
 
     return {i: [0.0] for i in k}

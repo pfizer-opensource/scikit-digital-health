@@ -31,7 +31,7 @@ author = "Pfizer, Inc"
 with open("../meson.build", "r") as f:
     for line in f.readlines():
         if "version" in line:
-            version = line.split(": ")[-1].strip(""",'""")
+            version = line.split(": ")[-1].strip().replace("'", "").replace(",", "")
             break  # we want the first line with version
 
 # -- General configuration ---------------------------------------------------

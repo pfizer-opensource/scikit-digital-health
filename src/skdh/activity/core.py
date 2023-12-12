@@ -57,6 +57,9 @@ def _update_date_results(
     results["N hours"][day_n] = around(
         (time[day_stop_idx - 1] - time[day_start_idx]) / 3600, 1
     )
+    results["Total Minutes"][day_n] = around(
+        (time[day_stop_idx - 1] - time[day_start_idx]) / 60, 1
+    )
 
     return start_dt
 
@@ -230,6 +233,16 @@ class ActivityLevelClassification(BaseProcess):
             ept.FragmentationEndpoints("MVPA", cutpoints=cutpoints),
         ]
 
+        # add wake endpoints for some new/experimental features
+        self.wake_endpoints += [
+            ept.ActivityDFA(scale=2**(1/8), state='wake'),
+            ept.EqualAverageDurationThreshold(),
+        ]
+        # signal features metrics across various window lengths
+        self.wake_endpoints += [
+            ept.SignalFeatures(window_minutes=i) for i in [15, 30, 60]
+        ]
+
         self.sleep_endpoints = [
             ept.TotalIntensityTime(lvl, self.wlen, self.cutpoints, state="sleep")
             for lvl in self.act_levels
@@ -368,6 +381,9 @@ class ActivityLevelClassification(BaseProcess):
             "N hours": full(n_, nan, dtype="float"),
             "N wear hours": full(n_, nan, dtype="float"),
             "N wear wake hours": full(n_, nan, dtype="float"),
+            "Total Minutes": full(n_, nan, dtype="float"),
+            "Wear Minutes": full(n_, nan, dtype="float"),
+            "Wear Wake Minutes": full(n_, nan, dtype="float"),
         }
 
         for endpt in self.wake_endpoints + self.sleep_endpoints:
@@ -410,6 +426,8 @@ class ActivityLevelClassification(BaseProcess):
             res["N wear hours"][iday] = around(
                 sum(dwear_stops - dwear_starts) / fs / 3600, 1
             )
+            res["Wear Minutes"][iday] = sum(dwear_stops - dwear_starts) / fs / 60
+
             if res["N wear hours"][iday] < self.min_wear:
                 continue  # skip day if less than minimum specified hours of wear time
 
@@ -432,6 +450,9 @@ class ActivityLevelClassification(BaseProcess):
 
                 res["N wear wake hours"][iday] = around(
                     sum(dwear_stops - dwear_starts) / fs / 3600, 1
+                )
+                res["Wear Wake Minutes"][iday] = (
+                    sum(dwear_stops - dwear_starts) / fs / 60
                 )
             else:
                 sleep_wear_starts = sleep_wear_stops = None

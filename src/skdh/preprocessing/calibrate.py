@@ -356,8 +356,8 @@ class Store:
                     value[self._n :], self.wlen, self.wlen, axis=0, return_previous=True
                 )
             else:
-                _rm = mean(value[self._n:], axis=0, keepdims=True)
-                _rsd = std(value[self._n:], axis=0, keepdims=True)
+                _rm = mean(value[self._n :], axis=0, keepdims=True)
+                _rsd = std(value[self._n :], axis=0, keepdims=True)
 
             self._acc_rsd = concatenate((self._acc_rsd, _rsd), axis=0)
             self._acc_rm = concatenate((self._acc_rm, _rm), axis=0)

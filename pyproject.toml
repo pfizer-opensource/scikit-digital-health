@@ -1,5 +1,4 @@
 [build-system]
-# TODO: unpin from github download for meson-python. currently required to remove the "strip" command which does not work on macs
 requires = [
     "meson-python",
     "wheel",
@@ -74,5 +73,5 @@ test = [
 ]
 
 [project.urls]
-homepage = "https://github.com/PfizerRD/scikit-digital-health"
+homepage = "https://github.com/pfizer-opensource/scikit-digital-health"
 documentation = "https://scikit-digital-health.readthedocs.io/en/latest/"
