@@ -1023,6 +1023,21 @@ class SignalFeatures(ActivityEndpoint):
         """
         super().predict()
 
+        # compute values for the data we have
+        wlen = int(self.wlen_min * (60 / epoch_s))
+        skip = int(wlen * self.wskip_p)
+        # if we dont have any data to run on
+        if wlen > accel_metric.size:
+            return
+
+        # get a windowed view of the acceleration metric
+        metric_w = get_windowed_view(accel_metric, wlen, skip, ensure_c_contiguity=True)
+
+        # compute the features
+        feats = self.bank.compute(metric_w, fs=1 / epoch_s, axis=1)
+
+        self.vals.append(feats)
+
         # get "pointers" to the results values
         self.r_sig_ent = results[self.name[0]]
         self.r_samp_ent = results[self.name[1]]
@@ -1032,17 +1047,6 @@ class SignalFeatures(ActivityEndpoint):
         self.r_spec_ent = results[self.name[5]]
         self.r_sparc = results[self.name[6]]
         self.i = i
-
-        # compute values for the data we have
-        wlen = int(self.wlen_min * (60 / epoch_s))
-        skip = int(wlen * self.wskip_p)
-        # get a windowed view of the acceleration metric
-        metric_w = get_windowed_view(accel_metric, wlen, skip, ensure_c_contiguity=True)
-
-        # compute the features
-        feats = self.bank.compute(metric_w, fs=1 / epoch_s, axis=1)
-
-        self.vals.append(feats)
 
     def reset_cached(self):
         super().reset_cached()
