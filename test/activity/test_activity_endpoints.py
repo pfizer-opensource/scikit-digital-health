@@ -1,5 +1,5 @@
 import pytest
-from numpy import isclose, allclose, nan, array, concatenate, log
+from numpy import isclose, allclose, nan, array, concatenate, log, maximum
 from numpy.random import default_rng
 
 from skdh.activity.endpoints import (
@@ -10,6 +10,8 @@ from skdh.activity.endpoints import (
     TotalIntensityTime,
     BoutIntensityTime,
     FragmentationEndpoints,
+    EqualAverageDurationThreshold,
+    SignalFeatures,
 )
 
 
@@ -202,3 +204,36 @@ class TestFragmentationEndpoints:
         assert allclose(act_results["wake MVPA gini index"], 0.3076923)
         assert allclose(act_results["wake MVPA avg hazard"], 0.8333333)
         assert allclose(act_results["wake MVPA power law distribution"], 3.151675)
+
+
+class TestEqualAverageDurationThreshold:
+    def test(self, act_results):
+        e = EqualAverageDurationThreshold(min_threshold=0.0001, max_threshold=0.1, skip_threshold=0.0001, state='wake')
+
+        # generate 10,000 random samples from uniform distribution
+        a = maximum(default_rng(seed=5).gamma(shape=0.2, scale=0.3, size=10000), 0.0)
+
+        e.predict(act_results, 0, a, a[::12], 5, 12)
+        e.reset_cached()
+
+        assert allclose(act_results["wake threshold equal avg duration [g]"], 0.0068)
+        assert allclose(act_results["wake duration equal avg duration [min]"], 1.9439252)
+
+
+class TestActivitySignalFeatures:
+    def test(self, act_results):
+        # generate 10,000 random samples from uniform distribution
+        a = maximum(default_rng(seed=5).gamma(shape=0.2, scale=0.3, size=10000), 0.0)
+
+        e = SignalFeatures(window_minutes=15, window_skip_percentage=0.5, state='wake')
+
+        e.predict(act_results, 0, a, a[::12], 5, 12)
+        e.reset_cached()
+
+        assert allclose(act_results['wake signal entropy'], -0.905934)
+        assert allclose(act_results['wake sample entropy'], 0.0050216387)
+        assert allclose(act_results['wake permutation entropy'], 0.99477370)
+        assert allclose(act_results['wake power spectral sum'], 1.00000005)
+        assert allclose(act_results['wake spectral flatness'], -3.08924230)
+        assert allclose(act_results['wake spectral entropy'], 0.88117488)
+        assert allclose(act_results['wake sparc'], -15.867399)
