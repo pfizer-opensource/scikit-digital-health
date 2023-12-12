@@ -44,6 +44,8 @@ __all__ = [
     "TotalIntensityTime",
     "BoutIntensityTime",
     "FragmentationEndpoints",
+    "EqualAverageDurationThreshold",
+    "SignalFeatures"
 ]
 
 
@@ -840,13 +842,13 @@ class SignalFeatures(ActivityEndpoint):
     def __init__(self, window_minutes=15, window_skip_percentage=0.5, state="wake"):
         super().__init__(
             [
-                "Signal Entropy",
-                "Sample Entropy",
-                "Permutation Entropy",
-                "Power Spectral Sum",
-                "Spectral Flatness",
-                "Spectral Entropy",
-                "SPARC"
+                "signal entropy",
+                "sample entropy",
+                "permutation entropy",
+                "power spectral sum",
+                "spectral flatness",
+                "spectral entropy",
+                "sparc"
             ],
             state,
         )
