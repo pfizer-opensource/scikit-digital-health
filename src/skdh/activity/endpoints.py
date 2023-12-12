@@ -25,11 +25,12 @@ from numpy import (
     isnan,
     argmin,
     abs,
+    exp,
     concatenate,
 )
 from scipy.stats import linregress
 
-from skdh.utility import moving_mean, get_windowed_view
+from skdh.utility import moving_mean, get_windowed_view, DFA
 from skdh.utility import fragmentation_endpoints as fe
 from skdh.utility.internal import rle
 from skdh.activity.cutpoints import get_level_thresholds
@@ -723,6 +724,108 @@ class FragmentationEndpoints(ActivityEndpoint):
         self.r_ah = None
         self.r_pld = None
         self.i = None
+
+
+class ActivityDFA(ActivityEndpoint):
+    """
+    Use the Detrended Fluctuation Analysis to compute alpha and Activity Balance
+    Index [2]_ from acceleration metric data.
+
+    Parameters
+    ----------
+    scale : {float, optional}, optional
+        Ratio between succesive box sizes. Default is 2**(1/8). Overwritten by
+        `box_sizes` if provided.
+    box_sizes : None, array-like, optional
+        List/array of box sizes (in samples) to use.
+    state : {'wake', 'sleep'}, optional
+        State during which the endpoint is being computed.
+
+    Notes
+    -----
+    In the case that a day has multiple groupings of data seperated by non-wear,
+    the `alpha` values from DFA will be averaged across wear bouts. ABI will be
+    re-calculated from the average `alpha` value.
+
+    References
+    ----------
+    .. [1] Victor Barreto Mesquita, Florêncio Mendes Oliveira Filho, Paulo Canas Rodrigues,
+        "Detection of crossover points in detrended fluctuation analysis: an application
+        to EEG signals of patients with epilepsy", Bioinformatics, Volume 37, Issue 9,
+        May 2021, Pages 1278–1284, https://doi.org/10.1093/bioinformatics/btaa955
+    .. [2] Ian Meneghel Danilevicz, Vincent Theodoor van Hees, Frank van der Heide et al.
+        "Measures of fragmentation of rest activity patterns: mathematical properties
+        and interpretability based on accelerometer real life data", 06 November 2023, PREPRINT
+    .. [3] C.-K. Peng, S. V. Buldyrev, S. Havlin, M. Simons, H. E. Stanley, and A. L.
+        Goldberger, “Mosaic organization of DNA nucleotides,” Phys. Rev. E, vol. 49,
+        no. 2, pp. 1685–1689, Feb. 1994, doi: 10.1103/PhysRevE.49.1685.
+    """
+    def __init__(self, scale=2 ** (1 / 8), box_sizes=None, state='wake'):
+        super().__init__(
+            [
+                "dfa alpha",
+                "dfa activity balance index",
+            ],
+            state,
+        )
+
+        self.scale = scale
+        self.box_sizes = box_sizes
+
+        # for caching
+        self.alphas = []
+        self.dfa = None
+        self.abi = None
+        self.i = None
+
+    def predict(self, results, i, accel_metric, accel_metric_60, epoch_s, epochs_per_min):
+        """
+        Saves the signal features values.
+
+        Parameters
+        ----------
+        results : dict
+            Dictionary containing the initialized results arrays. Keys in `results`
+            are taken from the names of endpoints.
+        i : int
+            Index of the day, used to index into individual result arrays, e.g.
+            `results[self.name][i] = 5.0`
+        accel_metric : numpy.ndarray
+            Computed acceleration metric (e.g. ENMO).
+        accel_metric_60 : numpy.ndarray
+            Computed acceleration metric for a 60 second window.
+        epoch_s : int
+            Duration in seconds of each sample of `accel_metric`.
+        epochs_per_min : int
+            Number of epochs per minute.
+        """
+        super().predict()
+
+        # get "pointers" to the results values
+        self.dfa = results[self.name[0]]
+        self.abi = results[self.name[1]]
+        self.i = i
+
+        # compute DFA and store alpha, we'll recompute ABI on the average slope
+        *_, alpha, _ = DFA(accel_metric, scale=self.scale, box_sizes=self.box_sizes)
+        self.alphas.append(alpha)
+
+    def reset_cached(self):
+        super().reset_cached()
+
+        if all([i is not None for i in [self.dfa, self.abi, self.i]]):
+            avg_alpha = mean(self.alphas)
+            # re-compute abi
+            abi = exp((-abs(avg_alpha - 1)) / exp(-2))
+
+            self.dfa[self.i] = avg_alpha
+            self.abi[self.i] = abi
+
+        # reset values
+        self.i = None
+        self.dfa = None
+        self.abi = None
+        self.alphas = []
 
 
 class EqualAverageDurationThreshold(ActivityEndpoint):
