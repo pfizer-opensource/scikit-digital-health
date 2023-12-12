@@ -233,6 +233,16 @@ class ActivityLevelClassification(BaseProcess):
             ept.FragmentationEndpoints("MVPA", cutpoints=cutpoints),
         ]
 
+        # add wake endpoints for some new/experimental features
+        self.wake_endpoints += [
+            ept.ActivityDFA(scale=2**(1/8), state='wake'),
+            ept.EqualAverageDurationThreshold(),
+        ]
+        # signal features metrics across various window lengths
+        self.wake_endpoints += [
+            ept.SignalFeatures(window_minutes=i) for i in [15, 30, 60]
+        ]
+
         self.sleep_endpoints = [
             ept.TotalIntensityTime(lvl, self.wlen, self.cutpoints, state="sleep")
             for lvl in self.act_levels
