@@ -10,6 +10,7 @@ from skdh.activity.endpoints import (
     TotalIntensityTime,
     BoutIntensityTime,
     FragmentationEndpoints,
+    ActivityDFA,
     EqualAverageDurationThreshold,
     SignalFeatures,
 )
@@ -204,6 +205,22 @@ class TestFragmentationEndpoints:
         assert allclose(act_results["wake MVPA gini index"], 0.3076923)
         assert allclose(act_results["wake MVPA avg hazard"], 0.8333333)
         assert allclose(act_results["wake MVPA power law distribution"], 3.151675)
+
+
+class TestActivityDFA:
+    def test(self, act_results):
+        e = ActivityDFA(
+            scale=2**(1/8), state="wake"
+        )
+
+        # generate 10,000 random samples from uniform distribution
+        a = maximum(default_rng(seed=5).gamma(shape=0.2, scale=0.3, size=10000), 0.0)
+
+        e.predict(act_results, 0, a, a[::12], 5, 12)
+        e.reset_cached()
+
+        assert allclose(act_results['wake dfa alpha'], 0.467900671)
+        assert allclose(act_results['wake dfa activity balance index'], 0.0196100754)
 
 
 class TestEqualAverageDurationThreshold:

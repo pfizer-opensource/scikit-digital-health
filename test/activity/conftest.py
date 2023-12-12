@@ -68,6 +68,8 @@ def act_results():
         "wake MVPA gini index",
         "wake MVPA avg hazard",
         "wake MVPA power law distribution",
+        "wake dfa alpha",
+        "wake dfa activity balance index",
         "wake threshold equal avg duration [g]",
         "wake duration equal avg duration [min]",
         "wake signal entropy",
