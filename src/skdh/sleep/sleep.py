@@ -600,7 +600,7 @@ class Sleep(BaseProcess):
         # finalize plotting
         self._finalize_plots()
 
-        return {"sleep": sleep_idx}
+        return sleep, {"sleep": sleep_idx}
 
     def _setup_day_plot(self, iday, source_file, date_str, start_dt):
         if self.f is not None:
