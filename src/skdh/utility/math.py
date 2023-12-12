@@ -20,6 +20,7 @@ from numpy import (
     arange,
     sqrt,
     log,
+    exp,
     float_,
 )
 from scipy.stats import linregress
@@ -854,7 +855,11 @@ def DFA(a, scale=2 ** (1 / 8), box_sizes=None):
     dfa : numpy.ndarray
         DFA values for each box size.
     alpha : float
-        Log-log relationship slope of the dfa values
+        Log-log relationship slope of the dfa values.
+    abi : float
+        Activity Balance Index [2]_. Values are re-scaled from `alpha` to (0, 1].
+        The theory is that higher values present as more healthy (ie activity
+        is close to fractal noise) [2]_.
 
     References
     ----------
@@ -902,5 +907,8 @@ def DFA(a, scale=2 ** (1 / 8), box_sizes=None):
 
     # compute alpha
     lr_dfa = linregress(log(box_sizes), log(dfa))
+    alpha = lr_dfa.slope
 
-    return box_sizes, dfa, lr_dfa.slope
+    abi = exp((-abs(alpha - 1)) / exp(-2))
+
+    return box_sizes, dfa, alpha, abi
