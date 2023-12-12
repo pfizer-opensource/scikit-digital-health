@@ -45,6 +45,7 @@ __all__ = [
     "TotalIntensityTime",
     "BoutIntensityTime",
     "FragmentationEndpoints",
+    "ActivityDFA",
     "EqualAverageDurationThreshold",
     "SignalFeatures",
 ]
