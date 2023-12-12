@@ -206,7 +206,7 @@ def test_DFA(np_rng):
     # get 1 axis from acc
     xacc = random.default_rng(seed=1313871834).random(500)
 
-    box_sizes, dfa, alpha = DFA(xacc, scale=4)
+    box_sizes, dfa, alpha, abi = DFA(xacc, scale=4)
 
     assert allclose(box_sizes, [4, 16, 64, 256])
     assert allclose(dfa, [0.12859269, 0.3036594, 0.66000571, 1.00018071])
