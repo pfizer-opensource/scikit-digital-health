@@ -962,13 +962,13 @@ class SignalFeatures(ActivityEndpoint):
     def __init__(self, window_minutes=15, window_skip_percentage=0.5, state="wake"):
         super().__init__(
             [
-                "signal entropy",
-                "sample entropy",
-                "permutation entropy",
-                "power spectral sum",
-                "spectral flatness",
-                "spectral entropy",
-                "sparc",
+                f"{window_minutes}min signal entropy",
+                f"{window_minutes}min sample entropy",
+                f"{window_minutes}min permutation entropy",
+                f"{window_minutes}min power spectral sum",
+                f"{window_minutes}min spectral flatness",
+                f"{window_minutes}min spectral entropy",
+                f"{window_minutes}min sparc",
             ],
             state,
         )
