@@ -76,7 +76,7 @@ def act_results():
         "wake power spectral sum",
         "wake spectral flatness",
         "wake spectral entropy",
-        "wake sparc"
+        "wake sparc",
     ]
 
     return {i: [0.0] for i in k}

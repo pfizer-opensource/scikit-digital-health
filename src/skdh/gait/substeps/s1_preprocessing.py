@@ -258,7 +258,10 @@ class PreprocessGaitBout(BaseProcess):
         # filter if possible
         if fs > (2 * self.filter_cutoff):
             sos = butter(
-                self.filter_order, 2 * self.filter_cutoff / fs, output="sos", btype="low"
+                self.filter_order,
+                2 * self.filter_cutoff / fs,
+                output="sos",
+                btype="low",
             )
             accel_filt = sosfiltfilt(sos, accel, axis=0)
         else:

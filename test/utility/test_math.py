@@ -209,10 +209,10 @@ def test_DFA(np_rng):
     box_sizes, dfa, alpha = DFA(xacc, scale=4)
 
     assert allclose(box_sizes, [4, 16, 64, 256])
-    assert allclose(dfa, [0.12859269, 0.3036594 , 0.66000571, 1.00018071])
+    assert allclose(dfa, [0.12859269, 0.3036594, 0.66000571, 1.00018071])
     assert isclose(alpha, 0.4999082494319027)
 
-    box_sizes, dfa, alpha = DFA(xacc, scale=2**(1/8), box_sizes=[4, 8, 12])
+    box_sizes, dfa, alpha = DFA(xacc, scale=2 ** (1 / 8), box_sizes=[4, 8, 12])
 
     assert allclose(box_sizes, [4, 8, 12])
     assert allclose(dfa, [0.12859269, 0.20931833, 0.25553007])

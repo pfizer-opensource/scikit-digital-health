@@ -16,7 +16,16 @@ from skdh.gait import gait_metrics
 class Test_update_date_results:
     @staticmethod
     def setup_results():
-        k = ["Date", "Day Start Timestamp", "Day End Timestamp", "Weekday", "Day N", "N hours", "Total Minutes", "Wear Minutes"]
+        k = [
+            "Date",
+            "Day Start Timestamp",
+            "Day End Timestamp",
+            "Weekday",
+            "Day N",
+            "N hours",
+            "Total Minutes",
+            "Wear Minutes",
+        ]
         r = {i: [0] for i in k}
 
         return r

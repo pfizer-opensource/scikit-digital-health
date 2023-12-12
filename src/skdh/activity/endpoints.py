@@ -25,7 +25,7 @@ from numpy import (
     isnan,
     argmin,
     abs,
-    concatenate
+    concatenate,
 )
 from scipy.stats import linregress
 
@@ -45,7 +45,7 @@ __all__ = [
     "BoutIntensityTime",
     "FragmentationEndpoints",
     "EqualAverageDurationThreshold",
-    "SignalFeatures"
+    "SignalFeatures",
 ]
 
 
@@ -741,7 +741,14 @@ class EqualAverageDurationThreshold(ActivityEndpoint):
     state : {'wake', 'sleep'}, optional
         State during which the endpoint is being computed.
     """
-    def __init__(self, min_threshold=0.0001, max_threshold=0.1, skip_threshold=0.0001, state='wake'):
+
+    def __init__(
+        self,
+        min_threshold=0.0001,
+        max_threshold=0.1,
+        skip_threshold=0.0001,
+        state="wake",
+    ):
         super().__init__(
             ["threshold equal avg duration [g]", "duration equal avg duration [min]"],
             state,
@@ -762,7 +769,16 @@ class EqualAverageDurationThreshold(ActivityEndpoint):
         self.lens_le = [[] for i in range(self.thresholds.size)]
         self.lens_gt = [[] for i in range(self.thresholds.size)]
 
-    def predict(self, results, i, accel_metric, accel_metric_60, epoch_s, epochs_per_min, **kwargs):
+    def predict(
+        self,
+        results,
+        i,
+        accel_metric,
+        accel_metric_60,
+        epoch_s,
+        epochs_per_min,
+        **kwargs,
+    ):
         """
         Compute the equal average duration threshold.
 
@@ -803,7 +819,6 @@ class EqualAverageDurationThreshold(ActivityEndpoint):
         super().reset_cached()
 
         if all([i is not None for i in [self.eq_thresh, self.eq_dur, self.i]]):
-
             mu_le = full(self.thresholds.size, nan)
             mu_gt = full(self.thresholds.size, nan)
 
@@ -839,6 +854,7 @@ class SignalFeatures(ActivityEndpoint):
     state : {'wake', 'sleep'}
         State during which the endpoint is being computed.
     """
+
     def __init__(self, window_minutes=15, window_skip_percentage=0.5, state="wake"):
         super().__init__(
             [
@@ -848,7 +864,7 @@ class SignalFeatures(ActivityEndpoint):
                 "power spectral sum",
                 "spectral flatness",
                 "spectral entropy",
-                "sparc"
+                "sparc",
             ],
             state,
         )
@@ -878,7 +894,9 @@ class SignalFeatures(ActivityEndpoint):
         self.r_sparc = None
         self.vals = []
 
-    def predict(self, results, i, accel_metric, accel_metric_60, epoch_s, epochs_per_min):
+    def predict(
+        self, results, i, accel_metric, accel_metric_60, epoch_s, epochs_per_min
+    ):
         """
         Saves the signal features values.
 
@@ -926,19 +944,19 @@ class SignalFeatures(ActivityEndpoint):
         super().reset_cached()
 
         if all(
-                [
-                    i is not None for i in
-                    [
-                        self.r_sig_ent,
-                        self.r_samp_ent,
-                        self.r_perm_ent,
-                        self.r_pss,
-                        self.r_spec_flat,
-                        self.r_spec_ent,
-                        self.r_sparc,
-                        self.i
-                    ]
+            [
+                i is not None
+                for i in [
+                    self.r_sig_ent,
+                    self.r_samp_ent,
+                    self.r_perm_ent,
+                    self.r_pss,
+                    self.r_spec_flat,
+                    self.r_spec_ent,
+                    self.r_sparc,
+                    self.i,
                 ]
+            ]
         ):
             # combine values
             values = concatenate(self.vals, axis=1)
