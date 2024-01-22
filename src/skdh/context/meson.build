@@ -1,8 +1,10 @@
 py3.install_sources(
     [
         '__init__.py',
-        'model.txt',
+        'core.py',
     ],
     pure: false,
-    subdir: 'skdh/ambulation/model',
+    subdir: 'skdh/context',
 )
+
+subdir('model')

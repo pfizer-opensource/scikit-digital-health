@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 from lightgbm import Booster
-from skdh.ambulation import Ambulation
+from skdh.context import Ambulation
 
 
 # Test input check on real data
@@ -62,7 +62,7 @@ def test_3_feature_extraction(ambulation_positive_data):
 
 # Test model loading
 def test_4_model_loading():
-    mdl = Ambulation()._load_model("model.txt")
+    mdl = Ambulation()._load_model("amublation_model.txt")
     print(type(mdl))
     assert isinstance(mdl, Booster)
 

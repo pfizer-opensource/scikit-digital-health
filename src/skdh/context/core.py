@@ -109,7 +109,7 @@ class Ambulation(BaseProcess):
         time_ds, accel_ds, fs = self._check_input(time, accel)
 
         # load model
-        model = self._load_model("model.txt")
+        model = self._load_model("amublation_model.txt")
 
         # preprocess input data
         preprocessed = self._preprocess(accel_ds)
