@@ -9,7 +9,7 @@ from numpy import arange
 def ambulation_positive_data():
     cwd = Path.cwd().parts
 
-    if cwd[-1] == "ambulation":
+    if cwd[-1] == "context":
         path = Path("data/test1.csv")
     elif cwd[-1] == "test":
         path = Path("context/data/test1.csv")

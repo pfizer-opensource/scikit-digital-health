@@ -62,7 +62,7 @@ def test_3_feature_extraction(ambulation_positive_data):
 
 # Test model loading
 def test_4_model_loading():
-    mdl = Ambulation()._load_model("amublation_model.txt")
+    mdl = Ambulation()._load_model("ambulation_model.txt")
     print(type(mdl))
     assert isinstance(mdl, Booster)
 

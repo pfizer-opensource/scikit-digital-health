@@ -10,7 +10,7 @@ Context Detection
 .. autosummary::
     :toctree: generated/
 
-    Context
+    Context Detection
 
 """
 from skdh.context.core import Ambulation
