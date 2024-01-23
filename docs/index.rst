@@ -36,6 +36,15 @@ Scikit Digital Health
         :classes: btn-outline-primary stretched-link btn-block
 
     ---
+    :img-top: _static/skdh_context.svg
+    :badge:`skdh.context,badge-primary`
+    +++
+    .. link-button:: skdh context
+        :type: ref
+        :text: Context detection methods for inertial sensor data.
+        :classes: btn-outline-primary stretched-link btn-block
+
+    ---
     :img-top: _static/skdh_gait.svg
     :badge:`skdh.gait,badge-primary`
     +++
