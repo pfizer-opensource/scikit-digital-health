@@ -9,12 +9,12 @@ from numpy import arange
 def ambulation_positive_data():
     cwd = Path.cwd().parts
 
-    if cwd[-1] == "ambulation":
+    if cwd[-1] == "context":
         path = Path("data/test1.csv")
     elif cwd[-1] == "test":
-        path = Path("ambulation/data/test1.csv")
+        path = Path("context/data/test1.csv")
     elif cwd[-1] == "scikit-digital-health":
-        path = Path("test/ambulation/data/test1.csv")
+        path = Path("test/context/data/test1.csv")
 
     accel = read_csv(path, header=None).values
     time = arange(0, len(accel) / 20, 1 / 20)
@@ -26,12 +26,12 @@ def ambulation_positive_data():
 def ambulation_negative_data():
     cwd = Path.cwd().parts
 
-    if cwd[-1] == "ambulation":
+    if cwd[-1] == "context":
         path = Path("data/test2.csv")
     elif cwd[-1] == "test":
-        path = Path("ambulation/data/test2.csv")
+        path = Path("context/data/test2.csv")
     elif cwd[-1] == "scikit-digital-health":
-        path = Path("test/ambulation/data/test2.csv")
+        path = Path("test/context/data/test2.csv")
 
     accel = read_csv(path, header=None).values
     time = arange(0, len(accel) / 20, 1 / 20)
@@ -43,12 +43,12 @@ def ambulation_negative_data():
 def ambulation_negative_data_50hz():
     cwd = Path.cwd().parts
 
-    if cwd[-1] == "ambulation":
+    if cwd[-1] == "context":
         path = Path("data/test2.csv")
     elif cwd[-1] == "test":
-        path = Path("ambulation/data/test2.csv")
+        path = Path("context/data/test2.csv")
     elif cwd[-1] == "scikit-digital-health":
-        path = Path("test/ambulation/data/test2.csv")
+        path = Path("test/context/data/test2.csv")
 
     accel = read_csv(path, header=None).values
     time = arange(0, len(accel) / 50, 1 / 50)

@@ -109,7 +109,7 @@ class Ambulation(BaseProcess):
         time_ds, accel_ds, fs = self._check_input(time, accel)
 
         # load model
-        model = self._load_model("model.txt")
+        model = self._load_model("ambulation_model.txt")
 
         # preprocess input data
         preprocessed = self._preprocess(accel_ds)
@@ -338,6 +338,6 @@ class Ambulation(BaseProcess):
 
         """
         # load the classification model
-        lgb_file = str(_resolve_path("skdh.ambulation.model", model_path))
+        lgb_file = str(_resolve_path("skdh.context.model", model_path))
         model = lgb.Booster(model_file=lgb_file)
         return model
