@@ -363,7 +363,8 @@ class ReadCSV(BaseProcess):
         # convert timestamps if necessary
         if tz_name is not None:
             # convert, and then remove the timezone so its naive again, but now in local time
-            raw["_datetime_"] = raw["_datetime_"].dt.tz_convert(tz_name).tz_localize(None)
+            tmp = raw["_datetime_"].dt.tz_convert(tz_name)
+            raw["_datetime_"] = tmp.dt.tz_localize(None)
 
         # now handle data gaps and second level timestamps, etc
         raw, fs = handle_timestamp_inconsistency(
