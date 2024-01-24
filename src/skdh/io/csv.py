@@ -323,7 +323,7 @@ class ReadCSV(BaseProcess):
 
     @handle_process_returns(results_to_kwargs=True)
     @check_input_file(".csv")
-    def predict(self, *, file, **kwargs):
+    def predict(self, *, file, tz_name=None, **kwargs):
         """
         predict(*, file)
 
@@ -332,7 +332,10 @@ class ReadCSV(BaseProcess):
         Parameters
         ----------
         file : {str, Path}
-            Path to the file to read
+            Path to the file to read.
+        tz_name : {None, str}, optional
+            Name of a time-zone to convert the timestamps to. Default is None,
+            which will leave them as naive.
 
         Returns
         -------
@@ -346,13 +349,22 @@ class ReadCSV(BaseProcess):
             If the file name is not provided.
         """
 
-        super().predict(expect_days=False, expect_wear=False, file=file, **kwargs)
+        super().predict(expect_days=False, expect_wear=False, file=file, tz_name=tz_name, **kwargs)
 
         # load the file with pandas
         raw = read_csv(file, **self.read_csv_kwargs)
 
+        # update the to_datetime_kwargs based on tz_name.  tz_name==None (utc=False)
+        self.to_datetime_kw.update({"utc": tz_name is not None})
+
         # convert time column to a datetime column. Give a unique name so we shouldnt overwrite
         raw["_datetime_"] = to_datetime(raw[self.time_col_name], **self.to_datetime_kw)
+
+        # convert timestamps if necessary
+        if tz_name is not None:
+            # convert, and then remove the timezone so its naive again, but now in local time
+            tmp = raw["_datetime_"].dt.tz_convert(tz_name)
+            raw["_datetime_"] = tmp.dt.tz_localize(None)
 
         # now handle data gaps and second level timestamps, etc
         raw, fs = handle_timestamp_inconsistency(
