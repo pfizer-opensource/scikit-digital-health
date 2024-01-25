@@ -89,7 +89,7 @@ def handle_timestamp_inconsistency(df, fill_gaps, accel_col_names, accel_in_g, g
     if fill_gaps:
         # now fix any data gaps: set the index as the datetime, and then upsample to match
         # the sampling frequency. This will put nan values in any data gaps
-        df_full = df.set_index("_datetime_").asfreq(f"{1 / n_samples}S")
+        df_full = df.set_index("_datetime_").asfreq(f"{1 / n_samples}s")
 
         # put the datetime array back in the dataframe
         df_full = df_full.reset_index(drop=False)
