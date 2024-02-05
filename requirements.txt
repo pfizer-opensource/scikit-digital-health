@@ -8,3 +8,5 @@ h5py
 matplotlib
 packaging
 pyyaml
+plotly
+avro

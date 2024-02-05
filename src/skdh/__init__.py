@@ -38,6 +38,7 @@ from skdh import gait
 from skdh import sit2stand
 from skdh import features
 from skdh import context
+from skdh import completeness
 
 __skdh_version__ = __version__
 
@@ -55,5 +56,6 @@ __all__ = [
     "features",
     "utility",
     "context",
+    "completeness",
     "__skdh_version__",
 ]
