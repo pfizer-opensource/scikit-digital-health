@@ -45,40 +45,45 @@ class Ambulation(BaseProcess):
     """
     Processes accelerometer data to extract bouts of ambulation.
 
-    The ambulation detection module is an algorithm for detecting ambulation or gait-like activities
-    from raw tri-axial accelerometer data. The model used is a binary machine learning classifier that takes
-    several signal features as input and produces predictions in three second non-overlapping epochs.
+    The ambulation detection module is an algorithm for detecting ambulation or
+    gait-like activities from raw tri-axial accelerometer data. The model used is
+    a binary machine learning classifier that takes several signal features as input
+    and produces predictions in three second non-overlapping epochs.
 
-    The original purpose of this module was to aid in context detection for nocturnal scratch detection.
-    The scratch model is specifically trained to differentiate restless activity from scratch activity during
-    sleep, and therefore has issues dealing with unseen activities such as walking. These activities sometimes
-    occur during at home recordings and increase the false positive rate of the scratch module. The ambulation
-    detection module was designed to help exclude these activities and therefore improve the performance of the
-    scratch module by minimizing false positives.
+    The original purpose of this module was to aid in context detection for nocturnal
+    scratch detection. The scratch model is specifically trained to differentiate
+    restless activity from scratch activity during sleep, and therefore has issues
+    dealing with unseen activities such as walking. These activities sometimes occur
+    during at home recordings and increase the false positive rate of the scratch
+    module. The ambulation detection module was designed to help exclude these activities
+    and therefore improve the performance of the scratch module by minimizing false
+    positives.
 
-    An additional use of this model has been as a base-level context detection tool for step detection. Unlike
-    the gait-bout detection algorithm, the ambulation detection module is not built to detect
-    well-defined bouts of consistent gait for gait parameter estimation. It is rather a tool for detecting the
-    presence of walking-similar activities, which makes it a good candidate for performing context detection for
-    step counting.
+    An additional use of this model has been as a base-level context detection tool
+    for step detection. Unlike the gait-bout detection algorithm, the ambulation
+    detection module is not built to detect well-defined bouts of consistent gait
+    for gait parameter estimation. It is rather a tool for detecting the presence
+    of walking-similar activities, which makes it a good candidate for performing
+    context detection for step counting.
 
     Input requirements:
 
-    1. Accelerometer data must be collected with a sampling frequency of at least 20hz. If the frequency
-    is greater than 20hz the signal will be automatically downsampled.
+    1. Accelerometer data must be collected with a sampling frequency of at least
+    20hz. If the frequency is greater than 20hz the signal will be automatically
+    downsampled.
 
-    2. Accelerometer data is expected to be tri-axial. Orientation does not affect algorithm performance.
+    2. Accelerometer data is expected to be tri-axial. Orientation does not affect
+    algorithm performance.
 
     3. Acceleration units are expected to be in G's.
 
-    4. A minimum of 60 samples (or the equivalent of a single 3-second window) is required for predictions
-    to be made.
+    4. A minimum of 60 samples (or the equivalent of a single 3-second window) is
+    required for predictions to be made.
 
     Parameters
     ----------
     pthresh : float
         Probability threshold for the classifier.
-
     """
 
     def __init__(self, pthresh=0.65):
@@ -90,7 +95,8 @@ class Ambulation(BaseProcess):
         """
         predict(time, accel)
 
-        Function to detect ambulation or gait-like activity from 20hz accelerometer data collected on the wrist.
+        Function to detect ambulation or gait-like activity from 20hz accelerometer
+        data collected on the wrist.
 
         Parameters
         ----------
@@ -102,8 +108,8 @@ class Ambulation(BaseProcess):
         Returns
         -------
         results : dict
-            Results dictionary including 3s epoch level predictions, probabilities, and unix timestamps.
-
+            Results dictionary including 3s epoch level predictions, probabilities,
+            and unix timestamps.
         """
         # check that input matches expectations, downsample to 20hz if necessary
         time_ds, accel_ds, fs = self._check_input(time, accel)

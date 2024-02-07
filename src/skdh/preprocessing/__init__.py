@@ -4,6 +4,14 @@ Inertial Data Preprocessing (:mod:`skdh.preprocessing`)
 
 .. currentmodule:: skdh.preprocessing
 
+Day Windowing
+-------------
+
+.. autosummary::
+    :toctree: generated/
+
+    GetDayWindowIndices
+
 Sensor Calibration
 ------------------
 
@@ -23,6 +31,8 @@ Wear Detection
     CtaWearDetection
     AccelThresholdWearDetection
 """
+from skdh.preprocessing.window_days import GetDayWindowIndices
+from skdh.preprocessing import window_days
 from skdh.preprocessing.calibrate import CalibrateAccelerometer
 from skdh.preprocessing import calibrate
 from skdh.preprocessing.wear_detection import (
@@ -34,6 +44,8 @@ from skdh.preprocessing.wear_detection import (
 from skdh.preprocessing import wear_detection
 
 __all__ = (
+    "GetDayWindowIndices",
+    "window_days",
     "CalibrateAccelerometer",
     "calibrate",
     "AccelThresholdWearDetection",
