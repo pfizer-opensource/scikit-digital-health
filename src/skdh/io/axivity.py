@@ -20,45 +20,32 @@ class UnexpectedAxesError(Exception):
 class ReadCwa(BaseProcess):
     """
     Read a binary CWA file from an axivity sensor into memory. Acceleration is return in units of
-    'g' while angular velocity (if available) is returned in units of `deg/s`. If providing a base
-    and period value, included in the output will be the indices to create windows starting at
-    the `base` time, with a length of `period`.
+    'g' while angular velocity (if available) is returned in units of `deg/s`.
 
     Parameters
     ----------
-    bases : {None, int}, optional
-        Base hour [0, 23] in which to start a window of time. Default is None, which
-        will not do any windowing. Both `base` and `period` must be defined in order
-        to window.
-    periods : {None, int}, optional
-        Period for each window, in [1, 24]. Defines the number of hours per window.
-        Default is None, which will do no windowing. Both `period` and `base` must
-        be defined to window
     ext_error : {"warn", "raise", "skip"}, optional
         What to do if the file extension does not match the expected extension (.cwa).
         Default is "warn". "raise" raises a ValueError. "skip" skips the file
         reading altogether and attempts to continue with the pipeline.
 
+    .. deprecated:: 0.14.0
+        `bases` Removed in favor of having windowing be its own class,
+        :class:`skdh.preprocessing.GetDayWindowIndices`.
+        `periods` Removed in favor of having windowing be its own class.
+
     Examples
     --------
-    Setup a reader with no windowing:
+    Setup a reader:
 
     >>> reader = ReadCwa()
     >>> reader.predict('example.cwa')
     {'accel': ..., 'time': ..., ...}
-
-    Setup a reader that does windowing between 8:00 AM and 8:00 PM (20:00):
-
-    >>> reader = ReadCwa(bases=8, periods=12)  # 8 + 12 = 20
-    >>> reader.predict('example.cwa')
-    {'accel': ..., 'time': ..., 'day_ends': [130, 13951, ...], ...}
     """
 
-    def __init__(self, bases=None, periods=None, ext_error="warn"):
+    def __init__(self, *, ext_error="warn"):
         super().__init__(
             # kwargs
-            bases=bases,
-            periods=periods,
             ext_error=ext_error,
         )
 
@@ -66,34 +53,6 @@ class ReadCwa(BaseProcess):
             self.ext_error = ext_error.lower()
         else:
             raise ValueError("`ext_error` must be one of 'raise', 'warn', 'skip'.")
-
-        if (bases is None) and (periods is None):
-            self.window = False
-            self.bases = asarray([0])  # needs to be defined for passing to extensions
-            self.periods = asarray([12])
-        elif (bases is None) or (periods is None):
-            warn("One of base or period is None, not windowing", UserWarning)
-            self.window = False
-            self.bases = asarray([0])
-            self.periods = asarray([12])
-        else:
-            if isinstance(bases, int) and isinstance(periods, int):
-                bases = asarray([bases])
-                periods = asarray([periods])
-            else:
-                bases = asarray(bases, dtype=int_)
-                periods = asarray(periods, dtype=int_)
-
-            if ((0 <= bases) & (bases <= 23)).all() and (
-                (1 <= periods) & (periods <= 24)
-            ).all():
-                self.window = True
-                self.bases = bases
-                self.periods = periods
-            else:
-                raise ValueError(
-                    "Base must be in [0, 23] and period must be in [1, 23]"
-                )
 
     @handle_process_returns(results_to_kwargs=True)
     @check_input_file(".cwa")
@@ -134,9 +93,7 @@ class ReadCwa(BaseProcess):
         super().predict(expect_days=False, expect_wear=False, file=file, **kwargs)
 
         # read the file
-        fs, n_bad_samples, imudata, ts, temperature, starts, stops = read_axivity(
-            file, self.bases, self.periods
-        )
+        fs, n_bad_samples, imudata, ts, temperature, starts, stops = read_axivity(file)
 
         # end = None if n_bad_samples == 0 else -n_bad_samples
         end = None
@@ -166,15 +123,5 @@ class ReadCwa(BaseProcess):
             results[self._gyro] = ascontiguousarray(imudata[:end, gyr_axes])
         if mag_axes is not None:  # pragma: no cover :: don't have data to test this
             results[self._mag] = ascontiguousarray(imudata[:end, mag_axes])
-
-        if self.window:
-            results[self._days] = {}
-            for i, data in enumerate(zip(self.bases, self.periods)):
-                strt = starts[stops[:, i] != 0, i]
-                stp = stops[stops[:, i] != 0, i]
-
-                results[self._days][(data[0], data[1])] = minimum(
-                    vstack((strt, stp)).T, results[self._time].size - 1
-                )
 
         return results
