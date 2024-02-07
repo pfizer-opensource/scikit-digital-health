@@ -80,7 +80,7 @@ PyObject * cwindow_days(PyObject *NPY_UNUSED(self), PyObject *args)
     npy_intp dims[] = {w_N, ndays, 2};
 
     // allocate starts and stops arrays
-    PyArrayObject *windows = (PyArrayObject *)PyArray_EMPTY(3, dims, NPY_LONG, 0);
+    PyArrayObject *windows = (PyArrayObject *)PyArray_ZEROS(3, dims, NPY_LONG, 0);
     if (!windows)
     {
         Py_XDECREF(time); Py_XDECREF(bases); Py_XDECREF(periods);
