@@ -21,5 +21,5 @@ py3.extension_module(
     c_args: numpy_nodepr_api,
     link_with: [window_lib],
     install: true,
-    subdir: 'skdh/io/_extensions',
+    subdir: 'skdh/preprocessing/_extensions',
 )
