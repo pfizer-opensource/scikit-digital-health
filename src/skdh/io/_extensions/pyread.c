@@ -309,7 +309,7 @@ static PyObject *read_geneactiv(PyObject *NPY_UNUSED(self), PyObject *args)
 }
 
 
-static const char read_axivity__doc__[] = "read_axivity(file, bases, periods)\n"
+static const char read_axivity__doc__[] = "read_axivity(file)\n"
 "Read an Axivity binary file.\n\n"
 "Parameters\n"
 "----------\n"
@@ -325,7 +325,7 @@ static const char read_axivity__doc__[] = "read_axivity(file, bases, periods)\n"
 "time : numpy.ndarray\n"
 "temperature : numpy.ndarray\n";
 
-static const char read_geneactiv__doc__[] = "read_geneactiv(file, bases, periods)\n"
+static const char read_geneactiv__doc__[] = "read_geneactiv(file)\n"
 "Read a Geneactiv File\n\n"
 "Parameters\n"
 "----------\n"
