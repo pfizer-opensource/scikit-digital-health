@@ -12,15 +12,24 @@ long finalize_guess(size_t n, double *timestamps, long *guess, double target)
     if (i2 <= 0) return 0;
     if (i2 >= (n - 1)) return (long)n - 1;
 
-    bool check1 = fabs(timestamps[i2] - target) < fabs(timestamps[i1] - target)
-    bool check3 = fabs(timestamps[i2] - target) < fabs(timestamps[i3] - target)
+    bool check1 = fabs(timestamps[i2] - target) < fabs(timestamps[i1] - target);
+    bool check3 = fabs(timestamps[i2] - target) < fabs(timestamps[i3] - target);
 
     // path 1: guess is smallest value
-    if (check1 && check3) return i2;
+    if (check1 && check3)
+    {
+        return i2;
+    }
     // path 2: smaller value to the left side
-    else if (!check1) *guess -= 1;
+    else if (!check1)
+    {
+        guess -= 1;
+    }
     // path 3: smaller value to the right side
-    else if (!check3) *guess += 1;
+    else if (!check3)
+    {
+        *guess += 1;
+    }
 
     // only got here for path 2 & 3 - continue with updated guess value
     return finalize_guess(n, timestamps, guess, target);
@@ -83,11 +92,11 @@ void window(size_t n, double *timestamps, double fs, long *base, long *period, l
         windows[i + 1] = finalize_guess(n, timestamps, &guess_period, ts_period);
 
         // increment by a day
-        guess_base += n_perday
-        guess_period += n_perday
+        guess_base += n_perday;
+        guess_period += n_perday;
 
-        ts_base += day_delta_s
-        ts_period += day_delta_s
+        ts_base += day_delta_s;
+        ts_period += day_delta_s;
 
         // increment counter - array is 2d;
         i += 2;
