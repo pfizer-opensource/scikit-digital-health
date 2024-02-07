@@ -96,9 +96,10 @@ class GetDayWindowIndices(BaseProcess):
         # create the return dictionary
         days = {}
         for i, (b, p) in enumerate(zip(self.bases, self.periods)):
-            # filter out extra indices
-            mask = raw_days[i, :, 0] != raw_days[i, :, 1]
+            # filter out extra indices, which will be indicated by both
+            # start and stop being 0
+            mask = (raw_days[i, :, 0] == 0) & (raw_days[i, :, 1] == 0)
 
-            days[(b, p)] = raw_days[i][mask, :]
+            days[(b, p)] = raw_days[i][~mask, :]
 
         return {self._days: days}
