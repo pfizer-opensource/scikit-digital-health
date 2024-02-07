@@ -2,7 +2,7 @@ import pytest
 from numpy import isclose, allclose, array
 
 from skdh.io import ReadCSV
-from skdh.io.csv import handle_timestamp_inconsistency, handle_accel, handle_windows
+from skdh.io.csv import handle_timestamp_inconsistency, handle_accel
 
 
 class TestHandleTimestampInconsistency:
@@ -46,57 +46,3 @@ class TestHandleTimestampInconsistency:
 
         with pytest.raises(ValueError, match="not all equal size"):
             handle_timestamp_inconsistency(raw, **kw)
-
-
-class TestHandleWindows:
-    def test_no_run(self, dummy_csv_contents):
-        raw, fs, n_full = dummy_csv_contents()
-
-        time = raw["_datetime_"]
-
-        out = handle_windows(time, [0], [24], run_windowing=False)
-
-        assert out == {}
-
-    def test_single_window(self, dummy_csv_contents):
-        raw, fs, n_full = dummy_csv_contents(drop=False)
-        time = raw["_datetime_"]
-
-        out = handle_windows(time, [14], [3], run_windowing=True)
-
-        truth = array(
-            [
-                [int(2 * 3600 * fs), (int((2 + 3) * 3600 * fs))],
-                [int((24 + 2) * 3600 * fs), int((24 + 2 + 3) * 3600 * fs)],
-                [int((48 + 2) * 3600 * fs), int((48 + 2 + 3) * 3600 * fs)],
-            ]
-        )
-
-        assert allclose(out[(14, 3)], truth)
-
-    def test_multiple_windows(self, dummy_csv_contents):
-        raw, fs, n_full = dummy_csv_contents(drop=False)
-        time = raw["_datetime_"]
-
-        out = handle_windows(time, [14, 10], [3, 8], run_windowing=True)
-
-        truth_14_3 = array(
-            [
-                [int(2 * 3600 * fs), (int((2 + 3) * 3600 * fs))],
-                [int((24 + 2) * 3600 * fs), int((24 + 2 + 3) * 3600 * fs)],
-                [int((48 + 2) * 3600 * fs), int((48 + 2 + 3) * 3600 * fs)],
-            ]
-        )
-
-        truth_10_8 = array(
-            [
-                [0, int((18 - 12) * 3600 * fs)],
-                [int((24 - 2) * 3600 * fs), int((24 + 8 - 2) * 3600 * fs)],
-                [int((48 - 2) * 3600 * fs), int((48 + 8 - 2) * 3600 * fs)],
-                [int((72 - 2) * 3600 * fs), n_full],
-            ]
-        )
-
-        assert len(out) == 2
-        assert allclose(out[(14, 3)], truth_14_3)
-        assert allclose(out[(10, 8)], truth_10_8)
