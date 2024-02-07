@@ -133,7 +133,7 @@ static struct PyMethodDef methods[] = {
 
 static struct PyModuleDef moduledef = {
     PyModuleDef_HEAD_INIT,
-    "postread",
+    "pywindow",
     NULL,
     -1,
     methods,
@@ -145,7 +145,7 @@ static struct PyModuleDef moduledef = {
 
 
 /* initialization function for the module */
-PyMODINIT_FUNC PyInit_postread(void)
+PyMODINIT_FUNC PyInit_pywindow(void)
 {
     PyObject *m;
     m = PyModule_Create(&moduledef);

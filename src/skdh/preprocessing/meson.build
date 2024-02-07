@@ -7,3 +7,7 @@ py3.install_sources(
     pure: false,
     subdir: 'skdh/preprocessing',
 )
+
+if is_not_rtd_build
+    subdir('_extensions')
+endif
