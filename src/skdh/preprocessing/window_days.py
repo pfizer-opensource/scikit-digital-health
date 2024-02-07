@@ -9,7 +9,7 @@ from warnings import warn
 from numpy import asarray, int_, mean, diff
 
 from skdh.base import BaseProcess, handle_process_returns
-from skdh.io._extensions import cwindow_days
+from skdh.preprocessing._extensions import cwindow_days
 
 
 class GetDayWindowIndices(BaseProcess):
