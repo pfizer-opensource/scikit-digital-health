@@ -4,7 +4,8 @@ from numpy import allclose, array
 from skdh import Pipeline
 from skdh.gait.core import GaitLumbar
 from skdh.gait import substeps
-from skdh.gait import gait_metrics, PredictGaitLumbarLgbm
+from skdh.gait import gait_metrics
+from skdh.context import PredictGaitLumbarLgbm
 from skdh.utility.exceptions import LowFrequencyError
 
 

@@ -1,8 +1,11 @@
 from collections.abc import Sequence
+from pathlib import Path
 
 import pytest
-from numpy import zeros, arange, ndarray, sin, pi, float64
+from numpy import zeros, arange, ndarray, sin, pi, float64, load
 from numpy.random import default_rng
+
+from skdh.utility.internal import apply_downsample
 
 
 def pytest_addoption(parser):
