@@ -4,9 +4,7 @@ Axivity reading functions
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
-from warnings import warn
-
-from numpy import vstack, asarray, ascontiguousarray, minimum, int_
+from numpy import ascontiguousarray
 
 from skdh.base import BaseProcess, handle_process_returns
 from skdh.io.base import check_input_file
@@ -93,7 +91,7 @@ class ReadCwa(BaseProcess):
         super().predict(expect_days=False, expect_wear=False, file=file, **kwargs)
 
         # read the file
-        fs, n_bad_samples, imudata, ts, temperature, starts, stops = read_axivity(file)
+        fs, n_bad_samples, imudata, ts, temperature = read_axivity(file)
 
         # end = None if n_bad_samples == 0 else -n_bad_samples
         end = None

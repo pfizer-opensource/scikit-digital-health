@@ -12,14 +12,12 @@ from numpy import (
     mean,
     diff,
     asarray,
-    argmin,
     abs,
-    vstack,
     unique,
     all as npall,
     int_,
 )
-from pandas import read_csv, to_datetime, to_timedelta, Timedelta
+from pandas import read_csv, to_datetime, to_timedelta
 
 from skdh.base import BaseProcess, handle_process_returns
 from skdh.io.base import check_input_file
@@ -111,68 +109,6 @@ def handle_timestamp_inconsistency(df, fill_gaps, accel_col_names, accel_in_g, g
         df_full = df.copy()
 
     return df_full, float(n_samples)
-
-
-def handle_windows(time_dt, bases, periods, run_windowing):
-    """
-    Handle computation of the indices for day windows.
-
-    Parameters
-    ----------
-    time_dt : pandas.Series
-        Timestamp array of pandas datetimes.
-    bases : list-like
-        List of base times at which windows start. 24hr format.
-    periods : list-like
-        List of window lengths for each `base` time.
-    run_windowing : bool
-        Compute day windows.
-
-    Returns
-    -------
-    day_windows : dict
-        Dictionary of numpy arrays containing the indices for the desired days.
-    """
-    if not run_windowing:
-        return {}
-
-    start_date = time_dt.iloc[0]
-    end_date = time_dt.iloc[-1]
-
-    days = {}
-    day_dt = Timedelta(1, unit="day")
-
-    for base, period in zip(bases, periods):
-        starts, stops = [], []
-
-        period2 = (base + period) % 24
-
-        t_base = (
-            start_date.replace(hour=base, minute=0, second=0, microsecond=0) - day_dt
-        )
-        t_period = (
-            start_date.replace(hour=period2, minute=0, second=0, microsecond=0) - day_dt
-        )
-
-        if t_period <= t_base:
-            t_period += day_dt
-        while (
-            t_period < start_date
-        ):  # make sure at least one of the indices is during recording
-            t_base += day_dt
-            t_period += day_dt
-
-        # iterate over the times
-        while t_base < end_date:
-            starts.append(argmin(abs(time_dt - t_base)))
-            stops.append(argmin(abs(time_dt - t_period)))
-
-            t_base += day_dt
-            t_period += day_dt
-
-        days[(base, period)] = vstack((starts, stops)).T
-
-    return days
 
 
 def handle_accel(df, accel_cols, acc_in_g, g):
@@ -371,11 +307,6 @@ class ReadCSV(BaseProcess):
             raw, self.fill_gaps, self.acc_col_names, self.accel_in_g, self.g_value
         )
 
-        # first do the windowing
-        day_windows = handle_windows(
-            raw["_datetime_"], self.bases, self.periods, self.window
-        )
-
         # get the time values and convert to seconds
         time = raw["_datetime_"].astype(int).values / 1e9  # int gives ns, convert to s
 
@@ -385,7 +316,6 @@ class ReadCSV(BaseProcess):
         results = {
             self._time: time,
             self._acc: accel,
-            self._days: day_windows,
             "fs": fs,
         }
 
