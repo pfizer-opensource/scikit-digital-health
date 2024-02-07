@@ -123,14 +123,5 @@ def dummy_frag_predictions():
 
 
 @fixture
-def activity_res():
-    cwd = Path.cwd().parts
-
-    if cwd[-1] == "activity":
-        path = Path("data/activity_results.npz")
-    elif cwd[-1] == "test":
-        path = Path("activity/data/activity_results.npz")
-    elif cwd[-1] == "scikit-digital-health":
-        path = Path("test/activity/data/activity_results.npz")
-
-    return load(path)
+def activity_res(path_tests):
+    return load(path_tests / "activity" / "data" / "activity_results.npz")

@@ -80,7 +80,6 @@ def dummy_sleep_predictions():
     )
 
 
-@fixture(scope="module")
-def activity_index_data():
-    with resources.path("sleep.test_data", "test_activity_index.h5") as file_path:
-        return file_path
+@fixture(scope="class")
+def activity_index_data(path_tests):
+    return str(path_tests / "sleep" / "data" / "test_activity_index.h5")

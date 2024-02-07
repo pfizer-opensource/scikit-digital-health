@@ -51,66 +51,21 @@ def d_gait_aux():
     return gait_aux
 
 
-@fixture(scope="module")
-def gait_input_50():
-    cwd = Path.cwd().parts
+# NOTE: gait_input_50 moved to top level conftest.py
 
-    if cwd[-1] == "gait":
-        path = Path("data/gait_input.npz")
-    elif cwd[-1] == "test":
-        path = Path("gait/data/gait_input.npz")
-    elif cwd[-1] == "scikit-digital-health":
-        path = Path("test/gait/data/gait_input.npz")
-
-    data = load(path)
-    t = data["time"]
-    acc = data["accel"]
-
-    t50, (acc50,) = apply_downsample(50.0, t, (acc,), (), aa_filter=True)
-
-    return t50, acc50
+@fixture(scope="class")
+def gait_res_50_apcwt(path_tests):
+    return load(path_tests / "gait" / "data" / "gait_results_apcwt.npz")
 
 
-@fixture(scope="module")
-def gait_res_50_apcwt():
-    cwd = Path.cwd().parts
-
-    if cwd[-1] == "gait":
-        path = Path("data/gait_results_apcwt.npz")
-    elif cwd[-1] == "test":
-        path = Path("gait/data/gait_results_apcwt.npz")
-    elif cwd[-1] == "scikit-digital-health":
-        path = Path("test/gait/data/gait_results_apcwt.npz")
-
-    return load(path)
+@fixture(scope="class")
+def gait_res_50_vcwt(path_tests):
+    return load(path_tests / "gait" / "data" / "gait_results_vcwt.npz")
 
 
-@fixture(scope="module")
-def gait_res_50_vcwt():
-    cwd = Path.cwd().parts
-
-    if cwd[-1] == "gait":
-        path = Path("data/gait_results_vcwt.npz")
-    elif cwd[-1] == "test":
-        path = Path("gait/data/gait_results_vcwt.npz")
-    elif cwd[-1] == "scikit-digital-health":
-        path = Path("test/gait/data/gait_results_vcwt.npz")
-
-    return load(path)
-
-
-@fixture(scope="module")
-def gait_input_gyro():
-    cwd = Path.cwd().parts
-
-    if cwd[-1] == "gait":
-        path = Path("data/gait_input2.npz")
-    elif cwd[-1] == "test":
-        path = Path("gait/data/gait_input2.npz")
-    elif cwd[-1] == "scikit-digital-health":
-        path = Path("test/gait/data/gait_input2.npz")
-
-    data = load(path)
+@fixture(scope="class")
+def gait_input_gyro(path_tests):
+    data = load(path_tests / "gait" / "data" / "gait_input2.npz")
     t = data["time"]
     acc = data["accel"]
     gyr = data["gyro"]
@@ -118,32 +73,14 @@ def gait_input_gyro():
     return t, acc, gyr
 
 
-@fixture(scope="module")
-def gait_res_gyro_apcwt():
-    cwd = Path.cwd().parts
-
-    if cwd[-1] == "gait":
-        path = Path("data/gait_results2_apcwt.npz")
-    elif cwd[-1] == "test":
-        path = Path("gait/data/gait_results2_apcwt.npz")
-    elif cwd[-1] == "scikit-digital-health":
-        path = Path("test/gait/data/gait_results2_apcwt.npz")
-
-    return load(path)
+@fixture(scope="class")
+def gait_res_gyro_apcwt(path_tests):
+    return load(path_tests / "gait" / "data" / "gait_results2_apcwt.npz")
 
 
-@fixture(scope="module")
-def gait_res_gyro_vcwt():
-    cwd = Path.cwd().parts
-
-    if cwd[-1] == "gait":
-        path = Path("data/gait_results2_vcwt.npz")
-    elif cwd[-1] == "test":
-        path = Path("gait/data/gait_results2_vcwt.npz")
-    elif cwd[-1] == "scikit-digital-health":
-        path = Path("test/gait/data/gait_results2_vcwt.npz")
-
-    return load(path)
+@fixture(scope="class")
+def gait_res_gyro_vcwt(path_tests):
+    return load(path_tests / "gait" / "data" / "gait_results2_vcwt.npz")
 
 
 @fixture(scope="module")

@@ -85,18 +85,9 @@ def get_bgait_samples_truth():  # boolean gait classification
     return get_stuff
 
 
-@fixture(scope="module")
-def gait_input_50():
-    cwd = Path.cwd().parts
-
-    if cwd[-1] == "gait_old":
-        path = Path("data/gait_input.npz")
-    elif cwd[-1] == "test":
-        path = Path("gait_old/data/gait_input.npz")
-    elif cwd[-1] == "scikit-digital-health":
-        path = Path("test/gait_old/data/gait_input.npz")
-
-    data = load(path)
+@fixture(scope="class")
+def gait_input_50(path_tests):
+    data = load(path_tests / "gait_old" / "data" / "gait_input.npz")
     t = data["time"]
     acc = data["accel"]
 
@@ -105,32 +96,14 @@ def gait_input_50():
     return t50, acc50
 
 
-@fixture(scope="module")
-def gait_res_50():
-    cwd = Path.cwd().parts
-
-    if cwd[-1] == "gait_old":
-        path = Path("data/gait_results.npz")
-    elif cwd[-1] == "test":
-        path = Path("gait_old/data/gait_results.npz")
-    elif cwd[-1] == "scikit-digital-health":
-        path = Path("test/gait_old/data/gait_results.npz")
-
-    return load(path)
+@fixture(scope="class")
+def gait_res_50(path_tests):
+    return load(path_tests / "gait_old" / "data" / "gait_results.npz")
 
 
-@fixture(scope="module")
-def gait_input_gyro():
-    cwd = Path.cwd().parts
-
-    if cwd[-1] == "gait_old":
-        path = Path("data/gait_input2.npz")
-    elif cwd[-1] == "test":
-        path = Path("gait_old/data/gait_input2.npz")
-    elif cwd[-1] == "scikit-digital-health":
-        path = Path("test/gait_old/data/gait_input2.npz")
-
-    data = load(path)
+@fixture(scope="class")
+def gait_input_gyro(path_tests):
+    data = load(path_tests / "gait_old" / "data" / "gait_input2.npz")
     t = data["time"]
     acc = data["accel"]
     gyr = data["gyro"]
@@ -138,15 +111,6 @@ def gait_input_gyro():
     return t, acc, gyr
 
 
-@fixture(scope="module")
-def gait_res_gyro():
-    cwd = Path.cwd().parts
-
-    if cwd[-1] == "gait_old":
-        path = Path("data/gait_results2.npz")
-    elif cwd[-1] == "test":
-        path = Path("gait_old/data/gait_results2.npz")
-    elif cwd[-1] == "scikit-digital-health":
-        path = Path("test/gait_old/data/gait_results2.npz")
-
-    return load(path)
+@fixture(scope="class")
+def gait_res_gyro(path_tests):
+    return load(path_tests / "gait_old" / "data" / "gait_results2.npz")
