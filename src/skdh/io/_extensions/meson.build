@@ -31,9 +31,9 @@ py3.extension_module(
 
 
 window_lib = static_library(
-    "window_days",
+    'window_days',
     [
-        "window_days.c",
+        'window_days.c',
     ],
     c_args: numpy_nodepr_api,
 )
