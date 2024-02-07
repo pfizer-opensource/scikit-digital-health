@@ -28,3 +28,22 @@ py3.extension_module(
     install: true,
     subdir: 'skdh/io/_extensions',
 )
+
+
+window_lib = static_library(
+    "window_days",
+    [
+        "window_days.c",
+    ],
+    c_args: numpy_nodepr_api,
+)
+
+py3.extension_module(
+    'postread',
+    sources: ['postread.c'],
+    include_directories: [inc_np],
+    c_args: numpy_nodepr_api,
+    link_with: [window_lib],
+    install: true,
+    subdir: 'skdh/io/_extensions',
+)
