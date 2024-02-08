@@ -3,6 +3,7 @@ name: Build_and_Publish
 on:
   release:
     types: [ released ]
+  workflow_dispatch:
 
 jobs:
   build_wheels:
@@ -36,7 +37,7 @@ jobs:
         env:
           FC: ${{ steps.setup-fortran-macos.outputs.fc }}
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.16.2
+        uses: pypa/cibuildwheel@v2.16.5
         env:
           CIBW_SKIP: pp* cp36-* cp37-* *musllinux*
           CIBW_ARCHS_MACOS: x86_64
