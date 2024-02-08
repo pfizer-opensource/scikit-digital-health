@@ -1,9 +1,9 @@
 name: Build_and_Publish
 
 on:
-  - release:
+  release:
     types: [ released ]
-  - workflow_dispatch
+  workflow_dispatch:
 
 jobs:
   build_wheels:
