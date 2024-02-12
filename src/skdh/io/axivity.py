@@ -91,7 +91,7 @@ class ReadCwa(BaseProcess):
         super().predict(expect_days=False, expect_wear=False, file=file, **kwargs)
 
         # read the file
-        fs, n_bad_samples, imudata, ts, temperature = read_axivity(file)
+        fs, n_bad_samples, imudata, ts, temperature = read_axivity(str(file))
 
         # end = None if n_bad_samples == 0 else -n_bad_samples
         end = None
