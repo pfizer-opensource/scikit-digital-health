@@ -10,10 +10,10 @@ SKDH Reference
     io
     preprocessing
     features
+    context
     sleep
     activity
     gait
     gait_old
     sit2stand
     utility
-    ambulation
