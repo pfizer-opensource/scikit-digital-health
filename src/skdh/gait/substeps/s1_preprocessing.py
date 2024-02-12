@@ -54,7 +54,7 @@ class PreprocessGaitBout(BaseProcess):
         - `btype`: band
         - `output`: sos - NOTE that this will always be set/overriden
 
-        See :scipy-signal:func:`scipy.signal.butter` for full options.
+        See :func:`scipy.signal.butter` for full options.
     """
 
     def __init__(
