@@ -81,7 +81,7 @@ def handle_timestamp_inconsistency(df, fill_gaps, accel_col_names, accel_in_g, g
         t_delta = to_timedelta(t_delta, unit="s")
 
         # add the time delta so that we have unique timestamps
-        df["_datetime_"] += t_delta
+        df.loc[:, "_datetime_"] += t_delta
 
     # check if we are filling gaps or not
     if fill_gaps:
