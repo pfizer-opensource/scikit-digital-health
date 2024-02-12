@@ -4,6 +4,8 @@ Metrics for classifying activity
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+import warnings
+
 from numpy import maximum, abs, repeat, arctan, sqrt, pi
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt
@@ -38,9 +40,11 @@ def metric_anglez(accel, wlen, *args, **kwargs):
     anglez : numpy.ndarray
         (N, ) array of angles between accelerometer z axis and horizontal plane in degrees.
     """
-    anglez = arctan(accel[:, 2] / sqrt(accel[:, 0] ** 2 + accel[:, 1] ** 2)) * (
-        180 / pi
-    )
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", message="divide by zero encountered in divide")
+        anglez = arctan(accel[:, 2] / sqrt(accel[:, 0] ** 2 + accel[:, 1] ** 2)) * (
+            180 / pi
+        )
     return moving_mean(anglez, wlen, wlen)
 
 
