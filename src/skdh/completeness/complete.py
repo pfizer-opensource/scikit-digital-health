@@ -2,8 +2,7 @@ import os
 import pickle
 import numpy as np
 from skdh.base import BaseProcess
-from skdh.completeness.parse import parse_raw
-from skdh.completeness.utils import input_data_checks, init_data_dic, compute_completeness_master, compute_summary_metrics
+from skdh.completeness.utils import load_subject_data, compute_completeness_master, compute_summary_metrics, check_hyperparameters
 from skdh.completeness.visualizations import visualize_overview_plot, plot_completeness, plot_data_gaps, plot_timescale_completeness
 
 
@@ -14,63 +13,54 @@ class completeness_pipe(BaseProcess):
 
     def __init__(
             self,
+            subject,
             subject_folder,
             device_name,
             fpath_output,
-            unix_time_key,
-            columns,
             measures,
-            subject_id_key,
-            resample_width='5m',
+            resample_width_mins=5,
             gap_size_mins=30,
-            ranges={},
-            timezone_key=None,
+            ranges=None,
             data_gaps=None,
             time_periods=None,
-            timescales=None,
-            ecg_key=None,
-            acc_raw_key=None,
-            acc_raw_fdir=None):
+            timescales=None):
 
-        self.df_raw = parse_raw(subject_folder, unix_time_key, subject_id_key, timezone_key=timezone_key)
-        input_data_checks(self.df_raw, device_name)
+        check_hyperparameters(subject,
+            subject_folder,
+            device_name,
+            fpath_output,
+            measures,
+            resample_width_mins,
+            gap_size_mins,
+            ranges,
+            data_gaps,
+            time_periods,
+            timescales)
 
         super().__init__(
+            subject=subject,
             subject_folder=subject_folder,
             device_name=device_name,
             fpath_output=fpath_output,
-            unix_time_key=unix_time_key,
-            columns=columns,
             measures=measures,
-            subject_id_key=subject_id_key,
-            resample_width=resample_width,
+            resample_width=resample_width_mins,
             gap_size_mins=gap_size_mins,
             ranges=ranges,
-            timezone_key=timezone_key,
             data_gaps=data_gaps,
             time_periods=time_periods,
-            timescales=timescales,
-            ecg_key=ecg_key,
-            acc_raw_key=acc_raw_key,
-            acc_raw_fdir=acc_raw_fdir)
+            timescales=timescales)
 
+        self.subject = subject
         self.subject_folder = subject_folder
         self.device_name = device_name
         self.fpath_output = fpath_output
-        self.unix_time_key = unix_time_key
-        self.columns = columns
         self.measures = measures
-        self.subject_id_key = subject_id_key
-        self.resample_width = resample_width
+        self.resample_width_mins = resample_width_mins
         self.gap_size_mins = gap_size_mins
         self.ranges = ranges
-        self.timezone_key = timezone_key
         self.data_gaps = data_gaps
         self.time_periods = time_periods
         self.timescales = timescales
-        self.ecg_key = ecg_key
-        self.acc_raw_key = acc_raw_key
-        self.acc_raw_fdir = acc_raw_fdir
 
 #    @handle_process_returns(results_to_kwargs=True)
     def predict(self,
@@ -84,9 +74,8 @@ class completeness_pipe(BaseProcess):
             expect_wear=False,
             **kwargs,
         )
+        data_dic = load_subject_data(self.subject_folder, self.subject, self.device_name, self.measures, self.ranges)
 
-        data_dic = init_data_dic(self.df_raw, self.columns, self.measures, self.device_name, self.ranges, self.ecg_key,
-                                 self.acc_raw_key, self.acc_raw_fdir)
         if self.time_periods is None:
             self.time_periods = [(np.min([x.index[0] for x in data_dic['Measurement Streams'].values()]),
                                   np.max([x.index[-1] for x in data_dic['Measurement Streams'].values()]))]
@@ -115,23 +104,24 @@ class completeness_pipe(BaseProcess):
         if generate_figures:
             fpath_dir = self.fpath_output + '/' + data_dic['Subject ID'] + '/' + self.device_name + '/'
             overview_fig = visualize_overview_plot(data_dic=data_dic, fpath=fpath_dir + 'overview.html',
-                                                   resample_width=self.resample_width, gap_size_mins=self.gap_size_mins,
+                                                   resample_width_mins=self.resample_width_mins, gap_size_mins=self.gap_size_mins,
                                                    time_periods=self.time_periods)
+            reason_color_dic = {'normal' : 'blue', 'unknown' : 'magenta', 'charging' : 'orange', 'no_wear' : 'red'}
             figures.update({'overview': overview_fig})
             completeness_fig = plot_completeness(completeness_master_dic, data_dic, self.time_periods,
-                                                 fpath=fpath_dir + 'completeness', reason_color_dic=None)
-            figures.update({'completeness': completeness_fig})
+                                                 fpath=fpath_dir + 'completeness', reason_color_dic=reason_color_dic)
+            figures.update({'Completeness': completeness_fig})
             if not self.data_gaps is None:
                 data_gap_fig = plot_data_gaps(completeness_master_dic, data_dic, self.data_gaps, self.time_periods,
-                                              fpath=fpath_dir + 'data_gaps', reason_color_dic=None)
+                                              fpath=fpath_dir + 'data_gaps', reason_color_dic=reason_color_dic)
                 figures.update({'data_gaps': data_gap_fig})
             if not self.timescales is None:
                 timescale_compl_fig = plot_timescale_completeness(completeness_master_dic, data_dic, self.time_periods,
                                                                   self.timescales,
                                                                   fpath=fpath_dir + 'timescale_completeness',
-                                                                  reason_color_dic=None)
+                                                                  reason_color_dic=reason_color_dic)
                 figures.update({'timescale_completeness': timescale_compl_fig})
 
-        return {"completeness": {'df_parsed' : self.df_raw, 'data_dic' : data_dic, 'compl_dic' : completeness_master_dic,
+        return {"Completeness": {'data_dic' : data_dic, 'compl_dic' : completeness_master_dic,
                                  'df_summary' : df_summary, 'figures' : figures}}
 

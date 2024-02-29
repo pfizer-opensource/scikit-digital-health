@@ -2,11 +2,12 @@ import copy
 import warnings
 import plotly.graph_objects as go
 import numpy as np
+import plotly.express as px
 import matplotlib.pyplot as plt
 from plotly.subplots import make_subplots
 from skdh.completeness.helpers import find_nan_regions
 
-def plot_overview_one_device(data, resample_width='1min', device_changes=None, shared_xaxes=True, title=None,
+def plot_overview_one_device(data, resample_width_mins=1, device_changes=None, shared_xaxes=True, title=None,
                              gap_size_mins=5):
     """
     Version of plot overview that plots several data streams for only one device/subject.
@@ -15,11 +16,14 @@ def plot_overview_one_device(data, resample_width='1min', device_changes=None, s
     """
     y_titles = [ele.name for ele in data]
     fig = make_subplots(rows=len(data), cols=1, x_title='Date', shared_xaxes=shared_xaxes)
+    colors = px.colors.qualitative.Alphabet
 
     for c, data_section in enumerate(data):
-        first_df = data_section.resample(resample_width).median()
+        first_df = data_section.resample(str(resample_width_mins) + 'min').median()
         start_nan_inds, end_nan_inds, nan_region_lengths = find_nan_regions(first_df)
-        crit_data_gap_inds = np.where(nan_region_lengths > gap_size_mins - 1)[0]
+
+        scatter_points = end_nan_inds[np.where((start_nan_inds[1:] - end_nan_inds[:-1]) == 2)[0]] + 1
+        crit_data_gap_inds = np.where((nan_region_lengths + 1) * resample_width_mins >= gap_size_mins)[0]
         data_gaps_start_ind = start_nan_inds[crit_data_gap_inds]
         data_gaps_end_ind = end_nan_inds[crit_data_gap_inds]
         if len(data_gaps_start_ind) > 100:
@@ -27,9 +31,13 @@ def plot_overview_one_device(data, resample_width='1min', device_changes=None, s
                                                                                 'data gaps. This will take some time to'
                                                                                 ' render, consider setting gap_size_'
                                                                                 'mins higher to make it faster')
-        fig.add_trace(go.Scatter(x=first_df.index, y=first_df), row=c + 1, col=1)
+
+        fig.add_trace(go.Scatter(x=first_df.index, y=first_df, line=dict(color=colors[c])), row=c + 1, col=1)
+        if len(scatter_points) > 0:
+            fig.add_trace(go.Scatter(x=first_df.index[scatter_points], y=first_df[scatter_points], mode='markers',
+                                     marker={'symbol' : 'line-ew-open', 'color' : colors[c], 'size' : 2}), row=c + 1, col=1)
         for start, end in zip(data_gaps_start_ind, data_gaps_end_ind):
-            fig.add_vrect(x0=first_df.index[start], x1=first_df.index[end],
+            fig.add_vrect(x0=first_df.index[start - 1], x1=first_df.index[end + 1],
                           fillcolor='red', opacity=0.25, line_width=0, row=c + 1, col=1)
         if len(data_gaps_start_ind) > 0:
             fig.add_trace(go.Scatter(x=[first_df.index[data_gaps_start_ind[0]], first_df.index[data_gaps_end_ind[0]]],
@@ -53,8 +61,8 @@ def plot_overview_one_device(data, resample_width='1min', device_changes=None, s
     if not title is None:
         fig.update_layout(title=title)
     remove_duplicate_labels_plotly(fig)
-
     return fig
+
 
 def remove_duplicate_labels_plotly(fig):
     names = set()
@@ -75,27 +83,32 @@ def plot_timescale_completeness(completeness_master_dic, data_dic, time_periods,
     fig = plt.figure(figsize=figsize, dpi=dpi)
     axes = fig.subplots(len(data_dic['Measurement Streams'].keys()), len(time_periods), sharex=True)
     x_labels = [str(timescale) for timescale in timescales]
+    handles = []
+    labels = []
     if len(time_periods) == 1 or len(data_dic['Measurement Streams'].keys()) == 1:
         axes = np.array([axes]).reshape((len(data_dic['Measurement Streams']), len(time_periods)))
     for c, time_period in enumerate(time_periods):
         for d, measure in enumerate(list(data_dic['Measurement Streams'].keys())):
-            heights = [completeness_master_dic[measure]['completeness'][timescale][time_period]['completeness'] * 100
+            heights = [completeness_master_dic[measure]['Completeness'][timescale][time_period]['Completeness'] * 100
                        for timescale in timescales]
-            axes[d, c].bar(x=np.arange(len(timescales)) * 3., height=heights, color='black', zorder=2)
+            axes[d, c].bar(x=np.arange(len(timescales)) * 3., height=heights, color='black', label='Completeness', zorder=2)
             if d == len(data_dic['Measurement Streams'].keys()) - 1:
                 axes[d, c].set_xticks(ticks=np.arange(len(timescales)) * 3 + .5, labels=x_labels, rotation=45)
             else:
                 axes[d, c].set_xticks(ticks=np.arange(len(timescales)) * 3 + .5, labels=[])
             ax2 = axes[d, c].twinx()
+            ax2.bar(x=0, height=0, color='black', label='Completeness', zorder=2)
             for k, timescale in enumerate(timescales):
                 bottom = 0
-                for reason, quota in completeness_master_dic[measure]['completeness'][timescale][time_period].items():
-                    if not reason == 'completeness':
-                        if not prior_reason_dic: reason_color_dic = grow_reason_color_dict(reason.replace('missingness, ', ''), reason_color_dic)
+                for reason, quota in completeness_master_dic[measure]['Completeness'][timescale][time_period].items():
+                    if not reason == 'Completeness':
+                        if not prior_reason_dic: reason_color_dic = grow_reason_color_dict(reason.replace('Missingness, ', ''), reason_color_dic)
                         ax2.bar(x=k * 3. + 1, height=quota * 100, width=.8, bottom=bottom, linewidth=1,
-                                edgecolor='black', color=reason_color_dic[reason.replace('missingness, ', '')], zorder=1,
-                                label=reason.replace('missingness, ', ''))
+                                edgecolor='black', color=reason_color_dic[reason.replace('Missingness, ', '')], zorder=1,
+                                label=reason.replace(' ', '\n') + ' reason')
                         bottom = bottom + quota * 100
+            handles = handles + fig.gca().get_legend_handles_labels()[0]
+            labels = labels + fig.gca().get_legend_handles_labels()[1]
             axes[d, c].set_ylim((0, 100))
             ax2.set_ylim((0, 100))
             axes[d, c].grid(axis='y', linestyle='--', color='gray', zorder=1000)
@@ -107,11 +120,8 @@ def plot_timescale_completeness(completeness_master_dic, data_dic, time_periods,
                 axes[d, c].set_ylabel(list(data_dic['Measurement Streams'].keys())[d] + '\nCompleteness\n(%)')
                 if d == 0:
                     first_ax2 = ax2
-#            if c == axes.shape[1] - 1:
-#                ax2.set_ylabel('Missingness (%) by reason', rotation=270)
-    handles, labels = fig.gca().get_legend_handles_labels()
     by_label = dict(zip(labels, handles))
-    first_ax2.legend(by_label.values(), by_label.keys())
+    first_ax2.legend(by_label.values(), by_label.keys(), loc='upper left')
     fig.text(0.985, 0.55, 'Missingness (%) by reason', va='center', rotation=270)
     fig.tight_layout()
     fig.savefig(fpath + '.png', dpi=300)
@@ -129,19 +139,24 @@ def plot_completeness(completeness_master_dic, data_dic, time_periods, fpath, fi
         figsize = (6 * len(data_dic['Measurement Streams'].keys()), 8)
     fig = plt.figure(figsize=figsize, dpi=dpi)
     axes = fig.subplots(1, len(data_dic['Measurement Streams'].keys()))
+    if len(data_dic['Measurement Streams'].keys()) == 1:
+        axes = np.array([axes])
     x_labels = [str(time_period[0]) + '-\n' + str(time_period[1]) for time_period in time_periods]
+    handles = []
+    labels = []
     for d, measure in enumerate(list(data_dic['Measurement Streams'].keys())):
         ax2 = axes[d].twinx()
+        ax2.bar(x=0, height=0, color='black', label='Completeness', zorder=2)
         for c, time_period in enumerate(time_periods):
-            axes[d].bar(x=c * 3., width=.8, height=completeness_master_dic[measure]['completeness']['native'][time_period][
-                                                  'completeness'] * 100, color='black', zorder=2)
+            axes[d].bar(x=c * 3., width=.8, height=completeness_master_dic[measure]['Completeness']['native'][time_period][
+                                                  'Completeness'] * 100, color='black', label='Completeness', zorder=2)
             bottom = 0
-            for reason, quota in completeness_master_dic[measure]['completeness']['native'][time_period].items():
-                if not reason == 'completeness':
+            for reason, quota in completeness_master_dic[measure]['Completeness']['native'][time_period].items():
+                if not reason == 'Completeness':
                     if not prior_reason_dic: reason_color_dic = grow_reason_color_dict(reason, reason_color_dic)
                     ax2.bar(x=c * 3. + 1, height=quota * 100, width=.8, bottom=bottom, linewidth=1,
-                            edgecolor='black', color=reason_color_dic[reason], zorder=1,
-                            label=reason.replace('missingness, ', ''))
+                            edgecolor='black', color=reason_color_dic[reason.replace('Missingness, ', '')], zorder=1,
+                            label=reason.replace(' ', '\n') + ' reason')
                     bottom = bottom + quota * 100
         axes[d].set_title(measure)
         axes[d].set_xlabel('Time period' )
@@ -150,6 +165,8 @@ def plot_completeness(completeness_master_dic, data_dic, time_periods, fpath, fi
             axes[d].set_ylabel('Completeness (%)')
         else:
             axes[d].set_yticks(ticks=np.arange(6) * 20, labels=[])
+        handles = handles + fig.gca().get_legend_handles_labels()[0]
+        labels = labels + fig.gca().get_legend_handles_labels()[1]
         axes[d].set_xticks(ticks=np.arange(len(time_periods)) * 3 + .5, labels=x_labels, rotation=90)
         axes[d].set_ylim((0, 100))
         ax2.set_ylim((0, 100))
@@ -160,7 +177,7 @@ def plot_completeness(completeness_master_dic, data_dic, time_periods, fpath, fi
         axes[d].grid(axis='y', linestyle='--', color='gray', zorder=100)
     handles, labels = fig.gca().get_legend_handles_labels()
     by_label = dict(zip(labels, handles))
-    first_ax2.legend(by_label.values(), by_label.keys())
+    first_ax2.legend(by_label.values(), by_label.keys(), loc='upper left')
     fig.tight_layout()
     fig.savefig(fpath + '.png', dpi=300)
     fig.savefig(fpath + '.svg')
@@ -180,6 +197,8 @@ def plot_data_gaps(completeness_master_dic, data_dic, data_gaps, time_periods, f
     fig = plt.figure(figsize=figsize, dpi=dpi)
     axes = fig.subplots(len(data_dic['Measurement Streams'].keys()), len(time_periods))
     x_labels = [str(dg) for dg in data_gaps]
+    handles = []
+    labels = []
     if len(time_periods) == 1 or len(data_dic['Measurement Streams'].keys()) == 1:
         axes = np.array([axes]).reshape((len(data_dic['Measurement Streams']), len(time_periods)))
     for c, time_period in enumerate(time_periods):
@@ -191,13 +210,15 @@ def plot_data_gaps(completeness_master_dic, data_dic, data_gaps, time_periods, f
             else:
                 axes[d, c].set_xticks(ticks=np.arange(len(data_gaps)) * 3 + .5, labels=[])
             ax2 = axes[d, c].twinx()
+            ax2.bar(x=0, height=0, color='black', label='Data gaps (n)', zorder=2)
             for k, data_gap in enumerate(completeness_master_dic[measure]['data_gaps'][time_period].values()):
                 bottom = 0
                 for reason, quota in data_gap.items():
                     reason_ratio = quota / counts_total[k] * 100
                     if not prior_reason_dic: reason_color_dic = grow_reason_color_dict(reason, reason_color_dic)
-                    ax2.bar(x = k * 3 + 1, height=reason_ratio, width=.8, log=False, color=reason_color_dic[reason], bottom=bottom,
-                           linewidth=1, edgecolor='black', zorder=1, label=reason)
+                    ax2.bar(x = k * 3 + 1, height=reason_ratio, width=.8, log=False,
+                            color=reason_color_dic[reason.replace('Missingness, ', '')], bottom=bottom,
+                            linewidth=1, edgecolor='black', zorder=1, label='Gap reason (%):\n' + reason)
                     bottom = bottom + reason_ratio
             if d == 0:
                 axes[d, c].set_title(str(time_period[0]) + ' - \n' + str(time_period[1]))
@@ -209,9 +230,10 @@ def plot_data_gaps(completeness_master_dic, data_dic, data_gaps, time_periods, f
                     first_ax2 = ax2
             axes[d, c].set_xlim((-.5, (len(data_gaps) - 1) * 3 + 1.5))
             ax2.set_ylim((0, 100))
-    handles, labels = fig.gca().get_legend_handles_labels()
+            handles = handles + fig.gca().get_legend_handles_labels()[0]
+            labels = labels + fig.gca().get_legend_handles_labels()[1]
     by_label = dict(zip(labels, handles))
-    first_ax2.legend(by_label.values(), by_label.keys())
+    first_ax2.legend(by_label.values(), by_label.keys(), loc='upper left')
     fig.text(0.985, 0.55, 'Gap reason (%)', va='center', rotation=270)
     fig.tight_layout()
     fig.savefig(fpath + '.png', dpi=300)
@@ -219,12 +241,14 @@ def plot_data_gaps(completeness_master_dic, data_dic, data_gaps, time_periods, f
     return fig
 
 
-def visualize_overview_plot(data_dic, fpath, resample_width, gap_size_mins, time_periods):
+def visualize_overview_plot(data_dic, fpath, resample_width_mins, gap_size_mins, time_periods):
     data_streams = [copy.deepcopy(data_dic['Measurement Streams'][key][key]) for key in data_dic['Measurement Streams'].keys()]
+    if 'Wear Indicator' in data_dic.keys():
+        data_streams.append(copy.deepcopy(data_dic['Wear Indicator']['Wear Indicator']))
     acc_raw_ind = np.where([data_stream.name == 'acc_raw' for data_stream in data_streams])[0]
     if len(acc_raw_ind) > 0:
         data_streams[acc_raw_ind[0]].iloc[:] = np.linalg.norm(np.array([np.array(x, dtype=float) for x in data_streams[acc_raw_ind[0]]]), axis=1)
-    fig = plot_overview_one_device(data_streams, resample_width=resample_width, device_changes=None, shared_xaxes=True,
+    fig = plot_overview_one_device(data_streams, resample_width_mins=resample_width_mins, device_changes=None, shared_xaxes=True,
                                    title=data_dic['Subject ID'], gap_size_mins=gap_size_mins)
     for row_ind, measure in enumerate(data_dic['Measurement Streams'].keys()):
         for time_period in time_periods:

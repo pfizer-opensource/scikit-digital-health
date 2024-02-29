@@ -26,7 +26,7 @@ def from_unix(ts, time_unit='s', utc_offset=0):
 
     """
     time_start = np.datetime64("1970-01-01T00:00:00")
-    return ts * np.timedelta64(1, time_unit) + time_start - np.timedelta64(utc_offset * 60 ** 2, "s")
+    return ts * np.timedelta64(1, time_unit) + time_start + np.timedelta64(utc_offset * 60 ** 2, "s")
 
 
 def to_unix(ts, time_unit='s', utc_offset=0):
@@ -44,7 +44,7 @@ def to_unix(ts, time_unit='s', utc_offset=0):
 
     """
     time_start = np.datetime64("1970-01-01T00:00:00")
-    return ((ts - time_start) + datetime.timedelta(hours=utc_offset)) / np.timedelta64(1, time_unit)
+    return ((ts - time_start) - np.timedelta64(utc_offset, 'h')) / np.timedelta64(1, time_unit)
 
 
 def find_nan_regions(arr):
