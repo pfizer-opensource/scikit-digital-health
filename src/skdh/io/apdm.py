@@ -24,6 +24,9 @@ class ReadApdmH5(BaseProcess):
     sensor_location : str
         Sensor location to get data from. Looks at the `Label 0` key to find the
         desired sensor.
+    localize_timestamps : bool, optional
+        Convert timestamps to local time from UTC. Default is True. Uses APDM's 
+        timezone offset attribute for the sensor being extracted.
     gravity_acceleration : float, optional
         Acceleration due to gravity. Used to convert values to units of `g`.
         Default is 9.81 m/s^2.
@@ -46,10 +49,11 @@ class ReadApdmH5(BaseProcess):
     - Sternum
     """
 
-    def __init__(self, sensor_location, gravity_acceleration=9.81, ext_error="warn"):
+    def __init__(self, sensor_location, localize_timestamps=True, gravity_acceleration=9.81, ext_error="warn"):
         super().__init__(
             # kwargs
             sensor_location=sensor_location,
+            localize_timestamps=localize_timestamps,
             gravity_acceleration=gravity_acceleration,
             ext_error=ext_error,
         )
@@ -59,6 +63,7 @@ class ReadApdmH5(BaseProcess):
         else:
             raise ValueError("`ext_error` must be one of 'raise', 'warn', 'skip'.")
 
+        self.localize_time = localize_timestamps
         self.sens = sensor_location
         self.g = gravity_acceleration
 
@@ -112,5 +117,13 @@ class ReadApdmH5(BaseProcess):
             res[self._time] = f["Sensors"][sid]["Time"][()] / 1e6  # to seconds
             res[self._gyro] = f["Sensors"][sid]["Gyroscope"][()]
             res[self._temp] = f["Sensors"][sid]["Temperature"][()]
+
+            # if we are converting to local time
+            if self.localize_time:
+                offset_hours = float(f['Sensors'][sid]['Configuration'].attrs["Timezone Offset"])
+                # convert to seconds
+                offset_sec = offset_hours * 3600.0
+
+                res[self._time] += offset_sec
 
         return res

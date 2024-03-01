@@ -4,7 +4,7 @@ IMU Gait Analysis (:mod:`skdh.gait`)
 
 .. currentmodule:: skdh.gait
 
-Pipeline gait processing
+Pipeline Gait Processing
 ------------------------
 
 .. autosummary::

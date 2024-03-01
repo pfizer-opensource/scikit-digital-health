@@ -48,7 +48,7 @@ def dummy_process():
 
 @fixture
 def gnactv_file(path_tests):
-    return str(path_tests / "io" / "data" / "gnactv_sample.bin")
+    return path_tests / "io" / "data" / "gnactv_sample.bin"
 
 
 @fixture
@@ -63,7 +63,7 @@ def gnactv_truth(path_tests):
 
 @fixture
 def ax3_file(path_tests):
-    return str(path_tests / "io" / "data" / "ax3_sample.cwa")
+    return path_tests / "io" / "data" / "ax3_sample.cwa"
 
 
 @fixture
@@ -78,7 +78,7 @@ def ax3_truth(path_tests):
 
 @fixture
 def ax6_file(path_tests):
-    return str(path_tests / "io" / "data" / "ax6_sample.cwa")
+    return path_tests / "io" / "data" / "ax6_sample.cwa"
 
 
 @fixture
@@ -93,7 +93,7 @@ def ax6_truth(path_tests):
 
 @fixture
 def apdm_file(path_tests):
-    return str(path_tests / "io" / 'data' / "apdm_sample.h5")
+    return path_tests / "io" / 'data' / "apdm_sample.h5"
 
 
 @fixture

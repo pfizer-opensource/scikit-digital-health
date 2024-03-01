@@ -77,7 +77,7 @@ class GaitLumbar(BaseProcess):
         - `btype`: band
         - `output`: sos - NOTE that this will always be set/overriden
 
-        See :scipy-signal:func:`scipy.signal.butter` for full options.
+        See :func:`scipy.signal.butter` for full options.
     ic_prom_factor : float, optional
         [:meth:`skdh.gaitv3.substeps.ApCwtGaitEvents`] Factor multiplied by the
         standard deviation of the CWT coefficients to obtain a minimum prominence
