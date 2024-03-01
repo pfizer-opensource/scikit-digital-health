@@ -120,7 +120,7 @@ class ReadApdmH5(BaseProcess):
 
             # if we are converting to local time
             if self.localize_time:
-                offset_hours = f['Sensors'][sid]['Configuration'].attrs["Timezone Offset"]
+                offset_hours = float(f['Sensors'][sid]['Configuration'].attrs["Timezone Offset"])
                 # convert to seconds
                 offset_sec = offset_hours * 3600.0
 
