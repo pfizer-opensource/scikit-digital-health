@@ -3,28 +3,30 @@ Installation
 
 Both PyPI and Conda-Forge should have pre-built wheels for major distributions.
 
-.. tabbed:: conda
+.. tab-set::
 
-    ::
+    .. tab-item:: conda
 
-        conda install -c conda-forge scikit-digital-health
+        ::
 
-.. tabbed:: pip
-    :selected:
+            conda install -c conda-forge scikit-digital-health
 
-    ::
+    .. tab-item:: pip
+        :selected:
 
-        pip install scikit-digital-health
+        ::
 
-.. tabbed:: pip from GitHub
+            pip install scikit-digital-health
 
-    ::
+    .. tab-item:: pip from GitHub
 
-        pip install git+ssh://git@github.com/PfizerRD/scikit-digital-health.git
-        # install from a specific tag
-        pip install git+ssh://git@github.com/PfizerRD/scikit-digital-health@0.9.10
-        # install from a specific branch
-        pip install git+ssh://git@github.com/PfizerRD/scikit-digital-health@development
+        ::
+
+            pip install git+ssh://git@github.com/PfizerRD/scikit-digital-health.git
+            # install from a specific tag
+            pip install git+ssh://git@github.com/PfizerRD/scikit-digital-health@0.9.10
+            # install from a specific branch
+            pip install git+ssh://git@github.com/PfizerRD/scikit-digital-health@development
 
 Run-time requirements
 ^^^^^^^^^^^^^^^^^^^^^

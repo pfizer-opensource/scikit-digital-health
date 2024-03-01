@@ -1,4 +1,4 @@
-.. _skdh utility:
+.. _skdh-utility:
 
 .. automodule:: skdh.utility
     :ignore-module-all:

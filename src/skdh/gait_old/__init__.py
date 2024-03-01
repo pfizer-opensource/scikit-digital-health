@@ -56,13 +56,13 @@ Background Information
 
 ::
 
-|      IC             FC      IC             FC      IC             FC
-|      i-1            i-1     i+1            i+1     i+3            i+3
-| L    |--------------|       |--------------|       |--------------|
-| R               |--------------|        |--------------|
-|                 i              i        i+2            i+2
-|                 IC             FC       IC             FC
-|      time --->
+    |      IC             FC      IC             FC      IC             FC
+    |      i-1            i-1     i+1            i+1     i+3            i+3
+    | L    |--------------|       |--------------|       |--------------|
+    | R               |--------------|        |--------------|
+    |                 i              i        i+2            i+2
+    |                 IC             FC       IC             FC
+    |      time --->
 
 General terminology:
 

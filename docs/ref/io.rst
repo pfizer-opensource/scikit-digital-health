@@ -1,4 +1,4 @@
-.. _skdh io:
+.. _skdh-io:
 
 .. automodule:: skdh.io
     :ignore-module-all:

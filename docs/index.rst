@@ -12,91 +12,53 @@ Scikit Digital Health
 
 `SciKit-Digital-Health` is a Python package with methods for reading, pre-processing, manipulating, and analyzing Inertial Meausurement Unit data. `scikit-digital-health` contains the following sub-modules:
 
-.. panels::
-    :img-top-cls: pl-3 pr-3
-    :card: shadow
+.. grid:: 1 2 2 2
+    :gutter: 2
 
-    :img-top: _static/skdh_io.svg
-
-    :badge:`skdh.io,badge-primary`
-
-    +++
-    .. link-button:: skdh io
-        :type: ref
-        :text: Ingestion of common binary data files and generic data stores.
-        :classes: btn-outline-primary stretched-link btn-block
-
-    ---
-    :img-top: _static/skdh_preproc.svg
-    :badge:`skdh.preprocessing,badge-primary`
-    +++
-    .. link-button:: skdh preprocessing
-        :type: ref
-        :text: Pre-processing algorithms for inertial data.
-        :classes: btn-outline-primary stretched-link btn-block
-
-    ---
-    :img-top: _static/skdh_context.svg
-    :badge:`skdh.context,badge-primary`
-    +++
-    .. link-button:: skdh context
-        :type: ref
-        :text: Context detection methods for inertial sensor data.
-        :classes: btn-outline-primary stretched-link btn-block
-
-    ---
-    :img-top: _static/skdh_gait.svg
-    :badge:`skdh.gait,badge-primary`
-    +++
-    .. link-button:: skdh gait
-        :type: ref
-        :text: Gait detection and analysis from lumbar inertial data.
-        :classes: btn-outline-primary stretched-link btn-block
-
-    ---
-    :img-top: _static/skdh_s2s.svg
-    :badge:`skdh.sit2stand,badge-primary`
-    +++
-    .. link-button:: skdh sit2stand
-        :type: ref
-        :text: Sit-to-stand detection and analysis from lumbar inertial data.
-        :classes: btn-outline-primary stretched-link btn-block
-
-    ---
-    :img-top: _static/skdh_activity.svg
-    :badge:`skdh.activity,badge-primary`
-    +++
-    .. link-button:: skdh activity
-        :type: ref
-        :text: Actigraphy & activity analysis from inertial data.
-        :classes: btn-outline-primary stretched-link btn-block
-
-    ---
-    :img-top: _static/skdh_sleep.svg
-    :badge:`skdh.sleep,badge-primary`
-    +++
-    .. link-button:: skdh sleep
-        :type: ref
-        :text: Sleep detection and analysis from wrist inertial data.
-        :classes: btn-outline-primary stretched-link btn-block
-
-    ---
-    :img-top: _static/skdh_features.svg
-    :badge:`skdh.features,badge-primary`
-    +++
-    .. link-button:: skdh features
-        :type: ref
-        :text: Common time-series signal features.
-        :classes: btn-outline-primary stretched-link btn-block
-
-    ---
-    :img-top: _static/skdh_utility.svg
-    :badge:`skdh.utility,badge-primary`
-    +++
-    .. link-button:: skdh utility
-        :type: ref
-        :text: Utility functions for time-series analysis.
-        :classes: btn-outline-primary stretched-link btn-block
+    .. grid-item-card:: :bdg-primary:`skdh.io`
+        :img-top: _static/skdh_io.svg
+        :link: skdh-io
+        :link-type: ref
+    
+    .. grid-item-card:: :bdg-primary:`skdh.preprocessing`
+        :img-top: _static/skdh_preproc.svg
+        :link: skdh-preprocessing
+        :link-type: ref
+    
+    .. grid-item-card:: :bdg-primary:`skdh.context`
+        :img-top: _static/skdh_context.svg
+        :link: skdh-context
+        :link-type: ref
+    
+    .. grid-item-card:: :bdg-primary:`skdh.gait`
+        :img-top: _static/skdh_gait.svg
+        :link: skdh-gait
+        :link-type: ref
+    
+    .. grid-item-card:: :bdg-primary:`skdh.sit2stand`
+        :img-top: _static/skdh_s2s.svg
+        :link: skdh-sit2stand
+        :link-type: ref
+    
+    .. grid-item-card:: :bdg-primary:`skdh.activity`
+        :img-top: _static/skdh_activity.svg
+        :link: skdh-activity
+        :link-type: ref
+    
+    .. grid-item-card:: :bdg-primary:`skdh.sleep`
+        :img-top: _static/skdh_sleep.svg
+        :link: skdh-sleep
+        :link-type: ref
+    
+    .. grid-item-card:: :bdg-primary:`skdh.features`
+        :img-top: _static/skdh_features.svg
+        :link: skdh-features
+        :link-type: ref
+    
+    .. grid-item-card:: :bdg-primary:`skdh.utility`
+        :img-top: _static/skdh_utility.svg
+        :link: skdh-utility
+        :link-type: ref
 
 
 ..
