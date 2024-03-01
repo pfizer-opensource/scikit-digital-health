@@ -1,4 +1,4 @@
-.. _skdh base:
+.. _skdh-base:
 
 .. automodule:: skdh
     :ignore-module-all:

@@ -19,7 +19,7 @@ Other than this, the docstrings will be automatically scanned and generated, wit
 
 Documentation of the your new module occurs almost fully in the ``__init__.py`` file
 for the module. This will contain any information on the module, how it works, as
-well as any relevant background information (e.g. :ref:`Gait <skdh gait>`). For
+well as any relevant background information (e.g. :ref:`Gait <skdh-gait>`). For
 another good reference from NumPy, see the
 `numpy.fft <https://numpy.org/doc/stable/reference/routines.fft.html>`_ page.
 
@@ -27,61 +27,63 @@ Next is the file directing Sphinx to automatically find and document the custom
 module, ``docs/ref/custom_module.rst``. Finally, to make the new module show up
 in the API reference, add it to the ``docs/ref/index.rst`` toctree!
 
-.. tabbed:: src/skdh/custom_module/\_\_init\_\_.py
-    :selected:
+.. tab-set::
 
-    .. code-block:: python
+    .. tab-item:: src/skdh/custom_module/\_\_init\_\_.py
+        :selected:
 
-        """
-        IMU <Custom Module> (:mod:`skdh.custom_module`)
-        ===============================================
+        .. code-block:: python
 
-        .. currentmodule:: skdh.custom_module
+            """
+            IMU <Custom Module> (:mod:`skdh.custom_module`)
+            ===============================================
 
-        Inertial sensor <custom module>
-        -------------------------------
+            .. currentmodule:: skdh.custom_module
 
-        .. _Remove the `` below
+            Inertial sensor <custom module>
+            -------------------------------
 
-        .. ``autosummary``::
-            :toctree: generated/
+            .. _Remove the `` below
 
-            CustomClass  .. _this is the name of your class
+            .. ``autosummary``::
+                :toctree: generated/
 
-        Headline 2
-        ----------
-        content
-        """
-        from skdh.custom_module.custom_module import CustomModule
+                CustomClass  .. _this is the name of your class
 
-.. tabbed:: docs/ref/custom_module.rst
+            Headline 2
+            ----------
+            content
+            """
+            from skdh.custom_module.custom_module import CustomModule
 
-    .. code:: rst
+    .. tab-item:: docs/ref/custom_module.rst
 
-        ..
-            _Give it a custom explicit reference label
+        .. code:: rst
 
-        .. _skdh custom-module:
+            ..
+                _Give it a custom explicit reference label
 
-        .. automodule:: skdh.custom_module
-            :ignore-module-all:
+            .. _skdh custom-module:
 
-.. tabbed:: docs/ref/index.rst
+            .. automodule:: skdh.custom_module
+                :ignore-module-all:
 
-    .. code:: rst
+    .. tab-item:: docs/ref/index.rst
 
-        .. _skdh api reference:
+        .. code:: rst
 
-        API Reference
-        =============
+            .. _skdh api reference:
 
-        .. toctree::
-            :maxdepth: 2
+            API Reference
+            =============
 
-            gait
-            sit2stand
-            read
-            custom_module
+            .. toctree::
+                :maxdepth: 2
+
+                gait
+                sit2stand
+                read
+                custom_module
 
 And thats it! Before pushing and creating a pull request, make sure that the documentation builds properly:
 

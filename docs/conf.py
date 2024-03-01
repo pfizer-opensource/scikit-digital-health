@@ -48,7 +48,7 @@ extensions = [
     "sphinx.ext.autosummary",
     "numpydoc",
     "sphinx.ext.coverage",
-    "sphinx_panels",
+    "sphinx_design",
 ]
 
 # this is needed for some reason...
@@ -73,7 +73,7 @@ master_doc = "index"
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = "en"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -243,11 +243,7 @@ autodoc_mock_imports = [
     "skdh.features.lib.extensions",
     "skdh.io._extensions",
     "skdh.utility._extensions",
+    "skdh.preprocessing._extensions",
 ]
-
-# -----------------------------------------------------------------------------
-# Sphinx Panels
-# -----------------------------------------------------------------------------
-panels_add_bootstrapp_css = False
 
 # -- Extension configuration -------------------------------------------------
