@@ -15,7 +15,7 @@ class TestApdmReader:
         lumbar_sens = "XI-010284"
         with h5py.File(apdm_file) as f:
             acc = f["Sensors"][lumbar_sens]["Accelerometer"][()] / 9.81
-            time = f["Sensors"][lumbar_sens]["Time"][()] / 1e6 - 5 * 3600  # to seconds, convert to local
+            time = f["Sensors"][lumbar_sens]["Time"][()] / 1e6 - 4 * 3600  # to seconds, convert to local
             gyro = f["Sensors"][lumbar_sens]["Gyroscope"][()]
             temp = f["Sensors"][lumbar_sens]["Temperature"][()]
 
