@@ -243,6 +243,7 @@ autodoc_mock_imports = [
     "skdh.features.lib.extensions",
     "skdh.io._extensions",
     "skdh.utility._extensions",
+    "skdh.preprocessing._extensions",
 ]
 
 # -----------------------------------------------------------------------------
