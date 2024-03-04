@@ -87,7 +87,7 @@ in the API reference, add it to the ``docs/ref/index.rst`` toctree!
 
 And thats it! Before pushing and creating a pull request, make sure that the documentation builds properly:
 
-* Make sure all the requirements are installed (``docs/requirements.txt``)
+* Make sure all the requirements are installed (``pyproject.toml docs dependencies``)
 * Run the following in the terminal:
 
 .. code:: sh

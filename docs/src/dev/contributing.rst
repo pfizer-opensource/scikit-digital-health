@@ -105,7 +105,11 @@ Test coverage
 Modification of code submitted through PRs should modify existing tests or create new tests where appropriate. Ideally these tests should be written to fail before the PR and pass afterwards. 
 Tests should be run locally before pushing a PR, in order to save CI resources.
 
-Some additional packages are required for running the tests, which can be found in ``test_requirements.txt``
+Some additional packages are required for running the tests, which can be installed via
+
+.. code:: sh
+
+    pip install scikit-digital-health[dev]
 
 Tests should provide 100% coverage in an ideal case. Coverage can be measured by installing `coverage <https://coverage.readthedocs.io/en/coverage-5.3/>`_ and running:
 
@@ -132,7 +136,11 @@ To build the html documentation:
 
 HTML files will be generated in ``docs/_build/html/``. Since the documentation is based on docstrings, the correct version of ``scikit-digital-health`` must be installed in the current environment used to run sphinx.
 
-Additional requirements for building the docs are listed in ``doc_requirements.txt``
+Additional requirements for building the docs can be installed via (pip)
+
+.. code:: sh
+
+    pip install scikit-digital-health[docs]
 
 The documentation includes mathematical formulae with LaTeX formatting. A working LaTeX document production system
 (e.g. `texlive <https://www.tug.org/texlive/>`__) is required for the proper rendering of the LaTeX math in the documentation.

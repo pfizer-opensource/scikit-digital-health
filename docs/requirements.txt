@@ -1,8 +1,0 @@
-numpy
-scipy
-pandas
-matplotlib
-numpydoc
-sphinx>=2.2.0
-pydata-sphinx-theme
-sphinx-design

@@ -63,11 +63,21 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-test = [
+dev = [
     'pytest',
     'coverage',
     'psutil',
     'tables'
+]
+actions = [
+    'flake8',
+    'wheel'
+]
+docs = [
+    "numpydoc",
+    "sphinx>=2.2.0",
+    "pydata-sphinx-theme",
+    "sphinx-design"
 ]
 
 [project.urls]
