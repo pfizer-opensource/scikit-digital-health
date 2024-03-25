@@ -76,7 +76,8 @@ class TestHandleTimestampInconsistency:
             raw.to_csv(fname, index=False)
 
             res = rdr.predict(file=fname)
-            res2 = rdr2.predict(file=fname)
+            with pytest.warns():
+                res2 = rdr2.predict(file=fname)
 
         assert res['time'].size == n_full
         assert res['fs'] == fs
