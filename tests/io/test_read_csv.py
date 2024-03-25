@@ -62,6 +62,13 @@ class TestHandleTimestampInconsistency:
             column_names={'accel': ['ax', 'ay', 'az'], 'temperature': 'temperature'},
             accel_in_g=True,
         )
+        # read with only temperature data, but we still have accel column names
+        rdr2 = ReadCSV(
+            time_col_name="_datetime_",
+            column_names={'accel': ['ax', 'ay', 'az'], 'temperature': 'temperature'},
+            accel_in_g=True,
+            read_csv_kwargs={'usecols': (4, 5)}
+        )
 
         # send raw data to io for reading
         with TemporaryDirectory() as tdir:
@@ -69,9 +76,14 @@ class TestHandleTimestampInconsistency:
             raw.to_csv(fname, index=False)
 
             res = rdr.predict(file=fname)
+            res2 = rdr2.predict(file=fname)
 
         assert res['time'].size == n_full
         assert res['fs'] == fs
         assert res['temperature'].ndim == 1
         assert res['accel'].ndim == 2
         assert res['accel'].shape == (n_full, 3)
+
+        assert 'accel' not in res2
+        assert 'time' in res2
+        assert 'temperature' in res2

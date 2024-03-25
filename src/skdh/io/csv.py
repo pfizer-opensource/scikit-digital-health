@@ -104,9 +104,13 @@ def handle_timestamp_inconsistency(df, fill_gaps, column_names, fill_dict):
 
         for dstream, stream_cols in column_names.items():
             stream_cols = _as_list(stream_cols)
-            for col in stream_cols[:-1]:
-                df_full[col] = df_full[col].fillna(value=0.0)
-            df_full[stream_cols[-1]] = df_full[stream_cols[-1]].fillna(fill_dict.get(dstream, 0.0))
+            try:
+                for col in stream_cols[:-1]:
+                    df_full[col] = df_full[col].fillna(value=0.0)
+                df_full[stream_cols[-1]] = df_full[stream_cols[-1]].fillna(fill_dict.get(dstream, 0.0))
+            except KeyError:
+                warn(f"Column {col} not found to fill.", UserWarning)
+                continue
     else:
         # if not filling data gaps, check that there are not gaps that would cause
         # garbage outputs from downstream algorithms
@@ -281,7 +285,11 @@ class ReadCSV(BaseProcess):
 
         # grab the data we expect
         for dstream in self.column_names:
-            results[dstream] = raw[self.column_names[dstream]].values
+            try:
+                results[dstream] = raw[self.column_names[dstream]].values
+            except KeyError:
+                warn(f"Data stream {dstream} specified in column names but all columns {self.column_names[dstream]} not found in the read data. Skipping.")
+                continue
         
         # convert accel data
         if 'accel' in results and not self.accel_in_g:
