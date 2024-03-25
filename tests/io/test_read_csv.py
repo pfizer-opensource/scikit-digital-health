@@ -1,15 +1,20 @@
 import pytest
-from numpy import isclose, allclose, array
+from tempfile import TemporaryDirectory
+from pathlib import Path
+
+from numpy import isclose
 
 from skdh.io import ReadCSV
-from skdh.io.csv import handle_timestamp_inconsistency, handle_accel
+from skdh.io.csv import handle_timestamp_inconsistency
 
 
 class TestHandleTimestampInconsistency:
     def test_block_timestamps(self, dummy_csv_contents):
         # save for multiple uses
         kw = dict(
-            fill_gaps=True, accel_col_names=["ax", "ay", "az"], accel_in_g=True, g=9.81
+            fill_gaps=True,
+            column_names={'accel': ["ax", "ay", "az"], 'temperature': ['temperature']},
+            fill_dict={'accel': 1.0, 'temperature': 0.0},
         )
         # get the fixture contents
         raw, fs, n_full = dummy_csv_contents(drop=True)
@@ -33,7 +38,9 @@ class TestHandleTimestampInconsistency:
 
     def test_unequal_blocks(self, dummy_csv_contents):
         kw = dict(
-            fill_gaps=True, accel_col_names=["ax", "ay", "az"], accel_in_g=True, g=9.81
+            fill_gaps=True,
+            column_names={'accel': ["ax", "ay", "az"], 'temperature': ['temperature']},
+            fill_dict={'accel': 1.0, 'temperature': 0.0},
         )
 
         raw, fs, n_full = dummy_csv_contents(drop=True)
@@ -46,3 +53,25 @@ class TestHandleTimestampInconsistency:
 
         with pytest.raises(ValueError, match="not all equal size"):
             handle_timestamp_inconsistency(raw, **kw)
+    
+    def test_reader(self, dummy_csv_contents):
+        raw, fs, n_full = dummy_csv_contents(drop=True)
+
+        rdr = ReadCSV(
+            time_col_name="_datetime_",
+            column_names={'accel': ['ax', 'ay', 'az'], 'temperature': 'temperature'},
+            accel_in_g=True,
+        )
+
+        # send raw data to io for reading
+        with TemporaryDirectory() as tdir:
+            fname = Path(tdir) / "test.csv"
+            raw.to_csv(fname, index=False)
+
+            res = rdr.predict(file=fname)
+
+        assert res['time'].size == n_full
+        assert res['fs'] == fs
+        assert res['temperature'].ndim == 1
+        assert res['accel'].ndim == 2
+        assert res['accel'].shape == (n_full, 3)

@@ -23,7 +23,16 @@ from skdh.base import BaseProcess, handle_process_returns
 from skdh.io.base import check_input_file
 
 
-def handle_timestamp_inconsistency(df, fill_gaps, accel_col_names, accel_in_g, g):
+def _as_list(a):
+    if isinstance(a, str):
+        return [a]
+    elif isinstance(a, list):
+        return a
+    else:
+        return list(a)
+
+
+def handle_timestamp_inconsistency(df, fill_gaps, column_names, fill_dict):
     """
     Handle any time gaps, or timestamps that are only down to the second.
 
@@ -34,12 +43,12 @@ def handle_timestamp_inconsistency(df, fill_gaps, accel_col_names, accel_in_g, g
     fill_gaps : bool
         Fill data gaps with the vector [0, 0, 1] or [0, 0, `g`] depending on
         accel units.
-    accel_col_names : array-like
-        Array-like (size 3) of the acceleration column names in XYZ order.
-    accel_in_g : bool
-        If acceleration values are already in units of "g".
-    g : float
-        Gravitational acceleration in m/s^2.
+    column_names : dict
+        Dictionary of column names.
+    fill_dict : dict
+        Dictionary of fill values for columns identified in `column_names`. In cases
+        where there are multiple columns for a datastream, the last will be filled with
+        the value.
 
     Returns
     -------
@@ -93,11 +102,11 @@ def handle_timestamp_inconsistency(df, fill_gaps, accel_col_names, accel_in_g, g
         # put the datetime array back in the dataframe
         df_full = df_full.reset_index(drop=False)
 
-        z_fill = 1.0 if accel_in_g else g
-
-        df_full[accel_col_names[0]] = df_full[accel_col_names[0]].fillna(value=0.0)
-        df_full[accel_col_names[1]] = df_full[accel_col_names[1]].fillna(value=0.0)
-        df_full[accel_col_names[2]] = df_full[accel_col_names[2]].fillna(value=z_fill)
+        for dstream, stream_cols in column_names.items():
+            stream_cols = _as_list(stream_cols)
+            for col in stream_cols[:-1]:
+                df_full[col] = df_full[col].fillna(value=0.0)
+            df_full[stream_cols[-1]] = df_full[stream_cols[-1]].fillna(fill_dict.get(dstream, 0.0))
     else:
         # if not filling data gaps, check that there are not gaps that would cause
         # garbage outputs from downstream algorithms
@@ -112,34 +121,6 @@ def handle_timestamp_inconsistency(df, fill_gaps, accel_col_names, accel_in_g, g
     return df_full, float(n_samples)
 
 
-def handle_accel(df, accel_cols, acc_in_g, g):
-    """
-    Extract the acceleration columns from the dataframe.
-
-    Parameters
-    ----------
-    df : pandas.DataFrame
-        Pandas dataframe containing data from the CSV file.
-    accel_cols : list-like
-        List of acceleration column names in X/Y/Z axis order.
-    acc_in_g : bool
-        If the data is already in units of "g".
-    g : float
-        Gravitational acceleration.
-
-    Returns
-    -------
-    accel : numpy.ndarray
-        (N, 3) array of acceleration values in units of "g".
-    """
-    acc = df[accel_cols].values
-
-    if not acc_in_g:
-        acc /= g
-
-    return acc
-
-
 class ReadCSV(BaseProcess):
     """
     Read a comma-separated value (CSV) file into memory.
@@ -148,6 +129,8 @@ class ReadCSV(BaseProcess):
     ----------
     time_col_name : str
         The name of the column containing timestamps.
+    column_names : dict
+        Dictionary of column names for different data types. See Notes.
     accel_col_names : list-like
         List-like of acceleration column names. Must be length 3, in X, Y, Z axis order.
     fill_gaps : bool, optional
@@ -161,23 +144,28 @@ class ReadCSV(BaseProcess):
         Gravitational acceleration. Default is 9.81 m/s^2.
     read_csv_kwargs : None, dict, optional
         Dictionary of additional key-word arguments for :py:class:`pandas.read_csv`.
-    bases : {None, int, list-like}, optional
-        Base hours [0, 23] in which to start a window of time. Default is None,
-        which will not do any windowing. Both `base` and `period` must be defined
-        in order to window. Can use multiple, but the number of `bases` must match
-        the number of `periods`.
-    periods : {None, int, list-like}, optional
-        Periods for each window, in [1, 24]. Defines the number of hours per window.
-        Default is None, which will do no windowing. Both `period` and `base` must
-        be defined to window. Can use multiple but the number of `periods` must
-        match the number of `bases`.
     ext_error : {"warn", "raise", "skip"}, optional
         What to do if the file extension does not match the expected extension (.bin).
         Default is "warn". "raise" raises a ValueError. "skip" skips the file
         reading altogether and attempts to continue with the pipeline.
+    
+    .. deprecated:: 0.14.0
+        `bases` Removed in favor of having windowing be its own class,
+        :class:`skdh.preprocessing.GetDayWindowIndices`.
+        `periods` Removed in favor of having windowing be its own class.
 
     Notes
     -----
+    For `column_names`, valid keys are:
+
+    - accel
+    - gyro
+    - ecg
+    - temperature
+
+    For a key, either strings or lists of strings are accepted. If multiple columns
+    are provided for different axes, they are assumed to be in X, Y, Z order.
+
     In order to handle windowing, data gap filling, or timestamp interpolation in
     the case that timestamps are only down to the second (ie ActiGraph CSV files),
     the time column is always first converted to a `datetime64` Series via
@@ -189,14 +177,12 @@ class ReadCSV(BaseProcess):
     def __init__(
         self,
         time_col_name,
-        accel_col_names,
+        column_names,
         fill_gaps=True,
         to_datetime_kwargs=None,
         accel_in_g=True,
         g_value=9.81,
         read_csv_kwargs=None,
-        bases=None,
-        periods=None,
         ext_error="warn",
     ):
         if to_datetime_kwargs is None:
@@ -206,19 +192,17 @@ class ReadCSV(BaseProcess):
 
         super().__init__(
             time_col_name=time_col_name,
-            accel_col_names=accel_col_names,
+            column_names=column_names,
             fill_gaps=fill_gaps,
             to_datetime_kwargs=to_datetime_kwargs,
             accel_in_g=accel_in_g,
             g_value=g_value,
             read_csv_kwargs=read_csv_kwargs,
-            bases=bases,
-            periods=periods,
             ext_error=ext_error,
         )
 
         self.time_col_name = time_col_name
-        self.acc_col_names = accel_col_names
+        self.column_names = column_names
         self.fill_gaps = fill_gaps
         self.to_datetime_kw = to_datetime_kwargs
         self.accel_in_g = accel_in_g
@@ -229,34 +213,6 @@ class ReadCSV(BaseProcess):
             self.ext_error = ext_error.lower()
         else:
             raise ValueError("`ext_error` must be one of 'raise', 'warn', 'skip'.")
-
-        if (bases is None) and (periods is None):
-            self.window = False
-            self.bases = asarray([0])  # needs to be defined for passing to extensions
-            self.periods = asarray([12])
-        elif (bases is None) or (periods is None):
-            warn("One of base or period is None, not windowing", UserWarning)
-            self.window = False
-            self.bases = asarray([0])
-            self.periods = asarray([12])
-        else:
-            if isinstance(bases, int) and isinstance(periods, int):
-                bases = asarray([bases])
-                periods = asarray([periods])
-            else:
-                bases = asarray(bases, dtype=int_)
-                periods = asarray(periods, dtype=int_)
-
-            if ((0 <= bases) & (bases <= 23)).all() and (
-                (1 <= periods) & (periods <= 24)
-            ).all():
-                self.window = True
-                self.bases = bases
-                self.periods = periods
-            else:
-                raise ValueError(
-                    "Base must be in [0, 23] and period must be in [1, 23]"
-                )
 
     @handle_process_returns(results_to_kwargs=True)
     @check_input_file(".csv")
@@ -285,6 +241,12 @@ class ReadCSV(BaseProcess):
         ValueError
             If the file name is not provided.
         """
+        fill_values = {
+            "accel": 1.0 if self.accel_in_g else self.g_value,
+            "gyro": 0.0,
+            "ecg": 0.0,
+            "temperature": 0.0,
+        }
 
         super().predict(expect_days=False, expect_wear=False, file=file, tz_name=tz_name, **kwargs)
 
@@ -305,19 +267,24 @@ class ReadCSV(BaseProcess):
 
         # now handle data gaps and second level timestamps, etc
         raw, fs = handle_timestamp_inconsistency(
-            raw, self.fill_gaps, self.acc_col_names, self.accel_in_g, self.g_value
+            raw, self.fill_gaps, self.column_names, fill_values
         )
 
         # get the time values and convert to seconds
         time = raw["_datetime_"].astype(int).values / 1e9  # int gives ns, convert to s
 
-        # get the acceleration values and convert if necessary
-        accel = handle_accel(raw, self.acc_col_names, self.accel_in_g, self.g_value)
-
+        # setup the results dictionary
         results = {
             self._time: time,
-            self._acc: accel,
             "fs": fs,
         }
+
+        # grab the data we expect
+        for dstream in self.column_names:
+            results[dstream] = raw[self.column_names[dstream]].values
+        
+        # convert accel data
+        if 'accel' in results and not self.accel_in_g:
+            results['accel'] /= self.g_value
 
         return results
