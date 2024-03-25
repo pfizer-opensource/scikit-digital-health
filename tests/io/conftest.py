@@ -102,7 +102,7 @@ def dummy_csv_contents():
         df = pd.DataFrame(columns=["ts", "ax", "ay", "az", "temperature"])
 
         # generate Xhrs of data at 32hz
-        hours = 12
+        hours = 1
         fs = 32.0
         rng = random.default_rng(24089752)
 
@@ -118,8 +118,8 @@ def dummy_csv_contents():
 
         # drop a chunk of data out
         if drop:
-            i1 = int(4 * 3600 * fs)
-            i2 = int(5.5 * 3600 * fs)
+            i1 = int(0.15 * 3600 * fs)
+            i2 = int(0.25 * 3600 * fs)
 
             df2 = df.drop(index=range(i1, i2)).reset_index(drop=True)
 

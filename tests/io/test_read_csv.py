@@ -48,7 +48,6 @@ class TestHandleTimestampInconsistency:
         # drop a few blocks to create uneven blocks of timestamps
         raw.drop(index=range(713, 723), inplace=True)
         raw.drop(index=range(13095, 14003), inplace=True)
-        raw.drop(index=range(987131, 987139), inplace=True)
         raw.reset_index(drop=True, inplace=True)
 
         with pytest.raises(ValueError, match="not all equal size"):
