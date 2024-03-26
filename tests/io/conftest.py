@@ -99,16 +99,17 @@ def apdm_file(path_tests):
 @fixture
 def dummy_csv_contents():
     def fn(drop=True):
-        df = pd.DataFrame(columns=["ts", "ax", "ay", "az"])
+        df = pd.DataFrame(columns=["ts", "ax", "ay", "az", "temperature"])
 
-        # generate 72hrs of data at 32hz
-        hours = 72
+        # generate Xhrs of data at 32hz
+        hours = 1
         fs = 32.0
         rng = random.default_rng(24089752)
 
         n = int(hours * 3600 * fs)  # number of samples
 
         df[["ax", "ay", "az"]] = rng.normal(size=(n, 3))
+        df['temperature'] = rng.normal(size=n, loc=27, scale=3)
 
         start = "2020-06-06 12:00:00.000"
         tdelta = repeat(pd.to_timedelta(arange(0, hours * 3600), unit="s"), int(fs))
@@ -117,8 +118,8 @@ def dummy_csv_contents():
 
         # drop a chunk of data out
         if drop:
-            i1 = int(13 * 3600 * fs)
-            i2 = int(19 * 3600 * fs)
+            i1 = int(0.15 * 3600 * fs)
+            i2 = int(0.25 * 3600 * fs)
 
             df2 = df.drop(index=range(i1, i2)).reset_index(drop=True)
 

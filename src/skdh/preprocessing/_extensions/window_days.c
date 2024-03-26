@@ -12,8 +12,8 @@ long finalize_guess(size_t n, double *timestamps, long *guess, double target)
     if (i2 <= 0) return 0;
     if (i2 >= (n - 1)) return (long)n - 1;
 
-    bool check1 = fabs(timestamps[i2] - target) < fabs(timestamps[i1] - target);
-    bool check3 = fabs(timestamps[i2] - target) < fabs(timestamps[i3] - target);
+    bool check1 = fabs(timestamps[i2] - target) <= fabs(timestamps[i1] - target);
+    bool check3 = fabs(timestamps[i2] - target) <= fabs(timestamps[i3] - target);
 
     // path 1: guess is smallest value
     if (check1 && check3)
@@ -23,7 +23,7 @@ long finalize_guess(size_t n, double *timestamps, long *guess, double target)
     // path 2: smaller value to the left side
     else if (!check1)
     {
-        guess -= 1;
+        *guess -= 1;
     }
     // path 3: smaller value to the right side
     else if (!check3)
