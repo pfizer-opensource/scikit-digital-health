@@ -5,6 +5,7 @@ py3.install_sources(
         'axivity.py',
         'base.py',
         'geneactiv.py',
+        'multireader.py',
         'numpy_compressed.py',
         'csv.py',
         'utility.py',

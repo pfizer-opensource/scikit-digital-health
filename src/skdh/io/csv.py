@@ -135,8 +135,6 @@ class ReadCSV(BaseProcess):
         The name of the column containing timestamps.
     column_names : dict
         Dictionary of column names for different data types. See Notes.
-    accel_col_names : list-like
-        List-like of acceleration column names. Must be length 3, in X, Y, Z axis order.
     fill_gaps : bool, optional
         Fill any gaps in acceleration data with the vector [0, 0, 1]. Default is True. If False
         and data gaps are detected, then the reading will raise a `ValueError`.
