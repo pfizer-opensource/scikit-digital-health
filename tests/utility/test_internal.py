@@ -4,6 +4,7 @@ from numpy import allclose, array, arange
 from skdh.utility.internal import (
     get_day_index_intersection,
     apply_downsample,
+    apply_resample,
     rle,
     invert_indices,
 )
@@ -154,6 +155,64 @@ class TestGetDayIndexIntersection:
         assert stops.size == 1
         assert starts[0] == 0
         assert stops[0] == 4000
+
+
+class TestApplyResample:
+    def test_downsample(self, np_rng):
+        t = arange(0, 10, 0.1)
+        x = np_rng.random((t.size, 3))
+        y = np_rng.random((t.size,))
+
+        ix = array([10, 20, 30])
+        iy = array([[15, 25], [25, 35]])
+
+        trs, (x_rs, y_rs), (ix_rs, iy_rs) = apply_resample(
+            time=t, goal_fs=5.0, data=(x, y), indices=(ix, iy), fs=10.0
+        )
+
+        assert allclose(trs, arange(0, 10, 0.2))
+        assert x_rs.shape == (50, 3)
+        assert y_rs.shape == (50,)
+        assert allclose(ix_rs, [5, 10, 15])
+        assert allclose(iy_rs, [[7, 12], [12, 18]])
+    
+        t_rs = array([0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5])
+        trs, (x_rs, y_rs), (ix_rs, iy_rs) = apply_resample(
+            time=t, time_rs=t_rs, data=(x, y), indices=(ix, iy), fs=10.0
+        )
+
+        assert allclose(trs, t_rs)
+        assert x_rs.shape == (trs.size, 3)
+        assert y_rs.shape == (trs.size,)
+        assert allclose(ix_rs, [2, 4, 6])
+        assert allclose(iy_rs, [[3, 5], [5, 7]])
+
+        t_rs = arange(0, 10, 1/3)
+        trs, (x_rs, y_rs), (ix_rs, iy_rs) = apply_resample(
+            time=t, time_rs=t_rs, data=(x, y), indices=(ix, iy), fs=10.0
+        )
+
+        assert allclose(trs, t_rs)
+        assert x_rs.shape == (t_rs.size, 3)
+        assert y_rs.shape == (t_rs.size,)
+        assert allclose(ix_rs, [3, 6, 9])
+        assert allclose(iy_rs, [[4, 8], [8, 10]])
+    
+    def test_upsample(self, np_rng):
+        t = arange(0, 5, 0.5)
+        x = arange(t.size)
+        ix = array([2, 4, 6])  # 1.0, 2.0, 3.0
+
+        trs, (x_rs,), (ix_rs,) = apply_resample(
+            time=t, goal_fs=4.0, data=(x,), indices=(ix,)
+        )
+
+        assert trs.size == x_rs.size
+        assert allclose(trs, arange(0, 4.5, 0.25))
+        assert x_rs.size == 18
+        assert ix_rs.size == 3
+        assert allclose(x_rs, arange(0, t.size - 1, 0.5))
+        assert allclose(ix_rs, [4, 8, 12])
 
 
 class TestApplyDownsample:
