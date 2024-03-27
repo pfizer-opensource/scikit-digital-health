@@ -4,8 +4,6 @@ from pytest import fixture
 
 from numpy import arange, zeros, sin, pi, load, array
 
-from skdh.utility.internal import apply_downsample
-
 
 @fixture(scope="module")
 def t_and_x():

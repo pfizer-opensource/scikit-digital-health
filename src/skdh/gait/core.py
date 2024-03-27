@@ -12,7 +12,7 @@ from numpy import ndarray, asarray, mean, diff, sum, nan
 
 from skdh import Pipeline
 from skdh.base import BaseProcess, handle_process_returns
-from skdh.utility.internal import rle, apply_downsample
+from skdh.utility.internal import rle, apply_resample
 from skdh.utility.exceptions import LowFrequencyError
 
 from skdh.gait.gait_metrics import GaitEventEndpoint, GaitBoutEndpoint
@@ -543,11 +543,11 @@ class GaitLumbar(BaseProcess):
                     time_rs,
                     (accel_rs, gyro_rs),
                     (gait_starts_rs, gait_stops_rs, day_starts_rs, day_stops_rs),
-                ) = apply_downsample(
-                    goal_fs,
-                    time,
-                    (accel, gyro),
-                    (gait_starts, gait_stops, *self.day_idx),
+                ) = apply_resample(
+                    goal_fs=goal_fs,
+                    time=time,
+                    data=(accel, gyro),
+                    indices=(gait_starts, gait_stops, *self.day_idx),
                     aa_filter=True,  # always want the AA filter for downsampling
                     fs=fs,
                 )

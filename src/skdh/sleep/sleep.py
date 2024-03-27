@@ -20,7 +20,7 @@ import matplotlib.lines as mlines
 import matplotlib.pyplot as plt
 
 from skdh.base import BaseProcess, handle_process_returns
-from skdh.utility.internal import get_day_index_intersection, apply_downsample, rle
+from skdh.utility.internal import get_day_index_intersection, apply_resample, rle
 from skdh.sleep.tso import get_total_sleep_opportunity
 from skdh.sleep.utility import compute_activity_index
 from skdh.sleep.sleep_classification import compute_sleep_predictions
@@ -424,9 +424,9 @@ class Sleep(BaseProcess):
                 time_ds,
                 (accel_ds, temp_ds),
                 (day_starts_ds, day_stops_ds, wear_starts_ds, wear_stops_ds),
-            ) = apply_downsample(
-                goal_fs,
-                time,
+            ) = apply_resample(
+                goal_fs=goal_fs,
+                time=time,
                 data=(accel, temperature),
                 indices=(*self.day_idx, *self.wear_idx),
                 aa_filter=self.aa_filter,

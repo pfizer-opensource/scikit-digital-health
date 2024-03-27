@@ -5,7 +5,7 @@ import pytest
 from numpy import zeros, arange, ndarray, sin, pi, float64, load
 from numpy.random import default_rng
 
-from skdh.utility.internal import apply_downsample
+from skdh.utility.internal import apply_resample
 
 
 def pytest_addoption(parser):
@@ -123,6 +123,6 @@ def gait_input_50(path_tests):
     t = data["time"]
     acc = data["accel"]
 
-    t50, (acc50,) = apply_downsample(50.0, t, (acc,), (), aa_filter=True)
+    t50, (acc50,) = apply_resample(goal_fs=50.0, time=t, data=(acc,), indices=(), aa_filter=True)
 
     return t50, acc50

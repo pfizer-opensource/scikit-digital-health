@@ -3,7 +3,6 @@ from numpy import allclose, array, arange
 
 from skdh.utility.internal import (
     get_day_index_intersection,
-    apply_downsample,
     apply_resample,
     rle,
     invert_indices,
@@ -213,33 +212,6 @@ class TestApplyResample:
         assert ix_rs.size == 3
         assert allclose(x_rs, arange(0, t.size - 1, 0.5))
         assert allclose(ix_rs, [4, 8, 12])
-
-
-class TestApplyDownsample:
-    def test(self, dummy_time, dummy_idx_1d, dummy_idx_2d, np_rng):
-        x = np_rng.random((dummy_time.size, 3))
-        y = np_rng.random((dummy_time.size,))
-        tds, (x_ds, y_ds), (idx_ds_1, idx_ds_2) = apply_downsample(
-            10.0, dummy_time, (x, y), (dummy_idx_1d[0], dummy_idx_2d[0])
-        )
-
-        assert allclose(tds, arange(0, 10, 0.1))
-        assert x_ds.shape == (100, 3)
-        assert y_ds.shape == (100,)
-        assert allclose(idx_ds_1, dummy_idx_1d[1])
-        assert allclose(idx_ds_2, dummy_idx_2d[1])
-
-    def test_none(self, dummy_time):
-        tds, (acc_ds,), (idx_ds,) = apply_downsample(10.0, dummy_time, (None,), (None,))
-
-        assert acc_ds is None
-        assert idx_ds is None
-
-    def test_3d_error(self, dummy_time, np_rng):
-        x = np_rng.random((500, 3, 2))
-
-        with pytest.raises(ValueError):
-            apply_downsample(10.0, dummy_time, (x,))
 
 
 class TestRLE:
