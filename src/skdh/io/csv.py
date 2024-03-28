@@ -58,7 +58,7 @@ def handle_timestamp_inconsistency(df, fill_gaps, column_names, fill_dict):
         Number of samples per second.
     """
     # get a sampling rate. If non-unique timestamps, this will be updated
-    n_samples = mean(1 / diff(df["_datetime_"][:2500]).astype(int)) * 1e9
+    n_samples = round(mean(1 / diff(df["_datetime_"][:2500]).astype(int)) * 1e9, decimals=6)
     # datetime diff is in ns
 
     # first check if we have non-unique timestamps
@@ -99,8 +99,9 @@ def handle_timestamp_inconsistency(df, fill_gaps, column_names, fill_dict):
         # do this in a round-about way so that we can use `reindex` and specify a tolerance
         t0 = df['_datetime_'].iloc[0]
         t1 = df['_datetime_'].iloc[-1]
-        dr = date_range(t0, t1, freq=f"{round(1000 / n_samples, decimals=6)}ms", inclusive='both')
+        dr = date_range(t0, t1, freq=f"{round(1000 / n_samples, decimals=6)}ms", inclusive='both', name='_datetime_')
         df_full = df.set_index("_datetime_").reindex(index=dr, method='nearest', limit=1, tolerance=to_timedelta(0.1 / n_samples, unit='s'))
+        df_full = df_full.reset_index()
 
         # put the datetime array back in the dataframe
         df_full = df_full.reset_index(drop=False)
