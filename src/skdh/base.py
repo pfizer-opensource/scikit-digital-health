@@ -89,10 +89,10 @@ class BaseProcess:
     _days = "day_ends"
 
     def __str__(self):
-        return self._name
+        return self._cls_name
 
     def __repr__(self):
-        ret = f"{self._name}("
+        ret = f"{self._cls_name}("
         for k in self._kw:
             ret += f"{k}={self._kw[k]!r}, "
         if ret[-1] != "(":
@@ -118,7 +118,8 @@ class BaseProcess:
         kwargs
             Key-word arguments which are passed to the sub-class
         """
-        self._name = self.__class__.__name__
+        self._cls_name = self.__class__.__name__
+        self._name = self._cls_name  # overwritten by pipeline as needed
         self._in_pipeline = False  # initialize to false.  Will be set by the pipeline
         self.pipe_save_file = None  # initialize to None, will be set/used by pipeline
         self.pip_plot_file = None  # will be set/used by Pipeline only
@@ -179,7 +180,7 @@ class BaseProcess:
         Intended to be overwritten in the subclass. Should still be called
         with super.
         """
-        self.logger.info(f"Entering {self._name} processing with call {self!r}")
+        self.logger.info(f"Entering {self._cls_name} processing with call {self!r}")
         # save the filename for saving reference
         self._file_name = Path(kwargs.get("file", "")).stem
 
@@ -215,7 +216,6 @@ class BaseProcess:
         Available format variables available:
 
         - date: todays date expressed in yyyymmdd format.
-        - name: process name.
         - file: file name used in the pipeline, or "" if not found.
         - version: SKDH version number (short form, no period separation)
         """
@@ -226,7 +226,7 @@ class BaseProcess:
         version = skdh_version.replace(".", "")
 
         file_name = file_name.format(
-            date=date, name=self._name, file=self._file_name, version=version
+            date=date, file=self._file_name, version=version
         )
 
         kw_line = [f"{k}: {self._kw[k]}".replace(",", "  ") for k in self._kw]

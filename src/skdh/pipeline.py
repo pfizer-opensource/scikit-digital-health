@@ -94,6 +94,9 @@ class Pipeline:
 
         self._min_vers = None
 
+        # keeping track of duplicate processes
+        self.duplicate_procs = {}
+
         if load_kwargs is not None:
             self.load(**load_kwargs)
 
@@ -116,13 +119,13 @@ class Pipeline:
             package, module = step.__class__.__module__.split(".", 1)
             pipe["Steps"].append(
                 {
-                    step._name: {
-                        "package": package,
-                        "module": module,
-                        "parameters": step._kw,
-                        "save_file": step.pipe_save_file,
-                        "plot_file": step.pipe_plot_file,
-                    }
+                    "name": step._name,
+                    "process": step._cls_name,
+                    "package": package,
+                    "module": module,
+                    "parameters": step._kw,
+                    "save_file": step.pipe_save_file,
+                    "plot_file": step.pipe_plot_file,
                 }
             )
 
@@ -259,12 +262,28 @@ class Pipeline:
             )
 
         for proc in procs:
-            name = list(proc.keys())[0]
-            pkg = proc[name]["package"]
-            mod = proc[name]["module"]
-            params = proc[name]["parameters"]
-            save_file = proc[name]["save_file"]
-            plot_file = proc[name]["plot_file"]
+            if 'process' in proc:
+                name = proc['name']
+                process_name = proc['process']
+                pkg = proc["package"]
+                mod = proc["module"]
+                params = proc["parameters"]
+                save_file = proc["save_file"]
+                plot_file = proc["plot_file"]
+            else:
+                warn(
+                    "Save formats with class names as top-level keys in a list of "
+                    "dictionaries will no longer be supported in a future release. "
+                    "The new format can be used by loading and re-saving the pipeline file",
+                    FutureWarning,
+                )
+                name = None
+                process_name = list(proc.keys())[0]
+                pkg = proc[process_name]["package"]
+                mod = proc[process_name]["module"]
+                params = proc[process_name]["parameters"]
+                save_file = proc[process_name]["save_file"]
+                plot_file = proc[process_name]["plot_file"]
 
             if pkg == "skdh":
                 package = skdh
@@ -272,10 +291,10 @@ class Pipeline:
                 package = import_module(pkg)
 
             try:
-                process = attrgetter(f"{mod}.{name}")(package)
+                process = attrgetter(f"{mod}.{process_name}")(package)
             except AttributeError:
                 warn_or_raise(
-                    f"Process ({pkg}.{mod}.{name}) not found. Not added to pipeline",
+                    f"Process ({pkg}.{mod}.{process_name}) not found. Not added to pipeline",
                     ProcessNotFoundError,
                     process_raise,
                 )
@@ -283,9 +302,9 @@ class Pipeline:
 
             proc = process(**params)
 
-            self.add(proc, save_file=save_file, plot_file=plot_file)
+            self.add(proc, name=name, save_file=save_file, plot_file=plot_file)
 
-    def add(self, process, save_file=None, plot_file=None, make_copy=True):
+    def add(self, process, name=None, save_file=None, plot_file=None, make_copy=True):
         """
         Add a processing step to the pipeline
 
@@ -293,6 +312,11 @@ class Pipeline:
         ----------
         process : Process
             Process class that forms the step to be run
+        name : str, optional
+            Process name. Used to delineate multiple of the same process if
+            required. Output results will be under this name. If None is provided,
+            output results will be under the class name, with some mangling in the
+            case of multiple of the same processes in the same pipeline.
         save_file : {None, str}, optional
             Optionally formattable path for the save file. If left/set to None,
             the results will not be saved anywhere.
@@ -367,6 +391,20 @@ class Pipeline:
 
         # point the step logging disabled to the pipeline disabled
         proc.logger.disabled = self.logger.disabled
+
+        # setup the name
+        if name is None:
+            name = proc._cls_name
+
+        # check if already in pipeline
+        if name in self.duplicate_procs:
+            self.duplicate_procs[name] += 1
+            name = f"{name}_{self.duplicate_procs[name]}"
+        else:
+            self.duplicate_procs[name] = 0
+
+        # set the process name
+        proc._name = name
 
         self._steps += [proc]
 

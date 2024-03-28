@@ -87,13 +87,13 @@ class TestBaseProcess:
         with TemporaryDirectory() as tdir:
             tdir = Path(tdir)
 
-            fname = tdir / "{file}__{name}.out"
+            fname = tdir / "{file}.out"
 
             bp.save_results({"a": [1, 2, 3]}, str(fname))
 
             files = [i.name for i in tdir.glob("*")]
 
-        assert "test_file__BaseProcess.out" in files
+        assert "test_file.out" in files
 
 
 class TestPredictReturns:

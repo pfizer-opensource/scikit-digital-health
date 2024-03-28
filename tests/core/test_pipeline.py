@@ -99,13 +99,13 @@ class TestPipeline:
         exp = {
             "Steps": [
                 {
-                    "TestProcess": {
-                        "package": "skdh",
-                        "module": "test.testmodule",
-                        "parameters": {"kw1": 2},
-                        "save_file": None,
-                        "plot_file": None,
-                    }
+                    "name": "TestProcess",
+                    "process": "TestProcess",
+                    "package": "skdh",
+                    "module": "test.testmodule",
+                    "parameters": {"kw1": 2},
+                    "save_file": None,
+                    "plot_file": None,
                 }
             ],
             "Version": skdh_vers,
