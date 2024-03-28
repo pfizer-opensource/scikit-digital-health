@@ -17,7 +17,7 @@ from numpy import (
     all as npall,
     int_,
 )
-from pandas import read_csv, to_datetime, to_timedelta
+from pandas import read_csv, to_datetime, to_timedelta, date_range
 
 from skdh.base import BaseProcess, handle_process_returns
 from skdh.io.base import check_input_file
@@ -97,7 +97,11 @@ def handle_timestamp_inconsistency(df, fill_gaps, column_names, fill_dict):
         # now fix any data gaps: set the index as the datetime, and then upsample to match
         # the sampling frequency. This will put nan values in any data gaps.
         # have to use ms to handle fractional seconds.
-        df_full = df.set_index("_datetime_").asfreq(f"{1000 / n_samples}ms")
+        # do this in a round-about way so that we can use `reindex` and specify a tolerance
+        t0 = df['_datetime_'].iloc[0]
+        t1 = df['_datetime_'].iloc[-1]
+        dr = date_range(t0, t1, freq=f"{1000 / n_samples}ms", inclusive='both')
+        df_full = df.set_index("_datetime_").reindex(index=dr, method='nearest', limit=1, tolerance=to_timedelta(0.1 / n_samples, unit='s'))
 
         # put the datetime array back in the dataframe
         df_full = df_full.reset_index(drop=False)
