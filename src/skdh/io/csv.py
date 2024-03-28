@@ -58,9 +58,8 @@ def handle_timestamp_inconsistency(df, fill_gaps, column_names, fill_dict):
         Number of samples per second.
     """
     # get a sampling rate. If non-unique timestamps, this will be updated
-    n_samples = (
-        mean(1 / diff(df["_datetime_"][:2500]).astype(int)) * 1e9,
-    )  # datetime diff is in ns
+    n_samples = mean(1 / diff(df["_datetime_"][:2500]).astype(int)) * 1e9
+    # datetime diff is in ns
 
     # first check if we have non-unique timestamps
     nonuniq_ts = df["_datetime_"].iloc[1] == df["_datetime_"].iloc[0]
