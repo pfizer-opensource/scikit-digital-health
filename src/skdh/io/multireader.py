@@ -68,7 +68,7 @@ class MultiReader(BaseProcess):
     Case 2:
 
     >>> kw = [
-    >>>     {'time_col_name': 'ts', 'column_names': {'accel': ['ax', 'ay', 'az]}},
+    >>>     {'time_col_name': 'ts', 'column_names': {'accel': ['ax', 'ay', 'az']}},
     >>>     {'time_col_name': 'ts', 'column_names': {'temperature': 'temperature C'}},
     >>> ]
     >>> mrdr = MultiReader(mode='combine', reader='ReadCsv', reader_kw=kw)
@@ -77,7 +77,7 @@ class MultiReader(BaseProcess):
     Case 3:
 
     >>> kw = {
-    >>>     'f1': {'time_col_name': 'ts', 'column_names': {'accel': ['ax', 'ay', 'az]}},
+    >>>     'f1': {'time_col_name': 'ts', 'column_names': {'accel': ['ax', 'ay', 'az']}},
     >>>     'f2': {'time_col_name': 'ts', 'column_names': {'temperature': 'temperature C'}},
     >>> }
     >>> mrdr = MultiReader(mode='combine', reader='ReadCsv', reader_kw=kw)
@@ -89,7 +89,10 @@ class MultiReader(BaseProcess):
         if reader_kw is None:
             reader_kw = {}
 
-        self.mode = mode
+        if mode.lower() in ['leave', 'combine', 'concatenate']:
+            self.mode = mode.lower()
+        else:
+            raise ValueError("mode must be one of {'leave', 'combine', 'concatenate'}.")
 
         # get the reader classes
         self.rdr = getattr(io, reader)
@@ -103,10 +106,8 @@ class MultiReader(BaseProcess):
 
         Parameters
         ----------
-        key : {None, str}
-            Key associated with the file
-        i : {None, int}
-            Index in the list for the file
+        idx : str, int
+            Index of the file to use to retrieve reader kwargs
         """
         try:
             # case 0: reader_kw == None -> reader_kw = {} -> [str, int] KeyError
@@ -144,7 +145,7 @@ class MultiReader(BaseProcess):
             i.get('fs', 1 / mean(diff(i['time'][:5000]))) for i in res
         ]
         # allow 0.1 absolute tolerance to account for hand-calculation of fs
-        needs_resample = allclose(all_fs, median(all_fs), atol=0.1)
+        needs_resample = not allclose(all_fs, median(all_fs), atol=0.1)
 
         if needs_resample:
             # get the index we want to resample to
@@ -167,10 +168,13 @@ class MultiReader(BaseProcess):
                 time = rdict.pop('time')
                 keys = []
                 data = ()
-                for key in rdict:
-                    if isinstance(rdict[key], ndarray):
-                        keys.append(k)
-                        data += (rdict.pop(key),)
+                for key, val in rdict.items():
+                    if isinstance(val, ndarray):
+                        keys.append(key)
+                        data += (val,)
+                # drop the keys
+                for k in keys:
+                    rdict.pop(k)
                 
                 _, data_rs, *_ = apply_resample(
                     time=time, time_rs=time_rs, data=data, aa_filter=True,
@@ -208,11 +212,21 @@ class MultiReader(BaseProcess):
         results : dict
             Dictionary of results datastreams
         """
+        if isinstance(res, dict):
+            res = [v for _, v in res.items()]  # standardize since we dont care about labels
+
         t0s = [i['time'][0] for i in res]
         # get sorted index
         t0_isort = argsort(t0s)
 
-        res_lists = {i: [] for i in res[0]}
+        results = {}
+        res_lists = {}
+        # split between concatenatable items and non
+        for k, v in res[0].items():
+            if isinstance(v, ndarray):
+                res_lists[k] = []
+            else:
+                results[k] = v
 
         # get items in time order
         for ires in t0_isort:
@@ -220,16 +234,17 @@ class MultiReader(BaseProcess):
 
             for k in res_lists:
                 try:
-                    res_lists[k].append(res_dict[k])
+                    res_lists[k].append(res_dict.pop(k))
                 except KeyError:
                     raise KeyError("To concatenate file contents, all files must have the same data streams.")
+            # update the non-concatenatable items results
+            results.update(res_dict)
         
-        results = {
+        results.update({
             k: concatenate(v) for k, v in res_lists.items()
-        }
+        })
 
         return results
-
 
     def handle_results(self, res):
         """
@@ -246,16 +261,16 @@ class MultiReader(BaseProcess):
             Dictionary of final results
         """
         if isinstance(res, dict):
-            if self.mode.lower() == "leave":
+            if self.mode == "leave":
                 return res
-            elif self.mode.lower() == "combine":
+            elif self.mode == "combine":
                 results = self.handle_combine(res)
-            else:
-                raise ValueError("Only {leave, combine} are valid for key-word specified files.")
+            elif self.mode == "concatenate":
+                results = self.handle_concatenation(res)
         else:  # res is a list
-            if self.mode.lower() == "combine":
+            if self.mode == "combine":
                 results = self.handle_combine(res)
-            elif self.mode.lower() == "concatenate":
+            elif self.mode == "concatenate":
                 results = self.handle_concatenation(res)
             else:
                 raise ValueError("Only {combine, concatenate} are valid for list specified files.")
@@ -283,7 +298,7 @@ class MultiReader(BaseProcess):
         """
         i0 = 0
         if isinstance(files, Mapping):
-            idx0 = files.keys()[0]
+            i0 = next(iter(files))  # get the first key
             pre_results = {}
             for fid, fpath in files.items():
                 # get the kwargs
