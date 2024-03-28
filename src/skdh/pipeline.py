@@ -233,7 +233,7 @@ class Pipeline:
 
         for proc in procs:
             if 'process' in proc:
-                name = proc['name']
+                name = proc.get('name', None)
                 process_name = proc['process']
                 pkg = proc["package"]
                 mod = proc["module"]
