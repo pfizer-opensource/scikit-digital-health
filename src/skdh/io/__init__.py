@@ -1,4 +1,6 @@
 """
+.. _SKDH IO
+
 Binary File Reading (:mod:`skdh.io`)
 ====================================
 
@@ -27,6 +29,16 @@ These processes are generic and not limited to a specific device/manufacturer's 
 
     ReadNumpyFile
     ReadCSV
+
+Multiple File IO
+----------------
+
+Support for reading multiple files in at once
+
+.. autosummary::
+    :toctree: generated/
+
+    MultiReader
 """
 from skdh.io.axivity import ReadCwa
 from skdh.io import axivity
@@ -38,6 +50,8 @@ from skdh.io.numpy_compressed import ReadNumpyFile
 from skdh.io import numpy_compressed
 from skdh.io.csv import ReadCSV
 from skdh.io import csv
+from skdh.io import multireader
+from skdh.io.multireader import MultiReader
 from skdh.io.utility import FileSizeError
 
 __all__ = (
@@ -46,9 +60,11 @@ __all__ = (
     "ReadApdmH5",
     "ReadNumpyFile",
     "ReadCSV",
+    "MultiReader",
     "axivity",
     "geneactiv",
     "apdm",
     "numpy_compressed",
     "csv",
+    "multireader",
 )

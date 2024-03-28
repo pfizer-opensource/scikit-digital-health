@@ -23,7 +23,7 @@ import lightgbm as lgb
 
 from skdh.base import BaseProcess, handle_process_returns
 from skdh.utility.exceptions import LowFrequencyError
-from skdh.utility.internal import apply_downsample, rle
+from skdh.utility.internal import apply_resample, rle
 from skdh.utility.windowing import get_windowed_view
 
 from skdh.features import Bank
@@ -117,11 +117,11 @@ class PredictGaitLumbarLgbm(BaseProcess):
         # handle frequency and downsampling
         goal_fs = 50.0 if fs >= 50.0 else 20.0
         if fs != goal_fs:
-            time_ds, (accel_ds,), *_ = apply_downsample(
-                goal_fs,
-                time,
-                (accel,),
-                (),
+            time_ds, (accel_ds,), *_ = apply_resample(
+                goal_fs=goal_fs,
+                time=time,
+                data=(accel,),
+                indices=(),
                 aa_filter=self.downsample_aa_filter,
                 fs=fs,
             )

@@ -1,4 +1,5 @@
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 from pytest import fixture
 from numpy import load, random, arange, repeat
@@ -6,6 +7,47 @@ import pandas as pd
 
 from skdh import BaseProcess, handle_process_returns
 from skdh.io.base import check_input_file
+
+
+@fixture(scope='class')
+def dummy_multireader_data():
+    tdir = TemporaryDirectory()
+
+    tpath = Path(tdir.name)
+    # create some sample files
+    t1 = arange(0, 10, 0.05) + 1.5e9
+    ax = random.default_rng().normal(size=t1.size)
+    ay = random.default_rng().normal(size=t1.size)
+    az = random.default_rng().normal(size=t1.size, loc=1)
+
+    # equally sampled temp
+    temp1 = random.default_rng().normal(size=t1.size, loc=26, scale=1.5)
+
+    # differently sampled temperature
+    t2 = arange(0, 11, 0.1) + 1.5e9
+    temp2 = random.default_rng().normal(size=t2.size, loc=26, scale=1.5)
+
+    # second set of accel data
+    t3 = arange(0.05, 10.05, 0.05) + t1[-1]
+    ax3 = random.default_rng().normal(size=t3.size)
+    ay3 = random.default_rng().normal(size=t3.size)
+    az3 = random.default_rng().normal(size=t3.size, loc=1)
+
+    # setup the paths
+    p_acc = tpath / "acc.csv"
+    p_eqt = tpath / "eq_temp.csv"
+    p_neqt = tpath / "neq_temp.csv"
+    p_acc_cont = tpath / "acc_cont.csv"
+
+    # save to CSVs
+    pd.DataFrame({'time': t1, 'ax': ax, 'ay': ay, 'az': az}).to_csv(p_acc, index=False)
+    pd.DataFrame({'time': t1, 'temperature': temp1}).to_csv(tpath / p_eqt, index=False)
+    pd.DataFrame({'time': t2, 'temperature': temp2}).to_csv(tpath / p_neqt, index=False)
+    pd.DataFrame({'time': t3, 'ax': ax3, 'ay': ay3, 'az': az3}).to_csv(p_acc_cont, index=False)
+
+    yield tpath, p_acc, p_eqt, p_neqt, p_acc_cont
+
+    tdir.cleanup()
 
 
 @fixture

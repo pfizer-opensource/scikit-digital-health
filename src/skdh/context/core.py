@@ -7,7 +7,7 @@ import lightgbm as lgb
 
 from skdh.base import BaseProcess, handle_process_returns
 from skdh.utility import get_windowed_view
-from skdh.utility.internal import apply_downsample, rle
+from skdh.utility.internal import apply_resample, rle
 from skdh.features import (
     Bank,
     Mean,
@@ -310,9 +310,9 @@ class Ambulation(BaseProcess):
                 "Frequency is > 20Hz. Downsampling to 20Hz.",
                 UserWarning,
             )
-            time_ds, (accel_ds,) = apply_downsample(
-                goal_fs=20.0,
+            time_ds, (accel_ds,) = apply_resample(
                 time=time,
+                goal_fs=20.0,
                 data=(accel,),
                 fs=fs,
             )

@@ -7,7 +7,7 @@ Copyright (c) 2022. Pfizer Inc. All rights reserved.
 from numpy import array, repeat, abs, minimum, floor, float_
 from scipy.signal import lfilter_zi, lfilter
 
-from skdh.utility.internal import apply_downsample
+from skdh.utility.internal import apply_resample
 from skdh.utility import moving_mean
 
 
@@ -77,9 +77,9 @@ def get_activity_counts(fs, time, accel, epoch_seconds=60):
     that have different sampling frequencies than what might be provided by ActiGraph.
     """
     # 3. down-sample to 30hz
-    time_ds, (acc_ds,) = apply_downsample(
-        30.0,
-        time,
+    time_ds, (acc_ds,) = apply_resample(
+        goal_fs=30.0,
+        time=time,
         data=(accel,),
         aa_filter=True,
         fs=fs,

@@ -500,8 +500,12 @@ class CountWearDetection(BaseProcess):
         wear_stops *= int(self.epoch_seconds * fs)
 
         # handle case where end is end of array
-        if isclose(wear_stops[-1], nonwear_counts.size * int(self.epoch_seconds * fs)):
-            wear_stops[-1] = time.size - 1
+        try:
+            if isclose(wear_stops[-1], nonwear_counts.size * int(self.epoch_seconds * fs)):
+                wear_stops[-1] = time.size - 1
+        except IndexError:
+            warn("No wear periods detected.")
+            pass
 
         # create a single wear array, and put it back into the correct
         # units for indexing

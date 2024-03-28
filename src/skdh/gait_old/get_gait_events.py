@@ -6,7 +6,7 @@ Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from numpy import fft, argmax, std, abs, argsort, corrcoef, mean, sign
 from scipy.signal import detrend, butter, sosfiltfilt, find_peaks
-from scipy.integrate import cumtrapz
+from scipy.integrate import cumulative_trapezoid
 from pywt import cwt
 
 from skdh.utility import correct_accelerometer_orientation
@@ -127,7 +127,7 @@ def get_gait_events(
         filt_vert_accel = vert_accel * 1
 
     # first integrate the vertical accel to get velocity
-    vert_velocity = cumtrapz(filt_vert_accel, x=ts - ts[0], initial=0)
+    vert_velocity = cumulative_trapezoid(filt_vert_accel, x=ts - ts[0], initial=0)
 
     # get the CWT scales
     scale1, scale2 = get_cwt_scales(use_optimal_scale, vert_velocity, orig_scale, fs)

@@ -57,22 +57,22 @@ def dummy_pipeline():
     exp = {
         "Steps": [
             {
-                "GaitLumbar": {
-                    "package": "skdh",
-                    "module": "gait.core",
-                    "parameters": {},
-                    "save_file": "gait_results.csv",
-                    "plot_file": None,
-                }
+                "name": "Gait",
+                "process": "GaitLumbar",
+                "package": "skdh",
+                "module": "gait.core",
+                "parameters": {},
+                "save_file": "gait_results.csv",
+                "plot_file": None,
             },
             {
-                "TestProcess": {
-                    "package": "skdh",
-                    "module": "test.testmodule",
-                    "parameters": {},
-                    "save_file": None,
-                    "plot_file": None,
-                }
+                "name": "TestProcess",
+                "process": "TestProcess",
+                "package": "skdh",
+                "module": "test.testmodule",
+                "parameters": {},
+                "save_file": None,
+                "plot_file": None,
             },
         ],
         "Version": skdh_vers,
