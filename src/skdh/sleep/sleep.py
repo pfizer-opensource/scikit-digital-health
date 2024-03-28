@@ -810,7 +810,7 @@ class Sleep(BaseProcess):
         if self.f is not None:
             date = dt_date.today().strftime("%Y%m%d")
             form_fname = self.plot_fname.format(
-                date=date, name=self._name, file=self._file_name
+                date=date, file=self._file_name
             )
             pp = PdfPages(Path(form_fname).with_suffix(".pdf"))
 

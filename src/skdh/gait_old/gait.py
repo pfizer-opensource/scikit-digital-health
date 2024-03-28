@@ -701,7 +701,7 @@ class Gait(BaseProcess):
         if self.valid_plot and self.f is not None:
             date = dt_date.today().strftime("%Y%m%d")
             form_fname = self.plot_fname.format(
-                date=date, name=self._name, file=Path(file).stem
+                date=date, file=Path(file).stem
             )
 
             self.ax.legend(loc="best")
