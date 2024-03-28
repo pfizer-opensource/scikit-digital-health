@@ -1,9 +1,6 @@
 from tempfile import TemporaryDirectory
 from pathlib import Path
 
-# DEPRECATED
-import json
-
 import pytest
 import yaml
 
@@ -116,28 +113,20 @@ class TestPipeline:
     def test__handle_load_input(self, dummy_pipeline):
         with TemporaryDirectory() as tdir:
             fname1 = Path(tdir) / "file.random"
-            fname_json = Path(tdir) / "file.json"
             fname_yaml = Path(tdir) / "file.yaml"
 
             with fname1.open(mode="w") as f:
                 yaml.dump(dummy_pipeline, f)
-            with fname_json.open(mode="w") as f:
-                json.dump(dummy_pipeline, f)
             with fname_yaml.open(mode="w") as f:
                 f.write("unbalanced brackets: ][\n")
 
             with pytest.warns(
                 UserWarning, match="does not have one of the expected suffixes:"
             ):
-                Pipeline._handle_load_input(None, None, str(fname1))
-            with pytest.warns(
-                DeprecationWarning, match="JSON format will be deprecated"
-            ):
-                Pipeline._handle_load_input(None, None, file=str(fname_json))
+                Pipeline._handle_load_input(None, str(fname1))
             # handle the json reader failing as well
-            with pytest.raises(json.decoder.JSONDecodeError):
-                with pytest.warns(UserWarning, match="Error reading file as YAML"):
-                    Pipeline._handle_load_input(None, None, file=str(fname_yaml))
+            with pytest.raises(yaml.YAMLError):
+                Pipeline._handle_load_input(None, file=str(fname_yaml))
 
     def test_load_through_init(self, dummy_pipeline):
         with TemporaryDirectory() as tdir:
@@ -179,11 +168,6 @@ class TestPipeline:
         p2.load(yaml_str=pipe_str)
 
         assert p2._steps == [GaitLumbar()]
-
-        # check for the deprecation warning for json input
-        pipe_str_json = json.dumps(dummy_pipeline)
-        with pytest.warns(DeprecationWarning):
-            p2.load(json_str=pipe_str_json)
 
     def test_load_errors(self, dummy_pipeline):
         p = Pipeline()
