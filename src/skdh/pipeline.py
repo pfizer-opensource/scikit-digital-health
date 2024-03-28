@@ -4,7 +4,6 @@ Pipeline class for stringing multiple features into 1 processing pipeline
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
-import json
 from operator import attrgetter
 from importlib import import_module
 from warnings import warn
@@ -136,7 +135,7 @@ class Pipeline:
             yaml.dump(pipe, f)
 
     @staticmethod
-    def _handle_load_input(yaml_str, json_str, file):
+    def _handle_load_input(yaml_str, file):
         """
         Handle different extensions loading
 
@@ -145,9 +144,6 @@ class Pipeline:
         yaml_str : str
             YAML string of the pipeline. If provided, `file` is ignored. Supersedes
             the `json_str` parameter.
-        json_str : str
-            DEPRECATED. JSON string of the pipeline. If provided, `file` is
-            ignored. WILL BE DEPRECATED IN A FUTURE VERSION.
         file : str, Path-like
             File path to load
 
@@ -156,49 +152,26 @@ class Pipeline:
         data : dict
             Loaded pipeline data.
         """
-        valid_json_ext = [".json"]
         valid_yaml_ext = [".skdh", ".yml", ".yaml"]
 
         if yaml_str is not None:
             return yaml.load(yaml_str, Loader=TupleSafeLoader)
-        elif json_str is not None:
-            warn(
-                "JSON format will be deprecated in a future version.",
-                DeprecationWarning,
-            )
-            return json.loads(json_str)
         else:
             pfile = Path(file)
-            if pfile.suffix not in valid_json_ext + valid_yaml_ext:
+            if pfile.suffix not in valid_yaml_ext:
                 warn(
                     f"File ({file}) does not have one of the expected suffixes: "
-                    f"{valid_yaml_ext + valid_json_ext}",
+                    f"{valid_yaml_ext}",
                     UserWarning,
                 )
             with open(file, "r") as f:
-                if pfile.suffix in valid_json_ext:
-                    warn(
-                        "JSON format will be deprecated in a future version.",
-                        DeprecationWarning,
-                    )
-                    data = json.load(f)
-                else:
-                    try:
-                        data = yaml.load(f, Loader=TupleSafeLoader)
-                    except yaml.YAMLError:
-                        warn(
-                            "Error reading file as YAML specification. Attempting "
-                            "`json.load` which will be deprecated in the future.",
-                            UserWarning,
-                        )
-                        data = json.load(f)
+                data = yaml.load(f, Loader=TupleSafeLoader)
             return data
 
     def load(
         self,
         file=None,
         *,
-        json_str=None,
         yaml_str=None,
         process_raise=False,
         noversion_raise=False,
@@ -211,9 +184,6 @@ class Pipeline:
         ----------
         file : {str, path-like}
             File path to load the pipeline structure from.
-        json_str : str
-            DEPRECATED. JSON string of the pipeline. If provided, `file` is
-            ignored. WILL BE DEPRECATED IN A FUTURE VERSION.
         yaml_str : str
             YAML string of the pipeline. If provided, `file` is ignored. Supersedes
             the `json_str` parameter.
@@ -236,7 +206,7 @@ class Pipeline:
         )
 
         # import the data, handling possible input/file types
-        data = self._handle_load_input(yaml_str, json_str, file)
+        data = self._handle_load_input(yaml_str, file)
 
         if "Steps" in data and "Version" in data:
             procs = data["Steps"]
