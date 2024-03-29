@@ -1,7 +1,7 @@
 """
-.. _SKDH IO
+.. _SKDH IO:
 
-Binary File Reading (:mod:`skdh.io`)
+File Reading (:mod:`skdh.io`)
 ====================================
 
 .. currentmodule:: skdh.io
