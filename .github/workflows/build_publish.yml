@@ -53,6 +53,7 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
+          name: artifact-${{ matrix.os }}
           path: ./wheelhouse/*.whl
   build_sdist:
     name: Build Source Distribution
@@ -73,10 +74,8 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          # unpacks default artifact into dist/
-          # if `name: artifact` is omitted, the action will create extra parent dir
-          name: artifact
           path: dist
+          merge-multiple: true
       - name: Print for info
         run: ls dist/
       - name: Upload to twine

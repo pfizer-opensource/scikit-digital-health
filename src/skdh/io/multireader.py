@@ -22,7 +22,7 @@ class MultiReader(BaseProcess):
         (see Notes), and leaves the results in separate dictionaries with titles 
         given by the keys of `reader_kw` and `files` as passed to the `predict` method.
     reader : str
-        The name of the reader class to use. See `SKDH IO`_.
+        The name of the reader class to use. See :ref:`SKDH IO`.
     reader_kw : {None, array-like, dict}, optional
         Reader key-word arguments to initialize the reader. See Notes for 3 specification
         options.

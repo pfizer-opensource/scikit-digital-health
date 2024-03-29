@@ -22,6 +22,8 @@ python:
   install:
     - method: pip
       path: .
+      extra_requirements:
+        - docs
 build:
   os: ubuntu-20.04
   tools:
