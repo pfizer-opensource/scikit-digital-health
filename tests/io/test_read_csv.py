@@ -58,13 +58,12 @@ class TestHandleTimestampInconsistency:
         rdr = ReadCSV(
             time_col_name="_datetime_",
             column_names={'accel': ['ax', 'ay', 'az'], 'temperature': 'temperature'},
-            accel_in_g=True,
+            raw_conversions={'accel': 1.0}
         )
         # read with only temperature data, but we still have accel column names
         rdr2 = ReadCSV(
             time_col_name="_datetime_",
             column_names={'accel': ['ax', 'ay', 'az'], 'temperature': 'temperature'},
-            accel_in_g=True,
             read_csv_kwargs={'usecols': (4, 5)}
         )
 

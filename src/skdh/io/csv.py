@@ -333,6 +333,9 @@ class ReadCSV(BaseProcess):
         
         # convert accel data
         for k, conv_factor in self.raw_conversions.items():
-            results[k] /= conv_factor
+            try:
+                results[k] /= conv_factor
+            except KeyError:
+                continue
 
         return results
