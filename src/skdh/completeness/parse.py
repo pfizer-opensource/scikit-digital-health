@@ -22,8 +22,8 @@ def vivalink_parse_ecg_data(df, ecg_key, s_freq):
     times = np.array([])
     for k in range(len(df)):
         ecg_records = df[ecg_key].iloc[k].replace('[', '').replace(']', '').split(',')
-        ecg_segment = np.array([np.nan] * n_samples[k])
-        if not len(ecg_records) == n_samples[k]:
+        ecg_segment = np.array([np.nan] * np.array(n_samples)[k])
+        if not len(ecg_records) == np.array(n_samples)[k]:
             warnings.warn('Not correct number of samples in df entry. Presuming they are in the beginning of the'
                           ' measurement period.')
         for c, ele in enumerate(df[ecg_key].iloc[k].replace('[', '').replace(']', '').split(',')):
@@ -90,8 +90,11 @@ def vivalink_parse_acc_data(df, acc_key):
 
 
 def empatica_parse_acc_data(fdir_raw):
-    from avro.datafile import DataFileReader
-    from avro.io import DatumReader
+
+    try:
+        import avro
+    except ImportError:
+        raise ImportError("avro is required to use the empatica raw acceleration data parser")
 
     fnames = os.listdir(fdir_raw)
     times_all = np.array([])
@@ -100,7 +103,7 @@ def empatica_parse_acc_data(fdir_raw):
     sfreq_all = []
     for fname in fnames:
         if fname[-5:] == '.avro':
-            reader = DataFileReader(open(fdir_raw + fname, "rb"), DatumReader())
+            reader = avro.datafile.DataFileReader(open(fdir_raw + fname, "rb"), avro.io.DatumReader())
             data_list = []
             for data_frac in reader:
                data_list.append(data_frac)
