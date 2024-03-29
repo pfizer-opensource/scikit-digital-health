@@ -42,9 +42,17 @@ class ReadCSV(BaseProcess):
         The name of the column containing timestamps.
     column_names : dict
         Dictionary of column names for different data types. See Notes.
+    drop_duplicate_timestamps : bool, optional
+        Drop duplicate timestamps before doing any timestamp handling or gap filling.
+        Default is False.
     fill_gaps : bool, optional
         Fill any gaps in acceleration data with the vector [0, 0, 1]. Default is True. If False
         and data gaps are detected, then the reading will raise a `ValueError`.
+    gaps_error : {'raise', 'warn', 'ignore'}, optional
+        Behavior if there are large gaps in the datastream after handling timestamps.
+        Default is to raise an error. NOT recommended to change unless the data
+        is being read as part of a :class:`skdh.io.MultiReader` call, in which case
+        it will likely be re-sampled.
     to_datetime_kwargs : dict, optional
         Dictionary of key-word arguments for :py:class:`pandas.to_datetime`.
     accel_in_g : bool, optional
@@ -87,7 +95,9 @@ class ReadCSV(BaseProcess):
         self,
         time_col_name,
         column_names,
+        drop_duplicate_timestamps=False,
         fill_gaps=True,
+        gaps_error='raise',
         to_datetime_kwargs=None,
         accel_in_g=True,
         g_value=9.81,
@@ -102,7 +112,9 @@ class ReadCSV(BaseProcess):
         super().__init__(
             time_col_name=time_col_name,
             column_names=column_names,
+            drop_duplicate_timestamps=drop_duplicate_timestamps,
             fill_gaps=fill_gaps,
+            gaps_error=gaps_error,
             to_datetime_kwargs=to_datetime_kwargs,
             accel_in_g=accel_in_g,
             g_value=g_value,
@@ -110,9 +122,14 @@ class ReadCSV(BaseProcess):
             ext_error=ext_error,
         )
 
+        if gaps_error.lower() not in ['raise', 'warn', 'ignore']:
+            raise ValueError('gaps_error must be one of `raise`, `warn`, or `ignore`.')
+
         self.time_col_name = time_col_name
         self.column_names = column_names
         self.fill_gaps = fill_gaps
+        self.gaps_error = gaps_error
+        self.drop_dupl_time = drop_duplicate_timestamps
         self.to_datetime_kw = to_datetime_kwargs
         self.accel_in_g = accel_in_g
         self.g_value = g_value
@@ -122,6 +139,14 @@ class ReadCSV(BaseProcess):
             self.ext_error = ext_error.lower()
         else:
             raise ValueError("`ext_error` must be one of 'raise', 'warn', 'skip'.")
+
+    def handle_gaps_error(self, msg):
+        if self.gaps_error == "raise":
+            raise ValueError(msg)
+        elif self.gaps_error == 'warn':
+            warn(msg)
+        else:
+            pass
 
     def handle_timestamp_inconsistency(self, df, fill_dict):
         """
@@ -143,6 +168,8 @@ class ReadCSV(BaseProcess):
         fs : float
             Number of samples per second.
         """
+        if self.drop_dupl_time:
+            df = df.drop_duplicates(subset=["_datetime_"], keep='first', ignore_index=True)
         # get a sampling rate. If non-unique timestamps, this will be updated
         n_samples = round(mean(1 / diff(df["_datetime_"][:2500]).astype(int)) * 1e9, decimals=6)
         # datetime diff is in ns
@@ -206,7 +233,7 @@ class ReadCSV(BaseProcess):
             # garbage outputs from downstream algorithms
             time_deltas = diff(df["_datetime_"]).astype(int) / 1e9  # convert to seconds
             if (abs(time_deltas) > (1.5 / n_samples)).any():
-                raise ValueError(
+                self.handle_gaps_error(
                     "There are data gaps in the data, which could potentially result in incorrect outputs from downstream algorithms."
                 )
 
