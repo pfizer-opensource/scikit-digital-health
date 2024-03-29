@@ -55,10 +55,23 @@ class ReadCSV(BaseProcess):
         it will likely be re-sampled.
     to_datetime_kwargs : dict, optional
         Dictionary of key-word arguments for :py:class:`pandas.to_datetime`.
+    raw_conversions : dict, optional
+        Conversions to apply to raw data, with keys matching those in `column_names`.
+        Conversions are applied by dividing the raw data stream by the conversion factor
+        provided. If left as None, no conversions will be applied (ie conversion
+        factor of 1.0).
     accel_in_g : bool, optional
         If the acceleration values are in units of "g". Default is True.
+
+        .. deprecated:: 0.15.1
+            Use `raw_conversions` instead.
+
     g_value : float, optional
         Gravitational acceleration. Default is 9.81 m/s^2.
+
+        .. deprecated:: 0.15.1
+            Use `raw_conversions` instead.
+
     read_csv_kwargs : None, dict, optional
         Dictionary of additional key-word arguments for :py:class:`pandas.read_csv`.
     ext_error : {"warn", "raise", "skip"}, optional
@@ -99,16 +112,12 @@ class ReadCSV(BaseProcess):
         fill_gaps=True,
         gaps_error='raise',
         to_datetime_kwargs=None,
+        raw_conversions=None,
         accel_in_g=True,
         g_value=9.81,
         read_csv_kwargs=None,
         ext_error="warn",
     ):
-        if to_datetime_kwargs is None:
-            to_datetime_kwargs = {}
-        if read_csv_kwargs is None:
-            read_csv_kwargs = {}
-
         super().__init__(
             time_col_name=time_col_name,
             column_names=column_names,
@@ -116,11 +125,22 @@ class ReadCSV(BaseProcess):
             fill_gaps=fill_gaps,
             gaps_error=gaps_error,
             to_datetime_kwargs=to_datetime_kwargs,
-            accel_in_g=accel_in_g,
-            g_value=g_value,
+            raw_conversions=raw_conversions,
             read_csv_kwargs=read_csv_kwargs,
             ext_error=ext_error,
         )
+
+        if to_datetime_kwargs is None:
+            to_datetime_kwargs = {}
+        if read_csv_kwargs is None:
+            read_csv_kwargs = {}
+
+        # raw conversions
+        if raw_conversions is None:
+            raw_conversions = {k: 1.0 for k in column_names}
+            if not accel_in_g:
+                warn("Parameter accel_in_g is deprecated in favor of raw_conversions", DeprecationWarning)
+                raw_conversions['accel'] = g_value
 
         if gaps_error.lower() not in ['raise', 'warn', 'ignore']:
             raise ValueError('gaps_error must be one of `raise`, `warn`, or `ignore`.')
@@ -131,8 +151,7 @@ class ReadCSV(BaseProcess):
         self.gaps_error = gaps_error
         self.drop_dupl_time = drop_duplicate_timestamps
         self.to_datetime_kw = to_datetime_kwargs
-        self.accel_in_g = accel_in_g
-        self.g_value = g_value
+        self.raw_conversions = raw_conversions
         self.read_csv_kwargs = read_csv_kwargs
 
         if ext_error.lower() in ["warn", "raise", "skip"]:
@@ -269,7 +288,7 @@ class ReadCSV(BaseProcess):
             If the file name is not provided.
         """
         fill_values = {
-            "accel": 1.0 if self.accel_in_g else self.g_value,
+            "accel": self.raw_conversions.get('accel', 1.0),
             "gyro": 0.0,
             "ecg": 0.0,
             "temperature": 0.0,
@@ -313,7 +332,7 @@ class ReadCSV(BaseProcess):
                 continue
         
         # convert accel data
-        if 'accel' in results and not self.accel_in_g:
-            results['accel'] /= self.g_value
+        for k, conv_factor in self.raw_conversions.items():
+            results[k] /= conv_factor
 
         return results
