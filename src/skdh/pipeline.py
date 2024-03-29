@@ -185,10 +185,9 @@ class Pipeline:
         file : {str, path-like}
             File path to load the pipeline structure from.
         yaml_str : str
-            YAML string of the pipeline. If provided, `file` is ignored. Supersedes
-            the `json_str` parameter.
+            YAML string of the pipeline. If provided, `file` is ignored.
         process_raise : bool, optional
-            Raise an error if a process in `file`, `json_str`, or `yaml_str` cannot
+            Raise an error if a process in `file` or `yaml_str` cannot
             be added to the pipeline. Default is False, which issues a warning
             instead.
         noversion_raise : bool
