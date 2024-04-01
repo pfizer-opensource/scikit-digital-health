@@ -24,7 +24,7 @@ from numpy import (
 )
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt, detrend
-from scipy.integrate import cumtrapz
+from scipy.integrate import cumulative_trapezoid
 
 from skdh.utility import moving_sd
 from skdh.utility.internal import rle
@@ -412,17 +412,17 @@ class Detector:
 
         # integrate and drift mitigate
         if not still_at_end:
-            vel = detrend(cumtrapz(vert_accel, dx=dt, initial=0))
+            vel = detrend(cumulative_trapezoid(vert_accel, dx=dt, initial=0))
             if abs(vel[0]) > 0.05:  # if too far away from 0
                 vel -= vel[0]  # reset the beginning back to 0
         else:
-            vel_dr = cumtrapz(vert_accel, dx=dt, initial=0)
+            vel_dr = cumulative_trapezoid(vert_accel, dx=dt, initial=0)
             vel = vel_dr - (
                 ((vel_dr[-1] - vel_dr[0]) / (x[-1] - x[0])) * x
             )  # no intercept
 
         # integrate velocity to get position
-        pos = cumtrapz(vel, dx=dt, initial=0)
+        pos = cumulative_trapezoid(vel, dx=dt, initial=0)
 
         return vel, pos
 

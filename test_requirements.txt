@@ -1,4 +1,0 @@
-pytest
-coverage
-psutil
-tables

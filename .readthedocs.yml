@@ -20,9 +20,10 @@ formats: []
 # Optionally set the version of Python and requirements required to build your docs
 python:
   install:
-    - requirements: docs/requirements.txt
     - method: pip
       path: .
+      extra_requirements:
+        - docs
 build:
   os: ubuntu-20.04
   tools:

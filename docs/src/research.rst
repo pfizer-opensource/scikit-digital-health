@@ -2,8 +2,8 @@ Peer Reviewed Journal Articles Using SKDH
 =========================================
 
 - W. Lin et al., “Can Gait Characteristics Be Represented by Physical Activity Measured with Wrist-Worn Accelerometers?,” Sensors, vol. 23, no. 20, Art. no. 20, Jan. 2023, doi: 10.3390/s23208542.
-- W. Lin et al., "SciKit Digital Health Package for Accelerometry-Measured Physical Activity: Comparisons to Existing Solutions and Investigations of Age Effects in Healthy Adults", In Preperation
-- J. Di et al., "Wearable Accelerometers as An Innovative Approach to Monitor Physical Activity and Gait in Children and Adolescents", In Preparation
+- W. Lin et al., "SciKit Digital Health Package for Accelerometry-Measured Physical Activity: Comparisons to Existing Solutions and Investigations of Age Effects in Healthy Adults", Front. Digit. Health, 26 Nov. 2023, doi: 10.3389/fdgth.2023.1321086
+- J. Di et al., “Monitoring Activity and Gait in Children (MAGIC) using digital health technologies,” Pediatr Res, Mar. 2024, doi: 10.1038/s41390-024-03147-x.
 - P. Sheriff et al., "In-Clinic and Natural Gait Observations (I-CAN-GO) an Observational Low-Interventional Master Protocol to Validate Gait and Physical Activity in Adults", In Preparation
 - N. Camerlingo et al., "Measuring gait parameters from a chest-worn accelerometer in healthy individuals: a validation study", In Preparation
 

@@ -5,7 +5,7 @@ Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 from numpy import nan, array, ones, nonzero, zeros
-from scipy.integrate import cumtrapz
+from scipy.integrate import cumulative_trapezoid
 
 
 def get_strides(
@@ -106,8 +106,8 @@ def get_strides(
 
         if gait["forward cycles"][i] > 0:
             vacc = vert_accel[i1:i2]
-            vvel = cumtrapz(vacc, x=ts[i1:i2], initial=0)
-            vpos = cumtrapz(vvel, x=ts[i1:i2], initial=0)
+            vvel = cumulative_trapezoid(vacc, x=ts[i1:i2], initial=0)
+            vpos = cumulative_trapezoid(vvel, x=ts[i1:i2], initial=0)
 
             gait["delta h"].append(
                 (vpos.max() - vpos.min()) * 9.81

@@ -50,10 +50,19 @@ module axivity
         real(c_double) :: tLast
         integer(c_int) :: N
         real(c_double) :: frequency
-        integer(c_long) :: Nwin
-        integer(c_long) :: max_days
         integer(c_long) :: n_bad_blocks
     end type FileInfo_t
+
+    type, bind(C) :: time_t
+        integer(c_long) :: hour
+        integer(c_long) :: min
+        integer(c_long) :: sec
+        integer(c_long) :: msec  ! NOTE that this is a integer!
+    end type time_t
+
+    real(c_double), parameter :: SEC_HOUR = 3600.0
+    real(c_double), parameter :: SEC_MIN = 60.0
+    real(c_double), parameter :: DAY_SEC = 86400.0
 
     ! converted from hex representations
     integer(c_int16_t), parameter :: HEADER_UNDEFINED = -1
@@ -184,8 +193,7 @@ contains
     ! axivity_read_block : read a single block (512 bytes) of data from an axivity file and 
     !   put the data into its respective storage arrays
     ! =============================================================================================
-    subroutine axivity_read_block(info, pos, imudata, timestamps, temp, bases, periods, starts, &
-        i_start, stops, i_stop, ierr) bind(C, name="axivity_read_block")
+    subroutine axivity_read_block(info, pos, imudata, timestamps, temp, ierr) bind(C, name="axivity_read_block")
         type(FileInfo_t), intent(inout) :: info  ! file information storage structure
         ! position of the file to read from. should be a multiple of 512
         integer(c_int), intent(in) :: pos
@@ -194,15 +202,6 @@ contains
         ! timestamp data array
         real(c_double), intent(out) :: timestamps(info%count * (info%nblocks - 2))
         real(c_double), intent(out) :: temp(info%count * (info%nblocks - 2))  ! light data array
-        ! bases (starts) of windows in 24 hour format
-        integer(c_long), intent(in) :: bases(info%Nwin)
-        integer(c_long), intent(in) :: periods(info%Nwin)  ! periods (durations) of windows
-        integer(c_long), intent(out) :: starts(info%Nwin, info%max_days)  ! Start indices of windows
-        ! keeps track of where in `starts` we are
-        integer(c_long), intent(out) :: i_start(info%Nwin)
-        integer(c_long), intent(out) :: stops(info%Nwin, info%max_days)  ! stop indices of windows
-        ! keeps track of where in `stops` we are
-        integer(c_long), intent(out) :: i_stop(info%Nwin)
         integer(c_int), intent(out) :: ierr  ! error recording and returning to calling function
         ! local
         type(datapacket) :: pkt
@@ -334,7 +333,7 @@ contains
         end if
 
         ! convert and create the timestamps
-        call get_time(info, pkt, timestamps(i1:i2), bases, periods, starts, i_start, stops, i_stop)
+        call get_time(info, pkt, timestamps(i1:i2))
 
         ierr = AX_READ_E_NONE
     end subroutine
@@ -343,18 +342,12 @@ contains
     ! get_time : creates the timestamps from the singular timestamp and offsets provided per data
     ! block. 
     ! =============================================================================================
-    subroutine get_time(info, pkt, time, bases, periods, starts, i_start, stops, i_stop)
-        use custom_time
+    subroutine get_time(info, pkt, time)
+
         type(FileInfo_t), intent(inout) :: info  ! file info storage structure
         type(datapacket), intent(in) :: pkt  ! data block info storage structure
         ! part of time array corresponding to current block
         real(c_double), intent(out) :: time(info%count)
-        integer(c_long), intent(in) :: bases(info%Nwin)  ! bases (starts) of windows in hours
-        integer(c_long), intent(in) :: periods(info%Nwin)  ! periods (durations) of windows
-        integer(c_long), intent(out) :: starts(info%Nwin, info%max_days)  ! start indices of windows
-        integer(c_long), intent(out) :: i_start(info%Nwin)  ! tracks of where we are in `starts`
-        integer(c_long), intent(out) :: stops(info%Nwin, info%max_days)  ! stop indices of windows
-        integer(c_long), intent(out) :: i_stop(info%Nwin)  ! track of where we are in `stops`
         ! local
         integer(c_long), parameter :: EPOCH = 2440588_c_long
         integer(c_long) :: i, days, year, month, day
@@ -397,33 +390,6 @@ contains
 
         tDelta = (t1 - t0) / pkt%sampleCount
         time = (/ (t0 + i * tDelta, i=0, info%count - 1) /)
-
-!        if (t%hour == 23 .and. t%min == 59 .and. t%sec == 59) then
-!            print "(I4,A,I0.2,A,I0.2,A,I0.2,A,I0.2,A,I0.2,A,I4,A,F6.3,F6.3)", year, '/', month, '/', day, '  ', t%hour, ':', &
-!                    t%min, ':', t%sec, '.', t%msec, '  block dur:', t1 - t0, time(info%count) - time(1)
-!        end if
-!        if (t%hour == 0 .and. t%min == 0 .and. t%sec < 2) then
-!            print "(I4,A,I0.2,A,I0.2,A,I0.2,A,I0.2,A,I0.2,A,I4,A,F6.3,F6.3)", year, '/', month, '/', day, '  ', t%hour, ':', &
-!                    t%min, ':', t%sec, '.', t%msec, '  block dur:', t1 - t0, time(info%count) - time(1)
-!        end if
-
-        ! subtract 2 from nblocks for 2 header blocks included in total
-        call get_day_indexing( &
-            freq, & ! Sampling frequency
-            t, &  ! structure containing hours/min/sec/msec
-            t1 - t0 - 0.5 * tDelta, &  ! time delta for the block.  Subtract a little bit so that we dont miss any windows
-            info%max_days, &  ! maximum days possible
-            info%Nwin, &  ! number of windows (bases & periods)
-            bases, &  ! window start hours
-            periods, &  ! window durations in hours
-            int(pkt%sequenceID, c_long), &  ! Number of the block currently on
-            int(info%nblocks, c_long) - 2, &  ! max number of blocks in the file
-            int(info%count, c_long), &  ! the number of data samples per block
-            starts, &  ! storage for start indices of windows
-            i_start, &  ! keep track of where in starts we are
-            stops, &  ! storage for stop indices of windows
-            i_stop &  ! keep track of where in stops we are
-        )
     end subroutine
 
     ! =============================================================================================

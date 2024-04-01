@@ -4,13 +4,12 @@ IMU Gait Analysis (:mod:`skdh.gait`)
 
 .. currentmodule:: skdh.gait
 
-Pipeline gait processing
+Pipeline Gait Processing
 ------------------------
 
 .. autosummary::
     :toctree: generated/
 
-    PredictGaitLumbarLgbm
     GaitLumbar
 
 Gait Bout Processing
@@ -178,7 +177,7 @@ result in values differing very small values):
         )
 
         # NOTE that this gait module does not automatically predict gait bouts,
-        # and this is now a separate module.
+        # and this is now a separate module (`skdh.context`).
         cls = PredictGaitLumbarLgbm()
         cls._in_pipeline = True
         kw, bouts = cls.predict(time=t, accel=acc, fs=50.0)
@@ -302,7 +301,6 @@ defined on a per-event level):
     :ignore-module-all:
 """
 from skdh.gait.core import GaitLumbar
-from skdh.gait.gait_classification import PredictGaitLumbarLgbm
 from skdh.gait import substeps
 from skdh.gait.substeps import *
 from skdh.gait.gait_metrics import *

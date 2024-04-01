@@ -23,8 +23,6 @@ from numpy import (
     int_,
     ndarray,
     concatenate,
-    minimum,
-    maximum,
     roll,
 )
 from scipy.signal import cheby1, sosfiltfilt
@@ -164,25 +162,30 @@ def get_day_index_intersection(starts, stops, for_inclusion, day_start, day_stop
     )
 
 
-def apply_downsample(goal_fs, time, data=(), indices=(), aa_filter=True, fs=None):
+def apply_resample(*, time, goal_fs=None, time_rs=None, data=(), indices=(), aa_filter=True, fs=None):
     """
-    Apply a downsample to a set of data.
+    Apply a re-sample to a set of data.
 
     Parameters
     ----------
-    goal_fs : float
-        Desired sampling frequency in Hz.
     time : numpy.ndarray
         Array of original timestamps.
+    goal_fs : float, optional
+        Desired sampling frequency in Hz.  One of `goal_fs` or `time_rs` must be 
+        provided.
+    time_rs : numpy.ndarray, optional
+        Resampled time series to sample to. One of `goal_fs` or `time_rs` must be 
+        provided.
     data : tuple, optional
-        Tuple of arrays to normally downsample using interpolation. Must match the size of `time`.
-        Can handle `None` inputs, and will return an array of zeros matching the downsampled size.
+        Tuple of arrays to normally downsample using interpolation. Must match the 
+        size of `time`. Can handle `None` inputs, and will return an array of zeros 
+        matching the downsampled size.
     indices : tuple, optional
         Tuple of arrays of indices to downsample.
     aa_filter : bool, optional
         Apply an anti-aliasing filter before downsampling. Default is True. This
         is the same filter as used by :py:function:`scipy.signal.decimate`.
-        See [1]_ for details.
+        See [1]_ for details. Ignored if upsampling.
     fs : {None, float}, optional
         Original sampling frequency in Hz. If `goal_fs` is an integer factor
         of `fs`, every nth sample will be taken, otherwise `np.interp` will be
@@ -190,79 +193,91 @@ def apply_downsample(goal_fs, time, data=(), indices=(), aa_filter=True, fs=None
 
     Returns
     -------
-    time_ds : numpy.ndarray
-        Downsampled time.
-    data_ds : tuple, optional
-        Downsampled data, if provided.
-    indices : tuple, optional
-        Downsampled indices, if provided.
+    time_rs : numpy.ndarray
+        Resampled time.
+    data_rs : tuple, optional
+        Resampled data, if provided.
+    indices_rs : tuple, optional
+        Resampled indices, if provided.
 
     References
     ----------
     .. [1] https://en.wikipedia.org/wiki/Downsampling_(signal_processing)
     """
-
-    def downsample(x, factor, t, t_ds):
-        if int(1 / factor) == 1 / factor:
-            if x.ndim == 1:
-                return (x[:: int(1 / factor)],)
-            elif x.ndim == 2:
-                return (x[:: int(1 / factor)],)
+    def resample(x, factor, t, t_rs):
+        if (int(factor) == factor) and (factor > 1):
+            # in case that t_rs is provided and ends earlier than t
+            n = nonzero(t <= t_rs[-1])[0][-1] + 1
+            return (x[:n:int(factor)],)
         else:
             if x.ndim == 1:
-                return (interp(t_ds, t, x),)
+                return (interp(t_rs, t, x),)
             elif x.ndim == 2:
-                xds = zeros((t_ds.size, x.shape[1]), dtype=float_)
+                xrs = zeros((t_rs.size, x.shape[1]), dtype=float_)
                 for j in range(x.shape[1]):
-                    xds[:, j] = interp(t_ds, t, x[:, j])
-                return (xds,)
-
+                    xrs[:, j] = interp(t_rs, t, x[:, j])
+                return (xrs,)
+    
     if fs is None:
-        # compute the sampling frequency by hand
-        fs = 1 / mean(diff(time[:2500]))
+        # compute sampling frequency by hand
+        fs = 1 / mean(diff(time[:5000]))
+    
+    if time_rs is None and goal_fs is None:
+        raise ValueError("One of `time_rs` or `goal_fs` is required.")
 
-    if int(fs / goal_fs) == fs / goal_fs:
-        time_ds = time[:: int(fs / goal_fs)]
+    # get resampled time if necessary
+    if time_rs is None:
+        if int(fs / goal_fs) == fs / goal_fs and goal_fs < fs:
+            time_rs = time[::int(fs / goal_fs)]
+        else:
+            time_rs = arange(time[0], time[-1], 1 / goal_fs)
     else:
-        time_ds = arange(time[0], time[-1], 1 / goal_fs)
+        goal_fs = 1 / mean(diff(time_rs[:5000]))
+        # prevent t_rs from extrapolating
+        time_rs = time_rs[time_rs <= time[-1]]
+    
     # AA filter, if necessary
-    sos = cheby1(8, 0.05, 0.8 / (fs / goal_fs), output="sos")
+    if (fs / goal_fs) >= 1.0:
+        sos = cheby1(8, 0.05, 0.8 / (fs / goal_fs), output="sos")
+    else:
+        aa_filter = False
 
-    data_ds = ()
+    # resample data
+    data_rs = ()
 
     for dat in data:
         if dat is None:
-            data_ds += (None,)
+            data_rs += (None,)
         elif dat.ndim in [1, 2]:
-            data_to_ds = sosfiltfilt(sos, dat, axis=0) if aa_filter else dat
-            data_ds += downsample(data_to_ds, fs / goal_fs, time, time_ds)
+            data_to_rs = sosfiltfilt(sos, dat, axis=0) if aa_filter else dat
+            data_rs += resample(data_to_rs, fs / goal_fs, time, time_rs)
         else:
             raise ValueError("Data dimension exceeds 2, or data not understood.")
-
-    # downsampling indices
-    indices_ds = ()
+    
+    # resampling indices
+    indices_rs = ()
     for idx in indices:
         if idx is None:
-            indices_ds += (None,)
+            indices_rs += (None,)
         elif idx.ndim == 1:
-            indices_ds += (
-                around(interp(time[idx], time_ds, arange(time_ds.size))).astype(int_),
+            indices_rs += (
+                around(interp(time[idx], time_rs, arange(time_rs.size))).astype(int_),
             )
         elif idx.ndim == 2:
-            indices_ds += (zeros(idx.shape, dtype=int_),)
+            indices_rs += (zeros(idx.shape, dtype=int_),)
             for i in range(idx.shape[1]):
-                indices_ds[-1][:, i] = around(
+                indices_rs[-1][:, i] = around(
                     interp(
-                        time[idx[:, i]], time_ds, arange(time_ds.size)
-                    )  # cast to int on insert
+                        time[idx[:, i]], time_rs, arange(time_rs.size)
+                    )  # cast to in on insert
                 )
-
-    ret = (time_ds,)
-    if data_ds != ():
-        ret += (data_ds,)
-    if indices_ds != ():
-        ret += (indices_ds,)
-
+    
+    ret = (time_rs,)
+    if data_rs != ():
+        ret += (data_rs,)
+    if indices_rs != ():
+        ret += (indices_rs,)
+    
     return ret
 
 

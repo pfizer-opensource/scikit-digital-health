@@ -1,4 +1,4 @@
-.. _skdh preprocessing:
+.. _skdh-preprocessing:
 
 .. automodule:: skdh.preprocessing
     :ignore-module-all:

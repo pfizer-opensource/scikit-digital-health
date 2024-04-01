@@ -30,16 +30,6 @@ GENERAL
     #define DEBUG_PRINTF(...) do {} while (0)
 #endif
 
-
-/* keep track of windowing information */
-typedef struct {
-    long n;  /* number of windows */
-    long *bases;  /* base hours for windowing */
-    long *periods;  /* lengths of windows */
-    long *i_start;  /* index for start array */
-    long *i_stop;  /* index for end array */
-} Window_t;
-
 /* match time_t from utility.f95 */
 typedef struct {
     long hour;
@@ -47,13 +37,6 @@ typedef struct {
     long sec;
     long msec;  /* NOTE that this is an integer! ex. 0.500 -> 500 */
 } Time_t;
-
-/* 
-get_day_indexing(fs, dtime, mxd, n, bases, periods, block_n, max_n, block_samples, starts, 
-    i_starts, stops, i_stops)
-*/
-extern void get_day_indexing(double *, Time_t *, double *, long *, long *, long *, long *, long *, long *,
-    long *, long *, long *, long *, long *);
 
 /*
 ======================================
@@ -69,8 +52,6 @@ typedef struct {
     double tLast;
     int N;
     double frequency;
-    long Nwin;  /* number of windows (bases/periods) */
-    long max_days;  /* max days set for the size of the starts/stops array */
     long n_bad_blocks;  /* number of blocks with nonzero checksums */
 } AX_Info_t;
 
@@ -94,8 +75,7 @@ typedef enum {
 } Read_Cwa_Error_t;
 
 extern void axivity_read_header(long *, char[], AX_Info_t *, int *);
-extern void axivity_read_block(AX_Info_t *, long *, double *, double *, double *, long *, long *,
-    long *, long *, long *, long *, int *);
+extern void axivity_read_block(AX_Info_t *, long *, double *, double *, double *, int *);
 extern void adjust_timestamps(AX_Info_t *, double *, int *);
 extern void axivity_close(AX_Info_t *);
 
@@ -153,4 +133,4 @@ typedef struct {
 
 
 int geneactiv_read_header(FILE *fp, GN_Info_t *info);
-int geneactiv_read_block(FILE *fp, Window_t *w_info, GN_Info_t *info, GN_Data_t *data);
+int geneactiv_read_block(FILE *fp, GN_Info_t *info, GN_Data_t *data);

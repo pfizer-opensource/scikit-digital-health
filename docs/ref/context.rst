@@ -1,4 +1,4 @@
-.. _skdh context:
+.. _skdh-context:
 
 .. automodule:: skdh.context
     :ignore-module-all:

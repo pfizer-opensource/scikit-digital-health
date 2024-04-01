@@ -6,7 +6,9 @@ Adding tests
 
 Tests are required for any contributions, and should have 100% statement coverage.
 
-Tests are written with `PyTest <https://docs.pytest.org/en/stable/>`_, and coverage is tested with `coverage <https://coverage.readthedocs.io/en/coverage-5.3/>`_. These and other testing requirements are listed in ``test_requirements.txt``
+Tests are written with `PyTest <https://docs.pytest.org/en/stable/>`_, and coverage is tested 
+with `coverage <https://coverage.readthedocs.io/en/coverage-5.3/>`_. These and other testing 
+requirements are listed in the optional ``test`` dependencies in ``pyproject.toml``.
 
 Adding tests for a new module
 -----------------------------

@@ -9,7 +9,6 @@ py3.install_sources(
 read_lib = static_library(
     'read',
     [
-        'utility.f95',
         'read_axivity.f95',
         'read_geneactiv.c',
     ],

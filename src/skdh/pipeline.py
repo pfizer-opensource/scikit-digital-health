@@ -4,7 +4,6 @@ Pipeline class for stringing multiple features into 1 processing pipeline
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
-import json
 from operator import attrgetter
 from importlib import import_module
 from warnings import warn
@@ -94,6 +93,9 @@ class Pipeline:
 
         self._min_vers = None
 
+        # keeping track of duplicate processes
+        self.duplicate_procs = {}
+
         if load_kwargs is not None:
             self.load(**load_kwargs)
 
@@ -116,13 +118,13 @@ class Pipeline:
             package, module = step.__class__.__module__.split(".", 1)
             pipe["Steps"].append(
                 {
-                    step._name: {
-                        "package": package,
-                        "module": module,
-                        "parameters": step._kw,
-                        "save_file": step.pipe_save_file,
-                        "plot_file": step.pipe_plot_file,
-                    }
+                    "name": step._name,
+                    "process": step._cls_name,
+                    "package": package,
+                    "module": module,
+                    "parameters": step._kw,
+                    "save_file": step.pipe_save_file,
+                    "plot_file": step.pipe_plot_file,
                 }
             )
 
@@ -133,7 +135,7 @@ class Pipeline:
             yaml.dump(pipe, f)
 
     @staticmethod
-    def _handle_load_input(yaml_str, json_str, file):
+    def _handle_load_input(yaml_str, file):
         """
         Handle different extensions loading
 
@@ -142,9 +144,6 @@ class Pipeline:
         yaml_str : str
             YAML string of the pipeline. If provided, `file` is ignored. Supersedes
             the `json_str` parameter.
-        json_str : str
-            DEPRECATED. JSON string of the pipeline. If provided, `file` is
-            ignored. WILL BE DEPRECATED IN A FUTURE VERSION.
         file : str, Path-like
             File path to load
 
@@ -153,49 +152,26 @@ class Pipeline:
         data : dict
             Loaded pipeline data.
         """
-        valid_json_ext = [".json"]
         valid_yaml_ext = [".skdh", ".yml", ".yaml"]
 
         if yaml_str is not None:
             return yaml.load(yaml_str, Loader=TupleSafeLoader)
-        elif json_str is not None:
-            warn(
-                "JSON format will be deprecated in a future version.",
-                DeprecationWarning,
-            )
-            return json.loads(json_str)
         else:
             pfile = Path(file)
-            if pfile.suffix not in valid_json_ext + valid_yaml_ext:
+            if pfile.suffix not in valid_yaml_ext:
                 warn(
                     f"File ({file}) does not have one of the expected suffixes: "
-                    f"{valid_yaml_ext + valid_json_ext}",
+                    f"{valid_yaml_ext}",
                     UserWarning,
                 )
             with open(file, "r") as f:
-                if pfile.suffix in valid_json_ext:
-                    warn(
-                        "JSON format will be deprecated in a future version.",
-                        DeprecationWarning,
-                    )
-                    data = json.load(f)
-                else:
-                    try:
-                        data = yaml.load(f, Loader=TupleSafeLoader)
-                    except yaml.YAMLError:
-                        warn(
-                            "Error reading file as YAML specification. Attempting "
-                            "`json.load` which will be deprecated in the future.",
-                            UserWarning,
-                        )
-                        data = json.load(f)
+                data = yaml.load(f, Loader=TupleSafeLoader)
             return data
 
     def load(
         self,
         file=None,
         *,
-        json_str=None,
         yaml_str=None,
         process_raise=False,
         noversion_raise=False,
@@ -208,14 +184,10 @@ class Pipeline:
         ----------
         file : {str, path-like}
             File path to load the pipeline structure from.
-        json_str : str
-            DEPRECATED. JSON string of the pipeline. If provided, `file` is
-            ignored. WILL BE DEPRECATED IN A FUTURE VERSION.
         yaml_str : str
-            YAML string of the pipeline. If provided, `file` is ignored. Supersedes
-            the `json_str` parameter.
+            YAML string of the pipeline. If provided, `file` is ignored.
         process_raise : bool, optional
-            Raise an error if a process in `file`, `json_str`, or `yaml_str` cannot
+            Raise an error if a process in `file` or `yaml_str` cannot
             be added to the pipeline. Default is False, which issues a warning
             instead.
         noversion_raise : bool
@@ -233,7 +205,7 @@ class Pipeline:
         )
 
         # import the data, handling possible input/file types
-        data = self._handle_load_input(yaml_str, json_str, file)
+        data = self._handle_load_input(yaml_str, file)
 
         if "Steps" in data and "Version" in data:
             procs = data["Steps"]
@@ -259,12 +231,28 @@ class Pipeline:
             )
 
         for proc in procs:
-            name = list(proc.keys())[0]
-            pkg = proc[name]["package"]
-            mod = proc[name]["module"]
-            params = proc[name]["parameters"]
-            save_file = proc[name]["save_file"]
-            plot_file = proc[name]["plot_file"]
+            if 'process' in proc:
+                name = proc.get('name', None)
+                process_name = proc['process']
+                pkg = proc["package"]
+                mod = proc["module"]
+                params = proc["parameters"]
+                save_file = proc["save_file"]
+                plot_file = proc["plot_file"]
+            else:
+                warn(
+                    "Save formats with class names as top-level keys in a list of "
+                    "dictionaries will no longer be supported in a future release. "
+                    "The new format can be used by loading and re-saving the pipeline file",
+                    FutureWarning,
+                )
+                name = None
+                process_name = list(proc.keys())[0]
+                pkg = proc[process_name]["package"]
+                mod = proc[process_name]["module"]
+                params = proc[process_name]["parameters"]
+                save_file = proc[process_name]["save_file"]
+                plot_file = proc[process_name]["plot_file"]
 
             if pkg == "skdh":
                 package = skdh
@@ -272,10 +260,10 @@ class Pipeline:
                 package = import_module(pkg)
 
             try:
-                process = attrgetter(f"{mod}.{name}")(package)
+                process = attrgetter(f"{mod}.{process_name}")(package)
             except AttributeError:
                 warn_or_raise(
-                    f"Process ({pkg}.{mod}.{name}) not found. Not added to pipeline",
+                    f"Process ({pkg}.{mod}.{process_name}) not found. Not added to pipeline",
                     ProcessNotFoundError,
                     process_raise,
                 )
@@ -283,9 +271,9 @@ class Pipeline:
 
             proc = process(**params)
 
-            self.add(proc, save_file=save_file, plot_file=plot_file)
+            self.add(proc, name=name, save_file=save_file, plot_file=plot_file)
 
-    def add(self, process, save_file=None, plot_file=None, make_copy=True):
+    def add(self, process, name=None, save_file=None, plot_file=None, make_copy=True):
         """
         Add a processing step to the pipeline
 
@@ -293,6 +281,11 @@ class Pipeline:
         ----------
         process : Process
             Process class that forms the step to be run
+        name : str, optional
+            Process name. Used to delineate multiple of the same process if
+            required. Output results will be under this name. If None is provided,
+            output results will be under the class name, with some mangling in the
+            case of multiple of the same processes in the same pipeline.
         save_file : {None, str}, optional
             Optionally formattable path for the save file. If left/set to None,
             the results will not be saved anywhere.
@@ -367,6 +360,20 @@ class Pipeline:
 
         # point the step logging disabled to the pipeline disabled
         proc.logger.disabled = self.logger.disabled
+
+        # setup the name
+        if name is None:
+            name = proc._cls_name
+
+        # check if already in pipeline
+        if name in self.duplicate_procs:
+            self.duplicate_procs[name] += 1
+            name = f"{name}_{self.duplicate_procs[name]}"
+        else:
+            self.duplicate_procs[name] = 0
+
+        # set the process name
+        proc._name = name
 
         self._steps += [proc]
 

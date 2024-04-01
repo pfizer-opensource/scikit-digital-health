@@ -64,7 +64,7 @@ int geneactiv_read_header(FILE *fp, GN_Info_t *info)
 }
 
 
-int get_timestamps(long *Nps, char time[40], GN_Info_t *info, GN_Data_t *data, Window_t *winfo)
+int get_timestamps(long *Nps, char time[40], GN_Info_t *info, GN_Data_t *data)
 {
     struct tm tm0;
     double t0;
@@ -96,30 +96,12 @@ int get_timestamps(long *Nps, char time[40], GN_Info_t *info, GN_Data_t *data, W
     long mdays = MAX_DAYS;
     long gns = GN_SAMPLES;
     double block_t_delta = GN_SAMPLESf / info->fs;
-    get_day_indexing(
-        &(info->fs),  /* sampling frequency */
-        &t,  /* struc containing HMS & msec time info */
-        &block_t_delta,  /* block time delta */
-        &mdays,  /* max possible days */
-        &(winfo->n),  /* number of different window definitions */
-        winfo->bases,  /* starts of windows */
-        winfo->periods,  /* window durations */
-        &(info->max_n),  /* the number of the block currently on */
-        &(info->npages),  /* number of blocks/pages */
-        &gns,  /* the number of data samples per block */
-        data->day_starts,  /* storage for start indices of windows */
-        winfo->i_start,  /* to keep track of where we are in starts */
-        data->day_stops,  /* storage for stop indices of windows */
-        winfo->i_stop  /* to keep track of where we are in stops */
-    );
-    // fs, dtime, p, n, bases, periods, block_n, max_n, block_samples, starts, i_starts, stops, i_stops
-    // int idx_err = get_day_indexing(Nps, &hour, &min, &sec, &msec, winfo, info, data);
 
     return GN_READ_E_NONE;
 }
 
 
-int geneactiv_read_block(FILE *fp, Window_t *w_info, GN_Info_t *info, GN_Data_t *data)
+int geneactiv_read_block(FILE *fp, GN_Info_t *info, GN_Data_t *data)
 {
     char buff[255], data_str[3610], p[4], time[40];
     long N = 0, Nps = 0, t_ = 0;
@@ -182,7 +164,7 @@ int geneactiv_read_block(FILE *fp, Window_t *w_info, GN_Info_t *info, GN_Data_t 
         ++jj;
     }
 
-    get_timestamps(&Nps, time, info, data, w_info);
+    get_timestamps(&Nps, time, info, data);
 
     return ier;
 }

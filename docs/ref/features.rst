@@ -1,4 +1,4 @@
-.. _skdh features:
+.. _skdh-features:
 
 .. automodule:: skdh.features
     :ignore-module-all:

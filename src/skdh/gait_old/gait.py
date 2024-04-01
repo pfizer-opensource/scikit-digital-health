@@ -17,7 +17,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 
 from skdh.base import BaseProcess, handle_process_returns
-from skdh.utility.internal import apply_downsample, rle
+from skdh.utility.internal import apply_resample, rle
 from skdh.utility.exceptions import LowFrequencyError
 
 from skdh.gait_old.get_gait_classification import (
@@ -505,12 +505,12 @@ class Gait(BaseProcess):
                 time_ds,
                 (accel_ds, gyro_ds),
                 (gait_starts_ds, gait_stops_ds, day_starts_ds, day_stops_ds),
-            ) = apply_downsample(
-                goal_fs,
-                time,
-                (accel, gyro),
-                (gait_starts, gait_stops, *self.day_idx),
-                self.aa_filter,
+            ) = apply_resample(
+                goal_fs=goal_fs,
+                time=time,
+                data=(accel, gyro),
+                indices=(gait_starts, gait_stops, *self.day_idx),
+                aa_filter=self.aa_filter,
                 fs=fs,
             )
         else:
@@ -701,7 +701,7 @@ class Gait(BaseProcess):
         if self.valid_plot and self.f is not None:
             date = dt_date.today().strftime("%Y%m%d")
             form_fname = self.plot_fname.format(
-                date=date, name=self._name, file=Path(file).stem
+                date=date, file=Path(file).stem
             )
 
             self.ax.legend(loc="best")
