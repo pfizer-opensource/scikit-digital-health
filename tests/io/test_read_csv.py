@@ -2,7 +2,7 @@ import pytest
 from tempfile import TemporaryDirectory
 from pathlib import Path
 
-from numpy import isclose
+from numpy import isclose, isnan
 
 from skdh.io import ReadCSV
 
@@ -19,22 +19,32 @@ class TestHandleTimestampInconsistency:
         # setup reader to be able to test timestamp handling
         rdr = ReadCSV('time', {'accel': ["ax", "ay", "az"], 'temperature': ['temperature']}, fill_gaps=True)
 
-        df_full, comp_fs = rdr.handle_timestamp_inconsistency(raw.copy(), **kw)
+        # get numpy arrays
+        time = raw['_datetime_'].astype(int).values / 1e9
+        data = {'accel': raw[['ax', 'ay', 'az']].values, 'temperature': raw['temperature'].values}
+
+        comp_fs, time_rs, data_rs = rdr.handle_timestamp_inconsistency_np(**kw, time=time, data=data)
 
         assert isclose(comp_fs, fs)
-        assert df_full.shape[0] == n_full
+        assert time_rs.size == n_full
         # check that the nans were filled
-        assert df_full["ax"].isna().sum() == 0
-        assert df_full["ay"].isna().sum() == 0
-        assert df_full["az"].isna().sum() == 0
+        for _, dstream in data_rs.items():
+            assert dstream.shape[0] == n_full
+            assert isnan(dstream).sum() == 0
 
         # trim a few samples off the last block and check we get a warning
-        raw2 = raw.iloc[:-5]
+        time2 = raw['_datetime_'].astype(int).values[:-5] / 1e9
+        data2 = {
+            'accel': raw[['ax', 'ay', 'az']].values[:-5],
+            'temperature': raw['temperature'].values[:-5]
+        }
         with pytest.warns(UserWarning, match="Non integer number of blocks"):
-            df_full2, comp_fs2 = rdr.handle_timestamp_inconsistency(raw2.copy(), **kw)
+            comp_fs2, time2_rs, data2_rs = rdr.handle_timestamp_inconsistency_np(**kw, time=time2, data=data2)
 
         assert isclose(comp_fs2, fs)
-        assert df_full2.shape[0] == int(n_full - fs)
+        assert time2_rs.size == int(n_full - fs)
+        for _, dstream in data2_rs.items():
+            assert dstream.shape[0] == int(n_full - fs)
 
     def test_unequal_blocks(self, dummy_csv_contents):
         kw = dict(
@@ -49,8 +59,11 @@ class TestHandleTimestampInconsistency:
         raw.drop(index=range(13095, 14003), inplace=True)
         raw.reset_index(drop=True, inplace=True)
 
+        time = raw['_datetime_'].astype(int).values / 1e9
+        data = {'accel': raw[['ax', 'ay', 'az']].values, 'temperature': raw['temperature'].values}
+
         with pytest.raises(ValueError, match="not all equal size"):
-            rdr.handle_timestamp_inconsistency(raw, **kw)
+            rdr.handle_timestamp_inconsistency_np(**kw, time=time, data=data)
     
     def test_reader(self, dummy_csv_contents):
         raw, fs, n_full = dummy_csv_contents(drop=True)

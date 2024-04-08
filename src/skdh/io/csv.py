@@ -7,6 +7,8 @@ Copyright (c) 2023. Pfizer Inc. All rights reserved
 from warnings import warn
 
 from numpy import (
+    nan,
+    array,
     tile,
     arange,
     mean,
@@ -15,9 +17,16 @@ from numpy import (
     abs,
     unique,
     all as npall,
+    any as npany,
+    allclose,
+    nonzero,
+    diff,
+    zeros,
+    full,
     int_,
+    float_,
 )
-from pandas import read_csv, to_datetime, to_timedelta, date_range
+from pandas import read_csv, to_datetime, to_timedelta, date_range, options as pd_options
 
 from skdh.base import BaseProcess, handle_process_returns
 from skdh.io.base import check_input_file
@@ -167,98 +176,111 @@ class ReadCSV(BaseProcess):
         else:
             pass
 
-    def handle_timestamp_inconsistency(self, df, fill_dict):
+    def handle_timestamp_inconsistency_np(self, fill_dict, time, data):
         """
         Handle any time gaps, or timestamps that are only down to the second.
 
         Parameters
         ----------
-        df : pandas.DataFrame
-            Dataframe containing timestamps and acceleration data.
         fill_dict : dict
             Dictionary of fill values for columns identified in `column_names`. In cases
             where there are multiple columns for a datastream, the last will be filled with
             the value.
+        time : numpy.ndarray
+            Array of timestamps in unix seconds.
+        data : dict
+            Dictionary of data streams
 
         Returns
         -------
-        df : pandas.DataFrame
-            Dataframe with corrected timestamps.
         fs : float
             Number of samples per second.
+        time : numpy.ndarray
+            Timestamp array with update timestamps to be unique and gaps filled
+        data : dict
+            Data dictionary with updated arrays with gaps filled if specified.
         """
         if self.drop_dupl_time:
-            df = df.drop_duplicates(subset=["_datetime_"], keep='first', ignore_index=True)
+            time, unq_ind = unique(time, return_index=True)
+            for name, dstream in data.items():
+                data[name] = dstream[unq_ind]
         # get a sampling rate. If non-unique timestamps, this will be updated
-        n_samples = round(mean(1 / diff(df["_datetime_"][:2500]).astype(int)) * 1e9, decimals=6)
-        # datetime diff is in ns
+        n_samples = round(mean(1 / diff(time[:2500])), decimals=6)
 
         # first check if we have non-unique timestamps
-        nonuniq_ts = df["_datetime_"].iloc[1] == df["_datetime_"].iloc[0]
+        nonuniq_ts = time[1] == time[0]
 
         # if there are non-unique timestamps, fix
         if nonuniq_ts:
             # check that all the blocks are the same size (or that there is only 1 non-equal block
             # at the end)
-            _, counts = unique(df["_datetime_"], return_counts=True)
-            if not npall(counts[:-1] == counts[0]):
-                raise ValueError(
-                    "Blocks of non-unique timestamps are not all equal size. "
-                    "Unable to continue reading data."
-                )
+            _, counts = unique(time, return_counts=True)
             # check if the last block is the same size
             if counts[-1] != counts[0]:
                 # drop the last blocks worth of data
                 warn("Non integer number of blocks. Trimming partial block.", UserWarning)
-                df = df.iloc[0 : -counts[-1]]
+                time = time[:-counts[-1]]
+                for name, dstream in data.items():
+                    data[name] = dstream[:-counts[-1]]
+                
+                counts = counts[:-1]  # remove the last block count
+            
+            # now check if all remaining blocks are the same size
+            if not allclose(counts, counts[0]):
+                raise ValueError(
+                    "Blocks of non-unique timestamps are not all equal size. "
+                    "Unable to continue reading data."
+                )
 
             # get the number of samples, and the number of blocks
             n_samples = counts[0]
-            n_blocks = df.shape[0] / n_samples
+            n_blocks = time.size / n_samples
 
             # compute time delta to add
             t_delta = tile(arange(0, 1, 1 / n_samples), int(n_blocks))
-            t_delta = to_timedelta(t_delta, unit="s")
 
             # add the time delta so that we have unique timestamps
-            df.loc[:, "_datetime_"] += t_delta
-
+            time += t_delta
+        
         # check if we are filling gaps or not
         if self.fill_gaps:
-            # now fix any data gaps: set the index as the datetime, and then upsample to match
-            # the sampling frequency. This will put nan values in any data gaps.
-            # have to use ms to handle fractional seconds.
-            # do this in a round-about way so that we can use `reindex` and specify a tolerance
-            t0 = df['_datetime_'].iloc[0]
-            t1 = df['_datetime_'].iloc[-1]
-            dr = date_range(t0, t1, freq=f"{round(1000 / n_samples, decimals=6)}ms", inclusive='both', name='_datetime_')
-            df_full = df.set_index("_datetime_").reindex(index=dr, method='nearest', limit=1, tolerance=to_timedelta(0.1 / n_samples, unit='s'))
-            df_full = df_full.reset_index()
+            time_rs = arange(time[0], time[-1] + 0.5 / n_samples, 1 / n_samples)
 
-            # put the datetime array back in the dataframe
-            df_full = df_full.reset_index(drop=False)
+            # get the location of gaps in the data - add 1 so that the index reflects
+            # the first value AFTER the gap
+            gaps = nonzero(diff(time) > (1.5 / n_samples))[0] + 1
+            # create sequences of data with no gaps
+            seqs = zeros((gaps.size + 1, 2), dtype=int_)
+            seqs[1:, 0] = gaps
+            seqs[:-1, 1] = gaps
+            seqs[-1, 1] = time.size
 
-            for dstream, stream_cols in self.column_names.items():
-                stream_cols = _as_list(stream_cols)
-                try:
-                    for col in stream_cols[:-1]:
-                        df_full[col] = df_full[col].fillna(value=0.0)
-                    df_full[stream_cols[-1]] = df_full[stream_cols[-1]].fillna(fill_dict.get(dstream, 0.0))
-                except KeyError:
-                    warn(f"Column {col} not found to fill.", UserWarning)
-                    continue
+            # iterate over the datastreams
+            for name, dstream in data.items():
+                shape = list(dstream.shape)
+                shape[0] = time_rs.size
+                new_stream = full(shape, fill_dict[name], dtype=float_)
+
+                for seq in seqs[::-1]:
+                    i1, i2 = seq
+                    # get the number of samples offset in the resampled time
+                    i_offset = int((time[i1] - time_rs[i1]) * n_samples)
+
+                    new_stream[i1 + i_offset:i2 + i_offset] = dstream[i1:i2]
+                
+                data[name] = new_stream
         else:
-            # if not filling data gaps, check that there are not gaps that would cause
-            # garbage outputs from downstream algorithms
-            time_deltas = diff(df["_datetime_"]).astype(int) / 1e9  # convert to seconds
-            if (abs(time_deltas) > (1.5 / n_samples)).any():
+            # if not filling data gaps, check that there are not gaps that would
+            # cause garbage outputs from downstream algorithms
+            time_deltas = diff(time)
+            if npany(abs(time_deltas) > (1.5 / n_samples)):
                 self.handle_gaps_error(
-                    "There are data gaps in the data, which could potentially result in incorrect outputs from downstream algorithms."
+                    "There are data gaps, which could potentially results in incorrect outputs from downstream algorithms"
                 )
-
-            df_full = df.copy()
-
-        return df_full, float(n_samples)
+        
+            time_rs = time
+        
+        return n_samples, time_rs, data
 
     @handle_process_returns(results_to_kwargs=True)
     @check_input_file(".csv")
@@ -288,7 +310,7 @@ class ReadCSV(BaseProcess):
             If the file name is not provided.
         """
         fill_values = {
-            "accel": self.raw_conversions.get('accel', 1.0),
+            "accel": array([0.0, 0.0, self.raw_conversions.get('accel', 1.0)]),
             "gyro": 0.0,
             "ecg": 0.0,
             "temperature": 0.0,
@@ -303,33 +325,38 @@ class ReadCSV(BaseProcess):
         self.to_datetime_kw.update({"utc": tz_name is not None})
 
         # convert time column to a datetime column. Give a unique name so we shouldnt overwrite
-        raw["_datetime_"] = to_datetime(raw[self.time_col_name], **self.to_datetime_kw)
+        raw[self.time_col_name] = to_datetime(raw[self.time_col_name], **self.to_datetime_kw)
 
         # convert timestamps if necessary
         if tz_name is not None:
             # convert, and then remove the timezone so its naive again, but now in local time
-            tmp = raw["_datetime_"].dt.tz_convert(tz_name)
-            raw["_datetime_"] = tmp.dt.tz_localize(None)
+            raw[self.time_col_name] = raw[self.time_col_name].dt.tz_convert(tz_name).dt.tz_localize(None)
 
         # now handle data gaps and second level timestamps, etc
-        raw, fs = self.handle_timestamp_inconsistency(raw, fill_values)
+        # raw, fs = self.handle_timestamp_inconsistency(raw, fill_values)
 
         # get the time values and convert to seconds
-        time = raw["_datetime_"].astype(int).values / 1e9  # int gives ns, convert to s
+        time = raw[self.time_col_name].astype(int).values / 1e9  # int gives ns, convert to s
 
-        # setup the results dictionary
-        results = {
-            self._time: time,
-            "fs": fs,
-        }
-
+        data = {}
         # grab the data we expect
         for dstream in self.column_names:
             try:
-                results[dstream] = raw[self.column_names[dstream]].values
+                data[dstream] = raw[self.column_names[dstream]].values
             except KeyError:
                 warn(f"Data stream {dstream} specified in column names but all columns {self.column_names[dstream]} not found in the read data. Skipping.")
                 continue
+        
+        # now handle data gaps and second level timestamps, etc
+        fs, time, results = self.handle_timestamp_inconsistency_np(fill_values, time, data)
+
+        # setup the results dictionary
+        results.update({
+            self._time: time,
+            "fs": fs,
+        })
+
+        
         
         # convert accel data
         for k, conv_factor in self.raw_conversions.items():
