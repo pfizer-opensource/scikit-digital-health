@@ -222,6 +222,8 @@ class ReadCSV(BaseProcess):
                 time = time[:-counts[-1]]
                 for name, dstream in data.items():
                     data[name] = dstream[:-counts[-1]]
+                
+                counts = counts[:-1]  # remove the last block count
             
             # now check if all remaining blocks are the same size
             if not allclose(counts, counts[0]):
