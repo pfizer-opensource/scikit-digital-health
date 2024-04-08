@@ -167,8 +167,6 @@ class ReadCSV(BaseProcess):
             self.ext_error = ext_error.lower()
         else:
             raise ValueError("`ext_error` must be one of 'raise', 'warn', 'skip'.")
-        
-        pd_options.mode.copy_on_write = True
 
     def handle_gaps_error(self, msg):
         if self.gaps_error == "raise":
