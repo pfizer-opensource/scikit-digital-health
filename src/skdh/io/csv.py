@@ -215,11 +215,6 @@ class ReadCSV(BaseProcess):
             # check that all the blocks are the same size (or that there is only 1 non-equal block
             # at the end)
             _, counts = unique(time, return_counts=True)
-            if not allclose(counts, counts[0]):
-                raise ValueError(
-                    "Blocks of non-unique timestamps are not all equal size. "
-                    "Unable to continue reading data."
-                )
             # check if the last block is the same size
             if counts[-1] != counts[0]:
                 # drop the last blocks worth of data
@@ -227,6 +222,13 @@ class ReadCSV(BaseProcess):
                 time = time[:-counts[-1]]
                 for name, dstream in data.items():
                     data[name] = dstream[:-counts[-1]]
+            
+            # now check if all remaining blocks are the same size
+            if not allclose(counts, counts[0]):
+                raise ValueError(
+                    "Blocks of non-unique timestamps are not all equal size. "
+                    "Unable to continue reading data."
+                )
 
             # get the number of samples, and the number of blocks
             n_samples = counts[0]
