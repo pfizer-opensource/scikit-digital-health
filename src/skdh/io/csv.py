@@ -7,6 +7,8 @@ Copyright (c) 2023. Pfizer Inc. All rights reserved
 from warnings import warn
 
 from numpy import (
+    nan,
+    array,
     tile,
     arange,
     mean,
@@ -15,9 +17,13 @@ from numpy import (
     abs,
     unique,
     all as npall,
-    int_,
+    any as npany,
+    allclose,
+    searchsorted,
+    ones,
+    bool_,
 )
-from pandas import read_csv, to_datetime, to_timedelta, date_range
+from pandas import read_csv, to_datetime, to_timedelta, date_range, options as pd_options
 
 from skdh.base import BaseProcess, handle_process_returns
 from skdh.io.base import check_input_file
@@ -158,6 +164,8 @@ class ReadCSV(BaseProcess):
             self.ext_error = ext_error.lower()
         else:
             raise ValueError("`ext_error` must be one of 'raise', 'warn', 'skip'.")
+        
+        pd_options.mode.copy_on_write = True
 
     def handle_gaps_error(self, msg):
         if self.gaps_error == "raise":
@@ -232,7 +240,8 @@ class ReadCSV(BaseProcess):
             t0 = df['_datetime_'].iloc[0]
             t1 = df['_datetime_'].iloc[-1]
             dr = date_range(t0, t1, freq=f"{round(1000 / n_samples, decimals=6)}ms", inclusive='both', name='_datetime_')
-            df_full = df.set_index("_datetime_").reindex(index=dr, method='nearest', limit=1, tolerance=to_timedelta(0.1 / n_samples, unit='s'))
+            df_full = df.set_index("_datetime_")
+            df_full = df_full.reindex(index=dr, method='nearest', limit=1, tolerance=to_timedelta(0.1 / n_samples, unit='s'))
             df_full = df_full.reset_index()
 
             # put the datetime array back in the dataframe
@@ -259,6 +268,99 @@ class ReadCSV(BaseProcess):
             df_full = df.copy()
 
         return df_full, float(n_samples)
+
+    def handle_timestamp_inconsistency_np(self, fill_dict, time, data):
+        """
+        Handle any time gaps, or timestamps that are only down to the second.
+
+        Parameters
+        ----------
+        fill_dict : dict
+            Dictionary of fill values for columns identified in `column_names`. In cases
+            where there are multiple columns for a datastream, the last will be filled with
+            the value.
+        time : numpy.ndarray
+            Array of timestamps in unix seconds.
+        data : dict
+            Dictionary of data streams
+
+        Returns
+        -------
+        fs : float
+            Number of samples per second.
+        time : numpy.ndarray
+            Timestamp array with update timestamps to be unique and gaps filled
+        data : dict
+            Data dictionary with updated arrays with gaps filled if specified.
+        """
+        if self.drop_dupl_time:
+            time, unq_ind = unique(time, return_index=True)
+            for name, dstream in data.items():
+                data[name] = dstream[unq_ind]
+        # get a sampling rate. If non-unique timestamps, this will be updated
+        n_samples = round(mean(1 / diff(time[:2500])), decimals=6)
+
+        # first check if we have non-unique timestamps
+        nonuniq_ts = time[1] == time[0]
+
+        # if there are non-unique timestamps, fix
+        if nonuniq_ts:
+            # check that all the blocks are the same size (or that there is only 1 non-equal block
+            # at the end)
+            _, counts = unique(time, return_counts=True)
+            if not allclose(counts, counts[0]):
+                raise ValueError(
+                    "Blocks of non-unique timestamps are not all equal size. "
+                    "Unable to continue reading data."
+                )
+            # check if the last block is the same size
+            if counts[-1] != counts[0]:
+                # drop the last blocks worth of data
+                warn("Non integer number of blocks. Trimming partial block.", UserWarning)
+                time = time[:-counts[-1]]
+                for name, dstream in data.items():
+                    data[name] = dstream[:-counts[-1]]
+
+            # get the number of samples, and the number of blocks
+            n_samples = counts[0]
+            n_blocks = time.size / n_samples
+
+            # compute time delta to add
+            t_delta = tile(arange(0, 1, 1 / n_samples), int(n_blocks))
+
+            # add the time delta so that we have unique timestamps
+            time += t_delta
+        
+        # check if we are filling gaps or not
+        if self.fill_gaps:
+            time_rs = arange(time[0], time[-1] + 0.5 / n_samples, 1 / n_samples)
+            # use searchsorted to determine where the old values would go in the 
+            # new array of timestamps
+            sorted_idx = searchsorted(time, time_rs)
+            # get the unique inverse so that we can re-index the datastreams
+            unq_inv = unique(sorted_idx, return_inverse=True)[1]  # only want the inverse
+
+            mask = ones(time_rs.size, dtype=bool_)
+            mask[1:] = unq_inv[1:] == unq_inv[:-1]
+
+            mask &= (time_rs - time[unq_inv]) > (0.1 / n_samples)
+
+            # iterate over the datastreams
+            for name, dstream in data.items():
+                data[name] = dstream[unq_inv]
+                data[name][mask] = fill_dict.get(name, 0.0)
+        else:
+            # if not filling data gaps, check that there are not gaps that would
+            # cause garbage outputs from downstream algorithms
+            time_deltas = diff(time)
+            if npany(abs(time_deltas) > (1.5 / n_samples)):
+                self.handle_gaps_error(
+                    "There are data gaps, which could potentially results in incorrect outputs from downstream algorithms"
+                )
+        
+            time_rs = time
+        
+        return n_samples, time_rs, data
 
     @handle_process_returns(results_to_kwargs=True)
     @check_input_file(".csv")
@@ -288,7 +390,7 @@ class ReadCSV(BaseProcess):
             If the file name is not provided.
         """
         fill_values = {
-            "accel": self.raw_conversions.get('accel', 1.0),
+            "accel": array([0.0, 0.0, self.raw_conversions.get('accel', 1.0)]),
             "gyro": 0.0,
             "ecg": 0.0,
             "temperature": 0.0,
@@ -303,33 +405,38 @@ class ReadCSV(BaseProcess):
         self.to_datetime_kw.update({"utc": tz_name is not None})
 
         # convert time column to a datetime column. Give a unique name so we shouldnt overwrite
-        raw["_datetime_"] = to_datetime(raw[self.time_col_name], **self.to_datetime_kw)
+        raw[self.time_col_name] = to_datetime(raw[self.time_col_name], **self.to_datetime_kw)
 
         # convert timestamps if necessary
         if tz_name is not None:
             # convert, and then remove the timezone so its naive again, but now in local time
-            tmp = raw["_datetime_"].dt.tz_convert(tz_name)
-            raw["_datetime_"] = tmp.dt.tz_localize(None)
+            raw[self.time_col_name] = raw[self.time_col_name].dt.tz_convert(tz_name).dt.tz_localize(None)
 
         # now handle data gaps and second level timestamps, etc
-        raw, fs = self.handle_timestamp_inconsistency(raw, fill_values)
+        # raw, fs = self.handle_timestamp_inconsistency(raw, fill_values)
 
         # get the time values and convert to seconds
-        time = raw["_datetime_"].astype(int).values / 1e9  # int gives ns, convert to s
+        time = raw[self.time_col_name].astype(int).values / 1e9  # int gives ns, convert to s
 
-        # setup the results dictionary
-        results = {
-            self._time: time,
-            "fs": fs,
-        }
-
+        data = {}
         # grab the data we expect
         for dstream in self.column_names:
             try:
-                results[dstream] = raw[self.column_names[dstream]].values
+                data[dstream] = raw[self.column_names[dstream]].values
             except KeyError:
                 warn(f"Data stream {dstream} specified in column names but all columns {self.column_names[dstream]} not found in the read data. Skipping.")
                 continue
+        
+        # now handle data gaps and second level timestamps, etc
+        fs, time, results = self.handle_timestamp_inconsistency_np(fill_values, time, data)
+
+        # setup the results dictionary
+        results.update({
+            self._time: time,
+            "fs": fs,
+        })
+
+        
         
         # convert accel data
         for k, conv_factor in self.raw_conversions.items():
