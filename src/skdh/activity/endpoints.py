@@ -89,8 +89,8 @@ def get_activity_bouts(
             percent of the epochs are above the threshold.
         - 3: Use sliding window across the data to test bout criteria per window
             and do not allow for breaks larger than 1 minute (exactly 1 minute long
-             breaks are allowed) and with fraction of time larger than the
-             `boutcrit` threshold.
+            breaks are allowed) and with fraction of time larger than the
+            `boutcrit` threshold.
         - 4: same as 3 but also requires the first and last epoch to meet the threshold
             criteria.
 
