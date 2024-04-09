@@ -199,7 +199,10 @@ def get_activity_bouts(
         N = int(60 / wlen) + 1
         i1 = int(floor((N + 1) / 2)) - 1
         i2 = int(ceil(x.size - N / 2))
-        lookforbreaks[i1:i2] = moving_mean(x, N, 1)
+        try:
+            lookforbreaks[i1:i2] = moving_mean(x, N, 1)
+        except ValueError:
+            pass  # just leave as all zeros since we dont have enough data
         # insert negative numbers to prevent these minutes from being counted in bouts
         xt[lookforbreaks == 0] = -(60 / wlen) * nboutdur
 
