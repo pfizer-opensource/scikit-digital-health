@@ -89,8 +89,8 @@ def get_activity_bouts(
             percent of the epochs are above the threshold.
         - 3: Use sliding window across the data to test bout criteria per window
             and do not allow for breaks larger than 1 minute (exactly 1 minute long
-             breaks are allowed) and with fraction of time larger than the
-             `boutcrit` threshold.
+            breaks are allowed) and with fraction of time larger than the
+            `boutcrit` threshold.
         - 4: same as 3 but also requires the first and last epoch to meet the threshold
             criteria.
 
@@ -170,7 +170,10 @@ def get_activity_bouts(
         N = int(60 / wlen) + 1
         i1 = int(floor((N + 1) / 2)) - 1
         i2 = int(ceil(x.size - N / 2))
-        lookforbreaks[i1:i2] = moving_mean(x, N, 1)
+        try:
+            lookforbreaks[i1:i2] = moving_mean(x, N, 1)
+        except ValueError:
+            pass  # just leave as all zeros since we dont have data
         # insert negative numbers to prevent these minutes from being counted in bouts
         xt[lookforbreaks == 0] = -(60 / wlen) * nboutdur
         # in this way there will not be bout breaks lasting longer than 1 minute
@@ -196,7 +199,10 @@ def get_activity_bouts(
         N = int(60 / wlen) + 1
         i1 = int(floor((N + 1) / 2)) - 1
         i2 = int(ceil(x.size - N / 2))
-        lookforbreaks[i1:i2] = moving_mean(x, N, 1)
+        try:
+            lookforbreaks[i1:i2] = moving_mean(x, N, 1)
+        except ValueError:
+            pass  # just leave as all zeros since we dont have enough data
         # insert negative numbers to prevent these minutes from being counted in bouts
         xt[lookforbreaks == 0] = -(60 / wlen) * nboutdur
 
