@@ -55,8 +55,11 @@ class ReadCSV(BaseProcess):
         Drop duplicate timestamps before doing any timestamp handling or gap filling.
         Default is False.
     fill_gaps : bool, optional
-        Fill any gaps in acceleration data with the vector [0, 0, 1]. Default is True. If False
-        and data gaps are detected, then the reading will raise a `ValueError`.
+        Fill any gaps in data streams. Default is True. If False and data gaps are 
+        detected, then the reading will raise a `ValueError`.
+    fill_value : {None, dict}, optional
+        Dictionary with keys and values to fill data streams with. See Notes for
+        default values if not provided. 
     gaps_error : {'raise', 'warn', 'ignore'}, optional
         Behavior if there are large gaps in the datastream after handling timestamps.
         Default is to raise an error. NOT recommended to change unless the data
@@ -111,6 +114,13 @@ class ReadCSV(BaseProcess):
     :py:class:`pandas.to_datetime`. To make sure this conversion applies correctly,
     specify whatever key-word arguments to `to_datetime_kwargs`. This includes specifying
     the unit (e.g. `s`, `ms`, `us`, `ns`, etc) if a unix timestamp integer is provided.
+
+    Default fill values are:
+
+    - accel: numpy.array([0.0, 0.0, 1.0])
+    - gyro: 0.0
+    - temperature: 0.0
+    - ecg: 0.0
     """
 
     def __init__(
@@ -119,6 +129,7 @@ class ReadCSV(BaseProcess):
         column_names,
         drop_duplicate_timestamps=False,
         fill_gaps=True,
+        fill_value=None,
         gaps_error='raise',
         to_datetime_kwargs=None,
         raw_conversions=None,
@@ -132,6 +143,7 @@ class ReadCSV(BaseProcess):
             column_names=column_names,
             drop_duplicate_timestamps=drop_duplicate_timestamps,
             fill_gaps=fill_gaps,
+            fill_value=None,
             gaps_error=gaps_error,
             to_datetime_kwargs=to_datetime_kwargs,
             raw_conversions=raw_conversions,
@@ -157,6 +169,7 @@ class ReadCSV(BaseProcess):
         self.time_col_name = time_col_name
         self.column_names = column_names
         self.fill_gaps = fill_gaps
+        self.fill_value = {} if fill_value is None else fill_value
         self.gaps_error = gaps_error
         self.drop_dupl_time = drop_duplicate_timestamps
         self.to_datetime_kw = to_datetime_kwargs
@@ -310,10 +323,10 @@ class ReadCSV(BaseProcess):
             If the file name is not provided.
         """
         fill_values = {
-            "accel": array([0.0, 0.0, self.raw_conversions.get('accel', 1.0)]),
-            "gyro": 0.0,
-            "ecg": 0.0,
-            "temperature": 0.0,
+            "accel": self.fill_value.get('accel', array([0.0, 0.0, self.raw_conversions.get('accel', 1.0)])),
+            "gyro": self.fill_value.get('gyro', 0.0),
+            "ecg": self.fill_value.get('ecg', 0.0),
+            "temperature": self.fill_value.get('temperature', 0.0),
         }
 
         super().predict(expect_days=False, expect_wear=False, file=file, tz_name=tz_name, **kwargs)
