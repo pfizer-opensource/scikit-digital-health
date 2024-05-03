@@ -1,5 +1,4 @@
-from skdh.completeness.complete import *
+from skdh.completeness import complete
+from skdh.completeness.complete import AssessCompleteness
 
-__all__ = (
-    "AssessCompleteness",
-)
+__all__ = ["complete", "AssessCompleteness"]

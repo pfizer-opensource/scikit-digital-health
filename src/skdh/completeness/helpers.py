@@ -1,4 +1,3 @@
-import datetime
 import numpy as np
 
 def convert_sfreq_to_sampling_interval(x):
@@ -47,13 +46,5 @@ def to_unix(ts, time_unit='s', utc_offset=0):
     return ((ts - time_start) - np.timedelta64(utc_offset, 'h')) / np.timedelta64(1, time_unit)
 
 
-def find_nan_regions(arr):
-    nan_inds = np.where(np.isnan(arr))[0]
-    if len(nan_inds) > 0:
-        end_nan_inds = np.append(nan_inds[np.where(~(np.diff(nan_inds) == 1))[0]], nan_inds[-1])
-        start_nan_inds = np.insert(nan_inds[::-1][np.where(~(np.diff(nan_inds[::-1]) == -1))[0]][::-1], 0, nan_inds[0])
-        nan_region_lengths = end_nan_inds - start_nan_inds + 1
-    else:
-        start_nan_inds, end_nan_inds, nan_region_lengths = np.array([]), np.array([]), np.array([])
-    return start_nan_inds, end_nan_inds, nan_region_lengths
+
 

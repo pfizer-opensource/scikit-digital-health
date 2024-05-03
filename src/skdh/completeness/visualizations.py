@@ -1,17 +1,18 @@
 import copy
 import warnings
-import plotly.graph_objects as go
+
 import numpy as np
-import plotly.express as px
 import matplotlib.pyplot as plt
+import plotly.graph_objects as go
+import plotly.express as px
 from plotly.subplots import make_subplots
-from skdh.completeness.helpers import find_nan_regions
+
 import skdh
 
 def plot_overview_one_device(data, resample_width_mins=1, device_changes=None, shared_xaxes=True, title=None,
                              gap_size_mins=5):
-    """
-    Version of plot overview that plots several data streams for only one device/subject.
+    r"""Version of plot overview that plots several data streams for only one device/subject.
+
     :param data: list where each element is a df with one column and a time stamp index. Each df will be plotted in one
     row and column title will be plotted as y-title.
     """
@@ -21,7 +22,11 @@ def plot_overview_one_device(data, resample_width_mins=1, device_changes=None, s
 
     for c, data_section in enumerate(data):
         first_df = data_section.resample(str(resample_width_mins) + 'min').median()
-        start_nan_inds, end_nan_inds, nan_region_lengths = find_nan_regions(first_df)
+        lo, so, vo = skdh.utility.internal.rle(np.isnan(np.array(first_df)))
+        start_nan_inds = so[vo]
+        end_nan_inds = so[vo] + lo[vo] - 1
+        nan_region_lengths = lo[vo]
+
         scatter_points = end_nan_inds[np.where((start_nan_inds[1:] - end_nan_inds[:-1]) == 2)[0]] + 1
         crit_data_gap_inds = np.where((nan_region_lengths + 1) * resample_width_mins >= gap_size_mins)[0]
         data_gaps_start_ind = start_nan_inds[crit_data_gap_inds]
