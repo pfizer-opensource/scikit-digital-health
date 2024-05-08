@@ -198,7 +198,36 @@ class MultiReader(BaseProcess):
         return results
 
     @staticmethod
-    def handle_concatenation(res):
+    def concat(data):
+        """
+        Custom concatenation function for data streams to handle inputs that are
+        either tuples of arrays or tuples of dictionaries
+
+        Parameters
+        ----------
+        data : tuple
+            Tuple of either numpy.ndarrays to concatenate, or dictionaries whose
+            keys should be concatenated.
+        
+        Returns
+        -------
+        data : {ndarray, dict}
+            Concatenated data.
+        """
+        if all([isinstance(i, ndarray) for i in data]):
+            return concatenate(data, axis=0)
+        elif all([isinstance(i, dict) for i in data]):
+            res = {}
+            for k in data[0]:
+                if isinstance(data[0][k], (ndarray, list)):
+                    res[k] = concatenate([d[k] for d in data], axis=0)
+                else:  # this might cause issues later on, but for now leave it
+                    res[k] = data[0][k]
+            return res
+        else:
+            raise ValueError("Data to be concatenated must be either all numpy.ndarrays or all dictionaries.")
+
+    def handle_concatenation(self, res):
         """
         Concatenate results. 
 
@@ -223,7 +252,7 @@ class MultiReader(BaseProcess):
         res_lists = {}
         # split between concatenatable items and non
         for k, v in res[0].items():
-            if isinstance(v, ndarray):
+            if isinstance(v, (ndarray, dict)):
                 res_lists[k] = []
             else:
                 results[k] = v
@@ -241,7 +270,7 @@ class MultiReader(BaseProcess):
             results.update(res_dict)
         
         results.update({
-            k: concatenate(v) for k, v in res_lists.items()
+            k: self.concat(v) for k, v in res_lists.items()
         })
 
         return results
