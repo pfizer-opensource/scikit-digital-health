@@ -51,6 +51,7 @@ def d_gait_aux():
 
 # NOTE: gait_input_50 moved to top level conftest.py
 
+
 @fixture(scope="class")
 def gait_res_50_apcwt(path_tests):
     return load(path_tests / "gait" / "data" / "gait_results_apcwt.npz")

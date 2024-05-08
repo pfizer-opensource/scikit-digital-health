@@ -9,7 +9,7 @@ from skdh import BaseProcess, handle_process_returns
 from skdh.io.base import check_input_file
 
 
-@fixture(scope='class')
+@fixture(scope="class")
 def dummy_multireader_data():
     tdir = TemporaryDirectory()
 
@@ -40,10 +40,12 @@ def dummy_multireader_data():
     p_acc_cont = tpath / "acc_cont.csv"
 
     # save to CSVs
-    pd.DataFrame({'time': t1, 'ax': ax, 'ay': ay, 'az': az}).to_csv(p_acc, index=False)
-    pd.DataFrame({'time': t1, 'temperature': temp1}).to_csv(tpath / p_eqt, index=False)
-    pd.DataFrame({'time': t2, 'temperature': temp2}).to_csv(tpath / p_neqt, index=False)
-    pd.DataFrame({'time': t3, 'ax': ax3, 'ay': ay3, 'az': az3}).to_csv(p_acc_cont, index=False)
+    pd.DataFrame({"time": t1, "ax": ax, "ay": ay, "az": az}).to_csv(p_acc, index=False)
+    pd.DataFrame({"time": t1, "temperature": temp1}).to_csv(tpath / p_eqt, index=False)
+    pd.DataFrame({"time": t2, "temperature": temp2}).to_csv(tpath / p_neqt, index=False)
+    pd.DataFrame({"time": t3, "ax": ax3, "ay": ay3, "az": az3}).to_csv(
+        p_acc_cont, index=False
+    )
 
     yield tpath, p_acc, p_eqt, p_neqt, p_acc_cont
 
@@ -135,7 +137,7 @@ def ax6_truth(path_tests):
 
 @fixture
 def apdm_file(path_tests):
-    return path_tests / "io" / 'data' / "apdm_sample.h5"
+    return path_tests / "io" / "data" / "apdm_sample.h5"
 
 
 @fixture
@@ -151,7 +153,7 @@ def dummy_csv_contents():
         n = int(hours * 3600 * fs)  # number of samples
 
         df[["ax", "ay", "az"]] = rng.normal(size=(n, 3))
-        df['temperature'] = rng.normal(size=n, loc=27, scale=3)
+        df["temperature"] = rng.normal(size=n, loc=27, scale=3)
 
         start = "2020-06-06 12:00:00.000"
         tdelta = repeat(pd.to_timedelta(arange(0, hours * 3600), unit="s"), int(fs))

@@ -104,7 +104,7 @@ def get_sin_signal(np_rng):
 # ===============
 # DATA
 # ===============
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def path_tests(request):
     test_path = None
     for par in Path(request.module.__file__).parents:
@@ -115,7 +115,7 @@ def path_tests(request):
     return test_path
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope="class")
 def gait_input_50(path_tests):
     path = path_tests / "gait" / "data" / "gait_input.npz"
 
@@ -123,6 +123,8 @@ def gait_input_50(path_tests):
     t = data["time"]
     acc = data["accel"]
 
-    t50, (acc50,) = apply_resample(goal_fs=50.0, time=t, data=(acc,), indices=(), aa_filter=True)
+    t50, (acc50,) = apply_resample(
+        goal_fs=50.0, time=t, data=(acc,), indices=(), aa_filter=True
+    )
 
     return t50, acc50
