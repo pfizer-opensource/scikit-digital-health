@@ -24,20 +24,18 @@ class ReadEmpaticaAvro(BaseProcess):
 
         self.resample_to_accel = resample_to_accel
     
-    def get_accel(self, raw_accel_dict):
+    def get_accel(self, raw_accel_dict, results_dict, key):
         """
         Get the raw acceleration data from the avro file record.
 
         Parameters
         ----------
         raw_accel_dict : dict
-            The record from the avro file for a raw data stream
-
-        Returns
-        -------
-        res : dict
-            Dictionary containing the timestamps and acceleration values,
-            and the sampling frequency.
+            The record from the avro file for a raw data stream.
+        results_dict : dict
+            Dictionary where the results will go.
+        key : str
+            Name for the results in `results_dict`.
         """
         # sampling frequency
         fs = round(raw_accel_dict['samplingFrequency'], decimals=3)
@@ -65,25 +63,23 @@ class ReadEmpaticaAvro(BaseProcess):
         time = arange(ts_start, ts_start + accel.shape[0] / fs, 1 / fs)
 
         # use special names here so we can just update dictionary later for returning
-        return {self._time: time, 'fs': fs, self._acc: accel}
+        results_dict[key] = {self._time: time, 'fs': fs, self._acc: accel}
 
-    def get_gyroscope(self, raw_gyro_dict):
+    def get_gyroscope(self, raw_gyro_dict, results_dict, key):
         """
         Get the raw gyroscope data from the avro file record.
 
         Parameters
         ----------
         raw_gyro_dict : dict
-            The record from the avro file for a raw gyroscope data stream
-
-        Returns
-        -------
-        res : dict
-            Dictionary containing the timestamps and gyroscope values,
-            and the sampling frequency.
+            The record from the avro file for a raw gyroscope data stream.
+        results_dict : dict
+            Dictionary where the results will go.
+        key : str
+            Name for the results in `results_dict`.
         """
         if not raw_gyro_dict['x']:
-            return {self._time: None, 'fs': None, 'values': None}
+            return
         
         # sampling frequency
         fs = round(raw_gyro_dict['samplingFrequency'], decimals=3)
@@ -108,25 +104,23 @@ class ReadEmpaticaAvro(BaseProcess):
         # create the timestamp array using ts_start, fs, and the number of samples
         time = arange(ts_start, ts_start + gyro.shape[0] / fs, 1 / fs)
 
-        return {self._time: time, 'fs': fs, 'values': gyro}
+        results_dict[key] = {self._time: time, 'fs': fs, 'values': gyro}
 
-    def get_values_1d(self, raw_dict):
+    def get_values_1d(self, raw_dict, results_dict, key):
         """
         Get the raw 1-dimensional values data from the avro file record.
 
         Parameters
         ----------
         raw_dict : dict
-            The record from the avro file for a raw 1-dimensional values data stream
-
-        Returns
-        -------
-        res : dict
-            Dictionary containing the timestamps and values for the 1d array,
-            and the sampling frequency.
+            The record from the avro file for a raw 1-dimensional values data stream.
+        results_dict : dict
+            Dictionary where the results will go.
+        key : str
+            Name for the results in `results_dict`.
         """
         if not raw_dict['values']:
-            return {self._time: None, 'fs': None, 'values': None}
+            return
 
         # sampling frequency
         fs = round(raw_dict['samplingFrequency'], decimals=3)
@@ -139,47 +133,44 @@ class ReadEmpaticaAvro(BaseProcess):
         # timestamp array
         time = arange(ts_start, ts_start + values.size / fs, 1 / fs)
 
-        return {self._time: time, 'fs': fs, 'values': values}
+        results_dict[key] = {self._time: time, 'fs': fs, 'values': values}
     
     @staticmethod
-    def get_systolic_peaks(raw_dict):
+    def get_systolic_peaks(raw_dict, results_dict, key):
         """
         Get the systolic peaks data from the avro file record.
 
         Parameters
         ----------
         raw_dict : dict
-            The record from the avro file for systolic peaks data
-
-        Returns
-        -------
-        res : dict
-            Dictionary containing an array of the systolic peaks timestamps
+            The record from the avro file for systolic peaks data.
+        results_dict : dict
+            Dictionary where the results will go.
+        key : str
+            Name for the results in `results_dict`.
         """
         if not raw_dict['peaksTimeNanos']:
-            return {'values': None}
+            return
         
         peaks = ascontiguousarray(raw_dict['peaksTimeNanos']) / 1e9  # convert to seconds
 
-        return {'values': peaks}
+        results_dict[key] = {'values': peaks}
     
-    def get_steps(self, raw_dict):
+    def get_steps(self, raw_dict, results_dict, key):
         """
         Get the raw steps data from the avro file record.
 
         Parameters
         ----------
         raw_dict : dict
-            The record from the avro file for raw steps data
-
-        Returns
-        -------
-        res : dict
-            Dictionary containing the timing of step counts, step count values
-            and the sampling frequency of the step counts.
+            The record from the avro file for raw steps data.
+        results_dict : dict
+            Dictionary where the results will go.
+        key : str
+            Name for the results in `results_dict`.
         """
         if not raw_dict['values']:
-            return {self._time: None, 'fs': None, 'values': None}
+            return
         
         # sampling frequency
         fs = round(raw_dict['samplingFrequency'], decimals=3)
@@ -193,7 +184,7 @@ class ReadEmpaticaAvro(BaseProcess):
         # timestamp array
         time = arange(ts_start, ts_start + steps.size / fs, 1 / fs)
 
-        return {self._time: time, 'fs': fs, 'values': steps}
+        results_dict[key] = {self._time: time, 'fs': fs, 'values': steps}
     
     def handle_resampling(self, streams):
         """
@@ -287,7 +278,7 @@ class ReadEmpaticaAvro(BaseProcess):
 
         raw_data_streams = {}
         for full_name, (stream_name, fn) in fn_map.items():
-            raw_data_streams[stream_name] = fn(raw_record[full_name])
+             fn(raw_record[full_name], raw_data_streams, stream_name)
 
         # handle re-scaling if desired, will handle re-formatting as well
         if self.resample_to_accel:
