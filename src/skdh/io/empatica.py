@@ -83,7 +83,7 @@ class ReadEmpaticaAvro(BaseProcess):
             and the sampling frequency.
         """
         if not raw_gyro_dict['x']:
-            return None, None, None
+            return {self._time: None, 'fs': None, 'values': None}
         
         # sampling frequency
         fs = round(raw_gyro_dict['samplingFrequency'], decimals=3)
@@ -126,7 +126,7 @@ class ReadEmpaticaAvro(BaseProcess):
             and the sampling frequency.
         """
         if not raw_dict['values']:
-            return None, None, None
+            return {self._time: None, 'fs': None, 'values': None}
 
         # sampling frequency
         fs = round(raw_dict['samplingFrequency'], decimals=3)
@@ -157,11 +157,11 @@ class ReadEmpaticaAvro(BaseProcess):
             Dictionary containing an array of the systolic peaks timestamps
         """
         if not raw_dict['peaksTimeNanos']:
-            return None
+            return {'values': None}
         
         peaks = ascontiguousarray(raw_dict['peaksTimeNanos']) / 1e9  # convert to seconds
 
-        return {'systolic_peaks': peaks}
+        return {'values': peaks}
     
     def get_steps(self, raw_dict):
         """
@@ -178,8 +178,8 @@ class ReadEmpaticaAvro(BaseProcess):
             Dictionary containing the timing of step counts, step count values
             and the sampling frequency of the step counts.
         """
-        if not raw_dict['steps']:
-            return None
+        if not raw_dict['values']:
+            return {self._time: None, 'fs': None, 'values': None}
         
         # sampling frequency
         fs = round(raw_dict['samplingFrequency'], decimals=3)
@@ -188,7 +188,7 @@ class ReadEmpaticaAvro(BaseProcess):
         ts_start = raw_dict['timestampStart'] / 1e6  # convert to seconds
 
         # raw steps data
-        steps = ascontiguousarray(raw_dict['steps'])
+        steps = ascontiguousarray(raw_dict['values'])
 
         # timestamp array
         time = arange(ts_start, ts_start + steps.size / fs, 1 / fs)
@@ -211,13 +211,13 @@ class ReadEmpaticaAvro(BaseProcess):
             Dictionary containing the resampled data streams
         """
         # remove accelerometer data stream
-        acc_dict = streams.pop('accelerometer')
+        acc_dict = streams.pop(self._acc)
         # remove keys that we can't resample
         rs_streams = {d: streams.pop(d) for d in ['systolic_peaks', 'steps']}
 
         # iterate over remaining streams and resample them
         for name, stream in streams.items():
-            if stream['value'] is None:
+            if stream['values'] is None:
                 continue
 
             # check that the stream doesn't start significantly later than accelerometer
@@ -229,8 +229,13 @@ class ReadEmpaticaAvro(BaseProcess):
                 )
             
             # check if we need to resample
-            if isclose(stream['fs'], acc_dict['fs'], rel_tol=1e-3):
-                rs_streams[name] = full(acc_dict['values'].shape, nan, dtype=float_)
+            if isclose(stream['fs'], acc_dict['fs'], atol=1e-3):
+                # create the new shape to match the accel shape
+                new_shape = list(stream['values'].shape)
+                new_shape[0] = acc_dict[self._acc].shape[0]
+                # create the full length data shape
+                rs_streams[name] = full(new_shape, nan, dtype=float_)
+                # get the indices for the stream data
                 i1 = argmin(abs(acc_dict['time'] - stream['time'][0]))
                 i2 = i1 + stream['time'].size
                 # put the stream values into the correct size array
@@ -276,21 +281,20 @@ class ReadEmpaticaAvro(BaseProcess):
             "eda": ('eda', self.get_values_1d),
             "temperature": (self._temp, self.get_values_1d),
             "bvp": ('bvp', self.get_values_1d),
-            "systolic_peaks": ('systolic_peaks', self.get_systolic_peaks),
+            "systolicPeaks": ('systolic_peaks', self.get_systolic_peaks),
             "steps": ('steps', self.get_steps),
         }
 
         raw_data_streams = {}
-        for name, dstream in raw_record.items():
-            stream_name, fn = fn_map[name]
-            raw_data_streams[stream_name] = fn(dstream)
+        for full_name, (stream_name, fn) in fn_map.items():
+            raw_data_streams[stream_name] = fn(raw_record[full_name])
 
         # handle re-scaling if desired, will handle re-formatting as well
         if self.resample_to_accel:
             data_streams = self.handle_resampling(raw_data_streams)
         else:
             # remove the accel dictionary to form the basis for the return dictionary
-            data_streams = raw_data_streams.pop('accelerometer')
+            data_streams = raw_data_streams.pop(self._acc)
             data_streams.update(raw_data_streams)  # add rest of data streams, keeping as dicts
         
         return data_streams
@@ -338,7 +342,7 @@ class ReadEmpaticaAvro(BaseProcess):
         # as needed, deviceSn, deviceModel
 
         # get the data streams
-        results = self.get_datastreams(records[0])
+        results = self.get_datastreams(records[0]['rawData'])
 
         # update the timestamps to be local
         results['time'] += tz_offset
@@ -346,7 +350,7 @@ class ReadEmpaticaAvro(BaseProcess):
         for k in results:
             if k == 'time':
                 continue
-            if isinstance(results[k], dict) and 'time' in results[k]:
+            if isinstance(results[k], dict) and 'time' in results[k] and results[k]['time'] is not None:
                 results[k]['time'] += tz_offset
         
         return results
