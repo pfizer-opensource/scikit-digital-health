@@ -4,6 +4,7 @@ Sleep predictions
 Yiorgos Christakis, Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 from numpy import array, convolve, int_
 
 from skdh.sleep.utility import rle

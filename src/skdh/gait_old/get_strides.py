@@ -4,6 +4,7 @@ Function for getting strides from detected gait events
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 from numpy import nan, array, ones, nonzero, zeros
 from scipy.integrate import cumulative_trapezoid
 

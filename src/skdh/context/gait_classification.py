@@ -4,6 +4,7 @@ Gait detection via LGBM classifier
 Lukas Adamowicz
 Copyright (c) 2023, Pfizer Inc. All rights reserved.
 """
+
 from sys import version_info
 from warnings import warn
 

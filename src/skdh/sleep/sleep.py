@@ -4,6 +4,7 @@ Sleep and major rest period detection
 Yiorgos Christakis, Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 from sys import gettrace
 from collections.abc import Iterable
 from warnings import warn
@@ -809,9 +810,7 @@ class Sleep(BaseProcess):
         """
         if self.f is not None:
             date = dt_date.today().strftime("%Y%m%d")
-            form_fname = self.plot_fname.format(
-                date=date, file=self._file_name
-            )
+            form_fname = self.plot_fname.format(date=date, file=self._file_name)
             pp = PdfPages(Path(form_fname).with_suffix(".pdf"))
 
             for f in self.f:

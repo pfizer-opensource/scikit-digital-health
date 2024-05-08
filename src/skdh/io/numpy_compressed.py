@@ -4,6 +4,7 @@ Read from a numpy compressed file.
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 from numpy import load as np_load
 
 from skdh.base import BaseProcess, handle_process_returns

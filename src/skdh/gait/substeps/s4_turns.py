@@ -4,6 +4,7 @@ Functions for getting turns.
 Lukas Adamowicz
 Copyright 2023 Pfizer Inc, all rights reserved
 """
+
 from numpy import (
     full,
     int_,

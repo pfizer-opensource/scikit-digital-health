@@ -4,6 +4,7 @@ Utility functions required for sleep metric generation
 Yiorgos Christakis
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 from numpy import (
     any,
     arctan,

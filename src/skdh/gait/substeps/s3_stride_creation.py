@@ -4,6 +4,7 @@ Stride creation and QC
 Lukas Adamowicz
 Copyright 2023 Pfizer Inc, All rights reserved
 """
+
 from numpy import ones, zeros, nonzero, array, int_
 
 from skdh.base import BaseProcess, handle_process_returns

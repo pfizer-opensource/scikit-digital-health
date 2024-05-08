@@ -4,6 +4,7 @@ Base gait endpoints class
 Lukas Adamowicz
 Copyright (c) 2023. Pfizer Inc. All rights reserved.
 """
+
 import functools
 import logging
 

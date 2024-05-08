@@ -4,6 +4,7 @@ Different entropy measures
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 from skdh.features.core import Feature
 from skdh.features.lib import extensions
 
@@ -48,6 +49,7 @@ class SignalEntropy(Feature):
     .. [1] Wallis, Kenneth. "A note on the calculation of entropy from histograms". 2006.
         https://warwick.ac.uk/fac/soc/economics/staff/academic/wallis/publications/entropy.pdf
     """
+
     __slots__ = ()
 
     def __init__(self):
@@ -110,6 +112,7 @@ class SampleEntropy(Feature):
     ----------
     .. [1] https://archive.physionet.org/physiotools/sampen/c/sampen.c
     """
+
     __slots__ = ("m", "r")
 
     def __init__(self, m=4, r=1.0):

@@ -4,6 +4,7 @@ Gait bout acceleration pre-processing functions.
 Lukas Adamowicz
 Copyright (c) 2023, Pfizer Inc. All rights reserved
 """
+
 from numpy import (
     mean,
     median,

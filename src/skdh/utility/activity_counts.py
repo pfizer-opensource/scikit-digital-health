@@ -4,6 +4,7 @@ Computation of activity counts.
 Lukas Adamowicz
 Copyright (c) 2022. Pfizer Inc. All rights reserved.
 """
+
 from numpy import array, repeat, abs, minimum, floor, float_
 from scipy.signal import lfilter_zi, lfilter
 

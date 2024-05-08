@@ -245,6 +245,7 @@ References
     Dec. 2019, doi: 10.1038/s41598-019-54267-y.
 
 """
+
 from skdh.activity.core import ActivityLevelClassification
 from skdh.activity.metrics import *
 from skdh.activity import metrics

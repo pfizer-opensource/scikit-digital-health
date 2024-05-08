@@ -4,6 +4,7 @@ Function for the detection of sleep boundaries, here defined as the total sleep 
 Yiorgos Christakis
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 from numpy import min, max, percentile, zeros, bool_, pad, sin, arange, pi, concatenate
 from numpy.random import default_rng
 

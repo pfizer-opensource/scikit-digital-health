@@ -4,6 +4,7 @@ Function for getting gait events from an accelerometer signal
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 from numpy import fft, argmax, std, abs, argsort, corrcoef, mean, sign
 from scipy.signal import detrend, butter, sosfiltfilt, find_peaks
 from scipy.integrate import cumulative_trapezoid

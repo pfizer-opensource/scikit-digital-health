@@ -4,6 +4,7 @@ Functions to apply to data post-reading.
 Lukas Adamowicz
 Copyright (c) 2024. Pfizer Inc. All rights reserved.
 """
+
 from warnings import warn
 
 from numpy import asarray, int_, mean, diff
@@ -29,6 +30,7 @@ class GetDayWindowIndices(BaseProcess):
         be defined to window. Can use multiple but the number of `periods` must
         match the number of `bases`.
     """
+
     def __init__(self, bases=None, periods=None):
         super().__init__(bases=bases, periods=periods)
 
@@ -82,7 +84,9 @@ class GetDayWindowIndices(BaseProcess):
             of (N, 2) indices corresponding to [start, stop] of days. Keys are
             tuples of `(base, period)`.
         """
-        super().predict(expect_days=False, expect_wear=False, time=time, fs=fs, **kwargs)
+        super().predict(
+            expect_days=False, expect_wear=False, time=time, fs=fs, **kwargs
+        )
 
         if not self.window:
             return {}

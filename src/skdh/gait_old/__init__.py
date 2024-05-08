@@ -189,6 +189,7 @@ defined on a per-event level):
             # broadcast step regularity into gait for each step
             gait[self.k_] = stepreg[gait_aux['inertial data i']]
 """
+
 from skdh.gait_old.gait import Gait
 from skdh.gait_old import gait
 from skdh.gait_old.gait_endpoints import *
