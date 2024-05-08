@@ -33,7 +33,6 @@ classifiers = [
     "Development Status :: 4 - Beta",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Fortran",
@@ -46,7 +45,7 @@ classifiers = [
     "Operating System :: POSIX :: Linux",
 ]
 
-requires-python = ">=3.6"
+requires-python = ">=3.9"
 dependencies = [
     "numpy>=1.17.2",
     "scipy>=1.12.0",
@@ -58,6 +57,7 @@ dependencies = [
     "matplotlib",
     "packaging",
     "pyyaml",
+    "avro",
     "importlib_resources;python_version<'3.7'",
     "importlib_metadata;python_version<'3.8'"
 ]
