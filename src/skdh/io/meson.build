@@ -8,6 +8,7 @@ py3.install_sources(
         'multireader.py',
         'numpy_compressed.py',
         'csv.py',
+        'empatica.py',
         'utility.py',
     ],
     pure: false,

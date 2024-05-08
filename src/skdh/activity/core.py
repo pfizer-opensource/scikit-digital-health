@@ -4,6 +4,7 @@ Activity level classification based on accelerometer data
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 from sys import gettrace  # to check if debugging
 from datetime import datetime, timedelta
 from warnings import warn
@@ -235,7 +236,7 @@ class ActivityLevelClassification(BaseProcess):
 
         # add wake endpoints for some new/experimental features
         self.wake_endpoints += [
-            ept.ActivityDFA(scale=2**(1/8), state='wake'),
+            ept.ActivityDFA(scale=2 ** (1 / 8), state="wake"),
             ept.EqualAverageDurationThreshold(),
         ]
         # signal features metrics across various window lengths
@@ -710,9 +711,7 @@ class ActivityLevelClassification(BaseProcess):
             return
 
         date = datetime.today().strftime("%Y%m%d")
-        form_fname = self.plot_fname.format(
-            date=date, file=self._file_name
-        )
+        form_fname = self.plot_fname.format(date=date, file=self._file_name)
 
         pp = PdfPages(Path(form_fname).with_suffix(".pdf"))
 

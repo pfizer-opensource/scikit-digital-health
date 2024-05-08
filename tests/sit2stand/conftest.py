@@ -16,18 +16,26 @@ def dummy_stillness_data(np_rng):
 
 @fixture
 def s2s_input(path_tests):
-    return load(path_tests / "sit2stand" / "data" / "s2s_input_data.npz", allow_pickle=False)
+    return load(
+        path_tests / "sit2stand" / "data" / "s2s_input_data.npz", allow_pickle=False
+    )
 
 
 @fixture
 def stillness_truth(path_tests):
-    data = load(path_tests / "sit2stand" / "data" / "s2s_stillness_results.npz", allow_pickle=False)
+    data = load(
+        path_tests / "sit2stand" / "data" / "s2s_stillness_results.npz",
+        allow_pickle=False,
+    )
 
     return data
 
 
 @fixture
 def displacement_truth(path_tests):
-    data = load(path_tests / "sit2stand" / "data" / "s2s_displacement_results.npz", allow_pickle=False)
+    data = load(
+        path_tests / "sit2stand" / "data" / "s2s_displacement_results.npz",
+        allow_pickle=False,
+    )
 
     return data

@@ -72,6 +72,7 @@ Example code is below (from `CreateStridesAndQc`):
     
             return res
 """
+
 from skdh.gait.substeps.s1_preprocessing import PreprocessGaitBout
 from skdh.gait.substeps.s2_contact_events import (
     VerticalCwtGaitEvents,

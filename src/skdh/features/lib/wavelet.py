@@ -4,6 +4,7 @@ Features using wavelet transforms
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 from numpy import zeros, ceil, log2, sort, sum, diff, sign, maximum
 import pywt
 

@@ -174,7 +174,7 @@ class TestApplyResample:
         assert y_rs.shape == (50,)
         assert allclose(ix_rs, [5, 10, 15])
         assert allclose(iy_rs, [[7, 12], [12, 18]])
-    
+
         t_rs = array([0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5])
         trs, (x_rs, y_rs), (ix_rs, iy_rs) = apply_resample(
             time=t, time_rs=t_rs, data=(x, y), indices=(ix, iy), fs=10.0
@@ -186,7 +186,7 @@ class TestApplyResample:
         assert allclose(ix_rs, [2, 4, 6])
         assert allclose(iy_rs, [[3, 5], [5, 7]])
 
-        t_rs = arange(0, 10, 1/3)
+        t_rs = arange(0, 10, 1 / 3)
         trs, (x_rs, y_rs), (ix_rs, iy_rs) = apply_resample(
             time=t, time_rs=t_rs, data=(x, y), indices=(ix, iy), fs=10.0
         )
@@ -196,7 +196,7 @@ class TestApplyResample:
         assert y_rs.shape == (t_rs.size,)
         assert allclose(ix_rs, [3, 6, 9])
         assert allclose(iy_rs, [[4, 8], [8, 10]])
-    
+
     def test_upsample(self, np_rng):
         t = arange(0, 5, 0.5)
         x = arange(t.size)

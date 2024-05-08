@@ -4,6 +4,7 @@ Testing of utility functions for sleep analysis.
 Yiorgos Christakis
 Pfizer DMTI 2021
 """
+
 import numpy as np
 
 from skdh.utility import moving_median

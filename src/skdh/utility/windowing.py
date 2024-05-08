@@ -4,6 +4,7 @@ Utility methods
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 from numpy import require
 from numpy.lib.stride_tricks import as_strided
 

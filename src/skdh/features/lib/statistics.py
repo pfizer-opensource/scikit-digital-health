@@ -4,6 +4,7 @@ Signal features based on statistics measures
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 from numpy import max, min, quantile, mean, std
 
 from skdh.features.core import Feature

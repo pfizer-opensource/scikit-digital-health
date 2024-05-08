@@ -4,6 +4,7 @@ Features dealing with the smoothness of a signal
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 from numpy import log as nplog, abs
 
 from skdh.features.core import Feature
@@ -32,6 +33,7 @@ class JerkMetric(Feature):
     .. math:: s = \frac{360max(|a|)^2}{\Delta t}
     .. math:: J = \frac{\hat{J}}{2s}
     """
+
     __slots__ = ()
 
     def __init__(self):
@@ -109,6 +111,7 @@ class DimensionlessJerk(Feature):
         DJ = \frac{-\hat{J}_{type}}{s_{type}} \\
         DJ_{log} = -ln\left(\frac{\hat{J}_{type}}{s_{type}}\right)
     """
+
     __slots__ = ("log", "i_type")
     _signal_type_options = ["velocity", "acceleration", "jerk"]
 

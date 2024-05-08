@@ -4,6 +4,7 @@ CSV reading process
 Lukas Adamowicz
 Copyright (c) 2023. Pfizer Inc. All rights reserved
 """
+
 from warnings import warn
 
 from numpy import (
@@ -26,7 +27,13 @@ from numpy import (
     int_,
     float_,
 )
-from pandas import read_csv, to_datetime, to_timedelta, date_range, options as pd_options
+from pandas import (
+    read_csv,
+    to_datetime,
+    to_timedelta,
+    date_range,
+    options as pd_options,
+)
 
 from skdh.base import BaseProcess, handle_process_returns
 from skdh.io.base import check_input_file
@@ -55,11 +62,11 @@ class ReadCSV(BaseProcess):
         Drop duplicate timestamps before doing any timestamp handling or gap filling.
         Default is False.
     fill_gaps : bool, optional
-        Fill any gaps in data streams. Default is True. If False and data gaps are 
+        Fill any gaps in data streams. Default is True. If False and data gaps are
         detected, then the reading will raise a `ValueError`.
     fill_value : {None, dict}, optional
         Dictionary with keys and values to fill data streams with. See Notes for
-        default values if not provided. 
+        default values if not provided.
     gaps_error : {'raise', 'warn', 'ignore'}, optional
         Behavior if there are large gaps in the datastream after handling timestamps.
         Default is to raise an error. NOT recommended to change unless the data
@@ -90,7 +97,7 @@ class ReadCSV(BaseProcess):
         What to do if the file extension does not match the expected extension (.bin).
         Default is "warn". "raise" raises a ValueError. "skip" skips the file
         reading altogether and attempts to continue with the pipeline.
-    
+
     .. deprecated:: 0.14.0
         `bases` Removed in favor of having windowing be its own class,
         :class:`skdh.preprocessing.GetDayWindowIndices`.
@@ -130,7 +137,7 @@ class ReadCSV(BaseProcess):
         drop_duplicate_timestamps=False,
         fill_gaps=True,
         fill_value=None,
-        gaps_error='raise',
+        gaps_error="raise",
         to_datetime_kwargs=None,
         raw_conversions=None,
         accel_in_g=True,
@@ -160,11 +167,14 @@ class ReadCSV(BaseProcess):
         if raw_conversions is None:
             raw_conversions = {k: 1.0 for k in column_names}
             if not accel_in_g:
-                warn("Parameter accel_in_g is deprecated in favor of raw_conversions", DeprecationWarning)
-                raw_conversions['accel'] = g_value
+                warn(
+                    "Parameter accel_in_g is deprecated in favor of raw_conversions",
+                    DeprecationWarning,
+                )
+                raw_conversions["accel"] = g_value
 
-        if gaps_error.lower() not in ['raise', 'warn', 'ignore']:
-            raise ValueError('gaps_error must be one of `raise`, `warn`, or `ignore`.')
+        if gaps_error.lower() not in ["raise", "warn", "ignore"]:
+            raise ValueError("gaps_error must be one of `raise`, `warn`, or `ignore`.")
 
         self.time_col_name = time_col_name
         self.column_names = column_names
@@ -184,7 +194,7 @@ class ReadCSV(BaseProcess):
     def handle_gaps_error(self, msg):
         if self.gaps_error == "raise":
             raise ValueError(msg)
-        elif self.gaps_error == 'warn':
+        elif self.gaps_error == "warn":
             warn(msg)
         else:
             pass
@@ -231,13 +241,15 @@ class ReadCSV(BaseProcess):
             # check if the last block is the same size
             if counts[-1] != counts[0]:
                 # drop the last blocks worth of data
-                warn("Non integer number of blocks. Trimming partial block.", UserWarning)
-                time = time[:-counts[-1]]
+                warn(
+                    "Non integer number of blocks. Trimming partial block.", UserWarning
+                )
+                time = time[: -counts[-1]]
                 for name, dstream in data.items():
-                    data[name] = dstream[:-counts[-1]]
-                
+                    data[name] = dstream[: -counts[-1]]
+
                 counts = counts[:-1]  # remove the last block count
-            
+
             # now check if all remaining blocks are the same size
             if not allclose(counts, counts[0]):
                 raise ValueError(
@@ -254,7 +266,7 @@ class ReadCSV(BaseProcess):
 
             # add the time delta so that we have unique timestamps
             time += t_delta
-        
+
         # check if we are filling gaps or not
         if self.fill_gaps:
             time_rs = arange(time[0], time[-1] + 0.5 / n_samples, 1 / n_samples)
@@ -279,8 +291,8 @@ class ReadCSV(BaseProcess):
                     # get the number of samples offset in the resampled time
                     i_offset = int((time[i1] - time_rs[i1]) * n_samples)
 
-                    new_stream[i1 + i_offset:i2 + i_offset] = dstream[i1:i2]
-                
+                    new_stream[i1 + i_offset : i2 + i_offset] = dstream[i1:i2]
+
                 data[name] = new_stream
         else:
             # if not filling data gaps, check that there are not gaps that would
@@ -290,9 +302,9 @@ class ReadCSV(BaseProcess):
                 self.handle_gaps_error(
                     "There are data gaps, which could potentially results in incorrect outputs from downstream algorithms"
                 )
-        
+
             time_rs = time
-        
+
         return n_samples, time_rs, data
 
     @handle_process_returns(results_to_kwargs=True)
@@ -323,13 +335,17 @@ class ReadCSV(BaseProcess):
             If the file name is not provided.
         """
         fill_values = {
-            "accel": self.fill_value.get('accel', array([0.0, 0.0, self.raw_conversions.get('accel', 1.0)])),
-            "gyro": self.fill_value.get('gyro', 0.0),
-            "ecg": self.fill_value.get('ecg', 0.0),
-            "temperature": self.fill_value.get('temperature', 0.0),
+            "accel": self.fill_value.get(
+                "accel", array([0.0, 0.0, self.raw_conversions.get("accel", 1.0)])
+            ),
+            "gyro": self.fill_value.get("gyro", 0.0),
+            "ecg": self.fill_value.get("ecg", 0.0),
+            "temperature": self.fill_value.get("temperature", 0.0),
         }
 
-        super().predict(expect_days=False, expect_wear=False, file=file, tz_name=tz_name, **kwargs)
+        super().predict(
+            expect_days=False, expect_wear=False, file=file, tz_name=tz_name, **kwargs
+        )
 
         # load the file with pandas
         raw = read_csv(file, **self.read_csv_kwargs)
@@ -338,18 +354,24 @@ class ReadCSV(BaseProcess):
         self.to_datetime_kw.update({"utc": tz_name is not None})
 
         # convert time column to a datetime column. Give a unique name so we shouldnt overwrite
-        raw[self.time_col_name] = to_datetime(raw[self.time_col_name], **self.to_datetime_kw)
+        raw[self.time_col_name] = to_datetime(
+            raw[self.time_col_name], **self.to_datetime_kw
+        )
 
         # convert timestamps if necessary
         if tz_name is not None:
             # convert, and then remove the timezone so its naive again, but now in local time
-            raw[self.time_col_name] = raw[self.time_col_name].dt.tz_convert(tz_name).dt.tz_localize(None)
+            raw[self.time_col_name] = (
+                raw[self.time_col_name].dt.tz_convert(tz_name).dt.tz_localize(None)
+            )
 
         # now handle data gaps and second level timestamps, etc
         # raw, fs = self.handle_timestamp_inconsistency(raw, fill_values)
 
         # get the time values and convert to seconds
-        time = raw[self.time_col_name].astype(int).values / 1e9  # int gives ns, convert to s
+        time = (
+            raw[self.time_col_name].astype(int).values / 1e9
+        )  # int gives ns, convert to s
 
         data = {}
         # grab the data we expect
@@ -357,20 +379,24 @@ class ReadCSV(BaseProcess):
             try:
                 data[dstream] = raw[self.column_names[dstream]].values
             except KeyError:
-                warn(f"Data stream {dstream} specified in column names but all columns {self.column_names[dstream]} not found in the read data. Skipping.")
+                warn(
+                    f"Data stream {dstream} specified in column names but all columns {self.column_names[dstream]} not found in the read data. Skipping."
+                )
                 continue
-        
+
         # now handle data gaps and second level timestamps, etc
-        fs, time, results = self.handle_timestamp_inconsistency_np(fill_values, time, data)
+        fs, time, results = self.handle_timestamp_inconsistency_np(
+            fill_values, time, data
+        )
 
         # setup the results dictionary
-        results.update({
-            self._time: time,
-            "fs": fs,
-        })
+        results.update(
+            {
+                self._time: time,
+                "fs": fs,
+            }
+        )
 
-        
-        
         # convert accel data
         for k, conv_factor in self.raw_conversions.items():
             try:

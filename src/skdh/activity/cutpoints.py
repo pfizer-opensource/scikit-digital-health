@@ -4,6 +4,7 @@ Cutpoint definitions
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 from skdh.activity import metrics
 
 

@@ -4,6 +4,7 @@ Metrics for classifying activity
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 import warnings
 
 from numpy import maximum, abs, repeat, arctan, sqrt, pi
@@ -41,7 +42,9 @@ def metric_anglez(accel, wlen, *args, **kwargs):
         (N, ) array of angles between accelerometer z axis and horizontal plane in degrees.
     """
     with warnings.catch_warnings():
-        warnings.filterwarnings("ignore", message="divide by zero encountered in divide")
+        warnings.filterwarnings(
+            "ignore", message="divide by zero encountered in divide"
+        )
         anglez = arctan(accel[:, 2] / sqrt(accel[:, 0] ** 2 + accel[:, 1] ** 2)) * (
             180 / pi
         )

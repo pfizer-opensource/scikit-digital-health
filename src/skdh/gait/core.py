@@ -4,6 +4,7 @@ Gait detection, processing, and analysis from wearable inertial sensor data
 Lukas Adamowicz
 Copyright (c) 2023, Pfizer Inc. All rights reserved.
 """
+
 from collections.abc import Iterable
 from warnings import warn
 from datetime import datetime, timedelta

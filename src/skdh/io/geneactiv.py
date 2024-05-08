@@ -4,6 +4,7 @@ GeneActiv reading process
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 from skdh.base import BaseProcess, handle_process_returns
 from skdh.io.base import check_input_file
 from skdh.io._extensions import read_geneactiv
