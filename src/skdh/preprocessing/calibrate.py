@@ -4,6 +4,7 @@ Inertial data/sensor calibration
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 from warnings import warn
 
 from numpy import (

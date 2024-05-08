@@ -4,6 +4,7 @@ Gait bout detection from accelerometer data
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 from sys import version_info
 
 from numpy import isclose, where, diff, insert, append, ascontiguousarray, int_

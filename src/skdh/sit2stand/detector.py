@@ -4,6 +4,7 @@ Sit-to-stand transfer detection and processing
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 import datetime
 
 from numpy import (

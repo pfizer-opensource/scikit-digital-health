@@ -4,6 +4,7 @@ GeneActiv reading process
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 import h5py
 
 from skdh.base import BaseProcess, handle_process_returns
@@ -25,7 +26,7 @@ class ReadApdmH5(BaseProcess):
         Sensor location to get data from. Looks at the `Label 0` key to find the
         desired sensor.
     localize_timestamps : bool, optional
-        Convert timestamps to local time from UTC. Default is True. Uses APDM's 
+        Convert timestamps to local time from UTC. Default is True. Uses APDM's
         timezone offset attribute for the sensor being extracted.
     gravity_acceleration : float, optional
         Acceleration due to gravity. Used to convert values to units of `g`.
@@ -49,7 +50,13 @@ class ReadApdmH5(BaseProcess):
     - Sternum
     """
 
-    def __init__(self, sensor_location, localize_timestamps=True, gravity_acceleration=9.81, ext_error="warn"):
+    def __init__(
+        self,
+        sensor_location,
+        localize_timestamps=True,
+        gravity_acceleration=9.81,
+        ext_error="warn",
+    ):
         super().__init__(
             # kwargs
             sensor_location=sensor_location,
@@ -120,7 +127,9 @@ class ReadApdmH5(BaseProcess):
 
             # if we are converting to local time
             if self.localize_time:
-                offset_hours = float(f['Sensors'][sid]['Configuration'].attrs["Timezone Offset"])
+                offset_hours = float(
+                    f["Sensors"][sid]["Configuration"].attrs["Timezone Offset"]
+                )
                 # convert to seconds
                 offset_sec = offset_hours * 3600.0
 

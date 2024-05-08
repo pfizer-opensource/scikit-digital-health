@@ -45,6 +45,7 @@ Signal Features
     DetailPower
     DetailPowerRatio
 """
+
 from skdh.features.core import *
 from skdh.features import core
 from skdh.features.lib import *

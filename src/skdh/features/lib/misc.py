@@ -4,6 +4,7 @@ Misc features
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 from skdh.features.core import Feature
 from skdh.features.lib import extensions
 

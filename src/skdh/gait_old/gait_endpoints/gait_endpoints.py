@@ -29,6 +29,7 @@ stride length: step_length_i + step_length_i+1
 
 gait speed: stride_length / stride time
 """
+
 from numpy import (
     zeros,
     full,

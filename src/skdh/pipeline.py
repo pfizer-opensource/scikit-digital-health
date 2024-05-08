@@ -4,6 +4,7 @@ Pipeline class for stringing multiple features into 1 processing pipeline
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 from operator import attrgetter
 from importlib import import_module
 from warnings import warn
@@ -231,9 +232,9 @@ class Pipeline:
             )
 
         for proc in procs:
-            if 'process' in proc:
-                name = proc.get('name', None)
-                process_name = proc['process']
+            if "process" in proc:
+                name = proc.get("name", None)
+                process_name = proc["process"]
                 pkg = proc["package"]
                 mod = proc["module"]
                 params = proc["parameters"]

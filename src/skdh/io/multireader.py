@@ -1,7 +1,18 @@
 from collections.abc import Mapping
 from warnings import warn
 
-from numpy import argsort, concatenate, mean, diff, median, allclose, argmin, argmax, nonzero, ndarray
+from numpy import (
+    argsort,
+    concatenate,
+    mean,
+    diff,
+    median,
+    allclose,
+    argmin,
+    argmax,
+    nonzero,
+    ndarray,
+)
 
 from skdh.base import BaseProcess, handle_process_returns
 from skdh import io
@@ -17,9 +28,9 @@ class MultiReader(BaseProcess):
     mode : {'combine', 'concatenate', 'leave'}
         The mode to use when reading multiple files. Options are "combine", which
         combines multiple data-streams from different files, or "concatenate" which
-        combines the same data-stream from multiple files (Case 3 `reader_kw` not 
-        allowed). Finally, "leave" is only valid when providing case 3 for `reader_kw` 
-        (see Notes), and leaves the results in separate dictionaries with titles 
+        combines the same data-stream from multiple files (Case 3 `reader_kw` not
+        allowed). Finally, "leave" is only valid when providing case 3 for `reader_kw`
+        (see Notes), and leaves the results in separate dictionaries with titles
         given by the keys of `reader_kw` and `files` as passed to the `predict` method.
     reader : str
         The name of the reader class to use. See :ref:`SKDH IO`.
@@ -30,7 +41,7 @@ class MultiReader(BaseProcess):
         When `mode` is "combine", resample separate datastreams to the lowest sampled
         stream. Default is True. False will re-sample all datastreams to the highest
         sampled stream.
-    
+
     Notes
     -----
     The combine `mode` should be used in the case when you have, for example, acceleration
@@ -48,10 +59,10 @@ class MultiReader(BaseProcess):
         argument for `predict` should be a dictionary with the same key-names as
         `reader_kw`, and the key-word arguments will be associated with the path
         in the `files` dictionary.
-    
-    Note that if the `reader` returns the same keys, and `mode` is "combine", 
+
+    Note that if the `reader` returns the same keys, and `mode` is "combine",
     keys will be overwritten.
-    
+
     Examples
     --------
     Case 0:
@@ -83,13 +94,16 @@ class MultiReader(BaseProcess):
     >>> mrdr = MultiReader(mode='combine', reader='ReadCsv', reader_kw=kw)
     >>> mrdr.predict(files={'f1': "file1.csv", 'f2': "file2.csv"})
     """
+
     def __init__(self, mode, reader, reader_kw=None, resample_to_lowest=True):
-        super().__init__(mode=mode, reader=reader, resample_to_lowest=resample_to_lowest)
+        super().__init__(
+            mode=mode, reader=reader, resample_to_lowest=resample_to_lowest
+        )
 
         if reader_kw is None:
             reader_kw = {}
 
-        if mode.lower() in ['leave', 'combine', 'concatenate']:
+        if mode.lower() in ["leave", "combine", "concatenate"]:
             self.mode = mode.lower()
         else:
             raise ValueError("mode must be one of {'leave', 'combine', 'concatenate'}.")
@@ -99,7 +113,7 @@ class MultiReader(BaseProcess):
         self.reader_kw = reader_kw
 
         self.resample_to_lowest = resample_to_lowest
-    
+
     def get_reader_kw(self, idx):
         """
         Get the appropriate reader class key-word arguments
@@ -119,7 +133,7 @@ class MultiReader(BaseProcess):
             return self.reader_kw
         except IndexError:
             raise IndexError("More files provided than reader key-word arguments.")
-    
+
     def handle_combine(self, res):
         """
         Combine results
@@ -134,16 +148,16 @@ class MultiReader(BaseProcess):
             Datastream results dictionary
         """
         if isinstance(res, dict):
-            res = [v for _, v in res.items()]  # standardize since we dont care about labels
-        
+            res = [
+                v for _, v in res.items()
+            ]  # standardize since we dont care about labels
+
         # get the last time available
-        t_ends = [i['time'][-1] for i in res]
+        t_ends = [i["time"][-1] for i in res]
         t_end = min(t_ends)
 
         # check if we need to resample time streams
-        all_fs = [
-            i.get('fs', 1 / mean(diff(i['time'][:5000]))) for i in res
-        ]
+        all_fs = [i.get("fs", 1 / mean(diff(i["time"][:5000]))) for i in res]
         # allow 0.1 absolute tolerance to account for hand-calculation of fs
         needs_resample = not allclose(all_fs, median(all_fs), atol=0.1)
 
@@ -156,16 +170,16 @@ class MultiReader(BaseProcess):
             # so that we can iterate over the rest and resample them
             results = res.pop(resample_idx)
             # get the length of the acceptable data so that it all matches
-            n = nonzero(results['time'] <= t_end)[0][-1] + 1
+            n = nonzero(results["time"] <= t_end)[0][-1] + 1
             for k, v in results.items():
                 if isinstance(v, ndarray):
                     results[k] = v[:n]
 
-            time_rs = results['time']
+            time_rs = results["time"]
 
             for rdict in res:
                 # deconstruct data to resample
-                time = rdict.pop('time')
+                time = rdict.pop("time")
                 keys = []
                 data = ()
                 for key, val in rdict.items():
@@ -175,18 +189,23 @@ class MultiReader(BaseProcess):
                 # drop the keys
                 for k in keys:
                     rdict.pop(k)
-                
+
                 _, data_rs, *_ = apply_resample(
-                    time=time, time_rs=time_rs, data=data, aa_filter=True,
+                    time=time,
+                    time_rs=time_rs,
+                    data=data,
+                    aa_filter=True,
                 )
 
                 # update results with re-sampled data, and any remaining keys in the dictionary
                 # that aren't file and fs. File will get overwritten later
-                rdict.pop('fs', None)
+                rdict.pop("fs", None)
 
                 for k, v in zip(keys, data_rs):
                     if k in results:
-                        warn(f"Data {k} is already in the results when combining, overwriting.")
+                        warn(
+                            f"Data {k} is already in the results when combining, overwriting."
+                        )
                     results[k] = v
                 results.update(rdict)
         else:
@@ -208,7 +227,7 @@ class MultiReader(BaseProcess):
         data : tuple
             Tuple of either numpy.ndarrays to concatenate, or dictionaries whose
             keys should be concatenated.
-        
+
         Returns
         -------
         data : {ndarray, dict}
@@ -225,26 +244,30 @@ class MultiReader(BaseProcess):
                     res[k] = data[0][k]
             return res
         else:
-            raise ValueError("Data to be concatenated must be either all numpy.ndarrays or all dictionaries.")
+            raise ValueError(
+                "Data to be concatenated must be either all numpy.ndarrays or all dictionaries."
+            )
 
     def handle_concatenation(self, res):
         """
-        Concatenate results. 
+        Concatenate results.
 
         Parameters
         ----------
         res : list
             List of results dictionaries
-        
+
         Returns
         -------
         results : dict
             Dictionary of results datastreams
         """
         if isinstance(res, dict):
-            res = [v for _, v in res.items()]  # standardize since we dont care about labels
+            res = [
+                v for _, v in res.items()
+            ]  # standardize since we dont care about labels
 
-        t0s = [i['time'][0] for i in res]
+        t0s = [i["time"][0] for i in res]
         # get sorted index
         t0_isort = argsort(t0s)
 
@@ -265,13 +288,13 @@ class MultiReader(BaseProcess):
                 try:
                     res_lists[k].append(res_dict.pop(k))
                 except KeyError:
-                    raise KeyError("To concatenate file contents, all files must have the same data streams.")
+                    raise KeyError(
+                        "To concatenate file contents, all files must have the same data streams."
+                    )
             # update the non-concatenatable items results
             results.update(res_dict)
-        
-        results.update({
-            k: self.concat(v) for k, v in res_lists.items()
-        })
+
+        results.update({k: self.concat(v) for k, v in res_lists.items()})
 
         return results
 
@@ -302,8 +325,10 @@ class MultiReader(BaseProcess):
             elif self.mode == "concatenate":
                 results = self.handle_concatenation(res)
             else:
-                raise ValueError("Only {combine, concatenate} are valid for list specified files.")
-        
+                raise ValueError(
+                    "Only {combine, concatenate} are valid for list specified files."
+                )
+
         return results
 
     @handle_process_returns(results_to_kwargs=True)
@@ -319,10 +344,10 @@ class MultiReader(BaseProcess):
             Either a list-like of files to read, or a dictionary of keys corresponding
             to files to read. Keys match with those provided to `reader_kw` upon
             initializing the process.
-        
+
         Notes
         -----
-        Note that any additional key-word arguments passed to `MultiReader.predict` 
+        Note that any additional key-word arguments passed to `MultiReader.predict`
         will be passed along to the `reader.predict` method.
         """
         i0 = 0
@@ -337,14 +362,12 @@ class MultiReader(BaseProcess):
             pre_results = []
             for i, fpath in enumerate(files):
                 kw = self.get_reader_kw(i)
-                pre_results.append(
-                    self.rdr(**kw).predict(file=fpath, **kwargs)
-                )
-        
+                pre_results.append(self.rdr(**kw).predict(file=fpath, **kwargs))
+
         results = self.handle_results(pre_results)
 
         # handle setting the file, either the first key from a dictionary or the
         # first index from a list
-        results['file'] = files[i0]
+        results["file"] = files[i0]
 
         return results

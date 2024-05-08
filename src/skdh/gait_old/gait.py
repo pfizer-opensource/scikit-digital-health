@@ -4,6 +4,7 @@ Gait detection, processing, and analysis from wearable inertial sensor data
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 from sys import gettrace
 from collections.abc import Iterable
 from warnings import warn
@@ -700,9 +701,7 @@ class Gait(BaseProcess):
     def _finalize_plot(self, file):  # pragma: no cover
         if self.valid_plot and self.f is not None:
             date = dt_date.today().strftime("%Y%m%d")
-            form_fname = self.plot_fname.format(
-                date=date, file=Path(file).stem
-            )
+            form_fname = self.plot_fname.format(date=date, file=Path(file).stem)
 
             self.ax.legend(loc="best")
             self.f.tight_layout()

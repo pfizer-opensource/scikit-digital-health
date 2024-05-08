@@ -4,6 +4,7 @@ Axivity reading functions
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 from numpy import ascontiguousarray
 
 from skdh.base import BaseProcess, handle_process_returns

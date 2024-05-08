@@ -41,6 +41,7 @@ Support for reading multiple files in at once
 
     MultiReader
 """
+
 from skdh.io.axivity import ReadCwa
 from skdh.io import axivity
 from skdh.io.geneactiv import ReadBin

@@ -4,6 +4,7 @@ Activity endpoint definitions
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 from numpy import (
     array,
     arange,
@@ -767,7 +768,8 @@ class ActivityDFA(ActivityEndpoint):
         Goldberger, “Mosaic organization of DNA nucleotides,” Phys. Rev. E, vol. 49,
         no. 2, pp. 1685–1689, Feb. 1994, doi: 10.1103/PhysRevE.49.1685.
     """
-    def __init__(self, scale=2 ** (1 / 8), box_sizes=None, state='wake'):
+
+    def __init__(self, scale=2 ** (1 / 8), box_sizes=None, state="wake"):
         super().__init__(
             [
                 "dfa alpha",
@@ -785,7 +787,9 @@ class ActivityDFA(ActivityEndpoint):
         self.abi = None
         self.i = None
 
-    def predict(self, results, i, accel_metric, accel_metric_60, epoch_s, epochs_per_min):
+    def predict(
+        self, results, i, accel_metric, accel_metric_60, epoch_s, epochs_per_min
+    ):
         """
         Saves the signal features values.
 
