@@ -36,14 +36,7 @@ else:
 
 
 def _resolve_path(mod, file):
-    if version_info >= (3, 7):
-        with resources.path(mod, file) as file_path:
-            path = file_path
-    else:
-        with importlib_resources.path(mod, file) as file_path:
-            path = file_path
-
-    return path
+    return resources.files(mod) / file
 
 
 class PredictGaitLumbarLgbm(BaseProcess):
