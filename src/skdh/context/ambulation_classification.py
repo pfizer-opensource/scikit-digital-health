@@ -1,3 +1,10 @@
+"""
+Ambulation detection via LGBM classifier
+
+Yiorgos Christakis
+Copyright (c) 2023, Pfizer Inc. All rights reserved.
+"""
+
 from warnings import warn
 from importlib import resources
 
