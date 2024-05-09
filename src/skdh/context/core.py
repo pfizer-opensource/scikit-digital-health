@@ -376,16 +376,14 @@ class MotionDetectionAlgorithm(BaseProcess):
         self.cov_threshold = cov_threshold
 
     @handle_process_returns(results_to_kwargs=False)
-    def predict(self, time, accel, fs, **kwargs):
+    def predict(self, accel, fs, **kwargs):
         """
-        predict(time, accel, fs)
+        predict(accel, fs)
 
         Function to detect periods of motion from an accelerometer signal.
 
         Parameters
         ----------
-        time : numpy.ndarray
-            (N, ) array of unix timestamps, in seconds.
         accel : numpy.ndarray
             (N, 3) array of acceleration, in units of 'g', collected at 20hz.
         fs : float
