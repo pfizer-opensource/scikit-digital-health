@@ -36,9 +36,7 @@ from skdh.features import (
 
 
 def _resolve_path(mod, file):
-    with resources.path(mod, file) as file_path:
-        path = file_path
-    return path
+    return resources.files(mod) / file
 
 
 class Ambulation(BaseProcess):
