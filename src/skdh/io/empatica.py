@@ -363,5 +363,9 @@ class ReadEmpaticaAvro(BaseProcess):
                 and results[k]["time"] is not None
             ):
                 results[k]["time"] += tz_offset
+        
+        # adjust systolic_peaks
+        if "systolic_peaks" in results:
+            results["systolic_peaks"]["values"] += tz_offset
 
         return results
