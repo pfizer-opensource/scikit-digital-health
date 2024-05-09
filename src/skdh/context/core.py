@@ -190,7 +190,7 @@ class Ambulation(BaseProcess):
         x_mag = np.linalg.norm(windowed_accel, axis=2)
 
         # High-pass filter at .25hz
-        sos = butter(N=1, Wn=[2 * 0.25 / 20.0], btype="highpass", output="sos")
+        sos = butter(N=1, Wn=2 * 0.25 / 20.0, btype="highpass", output="sos")
         preprocessed = sosfiltfilt(sos, x_mag, axis=1)
 
         return preprocessed
@@ -392,22 +392,16 @@ class MotionDetectionAlgorithm(BaseProcess):
         Returns
         -------
         results : dict
-            Results dictionary including 3s epoch level predictions, probabilities,
-            and unix timestamps.
-        cov_values_above_threshold : np.array
-            Detected motion.
-        rolling_cov : np.array
-            Computed rolling CoV on input data.
+            Results dictionary including detected motion (1s rolling) and raw values of rolling CoV.
+
         """
         # Vector Magnitude
         vmag = np.linalg.norm(accel, axis=1)
 
         # Low-pass filter the accelerometer vector magnitude signal to remove high frequency components
-        wn = [self.filter_cutoff * 2 / fs]
+        wn = self.filter_cutoff * 2 / fs
         [b, a] = iirfilter(self.filter_cutoff, wn, btype="lowpass", ftype="butter")
-        vmag_filt = filtfilt(
-            b, a, vmag
-        )
+        vmag_filt = filtfilt(b, a, vmag)
 
         # Calculate the 1s rolling coefficient of variation
         rolling_mean = moving_mean(a=vmag_filt, w_len=int(fs), skip=1)
@@ -415,12 +409,9 @@ class MotionDetectionAlgorithm(BaseProcess):
         rolling_cov = rolling_std / rolling_mean
 
         # Detect CoV values about given movement threshold
-        movement = (rolling_cov > self.cov_threshold)
+        movement = rolling_cov > self.cov_threshold
 
         # compile results
-        results = {
-            "movement_detected": movement,
-            "rolling_1s_cov": rolling_cov
-        }
+        results = {"movement_detected": movement, "rolling_1s_cov": rolling_cov}
 
         return results
