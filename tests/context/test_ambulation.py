@@ -92,7 +92,7 @@ def test_7_input_check_units():
 
 
 # Test input check sample rate requirement
-def test_8_input_check_units():
+def test_8_input_check_fs():
     with pytest.raises(ValueError) as e_info:
         Ambulation()._check_input(
             time=np.arange(0, 120 / 10, 1 / 10), accel=np.ones([120, 3])
