@@ -31,3 +31,25 @@ def ambulation_negative_data_50hz(path_tests):
     time = arange(0, len(accel) / 50, 1 / 50)
 
     return time, accel
+
+
+@fixture(scope="class")
+def motion_positive_data(path_tests):
+    accel = read_csv(
+        path_tests / "context" / "data" / "motion_test_positive.csv"
+    ).values
+
+    fs = 100.0
+
+    return accel, fs
+
+
+@fixture(scope="class")
+def motion_negative_data(path_tests):
+    accel = read_csv(
+        path_tests / "context" / "data" / "motion_test_negative.csv"
+    ).values
+
+    fs = 100.0
+
+    return accel, fs

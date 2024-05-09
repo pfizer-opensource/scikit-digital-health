@@ -188,7 +188,7 @@ class Ambulation(BaseProcess):
         x_mag = np.linalg.norm(windowed_accel, axis=2)
 
         # High-pass filter at .25hz
-        sos = butter(N=1, Wn=[2 * 0.25 / 20.0], btype="highpass", output="sos")
+        sos = butter(N=1, Wn=2 * 0.25 / 20.0, btype="highpass", output="sos")
         preprocessed = sosfiltfilt(sos, x_mag, axis=1)
 
         return preprocessed
