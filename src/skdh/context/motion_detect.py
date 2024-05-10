@@ -69,7 +69,7 @@ class MotionDetectRCoV(BaseProcess):
     @handle_process_returns(results_to_kwargs=False)
     def predict(self, time, accel, fs=None, **kwargs):
         """
-        predict(time, accel, fs)
+        predict(time, accel, fs=None)
 
         Function to detect periods of motion from an accelerometer signal.
 
@@ -79,7 +79,7 @@ class MotionDetectRCoV(BaseProcess):
             (N, ) array of unix timestamps, in seconds.
         accel : numpy.ndarray
             (N, 3) array of acceleration, in units of 'g'.
-        fs : float
+        fs : float, optional
             Sampling rate. Default None. If not provided, will be inferred.
 
         Returns
@@ -164,7 +164,7 @@ class MotionDetectRCoV(BaseProcess):
             Numpy array of unix timestamps. Units of seconds.
         accel : array-like
             Numpy array of triaxial accelerometer data.
-        fs : float
+        fs : float, optional
             Sampling rate. Default None. If not provided, will be inferred.
 
         Returns
@@ -261,7 +261,7 @@ class MotionDetectRCoVMaxSD(BaseProcess):
     @handle_process_returns(results_to_kwargs=False)
     def predict(self, time, accel, fs=None, **kwargs):
         """
-        predict(time, accel, fs)
+        predict(time, accel, fs=None)
 
         Function to detect periods of motion from an accelerometer signal.
 
@@ -271,7 +271,7 @@ class MotionDetectRCoVMaxSD(BaseProcess):
             (N, ) array of unix timestamps, in seconds.
         accel : numpy.ndarray
             (N, 3) array of acceleration, in units of 'g', collected at 20hz.
-        fs : float
+        fs : float, optional
             Sampling rate. Default None. If not provided, will be inferred.
 
         Returns
@@ -378,7 +378,7 @@ class MotionDetectRCoVMaxSD(BaseProcess):
             Numpy array of unix timestamps. Units of seconds.
         accel : array-like
             Numpy array of triaxial accelerometer data.
-        fs : float
+        fs : float, optional
             Sampling rate. Default None. If not provided, will be inferred.
 
         Returns
