@@ -8,7 +8,7 @@ Copyright (c) 2024, Pfizer Inc. All rights reserved.
 from warnings import warn
 from importlib import resources
 
-from numpy import round, all, linalg, mean, diff, absolute, max, asarray, concatenate
+from numpy import round, all, linalg, mean, diff, absolute, max, asarray, concatenate, clip
 from scipy.signal import butter, sosfiltfilt
 
 from skdh.base import BaseProcess, handle_process_returns
@@ -140,15 +140,11 @@ class MotionDetectRCoV(BaseProcess):
         starts *= int(fs)
         stops *= int(fs)
 
-        # handle cases: no bouts detected, or end is end of array
-        if len(starts) and stops[-1] == time.size:
-            stops[-1] = time.size - 1
+        # Handle cases: no bouts detected, or end is end of array
+        stops = clip(stops, 0, time.size - 1)
 
-        # create a single movement bouts array with correct units for indexing
-        if len(starts):
-            movement_bouts = concatenate((starts, stops)).reshape((2, -1)).T
-        else:
-            movement_bouts = None
+        # Create a single movement bouts array with correct units for indexing
+        movement_bouts = concatenate((starts, stops)).reshape((2, -1)).T
 
         return results, {"movement_bouts": movement_bouts}
 
@@ -355,14 +351,10 @@ class MotionDetectRCoVMaxSD(BaseProcess):
         stops *= int(fs)
 
         # Handle cases: no bouts detected, or end is end of array
-        if len(starts) and stops[-1] == time.size:
-            stops[-1] = time.size - 1
+        stops = clip(stops, 0, time.size - 1)
 
         # Create a single movement bouts array with correct units for indexing
-        if len(starts):
-            movement_bouts = concatenate((starts, stops)).reshape((2, -1)).T
-        else:
-            movement_bouts = None
+        movement_bouts = concatenate((starts, stops)).reshape((2, -1)).T
 
         return results, {"movement_bouts": movement_bouts}
 
