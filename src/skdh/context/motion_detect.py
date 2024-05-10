@@ -8,27 +8,22 @@ Copyright (c) 2024, Pfizer Inc. All rights reserved.
 from warnings import warn
 from importlib import resources
 
-import numpy as np
-from numpy import round
-from scipy.signal import iirfilter, filtfilt, butter, sosfiltfilt
+from numpy import round, all, linalg, mean, diff, absolute, max, asarray, concatenate
+from scipy.signal import butter, sosfiltfilt
 
 from skdh.base import BaseProcess, handle_process_returns
-from skdh.utility import moving_mean, moving_sd
-from skdh.utility.internal import apply_resample
+from skdh.utility import moving_mean, moving_sd, get_windowed_view
+from skdh.utility.internal import apply_resample, rle
 
 
 def _resolve_path(mod, file):
     return resources.files(mod) / file
 
 
-class MotionDetectMahadevanEtAl(BaseProcess):
+class MotionDetectRCoV(BaseProcess):
     """
     Detect periods of motion from an accelerometer signal. Threshold approach on computed 1s rolling coefficient
     of variation (CoV).
-
-    Method implemented as described in:
-    Mahadevan, N., Christakis, Y., Di, J. et al. Development of digital measures for nighttime scratch and sleep using
-    wrist-worn wearable devices. npj Digit. Med. 4, 42 (2021). https://doi.org/10.1038/s41746-021-00402-x
 
     Input requirements:
 
@@ -47,14 +42,28 @@ class MotionDetectMahadevanEtAl(BaseProcess):
     ----------
     filter_cutoff : int
         Low pass filter cutoff. Data filtered prior to CoV calculation.
+    filter_order : int
+        Low pass filter order. Data filtered prior to CoV calculation.
     cov_threshold : float
         Threshold computed rolling CoV to determine motion present.
 
+    References
+    ----------
+    .. [1] Mahadevan, N., Christakis, Y., Di, J. et al. Development of digital measures for nighttime scratch and
+    sleep using wrist-worn wearable devices. npj Digit. Med. 4, 42 (2021). https://doi.org/10.1038/s41746-021-00402-x
+
     """
 
-    def __init__(self, filter_cutoff=6, cov_threshold=0.022558169349678834):
-        super().__init__(filter_cutoff=filter_cutoff, cov_threshold=cov_threshold)
+    def __init__(
+        self, filter_cutoff=6, filter_order=6, cov_threshold=0.022558169349678834
+    ):
+        super().__init__(
+            filter_cutoff=filter_cutoff,
+            filter_order=filter_order,
+            cov_threshold=cov_threshold,
+        )
         self.filter_cutoff = filter_cutoff
+        self.filter_order = filter_order
         self.cov_threshold = cov_threshold
 
     @handle_process_returns(results_to_kwargs=False)
@@ -77,37 +86,77 @@ class MotionDetectMahadevanEtAl(BaseProcess):
         -------
         results : dict
             Results dictionary including detected motion (1s rolling) and raw values of 1s rolling CoV.
+        dict
+            Results dictionary for downstream pipeline use including start and stop times for movement bouts.
 
         """
         # check input requirements are met
-        time, accel, fs = self._check_input(time, accel)
+        time, accel, fs = self._check_input(time, accel, fs)
 
         # Vector Magnitude
-        vmag = np.linalg.norm(accel, axis=1)
+        vmag = linalg.norm(accel, axis=1)
 
         # Low-pass filter the accelerometer vector magnitude signal to remove high frequency components
-        # Note: iirfilter with filtfilt used to match legacy implementation
-        wn = self.filter_cutoff * 2 / fs
-        [b, a] = iirfilter(self.filter_cutoff, wn, btype="lowpass", ftype="butter")
-        vmag_filt = filtfilt(b, a, vmag)
+        # Note: legacy implementation used output = 'ba', switched for numerical stability
+        sos_lp = butter(
+            N=self.filter_order,
+            Wn=2 * self.filter_cutoff / fs,
+            btype="lowpass",
+            output="sos",
+        )
+        vmag_filt = sosfiltfilt(sos_lp, vmag, axis=0)
 
         # Calculate the 1s rolling coefficient of variation
         # Note: added a non-zero term in denominator to prevent divide by zero errors
-        rolling_std, rolling_mean = moving_sd(a=vmag_filt, w_len=int(fs), skip=1)
+        rolling_std, rolling_mean = moving_sd(
+            a=vmag_filt, w_len=int(fs), skip=1, return_previous=True
+        )
         rolling_cov = rolling_std / (rolling_mean + 1e-12)
 
         # Detect CoV values above movement threshold
         movement = rolling_cov > self.cov_threshold
 
-        # Group results
-        results = {"movement_detected": movement, "rolling_1s_cov": rolling_cov}
+        # Generate movement prediction array at 1s intervals, requiring each window have 100% hand movement
+        predictions = get_windowed_view(
+            x=movement, window_length=int(fs), step_size=int(fs)
+        )
+        predictions = all(predictions, axis=1)
 
-        return results
+        # Sample time array to 1s resolution
+        time_1s = time[0 :: int(fs)][0 : len(predictions)]
+
+        # Group results
+        results = {"movement_detected": predictions, "movement_time": time_1s}
+
+        # Get starts and stops of movement bouts
+        # Run length encoding of predictions @ 1s
+        lengths, starts, values = rle(predictions)
+
+        # subset to only movement bouts and compute stops
+        starts, lengths = asarray(starts[values == 1]), asarray(lengths[values == 1])
+        stops = starts + lengths
+
+        # convert to original index freq
+        starts *= int(fs)
+        stops *= int(fs)
+
+        # handle cases: no bouts detected, or end is end of array
+        if len(starts) and stops[-1] == time.size:
+            stops[-1] = time.size - 1
+
+        # create a single movement bouts array with correct units for indexing
+        if len(starts):
+            movement_bouts = concatenate((starts, stops)).reshape((2, -1)).T
+        else:
+            movement_bouts = None
+
+        return results, {"movement_bouts": movement_bouts}
 
     @staticmethod
     def _check_input(time, accel, fs=None):
         """
         Checks that input meets requirements (see class docstring). Infers fs if necessary.
+        Does not check accelerometer units.
 
         Parameters
         ----------
@@ -129,38 +178,27 @@ class MotionDetectMahadevanEtAl(BaseProcess):
         # check # of columns
         _, c = accel.shape
         if not (c == 3):
-            raise ValueError("Input expected to have 3 columns, but found " + str(c))
-
-        # units must be in G's (mean of magnitude of x,y,z across the entire signal < 4)
-        avg = np.mean(np.linalg.norm(accel, axis=1))
-        if not (avg < 4):
-            raise ValueError(
-                "Input expected to have units of G's, but mean signal magnitude greater than 4."
-            )
+            raise ValueError(f"Input expected to have 3 columns, but found {str(c)}")
 
         # check fs
-        fs = round(1 / np.mean(np.diff(time)), 3) if fs is None else fs
+        fs = round(1 / mean(diff(time)), 3) if fs is None else fs
         if fs < 20.0:
             raise ValueError(f"Frequency ({fs:.2f}Hz) is too low (<20Hz).")
 
-        # check
+        # check length of data
         r, _ = accel.shape
         if not (r >= 20):
             raise ValueError(
-                "Input at 20hz expected to have at least 20 rows, but found " + str(r)
+                f"Input at 20hz expected to have at least 20 rows, but found {str(r)}"
             )
 
         return time, accel, fs
 
 
-class MotionDetectJiEtAl(BaseProcess):
+class MotionDetectRCoVMaxSD(BaseProcess):
     """
     Detect periods of motion from a 20hz accelerometer signal. Threshold approach on computed 1s rolling coefficient
     of variation (CoV) and max standard deviation across three axes.
-
-    Method implemented as described in:
-    Ji, J., Venderley, J., Zhang, H. et al. Assessing nocturnal scratch with actigraphy in atopic dermatitis
-    patients. npj Digit. Med. 6, 72 (2023). https://doi.org/10.1038/s41746-023-00821-y
 
     Input requirements:
 
@@ -188,6 +226,11 @@ class MotionDetectJiEtAl(BaseProcess):
         Threshold computed rolling CoV to determine motion present.
     sd_threshold : float
         Threshold for max standard deviation to determine motion present.
+
+    References
+    ----------
+    .. [1] Ji, J., Venderley, J., Zhang, H. et al. Assessing nocturnal scratch with actigraphy in atopic dermatitis
+    patients. npj Digit. Med. 6, 72 (2023). https://doi.org/10.1038/s41746-023-00821-y
 
     """
 
@@ -235,6 +278,8 @@ class MotionDetectJiEtAl(BaseProcess):
         -------
         results : dict
             Results dictionary with motion predictions (1hz boolean; true indicates motion) and associated timestamps.
+        dict
+            Results dictionary for downstream pipeline use including start and stop times for movement bouts.
 
         """
         # check input requirements are met
@@ -242,7 +287,7 @@ class MotionDetectJiEtAl(BaseProcess):
 
         # Branch 1: Rolling CoV thresholding
         # 1. Vector Magnitude
-        vmag = np.linalg.norm(accel, axis=1)
+        vmag = linalg.norm(accel, axis=1)
 
         # 2. Low-pass filter the accelerometer vector magnitude signal to remove high frequency components
         sos_lp = butter(
@@ -263,8 +308,10 @@ class MotionDetectJiEtAl(BaseProcess):
         vmag_lp_hp = sosfiltfilt(sos_hp, vmag_lp, axis=0)
 
         # 4. Calculate the 1s rolling coefficient of variation
-        rolling_std, rolling_mean = moving_sd(a=vmag_lp_hp, w_len=int(fs), skip=1)
-        rolling_cov = rolling_std / (np.abs(rolling_mean) + 0.01)
+        rolling_std, rolling_mean = moving_sd(
+            a=vmag_lp_hp, w_len=int(fs), skip=1, return_previous=True
+        )
+        rolling_cov = rolling_std / (absolute(rolling_mean) + 0.01)
 
         # 5. Detect CoV values greater than movement threshold
         movement = rolling_cov >= self.cov_threshold
@@ -276,29 +323,54 @@ class MotionDetectJiEtAl(BaseProcess):
 
         # Branch 2: Max standard deviation thresholding
         # 1. Moving SD with no overlap
-        sd, _ = moving_sd(a=accel, w_len=int(fs), skip=int(fs), axis=0)
+        sd = moving_sd(
+            a=accel, w_len=int(fs), skip=int(fs), axis=0, return_previous=False
+        )
 
         # 2. Max in each second
-        maxsd = np.max(sd, axis=1)
+        maxsd = max(sd, axis=1)
 
         # 3. Threshold maxsd
         maxsd_predictions = maxsd >= self.sd_threshold
 
         # Final step: OR of branch 1 and 2
-        predictions = cov_predictions | maxsd_predictions[0:len(cov_predictions)]
+        predictions = cov_predictions | maxsd_predictions[0 : len(cov_predictions)]
 
         # Sample time array to 1s resolution
-        time_1s = time[0 :: int(fs)].copy()[0:len(predictions)]
+        time_1s = time[0 :: int(fs)][0 : len(predictions)]
 
-        # compile results
+        # Group results
         results = {"movement_detected": predictions, "movement_time": time_1s}
 
-        return results
+        # Get starts and stops of movement bouts
+        # Run length encoding of predictions @ 1s
+        lengths, starts, values = rle(predictions)
+
+        # Subset to only movement bouts and compute stops
+        starts, lengths = asarray(starts[values == 1]), asarray(lengths[values == 1])
+        stops = starts + lengths
+
+        # Convert to original index freq
+        starts *= int(fs)
+        stops *= int(fs)
+
+        # Handle cases: no bouts detected, or end is end of array
+        if len(starts) and stops[-1] == time.size:
+            stops[-1] = time.size - 1
+
+        # Create a single movement bouts array with correct units for indexing
+        if len(starts):
+            movement_bouts = concatenate((starts, stops)).reshape((2, -1)).T
+        else:
+            movement_bouts = None
+
+        return results, {"movement_bouts": movement_bouts}
 
     @staticmethod
     def _check_input(time, accel, fs=None):
         """
         Checks that input meets requirements (see class docstring). Downsamples data >20hz to 20hz.
+        Does not check accelerometer units.
 
         Parameters
         ----------
@@ -320,17 +392,10 @@ class MotionDetectJiEtAl(BaseProcess):
         # check # of columns
         _, c = accel.shape
         if not (c == 3):
-            raise ValueError("Input expected to have 3 columns, but found " + str(c))
-
-        # units must be in G's (mean of magnitude of x,y,z across the entire signal < 4)
-        avg = np.mean(np.linalg.norm(accel, axis=1))
-        if not (avg < 4):
-            raise ValueError(
-                "Input expected to have units of G's, but mean signal magnitude greater than 4."
-            )
+            raise ValueError(f"Input expected to have 3 columns, but found {str(c)}")
 
         # check fs & downsample if necessary
-        fs = round(1 / np.mean(np.diff(time)), 3) if fs is None else fs
+        fs = round(1 / mean(diff(time)), 3) if fs is None else fs
         if fs < 20.0:
             raise ValueError(f"Frequency ({fs:.2f}Hz) is too low (<20Hz).")
         elif fs > 20.0:
@@ -348,11 +413,11 @@ class MotionDetectJiEtAl(BaseProcess):
             time_ds = time
             accel_ds = accel
 
-        # check
+        # check length of data
         r, _ = accel_ds.shape
-        if not (r >= 60):
+        if not (r >= 20):
             raise ValueError(
-                "Input at 20hz expected to have at least 60 rows, but found " + str(r)
+                f"Input at 20hz expected to have at least 20 rows, but found {str(r)}"
             )
 
         return time_ds, accel_ds, fs
