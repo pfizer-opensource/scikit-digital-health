@@ -44,5 +44,6 @@ As of 0.9.15, Scikit Digital Health is built using Meson.
 
 If you use SKDH in your research, please include the following citation:
 
+<a id="1">[1]</a>
 L. Adamowicz, Y. Christakis, M. D. Czech, and T. Adamusiak, “SciKit Digital Health: Python Package for Streamlined Wearable Inertial Sensor Data Processing,” JMIR mHealth and uHealth, vol. 10, no. 4, p. e36762, Apr. 2022, doi: 10.2196/36762.
 
