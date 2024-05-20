@@ -12,7 +12,7 @@ dynamic = [
     'version'
 ]
 description = "Python general purpose human motion inertial data processing package."
-readme = "README.rst"
+readme = "README.md"
 license = { file = 'LICENSE' }
 keyword = [
     'IMU',
