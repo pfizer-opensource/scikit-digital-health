@@ -37,6 +37,7 @@ from pandas import (
 
 from skdh.base import BaseProcess, handle_process_returns
 from skdh.io.base import check_input_file
+from skdh.utility.internal import fill_data_gaps
 
 
 def _as_list(a):
@@ -269,31 +270,7 @@ class ReadCSV(BaseProcess):
 
         # check if we are filling gaps or not
         if self.fill_gaps:
-            time_rs = arange(time[0], time[-1] + 0.5 / n_samples, 1 / n_samples)
-
-            # get the location of gaps in the data - add 1 so that the index reflects
-            # the first value AFTER the gap
-            gaps = nonzero(diff(time) > (1.5 / n_samples))[0] + 1
-            # create sequences of data with no gaps
-            seqs = zeros((gaps.size + 1, 2), dtype=int_)
-            seqs[1:, 0] = gaps
-            seqs[:-1, 1] = gaps
-            seqs[-1, 1] = time.size
-
-            # iterate over the datastreams
-            for name, dstream in data.items():
-                shape = list(dstream.shape)
-                shape[0] = time_rs.size
-                new_stream = full(shape, fill_dict[name], dtype=float_)
-
-                for seq in seqs[::-1]:
-                    i1, i2 = seq
-                    # get the number of samples offset in the resampled time
-                    i_offset = int((time[i1] - time_rs[i1]) * n_samples)
-
-                    new_stream[i1 + i_offset : i2 + i_offset] = dstream[i1:i2]
-
-                data[name] = new_stream
+            time_rs, data = fill_data_gaps(time, n_samples, fill_dict, **data)
         else:
             # if not filling data gaps, check that there are not gaps that would
             # cause garbage outputs from downstream algorithms

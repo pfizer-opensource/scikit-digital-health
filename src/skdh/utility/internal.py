@@ -25,6 +25,7 @@ from numpy import (
     ndarray,
     concatenate,
     roll,
+    full,
 )
 from scipy.signal import cheby1, sosfiltfilt
 
@@ -360,3 +361,68 @@ def invert_indices(starts, stops, zero_index, end_index):
     mask = inv_starts != inv_stops
 
     return inv_starts[mask], inv_stops[mask]
+
+
+def fill_data_gaps(time, fs, fill_info, **kwargs):
+    """
+    Fill gaps in data-streams
+
+    Parameters
+    ----------
+    time : numpy.ndarray
+        Array of unix timestamps, in seconds.
+    fs : float
+        Sampling frequency. In number of samples in a second.
+    fill_info : dict
+        Dictionary with keys matching `**kwargs` to specify what value to use
+        for filling gaps. If a value is not provided, the gap will be filled with
+        zeros.
+    **kwargs : dict
+        Arrays of data to fill gaps in specified by keyword. Must be the same size
+        as `time`. Returned as one dictionary for all arrays specified this way.
+    
+    Returns
+    -------
+    time_filled : numpy.ndarray
+        Gap filled time array.
+    data_filled : dict
+        Dictionary of gap filled data arrays.
+    
+    Examples
+    --------
+    >>> time = np.concatenate((arange(0, 4, 0.01), arange(6, 10, 0.01))
+    >>> accel = np.random.default_rng().normal(0, 1, (time.size, 3))
+    >>> accel[:, 2] += 1  # add gravity acceleration
+    >>> temp = np.random.default_rng().normal(28, 1, time.size)
+    >>> fill_info = {"accel": [0, 0, 1]}  # only specifiying fill value for accel
+    >>> data_rs = fill_data_gaps(time, 100.0, fill_info, accel=accel, temp=temp)
+    >>> print(data_rs.keys())
+    dict_keys(['accel', 'temp'])
+    """
+    time_rs = arange(time[0], time[-1] + 0.5 / fs, 1 / fs)
+
+    # get the first location of gaps in the data - add 1 so that the index reflects
+    # the first value AFTER the gap
+    gaps = nonzero(diff(time) > (1.5 / fs))[0] + 1
+    # create sequences of data with no gaps
+    seqs = zeros((gaps.size + 1, 2), dtype=int_)
+    seqs[1:, 0] = gaps
+    seqs[:-1, 1], gaps
+    seqs[-1, 1] = time.size
+
+    # iterate over the datastreams
+    ret = {}
+    for name, data in kwargs.items():
+        shape = list(data.shape)
+        shape[0] = time_rs.size
+        new_data = full(shape, fill_info.get(name, 0.0), dtype=data.dtype)
+
+        for (i1, i2) in seqs[::-1]:
+            # get the number of samples offset in the resampled time
+            i_offset = int((time[i1] - time_rs[i1]) * fs)
+
+            new_data[i1 + i_offset:i2 + i_offset] = data[i1:i2]
+        
+        ret[name] = new_data
+    
+    return time_rs, ret
