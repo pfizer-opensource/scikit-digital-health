@@ -375,14 +375,21 @@ class MultiReader(BaseProcess):
         res_dict : dict
             Dictionary of data with gaps filled, as specified.
         """
-        # get fs
-        fs = data.get('fs', 1 / mean(diff(data['time'][:5000])))
-        
         if self.fill_gaps:
             # get a dictionary of streams that are the same size as the time array
             time = data.pop('time')
-            stream_keys = [i for i in data if data[i].shape[0] == time.size]
+            stream_keys = [i for i in data if isinstance(data[i], ndarray)]
+            stream_keys = [i for i in stream_keys if data[i].shape[0] == time.size]
             datastreams = {i: data.pop(i) for i in stream_keys}
+
+            # get fs
+            fs = data.pop('fs', None)
+            if fs is None:
+                fs = 1 / mean(diff(time[:5000]))
+                warn(
+                    f"Sampling frequency required calcluation, estimated to be {fs:.3f}. "
+                    f"May be effected if there are data gaps in the first 5000 samples."
+                )
 
             time_filled, data_filled = fill_data_gaps(time, fs, self.fill_value, **datastreams)
 
@@ -396,8 +403,10 @@ class MultiReader(BaseProcess):
             # put the non-filled data in the filled dictionary
             data_filled.update(data)
             data_filled['time'] = time_filled
+            data_filled['fs'] = fs
         else:
             # check if any gaps and warn if there are
+            fs = data.get('fs', 1 / mean(diff(data['time'][:500])))  # only get a few here
             time_deltas = diff(data['time'])
             if any(abs(time_deltas) > (1.5 / fs)):
                 self.handle_gaps_error(
