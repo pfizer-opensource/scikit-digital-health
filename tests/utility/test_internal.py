@@ -290,6 +290,8 @@ class TestFillDataGaps:
         assert 'temperature' in data
         assert allclose(t_rs, arange(0, 10, 0.01))
         assert allclose(data['accel'][400:600], [0.0, 0.0, 1.0])
+        assert allclose(data['accel'][:400], x[:400])
+        assert allclose(data['accel'][600:], x[400:])
         assert allclose(data['temperature'][400:600], 0.0)
     
     def test_no_gaps(self):

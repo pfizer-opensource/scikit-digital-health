@@ -407,7 +407,7 @@ def fill_data_gaps(time, fs, fill_info, **kwargs):
     # create sequences of data with no gaps
     seqs = zeros((gaps.size + 1, 2), dtype=int_)
     seqs[1:, 0] = gaps
-    seqs[:-1, 1], gaps
+    seqs[:-1, 1] = gaps
     seqs[-1, 1] = time.size
 
     # iterate over the datastreams
