@@ -1,11 +1,12 @@
 import pytest
-from numpy import allclose, array, arange
+from numpy import allclose, array, arange, random as np_random, concatenate
 
 from skdh.utility.internal import (
     get_day_index_intersection,
     apply_resample,
     rle,
     invert_indices,
+    fill_data_gaps,
 )
 
 
@@ -275,3 +276,28 @@ class TestInvertIndices:
 
         assert allclose(pred_inv_starts, array([0]))
         assert allclose(pred_inv_stops, array([900]))
+
+
+class TestFillDataGaps:
+    def test(self):
+        t = concatenate((arange(0, 4, 0.01), arange(6, 10, 0.01)))
+        x = np_random.default_rng().normal(0, 0.5, (t.size, 3))
+        temp = np_random.default_rng().normal(28, 0.75, t.size)
+
+        t_rs, data = fill_data_gaps(t, 100, {'accel': [0, 0, 1.0]}, accel=x, temperature=temp)
+
+        assert 'accel' in data
+        assert 'temperature' in data
+        assert allclose(t_rs, arange(0, 10, 0.01))
+        assert allclose(data['accel'][400:600], [0.0, 0.0, 1.0])
+        assert allclose(data['temperature'][400:600], 0.0)
+    
+    def test_no_gaps(self):
+        t = arange(0, 10, 0.01)
+        x = np_random.default_rng().normal(0, 0.5, (t.size, 3))
+
+        t_rs, data = fill_data_gaps(t, 100, {}, accel=x)
+
+        assert 'accel' in data
+        assert allclose(t_rs, t)
+        assert allclose(data['accel'], x)
