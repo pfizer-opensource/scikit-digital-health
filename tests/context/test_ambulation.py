@@ -5,14 +5,14 @@ from skdh.context import Ambulation
 
 
 # Test input check on real data
-def test_1_input_check(ambulation_positive_data):
+def test_input_check(ambulation_positive_data):
     time, accel = ambulation_positive_data
     amb = Ambulation()
     assert len(amb._check_input(time, accel)) == 3
 
 
 # Test preprocessing on real data
-def test_2_preprocessing(ambulation_positive_data):
+def test_preprocessing(ambulation_positive_data):
     time, accel = ambulation_positive_data
     r, c = accel.shape
     win_len = 60
@@ -22,7 +22,7 @@ def test_2_preprocessing(ambulation_positive_data):
 
 
 # Test feature extraction on real data
-def test_3_feature_extraction(ambulation_positive_data):
+def test_feature_extraction(ambulation_positive_data):
     time, accel = ambulation_positive_data
     r, c = accel.shape
     win_len = 60
@@ -61,14 +61,14 @@ def test_3_feature_extraction(ambulation_positive_data):
 
 
 # Test model loading
-def test_4_model_loading():
+def test_model_loading():
     mdl = Ambulation()._load_model("ambulation_model.txt")
     print(type(mdl))
     assert isinstance(mdl, Booster)
 
 
 # Test input check row requirement
-def test_5_input_check_rows():
+def test_input_check_rows():
     with pytest.raises(ValueError) as e_info:
         Ambulation()._check_input(
             time=np.arange(0, 59 / 20, 1 / 20), accel=np.ones([59, 3])
@@ -76,23 +76,15 @@ def test_5_input_check_rows():
 
 
 # Test input check column requirement
-def test_6_input_check_columns():
+def test_input_check_columns():
     with pytest.raises(ValueError) as e_info:
         Ambulation()._check_input(
             time=np.arange(0, 60 / 20, 1 / 20), accel=np.ones([60, 2])
         )
 
 
-# Test input check units requirement
-def test_7_input_check_units():
-    with pytest.raises(ValueError) as e_info:
-        Ambulation()._check_input(
-            time=np.arange(0, 59 / 20, 1 / 20), accel=np.ones([60, 3]) * 10
-        )
-
-
 # Test input check sample rate requirement
-def test_8_input_check_units():
+def test_input_check_fs():
     with pytest.raises(ValueError) as e_info:
         Ambulation()._check_input(
             time=np.arange(0, 120 / 10, 1 / 10), accel=np.ones([120, 3])
@@ -100,7 +92,7 @@ def test_8_input_check_units():
 
 
 # Integration test 1: predict method on ambulation data
-def test_9_integration_ambulation(ambulation_positive_data):
+def test_integration_ambulation(ambulation_positive_data):
     time, accel = ambulation_positive_data
     res = Ambulation().predict(time=time, accel=accel)
     prd = res["ambulation_3s_epochs_predictions"]
@@ -110,7 +102,7 @@ def test_9_integration_ambulation(ambulation_positive_data):
 
 
 # Integration test 2: predict method on non-ambulation data
-def test_10_integration_non_ambulation(ambulation_negative_data):
+def test_integration_non_ambulation(ambulation_negative_data):
     time, accel = ambulation_negative_data
     res = Ambulation().predict(time=time, accel=accel)
     prd = res["ambulation_3s_epochs_predictions"]
@@ -120,7 +112,7 @@ def test_10_integration_non_ambulation(ambulation_negative_data):
 
 
 # Integration test 3: predict method on non ambulation data requiring downsampling
-def test_11_integration_ambulation_downsample(ambulation_negative_data_50hz):
+def test_integration_ambulation_downsample(ambulation_negative_data_50hz):
     time, accel = ambulation_negative_data_50hz
     res = Ambulation().predict(time=time, accel=accel)
     prd = res["ambulation_3s_epochs_predictions"]

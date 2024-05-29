@@ -29,21 +29,11 @@ from skdh.utility.windowing import get_windowed_view
 
 from skdh.features import Bank
 
-if version_info >= (3, 7):
-    from importlib import resources
-else:
-    import importlib_resources
+from importlib import resources
 
 
 def _resolve_path(mod, file):
-    if version_info >= (3, 7):
-        with resources.path(mod, file) as file_path:
-            path = file_path
-    else:
-        with importlib_resources.path(mod, file) as file_path:
-            path = file_path
-
-    return path
+    return resources.files(mod) / file
 
 
 class PredictGaitLumbarLgbm(BaseProcess):

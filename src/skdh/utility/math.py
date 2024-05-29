@@ -162,7 +162,7 @@ def moving_sd(a, w_len, skip, trim=True, axis=-1, return_previous=True):
         Trim the ends of the result, where a value cannot be calculated. If False,
         these values will be set to NaN. Default is True.
     axis : int, optional
-        Axis to compute the moving mean along. Default is -1.
+        Axis to compute the moving standard deviation along. Default is -1.
     return_previous : bool, optional
         Return previous moments. These are computed either way, and are therefore optional returns.
         Default is True.
