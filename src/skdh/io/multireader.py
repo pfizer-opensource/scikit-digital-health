@@ -16,7 +16,7 @@ from numpy import (
 
 from skdh.base import BaseProcess, handle_process_returns
 from skdh import io
-from skdh.utility.internal import apply_resample
+from skdh.utility.internal import apply_resample, fill_data_gaps
 
 
 class MultiReader(BaseProcess):
@@ -41,6 +41,14 @@ class MultiReader(BaseProcess):
         When `mode` is "combine", resample separate datastreams to the lowest sampled
         stream. Default is True. False will re-sample all datastreams to the highest
         sampled stream.
+    fill_gaps : bool, optional
+        Fill any gaps in data streams where possible (same size as time array). Default
+        is True.
+    fill_value : {None, dict}, optional
+        Dictionary with keys and values to fill data streams with. See Notes for
+        default values if not provided.
+    gaps_error : {'raise', 'warn', 'ignore'}, optional
+        Behavior if there are gaps in the datastreams. Default is to raise an error.
 
     Notes
     -----
@@ -62,6 +70,13 @@ class MultiReader(BaseProcess):
 
     Note that if the `reader` returns the same keys, and `mode` is "combine",
     keys will be overwritten.
+
+    Default fill values are:
+
+    - accel: numpy.array([0.0, 0.0, 1.0])
+    - gyro: 0.0
+    - temperature: 0.0
+    - ecg: 0.0
 
     Examples
     --------
@@ -95,9 +110,9 @@ class MultiReader(BaseProcess):
     >>> mrdr.predict(files={'f1': "file1.csv", 'f2': "file2.csv"})
     """
 
-    def __init__(self, mode, reader, reader_kw=None, resample_to_lowest=True):
+    def __init__(self, mode, reader, reader_kw=None, resample_to_lowest=True, fill_gaps=True, fill_value=None, gaps_error="raise"):
         super().__init__(
-            mode=mode, reader=reader, resample_to_lowest=resample_to_lowest
+            mode=mode, reader=reader, resample_to_lowest=resample_to_lowest, fill_gaps=fill_gaps, fill_value=fill_value, gaps_error=gaps_error
         )
 
         if reader_kw is None:
@@ -113,6 +128,13 @@ class MultiReader(BaseProcess):
         self.reader_kw = reader_kw
 
         self.resample_to_lowest = resample_to_lowest
+
+        self.fill_gaps = fill_gaps
+        self.fill_value = {} if fill_value is None else fill_value
+        if gaps_error in ['raise', 'warn', 'ignore']:
+            self.gaps_error = gaps_error
+        else:
+            raise ValueError("gaps_error must be one of {'raise', 'warn', 'ignore'}.")
 
     def get_reader_kw(self, idx):
         """
@@ -331,6 +353,63 @@ class MultiReader(BaseProcess):
 
         return results
 
+    def handle_gaps_error(self, msg):
+        if self.gaps_error == "raise":
+            raise ValueError(msg)
+        elif self.gaps_error == "warn":
+            warn(msg)
+        else:
+            pass
+
+    def check_handle_gaps(self, data):
+        """
+        Check for gaps, and fill if specified.
+
+        Parameters
+        ----------
+        data : dict
+            Dictionary of data-streams
+
+        Returns
+        -------
+        res_dict : dict
+            Dictionary of data with gaps filled, as specified.
+        """
+        # get fs
+        fs = data.get('fs', 1 / mean(diff(data['time'][:5000])))
+        
+        if self.fill_gaps:
+            # get a dictionary of streams that are the same size as the time array
+            time = data.pop('time')
+            stream_keys = [i for i in data if data[i].shape[0] == time.size]
+            datastreams = {i: data.pop(i) for i in stream_keys}
+
+            time_filled, data_filled = fill_data_gaps(time, fs, self.fill_value, **datastreams)
+
+            if data:  # check if there are any keys left
+                warn(
+                    f"These keys could not be checked for gaps, or updated to new "
+                    f"time series. If they are indices this may cause down-stream "
+                    f"problems: {data.keys()}"
+                )
+            
+            # put the non-filled data in the filled dictionary
+            data_filled.update(data)
+            data_filled['time'] = time_filled
+        else:
+            # check if any gaps and warn if there are
+            time_deltas = diff(data['time'])
+            if any(abs(time_deltas) > (1.5 / fs)):
+                self.handle_gaps_error(
+                    f"There are data gaps (max length: {max(time_deltas):.2f}s), "
+                    f"which could potentially result in incorrect outputs from down-stream "
+                    f"algorithms"
+                )
+            
+            data_filled = data
+        
+        return data_filled
+
     @handle_process_returns(results_to_kwargs=True)
     def predict(self, *, files=None, **kwargs):
         """
@@ -365,6 +444,9 @@ class MultiReader(BaseProcess):
                 pre_results.append(self.rdr(**kw).predict(file=fpath, **kwargs))
 
         results = self.handle_results(pre_results)
+
+        # check for gaps, and fill if specified
+        results = self.check_handle_gaps(results)
 
         # handle setting the file, either the first key from a dictionary or the
         # first index from a list
