@@ -929,7 +929,7 @@ class AccelThresholdWearDetection(BaseProcess):
         w_starts = ch[1:-1:2]
         w_stops = ch[2:-1:2]
 
-        if apply_setup_rule and (w_starts[0] == 0) and (w_stops[0] <= (3 * nph)):
+        if apply_setup_rule and w_starts.size > 0 and (w_starts[0] == 0) and (w_stops[0] <= (3 * nph)):
             w_starts = w_starts[1:]
             w_stops = w_stops[1:]
 
