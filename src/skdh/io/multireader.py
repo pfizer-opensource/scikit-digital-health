@@ -440,7 +440,7 @@ class MultiReader(BaseProcess):
         """
         if files is None:
             try:
-                files = [kwargs['file']]
+                files = [kwargs.pop('file')]
             except KeyError:
                 raise ValueError("No files provided to read.")
 
