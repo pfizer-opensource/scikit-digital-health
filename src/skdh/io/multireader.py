@@ -438,6 +438,12 @@ class MultiReader(BaseProcess):
         Note that any additional key-word arguments passed to `MultiReader.predict`
         will be passed along to the `reader.predict` method.
         """
+        if files is None:
+            try:
+                files = [kwargs['file']]
+            except KeyError:
+                raise ValueError("No files provided to read.")
+
         i0 = 0
         if isinstance(files, Mapping):
             i0 = next(iter(files))  # get the first key
