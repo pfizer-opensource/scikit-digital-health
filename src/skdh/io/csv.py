@@ -239,7 +239,7 @@ class ReadCSV(BaseProcess):
             # check that all the blocks are the same size (or that there is only 1 non-equal block
             # at the end)
             block_changes = nonzero(diff(time, prepend=time[0], append=time[-1] + 1))[0]  # get a mask of where blocks change
-            counts = diff(block_changes, append=0)
+            counts = diff(block_changes, prepend=0)
             # check if the last block is the same size
             if counts[-1] != counts[0]:
                 # drop the last blocks worth of data
