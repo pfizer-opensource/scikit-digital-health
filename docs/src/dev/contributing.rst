@@ -1,8 +1,8 @@
 .. _devindex:
 
-#####################################
-Contributing to scikit-digital-health
-#####################################
+############
+Contributing
+############
 
 Contributing to ``scikit-digital-health`` is fairly straightforward, and the process is laid out below.  Much of the guidelines borrow from and are very similar to ``NumPy's`` guidelines.
 

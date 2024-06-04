@@ -69,9 +69,10 @@ Scikit Digital Health
    :hidden:
 
    src/installation
+   src/data
    src/usage
-   src/dev/contributing
    ref/index
+   src/dev/contributing
    src/research
 
 

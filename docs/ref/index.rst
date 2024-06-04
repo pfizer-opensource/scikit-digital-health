@@ -1,6 +1,6 @@
 .. _skdh-api-reference:
 
-SKDH Reference
+SKDH API
 ==============
 
 .. toctree::
