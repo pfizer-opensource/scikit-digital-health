@@ -6,7 +6,6 @@ Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 
 from sys import gettrace  # to check if debugging
-from datetime import datetime, timedelta
 from warnings import warn
 from pathlib import Path
 
@@ -24,6 +23,7 @@ from numpy import (
     full,
     arange,
 )
+from pandas import Timedelta
 import matplotlib
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.lines as mlines
@@ -35,34 +35,6 @@ from skdh.activity.cutpoints import get_level_thresholds, get_metric
 from skdh.activity import endpoints as ept
 from skdh.activity.endpoints import ActivityEndpoint
 from skdh.activity.utility import handle_cutpoints
-
-
-def _update_date_results(
-    results, time, day_n, day_start_idx, day_stop_idx, day_start_hour
-):
-    # add 15 seconds to make sure any rounding effects for the hour don't adversely
-    # effect the result of the comparison
-    start_dt = datetime.utcfromtimestamp(time[day_start_idx])
-
-    window_start_dt = start_dt + timedelta(seconds=15)
-    if start_dt.hour < day_start_hour:
-        window_start_dt -= timedelta(days=1)
-
-    results["Date"][day_n] = window_start_dt.strftime("%Y-%m-%d")
-    results["Day Start Timestamp"][day_n] = start_dt.strftime("%Y-%m-%d %H:%M:%S.%f")
-    results["Day End Timestamp"][day_n] = datetime.utcfromtimestamp(
-        time[day_stop_idx]
-    ).strftime("%Y-%m-%d %H:%M:%S.%f")
-    results["Weekday"][day_n] = window_start_dt.strftime("%A")
-    results["Day N"][day_n] = day_n + 1
-    results["N hours"][day_n] = around(
-        (time[day_stop_idx - 1] - time[day_start_idx]) / 3600, 1
-    )
-    results["Total Minutes"][day_n] = around(
-        (time[day_stop_idx - 1] - time[day_start_idx]) / 60, 1
-    )
-
-    return start_dt
 
 
 class ActivityLevelClassification(BaseProcess):
@@ -315,6 +287,33 @@ class ActivityLevelClassification(BaseProcess):
         self.plot_fname = save_name
 
         self._t60 = arange(0, 24.1, 1 / 60)
+    
+    def _update_date_results(
+        self, results, time, day_n, day_start_idx, day_stop_idx, day_start_hour
+    ):
+        # add 15 seconds to make sure any rounding effects for the hour don't adversely
+        # effect the result of the comparison
+        start_dt = self.convert_timestamps(time[day_start_idx])
+
+        window_start_dt = start_dt + Timedelta(15, unit='s')
+        if start_dt.hour < day_start_hour:
+            window_start_dt -= Timedelta(1, unit='day')
+
+        results["Date"][day_n] = window_start_dt.strftime("%Y-%m-%d")
+        results["Day Start Timestamp"][day_n] = start_dt.strftime("%Y-%m-%d %H:%M:%S.%f")
+        results["Day End Timestamp"][day_n] = self.convert_timestamps(
+            time[day_stop_idx]
+        ).strftime("%Y-%m-%d %H:%M:%S.%f")
+        results["Weekday"][day_n] = window_start_dt.strftime("%A")
+        results["Day N"][day_n] = day_n + 1
+        results["N hours"][day_n] = around(
+            (time[day_stop_idx - 1] - time[day_start_idx]) / 3600, 1
+        )
+        results["Total Minutes"][day_n] = around(
+            (time[day_stop_idx - 1] - time[day_start_idx]) / 60, 1
+        )
+
+        return start_dt
 
     @handle_process_returns(results_to_kwargs=False)
     def predict(self, *, time, accel, fs=None, wear=None, **kwargs):
@@ -400,7 +399,7 @@ class ActivityLevelClassification(BaseProcess):
         for iday, day_idx in enumerate(zip(*self.day_idx)):
             day_start, day_stop = day_idx
             # update the results dictionary with date strings, # of hours, etc
-            start_dt = _update_date_results(
+            start_dt = self._update_date_results(
                 res, time, iday, day_start, day_stop, self.day_key[0]
             )
 
