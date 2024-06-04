@@ -9,7 +9,7 @@ from sys import gettrace
 from collections.abc import Iterable
 from warnings import warn
 from pathlib import Path
-from datetime import date as dt_date
+from datetime import date as dt_date  # used for plotting name, today's date
 
 import h5py
 from numpy import mean, diff, asarray, sum, ndarray
