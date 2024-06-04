@@ -281,8 +281,9 @@ class ReadCSV(BaseProcess):
         file : {str, Path}
             Path to the file to read.
         tz_name : {None, str}, optional
-            Name of a time-zone to convert the timestamps to. Default is None,
-            which will leave them as naive.
+            IANA time-zone name for the recording location. If not provided, timestamps
+            will represent local time naively. This means they will not account for 
+            any time changes due to Daylight Saving Time.
 
         Returns
         -------
