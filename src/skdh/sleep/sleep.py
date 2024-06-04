@@ -362,10 +362,10 @@ class Sleep(BaseProcess):
 
     @handle_process_returns(results_to_kwargs=True)
     def predict(
-        self, time=None, accel=None, *, temperature=None, fs=None, wear=None, **kwargs
+        self, time=None, accel=None, *, temperature=None, fs=None, wear=None, tz_name=None, **kwargs
     ):
         """
-        predict(time, accel, *, temperature=None, fs=None, wear=None, day_ends={})
+        predict(time, accel, *, temperature=None, fs=None, wear=None, day_ends={}, tz_name=None)
 
         Generate the sleep boundaries and endpoints for a time series signal.
 
@@ -386,6 +386,12 @@ class Sleep(BaseProcess):
         day_ends : dict
             Dictionary containing (N, 2) arrays of start and stop indices for individual days.
             Must have the key
+        
+        Other Parameters
+        ----------------
+        tz_name : {None, str}, optional
+            IANA time-zone name for the recording location if passing in `time` as
+            UTC timestamps. Can be ignored if passing in naive timestamps.
         """
         super().predict(
             expect_days=True,
@@ -395,6 +401,7 @@ class Sleep(BaseProcess):
             temperature=temperature,
             fs=fs,
             wear=wear,
+            tz_name=tz_name,
             **kwargs,
         )
 

@@ -425,10 +425,11 @@ class GaitLumbar(BaseProcess):
         gait_pred=True,
         v_axis=None,
         ap_axis=None,
+        tz_name=None,
         **kwargs,
     ):
         """
-        predict(time, accel, *, gyro=None, fs=None, height=None, gait_pred=None, v_axis=None, ap_axis=None)
+        predict(time, accel, *, gyro=None, fs=None, height=None, gait_pred=None, v_axis=None, ap_axis=None, tz_name=None)
 
         Get the gait events and endpoints from a time series signal
 
@@ -465,6 +466,12 @@ class GaitLumbar(BaseProcess):
         ap_axis : {None, 0, 1, 2}, optional
             AP axis index. Default is None, which indicates that it will be estimated
             from the acceleration data each bout.
+        
+        Other Parameters
+        ----------------
+        tz_name : {None, str}, optional
+            IANA time-zone name for the recording location if passing in `time` as
+            UTC timestamps. Can be ignored if passing in naive timestamps.
 
         Returns
         -------
@@ -507,6 +514,7 @@ class GaitLumbar(BaseProcess):
             gait_pred=gait_pred,
             v_axis=v_axis,
             ap_axis=ap_axis,
+            tz_name=tz_name,
             **kwargs,
         )
 
@@ -697,5 +705,8 @@ class GaitLumbar(BaseProcess):
         gait.pop("FC", None)
         gait.pop("FC opp foot", None)
         gait.pop("forward cycles", None)
+
+        # convert IC time to actual datetimes
+        gait["IC Time"] = self.convert_timestamps(gait["IC Time"])
 
         return gait

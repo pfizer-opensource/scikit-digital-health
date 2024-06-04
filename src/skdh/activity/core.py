@@ -316,7 +316,7 @@ class ActivityLevelClassification(BaseProcess):
         return start_dt
 
     @handle_process_returns(results_to_kwargs=False)
-    def predict(self, *, time, accel, fs=None, wear=None, **kwargs):
+    def predict(self, *, time, accel, fs=None, wear=None, tz_name=None, **kwargs):
         """
         predict(*, time, accel, fs=None, wear=None)
 
@@ -335,6 +335,9 @@ class ActivityLevelClassification(BaseProcess):
         wear : {None, list}, optional
             List of length-2 lists of wear-time ([start, stop]). Default is None,
             which uses the whole recording as wear time.
+        tz_name : {None, str}, optional
+            IANA time-zone name for the recording location if passing in `time` as
+            UTC timestamps. Can be ignored if passing in naive timestamps.
 
         Returns
         -------
@@ -348,6 +351,7 @@ class ActivityLevelClassification(BaseProcess):
             accel=accel,
             fs=fs,
             wear=wear,
+            tz_name=tz_name,
             **kwargs,
         )
 

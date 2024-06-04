@@ -67,7 +67,7 @@ class MotionDetectRCoV(BaseProcess):
         self.cov_threshold = cov_threshold
 
     @handle_process_returns(results_to_kwargs=False)
-    def predict(self, time, accel, fs=None, **kwargs):
+    def predict(self, time, accel, fs=None, tz_name=None, **kwargs):
         """
         predict(time, accel, fs=None)
 
@@ -81,6 +81,12 @@ class MotionDetectRCoV(BaseProcess):
             (N, 3) array of acceleration, in units of 'g'.
         fs : float, optional
             Sampling rate. Default None. If not provided, will be inferred.
+        
+        Other Parameters
+        ----------------
+        tz_name : {None, str}, optional
+            IANA time-zone name for the recording location if passing in `time` as
+            UTC timestamps. Can be ignored if passing in naive timestamps.
 
         Returns
         -------
@@ -90,6 +96,9 @@ class MotionDetectRCoV(BaseProcess):
             Results dictionary for downstream pipeline use including start and stop times for movement bouts.
 
         """
+        super().predict(
+            expect_days=False, expect_wear=False, time=time, accel=accel, fs=fs, tz_name=tz_name, **kwargs
+        )
         # check input requirements are met
         time, accel, fs = self._check_input(time, accel, fs)
 
@@ -126,7 +135,7 @@ class MotionDetectRCoV(BaseProcess):
         time_1s = time[0 :: int(fs)][0 : len(predictions)]
 
         # Group results
-        results = {"movement_detected": predictions, "movement_time": time_1s}
+        results = {"movement_detected": predictions, "movement_time": time_1s, "tz_name": tz_name}
 
         # Get starts and stops of movement bouts
         # Run length encoding of predictions @ 1s

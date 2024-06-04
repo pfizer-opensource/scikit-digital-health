@@ -96,7 +96,7 @@ class Ambulation(BaseProcess):
         self.pthresh = pthresh
 
     @handle_process_returns(results_to_kwargs=False)
-    def predict(self, time, accel, fs=None, **kwargs):
+    def predict(self, time, accel, fs=None, tz_name=None, **kwargs):
         """
         predict(time, accel, fs=None)
 
@@ -111,6 +111,12 @@ class Ambulation(BaseProcess):
             (N, 3) array of acceleration, in units of 'g', collected at 20hz.
         fs : float, optional
             Sampling rate. Default None. If not provided, will be inferred.
+        
+        Other Parameters
+        ----------------
+        tz_name : {None, str}, optional
+            IANA time-zone name for the recording location if passing in `time` as
+            UTC timestamps. Can be ignored if passing in naive timestamps.
 
         Returns
         -------
@@ -121,6 +127,7 @@ class Ambulation(BaseProcess):
             Results dictionary for downstream pipeline use including start and stop times for ambulation bouts.
 
         """
+        super().predict(expect_days=False, expect_wear=False, time=time, accel=accel, fs=fs, tz_name=tz_name, **kwargs)
         # check that input matches expectations, downsample to 20hz if necessary
         time_ds, accel_ds, fs = self._check_input(time, accel, fs)
 
@@ -142,6 +149,7 @@ class Ambulation(BaseProcess):
             "ambulation_3s_epochs_predictions": predictions,
             "ambulation_3s_epochs_probs": probabilities,
             "ambulation_3s_time": time_ds[::60],  # every 60th sample (3s at 20hz)
+            "tz_name": tz_name,
         }
 
         # get starts and stops of ambulation bouts
