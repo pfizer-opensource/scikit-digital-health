@@ -276,7 +276,7 @@ class Sit2Stand(BaseProcess):
             power_peaks, _ = find_peaks(power, **self.power_peak_kw)
 
             self.detector.predict(
-                sts, dt, time[start:stop], accel[start:stop, :], f_acc, power_peaks
+                sts, dt, time[start:stop], accel[start:stop, :], f_acc, power_peaks, kwargs.get("tz_name")
             )
 
             # fill out the day information

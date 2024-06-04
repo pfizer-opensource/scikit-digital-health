@@ -7,7 +7,6 @@ Copyright (c) 2023, Pfizer Inc. All rights reserved.
 
 from collections.abc import Iterable
 from warnings import warn
-from datetime import datetime, timedelta
 
 from numpy import ndarray, asarray, mean, diff, sum, nan
 
@@ -605,7 +604,7 @@ class GaitLumbar(BaseProcess):
 
             # keep track of the date - get the date of the first timestamp
             # add a few samples to make sure we aren't catching the last sample of the previous day
-            dtime = datetime.utcfromtimestamp(time_rs[dstart + 10])
+            dtime = self.convert_timestamps(time_rs[dstart + 10])
 
             for ibout, bout in enumerate(gait_bouts):
                 # run the bout processing pipeline
@@ -665,10 +664,10 @@ class GaitLumbar(BaseProcess):
             gait["Date"].extend([dtime.strftime("%Y-%m-%d")] * nvals)
             # add day start/end timestamps
             gait["Day Start Timestamp"].extend(
-                [str(datetime.utcfromtimestamp(time_rs[dstart]))] * nvals
+                [str(self.convert_timestamps(time_rs[dstart]))] * nvals
             )
             gait["Day End Timestamp"].extend(
-                [str(datetime.utcfromtimestamp(time_rs[dstop]))] * nvals
+                [str(self.convert_timestamps(time_rs[dstop]))] * nvals
             )
 
         # add day start/stop hours

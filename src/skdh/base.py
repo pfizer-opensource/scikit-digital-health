@@ -286,5 +286,3 @@ class BaseProcess:
         if self.tz_name is not None:
             dt = dt.tz_convert(self.tz_name)
         return dt
-
-    
