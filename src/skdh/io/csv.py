@@ -8,7 +8,6 @@ Copyright (c) 2023. Pfizer Inc. All rights reserved
 from warnings import warn
 
 from numpy import (
-    nan,
     array,
     tile,
     arange,
@@ -22,31 +21,15 @@ from numpy import (
     allclose,
     nonzero,
     diff,
-    zeros,
-    full,
-    int_,
-    float_,
 )
 from pandas import (
     read_csv,
-    to_datetime,
-    to_timedelta,
-    date_range,
-    options as pd_options,
+    to_datetime
 )
 
 from skdh.base import BaseProcess, handle_process_returns
 from skdh.io.base import check_input_file
 from skdh.utility.internal import fill_data_gaps
-
-
-def _as_list(a):
-    if isinstance(a, str):
-        return [a]
-    elif isinstance(a, list):
-        return a
-    else:
-        return list(a)
 
 
 class ReadCSV(BaseProcess):
