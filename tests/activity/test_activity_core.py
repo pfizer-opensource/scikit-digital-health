@@ -5,10 +5,7 @@ from numpy import array, allclose, zeros, arange
 from numpy.random import default_rng
 
 from skdh.activity.cutpoints import _base_cutpoints
-from skdh.activity.core import (
-    _update_date_results,
-    ActivityLevelClassification,
-)
+from skdh.activity.core import ActivityLevelClassification
 from skdh.activity import endpoints as epts
 from skdh.gait import gait_metrics
 
@@ -46,7 +43,7 @@ class Test_update_date_results:
 
         time = [epoch_ts + i * 3600 for i in range(10)]
 
-        _update_date_results(res, time, 0, 0, 5, 0)
+        ActivityLevelClassification()._update_date_results(res, time, 0, 0, 5, 0)
 
         assert res["Date"][0] == "2021-05-11"  # next day is when it starts
         assert res["Weekday"][0] == "Tuesday"
@@ -70,7 +67,7 @@ class Test_update_date_results:
 
         time = [epoch_ts + i * 3600 for i in range(10)]
 
-        _update_date_results(res, time, 0, 0, 5, 12)
+        ActivityLevelClassification()._update_date_results(res, time, 0, 0, 5, 12)
 
         # previous day is the actual window start
         assert res["Date"][0] == "2021-05-10"
