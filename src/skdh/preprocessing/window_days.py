@@ -119,8 +119,8 @@ class GetDayWindowIndices(BaseProcess):
 
         Returns
         -------
-        _type_
-            _description_
+        days : dict
+            Dictionary of day starts and ends
         """
         dt0 = self.convert_timestamps(time[0])
 
@@ -205,7 +205,7 @@ class GetDayWindowIndices(BaseProcess):
             tuples of `(base, period)`.
         """
         super().predict(
-            expect_days=False, expect_wear=False, time=time, fs=fs, **kwargs
+            expect_days=False, expect_wear=False, time=time, fs=fs, tz_name=tz_name, **kwargs
         )
 
         if not self.window:

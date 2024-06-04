@@ -6,6 +6,8 @@ Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 
 import h5py
+from pandas import Timestamp
+from numpy import isclose
 
 from skdh.base import BaseProcess, handle_process_returns
 from skdh.io.base import check_input_file
@@ -27,7 +29,8 @@ class ReadApdmH5(BaseProcess):
         desired sensor.
     localize_timestamps : bool, optional
         Convert timestamps to local time from UTC. Default is True. Uses APDM's
-        timezone offset attribute for the sensor being extracted.
+        timezone offset attribute for the sensor being extracted. Ignored if a 
+        time-zone name is provided (`tz_name`) in the `predict` method.
     gravity_acceleration : float, optional
         Acceleration due to gravity. Used to convert values to units of `g`.
         Default is 9.81 m/s^2.
@@ -76,7 +79,7 @@ class ReadApdmH5(BaseProcess):
 
     @handle_process_returns(results_to_kwargs=True)
     @check_input_file(".h5", check_size=False)
-    def predict(self, *, file, **kwargs):
+    def predict(self, *, file, tz_name=None, **kwargs):
         """
         predict(*, file)
 
@@ -87,7 +90,10 @@ class ReadApdmH5(BaseProcess):
         file : {str, pathlib.Path}
             Path to the file to read. Must either be a string, or be able to be
             converted by `str(file)`.
-        kwargs
+        tz_name : {None, str}, optional
+            IANA time-zone name for the recording location. If provided, and `localize_timestamps`
+            is True, will check the offset matches that from the file. If not provided,
+            will convert to local time as specified by `localize_timestamps`.
 
         Returns
         -------
@@ -98,12 +104,14 @@ class ReadApdmH5(BaseProcess):
         ------
         ValueError
             If the file name is not provided.
+        ValueError
+            If the time-zone name offset does not match the offset in the file itself.
         FileNotFoundError
             If the file does not exist.
         skdh.io.SensorNotFoundError
             If the specified sensor name was not found.
         """
-        super().predict(expect_days=False, expect_wear=False, file=file, **kwargs)
+        super().predict(expect_days=False, expect_wear=False, file=file, tz_name=tz_name, **kwargs)
 
         res = {}
         # read the file
@@ -126,13 +134,29 @@ class ReadApdmH5(BaseProcess):
             res[self._temp] = f["Sensors"][sid]["Temperature"][()]
 
             # if we are converting to local time
-            if self.localize_time:
-                offset_hours = float(
+            if tz_name is not None:
+                # check that the file offset matches that from the tz_name
+                file_offset = float(
                     f["Sensors"][sid]["Configuration"].attrs["Timezone Offset"]
-                )
-                # convert to seconds
-                offset_sec = offset_hours * 3600.0
+                ) * 3600.0
+                
+                tz_offset = Timestamp(res[self._time][0], unit="s", tz=tz_name).utcoffset().total_seconds()
 
-                res[self._time] += offset_sec
+                if not isclose(tz_offset, file_offset):
+                    raise ValueError(
+                        "Timezone offset from the file does not match timezone "
+                        "offset from the provided tz_name."
+                    )
+                
+                # dont do any conversion since we have the time-zone name
+            else:
+                if self.localize_time:
+                    offset_hours = float(
+                        f["Sensors"][sid]["Configuration"].attrs["Timezone Offset"]
+                    )
+                    # convert to seconds
+                    offset_sec = offset_hours * 3600.0
+
+                    res[self._time] += offset_sec
 
         return res

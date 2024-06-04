@@ -308,7 +308,7 @@ class ReadEmpaticaAvro(BaseProcess):
 
     @handle_process_returns(results_to_kwargs=True)
     @check_input_file(extension=".avro", check_size=True)
-    def predict(self, *, file, **kwargs):
+    def predict(self, *, file, tz_name=None, **kwargs):
         """
         Read the input .avro file.
 
@@ -316,6 +316,10 @@ class ReadEmpaticaAvro(BaseProcess):
         ----------
         file : {path-like, str}
             The path to the input file.
+        tz_name : {None, optional}
+            IANA time-zone name for the recording location. If not provided, timestamps
+            will represent local time naively. This means they will not account for 
+            any time changes due to Daylight Saving Time.
 
         Returns
         -------
@@ -337,6 +341,8 @@ class ReadEmpaticaAvro(BaseProcess):
 
         `systolic_peaks` will always be a dictionary of the form `{'systolic_peaks': array}`.
         """
+        super().predict(expect_days=False, expect_wear=False, file=file, tz_name=tz_name, **kwargs)
+
         reader = DataFileReader(open(file, "rb"), DatumReader())
         records = []
         for record in reader:
@@ -351,18 +357,22 @@ class ReadEmpaticaAvro(BaseProcess):
         # get the data streams
         results = self.get_datastreams(records[0]["rawData"])
 
-        # update the timestamps to be local
-        results["time"] += tz_offset
+        # update the timestamps to be local. Do this as we don't have an actual
+        # timezone from the data. 
+        if tz_name is None:
+            results["time"] += tz_offset
 
-        for k in results:
-            if k == "time":
-                continue
-            if (
-                isinstance(results[k], dict)
-                and "time" in results[k]
-                and results[k]["time"] is not None
-            ):
-                results[k]["time"] += tz_offset
+            for k in results:
+                if k == "time":
+                    continue
+                if (
+                    isinstance(results[k], dict)
+                    and "time" in results[k]
+                    and results[k]["time"] is not None
+                ):
+                    results[k]["time"] += tz_offset
+        # do nothing if we have the time-zone name, the timestamps are already
+        # UTC
         
         # adjust systolic_peaks
         if "systolic_peaks" in results:

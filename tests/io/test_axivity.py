@@ -1,9 +1,11 @@
 from tempfile import NamedTemporaryFile
 
 import pytest
-from numpy import allclose, ndarray
+from numpy import allclose
+from pandas import to_datetime
 
-from skdh.io import ReadCwa, FileSizeError
+from skdh.io import ReadCwa
+from skdh.utility.exceptions import FileSizeError
 
 
 class TestReadCwa:
@@ -30,6 +32,24 @@ class TestReadCwa:
             res["time"] - ax6_truth["time"][0],
             ax6_truth["time"] - ax6_truth["time"][0],
             atol=5e-5,
+        )
+
+        for k in ["accel", "gyro", "temperature", "fs"]:
+            # adjust tolerance - GeneActiv truth values from the CSV
+            # were truncated by rounding
+            assert allclose(res[k], ax6_truth[k], atol=5e-5)
+    
+    def test_ax6_tz(self, ax6_file, ax6_truth):
+        res = ReadCwa().predict(file=ax6_file, tz_name="US/Eastern")
+
+        # adjust the truth timestamps
+        truth_time_ = to_datetime(ax6_truth["time"], unit="s", utc=False).tz_localize("US/Eastern")
+        truth_time = truth_time_.view("int64") / 1e9
+
+        assert allclose(
+            res['time'] - truth_time[0],
+            truth_time - truth_time[0],
+            atol=5e-5
         )
 
         for k in ["accel", "gyro", "temperature", "fs"]:

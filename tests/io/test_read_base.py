@@ -1,8 +1,11 @@
 from tempfile import NamedTemporaryFile
 
 import pytest
+from numpy import arange, concatenate, allclose
+from pandas import date_range
 
 from skdh import Pipeline
+from skdh.io.base import handle_naive_timestamps
 
 
 def test_in_pipeline(dummy_reader_class, dummy_process):
@@ -20,6 +23,20 @@ def test_in_pipeline(dummy_reader_class, dummy_process):
         "Rdr": {"in_predict": True, "test_input": 5},
         "dummyprocess": {"a": 5, "test_output": 10.0},
     }
+
+
+def test_handle_naive_timestamps():
+    # get a timestamp array of naive timestamps
+    ts = date_range("2023-11-05 00:00:00", "2023-11-05 05:00:00", freq="0.1h").view("int64") / 1e9
+    # get the true timestamps - note that with the DST change there is an extra hour here
+    # hence the earlier end time by 1 hour
+    ts_true = date_range(
+        "2023-11-05 00:00:00", "2023-11-05 04:00:00", freq="0.1h", tz='US/Eastern'
+    ).view("int64") / 1e9
+
+    ts_pred = handle_naive_timestamps(ts, is_local=True, tz_name="US/Eastern")
+
+    assert allclose(ts_pred - ts_true[0], ts_true - ts_true[0])
 
 
 class TestCheckInputFile:

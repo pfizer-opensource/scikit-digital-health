@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 
 import pytest
 from numpy import ndarray, int_, arange, allclose
+import pandas as pd
 
 from skdh.preprocessing import GetDayWindowIndices
 
@@ -65,6 +66,21 @@ class TestGetDayWindowIndices:
                 [321701, 328901],
                 [408101, 415301],
             ],
+        )
+    
+    def test_dst(self):
+        dr = pd.date_range(start="2023-11-04 18:00:00", end="2023-11-06 02:00:00", freq="s", tz="US/Eastern")
+        time = dr.astype(int).values / 1e9
+
+        days = GetDayWindowIndices(bases=[0], periods=[24]).predict(time=time, fs=1.0, tz_name="US/Eastern")
+
+        assert allclose(
+            days["day_ends"][(0, 24)],
+            [
+                [0, 21600],
+                [21600, 108000],
+                [108000, time.size - 1]
+            ]
         )
 
     def test_window_inputs(self):
