@@ -9,11 +9,11 @@ from sys import gettrace
 from collections.abc import Iterable
 from warnings import warn
 from pathlib import Path
-from datetime import date as dt_date
 
 import h5py
 from numpy import mean, diff, asarray, sum, ndarray
 from numpy.linalg import norm
+from pandas import Timestamp
 import matplotlib
 import matplotlib.pyplot as plt
 
@@ -700,7 +700,7 @@ class Gait(BaseProcess):
 
     def _finalize_plot(self, file):  # pragma: no cover
         if self.valid_plot and self.f is not None:
-            date = dt_date.today().strftime("%Y%m%d")
+            date = Timestamp.today().strftime("%Y%m%d")
             form_fname = self.plot_fname.format(date=date, file=Path(file).stem)
 
             self.ax.legend(loc="best")

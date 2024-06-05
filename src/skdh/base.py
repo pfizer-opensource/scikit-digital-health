@@ -10,7 +10,7 @@ import logging
 from pathlib import Path
 import functools
 
-from pandas import DataFrame
+from pandas import DataFrame, to_datetime
 from numpy import array
 
 
@@ -132,6 +132,9 @@ class BaseProcess:
         # default day key
         self.day_key = (-1, -1)
 
+        # time zone name
+        self.tz_name = None
+
         # day and wear indices
         self.day_idx = (None, None)
         self.wear_idx = (None, None)
@@ -184,6 +187,9 @@ class BaseProcess:
         self.logger.info(f"Entering {self._cls_name} processing with call {self!r}")
         # save the filename for saving reference
         self._file_name = Path(kwargs.get("file", "")).stem
+
+        # get the time zone name if available
+        self.tz_name = kwargs.get("tz_name", None)
 
         if expect_days:
             n = kwargs.get(self._acc, kwargs.get(self._time)).shape[0] - 1
@@ -258,3 +264,25 @@ class BaseProcess:
         >>>         self.setup_plotting = self._setup_plotting
         """
         pass
+
+    # TIME helpers
+    def convert_timestamps(self, t):
+        """
+        Convert a timestamp/array of timestamps to a datetime object
+
+        Parameters
+        ----------
+        t : float, pd.Series, numpy.ndarray
+            Unix timestamp in seconds
+
+        Returns
+        -------
+        datetime.datetime
+            Datetime object
+        """
+        # set if we want to return aware time
+        kw = {'unit': 's', 'utc': self.tz_name is not None}
+        dt = to_datetime(t, **kw)
+        if self.tz_name is not None:
+            dt = dt.tz_convert(self.tz_name)
+        return dt

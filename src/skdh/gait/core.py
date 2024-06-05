@@ -7,7 +7,6 @@ Copyright (c) 2023, Pfizer Inc. All rights reserved.
 
 from collections.abc import Iterable
 from warnings import warn
-from datetime import datetime, timedelta
 
 from numpy import ndarray, asarray, mean, diff, sum, nan
 
@@ -426,10 +425,11 @@ class GaitLumbar(BaseProcess):
         gait_pred=True,
         v_axis=None,
         ap_axis=None,
+        tz_name=None,
         **kwargs,
     ):
         """
-        predict(time, accel, *, gyro=None, fs=None, height=None, gait_pred=None, v_axis=None, ap_axis=None)
+        predict(time, accel, *, gyro=None, fs=None, height=None, gait_pred=None, v_axis=None, ap_axis=None, tz_name=None)
 
         Get the gait events and endpoints from a time series signal
 
@@ -466,6 +466,12 @@ class GaitLumbar(BaseProcess):
         ap_axis : {None, 0, 1, 2}, optional
             AP axis index. Default is None, which indicates that it will be estimated
             from the acceleration data each bout.
+        
+        Other Parameters
+        ----------------
+        tz_name : {None, str}, optional
+            IANA time-zone name for the recording location if passing in `time` as
+            UTC timestamps. Can be ignored if passing in naive timestamps.
 
         Returns
         -------
@@ -508,6 +514,7 @@ class GaitLumbar(BaseProcess):
             gait_pred=gait_pred,
             v_axis=v_axis,
             ap_axis=ap_axis,
+            tz_name=tz_name,
             **kwargs,
         )
 
@@ -605,7 +612,7 @@ class GaitLumbar(BaseProcess):
 
             # keep track of the date - get the date of the first timestamp
             # add a few samples to make sure we aren't catching the last sample of the previous day
-            dtime = datetime.utcfromtimestamp(time_rs[dstart + 10])
+            dtime = self.convert_timestamps(time_rs[dstart + 10])
 
             for ibout, bout in enumerate(gait_bouts):
                 # run the bout processing pipeline
@@ -665,10 +672,10 @@ class GaitLumbar(BaseProcess):
             gait["Date"].extend([dtime.strftime("%Y-%m-%d")] * nvals)
             # add day start/end timestamps
             gait["Day Start Timestamp"].extend(
-                [str(datetime.utcfromtimestamp(time_rs[dstart]))] * nvals
+                [str(self.convert_timestamps(time_rs[dstart]))] * nvals
             )
             gait["Day End Timestamp"].extend(
-                [str(datetime.utcfromtimestamp(time_rs[dstop]))] * nvals
+                [str(self.convert_timestamps(time_rs[dstop]))] * nvals
             )
 
         # add day start/stop hours
@@ -698,5 +705,8 @@ class GaitLumbar(BaseProcess):
         gait.pop("FC", None)
         gait.pop("FC opp foot", None)
         gait.pop("forward cycles", None)
+
+        # convert IC time to actual datetimes
+        gait["IC Time"] = self.convert_timestamps(gait["IC Time"])
 
         return gait

@@ -9,7 +9,6 @@ py3.install_sources(
         'numpy_compressed.py',
         'csv.py',
         'empatica.py',
-        'utility.py',
     ],
     pure: false,
     subdir: 'skdh/io',

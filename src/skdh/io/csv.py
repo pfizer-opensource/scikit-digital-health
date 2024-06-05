@@ -8,7 +8,6 @@ Copyright (c) 2023. Pfizer Inc. All rights reserved
 from warnings import warn
 
 from numpy import (
-    nan,
     array,
     tile,
     arange,
@@ -22,31 +21,15 @@ from numpy import (
     allclose,
     nonzero,
     diff,
-    zeros,
-    full,
-    int_,
-    float_,
 )
 from pandas import (
     read_csv,
-    to_datetime,
-    to_timedelta,
-    date_range,
-    options as pd_options,
+    to_datetime
 )
 
 from skdh.base import BaseProcess, handle_process_returns
 from skdh.io.base import check_input_file
 from skdh.utility.internal import fill_data_gaps
-
-
-def _as_list(a):
-    if isinstance(a, str):
-        return [a]
-    elif isinstance(a, list):
-        return a
-    else:
-        return list(a)
 
 
 class ReadCSV(BaseProcess):
@@ -238,7 +221,8 @@ class ReadCSV(BaseProcess):
         if nonuniq_ts:
             # check that all the blocks are the same size (or that there is only 1 non-equal block
             # at the end)
-            _, counts = unique(time, return_counts=True)
+            block_changes = nonzero(diff(time, prepend=time[0], append=time[-1] + 1))[0]  # get a mask of where blocks change
+            counts = diff(block_changes, prepend=0)
             # check if the last block is the same size
             if counts[-1] != counts[0]:
                 # drop the last blocks worth of data
@@ -297,8 +281,9 @@ class ReadCSV(BaseProcess):
         file : {str, Path}
             Path to the file to read.
         tz_name : {None, str}, optional
-            Name of a time-zone to convert the timestamps to. Default is None,
-            which will leave them as naive.
+            IANA time-zone name for the recording location. If not provided, timestamps
+            will represent local time naively. This means they will not account for 
+            any time changes due to Daylight Saving Time.
 
         Returns
         -------

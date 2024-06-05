@@ -56,7 +56,6 @@ from skdh.io.empatica import ReadEmpaticaAvro
 from skdh.io import empatica
 from skdh.io import multireader
 from skdh.io.multireader import MultiReader
-from skdh.io.utility import FileSizeError
 
 __all__ = (
     "ReadCwa",

@@ -31,8 +31,9 @@ Both PyPI and Conda-Forge should have pre-built wheels for major distributions.
 Run-time requirements
 ^^^^^^^^^^^^^^^^^^^^^
 
+- Python >= 3.9
 - numpy >=1.17.2
-- scipy >=1.3.1
+- scipy >=1.12.0
 - pandas >=1.0.0
 - lightgbm >=2.3.0
 - pywavelets
@@ -41,7 +42,7 @@ Run-time requirements
 - matplotlib
 - packaging
 - pyyaml
-- importlib_resources [Python < 3.7]
+- avro
 
 Windows Notes
 ^^^^^^^^^^^^^
@@ -58,26 +59,11 @@ Building from Source
 ====================
 In order to build from source, the following are required:
 
+- meson
 - C compiler (currently has only been tested with GCC)
 - Fortran compiler (currently only been tested with GFortran)
-- `libzip <https://libzip.org/>`_
-- setuptools
 - numpy >=1.17.2
-
-If you are using Conda, libzip can easily be installed via::
-
-    conda install -c conda-forge libzip
-
-C/Fortran Compilers
-^^^^^^^^^^^^^^^^^^^
-
-NumPy only supports specific compilers on each platform. To get a list of available
-compilers, when in the `scikit-digital-health` directory, running::
-
-    # Get a list of platform supported/installed C compilers
-    python setup.py build_ext --help-compiler
-    # Get a list of platform supported/installed Fortran compilers
-    python setup.py build_ext --help-fcompiler
+- meson-python
 
 
 Testing the Build
@@ -92,6 +78,12 @@ to run the test suite:
 - psutil
 - tables
 - coverage [optional, for running test coverage]
+
+These can also be installed with
+
+.. code-block:: shell
+
+    pip install scikit-digital-health[dev]
 
 From the top level `scikit-digital-health` directory, run::
 

@@ -4,9 +4,6 @@ Sit-to-stand transfer detection and processing
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
-
-import datetime
-
 from numpy import (
     array,
     zeros,
@@ -24,6 +21,7 @@ from numpy import (
     arange,
 )
 from numpy.linalg import norm
+from pandas import to_datetime
 from scipy.signal import butter, sosfiltfilt, detrend
 from scipy.integrate import cumulative_trapezoid
 
@@ -242,7 +240,7 @@ class Detector:
         self.long_still = long_still
         self.still_window = still_window
 
-    def predict(self, sts, dt, time, raw_accel, filt_accel, power_peaks):
+    def predict(self, sts, dt, time, raw_accel, filt_accel, power_peaks, tz_name):
         # convert accel to m/s^2 so that integrated values/thresholds are in m/s^2
         raw_acc = raw_accel * self.grav
         filt_acc = filt_accel * self.grav
@@ -324,7 +322,7 @@ class Detector:
                 0.05,
             )
 
-            dtime = datetime.datetime.utcfromtimestamp(time[sts_start])
+            dtime = self.convert_timestamps(time[sts_start], tz_name)
             sts["Date"].append(dtime.strftime("%Y-%m-%d"))
             sts["Time"].append(dtime.strftime("%H:%M:%S.%f"))
             sts["Hour"].append(dtime.hour)
@@ -523,3 +521,28 @@ class Detector:
         qc4 = (vp[t_end_i] - vp[t_start_i]) > self.thresh["stand displacement"]
 
         return qc1 & qc2 & qc3 & qc4, t_start_i, t_end_i
+
+    # TIME helpers - need to copy this since this is not currently a subclass
+    # of baseprocess
+    # TODO: this should be made a subprocess of baseprocess so we dont have to
+    # duplicate code here
+    def convert_timestamps(self, t, tz_name):
+        """
+        Convert a timestamp/array of timestamps to a datetime object
+
+        Parameters
+        ----------
+        t : float, pd.Series, numpy.ndarray
+            Unix timestamp in seconds
+
+        Returns
+        -------
+        datetime.datetime
+            Datetime object
+        """
+        # set if we want to return aware time
+        kw = {'unit': 's', 'utc': tz_name is not None}
+        dt = to_datetime(t, **kw)
+        if tz_name is not None:
+            dt = dt.tz_convert(tz_name)
+        return dt

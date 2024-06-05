@@ -58,7 +58,7 @@ class PredictGaitLumbarLgbm(BaseProcess):
         self.downsample_aa_filter = downsample_aa_filter
 
     @handle_process_returns(results_to_kwargs=False)
-    def predict(self, *, time, accel, fs=None, **kwargs):
+    def predict(self, *, time, accel, fs=None, tz_name=None, **kwargs):
         """
         predict(*, time, accel, fs=None)
 
@@ -74,6 +74,12 @@ class PredictGaitLumbarLgbm(BaseProcess):
         fs : float, optional
             Sampling frequency in Hz of the accelerometer data. If not provided,
             will be computed form the timestamps.
+        
+        Other Parameters
+        ----------------
+        tz_name : {None, str}, optional
+            IANA time-zone name for the recording location if passing in `time` as
+            UTC timestamps. Can be ignored if passing in naive timestamps.
 
         Returns
         -------
@@ -92,6 +98,7 @@ class PredictGaitLumbarLgbm(BaseProcess):
             time=time,
             accel=accel,
             fs=fs,
+            tz_name=tz_name,
             **kwargs,
         )
 
@@ -186,6 +193,7 @@ class PredictGaitLumbarLgbm(BaseProcess):
             "Gait Bout Stop": time[bout_stops],
             "Gait Bout Start Index": bout_starts,
             "Gait Bout Stop Index": bout_stops,
+            "Timezone": tz_name,
         }
 
         return results, {"gait_bouts": bouts}
