@@ -23,7 +23,7 @@ from numpy import (
     full,
     arange,
 )
-from pandas import Timedelta
+from pandas import Timedelta, Timestamp
 import matplotlib
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.lines as mlines
@@ -713,7 +713,7 @@ class ActivityLevelClassification(BaseProcess):
         if self.f is None:
             return
 
-        date = datetime.today().strftime("%Y%m%d")
+        date = Timestamp.today().strftime("%Y%m%d")
         form_fname = self.plot_fname.format(date=date, file=self._file_name)
 
         pp = PdfPages(Path(form_fname).with_suffix(".pdf"))
