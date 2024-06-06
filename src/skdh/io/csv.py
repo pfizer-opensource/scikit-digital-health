@@ -324,7 +324,7 @@ class ReadCSV(BaseProcess):
         if tz_name is not None:
             # convert, and then remove the timezone so its naive again, but now in local time
             raw[self.time_col_name] = (
-                raw[self.time_col_name].dt.tz_convert(tz_name).dt.tz_localize(None)
+                raw[self.time_col_name].dt.tz_convert(tz_name)
             )
 
         # now handle data gaps and second level timestamps, etc
