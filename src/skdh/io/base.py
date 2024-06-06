@@ -58,7 +58,7 @@ def check_input_file(
                     return kwargs
 
             # check file size if desired
-            if check_size:
+            if check_size and not hasattr(self, "_skip_file_size_check"):
                 if pfile.stat().st_size < 1000:
                     raise FileSizeError("File is less than 1kb, nothing to read.")
 

@@ -115,6 +115,10 @@ class MultiReader(BaseProcess):
             mode=mode, reader=reader, resample_to_lowest=resample_to_lowest, fill_gaps=fill_gaps, fill_value=fill_value, gaps_error=gaps_error
         )
 
+        # Set a variable here so that we can ignore file size checking when reading 
+        # multiple files. This should then get handled by gap filling.
+        self._skip_file_size_check = True
+
         if reader_kw is None:
             reader_kw = {}
 
