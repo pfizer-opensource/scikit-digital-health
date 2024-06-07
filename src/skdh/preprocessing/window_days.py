@@ -150,7 +150,7 @@ class GetDayWindowIndices(BaseProcess):
             start_time -= day_delta
 
             # make sure that at least one of the timestamps is during the recording
-            while end_time < dt0:
+            while end_time <= dt0:
                 start_time += day_delta
                 end_time += day_delta
             
