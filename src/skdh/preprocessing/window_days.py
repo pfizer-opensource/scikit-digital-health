@@ -52,10 +52,10 @@ def finalize_guess(time, fs, guess, target):
         return i2
     elif not check1:  # path 2: smaller value to the left side
         # make an intelligent update to guess to avoid recursion limits (avoiding if statement)
-        guess = guess - 1 + (int((time[i2] - ts_target) > 5) * int((time[i1] - ts_target) / fs))
+        guess = guess - 1 + (int((time[i2] - ts_target) > 5) * int((ts_target - time[i1]) * fs))
     elif not check3:  # path 3: smaller value to the right side
         # make an intelligent update to guess to avoid recursion limits (avoiding if statement)
-        guess = guess + 1 + (int((ts_target - time[i2]) > 5) * int((ts_target - time[i3]) / fs))
+        guess = guess + 1 + (int((ts_target - time[i2]) > 5) * int((ts_target - time[i3]) * fs))
     
     return finalize_guess(time, fs, guess, target)
 
