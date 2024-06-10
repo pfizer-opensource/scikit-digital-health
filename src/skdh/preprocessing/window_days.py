@@ -13,7 +13,7 @@ from pandas import Timedelta
 from skdh.base import BaseProcess, handle_process_returns
 
 
-def finalize_guess(time, guess, target):
+def finalize_guess(time, fs, guess, target):
     """
     Get the final guess for the index of a window start or stop
 
@@ -21,6 +21,8 @@ def finalize_guess(time, guess, target):
     ----------
     time : numpy.ndarray
         Array of unix timestamps
+    fs : float
+        Sampling frequency in Hz.
     guess : int
         Guess for the index of the window start/end.
     target : pandas.Timestamp
@@ -49,11 +51,13 @@ def finalize_guess(time, guess, target):
     if check1 and check3:
         return i2
     elif not check1:  # path 2: smaller value to the left side
-        guess -= 1
+        # make an intelligent update to guess to avoid recursion limits (avoiding if statement)
+        guess = guess - 1 + (int((time[i2] - ts_target) > 5) * int((time[i1] - ts_target) / fs))
     elif not check3:  # path 3: smaller value to the right side
-        guess += 1
+        # make an intelligent update to guess to avoid recursion limits (avoiding if statement)
+        guess = guess + 1 + (int((ts_target - time[i2]) > 5) * int((ts_target - time[i3]) / fs))
     
-    return finalize_guess(time, guess, target)
+    return finalize_guess(time, fs, guess, target)
 
 
 class GetDayWindowIndices(BaseProcess):
@@ -163,8 +167,8 @@ class GetDayWindowIndices(BaseProcess):
                 # finalize the guess and append to windows
                 windows.append(
                     [
-                        finalize_guess(time, guess_start, start_time),
-                        finalize_guess(time, guess_end, end_time),
+                        finalize_guess(time, fs, guess_start, start_time),
+                        finalize_guess(time, fs, guess_end, end_time),
                     ]
                 )
 
