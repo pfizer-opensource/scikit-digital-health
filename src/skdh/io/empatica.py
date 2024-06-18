@@ -12,7 +12,7 @@ from numpy import (
     argmin,
     abs,
     nan,
-    float_,
+    float64,
 )
 
 from skdh import BaseProcess, handle_process_returns
@@ -237,7 +237,7 @@ class ReadEmpaticaAvro(BaseProcess):
                 new_shape = list(stream["values"].shape)
                 new_shape[0] = acc_dict[self._acc].shape[0]
                 # create the full length data shape
-                rs_streams[name] = full(new_shape, nan, dtype=float_)
+                rs_streams[name] = full(new_shape, nan, dtype=float64)
                 # get the indices for the stream data
                 i1 = argmin(abs(acc_dict["time"] - stream["time"][0]))
                 i2 = i1 + stream["time"].size

@@ -20,7 +20,7 @@ from numpy import (
     around,
     diff,
     mean,
-    float_,
+    float64,
     int_,
     ndarray,
     concatenate,
@@ -218,7 +218,7 @@ def apply_resample(
             if x.ndim == 1:
                 return (interp(t_rs, t, x),)
             elif x.ndim == 2:
-                xrs = zeros((t_rs.size, x.shape[1]), dtype=float_)
+                xrs = zeros((t_rs.size, x.shape[1]), dtype=float64)
                 for j in range(x.shape[1]):
                     xrs[:, j] = interp(t_rs, t, x[:, j])
                 return (xrs,)

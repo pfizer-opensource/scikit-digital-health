@@ -176,7 +176,7 @@ class TestArgLongestBout:
 class TestComputeActivityIndex:
     def test(self):
         rng = np.random.default_rng(seed=5)
-        x = np.arange(120 * 3, dtype=np.float_).reshape((-1, 3))
+        x = np.arange(120 * 3, dtype=np.float64).reshape((-1, 3))
         x += rng.normal(loc=0.0, scale=0.5, size=x.shape)
 
         res = compute_activity_index(1.0, x, hp_cut=1e-3)
