@@ -5,7 +5,7 @@ Lukas Adamowicz
 Copyright (c) 2022. Pfizer Inc. All rights reserved.
 """
 
-from numpy import array, repeat, abs, minimum, floor, 64
+from numpy import array, repeat, abs, minimum, floor, float64
 from scipy.signal import lfilter_zi, lfilter
 
 from skdh.utility.internal import apply_resample
