@@ -16,7 +16,7 @@ from numpy import (
     abs,
     all as npall,
     around,
-    Inf,
+    inf,
     vstack,
     minimum,
     concatenate,
@@ -275,7 +275,7 @@ class CalibrateAccelerometer(BaseProcess):
         tmp_rm = (tmp_rm - tmp_mean).reshape((-1, 1))
 
         weights = ones(acc_rm.shape[0]) * 100
-        res = [Inf]
+        res = [inf]
         LR = LinearRegression()
 
         for niter in range(self.max_iter):
