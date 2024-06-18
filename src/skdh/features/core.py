@@ -367,4 +367,4 @@ class Feature(ABC):
             ndarray of the computed feature
         """
         # move the computation axis to the end
-        return moveaxis(asarray(signal, dtype=64), axis, -1)
+        return moveaxis(asarray(signal, dtype=float64), axis, -1)

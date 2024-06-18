@@ -592,7 +592,7 @@ class PhaseCoordinationIndex(GaitBoutEndpoint):
         )
 
     def _predict(self, fs, leg_length, gait, gait_aux):
-        pci = zeros(len(gait_aux["accel"]), dtype=64)
+        pci = zeros(len(gait_aux["accel"]), dtype=float64)
 
         phase = gait["PARAM:step time"] / gait["PARAM:stride time"]  # %, not degrees
         for i in range(len(gait_aux["accel"])):
