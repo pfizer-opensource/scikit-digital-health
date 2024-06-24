@@ -29,7 +29,7 @@ jobs:
         #   export F90=gfortran-9
         # fi
         # install scikit-dh with requirements
-        pip install .[dev,actions] && pip install --no-binary :tables: tables
+        pip install .[dev,actions]
       shell: bash
     - name: Test with pytest
       run: |
