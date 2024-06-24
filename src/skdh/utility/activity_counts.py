@@ -5,7 +5,7 @@ Lukas Adamowicz
 Copyright (c) 2022. Pfizer Inc. All rights reserved.
 """
 
-from numpy import array, repeat, abs, minimum, floor, float_
+from numpy import array, repeat, abs, minimum, floor, float64
 from scipy.signal import lfilter_zi, lfilter
 
 from skdh.utility.internal import apply_resample
@@ -26,7 +26,7 @@ input_coef = array(
         -0.006788163862310,
         0.000000000000000,
     ],
-    dtype=float_,
+    dtype=float64,
 )
 
 output_coef = array(
@@ -41,7 +41,7 @@ output_coef = array(
         0.01949130205890000000,
         0.00000000000000000000,
     ],
-    dtype=float_,
+    dtype=float64,
 )
 
 
