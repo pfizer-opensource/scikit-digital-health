@@ -78,8 +78,8 @@ class TestGetDayWindowIndices:
             days["day_ends"][(0, 24)],
             [
                 [0, 21600],
-                [21600, 108000],
-                [108000, time.size - 1]
+                [21600, 111600],
+                [111600, time.size - 1]
             ]
         )
 
