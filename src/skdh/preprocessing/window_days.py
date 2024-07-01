@@ -8,7 +8,7 @@ Copyright (c) 2024. Pfizer Inc. All rights reserved.
 from warnings import warn
 
 from numpy import asarray, int_, mean, diff, abs
-from pandas import Timedelta
+from pandas import DateOffset
 
 from skdh.base import BaseProcess, handle_process_returns
 
@@ -128,7 +128,7 @@ class GetDayWindowIndices(BaseProcess):
         """
         dt0 = self.convert_timestamps(time[0])
 
-        day_delta = Timedelta(days=1)
+        day_delta = DateOffset(days=1)
 
         # approximate number of samples per day
         samples_per_day = int(86400 * fs)
