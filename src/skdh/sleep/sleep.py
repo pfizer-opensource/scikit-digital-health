@@ -10,7 +10,7 @@ from collections.abc import Iterable
 from warnings import warn
 from pathlib import Path
 
-from numpy import mean, diff, array, nan, sum, arange, full, int_
+from numpy import mean, diff, array, nan, sum, arange, full, around, int_
 from numpy.ma import masked_where
 from pandas import DataFrame, date_range, Timedelta, Timestamp
 import matplotlib
@@ -454,6 +454,8 @@ class Sleep(BaseProcess):
                 "Date",
                 "Day Start Timestamp",
                 "Day End Timestamp",
+                "Total Minutes",
+                "Wear Minutes",
                 "TSO Start Timestamp",
                 "TSO Start",
                 "TSO Duration",
@@ -513,6 +515,10 @@ class Sleep(BaseProcess):
             dw_starts, dw_stops = get_day_index_intersection(
                 wear_starts_ds, wear_stops_ds, True, start, stop
             )
+
+            # get the total minutes and total wear minutes
+            sleep["Total Minutes"][-1] = around((time_ds[stop] - time_ds[start]) / 60, 1)
+            sleep["Wear Minutes"][-1] = around(sum(dw_stops - dw_starts) / (60 * goal_fs), 1)
 
             if (sum(dw_stops - dw_starts) / (3600 * goal_fs)) < self.min_wear_time:
                 self.logger.info(
