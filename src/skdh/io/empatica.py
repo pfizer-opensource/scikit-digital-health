@@ -216,7 +216,7 @@ class ReadEmpaticaAvro(BaseProcess):
         # remove accelerometer data stream
         acc_dict = streams.pop(self._acc)
         # remove keys that we can't resample
-        rs_streams = {d: streams.pop(d) for d in ["systolic_peaks", "steps"]}
+        rs_streams = {d: streams.pop(d) for d in ["systolic_peaks", "steps"] if d in streams}
 
         # iterate over remaining streams and resample them
         for name, stream in streams.items():

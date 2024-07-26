@@ -49,6 +49,8 @@ class MultiReader(BaseProcess):
         default values if not provided.
     gaps_error : {'raise', 'warn', 'ignore'}, optional
         Behavior if there are gaps in the datastreams. Default is to raise an error.
+    require_all_keys : bool, optional
+        Require all files to provide the same keys. Default is True.
 
     Notes
     -----
@@ -110,7 +112,7 @@ class MultiReader(BaseProcess):
     >>> mrdr.predict(files={'f1': "file1.csv", 'f2': "file2.csv"})
     """
 
-    def __init__(self, mode, reader, reader_kw=None, resample_to_lowest=True, fill_gaps=True, fill_value=None, gaps_error="raise"):
+    def __init__(self, mode, reader, reader_kw=None, resample_to_lowest=True, fill_gaps=True, fill_value=None, gaps_error="raise", require_all_keys=True):
         super().__init__(
             mode=mode, reader=reader, resample_to_lowest=resample_to_lowest, fill_gaps=fill_gaps, fill_value=fill_value, gaps_error=gaps_error
         )
@@ -139,6 +141,8 @@ class MultiReader(BaseProcess):
             self.gaps_error = gaps_error
         else:
             raise ValueError("gaps_error must be one of {'raise', 'warn', 'ignore'}.")
+
+        self.require_all_keys = require_all_keys
 
     def get_reader_kw(self, idx):
         """
@@ -314,9 +318,12 @@ class MultiReader(BaseProcess):
                 try:
                     res_lists[k].append(res_dict.pop(k))
                 except KeyError:
-                    raise KeyError(
-                        "To concatenate file contents, all files must have the same data streams."
-                    )
+                    if self.require_all_keys:
+                        raise KeyError(
+                            "To concatenate file contents, all files must have the same data streams."
+                        )
+                    else:
+                        pass
             # update the non-concatenatable items results
             results.update(res_dict)
 
