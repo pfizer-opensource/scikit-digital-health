@@ -53,8 +53,8 @@ class AssessCompleteness(BaseProcess):
                     'Measurement Streams': {}}
 
         data_files = measures
-        if 'Device Battery.csv' in os.listdir(subject_folder):
-            data_files = data_files + ['Device Battery']
+        if 'Charging Indicator.csv' in os.listdir(subject_folder):
+            data_files = data_files + ['Charging Indicator']
         if 'Wear Indicator.csv' in os.listdir(subject_folder):
             data_files = data_files + ['Wear Indicator']
 
@@ -89,7 +89,7 @@ class AssessCompleteness(BaseProcess):
                 if measure in self.ranges.keys():
                     df_raw = clean_df(df_raw, measure, self.ranges[measure][0], self.ranges[measure][1])
             if len(df_raw) > 1:
-                if measure in ['Device Battery', 'Wear Indicator']:
+                if measure in ['Charging Indicator', 'Wear Indicator']:
                     data_dic.update({measure: df_raw})
                 else:
                     data_dic['Measurement Streams'].update({measure: df_raw})
@@ -168,28 +168,20 @@ class AssessCompleteness(BaseProcess):
 
         completeness_master_dic = {}
 
-        if 'Device Battery' in list(data_dic.keys()):
-            completeness_master_dic.update({'charging': {'all': self.find_charging_periods(data_dic)}})
-            for time_period in time_periods:
-                completeness_master_dic['charging'].update(
-                    {time_period: find_time_periods_overlap(completeness_master_dic['charging']['all'], time_period)[
-                        0]})
-        else:
-            completeness_master_dic.update({'charging': {'all': None}})
-
-        if 'Wear Indicator' in list(data_dic.keys()):
-            completeness_master_dic.update({'wearing': {'all': self.find_wear_periods(data_dic)}})
-            for time_period in time_periods:
-                completeness_master_dic['wearing'].update({time_period: {
-                    key: find_time_periods_overlap(completeness_master_dic['wearing']['all'][key], time_period)[0] for
-                    key in
-                    completeness_master_dic['wearing']['all'].keys()}})
-        else:
-            completeness_master_dic.update({'wearing': {'all': None}})
+        completeness_master_dic.update({'Wear': {'all': None}})
+        completeness_master_dic.update({'Charging': {'all': None}})
+        for x in list(data_dic.keys()):
+            if x in ['Charging Indicator', 'Wear Indicator']:
+                completeness_master_dic.update({x.split(' ')[0]: {'all': self.find_periods(data_dic, key=x)}})
+                for time_period in time_periods:
+                    completeness_master_dic[x.split(' ')[0]].update({time_period: {
+                        key: find_time_periods_overlap(completeness_master_dic[x.split(' ')[0]]['all'][key], time_period)[0] for
+                        key in
+                        completeness_master_dic[x.split(' ')[0]]['all'].keys()}})
 
         for measure in data_dic['Measurement Streams'].keys():
-            deltas = self.find_gap_codes(data_dic, measure, completeness_master_dic['charging']['all'],
-                                     completeness_master_dic['wearing']['all'])
+            deltas = self.find_gap_codes(data_dic, measure, completeness_master_dic['Charging']['all'],
+                                     completeness_master_dic['Wear']['all'])
             completeness_master_dic.update({measure: {'Completeness':
                                                           self.compute_completeness(deltas, time_periods=time_periods,
                                                                                timescales=timescales,
@@ -202,73 +194,75 @@ class AssessCompleteness(BaseProcess):
 
         return completeness_master_dic
 
-    def find_charging_periods(self, data_dic):
-        battery_diff = np.diff(data_dic['Device Battery']['Device Battery'])
-        noise_lvl = 3 * np.nanstd(battery_diff)
-        charging_starts = np.where(battery_diff > noise_lvl)[0]
-        charging_periods = np.array(
-            [[data_dic['Device Battery'].index[start], data_dic['Device Battery'].index[start + 1]]
-             for start in charging_starts])
 
-        return charging_periods
+    def find_periods(self, data_dic, key):
+        """
 
-    def find_wear_periods(self, data_dic):
-        wear_indicator = np.array([np.nan] * (len(data_dic['Wear Indicator']['Wear Indicator']) - 1))
-        time_periods = np.array([[data_dic['Wear Indicator'].index[c], data_dic['Wear Indicator'].index[c + 1]] for c in
-                                 range(len(data_dic['Wear Indicator']) - 1)])
+        :param data_dic:
+        :param key: str 'Wear Indicator' | 'Charging Indicator'
+        :return:
+        """
+
+        assert key in ['Wear Indicator', 'Charging Indicator'], "'key' needs to be either 'Wear Indicator' or 'Charging Indicator'"
+
+        on_indicator = np.array([np.nan] * (len(data_dic[key][key]) - 1))
+        time_periods = np.array([[data_dic[key].index[c], data_dic[key].index[c + 1]] for c in
+                                 range(len(data_dic[key]) - 1)])
         for c in range(len(time_periods)):
             if (time_periods[c][1] - time_periods[c][0]) <= \
-                    data_dic['Wear Indicator']['Sampling Frequency (Hz)'].iloc[1:].iloc[c]:
-                if data_dic['Wear Indicator']['Wear Indicator'].iloc[c] == \
-                        data_dic['Wear Indicator']['Wear Indicator'].iloc[c + 1]:
-                    wear_indicator[c] = data_dic['Wear Indicator']['Wear Indicator'].iloc[c]
-        wear_times = []
-        no_wear_times = []
+                    data_dic[key]['Sampling Frequency (Hz)'].iloc[1:].iloc[c]:
+                if data_dic[key][key].iloc[c] == \
+                        data_dic[key][key].iloc[c + 1]:
+                    on_indicator[c] = data_dic[key][key].iloc[c]
+        on_times = []
+        no_on_times = []
         unknown_times = []
-        if wear_indicator[0] == 1:
-            wear_times.append([time_periods[0][0], -1])
+        if on_indicator[0] == 1:
+            on_times.append([time_periods[0][0], -1])
             current_ind = 1
-        if wear_indicator[0] == 0:
-            no_wear_times.append([time_periods[0][0], -1])
+        if on_indicator[0] == 0:
+            no_on_times.append([time_periods[0][0], -1])
             current_ind = 0
-        if np.isnan(wear_indicator[0]):
+        if np.isnan(on_indicator[0]):
             unknown_times.append([time_periods[0][0], -1])
             current_ind = np.nan
         for c, time_period in enumerate(time_periods):
-            if not wear_indicator[c] == current_ind:
+            if not on_indicator[c] == current_ind and not np.array([np.isnan(on_indicator[c]), np.isnan(current_ind)]).all():
                 if current_ind == 1:
-                    wear_times[-1][1] = time_periods[c - 1][1]
+                    on_times[-1][1] = time_periods[c - 1][1]
                 if current_ind == 0:
-                    no_wear_times[-1][1] = time_periods[c - 1][1]
+                    no_on_times[-1][1] = time_periods[c - 1][1]
                 if np.isnan(current_ind):
                     unknown_times[-1][1] = time_periods[c - 1][1]
-                current_ind = wear_indicator[c]
-                if wear_indicator[c] == 1:
-                    wear_times.append([time_period[0], -1])
+                current_ind = on_indicator[c]
+                if on_indicator[c] == 1:
+                    on_times.append([time_period[0], -1])
                     current_ind = 1
-                if wear_indicator[c] == 0:
-                    no_wear_times.append([time_period[0], -1])
+                if on_indicator[c] == 0:
+                    no_on_times.append([time_period[0], -1])
                     current_ind = 0
-                if np.isnan(wear_indicator[c]):
+                if np.isnan(on_indicator[c]):
                     unknown_times.append([time_period[0], -1])
                     current_ind = np.nan
-        if wear_indicator[-1] == 1:
-            wear_times[-1][1] = time_periods[-1][1]
-        if wear_indicator[-1] == 0:
-            no_wear_times[-1][1] = time_periods[-1][1]
-        if np.isnan(wear_indicator[-1]):
+        if on_indicator[-1] == 1:
+            on_times[-1][1] = time_periods[-1][1]
+        if on_indicator[-1] == 0:
+            no_on_times[-1][1] = time_periods[-1][1]
+        if np.isnan(on_indicator[-1]):
             unknown_times[-1][1] = time_periods[-1][1]
-        wear_times = np.array(wear_times)
-        no_wear_times = np.array(no_wear_times)
+        on_times = np.array(on_times)
+        no_on_times = np.array(no_on_times)
         unknown_times = np.array(unknown_times)
-
-        return {'wear_times': wear_times, 'no_wear_times': no_wear_times, 'unknown_times': unknown_times}
+        results_dic = {key.split(' ')[0] + '_times' : on_times,
+                       'no_' + key.split(' ')[0] + '_times' : no_on_times,
+                       'unknown_' + key.split(' ')[0] + '_times' : unknown_times}
+        return results_dic
 
     def compute_wear_basic(self, data_dic, time_periods):
 
         wear_basics = {}
         for time_period in time_periods:
-            wear_basics = {time_period: {}}
+            wear_basics.update({time_period: {}})
             wear_ind = data_dic['Wear Indicator'].iloc[np.array([
                 data_dic['Wear Indicator'].index >= time_period[0],
                 data_dic['Wear Indicator'].index < time_period[1]]).all(axis=0)]
@@ -281,7 +275,7 @@ class AssessCompleteness(BaseProcess):
                                                                                    0]])})
             wear_basics[time_period].update({'nan_time_basic': np.sum(np.isnan(wear_ind['Wear Indicator']) *
                                                                       wear_ind['Sampling Frequency (Hz)'])})
-
+            assert np.array([pd.isnull(x) for x in list(wear_basics[time_period].values())]).any() == False, 'Nan values in wear_basics'
         return wear_basics
 
     def find_gap_codes(self, data_dic, measure, charging_periods, wearing_periods):
@@ -309,15 +303,16 @@ class AssessCompleteness(BaseProcess):
             # Charging
             charging_time = np.timedelta64(0)
             if not charging_periods is None:
-                overlap = find_time_periods_overlap(charging_periods, [data_gap_start, data_gap_end])[0]
-                charging_time = np.sum(overlap[:, 1] - overlap[:, 0])
+                if not charging_periods['Charging_times'] is None:
+                    overlap = find_time_periods_overlap(charging_periods['Charging_times'], [data_gap_start, data_gap_end])[0]
+                    charging_time = np.sum(overlap[:, 1] - overlap[:, 0])
 
             # Non-wearing
             nonwear_time = np.timedelta64(0)
             if not wearing_periods is None:
-                if not wearing_periods['no_wear_times'] is None:
+                if not wearing_periods['no_Wear_times'] is None:
                     overlap = \
-                    find_time_periods_overlap(wearing_periods['no_wear_times'], [data_gap_start, data_gap_end])[0]
+                    find_time_periods_overlap(wearing_periods['no_Wear_times'], [data_gap_start, data_gap_end])[0]
                     nonwear_time = np.sum(overlap[:, 1] - overlap[:, 0])
 
             unknown_time = data_gap_duration - (nonwear_time + charging_time)
@@ -342,27 +337,20 @@ class AssessCompleteness(BaseProcess):
         for period in time_periods:
             period_summary = []
 
-            # Charging
-            if completeness_master_dic['charging']['all'] is None:
-                charging_time = None
-            else:
-                charging_time = np.sum(completeness_master_dic['charging'][period][:, 1] -
-                                       completeness_master_dic['charging'][period][:, 0])
-            period_summary.append(['charge time', charging_time])
-
-            # Wearing
-            if completeness_master_dic['wearing']['all'] is None:
-                wear_time = None
-            else:
-                wear_time = np.sum(completeness_master_dic['wearing'][period]['wear_times'][:, 1] -
-                                   completeness_master_dic['wearing'][period]['wear_times'][:, 0])
-                period_summary.append(['wear time', wear_time])
-                no_wear_time = np.sum(completeness_master_dic['wearing'][period]['no_wear_times'][:, 1] -
-                                      completeness_master_dic['wearing'][period]['no_wear_times'][:, 0])
-                period_summary.append(['no-wear time', no_wear_time])
-                unknown_wear_time = np.sum(completeness_master_dic['wearing'][period]['unknown_times'][:, 1] -
-                                           completeness_master_dic['wearing'][period]['unknown_times'][:, 0])
-                period_summary.append(['unknown wear time', unknown_wear_time])
+            # Wearing and Charging
+            for key in ['Wear', 'Charging']:
+                if completeness_master_dic[key]['all'] is None:
+                    wear_time = None
+                else:
+                    wear_time = np.sum(completeness_master_dic[key][period][key + '_times'][:, 1] -
+                                       completeness_master_dic[key][period][key + '_times'][:, 0])
+                    period_summary.append([key + '_times', wear_time])
+                    no_wear_time = np.sum(completeness_master_dic[key][period]['no_' + key + '_times'][:, 1] -
+                                          completeness_master_dic[key][period]['no_' + key + '_times'][:, 0])
+                    period_summary.append(['no_' + key + '_times', no_wear_time])
+                    unknown_wear_time = np.sum(completeness_master_dic[key][period]['unknown_' + key + '_times'][:, 1] -
+                                               completeness_master_dic[key][period]['unknown_' + key + '_times'][:, 0])
+                    period_summary.append(['unknown_' + key + '_times', unknown_wear_time])
 
             # Measures
             for measure in measures:
@@ -513,20 +501,20 @@ class AssessCompleteness(BaseProcess):
         data_dic_trunc['Wear Indicator'] = data_dic_trunc['Wear Indicator'].iloc[
             np.where(np.array([data_dic_trunc['Wear Indicator'].index >= time_period[0],
                                data_dic_trunc['Wear Indicator'].index <= time_period[1]]).all(axis=0))[0]]
-        data_dic_trunc['Device Battery'] = data_dic_trunc['Device Battery'].iloc[
-            np.where(np.array([data_dic_trunc['Device Battery'].index >= time_period[0],
-                               data_dic_trunc['Device Battery'].index <= time_period[1]]).all(axis=0))[0]]
+        data_dic_trunc['Charging Indicator'] = data_dic_trunc['Charging Indicator'].iloc[
+            np.where(np.array([data_dic_trunc['Charging Indicator'].index >= time_period[0],
+                               data_dic_trunc['Charging Indicator'].index <= time_period[1]]).all(axis=0))[0]]
 
         return data_dic_trunc
 
-    def generate_figures(self, fpath_output, data_dic, resample_width_mins, gap_size_mins):
+    def generate_figures(self, fpath_output, data_dic, resample_width_mins, gap_size_mins, fontsize=None):
 
         check_hyperparameters_figures(resample_width_mins, gap_size_mins)
         # Create and save visualizations of results
         figures = {}
         overview_fig = visualize_overview_plot(data_dic=data_dic, fpath=fpath_output + 'overview.html',
                                                resample_width_mins=resample_width_mins, gap_size_mins=gap_size_mins,
-                                               time_periods=self.time_periods)
+                                               time_periods=self.time_periods, fontsize=fontsize)
         reason_color_dic = {'normal' : 'blue', 'unknown' : 'magenta', 'charging' : 'orange', 'no_wear' : 'red'}
         figures.update({'overview': overview_fig})
         completeness_fig = plot_completeness(self.completeness_master_dic, data_dic, self.time_periods,

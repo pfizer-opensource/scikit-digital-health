@@ -246,10 +246,11 @@ def plot_data_gaps(completeness_master_dic, data_dic, data_gaps, time_periods, f
     return fig
 
 
-def visualize_overview_plot(data_dic, fpath, resample_width_mins, gap_size_mins, time_periods):
+def visualize_overview_plot(data_dic, fpath, resample_width_mins, gap_size_mins, time_periods, fontsize=None):
     data_streams = [copy.deepcopy(data_dic['Measurement Streams'][key][key]) for key in data_dic['Measurement Streams'].keys()]
-    if 'Wear Indicator' in data_dic.keys():
-        data_streams.append(copy.deepcopy(data_dic['Wear Indicator']['Wear Indicator']))
+    for x in ['Wear Indicator', 'Charging Indicator']:
+        if x in data_dic.keys():
+            data_streams.append(copy.deepcopy(data_dic[x][x]))
     acc_raw_ind = np.where([data_stream.name == 'acc_raw' for data_stream in data_streams])[0]
     if len(acc_raw_ind) > 0:
         data_streams[acc_raw_ind[0]].iloc[:] = np.linalg.norm(np.array([np.array(x, dtype=float) for x in data_streams[acc_raw_ind[0]]]), axis=1)
@@ -266,5 +267,7 @@ def visualize_overview_plot(data_dic, fpath, resample_width_mins, gap_size_mins,
                                      line=dict(color='red'), name='End of time period', mode='lines'),
                           row=row_ind + 1, col=1)
     remove_duplicate_labels_plotly(fig)
+    if not fontsize is None:
+        fig.update_yaxes(title_font=dict(size=fontsize))
     fig.write_html(fpath)
     return fig
