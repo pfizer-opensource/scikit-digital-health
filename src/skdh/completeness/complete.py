@@ -454,6 +454,7 @@ class AssessCompleteness(BaseProcess):
                     reason_periods['periods'][reason], time_period, weights)})
         assert np.abs(np.sum(list(list(data_completeness.values())[0].values())) - 1) < .005, \
             'Completeness + Missingness less than 99.5% (should be 100%). Something is wrong!'
+
         return data_completeness
 
     def compute_completeness(self, deltas, time_periods, last_time, timescales=None):
