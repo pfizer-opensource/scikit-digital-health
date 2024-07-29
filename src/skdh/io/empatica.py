@@ -72,7 +72,10 @@ class ReadEmpaticaAvro(BaseProcess):
         ) + phys_min
 
         # create the timestamp array using ts_start, fs, and the number of samples
-        time = arange(ts_start, ts_start + accel.shape[0] / fs, 1 / fs)
+        time = arange(ts_start, ts_start + accel.shape[0] / fs, 1 / fs)[:accel.shape[0]]
+
+        if time.size != accel.shape[0]:
+            raise ValueError("Time does not have enough samples for accel array")
 
         # use special names here so we can just update dictionary later for returning
         results_dict[key] = {self._time: time, "fs": fs, self._acc: accel}
@@ -112,7 +115,10 @@ class ReadEmpaticaAvro(BaseProcess):
         gyro = (gyro - dig_min) / (dig_max - dig_min) * (phys_max - phys_min) + phys_min
 
         # create the timestamp array using ts_start, fs, and the number of samples
-        time = arange(ts_start, ts_start + gyro.shape[0] / fs, 1 / fs)
+        time = arange(ts_start, ts_start + gyro.shape[0] / fs, 1 / fs)[:gyro.shape[0]]
+
+        if time.size != gyro.shape[0]:
+            raise ValueError("Time does not have enough samples for gyro array")
 
         results_dict[key] = {self._time: time, "fs": fs, "values": gyro}
 
@@ -141,7 +147,10 @@ class ReadEmpaticaAvro(BaseProcess):
         values = ascontiguousarray(raw_dict["values"])
 
         # timestamp array
-        time = arange(ts_start, ts_start + values.size / fs, 1 / fs)
+        time = arange(ts_start, ts_start + values.size / fs, 1 / fs)[:values.shape[0]]
+
+        if time.size != values.shape[0]:
+            raise ValueError(f"Time does not have enough samples for {key} array")
 
         results_dict[key] = {self._time: time, "fs": fs, "values": values}
 
@@ -194,7 +203,10 @@ class ReadEmpaticaAvro(BaseProcess):
         steps = ascontiguousarray(raw_dict["values"])
 
         # timestamp array
-        time = arange(ts_start, ts_start + steps.size / fs, 1 / fs)
+        time = arange(ts_start, ts_start + steps.size / fs, 1 / fs)[:steps.size]
+
+        if time.size != steps.size:
+            raise ValueError("Time does not have enough samples for steps array")
 
         results_dict[key] = {self._time: time, "fs": fs, "values": steps}
 
