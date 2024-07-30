@@ -21,7 +21,10 @@ def plot_overview_one_device(data, resample_width_mins=1, device_changes=None, s
     colors = px.colors.qualitative.Alphabet
 
     for c, data_section in enumerate(data):
-        first_df = data_section.resample(str(resample_width_mins) + 'min').median()
+        if resample_width_mins is None:
+            first_df = data_section
+        else:
+            first_df = data_section.resample(str(resample_width_mins) + 'min').median()
         lo, so, vo = skdh.utility.internal.rle(np.isnan(np.array(first_df)))
         start_nan_inds = so[vo]
         end_nan_inds = so[vo] + lo[vo] - 1
@@ -42,6 +45,8 @@ def plot_overview_one_device(data, resample_width_mins=1, device_changes=None, s
             fig.add_trace(go.Scatter(x=first_df.index[scatter_points], y=first_df[scatter_points], mode='markers',
                                      marker={'symbol' : 'line-ew-open', 'color' : colors[c], 'size' : 2}), row=c + 1, col=1)
         for start, end in zip(data_gaps_start_ind, data_gaps_end_ind):
+            if end == len(first_df) - 1: end = end - 1 # edge case of data gap going to the end of the signal
+            if start == 0: start = start + 1 # edge case of data gap starting in beginning of signal
             fig.add_vrect(x0=first_df.index[start - 1], x1=first_df.index[end + 1],
                           fillcolor='red', opacity=0.25, line_width=0, row=c + 1, col=1)
         if len(data_gaps_start_ind) > 0:
