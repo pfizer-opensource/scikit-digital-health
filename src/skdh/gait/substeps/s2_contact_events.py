@@ -4,6 +4,7 @@ Gait event (initial/final contact) estimation
 Lukas Adamowicz
 Copyright 2023, Pfizer Inc. All rights reserved
 """
+
 from warnings import warn
 
 from numpy import std, argmax, diff, sign, array, int_

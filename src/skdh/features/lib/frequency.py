@@ -4,6 +4,7 @@ Frequency based features
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 from skdh.features.core import Feature
 from skdh.features.lib import extensions
 
@@ -40,6 +41,7 @@ class DominantFrequency(Feature):
     So `padlevel=2` would mean that for a signal with length 150, the number of points used
     in the FFT would go from 256 to 1024.
     """
+
     __slots__ = ("pad", "low_cut", "high_cut")
 
     def __init__(self, padlevel=2, low_cutoff=0.0, high_cutoff=5.0):
@@ -99,6 +101,7 @@ class DominantFrequencyValue(Feature):
     So `padlevel=2` would mean that for a signal with length 150, the number of points used
     in the FFT would go from 256 to 1024.
     """
+
     __slots__ = ("pad", "low_cut", "high_cut")
 
     def __init__(self, padlevel=2, low_cutoff=0.0, high_cutoff=5.0):
@@ -159,6 +162,7 @@ class PowerSpectralSum(Feature):
     So `padlevel=2` would mean that for a signal with length 150, the number of points used
     in the FFT would go from 256 to 1024.
     """
+
     __slots__ = ("pad", "low_cut", "high_cut")
 
     def __init__(self, padlevel=2, low_cutoff=0.0, high_cutoff=5.0):
@@ -221,6 +225,7 @@ class SpectralFlatness(Feature):
     So `padlevel=2` would mean that for a signal with length 150, the number of points used
     in the FFT would go from 256 to 1024.
     """
+
     __slots__ = ("pad", "low_cut", "high_cut")
 
     def __init__(self, padlevel=2, low_cutoff=0.0, high_cutoff=5.0):
@@ -281,6 +286,7 @@ class SpectralEntropy(Feature):
     So `padlevel=2` would mean that for a signal with length 150, the number of points used
     in the FFT would go from 256 to 1024.
     """
+
     __slots__ = ("pad", "low_cut", "high_cut")
 
     def __init__(self, padlevel=2, low_cutoff=0.0, high_cutoff=5.0):

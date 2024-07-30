@@ -4,16 +4,15 @@ Sleep and major rest period detection
 Yiorgos Christakis, Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 from sys import gettrace
 from collections.abc import Iterable
 from warnings import warn
-from datetime import datetime, timedelta
 from pathlib import Path
-from datetime import date as dt_date
 
-from numpy import mean, diff, array, nan, sum, arange, full, int_
+from numpy import mean, diff, array, nan, sum, arange, full, around, int_
 from numpy.ma import masked_where
-from pandas import DataFrame, date_range
+from pandas import DataFrame, date_range, Timedelta, Timestamp
 import matplotlib
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.lines as mlines
@@ -25,44 +24,6 @@ from skdh.sleep.tso import get_total_sleep_opportunity
 from skdh.sleep.utility import compute_activity_index
 from skdh.sleep.sleep_classification import compute_sleep_predictions
 from skdh.sleep import endpoints
-
-
-def _get_date(epoch_ts, day_start_hour):
-    """
-    Compute the actual day start. Deals with the start days where the day may not start at the day
-    windowing time.
-
-    Parameters
-    ----------
-    epoch_ts : float
-        Epoch timestamp in seconds.
-    day_start_hour : int
-        The hour of the start of a day window
-
-    Returns
-    -------
-    start_datetime : datetime.datetime
-        Datetime of the start of the data.
-    day_str : str
-        Formatted YYYY-MM-DD string of the start of the day for that window.
-
-    Notes
-    -----
-    This function works such that if the day window starts at 12:00, and the recording starts at
-    10:00, the day returned will be the day *before*, as this would correspond to when the window
-    would have started provided the data. This matches the dates schema for the rest of the data.
-    """
-    # add 15 seconds to make sure any rounding effects for the hour dont adversely effect the
-    # result of the comparison
-    start_dt = datetime.utcfromtimestamp(epoch_ts + 15)
-
-    if start_dt.hour < day_start_hour:
-        day_str = (start_dt - timedelta(days=1)).strftime("%Y-%m-%d")
-    else:
-        day_str = start_dt.strftime("%Y-%m-%d")
-
-    # make sure to remove the 15s from the returned start datetime
-    return start_dt - timedelta(seconds=15), day_str
 
 
 class Sleep(BaseProcess):
@@ -361,13 +322,50 @@ class Sleep(BaseProcess):
                 df.loc[tso[0] : tso[1], "TSO"] = True
 
                 df.to_csv(rest_file, index=False)
+    
+    def _get_date(self, epoch_ts, day_start_hour):
+        """
+        Compute the actual day start. Deals with the start days where the day may not start at the day
+        windowing time.
+
+        Parameters
+        ----------
+        epoch_ts : float
+            Epoch timestamp in seconds.
+        day_start_hour : int
+            The hour of the start of a day window
+
+        Returns
+        -------
+        start_datetime : datetime.datetime
+            Datetime of the start of the data.
+        day_str : str
+            Formatted YYYY-MM-DD string of the start of the day for that window.
+
+        Notes
+        -----
+        This function works such that if the day window starts at 12:00, and the recording starts at
+        10:00, the day returned will be the day *before*, as this would correspond to when the window
+        would have started provided the data. This matches the dates schema for the rest of the data.
+        """
+        # add 15 seconds to make sure any rounding effects for the hour dont adversely effect the
+        # result of the comparison
+        start_dt = self.convert_timestamps(epoch_ts + 15)
+
+        if start_dt.hour < day_start_hour:
+            day_str = (start_dt - Timedelta(1, unit='day')).strftime("%Y-%m-%d")
+        else:
+            day_str = start_dt.strftime("%Y-%m-%d")
+
+        # make sure to remove the 15s from the returned start datetime
+        return start_dt - Timedelta(15, unit='s'), day_str
 
     @handle_process_returns(results_to_kwargs=True)
     def predict(
-        self, time=None, accel=None, *, temperature=None, fs=None, wear=None, **kwargs
+        self, time=None, accel=None, *, temperature=None, fs=None, wear=None, tz_name=None, **kwargs
     ):
         """
-        predict(time, accel, *, temperature=None, fs=None, wear=None, day_ends={})
+        predict(time, accel, *, temperature=None, fs=None, wear=None, day_ends={}, tz_name=None)
 
         Generate the sleep boundaries and endpoints for a time series signal.
 
@@ -388,6 +386,12 @@ class Sleep(BaseProcess):
         day_ends : dict
             Dictionary containing (N, 2) arrays of start and stop indices for individual days.
             Must have the key
+        
+        Other Parameters
+        ----------------
+        tz_name : {None, str}, optional
+            IANA time-zone name for the recording location if passing in `time` as
+            UTC timestamps. Can be ignored if passing in naive timestamps.
         """
         super().predict(
             expect_days=True,
@@ -397,6 +401,7 @@ class Sleep(BaseProcess):
             temperature=temperature,
             fs=fs,
             wear=wear,
+            tz_name=tz_name,
             **kwargs,
         )
 
@@ -449,6 +454,8 @@ class Sleep(BaseProcess):
                 "Date",
                 "Day Start Timestamp",
                 "Day End Timestamp",
+                "Total Minutes",
+                "Wear Minutes",
                 "TSO Start Timestamp",
                 "TSO Start",
                 "TSO Duration",
@@ -488,14 +495,14 @@ class Sleep(BaseProcess):
             sleep["Day N"][-1] = iday + 1
 
             # get the start timestamp and make sure its in the correct hour due to indexing
-            start_datetime, sleep["Date"][-1] = _get_date(
+            start_datetime, sleep["Date"][-1] = self._get_date(
                 time_ds[start], self.day_key[0]
             )
             # set the exact time of start/end of the day being used
-            sleep["Day Start Timestamp"][-1] = datetime.utcfromtimestamp(
+            sleep["Day Start Timestamp"][-1] = self.convert_timestamps(
                 time_ds[start]
             ).strftime("%Y-%m-%d %H:%M:%S.%f")
-            sleep["Day End Timestamp"][-1] = datetime.utcfromtimestamp(
+            sleep["Day End Timestamp"][-1] = self.convert_timestamps(
                 time_ds[stop]
             ).strftime("%Y-%m-%d %H:%M:%S.%f")
 
@@ -508,6 +515,10 @@ class Sleep(BaseProcess):
             dw_starts, dw_stops = get_day_index_intersection(
                 wear_starts_ds, wear_stops_ds, True, start, stop
             )
+
+            # get the total minutes and total wear minutes
+            sleep["Total Minutes"][-1] = around((time_ds[stop] - time_ds[start]) / 60, 1)
+            sleep["Wear Minutes"][-1] = around(sum(dw_stops - dw_starts) / (60 * goal_fs), 1)
 
             if (sum(dw_stops - dw_starts) / (3600 * goal_fs)) < self.min_wear_time:
                 self.logger.info(
@@ -577,7 +588,7 @@ class Sleep(BaseProcess):
             )
 
             # results fill out
-            tso_start_dt = datetime.utcfromtimestamp(tso[0])
+            tso_start_dt = self.convert_timestamps(tso[0])
             sleep["TSO Start Timestamp"][-1] = tso[0]
             sleep["TSO Start"][-1] = tso_start_dt.strftime("%Y-%m-%d %H:%M:%S.%f")
             sleep["TSO Duration"][-1] = (tso[3] - tso[2]) / (goal_fs * 60)  # in minutes
@@ -808,10 +819,8 @@ class Sleep(BaseProcess):
         Finalize and save the plots for sleep
         """
         if self.f is not None:
-            date = dt_date.today().strftime("%Y%m%d")
-            form_fname = self.plot_fname.format(
-                date=date, file=self._file_name
-            )
+            date = Timestamp.today().strftime("%Y%m%d")
+            form_fname = self.plot_fname.format(date=date, file=self._file_name)
             pp = PdfPages(Path(form_fname).with_suffix(".pdf"))
 
             for f in self.f:

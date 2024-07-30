@@ -1,11 +1,12 @@
 import pytest
-from numpy import allclose, array, arange
+from numpy import allclose, array, arange, random as np_random, concatenate
 
 from skdh.utility.internal import (
     get_day_index_intersection,
     apply_resample,
     rle,
     invert_indices,
+    fill_data_gaps,
 )
 
 
@@ -174,7 +175,7 @@ class TestApplyResample:
         assert y_rs.shape == (50,)
         assert allclose(ix_rs, [5, 10, 15])
         assert allclose(iy_rs, [[7, 12], [12, 18]])
-    
+
         t_rs = array([0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5])
         trs, (x_rs, y_rs), (ix_rs, iy_rs) = apply_resample(
             time=t, time_rs=t_rs, data=(x, y), indices=(ix, iy), fs=10.0
@@ -186,7 +187,7 @@ class TestApplyResample:
         assert allclose(ix_rs, [2, 4, 6])
         assert allclose(iy_rs, [[3, 5], [5, 7]])
 
-        t_rs = arange(0, 10, 1/3)
+        t_rs = arange(0, 10, 1 / 3)
         trs, (x_rs, y_rs), (ix_rs, iy_rs) = apply_resample(
             time=t, time_rs=t_rs, data=(x, y), indices=(ix, iy), fs=10.0
         )
@@ -196,7 +197,7 @@ class TestApplyResample:
         assert y_rs.shape == (t_rs.size,)
         assert allclose(ix_rs, [3, 6, 9])
         assert allclose(iy_rs, [[4, 8], [8, 10]])
-    
+
     def test_upsample(self, np_rng):
         t = arange(0, 5, 0.5)
         x = arange(t.size)
@@ -275,3 +276,30 @@ class TestInvertIndices:
 
         assert allclose(pred_inv_starts, array([0]))
         assert allclose(pred_inv_stops, array([900]))
+
+
+class TestFillDataGaps:
+    def test(self):
+        t = concatenate((arange(0, 4, 0.01), arange(6, 10, 0.01)))
+        x = np_random.default_rng().normal(0, 0.5, (t.size, 3))
+        temp = np_random.default_rng().normal(28, 0.75, t.size)
+
+        t_rs, data = fill_data_gaps(t, 100, {'accel': [0, 0, 1.0]}, accel=x, temperature=temp)
+
+        assert 'accel' in data
+        assert 'temperature' in data
+        assert allclose(t_rs, arange(0, 10, 0.01))
+        assert allclose(data['accel'][400:600], [0.0, 0.0, 1.0])
+        assert allclose(data['accel'][:400], x[:400])
+        assert allclose(data['accel'][600:], x[400:])
+        assert allclose(data['temperature'][400:600], 0.0)
+    
+    def test_no_gaps(self):
+        t = arange(0, 10, 0.01)
+        x = np_random.default_rng().normal(0, 0.5, (t.size, 3))
+
+        t_rs, data = fill_data_gaps(t, 100, {}, accel=x)
+
+        assert 'accel' in data
+        assert allclose(t_rs, t)
+        assert allclose(data['accel'], x)

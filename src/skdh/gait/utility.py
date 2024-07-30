@@ -4,6 +4,7 @@ Gait utility functions
 Lukas Adamowicz
 Copyright (c) 2023 Pfizer Inc. All rights reserved
 """
+
 from skdh.utility.internal import get_day_index_intersection
 
 

@@ -4,6 +4,7 @@ Utility functions dealing with IMU orientation
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 from warnings import warn
 
 from numpy import argmax, abs, mean, cos, arcsin, sign, zeros_like

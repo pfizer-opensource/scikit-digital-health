@@ -8,7 +8,7 @@ py3.install_sources(
         'multireader.py',
         'numpy_compressed.py',
         'csv.py',
-        'utility.py',
+        'empatica.py',
     ],
     pure: false,
     subdir: 'skdh/io',

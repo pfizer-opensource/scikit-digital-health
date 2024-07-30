@@ -4,6 +4,7 @@ Internal utility functions that don't necessarily need to be exposed in the publ
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 from numpy import (
     all,
     asarray,
@@ -19,11 +20,12 @@ from numpy import (
     around,
     diff,
     mean,
-    float_,
+    float64,
     int_,
     ndarray,
     concatenate,
     roll,
+    full,
 )
 from scipy.signal import cheby1, sosfiltfilt
 
@@ -162,7 +164,9 @@ def get_day_index_intersection(starts, stops, for_inclusion, day_start, day_stop
     )
 
 
-def apply_resample(*, time, goal_fs=None, time_rs=None, data=(), indices=(), aa_filter=True, fs=None):
+def apply_resample(
+    *, time, goal_fs=None, time_rs=None, data=(), indices=(), aa_filter=True, fs=None
+):
     """
     Apply a re-sample to a set of data.
 
@@ -171,14 +175,14 @@ def apply_resample(*, time, goal_fs=None, time_rs=None, data=(), indices=(), aa_
     time : numpy.ndarray
         Array of original timestamps.
     goal_fs : float, optional
-        Desired sampling frequency in Hz.  One of `goal_fs` or `time_rs` must be 
+        Desired sampling frequency in Hz.  One of `goal_fs` or `time_rs` must be
         provided.
     time_rs : numpy.ndarray, optional
-        Resampled time series to sample to. One of `goal_fs` or `time_rs` must be 
+        Resampled time series to sample to. One of `goal_fs` or `time_rs` must be
         provided.
     data : tuple, optional
-        Tuple of arrays to normally downsample using interpolation. Must match the 
-        size of `time`. Can handle `None` inputs, and will return an array of zeros 
+        Tuple of arrays to normally downsample using interpolation. Must match the
+        size of `time`. Can handle `None` inputs, and will return an array of zeros
         matching the downsampled size.
     indices : tuple, optional
         Tuple of arrays of indices to downsample.
@@ -204,38 +208,39 @@ def apply_resample(*, time, goal_fs=None, time_rs=None, data=(), indices=(), aa_
     ----------
     .. [1] https://en.wikipedia.org/wiki/Downsampling_(signal_processing)
     """
+
     def resample(x, factor, t, t_rs):
         if (int(factor) == factor) and (factor > 1):
             # in case that t_rs is provided and ends earlier than t
             n = nonzero(t <= t_rs[-1])[0][-1] + 1
-            return (x[:n:int(factor)],)
+            return (x[: n : int(factor)],)
         else:
             if x.ndim == 1:
                 return (interp(t_rs, t, x),)
             elif x.ndim == 2:
-                xrs = zeros((t_rs.size, x.shape[1]), dtype=float_)
+                xrs = zeros((t_rs.size, x.shape[1]), dtype=float64)
                 for j in range(x.shape[1]):
                     xrs[:, j] = interp(t_rs, t, x[:, j])
                 return (xrs,)
-    
+
     if fs is None:
         # compute sampling frequency by hand
         fs = 1 / mean(diff(time[:5000]))
-    
+
     if time_rs is None and goal_fs is None:
         raise ValueError("One of `time_rs` or `goal_fs` is required.")
 
     # get resampled time if necessary
     if time_rs is None:
         if int(fs / goal_fs) == fs / goal_fs and goal_fs < fs:
-            time_rs = time[::int(fs / goal_fs)]
+            time_rs = time[:: int(fs / goal_fs)]
         else:
             time_rs = arange(time[0], time[-1], 1 / goal_fs)
     else:
         goal_fs = 1 / mean(diff(time_rs[:5000]))
         # prevent t_rs from extrapolating
         time_rs = time_rs[time_rs <= time[-1]]
-    
+
     # AA filter, if necessary
     if (fs / goal_fs) >= 1.0:
         sos = cheby1(8, 0.05, 0.8 / (fs / goal_fs), output="sos")
@@ -253,7 +258,7 @@ def apply_resample(*, time, goal_fs=None, time_rs=None, data=(), indices=(), aa_
             data_rs += resample(data_to_rs, fs / goal_fs, time, time_rs)
         else:
             raise ValueError("Data dimension exceeds 2, or data not understood.")
-    
+
     # resampling indices
     indices_rs = ()
     for idx in indices:
@@ -271,13 +276,13 @@ def apply_resample(*, time, goal_fs=None, time_rs=None, data=(), indices=(), aa_
                         time[idx[:, i]], time_rs, arange(time_rs.size)
                     )  # cast to in on insert
                 )
-    
+
     ret = (time_rs,)
     if data_rs != ():
         ret += (data_rs,)
     if indices_rs != ():
         ret += (indices_rs,)
-    
+
     return ret
 
 
@@ -356,3 +361,68 @@ def invert_indices(starts, stops, zero_index, end_index):
     mask = inv_starts != inv_stops
 
     return inv_starts[mask], inv_stops[mask]
+
+
+def fill_data_gaps(time, fs, fill_info, **kwargs):
+    """
+    Fill gaps in data-streams
+
+    Parameters
+    ----------
+    time : numpy.ndarray
+        Array of unix timestamps, in seconds.
+    fs : float
+        Sampling frequency. In number of samples in a second.
+    fill_info : dict
+        Dictionary with keys matching `**kwargs` to specify what value to use
+        for filling gaps. If a value is not provided, the gap will be filled with
+        zeros.
+    **kwargs : dict
+        Arrays of data to fill gaps in specified by keyword. Must be the same size
+        as `time`. Returned as one dictionary for all arrays specified this way.
+    
+    Returns
+    -------
+    time_filled : numpy.ndarray
+        Gap filled time array.
+    data_filled : dict
+        Dictionary of gap filled data arrays.
+    
+    Examples
+    --------
+    >>> time = np.concatenate((arange(0, 4, 0.01), arange(6, 10, 0.01))
+    >>> accel = np.random.default_rng().normal(0, 1, (time.size, 3))
+    >>> accel[:, 2] += 1  # add gravity acceleration
+    >>> temp = np.random.default_rng().normal(28, 1, time.size)
+    >>> fill_info = {"accel": [0, 0, 1]}  # only specifiying fill value for accel
+    >>> data_rs = fill_data_gaps(time, 100.0, fill_info, accel=accel, temp=temp)
+    >>> print(data_rs.keys())
+    dict_keys(['accel', 'temp'])
+    """
+    time_rs = arange(time[0], time[-1] + 0.5 / fs, 1 / fs)
+
+    # get the first location of gaps in the data - add 1 so that the index reflects
+    # the first value AFTER the gap
+    gaps = nonzero(diff(time) > (1.5 / fs))[0] + 1
+    # create sequences of data with no gaps
+    seqs = zeros((gaps.size + 1, 2), dtype=int_)
+    seqs[1:, 0] = gaps
+    seqs[:-1, 1] = gaps
+    seqs[-1, 1] = time.size
+
+    # iterate over the datastreams
+    ret = {}
+    for name, data in kwargs.items():
+        shape = list(data.shape)
+        shape[0] = time_rs.size
+        new_data = full(shape, fill_info.get(name, 0.0), dtype=data.dtype)
+
+        for (i1, i2) in seqs[::-1]:
+            # get the number of samples offset in the resampled time
+            i_offset = int((time[i1] - time_rs[i1]) * fs)
+
+            new_data[i1 + i_offset:i2 + i_offset] = data[i1:i2]
+        
+        ret[name] = new_data
+    
+    return time_rs, ret

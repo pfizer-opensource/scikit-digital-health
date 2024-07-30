@@ -4,6 +4,7 @@ Inertial data/sensor calibration
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 from warnings import warn
 
 from numpy import (
@@ -15,7 +16,7 @@ from numpy import (
     abs,
     all as npall,
     around,
-    Inf,
+    inf,
     vstack,
     minimum,
     concatenate,
@@ -196,6 +197,7 @@ class CalibrateAccelerometer(BaseProcess):
             i_h += 1
 
         if apply and valid_calibration:
+            self.logger.info(f"Applying calibration: {offset=}, {scale=}, {temp_mean=}, {temp_scale=}")
             if temperature is None:
                 accel = (accel + offset) * scale
             else:
@@ -273,7 +275,7 @@ class CalibrateAccelerometer(BaseProcess):
         tmp_rm = (tmp_rm - tmp_mean).reshape((-1, 1))
 
         weights = ones(acc_rm.shape[0]) * 100
-        res = [Inf]
+        res = [inf]
         LR = LinearRegression()
 
         for niter in range(self.max_iter):

@@ -174,7 +174,7 @@ defined on a per-event level):
 
         def _predict(self, dt, leg_length, gait, gait_aux):
             # initialize 1 value per bout
-            stepreg = zeros(len(gait_aux['accel']), dtype=float_)
+            stepreg = zeros(len(gait_aux['accel']), dtype=float64)
 
             for i, acc in enumerate(gait_aux['accel']):
                 lag = int(
@@ -189,6 +189,7 @@ defined on a per-event level):
             # broadcast step regularity into gait for each step
             gait[self.k_] = stepreg[gait_aux['inertial data i']]
 """
+
 from skdh.gait_old.gait import Gait
 from skdh.gait_old import gait
 from skdh.gait_old.gait_endpoints import *

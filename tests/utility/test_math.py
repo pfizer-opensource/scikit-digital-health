@@ -131,9 +131,9 @@ class BaseMovingStatsTester:
 
     @pytest.mark.parametrize("trim", (True, False))
     @pytest.mark.parametrize("skip", (1, 2, 7, 150, 300))
-    def test_constant(self, skip, trim, np_rng):
+    def test_constant(self, skip, trim):
         wlen = 250  # constant
-        x = full(2000, np_rng.random())
+        x = full(2000, 0.78831)
         xw = get_windowed_view(x, wlen, skip)
 
         if isinstance(self.truth_function, Iterable):

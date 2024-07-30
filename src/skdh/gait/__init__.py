@@ -280,7 +280,7 @@ defined on a per-event level):
 
         def _predict(self, dt, leg_length, gait, gait_aux):
             # initialize 1 value per bout
-            stepreg = zeros(len(gait_aux['accel']), dtype=float_)
+            stepreg = zeros(len(gait_aux['accel']), dtype=float64)
 
             for i, acc in enumerate(gait_aux['accel']):
                 lag = int(
@@ -300,6 +300,7 @@ defined on a per-event level):
 .. automodule:: skdh.gait.substeps
     :ignore-module-all:
 """
+
 from skdh.gait.core import GaitLumbar
 from skdh.gait import substeps
 from skdh.gait.substeps import *

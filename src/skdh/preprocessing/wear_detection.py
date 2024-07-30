@@ -6,6 +6,7 @@ Copyright (c) 2021. Pfizer Inc. All rights reserved.
 
 DETACH algorithm: Copyright (c) 2022 Adam Vert
 """
+
 from warnings import warn
 
 from numpy import (
@@ -501,7 +502,9 @@ class CountWearDetection(BaseProcess):
 
         # handle case where end is end of array
         try:
-            if isclose(wear_stops[-1], nonwear_counts.size * int(self.epoch_seconds * fs)):
+            if isclose(
+                wear_stops[-1], nonwear_counts.size * int(self.epoch_seconds * fs)
+            ):
                 wear_stops[-1] = time.size - 1
         except IndexError:
             warn("No wear periods detected.")
@@ -926,7 +929,7 @@ class AccelThresholdWearDetection(BaseProcess):
         w_starts = ch[1:-1:2]
         w_stops = ch[2:-1:2]
 
-        if apply_setup_rule and (w_starts[0] == 0) and (w_stops[0] <= (3 * nph)):
+        if apply_setup_rule and w_starts.size > 0 and (w_starts[0] == 0) and (w_stops[0] <= (3 * nph)):
             w_starts = w_starts[1:]
             w_stops = w_stops[1:]
 

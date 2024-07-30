@@ -4,6 +4,7 @@ Utility functions for the Activity module
 Lukas Adamowicz
 Copyright (c) 2022. Pfizer Inc. All rights reserved.
 """
+
 from warnings import warn
 
 from skdh.activity.cutpoints import _base_cutpoints

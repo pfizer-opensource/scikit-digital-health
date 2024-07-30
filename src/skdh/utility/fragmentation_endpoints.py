@@ -4,6 +4,7 @@ Generic endpoints dealing with the fragmentation of binary predictions.
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 from numpy import (
     mean,
     asarray,
@@ -16,7 +17,7 @@ from numpy import (
     sum,
     log,
     nan,
-    float_,
+    float64,
 )
 
 from skdh.utility.internal import rle
@@ -65,8 +66,8 @@ def gini(x, w=None, corr=True):
         sorted_x = x[sorted_indices]
         sorted_w = w[sorted_indices]
         # Force float dtype to avoid overflows
-        cumw = cumsum(sorted_w, dtype=float_)
-        cumxw = cumsum(sorted_x * sorted_w, dtype=float_)
+        cumw = cumsum(sorted_w, dtype=float64)
+        cumxw = cumsum(sorted_x * sorted_w, dtype=float64)
         g = sum(cumxw[1:] * cumw[:-1] - cumxw[:-1] * cumw[1:]) / (cumxw[-1] * cumw[-1])
         if corr:
             return g * x.size / (x.size - 1)
@@ -75,7 +76,7 @@ def gini(x, w=None, corr=True):
     else:
         sorted_x = sort(x)
         n = x.size
-        cumx = cumsum(sorted_x, dtype=float_)
+        cumx = cumsum(sorted_x, dtype=float64)
         # The above formula, with all weights equal to 1 simplifies to:
         g = (n + 1 - 2 * sum(cumx) / cumx[-1]) / n
         if corr:

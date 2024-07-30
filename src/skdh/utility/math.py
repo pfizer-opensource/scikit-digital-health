@@ -4,6 +4,7 @@ Utility math functions
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 from warnings import warn
 
 from numpy import (
@@ -21,7 +22,7 @@ from numpy import (
     sqrt,
     log,
     exp,
-    float_,
+    float64,
 )
 from scipy.stats import linregress
 
@@ -161,7 +162,7 @@ def moving_sd(a, w_len, skip, trim=True, axis=-1, return_previous=True):
         Trim the ends of the result, where a value cannot be calculated. If False,
         these values will be set to NaN. Default is True.
     axis : int, optional
-        Axis to compute the moving mean along. Default is -1.
+        Axis to compute the moving standard deviation along. Default is -1.
     return_previous : bool, optional
         Return previous moments. These are computed either way, and are therefore optional returns.
         Default is True.
@@ -886,14 +887,14 @@ def DFA(a, scale=2 ** (1 / 8), box_sizes=None):
     # subtract the mean and compute cumulative sum
     y = cumsum(a - mean(a))
     # allocate results
-    dfa = zeros(box_sizes.size, dtype=float_)
+    dfa = zeros(box_sizes.size, dtype=float64)
 
     # iterate over window sizes
     for i, wlen in enumerate(box_sizes):
         # get a windowed view of y
         yw = get_windowed_view(y, wlen, wlen)
         # allocate results
-        f1w = zeros(yw.shape, dtype=float_)
+        f1w = zeros(yw.shape, dtype=float64)
         # allocate x array for LM fit
         x = arange(wlen)
         # iterate over windows

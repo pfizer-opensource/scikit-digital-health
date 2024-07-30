@@ -4,11 +4,14 @@ Base process for file IO
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 from pathlib import Path
 import functools
 from warnings import warn
 
-from skdh.io.utility import FileSizeError
+from pandas import to_datetime
+
+from skdh.utility.exceptions import FileSizeError
 
 
 def check_input_file(
@@ -55,7 +58,7 @@ def check_input_file(
                     return kwargs
 
             # check file size if desired
-            if check_size:
+            if check_size and not hasattr(self, "_skip_file_size_check"):
                 if pfile.stat().st_size < 1000:
                     raise FileSizeError("File is less than 1kb, nothing to read.")
 
@@ -64,3 +67,45 @@ def check_input_file(
         return wrapper_check_input_file
 
     return decorator_check_input_file
+
+
+def handle_naive_timestamps(time, is_local, tz_name=None):
+    """
+    Check timestamps to make sure they are either naive, or UTC with a time-zone
+    name available. 
+
+    Parameters
+    ----------
+    time : numpy.ndarray
+        Array of timestamps.
+    is_local : bool
+        If the timestamps are naive and represent local time.
+    tz_name : {None, str}
+        IANA time-zone name.
+    """
+    if is_local:
+        if tz_name is not None:
+            # get offset for the timestamp array based on the first timestamp. This works
+            # since naive timestamps don't account for DST changes, and therefore will
+            # not have duplicated timestamps (just like UTC).
+
+            # invert since we are going from local to UTC.
+            offset = -to_datetime(time[0], unit='s').tz_localize(tz_name).utcoffset().total_seconds()
+
+            time += offset
+        else:  # is_local, tz_name is None
+            warn(
+                "Timestamps are local but naive, and no time-zone information is available. "
+                "This may mean that if a DST change occurs during the recording period, "
+                "the times will be offset by an hour"
+            )
+    else:  # not is_local
+        if tz_name is None:
+            warn(
+                "Timestamps are not localized, but no time-zone information is available. "
+                "This will cause issues for day-windowing, where the day does not actually "
+                "start at midnight due to UTC offset.",
+                UserWarning,
+            )
+    return time
+

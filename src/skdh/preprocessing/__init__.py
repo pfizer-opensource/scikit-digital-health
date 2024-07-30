@@ -31,6 +31,7 @@ Wear Detection
     CtaWearDetection
     AccelThresholdWearDetection
 """
+
 from skdh.preprocessing.window_days import GetDayWindowIndices
 from skdh.preprocessing import window_days
 from skdh.preprocessing.calibrate import CalibrateAccelerometer

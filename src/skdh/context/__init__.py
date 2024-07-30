@@ -19,5 +19,7 @@ walking-similar activities from which step counts can be estimated, motion detec
     PredictGaitLumbarLgbm
 
 """
-from skdh.context.core import Ambulation
+
+from skdh.context.ambulation_classification import Ambulation
+from skdh.context.motion_detect import MotionDetectRCoV, MotionDetectRCoVMaxSD
 from skdh.context.gait_classification import PredictGaitLumbarLgbm

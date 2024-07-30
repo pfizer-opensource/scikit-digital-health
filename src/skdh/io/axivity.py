@@ -4,10 +4,11 @@ Axivity reading functions
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 from numpy import ascontiguousarray
 
 from skdh.base import BaseProcess, handle_process_returns
-from skdh.io.base import check_input_file
+from skdh.io.base import check_input_file, handle_naive_timestamps
 from skdh.io._extensions import read_axivity
 
 
@@ -54,7 +55,7 @@ class ReadCwa(BaseProcess):
 
     @handle_process_returns(results_to_kwargs=True)
     @check_input_file(".cwa")
-    def predict(self, *, file, **kwargs):
+    def predict(self, *, file, tz_name=None, **kwargs):
         """
         predict(*, file)
 
@@ -64,7 +65,11 @@ class ReadCwa(BaseProcess):
         ----------
         file : {str, Path}
             Path to the file to read. Must either be a string, or be able to be converted by
-            `str(file)`
+            `str(file)`.
+        tz_name : {None, str}, optional
+            IANA time-zone name for the recording location. If not provided, timestamps
+            will represent local time naively. This means they will not account for 
+            any time changes due to Daylight Saving Time.
 
         Returns
         -------
@@ -88,7 +93,7 @@ class ReadCwa(BaseProcess):
         - `time`: timestamps [s]
         - `day_ends`: window indices
         """
-        super().predict(expect_days=False, expect_wear=False, file=file, **kwargs)
+        super().predict(expect_days=False, expect_wear=False, file=file, tz_name=tz_name, **kwargs)
 
         # read the file
         fs, n_bad_samples, imudata, ts, temperature = read_axivity(str(file))
@@ -111,7 +116,7 @@ class ReadCwa(BaseProcess):
             raise UnexpectedAxesError("Unexpected number of axes in the IMU data")
 
         results = {
-            self._time: ts[:end],
+            self._time: handle_naive_timestamps(ts[:end], is_local=True, tz_name=tz_name),
             "fs": fs,
             self._temp: temperature[:end],
         }

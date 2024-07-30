@@ -29,6 +29,7 @@ stride length: step_length_i + step_length_i+1
 
 gait speed: stride_length / stride time
 """
+
 from numpy import (
     zeros,
     full,
@@ -43,7 +44,7 @@ from numpy import (
     argmin,
     abs,
     round,
-    float_,
+    float64,
     int_,
     fft,
     arange,
@@ -100,7 +101,7 @@ def _autocovariancefn(x, max_lag, biased=False, axis=0):
 
     shape = list(y.shape)
     shape[-1] = max_lag
-    ac = zeros(shape, dtype=float_)
+    ac = zeros(shape, dtype=float64)
 
     for i in range(min(max_lag, y.shape[-1] - 10)):
         ac[..., i] = autocorrelation(y, i, True)
@@ -795,7 +796,7 @@ class PhaseCoordinationIndex(GaitBoutEndpoint):
         )
 
     def _predict(self, *, fs, leg_length, gait, gait_aux):
-        pci = zeros(len(gait_aux["accel"]), dtype=float_)
+        pci = zeros(len(gait_aux["accel"]), dtype=float64)
 
         phase = gait["step time"] / gait["stride time"]  # %, not degrees
         for i in range(len(gait_aux["accel"])):
@@ -868,7 +869,7 @@ class GaitSymmetryIndex(GaitBoutEndpoint):
         super().__init__("gait symmetry index", __name__, depends=[StrideTime])
 
     def _predict(self, *, fs, leg_length, gait, gait_aux):
-        gsi = zeros(len(gait_aux["accel"]), dtype=float_)
+        gsi = zeros(len(gait_aux["accel"]), dtype=float64)
 
         # setup acceleration filter if its possible to use
         if 0 < (2 * 10 / fs) < 1:
@@ -941,7 +942,7 @@ class StepRegularityV(GaitBoutEndpoint):
         super().__init__("step regularity - V", __name__, depends=[StepTime])
 
     def _predict(self, *, fs, leg_length, gait, gait_aux):
-        stepreg = full(len(gait_aux["accel"]), nan, dtype=float_)
+        stepreg = full(len(gait_aux["accel"]), nan, dtype=float64)
 
         for i in unique(gait_aux["inertial data i"]):
             acc = gait_aux["accel"][i]
@@ -1001,7 +1002,7 @@ class StrideRegularityV(GaitBoutEndpoint):
         super().__init__("stride regularity - V", __name__, depends=[StrideTime])
 
     def _predict(self, *, fs, leg_length, gait, gait_aux):
-        stridereg = full(len(gait_aux["accel"]), nan, dtype=float_)
+        stridereg = full(len(gait_aux["accel"]), nan, dtype=float64)
 
         for i in unique(gait_aux["inertial data i"]):
             acc = gait_aux["accel"][i]

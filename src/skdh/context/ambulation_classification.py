@@ -1,7 +1,14 @@
+"""
+Ambulation detection via LGBM classifier
+
+Yiorgos Christakis
+Copyright (c) 2024, Pfizer Inc. All rights reserved.
+"""
+
 from warnings import warn
 from importlib import resources
 
-import numpy as np
+from numpy import asarray, ascontiguousarray, mean, diff, concatenate, linalg
 from scipy.signal import butter, sosfiltfilt
 import lightgbm as lgb
 
@@ -36,9 +43,7 @@ from skdh.features import (
 
 
 def _resolve_path(mod, file):
-    with resources.path(mod, file) as file_path:
-        path = file_path
-    return path
+    return resources.files(mod) / file
 
 
 class Ambulation(BaseProcess):
@@ -91,9 +96,9 @@ class Ambulation(BaseProcess):
         self.pthresh = pthresh
 
     @handle_process_returns(results_to_kwargs=False)
-    def predict(self, time, accel, **kwargs):
+    def predict(self, time, accel, fs=None, tz_name=None, **kwargs):
         """
-        predict(time, accel)
+        predict(time, accel, fs=None)
 
         Function to detect ambulation or gait-like activity from 20hz accelerometer
         data collected on the wrist.
@@ -104,15 +109,27 @@ class Ambulation(BaseProcess):
             (N, ) array of unix timestamps, in seconds.
         accel : numpy.ndarray
             (N, 3) array of acceleration, in units of 'g', collected at 20hz.
+        fs : float, optional
+            Sampling rate. Default None. If not provided, will be inferred.
+        
+        Other Parameters
+        ----------------
+        tz_name : {None, str}, optional
+            IANA time-zone name for the recording location if passing in `time` as
+            UTC timestamps. Can be ignored if passing in naive timestamps.
 
         Returns
         -------
         results : dict
             Results dictionary including 3s epoch level predictions, probabilities,
             and unix timestamps.
+        dict
+            Results dictionary for downstream pipeline use including start and stop times for ambulation bouts.
+
         """
+        super().predict(expect_days=False, expect_wear=False, time=time, accel=accel, fs=fs, tz_name=tz_name, **kwargs)
         # check that input matches expectations, downsample to 20hz if necessary
-        time_ds, accel_ds, fs = self._check_input(time, accel)
+        time_ds, accel_ds, fs = self._check_input(time, accel, fs)
 
         # load model
         model = self._load_model("ambulation_model.txt")
@@ -132,6 +149,7 @@ class Ambulation(BaseProcess):
             "ambulation_3s_epochs_predictions": predictions,
             "ambulation_3s_epochs_probs": probabilities,
             "ambulation_3s_time": time_ds[::60],  # every 60th sample (3s at 20hz)
+            "tz_name": tz_name,
         }
 
         # get starts and stops of ambulation bouts
@@ -142,7 +160,7 @@ class Ambulation(BaseProcess):
         lengths_3s, starts_3s, values = rle(predictions)
 
         # subset to only ambulation bouts and compute stops
-        starts, lengths = np.asarray(starts_3s[values == 1]), np.asarray(
+        starts, lengths = asarray(starts_3s[values == 1]), asarray(
             lengths_3s[values == 1]
         )
         stops = starts + lengths
@@ -157,7 +175,7 @@ class Ambulation(BaseProcess):
 
         # create a single ambulation bouts array with correct units for indexing
         if len(starts):
-            ambulation_bouts = np.concatenate((starts, stops)).reshape((2, -1)).T
+            ambulation_bouts = concatenate((starts, stops)).reshape((2, -1)).T
         else:
             ambulation_bouts = None
 
@@ -183,14 +201,14 @@ class Ambulation(BaseProcess):
             Preprocessed signal.
 
         """
-        c_contiguous = np.ascontiguousarray(accel)
+        c_contiguous = ascontiguousarray(accel)
         windowed_accel = get_windowed_view(c_contiguous, 60, 60)
 
         # Vector magnitude
-        x_mag = np.linalg.norm(windowed_accel, axis=2)
+        x_mag = linalg.norm(windowed_accel, axis=2)
 
         # High-pass filter at .25hz
-        sos = butter(N=1, Wn=[2 * 0.25 / 20.0], btype="highpass", output="sos")
+        sos = butter(N=1, Wn=2 * 0.25 / 20.0, btype="highpass", output="sos")
         preprocessed = sosfiltfilt(sos, x_mag, axis=1)
 
         return preprocessed
@@ -270,9 +288,10 @@ class Ambulation(BaseProcess):
         return features.T, names
 
     @staticmethod
-    def _check_input(time, accel):
+    def _check_input(time, accel, fs=None):
         """
         Checks that input meets requirements (see class docstring). Downsamples data >20hz to 20hz.
+        Does not check accelerometer units.
 
         Parameters
         ----------
@@ -280,6 +299,8 @@ class Ambulation(BaseProcess):
             Numpy array of unix timestamps. Units of seconds.
         accel : array-like
             Numpy array of triaxial accelerometer data.
+        fs : float, optional
+            Sampling rate. Default None. If not provided, will be inferred.
 
         Returns
         -------
@@ -292,17 +313,10 @@ class Ambulation(BaseProcess):
         # check # of columns
         _, c = accel.shape
         if not (c == 3):
-            raise ValueError("Input expected to have 3 columns, but found " + str(c))
-
-        # units must be in G's (mean of magnitude of x,y,z across the entire signal < 4)
-        avg = np.mean(np.linalg.norm(accel, axis=1))
-        if not (avg < 4):
-            raise ValueError(
-                "Input expected to have units of G's, but mean signal magnitude greater than 4."
-            )
+            raise ValueError(f"Input expected to have 3 columns, but found {str(c)}")
 
         # check fs & downsample if necessary
-        fs = 1 / np.mean(np.diff(time))
+        fs = round(1 / mean(diff(time)), 3) if fs is None else fs
         if fs < 20.0:
             raise ValueError(f"Frequency ({fs:.2f}Hz) is too low (<20Hz).")
         elif fs > 20.0:
@@ -320,11 +334,11 @@ class Ambulation(BaseProcess):
             time_ds = time
             accel_ds = accel
 
-        # check
+        # check input length
         r, _ = accel_ds.shape
         if not (r >= 60):
             raise ValueError(
-                "Input at 20hz expected to have at least 60 rows, but found " + str(r)
+                f"Input at 20hz expected to have at least 60 rows, but found {str(r)}"
             )
 
         return time_ds, accel_ds, fs

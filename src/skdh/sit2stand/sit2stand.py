@@ -4,6 +4,7 @@ Sit-to-stand transfer detection and processing
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 from numpy import (
     array,
     sum,
@@ -193,9 +194,9 @@ class Sit2Stand(BaseProcess):
             self.day_key = tuple(day_window)
 
     @handle_process_returns(results_to_kwargs=False)
-    def predict(self, *, time, accel, **kwargs):
+    def predict(self, *, time, accel, tz_name=None, **kwargs):
         """
-        predict(*, time, accel, day_ends={})
+        predict(*, time, accel, day_ends={}, tz_name=None)
 
         Predict the sit-to-stand transfers, and compute per-transition quantities
 
@@ -209,9 +210,15 @@ class Sit2Stand(BaseProcess):
             Optional dictionary containing (N, 2) arrays of start and stop indices for invididual
             days. Dictionary keys are in the format "{base}, {period}". If not provided, or the
             key specified by `day_window` is not found, no day-based windowing will be done.
+        
+        Other Parameters
+        ----------------
+        tz_name : {None, str}, optional
+            IANA time-zone name for the recording location if passing in `time` as
+            UTC timestamps. Can be ignored if passing in naive timestamps.
         """
         super().predict(
-            expect_days=True, expect_wear=False, time=time, accel=accel, **kwargs
+            expect_days=True, expect_wear=False, time=time, accel=accel, tz_name=tz_name, **kwargs
         )
 
         # FILTERING
@@ -275,7 +282,7 @@ class Sit2Stand(BaseProcess):
             power_peaks, _ = find_peaks(power, **self.power_peak_kw)
 
             self.detector.predict(
-                sts, dt, time[start:stop], accel[start:stop, :], f_acc, power_peaks
+                sts, dt, time[start:stop], accel[start:stop, :], f_acc, power_peaks, kwargs.get("tz_name")
             )
 
             # fill out the day information

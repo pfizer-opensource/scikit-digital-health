@@ -2,7 +2,7 @@
 requires = [
     "meson-python",
     "wheel",
-    "oldest-supported-numpy"
+    "numpy>=2.0.0rc1"
 ]
 build-backend = "mesonpy"
 
@@ -12,7 +12,7 @@ dynamic = [
     'version'
 ]
 description = "Python general purpose human motion inertial data processing package."
-readme = "README.rst"
+readme = "README.md"
 license = { file = 'LICENSE' }
 keyword = [
     'IMU',
@@ -33,7 +33,6 @@ classifiers = [
     "Development Status :: 4 - Beta",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Fortran",
@@ -46,9 +45,9 @@ classifiers = [
     "Operating System :: POSIX :: Linux",
 ]
 
-requires-python = ">=3.6"
+requires-python = ">=3.9"
 dependencies = [
-    "numpy>=1.17.2",
+    "numpy>=1.25.0",
     "scipy>=1.12.0",
     "pandas>=1.0.0",
     "lightgbm>=2.3.0",
@@ -58,8 +57,7 @@ dependencies = [
     "matplotlib",
     "packaging",
     "pyyaml",
-    "importlib_resources;python_version<'3.7'",
-    "importlib_metadata;python_version<'3.8'"
+    "avro",
 ]
 
 [project.optional-dependencies]
@@ -67,7 +65,8 @@ dev = [
     'pytest',
     'coverage',
     'psutil',
-    'tables'
+    # 'tables',
+    "numpy>=2.0.0rc1"
 ]
 actions = [
     'flake8',

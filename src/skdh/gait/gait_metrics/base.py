@@ -4,10 +4,11 @@ Base gait endpoints class
 Lukas Adamowicz
 Copyright (c) 2023. Pfizer Inc. All rights reserved.
 """
+
 import functools
 import logging
 
-from numpy import zeros, roll, full, nan, bool_, float_
+from numpy import zeros, roll, full, nan, bool_, float64
 
 
 def basic_asymmetry(f):
@@ -133,7 +134,7 @@ class GaitEventEndpoint:
 
     def _predict_asymmetry(self, *, fs, leg_length, gait, gait_aux):
         asy_name = f"{self.k_} asymmetry"
-        gait[asy_name] = full(gait["IC"].size, nan, dtype=float_)
+        gait[asy_name] = full(gait["IC"].size, nan, dtype=float64)
 
         mask = self._get_mask(gait, 1)
         mask_ofst = roll(mask, 1)
@@ -142,7 +143,7 @@ class GaitEventEndpoint:
 
     def _predict_init(self, gait, init=True, offset=None):
         if init:
-            gait[self.k_] = full(gait["IC"].size, nan, dtype=float_)
+            gait[self.k_] = full(gait["IC"].size, nan, dtype=float64)
         if offset is not None:
             mask = self._get_mask(gait, offset)
             mask_ofst = roll(mask, offset)

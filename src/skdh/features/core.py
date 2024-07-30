@@ -4,13 +4,14 @@ Core functionality for feature computation
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 from abc import ABC, abstractmethod
 from collections.abc import Iterator, Sequence
 import json
 from warnings import warn
 
 from pandas import DataFrame
-from numpy import float_, asarray, zeros, sum, moveaxis
+from numpy import float64, asarray, zeros, sum, moveaxis
 
 
 __all__ = ["Bank"]
@@ -261,10 +262,10 @@ class Bank:
         # standardize the input signal
         if isinstance(signal, DataFrame):
             columns = columns if columns is not None else signal.columns
-            x = signal[columns].values.astype(float_)
+            x = signal[columns].values.astype(float64)
         else:
             try:
-                x = asarray(signal, dtype=float_)
+                x = asarray(signal, dtype=float64)
             except ValueError as e:
                 raise ArrayConversionError("Error converting signal to ndarray") from e
 
@@ -284,7 +285,7 @@ class Bank:
             x = moveaxis(x, axis, -1)
             # number of feats is 1 per
             n_feats = [1] * len(self)
-            feats = zeros((sum(n_feats),) + x.shape[:-1], dtype=float_)
+            feats = zeros((sum(n_feats),) + x.shape[:-1], dtype=float64)
         else:
             # move both the computation and index axis. do this in two steps to allow for undoing
             # just the index axis swap later. The index_axis has been adjusted appropriately
@@ -296,7 +297,7 @@ class Bank:
             for ind in indices:
                 n_feats.append(get_n_feats(x.shape[0], ind))
 
-            feats = zeros((sum(n_feats),) + x.shape[1:-1], dtype=float_)
+            feats = zeros((sum(n_feats),) + x.shape[1:-1], dtype=float64)
 
         feat_i = 0  # keep track of where in the feature array we are
         for i, ft in enumerate(self._feats):
@@ -366,4 +367,4 @@ class Feature(ABC):
             ndarray of the computed feature
         """
         # move the computation axis to the end
-        return moveaxis(asarray(signal, dtype=float_), axis, -1)
+        return moveaxis(asarray(signal, dtype=float64), axis, -1)
