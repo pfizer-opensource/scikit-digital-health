@@ -399,7 +399,8 @@ def fill_data_gaps(time, fs, fill_info, **kwargs):
     >>> print(data_rs.keys())
     dict_keys(['accel', 'temp'])
     """
-    time_rs = arange(time[0], time[-1] + 0.5 / fs, 1 / fs)
+    # round-about way, but need to prevent start>>>>>>>>>step
+    time_rs = arange(0, (time[-1] - time[0]) + 0.5 / fs, 1 / fs) + time[0]
 
     # get the first location of gaps in the data - add 1 so that the index reflects
     # the first value AFTER the gap
