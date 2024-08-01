@@ -242,7 +242,7 @@ PyObject * power_spectral_sum(PyObject *NPY_UNUSED(self), PyObject *args){
 
 PyObject * range_power_sum(PyObject *NPY_UNUSED(self), PyObject *args)
 {
-    PyObject *x_;,
+    PyObject *x_;
     long padlevel;
     double fs=0., low_cut=0., hi_cut=12.;
     int norm;
@@ -305,7 +305,7 @@ PyObject * range_power_sum(PyObject *NPY_UNUSED(self), PyObject *args)
         {
             range_power_sum_1d(&stride, dptr, &fs, &nfft, &low_cut, &hi_cut, &norm, rptr);
             dptr += stride;
-            rprt ++;
+            rptr ++;
         }
     }
 
