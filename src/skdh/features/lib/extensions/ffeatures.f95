@@ -417,6 +417,62 @@ end subroutine
 
 
 ! --------------------------------------------------------------------
+! SUBROUTINE  range_power_sum_1d
+!     Compute the sum of the spectral power in the range specified.
+! 
+!     Input
+!     n         : integer(long)
+!     x(n)      : real(double), array to compute signal entropy for
+!     nfft      : integer(long), number of points to use in the FFT computation
+!     fs        : real(double), sampling frequency in Hz
+!     low_cut   : real(double), low frequency cutoff for the range to use
+!     hi_cut    : real(double), high frequency cutoff for the range to use
+!     normalize : integer(int), normalize to the power sum across the whole range
+! 
+!     Output
+!     pss : real(double)
+! --------------------------------------------------------------------
+subroutine range_power_sum_1d(n, x, fs, nfft, low_cut, hi_cut, normalize, rps) bind(C, name="range_power_sum_1d")
+    use, intrinsic :: iso_c_binding
+    use real_fft, only : execute_real_forward
+    implicit none
+    integer(c_long), intent(in) :: n, nfft
+    real(c_double), intent(in) :: x(n), fs, low_cut, hi_cut
+    integer(c_int), intent(in) :: normalize
+    real(c_double), intent(out) :: rps
+    ! local
+    real(c_double), parameter :: log2 = log(2._c_double)
+    integer(c_long) :: i, ihcut, ilcut, ier
+    real(c_double) :: sp_norm(nfft + 1)
+    real(c_double) :: sp_hat(2 * nfft + 2), y(2 * nfft)
+
+    ! find the cutoff indices for the high and low cutoffs
+    ihcut = min(floor(hi_cut / (fs / 2) * (nfft - 1) + 1, c_long), nfft + 1)
+    ilcut = max(ceiling(low_cut / (fs / 2) * (nfft - 1) + 1, c_long), 1_c_long)
+
+    if (ihcut > nfft) then
+        ihcut = nfft
+    end if
+
+    rps = 0._c_double  ! ensure starts at 0
+
+    y = 0._c_double
+    y(:n) = x
+    sp_hat = 0._c_double
+    call execute_real_forward(2 * nfft, y, 1.0_c_double, sp_hat, ier)
+
+    sp_norm = sp_hat(1:2*nfft+2:2)**2 + sp_hat(2:2*nfft+2:2)**2
+    ! sp_norm = sp_norm / sum(sp_norm(ilcut:ihcut)) + 1.d-10
+
+    if (normalize == 1_c_int) then
+        rps = sum(sp_norm(ilcut:ihcut)) / sum(sp_norm(1:nfft))
+    else
+        rps = sum(sp_norm(ilcut:ihcut))
+    end if
+end subroutine
+
+
+! --------------------------------------------------------------------
 ! SUBROUTINE  spectral_entropy_1d
 !     Compute the spectral entropy of the specified frequency range
 ! 

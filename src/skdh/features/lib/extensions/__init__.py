@@ -13,6 +13,7 @@ from skdh.features.lib.extensions.frequency import (
     dominant_frequency,
     dominant_frequency_value,
     power_spectral_sum,
+    range_power_sum,
     spectral_entropy,
     spectral_flatness,
 )
@@ -42,6 +43,7 @@ __all__ = [
     "dominant_frequency",
     "dominant_frequency_value",
     "power_spectral_sum",
+    "range_power_sum",
     "spectral_entropy",
     "spectral_flatness",
     "signal_entropy",

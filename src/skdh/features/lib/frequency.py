@@ -12,6 +12,7 @@ __all__ = [
     "DominantFrequency",
     "DominantFrequencyValue",
     "PowerSpectralSum",
+    "RangePowerSum",
     "SpectralFlatness",
     "SpectralEntropy",
 ]
@@ -197,6 +198,70 @@ class PowerSpectralSum(Feature):
         x = super().compute(signal, fs, axis=axis)
         return extensions.power_spectral_sum(
             x, fs, self.pad, self.low_cut, self.high_cut
+        )
+
+
+class RangePowerSum(Feature):
+    r"""
+    Sum of power spectral density values within the specified range. Can be 
+    normalized to the power spectral sum across the entire frequency range.
+
+    Parameters
+    ----------
+    padlevel : int, optional
+        Padding (factors of 2) to use in the FFT computation. Default is 2.
+    low_cutoff : float, optional
+        Low value of the frequency range. Default is 0.0 Hz
+    high_cutoff : float, optional
+        High value of the frequency range. Default is 5.0 Hz
+    normalize : bool, optional
+        Normalize the range power sum by the total power spectral sum. Default is False.
+
+    Notes
+    -----
+    The `padlevel` parameter effects the number of points to be used in the FFT computation by
+    factors of 2. The computation of number of points is per
+
+    .. math:: nfft = 2^{ceil(log_2(N)) + padlevel}
+
+    So `padlevel=2` would mean that for a signal with length 150, the number of points used
+    in the FFT would go from 256 to 1024.
+    """
+
+    __slots__ = ("pad", "low_cut", "high_cut", "normalize")
+
+    def __init__(self, padlevel=2, low_cutoff=0.0, high_cutoff=5.0, normalize=False):
+        super(RangePowerSum, self).__init__(
+            padlevel=padlevel, low_cutoff=low_cutoff, high_cutoff=high_cutoff, normalize=normalize
+        )
+
+        self.pad = padlevel
+        self.low_cut = low_cutoff
+        self.high_cut = high_cutoff
+        self.normalize = normalize
+
+    def compute(self, signal, fs=1.0, *, axis=-1):
+        """
+        Compute the power spectral density sum within the specified range.
+
+        Parameters
+        ----------
+        signal : array-like
+            Array-like containing values to compute the power spectral sum for.
+        fs : float, optional
+            Sampling frequency in Hz. If not provided, default is assumed to be 1Hz.
+        axis : int, optional
+            Axis along which the signal entropy will be computed. Ignored if `signal` is a
+            pandas.DataFrame. Default is last (-1).
+
+        Returns
+        -------
+        pss : numpy.ndarray
+            Computed power spectral sum.
+        """
+        x = super().compute(signal, fs, axis=axis)
+        return extensions.range_power_sum(
+            x, fs, self.pad, self.low_cut, self.high_cut, self.normalize
         )
 
 
