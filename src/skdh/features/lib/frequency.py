@@ -141,7 +141,8 @@ class DominantFrequencyValue(Feature):
 class PowerSpectralSum(Feature):
     r"""
     Sum of power spectral density values. The sum of power spectral density values in a
-    1.0Hz wide band around the primary (dominant) frequency (:math:`f_{dom}\pm 0.5`)
+    1.0Hz wide band around the primary (dominant) frequency (:math:`f_{dom}\pm 0.5`) 
+    within the chosen range.
 
     Parameters
     ----------
