@@ -121,7 +121,7 @@ def find_time_periods_overlap_fraction(periods, time_segment, weights=None):
         weights = np.ones(len(periods))
     assert len(weights) == len(periods), 'weights and periods have to be equal size'
     if np.array([periods[:, 0] <= time_segment[0], periods[:, 1] >= time_segment[1]]).all(axis=0).any():
-        return weights[np.where(np.array([periods[:, 0] <= time_segment[0], periods[:, 1] >= time_segment[1]]).all(axis=0))[0]]
+        return np.sum(weights[np.where(np.array([periods[:, 0] <= time_segment[0], periods[:, 1] >= time_segment[1]]).all(axis=0))[0]])
     else:
         period_overlap, period_inds = find_time_periods_overlap(periods, time_segment)
         return np.sum((period_overlap[:, 1] - period_overlap[:, 0]) * weights[period_inds]) / (time_segment[1] - time_segment[0])

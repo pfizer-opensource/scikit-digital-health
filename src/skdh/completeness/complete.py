@@ -452,7 +452,8 @@ class AssessCompleteness(BaseProcess):
                 weights = reason_periods['weights'][reason][np.where(reason_periods['weights'][reason] > 0)[0]]
                 data_completeness[time_period].update({'Missingness, ' + reason: find_time_periods_overlap_fraction(
                     reason_periods['periods'][reason], time_period, weights)})
-        assert np.abs(np.sum(list(list(data_completeness.values())[0].values())) - 1) < .005, \
+        for dict_tp in data_completeness.values():
+            assert np.abs(np.sum(list(dict_tp.values())) - 1) < .005, \
             'Completeness + Missingness less than 99.5% (should be 100%). Something is wrong!'
 
         return data_completeness
