@@ -21,10 +21,7 @@ def plot_overview_one_device(data, resample_width_mins=1, device_changes=None, s
     colors = px.colors.qualitative.Alphabet
 
     for c, data_section in enumerate(data):
-        if resample_width_mins is None:
-            first_df = data_section
-        else:
-            first_df = data_section.resample(str(resample_width_mins) + 'min').median()
+        first_df = data_section.resample(str(resample_width_mins) + 'min').median()
         lo, so, vo = skdh.utility.internal.rle(np.isnan(np.array(first_df)))
         start_nan_inds = so[vo]
         end_nan_inds = so[vo] + lo[vo] - 1
