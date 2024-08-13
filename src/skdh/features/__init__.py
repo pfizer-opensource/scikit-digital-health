@@ -34,6 +34,7 @@ Signal Features
     DominantFrequency
     DominantFrequencyValue
     PowerSpectralSum
+    RangePowerSum
     SpectralFlatness
     SpectralEntropy
     ComplexityInvariantDistance
