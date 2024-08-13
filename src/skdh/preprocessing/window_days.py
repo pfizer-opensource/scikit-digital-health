@@ -140,8 +140,8 @@ class GetDayWindowIndices(BaseProcess):
         day_windows = {}
         for start, end, p in zip(self.bases, w_ends, self.periods):
             # get the start and end times
-            start_time = dt0.replace(hour=start, minute=0, second=0)
-            end_time = dt0.replace(hour=end, minute=0, second=0)
+            start_time = dt0.replace(hour=start, minute=0, second=0, microsecond=0)
+            end_time = dt0.replace(hour=end, minute=0, second=0, microsecond=0)
 
             # only subtract a day if the end time is after the start time
             # this works because we added the base to the period and took the mod 24
