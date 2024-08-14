@@ -86,6 +86,9 @@ class FillGaps(BaseProcess):
         aligned_streams = [i for i in streams if isinstance(kwargs.get(i), ndarray)]
         single_streams = [i for i in streams if isinstance(kwargs.get(i), dict)]
 
+        self.logger.info(f"Aligned streams to fill gaps in: {aligned_streams}")
+        self.logger.info(f"Single streams to fill gaps in: {single_streams}")
+
         # fill gaps in the aligned data
         time_rs, data_rs = fill_data_gaps(
             time,
@@ -100,9 +103,12 @@ class FillGaps(BaseProcess):
                 kwargs[stream]['time'],
                 kwargs[stream].get('fs', 1 / median(diff(kwargs[stream]['time'][:5000]))),
                 self.fill_values,
-                stream=kwargs[stream]['values']
+                **{stream: kwargs[stream]['values']}
             )
             s_data_rs['time'] = s_time_rs
+            # rename the stream key to values
+            s_data_rs['values'] = s_data_rs.pop(stream)
+            # put the re-sampled single stream data into the results dictionary
             data_rs[stream] = s_data_rs
         
         # add time back into the re-sampled results
