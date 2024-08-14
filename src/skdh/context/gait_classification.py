@@ -74,7 +74,7 @@ class PredictGaitLumbarLgbm(BaseProcess):
         fs : float, optional
             Sampling frequency in Hz of the accelerometer data. If not provided,
             will be computed form the timestamps.
-        
+
         Other Parameters
         ----------------
         tz_name : {None, str}, optional

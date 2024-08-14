@@ -4,6 +4,14 @@ Inertial Data Preprocessing (:mod:`skdh.preprocessing`)
 
 .. currentmodule:: skdh.preprocessing
 
+Gap Filling
+-----------
+
+.. autosummary::
+    :toctree: generated/
+
+    FillGaps
+
 Day Windowing
 -------------
 
@@ -32,6 +40,8 @@ Wear Detection
     AccelThresholdWearDetection
 """
 
+from skdh.preprocessing.gaps import FillGaps
+from skdh.preprocessing import gaps
 from skdh.preprocessing.window_days import GetDayWindowIndices
 from skdh.preprocessing import window_days
 from skdh.preprocessing.calibrate import CalibrateAccelerometer
@@ -45,13 +55,11 @@ from skdh.preprocessing.wear_detection import (
 from skdh.preprocessing import wear_detection
 
 __all__ = (
+    "FillGaps",
     "GetDayWindowIndices",
-    "window_days",
     "CalibrateAccelerometer",
-    "calibrate",
     "AccelThresholdWearDetection",
     "CtaWearDetection",
     "DETACH",
     "CountWearDetection",
-    "wear_detection",
 )

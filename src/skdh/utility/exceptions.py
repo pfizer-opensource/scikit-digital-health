@@ -4,4 +4,3 @@ class LowFrequencyError(Exception):
 
 class FileSizeError(Exception):
     pass
-

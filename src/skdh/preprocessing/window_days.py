@@ -27,7 +27,7 @@ def finalize_guess(time, fs, guess, target):
         Guess for the index of the window start/end.
     target : pandas.Timestamp
         Target time for the window start/end.
-    
+
     Returns
     -------
     final_i : int
@@ -43,7 +43,7 @@ def finalize_guess(time, fs, guess, target):
         return 0
     if i2 >= (time.size - 1):
         return time.size - 1
-    
+
     check1 = abs(time[i2] - ts_target) <= abs(time[i1] - ts_target)
     check3 = abs(time[i2] - ts_target) <= abs(time[i3] - ts_target)
 
@@ -52,11 +52,19 @@ def finalize_guess(time, fs, guess, target):
         return i2
     elif not check1:  # path 2: smaller value to the left side
         # make an intelligent update to guess to avoid recursion limits (avoiding if statement)
-        guess = guess - 1 + (int((time[i2] - ts_target) > 5) * int((ts_target - time[i1]) * fs))
+        guess = (
+            guess
+            - 1
+            + (int((time[i2] - ts_target) > 5) * int((ts_target - time[i1]) * fs))
+        )
     elif not check3:  # path 3: smaller value to the right side
         # make an intelligent update to guess to avoid recursion limits (avoiding if statement)
-        guess = guess + 1 + (int((ts_target - time[i2]) > 5) * int((ts_target - time[i3]) * fs))
-    
+        guess = (
+            guess
+            + 1
+            + (int((ts_target - time[i2]) > 5) * int((ts_target - time[i3]) * fs))
+        )
+
     return finalize_guess(time, fs, guess, target)
 
 
@@ -140,8 +148,8 @@ class GetDayWindowIndices(BaseProcess):
         day_windows = {}
         for start, end, p in zip(self.bases, w_ends, self.periods):
             # get the start and end times
-            start_time = dt0.replace(hour=start, minute=0, second=0)
-            end_time = dt0.replace(hour=end, minute=0, second=0)
+            start_time = dt0.replace(hour=start, minute=0, second=0, microsecond=0)
+            end_time = dt0.replace(hour=end, minute=0, second=0, microsecond=0)
 
             # only subtract a day if the end time is after the start time
             # this works because we added the base to the period and took the mod 24
@@ -157,7 +165,7 @@ class GetDayWindowIndices(BaseProcess):
             while end_time <= dt0:
                 start_time += day_delta
                 end_time += day_delta
-            
+
             # create a first guess for the indices
             guess_start = int((start_time.timestamp() - time[0]) * fs)
             guess_end = int((end_time.timestamp() - time[0]) * fs)
@@ -180,7 +188,7 @@ class GetDayWindowIndices(BaseProcess):
                 start_time += day_delta
                 end_time += day_delta
             day_windows[(start, p)] = asarray(windows)
-        
+
         return day_windows
 
     @handle_process_returns(results_to_kwargs=True)
@@ -198,7 +206,7 @@ class GetDayWindowIndices(BaseProcess):
             Sampling frequency in Hz. If not provided, it is calculated from the
             timestamps.
         tz_name : {None, str}, optional
-            Timezone name. If none provided, timestamps are assumed to be naive 
+            Timezone name. If none provided, timestamps are assumed to be naive
             in local time.
 
         Returns
@@ -209,7 +217,12 @@ class GetDayWindowIndices(BaseProcess):
             tuples of `(base, period)`.
         """
         super().predict(
-            expect_days=False, expect_wear=False, time=time, fs=fs, tz_name=tz_name, **kwargs
+            expect_days=False,
+            expect_wear=False,
+            time=time,
+            fs=fs,
+            tz_name=tz_name,
+            **kwargs,
         )
 
         if not self.window:
@@ -217,7 +230,7 @@ class GetDayWindowIndices(BaseProcess):
 
         # calculate fs if necessary
         fs = 1 / mean(diff(time)) if fs is None else fs
-        
+
         days = self.window_days(time, fs)
 
         return {self._days: days}

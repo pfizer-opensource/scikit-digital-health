@@ -322,7 +322,7 @@ class Sleep(BaseProcess):
                 df.loc[tso[0] : tso[1], "TSO"] = True
 
                 df.to_csv(rest_file, index=False)
-    
+
     def _get_date(self, epoch_ts, day_start_hour):
         """
         Compute the actual day start. Deals with the start days where the day may not start at the day
@@ -353,16 +353,24 @@ class Sleep(BaseProcess):
         start_dt = self.convert_timestamps(epoch_ts + 15)
 
         if start_dt.hour < day_start_hour:
-            day_str = (start_dt - Timedelta(1, unit='day')).strftime("%Y-%m-%d")
+            day_str = (start_dt - Timedelta(1, unit="day")).strftime("%Y-%m-%d")
         else:
             day_str = start_dt.strftime("%Y-%m-%d")
 
         # make sure to remove the 15s from the returned start datetime
-        return start_dt - Timedelta(15, unit='s'), day_str
+        return start_dt - Timedelta(15, unit="s"), day_str
 
     @handle_process_returns(results_to_kwargs=True)
     def predict(
-        self, time=None, accel=None, *, temperature=None, fs=None, wear=None, tz_name=None, **kwargs
+        self,
+        time=None,
+        accel=None,
+        *,
+        temperature=None,
+        fs=None,
+        wear=None,
+        tz_name=None,
+        **kwargs,
     ):
         """
         predict(time, accel, *, temperature=None, fs=None, wear=None, day_ends={}, tz_name=None)
@@ -386,7 +394,7 @@ class Sleep(BaseProcess):
         day_ends : dict
             Dictionary containing (N, 2) arrays of start and stop indices for individual days.
             Must have the key
-        
+
         Other Parameters
         ----------------
         tz_name : {None, str}, optional
@@ -517,8 +525,12 @@ class Sleep(BaseProcess):
             )
 
             # get the total minutes and total wear minutes
-            sleep["Total Minutes"][-1] = around((time_ds[stop] - time_ds[start]) / 60, 1)
-            sleep["Wear Minutes"][-1] = around(sum(dw_stops - dw_starts) / (60 * goal_fs), 1)
+            sleep["Total Minutes"][-1] = around(
+                (time_ds[stop] - time_ds[start]) / 60, 1
+            )
+            sleep["Wear Minutes"][-1] = around(
+                sum(dw_stops - dw_starts) / (60 * goal_fs), 1
+            )
 
             if (sum(dw_stops - dw_starts) / (3600 * goal_fs)) < self.min_wear_time:
                 self.logger.info(

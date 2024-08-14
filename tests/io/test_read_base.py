@@ -27,12 +27,20 @@ def test_in_pipeline(dummy_reader_class, dummy_process):
 
 def test_handle_naive_timestamps():
     # get a timestamp array of naive timestamps
-    ts = date_range("2023-11-05 00:00:00", "2023-11-05 05:00:00", freq="0.1h").view("int64") / 1e9
+    ts = (
+        date_range("2023-11-05 00:00:00", "2023-11-05 05:00:00", freq="0.1h").view(
+            "int64"
+        )
+        / 1e9
+    )
     # get the true timestamps - note that with the DST change there is an extra hour here
     # hence the earlier end time by 1 hour
-    ts_true = date_range(
-        "2023-11-05 00:00:00", "2023-11-05 04:00:00", freq="0.1h", tz='US/Eastern'
-    ).view("int64") / 1e9
+    ts_true = (
+        date_range(
+            "2023-11-05 00:00:00", "2023-11-05 04:00:00", freq="0.1h", tz="US/Eastern"
+        ).view("int64")
+        / 1e9
+    )
 
     ts_pred = handle_naive_timestamps(ts, is_local=True, tz_name="US/Eastern")
 

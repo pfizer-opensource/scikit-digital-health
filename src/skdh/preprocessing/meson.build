@@ -4,6 +4,7 @@ py3.install_sources(
         'calibrate.py',
         'wear_detection.py',
         'window_days.py',
+        'gaps.py',
     ],
     pure: false,
     subdir: 'skdh/preprocessing',

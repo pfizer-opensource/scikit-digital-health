@@ -112,12 +112,27 @@ class MultiReader(BaseProcess):
     >>> mrdr.predict(files={'f1': "file1.csv", 'f2': "file2.csv"})
     """
 
-    def __init__(self, mode, reader, reader_kw=None, resample_to_lowest=True, fill_gaps=True, fill_value=None, gaps_error="raise", require_all_keys=True):
+    def __init__(
+        self,
+        mode,
+        reader,
+        reader_kw=None,
+        resample_to_lowest=True,
+        fill_gaps=True,
+        fill_value=None,
+        gaps_error="raise",
+        require_all_keys=True,
+    ):
         super().__init__(
-            mode=mode, reader=reader, resample_to_lowest=resample_to_lowest, fill_gaps=fill_gaps, fill_value=fill_value, gaps_error=gaps_error
+            mode=mode,
+            reader=reader,
+            resample_to_lowest=resample_to_lowest,
+            fill_gaps=fill_gaps,
+            fill_value=fill_value,
+            gaps_error=gaps_error,
         )
 
-        # Set a variable here so that we can ignore file size checking when reading 
+        # Set a variable here so that we can ignore file size checking when reading
         # multiple files. This should then get handled by gap filling.
         self._skip_file_size_check = True
 
@@ -137,7 +152,7 @@ class MultiReader(BaseProcess):
 
         self.fill_gaps = fill_gaps
         self.fill_value = {} if fill_value is None else fill_value
-        if gaps_error in ['raise', 'warn', 'ignore']:
+        if gaps_error in ["raise", "warn", "ignore"]:
             self.gaps_error = gaps_error
         else:
             raise ValueError("gaps_error must be one of {'raise', 'warn', 'ignore'}.")
@@ -388,13 +403,13 @@ class MultiReader(BaseProcess):
         """
         if self.fill_gaps:
             # get a dictionary of streams that are the same size as the time array
-            time = data.pop('time')
+            time = data.pop("time")
             stream_keys = [i for i in data if isinstance(data[i], ndarray)]
             stream_keys = [i for i in stream_keys if data[i].shape[0] == time.size]
             datastreams = {i: data.pop(i) for i in stream_keys}
 
             # get fs
-            fs = data.pop('fs', None)
+            fs = data.pop("fs", None)
             if fs is None:
                 fs = 1 / mean(diff(time[:5000]))
                 warn(
@@ -402,7 +417,9 @@ class MultiReader(BaseProcess):
                     f"May be effected if there are data gaps in the first 5000 samples."
                 )
 
-            time_filled, data_filled = fill_data_gaps(time, fs, self.fill_value, **datastreams)
+            time_filled, data_filled = fill_data_gaps(
+                time, fs, self.fill_value, **datastreams
+            )
 
             if data:  # check if there are any keys left
                 warn(
@@ -410,24 +427,26 @@ class MultiReader(BaseProcess):
                     f"time series. If they are indices this may cause down-stream "
                     f"problems: {data.keys()}"
                 )
-            
+
             # put the non-filled data in the filled dictionary
             data_filled.update(data)
-            data_filled['time'] = time_filled
-            data_filled['fs'] = fs
+            data_filled["time"] = time_filled
+            data_filled["fs"] = fs
         else:
             # check if any gaps and warn if there are
-            fs = data.get('fs', 1 / mean(diff(data['time'][:500])))  # only get a few here
-            time_deltas = diff(data['time'])
+            fs = data.get(
+                "fs", 1 / mean(diff(data["time"][:500]))
+            )  # only get a few here
+            time_deltas = diff(data["time"])
             if any(abs(time_deltas) > (1.5 / fs)):
                 self.handle_gaps_error(
                     f"There are data gaps (max length: {max(time_deltas):.2f}s), "
                     f"which could potentially result in incorrect outputs from down-stream "
                     f"algorithms"
                 )
-            
+
             data_filled = data
-        
+
         return data_filled
 
     @handle_process_returns(results_to_kwargs=True)
@@ -451,7 +470,7 @@ class MultiReader(BaseProcess):
         """
         if files is None:
             try:
-                files = [kwargs.pop('file')]
+                files = [kwargs.pop("file")]
             except KeyError:
                 raise ValueError("No files provided to read.")
 

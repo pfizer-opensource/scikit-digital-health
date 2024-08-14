@@ -72,7 +72,7 @@ def check_input_file(
 def handle_naive_timestamps(time, is_local, tz_name=None):
     """
     Check timestamps to make sure they are either naive, or UTC with a time-zone
-    name available. 
+    name available.
 
     Parameters
     ----------
@@ -90,7 +90,12 @@ def handle_naive_timestamps(time, is_local, tz_name=None):
             # not have duplicated timestamps (just like UTC).
 
             # invert since we are going from local to UTC.
-            offset = -to_datetime(time[0], unit='s').tz_localize(tz_name).utcoffset().total_seconds()
+            offset = (
+                -to_datetime(time[0], unit="s")
+                .tz_localize(tz_name)
+                .utcoffset()
+                .total_seconds()
+            )
 
             time += offset
         else:  # is_local, tz_name is None
@@ -108,4 +113,3 @@ def handle_naive_timestamps(time, is_local, tz_name=None):
                 UserWarning,
             )
     return time
-

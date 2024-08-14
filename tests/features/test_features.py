@@ -10,6 +10,7 @@ from skdh.features.lib import (
     DominantFrequency,
     DominantFrequencyValue,
     PowerSpectralSum,
+    RangePowerSum,
     SpectralFlatness,
     SpectralEntropy,
     Range,
@@ -36,6 +37,7 @@ def test_size_0_input():
         DominantFrequency,
         DominantFrequencyValue,
         PowerSpectralSum,
+        RangePowerSum,
         SpectralFlatness,
         SpectralEntropy,
         Autocorrelation,
@@ -153,6 +155,20 @@ def test_PowerSpectralSum(get_sin_signal):
     # a +-0.5 hz window, but there is noise
     assert isclose(res_low, 1.0, atol=0.03)
     assert isclose(res_all, 0.8, atol=0.03)
+
+
+def test_RangePowerSum(get_sin_signal):
+    fs, x = get_sin_signal([1.0, 0.5], [1.0, 0.5], 0.0)
+
+    df_all = RangePowerSum(padlevel=1, low_cutoff=0.0, high_cutoff=15.0)
+    df_low = RangePowerSum(padlevel=1, low_cutoff=0.0, high_cutoff=0.75, normalize=True)
+
+    res_all = df_all.compute(x, fs=fs)
+    res_low = df_low.compute(x, fs=fs)
+
+    assert res_low <= 1.0  # this should be a fraction of total power so less than 1
+    assert isclose(res_low, 0.24425634)
+    assert isclose(res_all, 160505.75447688)
 
 
 def test_SpectralFlatness(get_sin_signal):

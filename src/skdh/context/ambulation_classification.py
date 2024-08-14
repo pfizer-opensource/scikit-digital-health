@@ -111,7 +111,7 @@ class Ambulation(BaseProcess):
             (N, 3) array of acceleration, in units of 'g', collected at 20hz.
         fs : float, optional
             Sampling rate. Default None. If not provided, will be inferred.
-        
+
         Other Parameters
         ----------------
         tz_name : {None, str}, optional
@@ -127,7 +127,15 @@ class Ambulation(BaseProcess):
             Results dictionary for downstream pipeline use including start and stop times for ambulation bouts.
 
         """
-        super().predict(expect_days=False, expect_wear=False, time=time, accel=accel, fs=fs, tz_name=tz_name, **kwargs)
+        super().predict(
+            expect_days=False,
+            expect_wear=False,
+            time=time,
+            accel=accel,
+            fs=fs,
+            tz_name=tz_name,
+            **kwargs,
+        )
         # check that input matches expectations, downsample to 20hz if necessary
         time_ds, accel_ds, fs = self._check_input(time, accel, fs)
 

@@ -21,7 +21,7 @@ class TestReadBin:
             # adjust tolerance - GeneActiv truth values from the CSV
             # were truncated by rounding
             assert allclose(res[k], gnactv_truth[k], atol=5e-5)
-    
+
     def test_tz(self, gnactv_file, gnactv_truth):
         # adjust the geneactive truth time to be actual UTC timestamps
         gnactv_truth["time"] = gnactv_truth["time"] + 3600 * 4

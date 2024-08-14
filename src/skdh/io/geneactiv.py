@@ -58,7 +58,7 @@ class ReadBin(BaseProcess):
             `str(file)`.
         tz_name : {None, str}, optional
             IANA time-zone name for the recording location. If not provided, timestamps
-            will represent local time naively. This means they will not account for 
+            will represent local time naively. This means they will not account for
             any time changes due to Daylight Saving Time.
 
         Returns
@@ -80,13 +80,17 @@ class ReadBin(BaseProcess):
         - `light`: light values [unknown]
         - `temperature`: temperature [deg C]
         """
-        super().predict(expect_days=False, expect_wear=False, file=file, tz_name=tz_name, **kwargs)
+        super().predict(
+            expect_days=False, expect_wear=False, file=file, tz_name=tz_name, **kwargs
+        )
 
         # read the file
         n_max, fs, acc, time, light, temp = read_geneactiv(str(file))
 
         results = {
-            self._time: handle_naive_timestamps(time[:n_max], is_local=True, tz_name=tz_name),
+            self._time: handle_naive_timestamps(
+                time[:n_max], is_local=True, tz_name=tz_name
+            ),
             self._acc: acc[:n_max, :],
             self._temp: temp[:n_max],
             "light": light[:n_max],

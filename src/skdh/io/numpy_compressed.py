@@ -4,6 +4,7 @@ Read from a numpy compressed file.
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 from warnings import warn
 
 from numpy import load as np_load
@@ -64,7 +65,7 @@ class ReadNumpyFile(BaseProcess):
             converted by `str(file)`.
         tz_name : {None, str}, optional
             IANA time-zone name for the recording location. If not provided, timestamps
-            will represent local time naively. This means they will not account for 
+            will represent local time naively. This means they will not account for
             any time changes due to Daylight Saving Time.
 
         Returns
@@ -85,7 +86,9 @@ class ReadNumpyFile(BaseProcess):
         - `time`: timestamps [s]
         - `fs`: sampling frequency in Hz.
         """
-        super().predict(expect_days=False, expect_wear=False, file=file, tz_name=tz_name, **kwargs)
+        super().predict(
+            expect_days=False, expect_wear=False, file=file, tz_name=tz_name, **kwargs
+        )
 
         # warn if time is not local and we dont have a timezone
         if not self.time_is_local and tz_name is None:

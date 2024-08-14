@@ -466,7 +466,7 @@ class GaitLumbar(BaseProcess):
         ap_axis : {None, 0, 1, 2}, optional
             AP axis index. Default is None, which indicates that it will be estimated
             from the acceleration data each bout.
-        
+
         Other Parameters
         ----------------
         tz_name : {None, str}, optional

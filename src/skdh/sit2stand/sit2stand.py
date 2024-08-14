@@ -210,7 +210,7 @@ class Sit2Stand(BaseProcess):
             Optional dictionary containing (N, 2) arrays of start and stop indices for invididual
             days. Dictionary keys are in the format "{base}, {period}". If not provided, or the
             key specified by `day_window` is not found, no day-based windowing will be done.
-        
+
         Other Parameters
         ----------------
         tz_name : {None, str}, optional
@@ -218,7 +218,12 @@ class Sit2Stand(BaseProcess):
             UTC timestamps. Can be ignored if passing in naive timestamps.
         """
         super().predict(
-            expect_days=True, expect_wear=False, time=time, accel=accel, tz_name=tz_name, **kwargs
+            expect_days=True,
+            expect_wear=False,
+            time=time,
+            accel=accel,
+            tz_name=tz_name,
+            **kwargs,
         )
 
         # FILTERING
@@ -282,7 +287,13 @@ class Sit2Stand(BaseProcess):
             power_peaks, _ = find_peaks(power, **self.power_peak_kw)
 
             self.detector.predict(
-                sts, dt, time[start:stop], accel[start:stop, :], f_acc, power_peaks, kwargs.get("tz_name")
+                sts,
+                dt,
+                time[start:stop],
+                accel[start:stop, :],
+                f_acc,
+                power_peaks,
+                kwargs.get("tz_name"),
             )
 
             # fill out the day information
