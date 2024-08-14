@@ -57,12 +57,9 @@ from skdh.preprocessing import wear_detection
 __all__ = (
     "FillGaps",
     "GetDayWindowIndices",
-    "window_days",
     "CalibrateAccelerometer",
-    "calibrate",
     "AccelThresholdWearDetection",
     "CtaWearDetection",
     "DETACH",
     "CountWearDetection",
-    "wear_detection",
 )
