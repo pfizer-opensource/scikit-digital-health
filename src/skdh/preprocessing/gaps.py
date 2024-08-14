@@ -100,7 +100,7 @@ class FillGaps(BaseProcess):
                 kwargs[stream]['time'],
                 kwargs[stream].get('fs', 1 / median(diff(kwargs[stream]['time'][:5000]))),
                 self.fill_values,
-                values=kwargs[stream]['values']
+                stream=kwargs[stream]['values']
             )
             s_data_rs['time'] = s_time_rs
             data_rs[stream] = s_data_rs
