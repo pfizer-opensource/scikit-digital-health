@@ -68,7 +68,9 @@ class TestDetector:
         }
         acc_f = norm(acc, axis=1)
 
-        Detector().predict(res, 0.01, arange(0, 20, 0.004), acc, acc_f, array([2200]), tz_name="UTC")
+        Detector().predict(
+            res, 0.01, arange(0, 20, 0.004), acc, acc_f, array([2200]), tz_name="UTC"
+        )
 
         # 2 seconds, off due to detection of still periods, etc
         assert isclose(res["Duration"][0], 1.92, atol=5e-2)

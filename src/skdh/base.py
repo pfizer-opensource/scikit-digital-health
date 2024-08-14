@@ -281,7 +281,7 @@ class BaseProcess:
             Datetime object
         """
         # set if we want to return aware time
-        kw = {'unit': 's', 'utc': self.tz_name is not None}
+        kw = {"unit": "s", "utc": self.tz_name is not None}
         dt = to_datetime(t, **kw)
         if self.tz_name is not None:
             dt = dt.tz_convert(self.tz_name)

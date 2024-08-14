@@ -380,14 +380,14 @@ def fill_data_gaps(time, fs, fill_info, **kwargs):
     **kwargs : dict
         Arrays of data to fill gaps in specified by keyword. Must be the same size
         as `time`. Returned as one dictionary for all arrays specified this way.
-    
+
     Returns
     -------
     time_filled : numpy.ndarray
         Gap filled time array.
     data_filled : dict
         Dictionary of gap filled data arrays.
-    
+
     Examples
     --------
     >>> time = np.concatenate((arange(0, 4, 0.01), arange(6, 10, 0.01))
@@ -418,12 +418,12 @@ def fill_data_gaps(time, fs, fill_info, **kwargs):
         shape[0] = time_rs.size
         new_data = full(shape, fill_info.get(name, 0.0), dtype=data.dtype)
 
-        for (i1, i2) in seqs[::-1]:
+        for i1, i2 in seqs[::-1]:
             # get the number of samples offset in the resampled time
             i_offset = int((time[i1] - time_rs[i1]) * fs)
 
-            new_data[i1 + i_offset:i2 + i_offset] = data[i1:i2]
-        
+            new_data[i1 + i_offset : i2 + i_offset] = data[i1:i2]
+
         ret[name] = new_data
-    
+
     return time_rs, ret

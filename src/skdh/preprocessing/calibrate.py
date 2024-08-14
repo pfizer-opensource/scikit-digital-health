@@ -197,7 +197,9 @@ class CalibrateAccelerometer(BaseProcess):
             i_h += 1
 
         if apply and valid_calibration:
-            self.logger.info(f"Applying calibration: {offset=}, {scale=}, {temp_mean=}, {temp_scale=}")
+            self.logger.info(
+                f"Applying calibration: {offset=}, {scale=}, {temp_mean=}, {temp_scale=}"
+            )
             if temperature is None:
                 accel = (accel + offset) * scale
             else:

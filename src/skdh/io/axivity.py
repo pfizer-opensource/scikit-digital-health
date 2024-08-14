@@ -68,7 +68,7 @@ class ReadCwa(BaseProcess):
             `str(file)`.
         tz_name : {None, str}, optional
             IANA time-zone name for the recording location. If not provided, timestamps
-            will represent local time naively. This means they will not account for 
+            will represent local time naively. This means they will not account for
             any time changes due to Daylight Saving Time.
 
         Returns
@@ -93,7 +93,9 @@ class ReadCwa(BaseProcess):
         - `time`: timestamps [s]
         - `day_ends`: window indices
         """
-        super().predict(expect_days=False, expect_wear=False, file=file, tz_name=tz_name, **kwargs)
+        super().predict(
+            expect_days=False, expect_wear=False, file=file, tz_name=tz_name, **kwargs
+        )
 
         # read the file
         fs, n_bad_samples, imudata, ts, temperature = read_axivity(str(file))
@@ -116,7 +118,9 @@ class ReadCwa(BaseProcess):
             raise UnexpectedAxesError("Unexpected number of axes in the IMU data")
 
         results = {
-            self._time: handle_naive_timestamps(ts[:end], is_local=True, tz_name=tz_name),
+            self._time: handle_naive_timestamps(
+                ts[:end], is_local=True, tz_name=tz_name
+            ),
             "fs": fs,
             self._temp: temperature[:end],
         }

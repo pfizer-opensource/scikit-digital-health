@@ -8,7 +8,18 @@ Copyright (c) 2024, Pfizer Inc. All rights reserved.
 from warnings import warn
 from importlib import resources
 
-from numpy import round, all, linalg, mean, diff, absolute, max, asarray, concatenate, clip
+from numpy import (
+    round,
+    all,
+    linalg,
+    mean,
+    diff,
+    absolute,
+    max,
+    asarray,
+    concatenate,
+    clip,
+)
 from scipy.signal import butter, sosfiltfilt
 
 from skdh.base import BaseProcess, handle_process_returns
@@ -81,7 +92,7 @@ class MotionDetectRCoV(BaseProcess):
             (N, 3) array of acceleration, in units of 'g'.
         fs : float, optional
             Sampling rate. Default None. If not provided, will be inferred.
-        
+
         Other Parameters
         ----------------
         tz_name : {None, str}, optional
@@ -97,7 +108,13 @@ class MotionDetectRCoV(BaseProcess):
 
         """
         super().predict(
-            expect_days=False, expect_wear=False, time=time, accel=accel, fs=fs, tz_name=tz_name, **kwargs
+            expect_days=False,
+            expect_wear=False,
+            time=time,
+            accel=accel,
+            fs=fs,
+            tz_name=tz_name,
+            **kwargs,
         )
         # check input requirements are met
         time, accel, fs = self._check_input(time, accel, fs)
@@ -135,7 +152,11 @@ class MotionDetectRCoV(BaseProcess):
         time_1s = time[0 :: int(fs)][0 : len(predictions)]
 
         # Group results
-        results = {"movement_detected": predictions, "movement_time": time_1s, "tz_name": tz_name}
+        results = {
+            "movement_detected": predictions,
+            "movement_time": time_1s,
+            "tz_name": tz_name,
+        }
 
         # Get starts and stops of movement bouts
         # Run length encoding of predictions @ 1s

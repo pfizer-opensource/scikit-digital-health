@@ -72,7 +72,9 @@ class ReadEmpaticaAvro(BaseProcess):
         ) + phys_min
 
         # create the timestamp array using ts_start, fs, and the number of samples
-        time = arange(ts_start, ts_start + accel.shape[0] / fs, 1 / fs)[:accel.shape[0]]
+        time = arange(ts_start, ts_start + accel.shape[0] / fs, 1 / fs)[
+            : accel.shape[0]
+        ]
 
         if time.size != accel.shape[0]:
             raise ValueError("Time does not have enough samples for accel array")
@@ -115,7 +117,7 @@ class ReadEmpaticaAvro(BaseProcess):
         gyro = (gyro - dig_min) / (dig_max - dig_min) * (phys_max - phys_min) + phys_min
 
         # create the timestamp array using ts_start, fs, and the number of samples
-        time = arange(ts_start, ts_start + gyro.shape[0] / fs, 1 / fs)[:gyro.shape[0]]
+        time = arange(ts_start, ts_start + gyro.shape[0] / fs, 1 / fs)[: gyro.shape[0]]
 
         if time.size != gyro.shape[0]:
             raise ValueError("Time does not have enough samples for gyro array")
@@ -147,7 +149,7 @@ class ReadEmpaticaAvro(BaseProcess):
         values = ascontiguousarray(raw_dict["values"])
 
         # timestamp array
-        time = arange(ts_start, ts_start + values.size / fs, 1 / fs)[:values.shape[0]]
+        time = arange(ts_start, ts_start + values.size / fs, 1 / fs)[: values.shape[0]]
 
         if time.size != values.shape[0]:
             raise ValueError(f"Time does not have enough samples for {key} array")
@@ -203,7 +205,7 @@ class ReadEmpaticaAvro(BaseProcess):
         steps = ascontiguousarray(raw_dict["values"])
 
         # timestamp array
-        time = arange(ts_start, ts_start + steps.size / fs, 1 / fs)[:steps.size]
+        time = arange(ts_start, ts_start + steps.size / fs, 1 / fs)[: steps.size]
 
         if time.size != steps.size:
             raise ValueError("Time does not have enough samples for steps array")
@@ -228,7 +230,9 @@ class ReadEmpaticaAvro(BaseProcess):
         # remove accelerometer data stream
         acc_dict = streams.pop(self._acc)
         # remove keys that we can't resample
-        rs_streams = {d: streams.pop(d) for d in ["systolic_peaks", "steps"] if d in streams}
+        rs_streams = {
+            d: streams.pop(d) for d in ["systolic_peaks", "steps"] if d in streams
+        }
 
         # iterate over remaining streams and resample them
         for name, stream in streams.items():
@@ -330,7 +334,7 @@ class ReadEmpaticaAvro(BaseProcess):
             The path to the input file.
         tz_name : {None, optional}
             IANA time-zone name for the recording location. If not provided, timestamps
-            will represent local time naively. This means they will not account for 
+            will represent local time naively. This means they will not account for
             any time changes due to Daylight Saving Time.
 
         Returns
@@ -353,7 +357,9 @@ class ReadEmpaticaAvro(BaseProcess):
 
         `systolic_peaks` will always be a dictionary of the form `{'systolic_peaks': array}`.
         """
-        super().predict(expect_days=False, expect_wear=False, file=file, tz_name=tz_name, **kwargs)
+        super().predict(
+            expect_days=False, expect_wear=False, file=file, tz_name=tz_name, **kwargs
+        )
 
         reader = DataFileReader(open(file, "rb"), DatumReader())
         records = []
@@ -370,7 +376,7 @@ class ReadEmpaticaAvro(BaseProcess):
         results = self.get_datastreams(records[0]["rawData"])
 
         # update the timestamps to be local. Do this as we don't have an actual
-        # timezone from the data. 
+        # timezone from the data.
         if tz_name is None:
             results["time"] += tz_offset
 
@@ -385,7 +391,7 @@ class ReadEmpaticaAvro(BaseProcess):
                     results[k]["time"] += tz_offset
         # do nothing if we have the time-zone name, the timestamps are already
         # UTC
-        
+
         # adjust systolic_peaks
         if "systolic_peaks" in results:
             results["systolic_peaks"]["values"] += tz_offset

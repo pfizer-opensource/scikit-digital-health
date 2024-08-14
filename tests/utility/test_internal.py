@@ -284,22 +284,24 @@ class TestFillDataGaps:
         x = np_random.default_rng().normal(0, 0.5, (t.size, 3))
         temp = np_random.default_rng().normal(28, 0.75, t.size)
 
-        t_rs, data = fill_data_gaps(t, 100, {'accel': [0, 0, 1.0]}, accel=x, temperature=temp)
+        t_rs, data = fill_data_gaps(
+            t, 100, {"accel": [0, 0, 1.0]}, accel=x, temperature=temp
+        )
 
-        assert 'accel' in data
-        assert 'temperature' in data
+        assert "accel" in data
+        assert "temperature" in data
         assert allclose(t_rs, arange(0, 10, 0.01))
-        assert allclose(data['accel'][400:600], [0.0, 0.0, 1.0])
-        assert allclose(data['accel'][:400], x[:400])
-        assert allclose(data['accel'][600:], x[400:])
-        assert allclose(data['temperature'][400:600], 0.0)
-    
+        assert allclose(data["accel"][400:600], [0.0, 0.0, 1.0])
+        assert allclose(data["accel"][:400], x[:400])
+        assert allclose(data["accel"][600:], x[400:])
+        assert allclose(data["temperature"][400:600], 0.0)
+
     def test_no_gaps(self):
         t = arange(0, 10, 0.01)
         x = np_random.default_rng().normal(0, 0.5, (t.size, 3))
 
         t_rs, data = fill_data_gaps(t, 100, {}, accel=x)
 
-        assert 'accel' in data
+        assert "accel" in data
         assert allclose(t_rs, t)
-        assert allclose(data['accel'], x)
+        assert allclose(data["accel"], x)

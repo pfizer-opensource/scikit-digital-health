@@ -29,7 +29,7 @@ class ReadApdmH5(BaseProcess):
         desired sensor.
     localize_timestamps : bool, optional
         Convert timestamps to local time from UTC. Default is True. Uses APDM's
-        timezone offset attribute for the sensor being extracted. Ignored if a 
+        timezone offset attribute for the sensor being extracted. Ignored if a
         time-zone name is provided (`tz_name`) in the `predict` method.
     gravity_acceleration : float, optional
         Acceleration due to gravity. Used to convert values to units of `g`.
@@ -111,7 +111,9 @@ class ReadApdmH5(BaseProcess):
         skdh.io.SensorNotFoundError
             If the specified sensor name was not found.
         """
-        super().predict(expect_days=False, expect_wear=False, file=file, tz_name=tz_name, **kwargs)
+        super().predict(
+            expect_days=False, expect_wear=False, file=file, tz_name=tz_name, **kwargs
+        )
 
         res = {}
         # read the file
@@ -136,18 +138,23 @@ class ReadApdmH5(BaseProcess):
             # if we are converting to local time
             if tz_name is not None:
                 # check that the file offset matches that from the tz_name
-                file_offset = float(
-                    f["Sensors"][sid]["Configuration"].attrs["Timezone Offset"]
-                ) * 3600.0
-                
-                tz_offset = Timestamp(res[self._time][0], unit="s", tz=tz_name).utcoffset().total_seconds()
+                file_offset = (
+                    float(f["Sensors"][sid]["Configuration"].attrs["Timezone Offset"])
+                    * 3600.0
+                )
+
+                tz_offset = (
+                    Timestamp(res[self._time][0], unit="s", tz=tz_name)
+                    .utcoffset()
+                    .total_seconds()
+                )
 
                 if not isclose(tz_offset, file_offset):
                     raise ValueError(
                         "Timezone offset from the file does not match timezone "
                         "offset from the provided tz_name."
                     )
-                
+
                 # dont do any conversion since we have the time-zone name
             else:
                 if self.localize_time:

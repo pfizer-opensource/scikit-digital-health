@@ -22,10 +22,7 @@ from numpy import (
     nonzero,
     diff,
 )
-from pandas import (
-    read_csv,
-    to_datetime
-)
+from pandas import read_csv, to_datetime
 
 from skdh.base import BaseProcess, handle_process_returns
 from skdh.io.base import check_input_file
@@ -221,7 +218,9 @@ class ReadCSV(BaseProcess):
         if nonuniq_ts:
             # check that all the blocks are the same size (or that there is only 1 non-equal block
             # at the end)
-            block_changes = nonzero(diff(time, prepend=time[0], append=time[-1] + 1))[0]  # get a mask of where blocks change
+            block_changes = nonzero(diff(time, prepend=time[0], append=time[-1] + 1))[
+                0
+            ]  # get a mask of where blocks change
             counts = diff(block_changes, prepend=0)
             # check if the last block is the same size
             if counts[-1] != counts[0]:
@@ -282,7 +281,7 @@ class ReadCSV(BaseProcess):
             Path to the file to read.
         tz_name : {None, str}, optional
             IANA time-zone name for the recording location. If not provided, timestamps
-            will represent local time naively. This means they will not account for 
+            will represent local time naively. This means they will not account for
             any time changes due to Daylight Saving Time.
 
         Returns
@@ -323,9 +322,7 @@ class ReadCSV(BaseProcess):
         # convert timestamps if necessary
         if tz_name is not None:
             # convert, and then remove the timezone so its naive again, but now in local time
-            raw[self.time_col_name] = (
-                raw[self.time_col_name].dt.tz_convert(tz_name)
-            )
+            raw[self.time_col_name] = raw[self.time_col_name].dt.tz_convert(tz_name)
 
         # now handle data gaps and second level timestamps, etc
         # raw, fs = self.handle_timestamp_inconsistency(raw, fill_values)

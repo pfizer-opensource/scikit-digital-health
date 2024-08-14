@@ -142,7 +142,7 @@ class DominantFrequencyValue(Feature):
 class PowerSpectralSum(Feature):
     r"""
     Sum of power spectral density values. The sum of power spectral density values in a
-    1.0Hz wide band around the primary (dominant) frequency (:math:`f_{dom}\pm 0.5`) 
+    1.0Hz wide band around the primary (dominant) frequency (:math:`f_{dom}\pm 0.5`)
     within the chosen range.
 
     Parameters
@@ -203,7 +203,7 @@ class PowerSpectralSum(Feature):
 
 class RangePowerSum(Feature):
     r"""
-    Sum of power spectral density values within the specified range. Can be 
+    Sum of power spectral density values within the specified range. Can be
     normalized to the power spectral sum across the entire frequency range.
 
     Parameters
@@ -232,7 +232,10 @@ class RangePowerSum(Feature):
 
     def __init__(self, padlevel=2, low_cutoff=0.0, high_cutoff=5.0, normalize=False):
         super(RangePowerSum, self).__init__(
-            padlevel=padlevel, low_cutoff=low_cutoff, high_cutoff=high_cutoff, normalize=normalize
+            padlevel=padlevel,
+            low_cutoff=low_cutoff,
+            high_cutoff=high_cutoff,
+            normalize=normalize,
         )
 
         self.pad = padlevel

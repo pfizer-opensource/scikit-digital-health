@@ -4,6 +4,7 @@ Sit-to-stand transfer detection and processing
 Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
+
 from numpy import (
     array,
     zeros,
@@ -541,7 +542,7 @@ class Detector:
             Datetime object
         """
         # set if we want to return aware time
-        kw = {'unit': 's', 'utc': tz_name is not None}
+        kw = {"unit": "s", "utc": tz_name is not None}
         dt = to_datetime(t, **kw)
         if tz_name is not None:
             dt = dt.tz_convert(tz_name)
