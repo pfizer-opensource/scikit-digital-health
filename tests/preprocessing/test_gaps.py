@@ -49,14 +49,12 @@ class TestFillGaps:
         assert res['accel'].shape == (50 + 10 + 15, 3)
         assert res['temperature'].shape == (50 + 10 + 15,)
 
-        assert res['ds']['time'].size == 45 + 12
+        assert res['ds']['time'].size == (45 + 12) * 2  # 2x because of the 0.5 fs
         assert diff(res['ds']['time']).max() == 0.5
-        assert res['ds']['values'].shape == (45 + 12,)
+        assert res['ds']['values'].shape == ((45 + 12) * 2,)
         assert res['ds']['values'].min() == -500.0
 
-        assert res['ds2']['time'].size == 45
-        assert diff(res['ds2']['time']).max() == 12.5
-        assert res['ds2']['values'].shape == (45,)
+        assert 'ds2' not in res
     
     def test_nogap(self, np_rng):
         # make some dummy data
