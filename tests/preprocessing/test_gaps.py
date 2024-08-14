@@ -1,6 +1,5 @@
 import pytest
-from numpy import arange, diff
-from numpy.linalg import norm
+from numpy import arange, diff, allclose
 
 from skdh.preprocessing import FillGaps
 
@@ -58,3 +57,32 @@ class TestFillGaps:
         assert res['ds2']['time'].size == 45
         assert diff(res['ds2']['time']).max() == 12.5
         assert res['ds2']['values'].shape == (45,)
+    
+    def test_nogap(self, np_rng):
+        # make some dummy data
+        t = arange(0, 50, 1)
+        fs = 1.0
+        acc = np_rng.random((t.size, 3))
+        temp = np_rng.random(t.size) + 27
+
+        fg = FillGaps(
+            fill_values={
+                'accel': [0.0, 0.0, 1.0],
+            }
+        )
+
+        res = fg.predict(
+            time=t,
+            fs=fs,
+            accel=acc,
+            temperature=temp,
+        )
+
+        # check the results
+        assert res['time'][-1] == 49
+        assert res['time'].size == 50
+        assert diff(res['time']).max() == 1.0
+        assert res['accel'].shape == (50, 3)
+        assert res['temperature'].shape == (50,)
+
+        assert allclose(res['accel'], acc)
