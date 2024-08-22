@@ -50,7 +50,7 @@ class ReadEmpaticaAvro(BaseProcess):
             Name for the results in `results_dict`.
         """
         # sampling frequency
-        fs = round(raw_accel_dict["samplingFrequency"], decimals=3)
+        fs = raw_accel_dict["samplingFrequency"]
 
         # timestamp start
         ts_start = raw_accel_dict["timestampStart"] / 1e6  # convert to seconds
