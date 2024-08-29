@@ -399,17 +399,20 @@ def fill_data_gaps(time, fs, fill_info, **kwargs):
     >>> print(data_rs.keys())
     dict_keys(['accel', 'temp'])
     """
-    # round-about way, but need to prevent start>>>>>>>>>step
-    time_rs = arange(0, (time[-1] - time[0]) + 0.5 / fs, 1 / fs) + time[0]
-
     # get the first location of gaps in the data - add 1 so that the index reflects
     # the first value AFTER the gap
     gaps = nonzero(diff(time) > (1.5 / fs))[0] + 1
+    if gaps.size == 0:
+        return time, kwargs
+
     # create sequences of data with no gaps
     seqs = zeros((gaps.size + 1, 2), dtype=int_)
     seqs[1:, 0] = gaps
     seqs[:-1, 1] = gaps
     seqs[-1, 1] = time.size
+
+    # round-about way, but need to prevent start>>>>>>>>>step
+    time_rs = arange(0, (time[-1] - time[0]) + 0.5 / fs, 1 / fs) + time[0]
 
     # iterate over the datastreams
     ret = {}
