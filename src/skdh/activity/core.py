@@ -432,7 +432,7 @@ class ActivityLevelClassification(BaseProcess):
             res["N wear hours"][iday] = around(
                 sum(dwear_stops - dwear_starts) / fs / 3600, 1
             )
-            res["Wear Minutes"][iday] = sum(dwear_stops - dwear_starts) / fs / 60
+            res["Wear Minutes"][iday] = sum(time[dwear_stops] - time[dwear_starts]) / 60
 
             if res["N wear hours"][iday] < self.min_wear:
                 continue  # skip day if less than minimum specified hours of wear time
