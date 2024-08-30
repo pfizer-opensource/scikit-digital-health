@@ -1,7 +1,7 @@
 project(
     'scikit-digital-health',
     'c',
-    version: '0.16.9',
+    version: '0.16.10',
     license: 'MIT',
     meson_version: '>=1.1',
 )
