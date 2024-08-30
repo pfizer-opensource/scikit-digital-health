@@ -16,7 +16,6 @@ from numpy import (
     round,
     abs,
     unique,
-    all as npall,
     any as npany,
     allclose,
     nonzero,
@@ -315,8 +314,11 @@ class ReadCSV(BaseProcess):
                 end = end.tz_localize(tz_name)
         else:
             raise ValueError("Invalid trim value, must be one of {'start', 'end', 'both'}")
+
+        i1 = nonzero(df[self.time_col_name] <= start)[0][-1]
+        i2 = nonzero(df[self.time_col_name] >= end)[0][0]
         
-        return df[(df[self.time_col_name] >= start) & (df[self.time_col_name] <= end)]
+        return df.iloc[i1:i2]
 
     @handle_process_returns(results_to_kwargs=True)
     @check_input_file(".csv")
