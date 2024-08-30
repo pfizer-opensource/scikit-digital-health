@@ -11,7 +11,7 @@ from numpy import (
     array,
     tile,
     arange,
-    mean,
+    median,
     diff,
     round,
     abs,
@@ -218,7 +218,7 @@ class ReadCSV(BaseProcess):
             for name, dstream in data.items():
                 data[name] = dstream[unq_ind]
         # get a sampling rate. If non-unique timestamps, this will be updated
-        n_samples = round(mean(1 / diff(time[:2500])), decimals=6)
+        n_samples = round(median(1 / diff(time[:2500])), decimals=6)
 
         # first check if we have non-unique timestamps
         nonuniq_ts = time[1] == time[0]
