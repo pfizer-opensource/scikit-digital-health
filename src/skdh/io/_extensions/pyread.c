@@ -194,6 +194,7 @@ static PyObject *read_geneactiv(PyObject *NPY_UNUSED(self), PyObject *args)
     GN_Data_t data;
 
     /* INITIALIZATION */
+    info.drift = 0.0;
     info.fs_err = 0;
     info.max_n = 0;
     info.npages = -1;

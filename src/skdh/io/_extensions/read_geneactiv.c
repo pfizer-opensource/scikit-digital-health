@@ -25,9 +25,18 @@ int geneactiv_read_header(FILE *fp, GN_Info_t *info)
 
     /* read another group of lines */
     DEBUG_PRINTF("reading next batch of lines\n");
-    /* this should read from line 21 to 48, but will also handle
-       cases where a subject comment spans multiple lines
-     */
+    /* read until the device drift note, if available */
+    while (strncmp(buff, "Extract Notes", 13) != 0)
+    {
+        GN_READLINE;
+    }
+    /* parse buff for the actual data */
+    char *note = strstr(buff, "device clock drift ");
+    if (note != NULL)
+    {
+        info->drift = (double)strtod(&note[19], NULL);
+    }
+
     while (strncmp(buff, "Calibration Data", 16) != 0)
     {
         GN_READLINE;
@@ -69,6 +78,8 @@ int get_timestamps(long *Nps, char time[40], GN_Info_t *info, GN_Data_t *data)
     struct tm tm0;
     double t0;
     Time_t t;
+
+    double drift_start = info->drift * (double)*Nps / ((double)(info->npages * GN_SAMPLES));
 
     /* time */
     t.hour = GN_DATE_HOUR(time);

@@ -114,6 +114,7 @@ typedef enum {
 typedef struct {
     double fs;  /* sampling frequency */
     int fs_err;  /* keep track of differing values of fs during block reading */
+    double drift;  /* clock drift */
     double gain[3];  /* raw accel value gain for converting to g */
     double offset[3];  /* raw accel value offset for converting to g */
     double volts;
