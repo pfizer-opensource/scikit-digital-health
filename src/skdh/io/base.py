@@ -63,7 +63,8 @@ def check_input_file(
                     raise FileSizeError("File is less than 1kb, nothing to read.")
                 elif hasattr(self, "_skip_file_size_check"):
                     warn(
-                        f"File is less than 1kb, but the file size check has been skipped: {file}",
+                        f"File is less than 1kb, but the file size check has been "
+                        f"skipped, returning empty dictionary: {file}",
                         UserWarning,
                     )
                     return {}
