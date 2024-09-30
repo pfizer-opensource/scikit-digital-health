@@ -122,6 +122,7 @@ class MultiReader(BaseProcess):
         fill_value=None,
         gaps_error="raise",
         require_all_keys=True,
+        ignore_file_size_check=True,
     ):
         super().__init__(
             mode=mode,
@@ -130,6 +131,8 @@ class MultiReader(BaseProcess):
             fill_gaps=fill_gaps,
             fill_value=fill_value,
             gaps_error=gaps_error,
+            require_all_keys=require_all_keys,
+            ignore_file_size_check=ignore_file_size_check,
         )
 
         # Set a variable here so that we can ignore file size checking when reading
@@ -147,6 +150,10 @@ class MultiReader(BaseProcess):
         # get the reader classes
         self.rdr = getattr(io, reader)
         self.reader_kw = reader_kw
+
+        # set an attribute if we want to skip file size checks
+        if ignore_file_size_check:
+            self.rdr._skip_file_size_check = True  # just needs to be set to anything
 
         self.resample_to_lowest = resample_to_lowest
 
@@ -196,6 +203,12 @@ class MultiReader(BaseProcess):
             res = [
                 v for _, v in res.items()
             ]  # standardize since we dont care about labels
+        
+        # drop any empty dictionaries - might occur due to some empty files
+        res = [i for i in res if i]  # "if i" === "if i != {}"
+        # check now that we have any data
+        if not res:
+            raise ValueError("No data found in any of the files.")
 
         # get the last time available
         t_ends = [i["time"][-1] for i in res]
@@ -311,6 +324,12 @@ class MultiReader(BaseProcess):
             res = [
                 v for _, v in res.items()
             ]  # standardize since we dont care about labels
+        
+        # drop any empty dictionaries - might occur due to some empty files
+        res = [i for i in res if i]  # "if i" === "if i != {}"
+        # check now that we have any data
+        if not res:
+            raise ValueError("No data found in any of the files.")
 
         t0s = [i["time"][0] for i in res]
         # get sorted index
