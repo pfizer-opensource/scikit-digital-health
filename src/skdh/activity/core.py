@@ -291,23 +291,16 @@ class ActivityLevelClassification(BaseProcess):
     def _update_date_results(
         self, results, time, day_n, day_start_idx, day_stop_idx, day_start_hour
     ):
-        '''
-        # LEAVING this here but commented out in case we need to revert back to this
-
-        # add 15 seconds to make sure any rounding effects for the hour don't adversely
-        # effect the result of the comparison
-        start_dt = self.convert_timestamps(time[day_start_idx])
-
-        window_start_dt = start_dt + Timedelta(15, unit="s")
-        # not sure what edge case these are here for....
-        if start_dt.hour < day_start_hour:
-            window_start_dt -= Timedelta(1, unit="day")
-        '''
         # get the start time, but round to the nearest minute - could do second
         # but going larger just to be completely sure.
         start_dt = self.convert_timestamps(time[day_start_idx]).round("min")
 
-        results["Date"][day_n] = start_dt.strftime("%Y-%m-%d")
+        # subtracting a day handles cases where the recording starts well into a day, in which case
+        # the date should be the previous day, when the window WOULD have started had their been
+        # more data
+        window_start_dt = start_dt - Timedelta(1, unit='day') if (start_dt.hour < day_start_hour) else start_dt
+
+        results["Date"][day_n] = window_start_dt.strftime("%Y-%m-%d")
         results["Day Start Timestamp"][day_n] = start_dt.strftime(
             "%Y-%m-%d %H:%M:%S"
         )
@@ -315,7 +308,7 @@ class ActivityLevelClassification(BaseProcess):
         results["Day End Timestamp"][day_n] = self.convert_timestamps(
             time[day_stop_idx]
         ).round("min").strftime("%Y-%m-%d %H:%M:%S")
-        results["Weekday"][day_n] = start_dt.strftime("%A")
+        results["Weekday"][day_n] = window_start_dt.strftime("%A")
         results["Day N"][day_n] = day_n + 1
         results["N hours"][day_n] = around(
             (time[day_stop_idx - 1] - time[day_start_idx]) / 3600, 1
