@@ -245,10 +245,10 @@ PyObject * range_power_sum(PyObject *NPY_UNUSED(self), PyObject *args)
     PyObject *x_;
     long padlevel;
     double fs=0., low_cut=0., hi_cut=12.;
-    int norm;
+    int demean, use_mod, norm;
     int fail = 0;
 
-    if (!PyArg_ParseTuple(args, "Odlddi:range_power_sum", &x_, &fs, &padlevel, &low_cut, &hi_cut, &norm)) return NULL;
+    if (!PyArg_ParseTuple(args, "Odlddiii:range_power_sum", &x_, &fs, &padlevel, &low_cut, &hi_cut, &demean, &use_mod, &norm)) return NULL;
 
     if (fs <= 0.)
     {
@@ -303,7 +303,7 @@ PyObject * range_power_sum(PyObject *NPY_UNUSED(self), PyObject *args)
 
         for (int i = 0; i < nrepeats; ++i)
         {
-            range_power_sum_1d(&stride, dptr, &fs, &nfft, &low_cut, &hi_cut, &norm, rptr);
+            range_power_sum_1d(&stride, dptr, &fs, &nfft, &low_cut, &hi_cut, &demean, &use_mod, &norm, rptr);
             dptr += stride;
             rptr ++;
         }
