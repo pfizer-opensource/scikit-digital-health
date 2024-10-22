@@ -1009,7 +1009,7 @@ class StaudenmayerClassification(BaseProcess):
 
             # non-sedentary
             mask_ns = sd_avm > 0.148
-            mask_ns |= ((0.062 < sd_avm) & (sd_avm <= 0.098)) & (p625 <= 0.118)
+            mask_ns |= ((0.062 < sd_avm) & (sd_avm <= 0.098)) & (p625 <= 0.138)
             mask_ns |= ((0.098 < sd_avm) & (sd_avm <= 0.148)) & (p625 > 0.118)
 
             if (mask_s.sum() + mask_ns.sum()) != sd_avm.size:
