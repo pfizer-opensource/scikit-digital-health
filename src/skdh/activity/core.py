@@ -1003,7 +1003,7 @@ class StaudenmayerClassification(BaseProcess):
                 raise ValueError("Light/Mod/Vig masks do not equal input size")
 
             # sedentary
-            mask_s = (sd_avm <= 0.98) & (p625 <= 0.138)
+            mask_s = (sd_avm <= 0.098) & (p625 <= 0.138)
             mask_s |= (sd_avm <= 0.062) & (p625 > 0.138)
             mask_s |= ((0.098 < sd_avm) & (sd_avm <= 0.148)) & (p625 <= 0.118)
 
