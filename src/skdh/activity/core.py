@@ -951,7 +951,7 @@ class StaudenmayerClassification(BaseProcess):
         # initialize values from nan to 0.0. Do this here because days with less than
         # minimum hours should have nan values
         for endpt in self.endpoints:
-            results[endpt][day_n] = 0.0
+            results[f"{filt_prefix}_{endpt}"][day_n] = 0.0
         
         # get starts and stops for wich we can actually compute values
         mask = (stops - starts) > n_wlen
