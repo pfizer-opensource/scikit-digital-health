@@ -774,6 +774,8 @@ class StaudenmayerClassification(BaseProcess):
         self.use_power = use_power
         self.min_wear_time = min_wear_time
 
+        self._return_raw = False
+
         self.endpoints = [
             'sedentary',
             'nonsedentary',
@@ -890,6 +892,13 @@ class StaudenmayerClassification(BaseProcess):
         for endpt in self.endpoints:
             res[f"{filt_name}_{endpt}"] = full(self.day_idx[0].size, nan, dtype="float")
         
+        raw = {
+            'starts': [],
+            'stops': [],
+            'sd_avm': [],
+            'mean_angle': [],
+            'p625': []
+        }
         # =============================================================================
         # PROCESSING
         # =============================================================================
@@ -925,16 +934,19 @@ class StaudenmayerClassification(BaseProcess):
                 )
             
             self._compute_wear_wake_activity(
-                res, accel, fs, iday, dwear_starts, dwear_stops, nwlen, epm, filt_name
+                res, accel, fs, iday, dwear_starts, dwear_stops, nwlen, epm, filt_name, raw
             )
         
-        return res
+        if self._return_raw:
+            res.update({'raw': raw})
+        else:
+            return res
 
     def _get_arm_angle(self, acc):
         return 180 * arcsin(acc[:, self.axis] / norm(acc, axis=1)) / pi
 
     def _compute_wear_wake_activity(
-        self, results, accel, fs, day_n, starts, stops, n_wlen, epm, filt_prefix
+        self, results, accel, fs, day_n, starts, stops, n_wlen, epm, filt_prefix, raw
     ):
         # initialize values from nan to 0.0. Do this here because days with less than
         # minimum hours should have nan values
@@ -968,6 +980,13 @@ class StaudenmayerClassification(BaseProcess):
             sd_avm = moving_sd(avm, n_wlen, n_wlen, return_previous=False)
             mean_angle = moving_mean(arm_angle, n_wlen, n_wlen)
             p625 = ft.compute(acc_vm_w, fs=fs, axis=-1)
+
+            # append raw
+            raw['starts'].append(start)
+            raw['stops'].append(stop)
+            raw['sd_avm'].append(sd_avm)
+            raw['mean_angle'].append(mean_angle)
+            raw['p625'].append(p625)
 
             # get light time
             mask_l = (sd_avm <= 0.26) & (mean_angle > -52.0)

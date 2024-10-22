@@ -10,7 +10,7 @@
 extern void dominant_freq_1d(long *, double *, double *, long *, double *, double *, double *);
 extern void dominant_freq_value_1d(long *, double *, double *, long *, double *, double *, double *);
 extern void power_spectral_sum_1d(long *, double *, double *, long *, double *, double *, double *);
-extern void range_power_sum_1d(long *, double *, double *, long *, double *, double *, int *, double *);
+extern void range_power_sum_1d(long *, double *, double *, long *, double *, double *, int *, int *, int *, double *);
 extern void spectral_entropy_1d(long *, double *, double *, long *, double *, double *, double *);
 extern void spectral_flatness_1d(long *, double *, double *, long *, double *, double *, double *);
 extern void destroy_plan(void);
