@@ -939,8 +939,8 @@ class StaudenmayerClassification(BaseProcess):
         
         if self._return_raw:
             res.update({'raw': raw})
-        else:
-            return res
+
+        return res
 
     def _get_arm_angle(self, acc):
         return 180 * arcsin(acc[:, self.axis] / norm(acc, axis=1)) / pi
