@@ -22,7 +22,10 @@ from numpy import (
     around,
     full,
     arange,
+    arcsin,
+    pi
 )
+from numpy.linalg import norm
 from pandas import Timedelta, Timestamp
 import matplotlib
 from matplotlib.backends.backend_pdf import PdfPages
@@ -31,6 +34,9 @@ import matplotlib.pyplot as plt
 
 from skdh.base import BaseProcess, handle_process_returns
 from skdh.utility.internal import get_day_index_intersection
+from skdh.utility.windowing import get_windowed_view
+from skdh.utility.math import moving_sd, moving_mean
+from skdh.features import RangePowerSum
 from skdh.activity.cutpoints import get_level_thresholds, get_metric
 from skdh.activity import endpoints as ept
 from skdh.activity.endpoints import ActivityEndpoint
@@ -728,3 +734,292 @@ class ActivityLevelClassification(BaseProcess):
             pp.savefig(f)
 
         pp.close()
+
+
+class StaudenmayerClassification(BaseProcess):
+    """
+    Classify accelerometer data into different activity levels based on [1]_.
+
+    Parameters
+    ----------
+    arm_axis : int
+        Axis of the accelerometer to use as the z axis.
+    demean : bool, optional
+        If True, will demean the FFT output (ignore the 0 frequency component).
+        Default is False.
+    use_power : bool, optional
+        If True, will use the power of the signal. If False, uses the modulus.
+        Default is True.
+    min_wear_time : int, optional
+        Minimum wear time in hours for a day to be analyzed. Default is 10 hours.
+    
+    References
+    ----------
+    .. [1] J. Staudenmayer, S. He, A. Hickey, J. Sasaki, and P. Freedson, 
+        “Methods to estimate aspects of physical activity and sedentary behavior 
+        from high-frequency wrist accelerometer measurements,” J Appl Physiol, 
+        vol. 119, no. 4, pp. 396–403, Aug. 2015, doi: 10.1152/japplphysiol.00026.2015.
+
+    """
+    def __init__(self, arm_axis, demean=False, use_power=True, min_wear_time=10):
+        super().__init__(
+            arm_axis=arm_axis,
+            demean=demean,
+            use_power=use_power,
+            min_wear_time=min_wear_time
+        )
+
+        self.axis = arm_axis
+        self.demean = demean
+        self.use_power = use_power
+        self.min_wear_time = min_wear_time
+
+        self._return_raw = False
+
+        self.endpoints = [
+            'sedentary',
+            'nonsedentary',
+            'light',
+            'moderate',
+            'vigorous'
+        ]
+    
+    def _update_date_results(
+        self, results, time, day_n, day_start_idx, day_stop_idx, day_start_hour
+    ):
+        # get the start time, but round to the nearest minute - could do second
+        # but going larger just to be completely sure.
+        start_dt = self.convert_timestamps(time[day_start_idx]).round("min")
+
+        # subtracting a day handles cases where the recording starts well into a day, in which case
+        # the date should be the previous day, when the window WOULD have started had their been
+        # more data
+        window_start_dt = start_dt - Timedelta(1, unit='day') if (start_dt.hour < day_start_hour) else start_dt
+
+        results["Date"][day_n] = window_start_dt.strftime("%Y-%m-%d")
+        results["Day Start Timestamp"][day_n] = start_dt.strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+        # round end time as well
+        results["Day End Timestamp"][day_n] = self.convert_timestamps(
+            time[day_stop_idx]
+        ).round("min").strftime("%Y-%m-%d %H:%M:%S")
+        results["Weekday"][day_n] = window_start_dt.strftime("%A")
+        results["Day N"][day_n] = day_n + 1
+        results["N hours"][day_n] = around(
+            (time[day_stop_idx - 1] - time[day_start_idx]) / 3600, 1
+        )
+        results["Total Minutes"][day_n] = around(
+            (time[day_stop_idx - 1] - time[day_start_idx]) / 60, 1
+        )
+
+        return start_dt
+    
+    @handle_process_returns(results_to_kwargs=False)
+    def predict(self, *, time, accel, fs=None, wear=None, tz_name=None, **kwargs):
+        """
+        predict(*, time, accel, fs=None, wear=None)
+
+        Compute the time spent in different activity levels.
+
+        Parameters
+        ----------
+        time : numpy.ndarray
+            (N, ) array of continuous unix timestamps, in seconds
+        accel : numpy.ndarray
+            (N, 3) array of accelerations measured by centrally mounted lumbar device,
+            in units of 'g'.
+        fs : {None, float}, optional
+            Sampling frequency in Hz. If None will be computed from the first 5000
+            samples of `time`.
+        wear : {None, list}, optional
+            List of length-2 lists of wear-time ([start, stop]). Default is None,
+            which uses the whole recording as wear time.
+        tz_name : {None, str}, optional
+            IANA time-zone name for the recording location if passing in `time` as
+            UTC timestamps. Can be ignored if passing in naive timestamps.
+
+        Returns
+        -------
+        activity_res : dict
+            Computed activity level metrics.
+        """
+        super().predict(
+            expect_days=True,
+            expect_wear=True,
+            time=time,
+            accel=accel,
+            fs=fs,
+            wear=wear,
+            tz_name=tz_name,
+            **kwargs,
+        )
+        # ==============================================================================
+        # SETUP / INITIALIZATION
+        # ==============================================================================
+        if fs is None:
+            fs = 1 / mean(diff(time[:5000]))
+
+        nwlen = int(15 * fs)  # 15 second windows
+        epm = 4  # epochs per minute
+
+        # check if sleep data is provided
+        sleep = kwargs.get("sleep", None)
+        slp_msg = (
+            f"[{self!s}] No sleep information found. Only computing full day metrics."
+        )
+        sleep_starts, sleep_stops = self._check_if_idx_none(sleep, slp_msg, None, None)
+
+        # ==============================================================================
+        # SETUP RESULTS KEYS/ENDPOINTS
+        # ==============================================================================
+        n_ = self.day_idx[0].size
+        res = {
+            "Date": full(n_, "", dtype="U11"),
+            "Day Start Timestamp": full(n_, "", dtype="U26"),
+            "Day End Timestamp": full(n_, "", dtype="U26"),
+            "Weekday": full(n_, "", dtype="U11"),
+            "Day N": full(n_, -1, dtype="int"),
+            "N hours": full(n_, nan, dtype="float"),
+            "N wear hours": full(n_, nan, dtype="float"),
+            "N wear wake hours": full(n_, nan, dtype="float"),
+            "Total Minutes": full(n_, nan, dtype="float"),
+            "Wear Minutes": full(n_, nan, dtype="float"),
+            "Wear Wake Minutes": full(n_, nan, dtype="float"),
+        }
+
+        filt_name = "wear" if sleep is None else "wear-wake"
+        for endpt in self.endpoints:
+            res[f"{filt_name}_{endpt}"] = full(self.day_idx[0].size, nan, dtype="float")
+        
+        raw = {
+            'starts': [],
+            'stops': [],
+            'sd_avm': [],
+            'mean_angle': [],
+            'p625': []
+        }
+        # =============================================================================
+        # PROCESSING
+        # =============================================================================
+        for iday, day_idx in enumerate(zip(*self.day_idx)):
+            day_start, day_stop = day_idx
+            # update the results dict
+            start_dt = self._update_date_results(
+                res, time, iday, day_start, day_stop, self.day_key[0]
+            )
+
+            # get the intersection of wear time and day
+            dwear_starts, dwear_stops = get_day_index_intersection(
+                *self.wear_idx, True, day_start, day_stop
+            )
+
+            # save wear time
+            res['N wear hours'][iday] = around(
+                sum(dwear_stops - dwear_starts) / fs / 3600, 1
+            )
+            res['Wear Minutes'][iday] = sum(time[dwear_stops] - time[dwear_starts]) / 60
+
+            if res['N wear hours'][iday] < self.min_wear_time:
+                continue  # skip day if less than minimum wear time
+
+            # if there is sleep data, add it to the intersection of indices
+            if sleep_starts is not None and sleep_stops is not None:
+                dwear_starts, dwear_stops = get_day_index_intersection(
+                    (self.wear_idx[0], sleep_starts),
+                    (self.wear_idx[1], sleep_stops),
+                    (True, False),  # include wear time, exclude sleeping time
+                    day_start,
+                    day_stop
+                )
+            
+            self._compute_wear_wake_activity(
+                res, accel, fs, iday, dwear_starts, dwear_stops, nwlen, epm, filt_name, raw
+            )
+        
+        if self._return_raw:
+            res.update({'raw': raw})
+
+        return res
+
+    def _get_arm_angle(self, acc):
+        return 180 * arcsin(acc[:, self.axis] / norm(acc, axis=1)) / pi
+
+    def _compute_wear_wake_activity(
+        self, results, accel, fs, day_n, starts, stops, n_wlen, epm, filt_prefix, raw
+    ):
+        # initialize values from nan to 0.0. Do this here because days with less than
+        # minimum hours should have nan values
+        for endpt in self.endpoints:
+            results[f"{filt_prefix}_{endpt}"][day_n] = 0.0
+        
+        # get starts and stops for wich we can actually compute values
+        mask = (stops - starts) > n_wlen
+        starts = starts[mask]
+        stops = stops[mask]
+
+        for start, stop in zip(starts, stops):
+            # calculate the various metrics needed
+            avm = norm(accel[start:stop], axis=1)
+            arm_angle = self._get_arm_angle(accel[start:stop])
+
+            # computing power
+            ft = RangePowerSum(
+                padlevel=0,
+                low_cutoff=0.6,
+                high_cutoff=2.5,
+                demean=self.demean,
+                use_modulus=not self.use_power,
+                normalize=True,
+            )
+            
+            # windowed acceleration magnitude
+            acc_vm_w = get_windowed_view(avm, n_wlen, n_wlen, ensure_c_contiguity=True)
+
+            # compute metrics
+            sd_avm = moving_sd(avm, n_wlen, n_wlen, return_previous=False)
+            mean_angle = moving_mean(arm_angle, n_wlen, n_wlen)
+            p625 = ft.compute(acc_vm_w, fs=fs, axis=-1)
+
+            # append raw
+            raw['starts'].append(start)
+            raw['stops'].append(stop)
+            raw['sd_avm'].append(sd_avm)
+            raw['mean_angle'].append(mean_angle)
+            raw['p625'].append(p625)
+
+            # get light time
+            mask_l = (sd_avm <= 0.26) & (mean_angle > -52.0)
+
+            # get moderate
+            mask_m = (sd_avm <= 0.26) & (mean_angle <= -52.0)
+            mask_m |= ((0.26 < sd_avm) & (sd_avm <= 0.79)) & (mean_angle > -53.0)
+
+            # vigorous
+            mask_v = 0.79 < sd_avm
+            mask_v |= ((0.26 < sd_avm) & (sd_avm <= 0.79)) & (mean_angle <= -53.0)
+
+            if (mask_l.sum() + mask_m.sum() + mask_v.sum()) != sd_avm.size:
+                raise ValueError("Light/Mod/Vig masks do not equal input size")
+
+            # sedentary
+            mask_s = (sd_avm <= 0.098) & (p625 <= 0.138)
+            mask_s |= (sd_avm <= 0.062) & (p625 > 0.138)
+            mask_s |= ((0.098 < sd_avm) & (sd_avm <= 0.148)) & (p625 <= 0.118)
+
+            # non-sedentary
+            mask_ns = sd_avm > 0.148
+            mask_ns |= ((0.062 < sd_avm) & (sd_avm <= 0.098)) & (p625 > 0.138)
+            mask_ns |= ((0.098 < sd_avm) & (sd_avm <= 0.148)) & (p625 > 0.118)
+
+            if (mask_s.sum() + mask_ns.sum()) != sd_avm.size:
+                raise ValueError("Sed/Nonsed masks do not equal input size")
+            
+            # add the time to the results
+            results[f'{filt_prefix}_light'] += mask_l.sum() / epm
+            results[f'{filt_prefix}_moderate'] += mask_m.sum() / epm
+            results[f'{filt_prefix}_vigorous'] += mask_v.sum() / epm
+            results[f'{filt_prefix}_sedentary'] += mask_s.sum() / epm
+            results[f'{filt_prefix}_nonsedentary'] += mask_ns.sum() / epm
+
+

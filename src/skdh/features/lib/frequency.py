@@ -214,6 +214,10 @@ class RangePowerSum(Feature):
         Low value of the frequency range. Default is 0.0 Hz
     high_cutoff : float, optional
         High value of the frequency range. Default is 5.0 Hz
+    demean : bool, optional
+        Demean (ignore 0 frequency component). Default is False.
+    use_modulus : bool, optional
+        Use modulus instead of power. Default is False
     normalize : bool, optional
         Normalize the range power sum by the total power spectral sum. Default is False.
 
@@ -228,19 +232,23 @@ class RangePowerSum(Feature):
     in the FFT would go from 256 to 1024.
     """
 
-    __slots__ = ("pad", "low_cut", "high_cut", "normalize")
+    __slots__ = ("pad", "low_cut", "high_cut", "demean", "use_modulus", "normalize")
 
-    def __init__(self, padlevel=2, low_cutoff=0.0, high_cutoff=5.0, normalize=False):
+    def __init__(self, padlevel=2, low_cutoff=0.0, high_cutoff=5.0, demean=False, use_modulus=False, normalize=False):
         super(RangePowerSum, self).__init__(
             padlevel=padlevel,
             low_cutoff=low_cutoff,
             high_cutoff=high_cutoff,
+            demean=demean,
+            use_modulus=use_modulus,
             normalize=normalize,
         )
 
         self.pad = padlevel
         self.low_cut = low_cutoff
         self.high_cut = high_cutoff
+        self.demean = demean
+        self.use_modulus = use_modulus
         self.normalize = normalize
 
     def compute(self, signal, fs=1.0, *, axis=-1):
@@ -264,7 +272,7 @@ class RangePowerSum(Feature):
         """
         x = super().compute(signal, fs, axis=axis)
         return extensions.range_power_sum(
-            x, fs, self.pad, self.low_cut, self.high_cut, self.normalize
+            x, fs, self.pad, self.low_cut, self.high_cut, self.demean, self.use_modulus, self.normalize
         )
 
 
