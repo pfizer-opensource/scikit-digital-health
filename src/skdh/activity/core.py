@@ -762,12 +762,13 @@ class StaudenmayerClassification(BaseProcess):
         vol. 119, no. 4, pp. 396–403, Aug. 2015, doi: 10.1152/japplphysiol.00026.2015.
 
     """
-    def __init__(self, arm_axis, demean=False, use_power=True, min_wear_time=10):
+    def __init__(self, arm_axis, demean=False, use_power=True, min_wear_time=10, day_window=(0, 24),):
         super().__init__(
             arm_axis=arm_axis,
             demean=demean,
             use_power=use_power,
-            min_wear_time=min_wear_time
+            min_wear_time=min_wear_time,
+            day_window=day_window
         )
 
         self.axis = arm_axis
@@ -784,6 +785,11 @@ class StaudenmayerClassification(BaseProcess):
             'moderate',
             'vigorous'
         ]
+
+        if day_window is None:
+            self.day_key = (-1, -1)
+        else:
+            self.day_key = tuple(day_window)
     
     def _update_date_results(
         self, results, time, day_n, day_start_idx, day_stop_idx, day_start_hour
