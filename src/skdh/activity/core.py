@@ -23,7 +23,8 @@ from numpy import (
     full,
     arange,
     arcsin,
-    pi
+    pi,
+    isnan
 )
 from numpy.linalg import norm
 from pandas import Timedelta, Timestamp
@@ -999,7 +1000,7 @@ class StaudenmayerClassification(BaseProcess):
             mask_v = 0.79 < sd_avm
             mask_v |= ((0.26 < sd_avm) & (sd_avm <= 0.79)) & (mean_angle <= -53.0)
 
-            if (mask_l.sum() + mask_m.sum() + mask_v.sum()) != sd_avm.size:
+            if (mask_l.sum() + mask_m.sum() + mask_v.sum()) != isnan(sd_avm).sum():
                 raise ValueError("Light/Mod/Vig masks do not equal input size")
 
             # sedentary
@@ -1012,7 +1013,7 @@ class StaudenmayerClassification(BaseProcess):
             mask_ns |= ((0.062 < sd_avm) & (sd_avm <= 0.098)) & (p625 > 0.138)
             mask_ns |= ((0.098 < sd_avm) & (sd_avm <= 0.148)) & (p625 > 0.118)
 
-            if (mask_s.sum() + mask_ns.sum()) != sd_avm.size:
+            if (mask_s.sum() + mask_ns.sum()) != isnan(sd_avm).sum():
                 raise ValueError("Sed/Nonsed masks do not equal input size")
             
             # add the time to the results
