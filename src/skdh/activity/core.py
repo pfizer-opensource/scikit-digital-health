@@ -989,6 +989,9 @@ class StaudenmayerClassification(BaseProcess):
             raw['mean_angle'].append(mean_angle)
             raw['p625'].append(p625)
 
+            # number of available labels
+            n_labels = sd_avm.size - isnan(sd_avm).sum()
+
             # get light time
             mask_l = (sd_avm <= 0.26) & (mean_angle > -52.0)
 
@@ -1000,7 +1003,7 @@ class StaudenmayerClassification(BaseProcess):
             mask_v = 0.79 < sd_avm
             mask_v |= ((0.26 < sd_avm) & (sd_avm <= 0.79)) & (mean_angle <= -53.0)
 
-            if (mask_l.sum() + mask_m.sum() + mask_v.sum()) != isnan(sd_avm).sum():
+            if (mask_l.sum() + mask_m.sum() + mask_v.sum()) != n_labels:
                 raise ValueError("Light/Mod/Vig masks do not equal input size")
 
             # sedentary
@@ -1013,7 +1016,7 @@ class StaudenmayerClassification(BaseProcess):
             mask_ns |= ((0.062 < sd_avm) & (sd_avm <= 0.098)) & (p625 > 0.138)
             mask_ns |= ((0.098 < sd_avm) & (sd_avm <= 0.148)) & (p625 > 0.118)
 
-            if (mask_s.sum() + mask_ns.sum()) != isnan(sd_avm).sum():
+            if (mask_s.sum() + mask_ns.sum()) != n_labels:
                 raise ValueError("Sed/Nonsed masks do not equal input size")
             
             # add the time to the results
