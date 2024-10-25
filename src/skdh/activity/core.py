@@ -1026,10 +1026,10 @@ class StaudenmayerClassification(BaseProcess):
                 raise ValueError("Sed/Nonsed masks do not equal input size")
             
             # add the time to the results
-            results[f'{filt_prefix}_light'] += mask_l.sum() / epm
-            results[f'{filt_prefix}_moderate'] += mask_m.sum() / epm
-            results[f'{filt_prefix}_vigorous'] += mask_v.sum() / epm
-            results[f'{filt_prefix}_sedentary'] += mask_s.sum() / epm
-            results[f'{filt_prefix}_nonsedentary'] += mask_ns.sum() / epm
+            results[f'{filt_prefix}_light'][day_n] += mask_l.sum() / epm
+            results[f'{filt_prefix}_moderate'][day_n] += mask_m.sum() / epm
+            results[f'{filt_prefix}_vigorous'][day_n] += mask_v.sum() / epm
+            results[f'{filt_prefix}_sedentary'][day_n] += mask_s.sum() / epm
+            results[f'{filt_prefix}_nonsedentary'][day_n] += mask_ns.sum() / epm
 
 
