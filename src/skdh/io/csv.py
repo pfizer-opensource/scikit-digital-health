@@ -23,12 +23,12 @@ from numpy import (
 )
 from pandas import read_csv, to_datetime
 
-from skdh.base import BaseProcess, handle_process_returns
-from skdh.io.base import check_input_file
+from skdh.base import handle_process_returns
+from skdh.io.base import check_input_file, BaseIO
 from skdh.utility.internal import fill_data_gaps
 
 
-class ReadCSV(BaseProcess):
+class ReadCSV(BaseIO):
     """
     Read a comma-separated value (CSV) file into memory.
 
@@ -41,13 +41,12 @@ class ReadCSV(BaseProcess):
     drop_duplicate_timestamps : bool, optional
         Drop duplicate timestamps before doing any timestamp handling or gap filling.
         Default is False.
-    trim : {None, 'start', 'end', 'both'}, optional
-        Trim the recording/data length to times provided to the `predict` method. Default
-        is None, which will trim nothing. 'start' will trim the start of the recording
-        to after the `trim_start` parameter, 'end' will trim the end of the recording
-        to be the `trim_end` parameter. Both will trim at both ends. Timestrings 
-        will be assumed to be in the same timezone as the data, such that if you pass
-        `tz_name` to the predict method, the trim times will be taken as in that timezone.
+    trim_keys : {None, tuple}, optional
+        Trim keys provided in the `predict` method. Default (None) will not do any trimming.
+        Trimming of either start or end can be accomplished by providing None in the place
+        of the key you do not want to trim. If provided, the tuple should be of the form
+        (start_key, end_key). When provided, trim datetimes will be assumed to be in the 
+        same timezone as the data (ie naive if naive, or in the timezone provided).
     fill_gaps : bool, optional
         Fill any gaps in data streams. Default is True. If False and data gaps are
         detected, then the reading will raise a `ValueError`.
@@ -122,7 +121,7 @@ class ReadCSV(BaseProcess):
         time_col_name,
         column_names,
         drop_duplicate_timestamps=False,
-        trim=None,
+        trim_keys=None,
         fill_gaps=True,
         fill_value=None,
         gaps_error="raise",
@@ -137,7 +136,7 @@ class ReadCSV(BaseProcess):
             time_col_name=time_col_name,
             column_names=column_names,
             drop_duplicate_timestamps=drop_duplicate_timestamps,
-            trim=trim,
+            trim_keys=trim_keys,
             fill_gaps=fill_gaps,
             fill_value=None,
             gaps_error=gaps_error,
@@ -167,7 +166,7 @@ class ReadCSV(BaseProcess):
 
         self.time_col_name = time_col_name
         self.column_names = column_names
-        self.trim = trim
+        self.trim_keys = trim_keys
         self.fill_gaps = fill_gaps
         self.fill_value = {} if fill_value is None else fill_value
         self.gaps_error = gaps_error
@@ -276,50 +275,6 @@ class ReadCSV(BaseProcess):
 
         return n_samples, time_rs, data
 
-    def trim_data(self, df, trim_start, trim_end, tz_name):
-        """
-        Trim data to provided start/end times.
-
-        Parameters
-        ----------
-        df : pandas.DataFrame
-            Raw data
-        trim_start : {None, str}
-            Trim start time
-        trim_end : {None, str}
-            Trime end time
-        tz_name : {None, str}
-            Timezone name for the data
-
-        Returns
-        -------
-        df_trimmed : pandas.DataFrame
-        """
-        if self.trim.lower() == "start":
-            start = to_datetime(trim_start, utc=False)
-            if tz_name is not None:
-                start = start.tz_localize(tz_name)
-            end = df[self.time_col_name].iloc[-1]
-        elif self.trim.lower() == "end":
-            end = to_datetime(trim_end, utc=False)
-            if tz_name is not None:
-                end = end.tz_localize(tz_name)
-            start = df[self.time_col_name].iloc[0]
-        elif self.trim.lower() == "both":
-            start = to_datetime(trim_start, utc=False)
-            if tz_name is not None:
-                start = start.tz_localize(tz_name)
-            end = to_datetime(trim_end, utc=False)
-            if tz_name is not None:
-                end = end.tz_localize(tz_name)
-        else:
-            raise ValueError("Invalid trim value, must be one of {'start', 'end', 'both'}")
-
-        i1 = nonzero(df[self.time_col_name] <= start)[0][-1]
-        i2 = nonzero(df[self.time_col_name] >= end)[0][0]
-        
-        return df.iloc[i1:i2]
-
     @handle_process_returns(results_to_kwargs=True)
     @check_input_file(".csv")
     def predict(self, *, file, tz_name=None, **kwargs):
@@ -376,9 +331,6 @@ class ReadCSV(BaseProcess):
         if tz_name is not None:
             # convert, and then remove the timezone so its naive again, but now in local time
             raw[self.time_col_name] = raw[self.time_col_name].dt.tz_convert(tz_name)
-        
-        if self.trim is not None:
-            raw = self.trim_data(raw, kwargs.get("trim_start"), kwargs.get("trim_end"), tz_name)
 
         # now handle data gaps and second level timestamps, etc
         # raw, fs = self.handle_timestamp_inconsistency(raw, fill_values)
@@ -398,6 +350,11 @@ class ReadCSV(BaseProcess):
                     f"Data stream {dstream} specified in column names but all columns {self.column_names[dstream]} not found in the read data. Skipping."
                 )
                 continue
+        
+        # trim the data
+        if self.trim_keys is not None:
+            data = self.trim_data(*self.trim_keys, tz_name, kwargs, time=time, **data)
+            time = data.pop(self._time)
 
         # now handle data gaps and second level timestamps, etc
         fs, time, results = self.handle_timestamp_inconsistency_np(

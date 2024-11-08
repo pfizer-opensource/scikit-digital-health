@@ -9,15 +9,15 @@ import h5py
 from pandas import Timestamp
 from numpy import isclose
 
-from skdh.base import BaseProcess, handle_process_returns
-from skdh.io.base import check_input_file
+from skdh.base import handle_process_returns
+from skdh.io.base import check_input_file, BaseIO
 
 
 class SensorNotFoundError(Exception):
     pass
 
 
-class ReadApdmH5(BaseProcess):
+class ReadApdmH5(BaseIO):
     """
     Read a H5 file produced by the APDM software into memory. Acceleration values
     are returned in units of `g`.
