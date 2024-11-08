@@ -9,8 +9,10 @@ from pathlib import Path
 import functools
 from warnings import warn
 
+from numpy import nonzero
 from pandas import to_datetime
 
+from skdh.base import BaseProcess
 from skdh.utility.exceptions import FileSizeError
 
 
@@ -121,3 +123,51 @@ def handle_naive_timestamps(time, is_local, tz_name=None):
                 UserWarning,
             )
     return time
+
+
+class BaseIO(BaseProcess):
+    @staticmethod
+    def _to_timestamp(time_str, tz_name):
+        ts = to_datetime(time_str)
+        if tz_name is not None:
+            ts = ts.tz_localize(tz_name)
+        
+        return ts.timestamp()
+
+    def trim_data(self, start_key, end_key, tz_name, predict_kw, *, time, **data):
+        """
+        Trim raw data based on provided date-times
+
+        Parameters
+        ----------
+        start_key : {None, str}
+            Start key for the provided trim start time.
+        end_key : {None, str}
+            End key for the provided trim end time.
+        tz_name : {None, str}
+            IANA time-zone name for the recording location. If not provided,
+            both the `time` array and provided trim times will be assumed to be naive
+            and in the same time-zone.
+        predict_kw : dict
+            Key-word arguments passed to the predict method.
+        """
+        trim_start = predict_kw.get(start_key)
+        trim_end = predict_kw.get(end_key)
+
+        if trim_start is not None and trim_start is None:
+            raise ValueError(f"`{start_key=}` was provided but not found in `predict` arguments")
+        if trim_end is not None and trim_end is None:
+            raise ValueError(f"`{end_key=}` was provided but not found in `predict` arguments")
+
+        ts_trim_start = time[0] - 1 if trim_start is None else self._to_timestamp(trim_start, tz_name)
+        ts_trim_end = time[-1] + 1 if trim_end is None else self._to_timestamp(trim_end, tz_name)
+        
+        idx = nonzero((time >= ts_trim_start) & (time <= ts_trim_end))[0]
+
+        i1 = idx[0]
+        i2 = idx[-1]
+
+        res = {self._time: time[i1:i2]}
+        res.update({k: v[i1:i2] for k, v in data.items()})
+
+        return res

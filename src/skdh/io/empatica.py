@@ -15,25 +15,32 @@ from numpy import (
     float64,
 )
 
-from skdh import BaseProcess, handle_process_returns
-from skdh.io.base import check_input_file
+from skdh import handle_process_returns
+from skdh.io.base import check_input_file, BaseIO
 from skdh.utility.internal import apply_resample
 
 
-class ReadEmpaticaAvro(BaseProcess):
+class ReadEmpaticaAvro(BaseIO):
     """
     Read Empatica data from an avro file.
 
     Parameters
     ----------
+    trim_keys : {None, tuple}, optional
+        Trim keys provided in the `predict` method. Default (None) will not do any trimming.
+        Trimming of either start or end can be accomplished by providing None in the place
+        of the key you do not want to trim. If provided, the tuple should be of the form
+        (start_key, end_key). When provided, trim datetimes will be assumed to be in the 
+        same timezone as the data (ie naive if naive, or in the timezone provided).
     resample_to_accel : bool, optional
         Resample any additional data streams to match the accelerometer data stream.
         Default is True.
     """
 
-    def __init__(self, resample_to_accel=True):
-        super().__init__(resample_to_accel=resample_to_accel)
+    def __init__(self, trim_keys=None, resample_to_accel=True):
+        super().__init__(trim_keys=trim_keys, resample_to_accel=resample_to_accel)
 
+        self.trim_keys = trim_keys
         self.resample_to_accel = resample_to_accel
 
     def get_accel(self, raw_accel_dict, results_dict, key):
