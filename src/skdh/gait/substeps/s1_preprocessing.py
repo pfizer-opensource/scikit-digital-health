@@ -18,6 +18,7 @@ from numpy import (
     exp,
     sum,
     max as npmax,
+    searchsorted
 )
 from scipy.signal import detrend, butter, sosfiltfilt, find_peaks, correlate
 import pywt
@@ -139,8 +140,12 @@ class PreprocessGaitBout(BaseProcess):
         med_prom = median(mx_meta["prominences"])
         mask = mx_meta["prominences"] > (0.75 * med_prom)
 
-        left_med = median(mx[mask] - mx_meta["left_bases"][mask])
-        right_med = median(mx_meta["right_bases"][mask] - mx[mask])
+        # can't use bases here from maxima since it is effected by prominence and
+        # will get bases pase other peaks
+        mn, _ = find_peaks(-ap_acc_f, prominence=0.75 * med_prom)
+        idx = searchsorted(mn, mx[mask])
+        left_med = median(mx[mask] - mn[idx - 1])
+        right_med = median(mn[idx] - mx[mask])
 
         sign = -1 if (left_med < right_med) else 1
 
