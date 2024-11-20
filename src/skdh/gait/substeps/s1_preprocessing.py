@@ -144,6 +144,9 @@ class PreprocessGaitBout(BaseProcess):
         # will get bases pase other peaks
         mn, _ = find_peaks(-ap_acc_f, prominence=0.75 * med_prom)
         idx = searchsorted(mn, mx[mask])
+        # make sure that we dont go out of bounds
+        mask = mask[idx < mn.size]
+        idx = idx[idx < mn.size]
         left_med = median(mx[mask] - mn[idx - 1])
         right_med = median(mn[idx] - mx[mask])
 
