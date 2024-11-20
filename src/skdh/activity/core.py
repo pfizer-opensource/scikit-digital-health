@@ -24,7 +24,7 @@ from numpy import (
     arange,
     arcsin,
     pi,
-    isnan
+    isnan,
 )
 from numpy.linalg import norm
 from pandas import Timedelta, Timestamp
@@ -305,16 +305,20 @@ class ActivityLevelClassification(BaseProcess):
         # subtracting a day handles cases where the recording starts well into a day, in which case
         # the date should be the previous day, when the window WOULD have started had their been
         # more data
-        window_start_dt = start_dt - Timedelta(1, unit='day') if (start_dt.hour < day_start_hour) else start_dt
+        window_start_dt = (
+            start_dt - Timedelta(1, unit="day")
+            if (start_dt.hour < day_start_hour)
+            else start_dt
+        )
 
         results["Date"][day_n] = window_start_dt.strftime("%Y-%m-%d")
-        results["Day Start Timestamp"][day_n] = start_dt.strftime(
-            "%Y-%m-%d %H:%M:%S"
-        )
+        results["Day Start Timestamp"][day_n] = start_dt.strftime("%Y-%m-%d %H:%M:%S")
         # round end time as well
-        results["Day End Timestamp"][day_n] = self.convert_timestamps(
-            time[day_stop_idx]
-        ).round("min").strftime("%Y-%m-%d %H:%M:%S")
+        results["Day End Timestamp"][day_n] = (
+            self.convert_timestamps(time[day_stop_idx])
+            .round("min")
+            .strftime("%Y-%m-%d %H:%M:%S")
+        )
         results["Weekday"][day_n] = window_start_dt.strftime("%A")
         results["Day N"][day_n] = day_n + 1
         results["N hours"][day_n] = around(
@@ -753,22 +757,30 @@ class StaudenmayerClassification(BaseProcess):
         Default is True.
     min_wear_time : int, optional
         Minimum wear time in hours for a day to be analyzed. Default is 10 hours.
-    
+
     References
     ----------
-    .. [1] J. Staudenmayer, S. He, A. Hickey, J. Sasaki, and P. Freedson, 
-        “Methods to estimate aspects of physical activity and sedentary behavior 
-        from high-frequency wrist accelerometer measurements,” J Appl Physiol, 
+    .. [1] J. Staudenmayer, S. He, A. Hickey, J. Sasaki, and P. Freedson,
+        “Methods to estimate aspects of physical activity and sedentary behavior
+        from high-frequency wrist accelerometer measurements,” J Appl Physiol,
         vol. 119, no. 4, pp. 396–403, Aug. 2015, doi: 10.1152/japplphysiol.00026.2015.
 
     """
-    def __init__(self, arm_axis, demean=False, use_power=True, min_wear_time=10, day_window=(0, 24),):
+
+    def __init__(
+        self,
+        arm_axis,
+        demean=False,
+        use_power=True,
+        min_wear_time=10,
+        day_window=(0, 24),
+    ):
         super().__init__(
             arm_axis=arm_axis,
             demean=demean,
             use_power=use_power,
             min_wear_time=min_wear_time,
-            day_window=day_window
+            day_window=day_window,
         )
 
         self.axis = arm_axis
@@ -778,19 +790,13 @@ class StaudenmayerClassification(BaseProcess):
 
         self._return_raw = False
 
-        self.endpoints = [
-            'sedentary',
-            'nonsedentary',
-            'light',
-            'moderate',
-            'vigorous'
-        ]
+        self.endpoints = ["sedentary", "nonsedentary", "light", "moderate", "vigorous"]
 
         if day_window is None:
             self.day_key = (-1, -1)
         else:
             self.day_key = tuple(day_window)
-    
+
     def _update_date_results(
         self, results, time, day_n, day_start_idx, day_stop_idx, day_start_hour
     ):
@@ -801,16 +807,20 @@ class StaudenmayerClassification(BaseProcess):
         # subtracting a day handles cases where the recording starts well into a day, in which case
         # the date should be the previous day, when the window WOULD have started had their been
         # more data
-        window_start_dt = start_dt - Timedelta(1, unit='day') if (start_dt.hour < day_start_hour) else start_dt
+        window_start_dt = (
+            start_dt - Timedelta(1, unit="day")
+            if (start_dt.hour < day_start_hour)
+            else start_dt
+        )
 
         results["Date"][day_n] = window_start_dt.strftime("%Y-%m-%d")
-        results["Day Start Timestamp"][day_n] = start_dt.strftime(
-            "%Y-%m-%d %H:%M:%S"
-        )
+        results["Day Start Timestamp"][day_n] = start_dt.strftime("%Y-%m-%d %H:%M:%S")
         # round end time as well
-        results["Day End Timestamp"][day_n] = self.convert_timestamps(
-            time[day_stop_idx]
-        ).round("min").strftime("%Y-%m-%d %H:%M:%S")
+        results["Day End Timestamp"][day_n] = (
+            self.convert_timestamps(time[day_stop_idx])
+            .round("min")
+            .strftime("%Y-%m-%d %H:%M:%S")
+        )
         results["Weekday"][day_n] = window_start_dt.strftime("%A")
         results["Day N"][day_n] = day_n + 1
         results["N hours"][day_n] = around(
@@ -821,7 +831,7 @@ class StaudenmayerClassification(BaseProcess):
         )
 
         return start_dt
-    
+
     @handle_process_returns(results_to_kwargs=False)
     def predict(self, *, time, accel, fs=None, wear=None, tz_name=None, **kwargs):
         """
@@ -898,14 +908,8 @@ class StaudenmayerClassification(BaseProcess):
         filt_name = "wear" if sleep is None else "wear-wake"
         for endpt in self.endpoints:
             res[f"{filt_name}_{endpt}"] = full(self.day_idx[0].size, nan, dtype="float")
-        
-        raw = {
-            'starts': [],
-            'stops': [],
-            'sd_avm': [],
-            'mean_angle': [],
-            'p625': []
-        }
+
+        raw = {"starts": [], "stops": [], "sd_avm": [], "mean_angle": [], "p625": []}
         # =============================================================================
         # PROCESSING
         # =============================================================================
@@ -922,12 +926,12 @@ class StaudenmayerClassification(BaseProcess):
             )
 
             # save wear time
-            res['N wear hours'][iday] = around(
+            res["N wear hours"][iday] = around(
                 sum(dwear_stops - dwear_starts) / fs / 3600, 1
             )
-            res['Wear Minutes'][iday] = sum(time[dwear_stops] - time[dwear_starts]) / 60
+            res["Wear Minutes"][iday] = sum(time[dwear_stops] - time[dwear_starts]) / 60
 
-            if res['N wear hours'][iday] < self.min_wear_time:
+            if res["N wear hours"][iday] < self.min_wear_time:
                 continue  # skip day if less than minimum wear time
 
             # if there is sleep data, add it to the intersection of indices
@@ -937,15 +941,24 @@ class StaudenmayerClassification(BaseProcess):
                     (self.wear_idx[1], sleep_stops),
                     (True, False),  # include wear time, exclude sleeping time
                     day_start,
-                    day_stop
+                    day_stop,
                 )
-            
+
             self._compute_wear_wake_activity(
-                res, accel, fs, iday, dwear_starts, dwear_stops, nwlen, epm, filt_name, raw
+                res,
+                accel,
+                fs,
+                iday,
+                dwear_starts,
+                dwear_stops,
+                nwlen,
+                epm,
+                filt_name,
+                raw,
             )
-        
+
         if self._return_raw:
-            res.update({'raw': raw})
+            res.update({"raw": raw})
 
         return res
 
@@ -959,7 +972,7 @@ class StaudenmayerClassification(BaseProcess):
         # minimum hours should have nan values
         for endpt in self.endpoints:
             results[f"{filt_prefix}_{endpt}"][day_n] = 0.0
-        
+
         # get starts and stops for wich we can actually compute values
         mask = (stops - starts) > n_wlen
         starts = starts[mask]
@@ -979,7 +992,7 @@ class StaudenmayerClassification(BaseProcess):
                 use_modulus=not self.use_power,
                 normalize=True,
             )
-            
+
             # windowed acceleration magnitude
             acc_vm_w = get_windowed_view(avm, n_wlen, n_wlen, ensure_c_contiguity=True)
 
@@ -989,11 +1002,11 @@ class StaudenmayerClassification(BaseProcess):
             p625 = ft.compute(acc_vm_w, fs=fs, axis=-1)
 
             # append raw
-            raw['starts'].append(start)
-            raw['stops'].append(stop)
-            raw['sd_avm'].append(sd_avm)
-            raw['mean_angle'].append(mean_angle)
-            raw['p625'].append(p625)
+            raw["starts"].append(start)
+            raw["stops"].append(stop)
+            raw["sd_avm"].append(sd_avm)
+            raw["mean_angle"].append(mean_angle)
+            raw["p625"].append(p625)
 
             # number of available labels
             n_labels = sd_avm.size - isnan(sd_avm).sum()
@@ -1024,12 +1037,10 @@ class StaudenmayerClassification(BaseProcess):
 
             if (mask_s.sum() + mask_ns.sum()) != n_labels:
                 raise ValueError("Sed/Nonsed masks do not equal input size")
-            
+
             # add the time to the results
-            results[f'{filt_prefix}_light'][day_n] += mask_l.sum() / epm
-            results[f'{filt_prefix}_moderate'][day_n] += mask_m.sum() / epm
-            results[f'{filt_prefix}_vigorous'][day_n] += mask_v.sum() / epm
-            results[f'{filt_prefix}_sedentary'][day_n] += mask_s.sum() / epm
-            results[f'{filt_prefix}_nonsedentary'][day_n] += mask_ns.sum() / epm
-
-
+            results[f"{filt_prefix}_light"][day_n] += mask_l.sum() / epm
+            results[f"{filt_prefix}_moderate"][day_n] += mask_m.sum() / epm
+            results[f"{filt_prefix}_vigorous"][day_n] += mask_v.sum() / epm
+            results[f"{filt_prefix}_sedentary"][day_n] += mask_s.sum() / epm
+            results[f"{filt_prefix}_nonsedentary"][day_n] += mask_ns.sum() / epm

@@ -70,7 +70,6 @@ def check_input_file(
                         UserWarning,
                     )
                     return {}
-                
 
             return func(self, **kwargs)
 
@@ -131,7 +130,7 @@ class BaseIO(BaseProcess):
         ts = to_datetime(time_str)
         if tz_name is not None:
             ts = ts.tz_localize(tz_name)
-        
+
         return ts.timestamp()
 
     def trim_data(self, start_key, end_key, tz_name, predict_kw, *, time, **data):
@@ -155,13 +154,23 @@ class BaseIO(BaseProcess):
         trim_end = predict_kw.get(end_key)
 
         if trim_start is not None and trim_start is None:
-            raise ValueError(f"`{start_key=}` was provided but not found in `predict` arguments")
+            raise ValueError(
+                f"`{start_key=}` was provided but not found in `predict` arguments"
+            )
         if trim_end is not None and trim_end is None:
-            raise ValueError(f"`{end_key=}` was provided but not found in `predict` arguments")
+            raise ValueError(
+                f"`{end_key=}` was provided but not found in `predict` arguments"
+            )
 
-        ts_trim_start = time[0] - 1 if trim_start is None else self._to_timestamp(trim_start, tz_name)
-        ts_trim_end = time[-1] + 1 if trim_end is None else self._to_timestamp(trim_end, tz_name)
-        
+        ts_trim_start = (
+            time[0] - 1
+            if trim_start is None
+            else self._to_timestamp(trim_start, tz_name)
+        )
+        ts_trim_end = (
+            time[-1] + 1 if trim_end is None else self._to_timestamp(trim_end, tz_name)
+        )
+
         idx = nonzero((time >= ts_trim_start) & (time <= ts_trim_end))[0]
 
         i1 = idx[0]

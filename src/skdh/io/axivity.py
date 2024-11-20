@@ -27,7 +27,7 @@ class ReadCwa(BaseIO):
         Trim keys provided in the `predict` method. Default (None) will not do any trimming.
         Trimming of either start or end can be accomplished by providing None in the place
         of the key you do not want to trim. If provided, the tuple should be of the form
-        (start_key, end_key). When provided, trim datetimes will be assumed to be in the 
+        (start_key, end_key). When provided, trim datetimes will be assumed to be in the
         same timezone as the data (ie naive if naive, or in the timezone provided).
     ext_error : {"warn", "raise", "skip"}, optional
         What to do if the file extension does not match the expected extension (.cwa).
@@ -138,16 +138,15 @@ class ReadCwa(BaseIO):
             results[self._gyro] = ascontiguousarray(imudata[:end, gyr_axes])
         if mag_axes is not None:  # pragma: no cover :: don't have data to test this
             results[self._mag] = ascontiguousarray(imudata[:end, mag_axes])
-        
+
         if self.trim_keys is not None:
             results = self.trim_data(
                 *self.trim_keys,
                 tz_name,
                 kwargs,
-                **results  # contains the time array/argument
+                **results,  # contains the time array/argument
             )
-        
-        results['fs'] = fs
 
+        results["fs"] = fs
 
         return results

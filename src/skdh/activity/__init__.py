@@ -254,7 +254,13 @@ from skdh.activity.endpoints import *
 from skdh.activity import endpoints
 
 __all__ = (
-    ["ActivityLevelClassification", "StaudenmayerClassification", "metrics", "get_available_cutpoints", "endpoints"]
+    [
+        "ActivityLevelClassification",
+        "StaudenmayerClassification",
+        "metrics",
+        "get_available_cutpoints",
+        "endpoints",
+    ]
     + metrics.__all__
     + endpoints.__all__
 )
