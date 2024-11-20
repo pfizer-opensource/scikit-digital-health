@@ -22,7 +22,7 @@ class ReadBin(BaseIO):
         Trim keys provided in the `predict` method. Default (None) will not do any trimming.
         Trimming of either start or end can be accomplished by providing None in the place
         of the key you do not want to trim. If provided, the tuple should be of the form
-        (start_key, end_key). When provided, trim datetimes will be assumed to be in the 
+        (start_key, end_key). When provided, trim datetimes will be assumed to be in the
         same timezone as the data (ie naive if naive, or in the timezone provided).
     ext_error : {"warn", "raise", "skip"}, optional
         What to do if the file extension does not match the expected extension (.bin).
@@ -109,9 +109,9 @@ class ReadBin(BaseIO):
                     self._acc: acc[:n_max, :],
                     self._temp: temp[:n_max],
                     "light": light[:n_max],
-                }
+                },
             )
-            results['fs'] = fs
+            results["fs"] = fs
         else:
             results = {
                 self._time: handle_naive_timestamps(

@@ -7,7 +7,7 @@ Copyright (c) 2023, Pfizer Inc. All rights reserved
 
 from numpy import (
     mean,
-    median,
+    nanmedian,
     argmax,
     sign,
     abs,
@@ -18,7 +18,9 @@ from numpy import (
     exp,
     sum,
     max as npmax,
-    searchsorted
+    searchsorted,
+    append,
+    nan,
 )
 from scipy.signal import detrend, butter, sosfiltfilt, find_peaks, correlate
 import pywt
@@ -137,18 +139,17 @@ class PreprocessGaitBout(BaseProcess):
         ap_acc_f = sosfiltfilt(sos, accel[:, ap_axis])
 
         mx, mx_meta = find_peaks(ap_acc_f, prominence=0.05)
-        med_prom = median(mx_meta["prominences"])
+        med_prom = nanmedian(mx_meta["prominences"])
         mask = mx_meta["prominences"] > (0.75 * med_prom)
 
         # can't use bases here from maxima since it is effected by prominence and
         # will get bases pase other peaks
         mn, _ = find_peaks(-ap_acc_f, prominence=0.75 * med_prom)
         idx = searchsorted(mn, mx[mask])
-        # make sure that we dont go out of bounds
-        mask = mask[idx < mn.size]
-        idx = idx[idx < mn.size]
-        left_med = median(mx[mask] - mn[idx - 1])
-        right_med = median(mn[idx] - mx[mask])
+        # make sure that we dont go out of bounds by adding a nan to the end
+        mn = append(mn, nan)
+        left_med = nanmedian(mx[mask] - mn[idx - 1])
+        right_med = nanmedian(mn[idx] - mx[mask])
 
         sign = -1 if (left_med < right_med) else 1
 
@@ -197,7 +198,7 @@ class PreprocessGaitBout(BaseProcess):
             raise ValueError(
                 "Not enough valid autocovariance windows to estimate step frequency."
             )
-        step_samples = median(first_peaks)
+        step_samples = nanmedian(first_peaks)
 
         return step_samples / fs
 

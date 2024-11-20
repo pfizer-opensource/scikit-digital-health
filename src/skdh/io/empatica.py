@@ -30,7 +30,7 @@ class ReadEmpaticaAvro(BaseIO):
         Trim keys provided in the `predict` method. Default (None) will not do any trimming.
         Trimming of either start or end can be accomplished by providing None in the place
         of the key you do not want to trim. If provided, the tuple should be of the form
-        (start_key, end_key). When provided, trim datetimes will be assumed to be in the 
+        (start_key, end_key). When provided, trim datetimes will be assumed to be in the
         same timezone as the data (ie naive if naive, or in the timezone provided).
     resample_to_accel : bool, optional
         Resample any additional data streams to match the accelerometer data stream.

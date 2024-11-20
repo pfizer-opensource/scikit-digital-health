@@ -234,7 +234,15 @@ class RangePowerSum(Feature):
 
     __slots__ = ("pad", "low_cut", "high_cut", "demean", "use_modulus", "normalize")
 
-    def __init__(self, padlevel=2, low_cutoff=0.0, high_cutoff=5.0, demean=False, use_modulus=False, normalize=False):
+    def __init__(
+        self,
+        padlevel=2,
+        low_cutoff=0.0,
+        high_cutoff=5.0,
+        demean=False,
+        use_modulus=False,
+        normalize=False,
+    ):
         super(RangePowerSum, self).__init__(
             padlevel=padlevel,
             low_cutoff=low_cutoff,
@@ -272,7 +280,14 @@ class RangePowerSum(Feature):
         """
         x = super().compute(signal, fs, axis=axis)
         return extensions.range_power_sum(
-            x, fs, self.pad, self.low_cut, self.high_cut, self.demean, self.use_modulus, self.normalize
+            x,
+            fs,
+            self.pad,
+            self.low_cut,
+            self.high_cut,
+            self.demean,
+            self.use_modulus,
+            self.normalize,
         )
 
 

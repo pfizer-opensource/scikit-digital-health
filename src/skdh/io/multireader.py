@@ -203,7 +203,7 @@ class MultiReader(BaseProcess):
             res = [
                 v for _, v in res.items()
             ]  # standardize since we dont care about labels
-        
+
         # drop any empty dictionaries - might occur due to some empty files
         res = [i for i in res if i]  # "if i" === "if i != {}"
         # check now that we have any data
@@ -324,7 +324,7 @@ class MultiReader(BaseProcess):
             res = [
                 v for _, v in res.items()
             ]  # standardize since we dont care about labels
-        
+
         # drop any empty dictionaries - might occur due to some empty files
         res = [i for i in res if i]  # "if i" === "if i != {}"
         # check now that we have any data
