@@ -8,6 +8,7 @@ Copyright (c) 2023, Pfizer Inc. All rights reserved
 from numpy import (
     mean,
     nanmedian,
+    nanmean,
     argmax,
     sign,
     abs,
@@ -148,9 +149,18 @@ class PreprocessGaitBout(BaseProcess):
         idx = searchsorted(mn, mx[mask])
         # make sure that we dont go out of bounds by adding a nan to the end
         mn = append(mn, nan)
-        left_med = nanmedian(mx[mask] - mn[idx - 1])
-        right_med = nanmedian(mn[idx] - mx[mask])
+        left_bases = mx[mask] - mn[idx - 1]
+        right_bases = mn[idx] - mx[mask]
+        
+        left_med = nanmedian(left_bases)
+        right_med = nanmedian(right_bases)
 
+        # adjust if both the same
+        if left_med == right_med:
+            pk_dist = nanmedian(diff(mx[mask]))
+            left_med = nanmean(left_bases[left_bases < (1.25 * pk_dist)])
+            right_med = nanmean(right_bases[right_bases < (1.25 * pk_dist)])
+        
         sign = -1 if (left_med < right_med) else 1
 
         return sign
