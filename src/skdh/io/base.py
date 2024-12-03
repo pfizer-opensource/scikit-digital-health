@@ -171,10 +171,10 @@ class BaseIO(BaseProcess):
             time[-1] + 1 if trim_end is None else self._to_timestamp(trim_end, tz_name)
         )
 
-        idx = nonzero((time >= ts_trim_start) & (time <= ts_trim_end))[0]
-
-        i1 = idx[0]
-        i2 = idx[-1]
+        # write it so that if there is any time weirdness, get the data from the "middle",
+        # ie the last index before the start time, and the first index after the end time.
+        i1 = nonzero(time <= ts_trim_start)[0][-1]
+        i2 = nonzero(time >= ts_trim_end)[0][0]
 
         res = {self._time: time[i1:i2]}
         res.update({k: v[i1:i2] for k, v in data.items()})
