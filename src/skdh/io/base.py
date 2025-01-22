@@ -173,8 +173,8 @@ class BaseIO(BaseProcess):
 
         # write it so that if there is any time weirdness, get the data from the "middle",
         # ie the last index before the start time, and the first index after the end time.
-        i1 = nonzero(time <= ts_trim_start)[0][-1]
-        i2 = nonzero(time >= ts_trim_end)[0][0]
+        i1 = nonzero(time <= max(time[0], ts_trim_start))[0][-1]
+        i2 = nonzero(time >= min(time[-1], ts_trim_end))[0][0]
 
         res = {self._time: time[i1:i2]}
         res.update({k: v[i1:i2] for k, v in data.items()})
