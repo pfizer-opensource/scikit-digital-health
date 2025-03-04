@@ -208,10 +208,10 @@ class TestApplyResample:
         )
 
         assert trs.size == x_rs.size
-        assert allclose(trs, arange(0, 4.5, 0.25))
-        assert x_rs.size == 18
+        assert allclose(trs, arange(0, 4.6, 0.25))
+        assert x_rs.size == 19
         assert ix_rs.size == 3
-        assert allclose(x_rs, arange(0, t.size - 1, 0.5))
+        assert allclose(x_rs, arange(0, t.size - 0.6, 0.5))
         assert allclose(ix_rs, [4, 8, 12])
 
 

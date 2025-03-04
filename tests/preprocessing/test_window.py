@@ -85,6 +85,33 @@ class TestGetDayWindowIndices:
             days["day_ends"][(0, 24)],
             [[0, 21600], [21600, 111600], [111600, time.size - 1]],
         )
+    
+    def test_bad_guess(self):
+        dr = pd.date_range(
+            start="2025-02-18 18:00:00",
+            end="2025-02-24 00:30:00",
+            freq="s",
+            tz="US/Eastern",
+        )
+        time = dr.astype(int).values / 1e9
+
+        # intentionally making fs wrong here to force a bad guess at the end
+        days = GetDayWindowIndices(bases=[0], periods=[24]).predict(
+            time=time, fs=1.1, tz_name="US/Eastern"
+        )
+
+        assert allclose(
+            days['day_ends'][(0, 24)],
+            [
+                [0, 21600],  # 18-19
+                [21600, 108000],  # 19-20
+                [108000, 194400],  # 20-21
+                [194400, 280800],  # 21-22
+                [280800, 367200],  # 22-23
+                [367200, 453600],  # 23-24
+                [453600, time.size - 1],  # 24-end
+            ]
+        )
 
     def test_window_inputs(self):
         w = GetDayWindowIndices(bases=None, periods=None)
