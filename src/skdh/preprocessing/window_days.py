@@ -42,7 +42,11 @@ def finalize_guess(time, fs, guess, target):
     if i2 <= 0:
         return 0
     if i2 >= (time.size - 1):
-        return time.size - 1
+        if time[-1] > ts_target:
+            i2 = i3 - 1
+            i1 = i3 - 2
+        else:
+            return time.size - 1
 
     check1 = abs(time[i2] - ts_target) <= abs(time[i1] - ts_target)
     check3 = abs(time[i2] - ts_target) <= abs(time[i3] - ts_target)
