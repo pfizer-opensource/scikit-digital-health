@@ -244,7 +244,10 @@ def apply_resample(
 
     # AA filter, if necessary
     if (fs / goal_fs) >= 1.0:
-        sos = cheby1(8, 0.05, 0.8 / (fs / goal_fs), output="sos")
+        # adjust the cutoff frequency based on if we are decimating or interpolating
+        # decimation cutoff comes from scipy.decimate
+        wn = 0.8 / (fs / goal_fs) if int(fs / goal_fs) == fs / goal_fs else goal_fs / fs
+        sos = cheby1(8, 0.05, wn, output="sos")
     else:
         aa_filter = False
 
