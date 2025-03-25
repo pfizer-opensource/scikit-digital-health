@@ -105,7 +105,7 @@ class PredictGaitLumbarLgbm(BaseProcess):
         # compute fs if necessary
         fs = 1 / mean(diff(time)) if fs is None else fs
         if fs < 20.0:
-            raise LowFrequencyError(f"Frequency ({fs:.2}Hz) is too low (<20Hz).")
+            raise LowFrequencyError(f"Frequency ({fs:.2f}Hz) is too low (<20Hz).")
         if fs < 50.0:
             warn(
                 f"Frequency ({fs:.2f}Hz) is less than 50Hz. Downsampling to 20Hz.",
