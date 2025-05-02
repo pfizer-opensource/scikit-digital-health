@@ -31,7 +31,7 @@ class TestHandleTimestampInconsistency:
         }
 
         comp_fs, time_rs, data_rs = rdr.handle_timestamp_inconsistency_np(
-            **kw, time=time, data=data
+            **kw, time=time, fs=None, data=data
         )
 
         assert isclose(comp_fs, fs)
@@ -49,7 +49,7 @@ class TestHandleTimestampInconsistency:
         }
         with pytest.warns(UserWarning, match="Non integer number of blocks"):
             comp_fs2, time2_rs, data2_rs = rdr.handle_timestamp_inconsistency_np(
-                **kw, time=time2, data=data2
+                **kw, time=time2, fs=None, data=data2
             )
 
         assert isclose(comp_fs2, fs)
@@ -81,7 +81,7 @@ class TestHandleTimestampInconsistency:
         }
 
         with pytest.raises(ValueError, match="not all equal size"):
-            rdr.handle_timestamp_inconsistency_np(**kw, time=time, data=data)
+            rdr.handle_timestamp_inconsistency_np(**kw, time=time, fs=None, data=data)
 
     def test_reader(self, dummy_csv_contents):
         raw, fs, n_full = dummy_csv_contents(drop=True)
