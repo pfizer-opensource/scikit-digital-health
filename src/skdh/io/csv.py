@@ -188,7 +188,7 @@ class ReadCSV(BaseIO):
         else:
             pass
 
-    def handle_timestamp_inconsistency_np(self, fill_dict, time, data):
+    def handle_timestamp_inconsistency_np(self, fill_dict, time, fs, data):
         """
         Handle any time gaps, or timestamps that are only down to the second.
 
@@ -200,6 +200,8 @@ class ReadCSV(BaseIO):
             the value.
         time : numpy.ndarray
             Array of timestamps in unix seconds.
+        fs : {None, float}
+            Sampling frequency. If None, will be calculated from the data.
         data : dict
             Dictionary of data streams
 
@@ -217,7 +219,9 @@ class ReadCSV(BaseIO):
             for name, dstream in data.items():
                 data[name] = dstream[unq_ind]
         # get a sampling rate. If non-unique timestamps, this will be updated
-        n_samples = round(median(1 / diff(time[:2500])), decimals=6)
+        n_samples = (
+            round(median(1 / diff(time[:2500])), decimals=6) if fs is None else fs
+        )
 
         # first check if we have non-unique timestamps
         nonuniq_ts = time[1] == time[0]
@@ -251,6 +255,11 @@ class ReadCSV(BaseIO):
 
             # get the number of samples, and the number of blocks
             n_samples = counts[0]
+            if n_samples != fs:
+                raise ValueError(
+                    "Calculated sampling rate from non-unique timestamp blocks does "
+                    "not match provided fs."
+                )
             n_blocks = time.size / n_samples
 
             # compute time delta to add
@@ -268,7 +277,8 @@ class ReadCSV(BaseIO):
             time_deltas = diff(time)
             if npany(abs(time_deltas) > (1.5 / n_samples)):
                 self.handle_gaps_error(
-                    "There are data gaps, which could potentially results in incorrect outputs from downstream algorithms"
+                    "There are data gaps, which could potentially results in incorrect "
+                    "outputs from downstream algorithms"
                 )
 
             time_rs = time
@@ -347,7 +357,8 @@ class ReadCSV(BaseIO):
                 data[dstream] = raw[self.column_names[dstream]].values
             except KeyError:
                 warn(
-                    f"Data stream {dstream} specified in column names but all columns {self.column_names[dstream]} not found in the read data. Skipping."
+                    f"Data stream {dstream} specified in column names but all "
+                    f"columns {self.column_names[dstream]} not found in the read data. Skipping."
                 )
                 continue
 
@@ -358,7 +369,7 @@ class ReadCSV(BaseIO):
 
         # now handle data gaps and second level timestamps, etc
         fs, time, results = self.handle_timestamp_inconsistency_np(
-            fill_values, time, data
+            fill_values, time, kwargs.get("fs", None), data
         )
 
         # setup the results dictionary

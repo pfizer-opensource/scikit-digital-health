@@ -944,10 +944,12 @@ class StaudenmayerClassification(BaseProcess):
                     day_stop,
                 )
 
-                res['N wear wake hours'][iday] = around(
+                res["N wear wake hours"][iday] = around(
                     sum(dwear_stops - dwear_starts) / fs / 3600, 1
                 )
-                res['Wear Wake Minutes'][iday] = sum(time[dwear_stops] - time[dwear_starts]) / 60
+                res["Wear Wake Minutes"][iday] = (
+                    sum(time[dwear_stops] - time[dwear_starts]) / 60
+                )
 
             self._compute_wear_wake_activity(
                 res,

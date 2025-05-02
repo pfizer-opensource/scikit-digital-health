@@ -236,7 +236,9 @@ def apply_resample(
             time_rs = time[:: int(fs / goal_fs)]
         else:
             # round-about way, but need to prevent start>>>>>>>>>step
-            time_rs = arange(0, (time[-1] - time[0]) + 0.5 / goal_fs, 1 / goal_fs) + time[0]
+            time_rs = (
+                arange(0, (time[-1] - time[0]) + 0.5 / goal_fs, 1 / goal_fs) + time[0]
+            )
     else:
         goal_fs = 1 / mean(diff(time_rs[:5000]))
         # prevent t_rs from extrapolating

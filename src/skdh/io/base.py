@@ -168,7 +168,9 @@ class BaseIO(BaseProcess):
             else self._to_timestamp(trim_start, tz_name)
         )
         ts_trim_end = (
-            time[-1] - 0.001 if trim_end is None else self._to_timestamp(trim_end, tz_name)
+            time[-1] - 0.001
+            if trim_end is None
+            else self._to_timestamp(trim_end, tz_name)
         )
 
         # write it so that if there is any time weirdness, get the data from the "middle",
