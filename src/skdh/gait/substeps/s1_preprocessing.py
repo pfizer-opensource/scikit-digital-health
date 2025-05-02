@@ -151,7 +151,7 @@ class PreprocessGaitBout(BaseProcess):
         mn = append(mn, nan)
         left_bases = mx[mask] - mn[idx - 1]
         right_bases = mn[idx] - mx[mask]
-        
+
         left_med = nanmedian(left_bases)
         right_med = nanmedian(right_bases)
 
@@ -160,7 +160,7 @@ class PreprocessGaitBout(BaseProcess):
             pk_dist = nanmedian(diff(mx[mask]))
             left_med = nanmean(left_bases[left_bases < (1.25 * pk_dist)])
             right_med = nanmean(right_bases[right_bases < (1.25 * pk_dist)])
-        
+
         sign = -1 if (left_med < right_med) else 1
 
         return sign
