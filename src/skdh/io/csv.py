@@ -255,7 +255,7 @@ class ReadCSV(BaseIO):
 
             # get the number of samples, and the number of blocks
             n_samples = counts[0]
-            if n_samples != fs:
+            if fs is not None and n_samples != fs:
                 raise ValueError(
                     "Calculated sampling rate from non-unique timestamp blocks does "
                     "not match provided fs."
