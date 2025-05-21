@@ -72,8 +72,8 @@ subroutine mov_moments_2(n, x, wlen, skip, mean, sd) bind(C, name="mov_moments_2
         j = j + 1
     end do
 
-    where ((sd > -epsilon(sd(1))) .and. (sd < 0.0))
-        sd = -1.0 * sd
+    where ((sd > -1e-5) .and. (sd < 0.0))
+        sd = 0.0
     end where
 
     ! NOTE: currently, sd = M2, skew = M3, kurt = M4, so this order of computation matters
