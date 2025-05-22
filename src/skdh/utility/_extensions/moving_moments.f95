@@ -72,7 +72,7 @@ subroutine mov_moments_2(n, x, wlen, skip, mean, sd) bind(C, name="mov_moments_2
         j = j + 1
     end do
 
-    where ((sd > -1e-5) .and. (sd < 0.0))
+    where (sd < 0)
         sd = 0.0
     end where
 
