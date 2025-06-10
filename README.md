@@ -40,6 +40,13 @@ pip install scikit-digital-health
 As of 0.9.15, Scikit Digital Health is built using Meson.
 
 
+### Examples
+
+An example notebook can be found in the examples folder: [SKDH tutorial](examples/skdh_tutorial.ipynb)
+along with some sample data. The tutorial walks through running individual modules in SKDH,
+then building up a pipeline, and finally creating a new module.
+
+
 ### Citation
 
 If you use SKDH in your research, please include the following citation:

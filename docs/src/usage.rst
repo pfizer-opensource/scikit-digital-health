@@ -73,3 +73,11 @@ Run a process starting with data ingestion
 
     # run the pipeline
     res = pipeline.run(file='your_data.csv', height=1.8)
+
+
+Follow a IPython notebook example
+---------------------------------
+
+A notebook stepping through the process of setting up SKDH processes and then building up a pipeline
+can be found in the `examples` directory of the respository, along with a short sample data
+file. The notebook is called `skdh_example.ipynb`.
