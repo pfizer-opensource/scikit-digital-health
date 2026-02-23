@@ -39,8 +39,8 @@ class ComplexityInvariantDistance(Feature):
             Array-like containing values to compute the complexity invariant
             distance for.
         axis : int, optional
-            Axis along which the signal entropy will be computed. Ignored if
-            `signal` is a pandas.DataFrame. Default is last (-1).
+            Axis along which the complexity invariant distance will be computed.
+            Ignored if `signal` is a pandas.DataFrame. Default is last (-1).
 
         Returns
         -------
@@ -84,8 +84,8 @@ class RangeCountPercentage(Feature):
         signal : array-like
             Array-like containing values to compute the range count percentage for.
         axis : int, optional
-            Axis along which the signal entropy will be computed. Ignored if `signal` is a
-            pandas.DataFrame. Default is last (-1).
+            Axis along which the range count percentage will be computed.
+            Ignored if `signal` is a pandas.DataFrame. Default is last (-1).
 
         Returns
         -------
@@ -124,8 +124,8 @@ class RatioBeyondRSigma(Feature):
         signal : array-like
             Array-like containing values to compute the ratio beyond :math:`r\sigma` for.
         axis : int, optional
-            Axis along which the signal entropy will be computed. Ignored if `signal` is a
-            pandas.DataFrame. Default is last (-1).
+            Axis along which the ratio beyond :math:`r\sigma` will be computed.
+            Ignored if `signal` is a pandas.DataFrame. Default is last (-1).
 
         Returns
         -------
