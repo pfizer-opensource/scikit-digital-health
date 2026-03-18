@@ -9,6 +9,7 @@ from numpy import (
     all,
     asarray,
     argsort,
+    around,
     array,
     clip,
     nonzero,
@@ -30,7 +31,7 @@ from numpy import (
 from scipy.signal import cheby1, sosfiltfilt
 
 
-def get_day_index_intersection(starts, stops, for_inclusion, day_start, day_stop):
+def get_day_index_intersection(starts, stops, for_inclusion, day_start, day_stop, ends_round=None, fs=None):
     """
     Get the intersection between day start and stop indices and various start and stop indices
     that may or may not happen during the day, and are not necessarily for inclusion.
@@ -50,6 +51,11 @@ def get_day_index_intersection(starts, stops, for_inclusion, day_start, day_stop
         Day start index.
     day_stop : int
         Day stop index.
+    ends_round : {None, int}, optional
+        If provided, will round the start and stop indices to the nearest multiple of this value
+        away from the day start.
+    fs : float, optional
+        Sampling frequency of the data. Required if `ends_round` is provided.
 
     Returns
     -------
@@ -157,6 +163,18 @@ def get_day_index_intersection(starts, stops, for_inclusion, day_start, day_stop
 
     valid_starts = asarray(valid_starts)
     valid_stops = asarray(valid_stops)
+
+    # handle rounding to nearest multiple of ends_round away from day_start
+    if ends_round is not None:
+        if fs is None:
+            raise ValueError("Sampling frequency `fs` must be provided if `ends_round` is provided.")
+        factor = int(ends_round * fs)
+        valid_starts = around((valid_starts - day_start) / factor, 0) * factor + day_start
+        valid_stops = around((valid_stops - day_start) / factor, 0) * factor + day_start
+
+        # make sure they stay as integers
+        valid_starts = valid_starts.astype(int_)
+        valid_stops = valid_stops.astype(int_)
 
     return (
         valid_starts[valid_starts != valid_stops],

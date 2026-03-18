@@ -814,7 +814,7 @@ class AccelThresholdWearDetection(BaseProcess):
             **kwargs,
         )
         # dont start at zero due to timestamp weirdness with some devices
-        fs = 1 / mean(diff(time[1000:5000]))
+        fs = 1 / mean(diff(time[1000:5000])) if fs is None else fs
         n_wlen = int(self.wlen * 60 * fs)  # samples in wlen minutes
         n_wskip = int(self.wskip * 60 * fs)  # samples in wskip minutes
 
