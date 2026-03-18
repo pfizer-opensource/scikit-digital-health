@@ -172,6 +172,10 @@ def get_day_index_intersection(starts, stops, for_inclusion, day_start, day_stop
         valid_starts = around((valid_starts - day_start) / factor, 0) * factor + day_start
         valid_stops = around((valid_stops - day_start) / factor, 0) * factor + day_start
 
+        # make sure they stay as integers
+        valid_starts = valid_starts.astype(int_)
+        valid_stops = valid_stops.astype(int_)
+
     return (
         valid_starts[valid_starts != valid_stops],
         valid_stops[valid_starts != valid_stops],
