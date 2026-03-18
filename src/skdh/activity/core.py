@@ -476,7 +476,7 @@ class ActivityLevelClassification(BaseProcess):
 
             # get the intersection of wear time and day
             dwear_starts, dwear_stops = get_day_index_intersection(
-                *self.wear_idx, True, day_start, day_stop  # include wear time
+                *self.wear_idx, True, day_start, day_stop, ends_round=self.wear_wake_times_round, fs=fs  # include wear time
             )
 
             # PLOTTING. handle here before returning for minimal wear hours, etc
@@ -774,7 +774,7 @@ class ActivityLevelClassification(BaseProcess):
                 start_hr -= 24
         # get day-sleep intersection
         day_sleep_starts, day_sleep_stops = get_day_index_intersection(
-            sleep_starts, sleep_stops, True, day_start, day_stop
+            sleep_starts, sleep_stops, True, day_start, day_stop, ends_round=self.wear_wake_times_round, fs=fs
         )
 
         sleep = []
