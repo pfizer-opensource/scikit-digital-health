@@ -71,6 +71,11 @@ class ActivityLevelClassification(BaseProcess):
         If True then count breaks in a bout towards the bout duration. If False
         then only count time spent above the threshold towards the bout duration.
         Only used if `bout_metric=1`. Default is False.
+    wear_wake_times_round : {None, int}, optional
+        A value in seconds to round the wear/wake start/end times to, relative to the
+        start of the day. For example, if 15 is passed, and the wear/wake period
+        starts at xx:yy:10, (and the day starts at 00:00:00), the start time will
+        be rounded to xx:yy:15.
     min_wear_time : int, optional
         Minimum wear time in hours for a day to be analyzed. Default is 10 hours.
     cutpoints : {str, dict, list}, optional
@@ -136,6 +141,7 @@ class ActivityLevelClassification(BaseProcess):
         bout_criteria=0.8,
         bout_metric=4,
         closed_bout=False,
+        wear_wake_times_round=None,
         min_wear_time=10,
         cutpoints="migueles_wrist_adult",
         day_window=(0, 24),
@@ -165,6 +171,7 @@ class ActivityLevelClassification(BaseProcess):
             bout_criteria=bout_criteria,
             bout_metric=bout_metric,
             closed_bout=closed_bout,
+            wear_wake_times_round=wear_wake_times_round,
             min_wear_time=min_wear_time,
             cutpoints=cutpoints_,
             day_window=day_window,
@@ -177,6 +184,7 @@ class ActivityLevelClassification(BaseProcess):
         self.boutcrit = bout_criteria
         self.boutmetric = bout_metric
         self.closedbout = closed_bout
+        self.wear_wake_times_round = wear_wake_times_round
         self.min_wear = min_wear_time
         self.cutpoints = cutpoints_
 
@@ -502,6 +510,8 @@ class ActivityLevelClassification(BaseProcess):
                     (True, False),  # include wear time, exclude sleeping time
                     day_start,
                     day_stop,
+                    ends_round=self.wear_wake_times_round,
+                    fs=fs,
                 )
                 sleep_wear_starts, sleep_wear_stops = get_day_index_intersection(
                     (self.wear_idx[0], sleep_starts),
@@ -509,6 +519,8 @@ class ActivityLevelClassification(BaseProcess):
                     (True, True),  # now we want only sleep
                     day_start,
                     day_stop,
+                    ends_round=self.wear_wake_times_round,
+                    fs=fs,
                 )
 
                 res["N wear wake hours"][iday] = around(

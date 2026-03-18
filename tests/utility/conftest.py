@@ -91,6 +91,21 @@ def true_intersect_ends():
 
 
 @pytest.fixture(scope="module")
+def true_intersect_ends_15s():
+    starts = {
+        1: np.array([2795, 3005]),
+        2: np.array([2495, 3005]),
+        3: np.array([2300, 3005]),
+    }
+    stops = {
+        1: np.array([2900, 3905]),
+        2: np.array([2900, 3800]),
+        3: np.array([2900, 3905]),
+    }
+    return starts, stops
+
+
+@pytest.fixture(scope="module")
 def true_sleep_only_ends():
     starts = {1: np.array([2000, 2800]), 2: np.array([2500]), 3: np.array([2000])}
     stops = {1: np.array([2200, 4000]), 2: np.array([3800]), 3: np.array([4000])}
