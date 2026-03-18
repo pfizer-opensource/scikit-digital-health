@@ -13,7 +13,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ github.ref_name }}
       - uses: fortran-lang/setup-fortran@v1
@@ -21,13 +21,13 @@ jobs:
         id: setup-fortran
         with:
           compiler: gcc
-          version: 12
+          version: 15
       - uses: fortran-lang/setup-fortran@v1
         if: runner.os == 'macOS'
         id: setup-fortran-macos
         with:
           compiler: gcc
-          version: 12
+          version: 15
       - run: ${{ env.FC }} --version
         if: runner.os == 'Windows'
         env:
@@ -37,9 +37,9 @@ jobs:
         env:
           FC: ${{ steps.setup-fortran-macos.outputs.fc }}
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.17.0
+        uses: pypa/cibuildwheel@v3.4.0
         env:
-          CIBW_SKIP: pp* cp36-* cp37-* cp38-* *musllinux*
+          CIBW_SKIP: pp* cp36-* cp37-* cp38-* cp39-* cp310-* *musllinux*
           CIBW_ARCHS_MACOS: auto64
           CIBW_ARCHS_LINUX: auto64
           CIBW_ARCHS_WINDOWS: auto64
@@ -51,7 +51,7 @@ jobs:
       - name: Print for Debugging
         run: ls ./wheelhouse
       - name: Upload wheels
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: artifact-${{ matrix.os }}
           path: ./wheelhouse/*.whl
@@ -59,12 +59,12 @@ jobs:
     name: Build Source Distribution
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ github.ref_name }}
       - name: Build sdist
         run: pipx run build --sdist
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           path: dist/*.tar.gz
 
@@ -72,7 +72,7 @@ jobs:
     needs: [build_wheels, build_sdist]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           path: dist
           merge-multiple: true
