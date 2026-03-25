@@ -36,7 +36,6 @@ jobs:
         if: runner.os == 'macOS'
         env:
           FC: ${{ steps.setup-fortran-macos.outputs.fc }}
-          MACOSX_DEPLOYMENT_TARGET: 15.0
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.4.0
         env:
@@ -46,6 +45,7 @@ jobs:
           CIBW_ARCHS_WINDOWS: auto64
           CIBW_BEFORE_BUILD_WINDOWS: "pip install delvewheel"
           CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "delvewheel repair -w {dest_dir} {wheel}"
+          MACOSX_DEPLOYMENT_TARGET: 15.0
         with:
           output-dir: wheelhouse
           config-file: "{package}/pyproject.toml"
