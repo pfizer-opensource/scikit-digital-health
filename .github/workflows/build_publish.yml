@@ -36,10 +36,11 @@ jobs:
         if: runner.os == 'macOS'
         env:
           FC: ${{ steps.setup-fortran-macos.outputs.fc }}
+          MACOSX_DEPLOYMENT_TARGET: 15.0
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.4.0
         env:
-          CIBW_SKIP: pp* cp36-* cp37-* cp38-* cp39-* cp310-* *musllinux*
+          CIBW_SKIP: pp* cp38-* cp39-* cp310-* *musllinux*
           CIBW_ARCHS_MACOS: auto64
           CIBW_ARCHS_LINUX: auto64
           CIBW_ARCHS_WINDOWS: auto64
