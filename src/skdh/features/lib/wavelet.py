@@ -58,8 +58,8 @@ class DetailPower(Feature):
         fs : float, optional
             Sampling frequency in Hz. If not provided, default is 1.0Hz.
         axis : int, optional
-            Axis along which the signal entropy will be computed. Ignored if
-            `signal` is a pandas.DataFrame. Default is last (-1).
+            Axis along which the detail power will be computed.
+            Ignored if `signal` is a pandas.DataFrame. Default is last (-1).
 
         Returns
         -------
@@ -151,8 +151,8 @@ class DetailPowerRatio(Feature):
         fs : float, optional
             Sampling frequency in Hz. If not provided, default is 1.0Hz.
         axis : int, optional
-            Axis along which the signal entropy will be computed. Ignored if `signal` is a
-            pandas.DataFrame. Default is last (-1).
+            Axis along which the detail power ratio will be computed.
+            Ignored if `signal` is a pandas.DataFrame. Default is last (-1).
 
         Returns
         -------

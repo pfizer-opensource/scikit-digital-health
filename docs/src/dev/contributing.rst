@@ -13,7 +13,7 @@ This is the short summary, complete descriptions are below:
 
 1. If you are contributing for the first time:
 
-    * Go to https://github.com/PfizerRD/scikit-digital-health and use the "fork" button to create a version that will create a copy for yourself.
+    * Go to https://github.com/pfizer-opensource/scikit-digital-health and use the "fork" button to create a version that will create a copy for yourself.
     * Clone the project to your local computer::
 
         git clone https://github.com/your-username/scikit-digital-health.git
@@ -24,7 +24,7 @@ This is the short summary, complete descriptions are below:
     
     * Add the upstream repository::
 
-        git remote add upstream https://github.com/PfizerRD/scikit-digital-health.git
+        git remote add upstream https://github.com/pfizer-opensource/scikit-digital-health.git
     
     * After adding the upstream repository, `git remote -v` will show two remote repositories:
 

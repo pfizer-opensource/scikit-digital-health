@@ -66,8 +66,8 @@ class SignalEntropy(Feature):
         signal : array-like
             Array-like containing values to compute the signal entropy for.
         axis : int, optional
-            Axis along which the signal entropy will be computed. Ignored if `signal` is a
-            pandas.DataFrame. Default is last (-1).
+            Axis along which the signal entropy will be computed.
+            Ignored if `signal` is a pandas.DataFrame. Default is last (-1).
 
         Returns
         -------
@@ -132,8 +132,8 @@ class SampleEntropy(Feature):
         signal : array-like
             Array-like containing values to compute the sample entropy for.
         axis : int, optional
-            Axis along which the signal entropy will be computed. Ignored if `signal` is a
-            pandas.DataFrame. Default is last (-1).
+            Axis along which the sample entropy will be computed.
+            Ignored if `signal` is a pandas.DataFrame. Default is last (-1).
 
         Returns
         -------
@@ -178,10 +178,10 @@ class PermutationEntropy(Feature):
         Parameters
         ----------
         signal : array-like
-            Array-like containing values to compute the signal entropy for.
+            Array-like containing values to compute the permutation entropy for.
         axis : int, optional
-            Axis along which the signal entropy will be computed. Ignored if `signal` is a
-            pandas.DataFrame. Default is last (-1).
+            Axis along which the permutation entropy will be computed.
+            Ignored if `signal` is a pandas.DataFrame. Default is last (-1).
 
         Returns
         -------

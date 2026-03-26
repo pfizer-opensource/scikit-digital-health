@@ -34,8 +34,8 @@ class Range(Feature):
         signal : array-like
             Array-like containing values to compute the range for.
         axis : int, optional
-            Axis along which the signal entropy will be computed. Ignored if `signal` is a
-            pandas.DataFrame. Default is last (-1).
+            Axis along which the range will be computed.
+            Ignored if `signal` is a pandas.DataFrame. Default is last (-1).
 
         Returns
         -------
@@ -67,8 +67,8 @@ class IQR(Feature):
         signal : array-like
             Array-like containing values to compute the IQR for.
         axis : int, optional
-            Axis along which the signal entropy will be computed. Ignored if `signal` is a
-            pandas.DataFrame. Default is last (-1).
+            Axis along which the IQR will be computed.
+            Ignored if `signal` is a pandas.DataFrame. Default is last (-1).
 
         Returns
         -------
@@ -100,8 +100,8 @@ class RMS(Feature):
         signal : array-like
             Array-like containing values to compute the RMS for.
         axis : int, optional
-            Axis along which the signal entropy will be computed. Ignored if `signal` is a
-            pandas.DataFrame. Default is last (-1).
+            Axis along which the RMS will be computed.
+            Ignored if `signal` is a pandas.DataFrame. Default is last (-1).
 
         Returns
         -------
@@ -143,8 +143,8 @@ class Autocorrelation(Feature):
         signal : array-like
             Array-like containing values to compute the autocorrelation for.
         axis : int, optional
-            Axis along which the signal entropy will be computed. Ignored if `signal` is a
-            pandas.DataFrame. Default is last (-1).
+            Axis along which the autocorrelation will be computed.
+            Ignored if `signal` is a pandas.DataFrame. Default is last (-1).
 
         Returns
         -------
@@ -176,8 +176,8 @@ class LinearSlope(Feature):
         fs : float, optional
             Sampling frequency in Hz. If not provided, default is 1.0Hz.
         axis : int, optional
-            Axis along which the signal entropy will be computed. Ignored if `signal` is a
-            pandas.DataFrame. Default is last (-1).
+            Axis along which the linear slope will be computed.
+            Ignored if `signal` is a pandas.DataFrame. Default is last (-1).
 
         Returns
         -------

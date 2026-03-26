@@ -7,10 +7,10 @@
 Scikit Digital Health
 =====================
 
-.. image:: https://github.com/PfizerRD/scikit-digital-health/workflows/skdh/badge.svg
+.. image:: https://github.com/pfizer-opensource/scikit-digital-health/workflows/skdh/badge.svg
    :alt: GitHub Actions Badge
 
-`SciKit-Digital-Health` is a Python package with methods for reading, pre-processing, manipulating, and analyzing Inertial Meausurement Unit data. `scikit-digital-health` contains the following sub-modules:
+`SciKit-Digital-Health` is a Python package with methods for reading, pre-processing, manipulating, and analyzing Inertial Measurement Unit data. `scikit-digital-health` contains the following sub-modules:
 
 .. grid:: 1 2 2 2
     :gutter: 2
