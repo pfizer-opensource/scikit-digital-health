@@ -74,7 +74,7 @@ typedef enum {
     AX_READ_E_BAD_LENGTH_ZERO_TIMESTAMPS = 7,
 } Read_Cwa_Error_t;
 
-extern void axivity_read_header(long *, char[], AX_Info_t *, int *);
+extern void axivity_read_header(Py_ssize_t *, char[], AX_Info_t *, int *);
 extern void axivity_read_block(AX_Info_t *, long *, double *, double *, double *, int *);
 extern void adjust_timestamps(AX_Info_t *, double *, int *);
 extern void axivity_close(AX_Info_t *);

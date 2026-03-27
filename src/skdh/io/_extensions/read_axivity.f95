@@ -97,7 +97,7 @@ contains
     ! axivity_read_header : read the header (first 1024 bytes) plus a little bit for error checking
     ! =============================================================================================
     subroutine axivity_read_header(flen, file, finfo, ierr) bind(C, name="axivity_read_header")
-        integer(c_long), intent(in) :: flen  ! length of the file name string
+        integer(c_size_t), intent(in) :: flen  ! length of the file name string
         character(kind=c_char), intent(in) :: file(flen)  ! file name
         type(FileInfo_t), intent(inout) :: finfo  ! file info storage structure
         integer(c_int), intent(inout) :: ierr  ! error tracking/returning
