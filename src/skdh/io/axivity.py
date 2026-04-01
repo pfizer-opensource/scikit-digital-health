@@ -64,7 +64,10 @@ class ReadCwa(BaseIO):
             if not 1 <= trim_start_factor <= 60:
                 raise ValueError("trim_start_factor must be between 1 and 60 seconds.")
 
-        self.trim_keys = trim_keys
+        if trim_keys is None:
+            self.trim_keys = (None, None)
+        else:
+            self.trim_keys = trim_keys
         self.trim_start_factor = trim_start_factor
 
         if ext_error.lower() in ["warn", "raise", "skip"]:

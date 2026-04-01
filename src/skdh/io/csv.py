@@ -177,7 +177,10 @@ class ReadCSV(BaseIO):
 
         self.time_col_name = time_col_name
         self.column_names = column_names
-        self.trim_keys = trim_keys
+        if trim_keys is None:
+            self.trim_keys = (None, None)
+        else:
+            self.trim_keys = trim_keys
         self.trim_start_factor = trim_start_factor
         self.fill_gaps = fill_gaps
         self.fill_value = {} if fill_value is None else fill_value
