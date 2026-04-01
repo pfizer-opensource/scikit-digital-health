@@ -10,6 +10,10 @@
 #define NP_FROM_ANY(x) PyArray_FromAny(x, PyArray_DescrFromType(NPY_LONG), 1, 0, NPY_ARRAY_ENSUREARRAY | NPY_ARRAY_CARRAY_RO, NULL)
 
 
+// Have to do this here so that we can use the Py_ssize_t type
+extern void axivity_read_header(Py_ssize_t *, char[], AX_Info_t *, int *);
+
+
 void geneactiv_set_error_message(int ierr)
 {
     switch (ierr)
