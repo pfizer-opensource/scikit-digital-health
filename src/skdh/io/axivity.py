@@ -29,6 +29,10 @@ class ReadCwa(BaseIO):
         of the key you do not want to trim. If provided, the tuple should be of the form
         (start_key, end_key). When provided, trim datetimes will be assumed to be in the
         same timezone as the data (ie naive if naive, or in the timezone provided).
+    trim_start_factor : int, optional
+        Factor of seconds to trim start time to. For example, if `trim_start_factor=15`,
+        then the start time will be trimmed to the next multiple of 15 seconds. Default
+        is None (no trimming).
     ext_error : {"warn", "raise", "skip"}, optional
         What to do if the file extension does not match the expected extension (.cwa).
         Default is "warn". "raise" raises a ValueError. "skip" skips the file
@@ -48,14 +52,20 @@ class ReadCwa(BaseIO):
     {'accel': ..., 'time': ..., ...}
     """
 
-    def __init__(self, *, trim_keys=None, ext_error="warn"):
+    def __init__(self, *, trim_keys=None, trim_start_factor=None, ext_error="warn"):
         super().__init__(
             # kwargs
             trim_keys=trim_keys,
+            trim_start_factor=trim_start_factor,
             ext_error=ext_error,
         )
 
+        if trim_start_factor is not None:
+            if not 1 <= trim_start_factor <= 60:
+                raise ValueError("trim_start_factor must be between 1 and 60 seconds.")
+
         self.trim_keys = trim_keys
+        self.trim_start_factor = trim_start_factor
 
         if ext_error.lower() in ["warn", "raise", "skip"]:
             self.ext_error = ext_error.lower()
@@ -139,14 +149,14 @@ class ReadCwa(BaseIO):
         if mag_axes is not None:  # pragma: no cover :: don't have data to test this
             results[self._mag] = ascontiguousarray(imudata[:end, mag_axes])
 
-        if self.trim_keys is not None:
-            results = self.trim_data(
-                *self.trim_keys,
-                tz_name,
-                kwargs,
-                **results,  # contains the time array/argument
-            )
-
+        time, results = self.trim_data(
+            self.trim_start_factor,
+            *self.trim_keys,
+            tz_name,
+            kwargs,
+            **results,  # contains the time array/argument
+        )
+        results[self._time] = time
         results["fs"] = fs
 
         return results

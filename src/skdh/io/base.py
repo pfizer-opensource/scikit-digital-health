@@ -9,7 +9,7 @@ from pathlib import Path
 import functools
 from warnings import warn
 
-from numpy import nonzero
+from numpy import nonzero, argwhere
 from pandas import to_datetime
 
 from skdh.base import BaseProcess
@@ -133,7 +133,63 @@ class BaseIO(BaseProcess):
 
         return ts.timestamp()
 
-    def trim_data(self, start_key, end_key, tz_name, predict_kw, *, time, **data):
+    def trim_data(self, trim_start_factor, start_key, end_key, tz_name, predict_kw, *, time, **data):
+        """
+        Trim data based on either a start factor or start/end keys
+
+        Parameters
+        ----------
+        trim_start_factor : int
+            Factor of seconds to trim start time to. For example, if `trim_start_factor=15`,
+            then the start time will be trimmed to the next multiple of 15 seconds. Computed
+            after trimming by time.
+        start_key : {None, str}
+            Start key for the provided trim start time.
+        end_key : {None, str}
+            End key for the provided trim end time.
+        tz_name : {None, str}
+            IANA time-zone name for the recording location. If not provided,
+            both the `time` array and provided trim times will be assumed to be naive
+            and in the same time-zone.
+        predict_kw : dict
+            Key-word arguments passed to the predict method.
+        """
+        if start_key is not None or end_key is not None:
+            time, data = self.trim_data_time(start_key, end_key, tz_name, predict_kw, time=time, **data)
+        if trim_start_factor is not None:
+            time, data = self.trim_data_factor(trim_start_factor, time=time, **data)
+        
+        return time, data
+
+    def trim_data_factor(self, trim_start_factor, *, time, **data):
+        """
+        Trim raw data based on a factor of seconds.
+
+        Parameters
+        ----------
+        trim_start_factor : int
+            Factor of seconds to trim start time to. For example, if `trim_start_factor=15`,
+            then the start time will be trimmed to the next multiple of 15 seconds.
+        time : numpy.ndarray
+            Array of timestamps.
+        data : dict of numpy.ndarray
+            Dictionary of data arrays to trim, where each array is the same length as `time`.
+        """
+        i1 = 0
+        # convert the first N timestamps
+        for n in [1000, 5000, 10000, 50000]:
+            dt = to_datetime(time[:n], unit="s")
+            idx = argwhere((dt.second % trim_start_factor) == 0)
+            if idx.size > 0:
+                i1 = idx[0][0]
+                break
+
+        time = time[i1:]
+        res = {k: v[i1:] for k, v in data.items()}
+
+        return time, res
+
+    def trim_data_time(self, start_key, end_key, tz_name, predict_kw, *, time, **data):
         """
         Trim raw data based on provided date-times
 
@@ -153,11 +209,11 @@ class BaseIO(BaseProcess):
         trim_start = predict_kw.get(start_key)
         trim_end = predict_kw.get(end_key)
 
-        if trim_start is not None and trim_start is None:
+        if start_key is not None and trim_start is None:
             raise ValueError(
                 f"`{start_key=}` was provided but not found in `predict` arguments"
             )
-        if trim_end is not None and trim_end is None:
+        if end_key is not None and trim_end is None:
             raise ValueError(
                 f"`{end_key=}` was provided but not found in `predict` arguments"
             )
@@ -178,7 +234,7 @@ class BaseIO(BaseProcess):
         i1 = nonzero(time <= max(time[0], ts_trim_start))[0][-1]
         i2 = nonzero(time >= min(time[-1], ts_trim_end))[0][0]
 
-        res = {self._time: time[i1:i2]}
-        res.update({k: v[i1:i2] for k, v in data.items()})
+        time = time[i1:i2]
+        res = {k: v[i1:i2] for k, v in data.items()}
 
-        return res
+        return time, res

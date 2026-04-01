@@ -48,6 +48,10 @@ class ReadCSV(BaseIO):
         of the key you do not want to trim. If provided, the tuple should be of the form
         (start_key, end_key). When provided, trim datetimes will be assumed to be in the
         same timezone as the data (ie naive if naive, or in the timezone provided).
+    trim_start_factor : int, optional
+        Factor of seconds to trim start time to. For example, if `trim_start_factor=15`,
+        then the start time will be trimmed to the next multiple of 15 seconds. Default
+        is None (no trimming).
     fill_gaps : bool, optional
         Fill any gaps in data streams. Default is True. If False and data gaps are
         detected, then the reading will raise a `ValueError`.
@@ -123,6 +127,7 @@ class ReadCSV(BaseIO):
         column_names,
         drop_duplicate_timestamps=False,
         trim_keys=None,
+        trim_start_factor=None,
         fill_gaps=True,
         fill_value=None,
         gaps_error="raise",
@@ -138,6 +143,7 @@ class ReadCSV(BaseIO):
             column_names=column_names,
             drop_duplicate_timestamps=drop_duplicate_timestamps,
             trim_keys=trim_keys,
+            trim_start_factor=trim_start_factor,
             fill_gaps=fill_gaps,
             fill_value=None,
             gaps_error=gaps_error,
@@ -164,10 +170,15 @@ class ReadCSV(BaseIO):
 
         if gaps_error.lower() not in ["raise", "warn", "ignore"]:
             raise ValueError("gaps_error must be one of `raise`, `warn`, or `ignore`.")
+        
+        if trim_start_factor is not None:
+            if not 1 <= trim_start_factor <= 60:
+                raise ValueError("trim_start_factor must be between 1 and 60 seconds.")
 
         self.time_col_name = time_col_name
         self.column_names = column_names
         self.trim_keys = trim_keys
+        self.trim_start_factor = trim_start_factor
         self.fill_gaps = fill_gaps
         self.fill_value = {} if fill_value is None else fill_value
         self.gaps_error = gaps_error
@@ -364,9 +375,7 @@ class ReadCSV(BaseIO):
                 continue
 
         # trim the data
-        if self.trim_keys is not None:
-            data = self.trim_data(*self.trim_keys, tz_name, kwargs, time=time, **data)
-            time = data.pop(self._time)
+        time, data = self.trim_data(self.trim_start_factor, *self.trim_keys, tz_name, kwargs, time=time, **data)
 
         # now handle data gaps and second level timestamps, etc
         fs, time, results = self.handle_timestamp_inconsistency_np(

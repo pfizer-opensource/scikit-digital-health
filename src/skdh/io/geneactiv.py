@@ -38,14 +38,20 @@ class ReadBin(BaseIO):
     {'accel': ..., 'time': ...}
     """
 
-    def __init__(self, trim_keys=None, ext_error="warn"):
+    def __init__(self, trim_keys=None, trim_start_factor=None, ext_error="warn"):
         super().__init__(
             # kwargs
             trim_keys=trim_keys,
+            trim_start_factor=trim_start_factor,
             ext_error=ext_error,
         )
 
+        if trim_start_factor is not None:
+            if not 1 <= trim_start_factor <= 60:
+                raise ValueError("trim_start_factor must be between 1 and 60 seconds.")
+
         self.trim_keys = trim_keys
+        self.trim_start_factor = trim_start_factor
 
         if ext_error.lower() in ["warn", "raise", "skip"]:
             self.ext_error = ext_error.lower()
@@ -97,30 +103,21 @@ class ReadBin(BaseIO):
         n_max, fs, acc, time, light, temp = read_geneactiv(str(file))
 
         # trim the data if necessary
-        if self.trim_keys is not None:
-            results = self.trim_data(
-                *self.trim_keys,
-                tz_name,
-                kwargs,
-                time=handle_naive_timestamps(
-                    time[:n_max], is_local=True, tz_name=tz_name
-                ),
-                **{
-                    self._acc: acc[:n_max, :],
-                    self._temp: temp[:n_max],
-                    "light": light[:n_max],
-                },
-            )
-            results["fs"] = fs
-        else:
-            results = {
-                self._time: handle_naive_timestamps(
-                    time[:n_max], is_local=True, tz_name=tz_name
-                ),
+        time, results = self.trim_data(
+            self.trim_start_factor,
+            *self.trim_keys,
+            tz_name,
+            kwargs,
+            time=handle_naive_timestamps(
+                time[:n_max], is_local=True, tz_name=tz_name
+            ),
+            **{
                 self._acc: acc[:n_max, :],
                 self._temp: temp[:n_max],
                 "light": light[:n_max],
-                "fs": fs,
-            }
+            },
+        )
+        results["fs"] = fs
+        results[self._time] = time
 
         return results
