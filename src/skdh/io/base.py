@@ -183,6 +183,8 @@ class BaseIO(BaseProcess):
             if idx.size > 0:
                 i1 = idx[0][0]
                 break
+        
+        self.logger.info(f"Trimming start time from {time[0]} to {time[i1]}, a factor of {trim_start_factor} seconds.")
 
         time = time[i1:]
         res = {k: v[i1:] for k, v in data.items()}
@@ -233,6 +235,9 @@ class BaseIO(BaseProcess):
         # ie the last index before the start time, and the first index after the end time.
         i1 = nonzero(time <= max(time[0], ts_trim_start))[0][-1]
         i2 = nonzero(time >= min(time[-1], ts_trim_end))[0][0]
+
+        self.logger.info(f"Trimming start time from {time[0]} to {time[i1]}")
+        self.logger.info(f"Trimming end time from {time[-1]} to {time[i2]}.")
 
         time = time[i1:i2]
         res = {k: v[i1:i2] for k, v in data.items()}
