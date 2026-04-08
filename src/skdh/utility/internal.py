@@ -170,7 +170,7 @@ def get_day_index_intersection(starts, stops, for_inclusion, day_start, day_stop
         if fs is None:
             raise ValueError("Sampling frequency `fs` must be provided if `ends_round` is provided.")
         factor = int(ends_round * fs)
-        valid_starts = around((valid_starts - day_start) / factor, 0) * factor + day_start
+        valid_starts = minimum(around((valid_starts - day_start) / factor, 0) * factor + day_start, day_stop)
         valid_stops = minimum(around((valid_stops - day_start) / factor, 0) * factor + day_start, day_stop)
 
         # make sure they stay as integers
