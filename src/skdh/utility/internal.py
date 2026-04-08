@@ -27,6 +27,7 @@ from numpy import (
     concatenate,
     roll,
     full,
+    minimum,
 )
 from scipy.signal import cheby1, sosfiltfilt
 
@@ -170,7 +171,7 @@ def get_day_index_intersection(starts, stops, for_inclusion, day_start, day_stop
             raise ValueError("Sampling frequency `fs` must be provided if `ends_round` is provided.")
         factor = int(ends_round * fs)
         valid_starts = around((valid_starts - day_start) / factor, 0) * factor + day_start
-        valid_stops = around((valid_stops - day_start) / factor, 0) * factor + day_start
+        valid_stops = minimum(around((valid_stops - day_start) / factor, 0) * factor + day_start, day_stop)
 
         # make sure they stay as integers
         valid_starts = valid_starts.astype(int_)
