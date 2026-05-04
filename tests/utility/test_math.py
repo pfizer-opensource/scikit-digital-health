@@ -160,6 +160,29 @@ class TestMovingMean(BaseMovingStatsTester):
     truth_function = staticmethod(mean)
     truth_kw = {}
 
+    @pytest.mark.parametrize("skip", (1, 2, 150, 300))
+    @pytest.mark.parametrize("req_points", (1, 0.5, 250))
+    def test_full(self, skip, req_points, np_rng):
+        wlen = 250  # constant
+        x = np_rng.random(2000)
+
+        if isinstance(req_points, float):
+            t_req_points = int(round(req_points * wlen))
+        else:
+            t_req_points = req_points
+        truth = full((x.size - 1) // skip + 1, nan)
+        j = 0
+        for i in range(0, x.size, skip):
+            if (x.size - i) >= t_req_points:
+                truth[j] = mean(x[i:i + wlen])
+            else:
+                truth[j] = nan
+            j += 1
+
+        pred = self.function(x, wlen, skip, trim=False, req_points=req_points)
+
+        assert allclose(pred, truth, equal_nan=True)
+
 
 class TestMovingSD(BaseMovingStatsTester):
     function = staticmethod(moving_sd)
