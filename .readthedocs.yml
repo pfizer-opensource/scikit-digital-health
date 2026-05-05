@@ -27,7 +27,7 @@ python:
 build:
   os: ubuntu-lts-latest
   tools:
-    python: "3.10"
+    python: "3.13"
   jobs:
     pre_install:
       - echo "\n\n[tool.meson-python.args]\nsetup = [\"-Dis_not_rtd_build=false\"]" >> pyproject.toml

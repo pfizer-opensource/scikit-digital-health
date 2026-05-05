@@ -93,9 +93,9 @@ int get_timestamps(long *Nps, char time[40], GN_Info_t *info, GN_Data_t *data)
         data->ts[*Nps + j] = t0 + (double)j / info->fs;
     
     /* INDEXING */
-    long mdays = MAX_DAYS;
-    long gns = GN_SAMPLES;
-    double block_t_delta = GN_SAMPLESf / info->fs;
+    // long mdays = MAX_DAYS;
+    // long gns = GN_SAMPLES;
+    // double block_t_delta = GN_SAMPLESf / info->fs;
 
     return GN_READ_E_NONE;
 }

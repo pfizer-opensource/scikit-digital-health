@@ -444,7 +444,7 @@ subroutine range_power_sum_1d(n, x, fs, nfft, low_cut, hi_cut, demean, use_mod, 
     real(c_double), intent(out) :: rps
     ! local
     real(c_double), parameter :: log2 = log(2._c_double)
-    integer(c_long) :: i, ihcut, ilcut, ier, istart
+    integer(c_long) :: ihcut, ilcut, ier, istart
     real(c_double) :: sp_norm(nfft + 1)
     real(c_double) :: sp_hat(2 * nfft + 2), y(2 * nfft)
 

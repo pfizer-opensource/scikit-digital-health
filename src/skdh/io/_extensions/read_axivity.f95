@@ -111,7 +111,7 @@ contains
         integer(4) :: fstat_vals(13), fstat_err
 
         ! needed for converting c strings
-        do i=1_c_long, flen
+        do i=1_c_size_t, flen
             file_(i:i + 1) = file(i)
         end do
 

@@ -7,18 +7,18 @@
 #include <stdlib.h>
 #include <math.h>
 
-extern void mean_sd_1d(long *, double *, double *, double *);
-extern void unique(long *, double *, double *, long *, long *);
-extern void gmean(long *, double *, double *);
-extern void embed_sort(long *, long *, double *, long *, long *, long *);
-extern void hist(long *, double *, long *, double *, double *, long *);
-extern void histogram(long *, long *, double *, double *, long *);
+extern void mean_sd_1d(Py_ssize_t *, double *, double *, double *);
+extern void unique(Py_ssize_t *, double *, double *, long *, long *);
+extern void gmean(Py_ssize_t *, double *, double *);
+extern void embed_sort(Py_ssize_t *, long *, double *, long *, long *, long *);
+extern void hist(Py_ssize_t *, double *, long *, double *, double *, long *);
+extern void histogram(Py_ssize_t *, long *, double *, double *, long *);
 
 extern void insertion_sort_2d(long *, long *, double *, long *);
 extern void quick_argsort_(long *, double *, long *);
 extern void quick_sort_(long *, double *);
 
-extern void f_rfft(long *, double *, long *, double *);
+extern void f_rfft(Py_ssize_t *, double *, long *, double *);
 extern void destroy_plan(void);
 
 
@@ -194,10 +194,10 @@ PyObject * cf_embed_sort(PyObject *NPY_UNUSED(self), PyObject *args){
 
 PyObject * cf_hist(PyObject *NPY_UNUSED(self), PyObject *args){
     PyObject *x_;
-    long ncells = 1;
+    npy_intp ncells = 1;
     double min_val = 0., max_val = 100.;
 
-    if (!PyArg_ParseTuple(args, "Oldd:cf_hist", &x_, &ncells, &min_val, &max_val)) return NULL;
+    if (!PyArg_ParseTuple(args, "Ondd:cf_hist", &x_, &ncells, &min_val, &max_val)) return NULL;
 
     PyArrayObject *data = (PyArrayObject *)PyArray_FromAny(
         x_, PyArray_DescrFromType(NPY_DOUBLE), 1, 0,
@@ -261,8 +261,8 @@ PyObject * cf_histogram(PyObject *NPY_UNUSED(self), PyObject *args){
 
     npy_intp n_elem = PyArray_SIZE(data);
 
-    long n3 = 3;
-    long ncells = (long)ceil(sqrt(n_elem));
+    npy_intp n3 = 3;
+    npy_intp ncells = (npy_intp)ceil(sqrt(n_elem));
 
     PyArrayObject *d = (PyArrayObject *)PyArray_EMPTY(1, &n3, NPY_DOUBLE, 0);
     PyArrayObject *counts = (PyArrayObject *)PyArray_ZEROS(1, &ncells, NPY_LONG, 0);

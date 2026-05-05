@@ -18,7 +18,7 @@ contains
     !     sd : real(double), sample standard deviation of x
     ! --------------------------------------------------------------------
     subroutine mean_sd_1d(n, x, mn, sd) bind(C)
-        integer(c_long), intent(in) :: n
+        integer(c_size_t), intent(in) :: n
         real(c_double), intent(in) :: x(n)
         real(c_double), intent(out) :: mn, sd
         ! local
@@ -55,7 +55,7 @@ contains
     !     j         : integer(long), number of unique values in x
     ! --------------------------------------------------------------------
     subroutine unique(n, x, uniq, counts, j) bind(C)
-        integer(c_long), intent(in) :: n
+        integer(c_size_t), intent(in) :: n
         real(c_double), intent(in) :: x(n)
         real(c_double), intent(out) :: uniq(n), counts(n)
         integer(c_long), intent(out) :: j
@@ -72,7 +72,7 @@ contains
         counts(1) = 1._c_double
         j = 2_c_long
         
-        do i=2_c_long, n
+        do i=2_c_size_t, n
             if (y(i) .NE. y(i-1)) then
                 uniq(j) = y(i)
                 counts(j) = counts(j) + 1
@@ -97,7 +97,7 @@ contains
     !     gm : real(double), geometric mean of the series x
     ! --------------------------------------------------------------------
     subroutine gmean(n, x, gm) bind(C)
-        integer(c_long), intent(in) :: n
+        integer(c_size_t), intent(in) :: n
         real(c_double), intent(in) :: x(n)
         real(c_double), intent(out) :: gm
     !f2py intent(hide) :: n
@@ -132,7 +132,8 @@ contains
     !     res(m, order)  : integer(long), sorted embedding vectors
     ! --------------------------------------------------------------------
     subroutine embed_sort(n, m, x, order, delay, res) bind(C, name="embed_sort")
-        integer(c_long), intent(in) :: n, m, order, delay
+        integer(c_size_t), intent(in) :: n
+        integer(c_long), intent(in) :: m, order, delay
         real(c_double), intent(in) :: x(n)
         integer(c_long), intent(out) :: res(m, order)
         ! local
@@ -165,7 +166,7 @@ contains
     !     counts  : integer(8), counts in each bin
     ! --------------------------------------------------------------------
     subroutine hist(n, x, ncells, min_val, max_val, counts) bind(C)
-        integer(c_long), intent(in) :: n, ncells
+        integer(c_size_t), intent(in) :: n, ncells
         real(c_double), intent(in) :: x(n), min_val, max_val
         integer(c_long), intent(out) :: counts(ncells)
     !f2py intent(hide) :: n
@@ -181,9 +182,9 @@ contains
             bin_width = 1._c_double  ! prevent 0 division
         end if
         
-        do i=1, n
+        do i=1_c_size_t, n
             if (.NOT. isnan(x(i))) then
-                idx = int((x(i) - min_val) / bin_width, c_long) + 1
+                idx = int((x(i) - min_val) / bin_width, c_size_t) + 1
                 if (idx > ncells) then
                     idx = ncells
                 end if
@@ -207,7 +208,7 @@ contains
     !     counts     : integer(8), counts in each bin
     ! --------------------------------------------------------------------
     subroutine histogram(n, k, x, descriptor, counts) bind(C)
-        integer(c_long), intent(in) :: n, k
+        integer(c_size_t), intent(in) :: n, k
         real(c_double), intent(in) :: x(n)
         real(c_double), intent(out) :: descriptor(3)
         integer(c_long), intent(out) :: counts(k)
