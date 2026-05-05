@@ -23,7 +23,7 @@ contains
         real(c_double), intent(out) :: mn, sd
         ! local
         real(c_double) :: Ex, Ex2
-        integer(c_long) :: i
+        integer(c_size_t) :: i
         
         Ex2 = 0._c_double
         mn = 0._c_double
@@ -60,7 +60,7 @@ contains
         real(c_double), intent(out) :: uniq(n), counts(n)
         integer(c_long), intent(out) :: j
     !f2py intent(hide) :: n
-        integer(c_long) :: i
+        integer(c_size_t) :: i
         real(c_double) :: y(n)
         
         y = x
@@ -103,12 +103,12 @@ contains
     !f2py intent(hide) :: n
         real(c_double) :: logsum, prod
         real(c_double), parameter :: large=1.d64, small=1.d-64
-        integer(c_long) :: i
+        integer(c_size_t) :: i
         
         logsum = 0._c_double
         prod = 1._c_double
         
-        do i=1, n
+        do i=1_c_size_t, n
             prod = prod * x(i)
             if ((prod > large) .OR. (prod < small)) then
                 logsum = logsum + log(prod)
@@ -170,7 +170,7 @@ contains
         real(c_double), intent(in) :: x(n), min_val, max_val
         integer(c_long), intent(out) :: counts(ncells)
     !f2py intent(hide) :: n
-        integer(c_long) :: i, idx
+        integer(c_size_t) :: i, idx
         real(c_double) :: bin_width
         
         counts = 0_c_long
@@ -184,9 +184,9 @@ contains
         
         do i=1_c_size_t, n
             if (.NOT. isnan(x(i))) then
-                idx = int((x(i) - min_val) / bin_width, c_size_t) + 1
+                idx = int((x(i) - min_val) / bin_width, c_size_t) + 1_c_size_t
                 if (idx > ncells) then
-                    idx = ncells
+                    idx = int(ncells, c_size_t)
                 end if
                 
                 counts(idx) = counts(idx) + 1

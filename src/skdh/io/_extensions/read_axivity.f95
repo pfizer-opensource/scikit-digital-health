@@ -103,7 +103,7 @@ contains
         integer(c_int), intent(inout) :: ierr  ! error tracking/returning
         ! local
         type(metadata) :: hdr
-        integer(c_long) :: itmp, i
+        integer(c_size_t) :: itmp, i
         character(960) :: annotation_block
         character(flen) :: file_
         integer(c_int8_t) :: numAxesBps
