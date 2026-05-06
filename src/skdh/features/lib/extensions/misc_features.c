@@ -6,9 +6,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-extern void cid_1d(long *, double *, int *, double *);
-extern void range_count_1d(long *, double *, double *, double *, double *);
-extern void ratio_beyond_r_sigma_1d(long *, double *, double *, double *);
+extern void cid_1d(Py_ssize_t *, double *, int *, double *);
+extern void range_count_1d(Py_ssize_t *, double *, double *, double *, double *);
+extern void ratio_beyond_r_sigma_1d(Py_ssize_t *, double *, double *, double *);
 
 PyObject * complexity_invariant_distance(PyObject *NPY_UNUSED(self), PyObject *args){
     PyObject *x_;
@@ -53,7 +53,7 @@ PyObject * complexity_invariant_distance(PyObject *NPY_UNUSED(self), PyObject *a
         double *dptr = (double *)PyArray_DATA(data);
         double *rptr = (double *)PyArray_DATA(res);
 
-        long stride = ddims[ndim - 1];
+        npy_intp stride = ddims[ndim - 1];
         int nrepeats = PyArray_SIZE(data) / stride;
 
         for (int i = 0; i < nrepeats; ++i){
@@ -111,7 +111,7 @@ PyObject * range_count(PyObject *NPY_UNUSED(self), PyObject *args){
         double *dptr = (double *)PyArray_DATA(data);
         double *rptr = (double *)PyArray_DATA(res);
 
-        long stride = ddims[ndim-1];
+        npy_intp stride = ddims[ndim-1];
         int nrepeats = PyArray_SIZE(data) / stride;
 
         for (int i = 0; i < nrepeats; ++i){
@@ -169,7 +169,7 @@ PyObject * ratio_beyond_r_sigma(PyObject *NPY_UNUSED(self), PyObject *args){
         double *dptr = (double *)PyArray_DATA(data);
         double *rptr = (double *)PyArray_DATA(res);
 
-        long stride = ddims[ndim-1];
+        npy_intp stride = ddims[ndim-1];
         int nrepeats = PyArray_SIZE(data) / stride;
 
         for (int i = 0; i < nrepeats; ++i){

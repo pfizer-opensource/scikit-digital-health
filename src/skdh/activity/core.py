@@ -209,6 +209,10 @@ class ActivityLevelClassification(BaseProcess):
         self.wake_endpoints = [
             ept.IntensityGradient(state="wake"),
             ept.MaxAcceleration(self.max_acc_lens, state="wake"),
+            # M5hr, M10hr
+            ept.MaxAcceleration([300, 600], required_points=0.5, state="wake"),
+            # L5hr
+            ept.MinAcceleration([300], required_points=0.5, state="wake"),
         ]
         self.wake_endpoints += [
             ept.TotalIntensityTime(lvl, self.wlen, self.cutpoints, state="wake")

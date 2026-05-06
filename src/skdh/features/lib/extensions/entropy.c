@@ -6,9 +6,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-extern void signal_entropy_1d(long *, double *, double *);
-extern void sample_entropy_1d(long *, double *, long *, double *, double *);
-extern void permutation_entropy_1d(long *, double *, long *, long *, int *, double *);
+extern void signal_entropy_1d(Py_ssize_t *, double *, double *);
+extern void sample_entropy_1d(Py_ssize_t *, double *, long *, double *, double *);
+extern void permutation_entropy_1d(Py_ssize_t *, double *, long *, long *, int *, double *);
 
 
 PyObject * signal_entropy(PyObject *NPY_UNUSED(self), PyObject *args){
@@ -48,7 +48,7 @@ PyObject * signal_entropy(PyObject *NPY_UNUSED(self), PyObject *args){
         double *dptr = (double *)PyArray_DATA(data);
         double *rptr = (double *)PyArray_DATA(res);
 
-        long stride = ddims[ndim-1];
+        npy_intp stride = ddims[ndim-1];
         int nrepeats = PyArray_SIZE(data) / stride;
 
         for (int i = 0; i < nrepeats; ++i){
@@ -107,7 +107,7 @@ PyObject * sample_entropy(PyObject *NPY_UNUSED(self), PyObject *args){
         double *dptr = (double *)PyArray_DATA(data);
         double *rptr = (double *)PyArray_DATA(res);
 
-        long stride = ddims[ndim-1];
+        npy_intp stride = ddims[ndim-1];
         int nrepeats = PyArray_SIZE(data) / stride;
 
         for (int i = 0; i < nrepeats; ++i){
@@ -168,7 +168,7 @@ PyObject * permutation_entropy(PyObject *NPY_UNUSED(self), PyObject *args){
         double *dptr = (double *)PyArray_DATA(data);
         double *rptr = (double *)PyArray_DATA(res);
 
-        long stride = ddims[ndim-1];
+        npy_intp stride = ddims[ndim-1];
         int nrepeats = PyArray_SIZE(data) / stride;
 
         for (int i = 0; i < nrepeats; ++i){

@@ -11,7 +11,9 @@ from numpy import (
     zeros,
     full,
     max,
+    min,
     nanmax,
+    nanmin,
     histogram,
     log,
     nan,
@@ -43,6 +45,7 @@ __all__ = [
     "ActivityEndpoint",
     "IntensityGradient",
     "MaxAcceleration",
+    "MinAcceleration",
     "TotalIntensityTime",
     "BoutIntensityTime",
     "FragmentationEndpoints",
@@ -394,17 +397,23 @@ class MaxAcceleration(ActivityEndpoint):
     ----------
     window_lengths : {list, int}
         List of window lengths, or a single window length.
+    required_points : int, float, optional
+        Number of points required in the window to compute the endpoint. If float, 
+        should be between 0 and 1 and will be interpreted as a fraction of the total 
+        number of points in the window. Default is 1.0, meaning all points in the 
+        window must be present.
     state : {'wake', 'sleep}
         State during which the endpoint is being computed.
     """
 
-    def __init__(self, window_lengths, state="wake"):
+    def __init__(self, window_lengths, required_points=1.0, state="wake"):
         if isinstance(window_lengths, int):
             window_lengths = [window_lengths]
 
         super().__init__([f"max acc {i}min [g]" for i in window_lengths], state)
 
         self.wlens = window_lengths
+        self.required_points = required_points
 
     def predict(
         self,
@@ -445,12 +454,85 @@ class MaxAcceleration(ActivityEndpoint):
             # skipping more samples would introduce bias by random chance of
             # where the windows start and stop
             try:
-                tmp_max = max(moving_mean(accel_metric, n, 1))
+                tmp_max = max(moving_mean(accel_metric, n, 1, req_points=self.required_points))
             except ValueError:
                 return  # if the window length is too long for this block of data
 
             # check that we don't have a larger result already for this day
             results[name][i] = nanmax([tmp_max, results[name][i]])
+
+
+class MinAcceleration(ActivityEndpoint):
+    """
+    Compute the minimum acceleration over windows of the specified length.
+
+    Parameters
+    ----------
+    window_lengths : {list, int}
+        List of window lengths, or a single window length.
+    required_points : int, float, optional
+        Number of points required in the window to compute the endpoint. If float, 
+        should be between 0 and 1 and will be interpreted as a fraction of the total 
+        number of points in the window. Default is 1.0, meaning all points in the 
+        window must be present.
+    state : {'wake', 'sleep}
+        State during which the endpoint is being computed.
+    """
+
+    def __init__(self, window_lengths, required_points=1.0, state="wake"):
+        if isinstance(window_lengths, int):
+            window_lengths = [window_lengths]
+
+        super().__init__([f"min acc {i}min [g]" for i in window_lengths], state)
+
+        self.wlens = window_lengths
+        self.required_points = required_points
+
+    def predict(
+        self,
+        results,
+        i,
+        accel_metric,
+        accel_metric_60,
+        epoch_s,
+        epochs_per_min,
+        **kwargs,
+    ):
+        """
+        Compute the minimum acceleration during this set of data, and compare it
+        to the previous smallest detected value.
+
+        Parameters
+        ----------
+        results : dict
+            Dictionary containing the initialized results arrays. Keys in `results`
+            are taken from the names of endpoints.
+        i : int
+            Index of the day, used to index into individual result arrays, e.g.
+            `results[self.name][i] = 5.0`
+        accel_metric : numpy.ndarray
+            Computed acceleration metric (e.g. ENMO).
+        accel_metric_60 : numpy.ndarray
+            Computed acceleration metric for a 60 second window.
+        epoch_s : int
+            Duration in seconds of each sample of `accel_metric`.
+        epochs_per_min : int
+            Number of epochs per minute.
+        """
+        super(MinAcceleration, self).predict()
+
+        for wlen, name in zip(self.wlens, self.name):
+            n = wlen * epochs_per_min
+            # skip 1 sample because we want the window with the smallest acceleration
+            # skipping more samples would introduce bias by random chance of
+            # where the windows start and stop
+            try:
+                tmp_min = min(moving_mean(accel_metric, n, 1, req_points=self.required_points))
+            except ValueError:
+                return  # if the window length is too long for this block of data
+
+            # check that we don't have a smaller result already for this day
+            results[name][i] = nanmin([tmp_min, results[name][i]])
 
 
 class TotalIntensityTime(ActivityEndpoint):

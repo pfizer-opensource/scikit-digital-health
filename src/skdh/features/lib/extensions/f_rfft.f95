@@ -6,7 +6,8 @@ subroutine f_rfft(n, x, nfft, F) bind(C, name="f_rfft")
     use, intrinsic :: iso_c_binding
     use real_fft, only : execute_real_forward
     implicit none
-    integer(c_long), intent(in) :: n, nfft
+    integer(c_size_t), intent(in) :: n
+    integer(c_long), intent(in) :: nfft
     real(c_double), intent(in) :: x(n)
     real(c_double), intent(out) :: F(2 * nfft + 2)
     ! local

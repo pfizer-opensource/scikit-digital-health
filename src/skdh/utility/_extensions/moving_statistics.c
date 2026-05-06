@@ -13,6 +13,7 @@
 
 /* moving moments */
 extern void mov_moments_1(long *, double *, long *, long *, double *);
+extern void mov_moments_1_full(long *, double *, long *, long *, long *, double *);
 extern void moving_moments_1(long *, double *, long *, long *, double *);
 extern void mov_moments_2(long *, double *, long *, long *, double *, double *);
 extern void moving_moments_2(long *, double *, long *, long *, double *, double *);
@@ -24,10 +25,9 @@ extern void fmoving_median(long *, double *, long *, long *, double *);
 
 PyObject * moving_mean(PyObject *NPY_UNUSED(self), PyObject *args){
     PyObject *x_;
-    long wlen, skip;
-    int trim;
+    long wlen, skip, req_npts;
 
-    if (!PyArg_ParseTuple(args, "Ollp:moving_mean", &x_, &wlen, &skip, &trim))
+    if (!PyArg_ParseTuple(args, "Olll:moving_mean", &x_, &wlen, &skip, &req_npts))
         return NULL;
 
     PyArrayObject *data = (PyArrayObject *)PyArray_FromAny(
@@ -45,7 +45,6 @@ PyObject * moving_mean(PyObject *NPY_UNUSED(self), PyObject *args){
     int ndim = PyArray_NDIM(data);
     const npy_intp *ddims = PyArray_DIMS(data);
     long npts = ddims[ndim - 1];
-    long trim_pts = (npts - wlen) / skip + 1;
     npy_intp *rdims = (npy_intp *)malloc(ndim * sizeof(npy_intp));
     if (!rdims)
     {
@@ -58,20 +57,15 @@ PyObject * moving_mean(PyObject *NPY_UNUSED(self), PyObject *args){
         rdims[i] = ddims[i];
     }
     // dimension of the roll
-    if (trim)
-    {
-        rdims[ndim - 1] = trim_pts;
-    } else {
-        rdims[ndim - 1] = (npts - 1) / skip + 1;
-    }
+    rdims[ndim - 1] = (npts - 1) / skip + 1;
 
     PyArrayObject *rmean = (PyArrayObject *)PyArray_EMPTY(ndim, rdims, NPY_DOUBLE, 0);
-    free(rdims);
 
     if (!rmean)
     {
         Py_XDECREF(data);
         Py_XDECREF(rmean);
+        free(rdims);
         return NULL;
     }
 
@@ -84,16 +78,13 @@ PyObject * moving_mean(PyObject *NPY_UNUSED(self), PyObject *args){
 
     for (int i = 0; i < nrepeats; ++i)
     {
-        for (int j = trim_pts; j < res_stride; ++j)
-        {
-            rmean_ptr[j] = NPY_NAN;
-        }
-        mov_moments_1(&npts, dptr, &wlen, &skip, rmean_ptr);
+        mov_moments_1_full(&npts, dptr, &wlen, &skip, &req_npts, rmean_ptr);
         dptr += npts;  // increment by number of points in last dimension
         rmean_ptr += res_stride;
     }
 
     Py_XDECREF(data);
+    free(rdims);
 
     return (PyObject *)rmean;
 }

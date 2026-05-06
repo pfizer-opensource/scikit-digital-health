@@ -39,12 +39,13 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.4.0
         env:
-          CIBW_SKIP: pp* cp36-* cp37-* cp38-* cp39-* cp310-* *musllinux*
+          CIBW_SKIP: pp* cp38-* cp39-* cp310-* *musllinux*
           CIBW_ARCHS_MACOS: auto64
           CIBW_ARCHS_LINUX: auto64
           CIBW_ARCHS_WINDOWS: auto64
           CIBW_BEFORE_BUILD_WINDOWS: "pip install delvewheel"
           CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "delvewheel repair -w {dest_dir} {wheel}"
+          MACOSX_DEPLOYMENT_TARGET: 15.0
         with:
           output-dir: wheelhouse
           config-file: "{package}/pyproject.toml"
@@ -69,6 +70,7 @@ jobs:
           path: dist/*.tar.gz
 
   upload_pypi:
+    if: ${{ github.event_name != 'workflow_dispatch' }}
     needs: [build_wheels, build_sdist]
     runs-on: ubuntu-latest
     steps:

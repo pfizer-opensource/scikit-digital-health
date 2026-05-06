@@ -3,6 +3,42 @@
 ! Copyright (c) 2021. Pfizer Inc. All rights reserved.
 
 
+subroutine mov_moments_1_full(n, x, wlen, skip, req_n, mean) bind(C, name="mov_moments_1_full")
+    use, intrinsic :: iso_c_binding
+    use, intrinsic :: ieee_arithmetic, only: IEEE_Value, IEEE_QUIET_NAN
+    implicit none
+    integer(c_long), intent(in) :: n, wlen, skip, req_n
+    real(c_double), intent(in) :: x(n)
+    real(c_double), intent(out) :: mean((n - 1)/skip + 1)
+    ! local
+    integer(c_long) :: i, j
+    real(c_double) :: m1(n)
+
+    m1(1) = x(1)
+
+    do i=2, n
+        m1(i) = m1(i-1) + x(i)
+    end do
+
+    j = 2_c_long
+    mean(1) = m1(wlen)
+
+    do i=skip, n-1, skip
+        if ((i + wlen) < n) then
+            mean(j) = m1(i+wlen) - m1(i)
+        else
+            if ((n - i) >= req_n) then
+                mean(j) = (m1(n) - m1(i)) * wlen / real(n - i, c_double)
+            else
+                mean(j) = IEEE_Value(mean(j), IEEE_QUIET_NAN)
+            end if
+        end if
+        j = j + 1
+    end do
+
+    mean = mean / wlen
+end subroutine
+
 subroutine mov_moments_1(n, x, wlen, skip, mean) bind(C, name="mov_moments_1")
     use, intrinsic :: iso_c_binding
     implicit none

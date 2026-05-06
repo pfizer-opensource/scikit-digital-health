@@ -676,7 +676,7 @@ contains
             plan%fct(nfct)%fct = tmp
         end if
         
-        maxl = int(sqrt(real( length)), 8) + 1
+        maxl = int(sqrt(real( length)), 8) + 1_c_long
         divisor = 3_c_long
         
         do while (( length > 1) .AND. (divisor < maxl))
@@ -692,7 +692,7 @@ contains
                     length = length / divisor
                 end do
                 
-                maxl = int(sqrt(real( length)), 8) + 1
+                maxl = int(sqrt(real( length)), 8) + 1_c_long
             end if
             
             divisor = divisor + 2

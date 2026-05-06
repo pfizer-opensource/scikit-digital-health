@@ -7,9 +7,9 @@
 #include <stdlib.h>
 
 
-extern void jerk_1d(long *, double *, double *, double *);
-extern void dimensionless_jerk_1d(long *, double *, long *, double *);
-extern void sparc_1d(long *, double *, double *, long *, double *, double *, double *);
+extern void jerk_1d(Py_ssize_t *, double *, double *, double *);
+extern void dimensionless_jerk_1d(Py_ssize_t *, double *, long *, double *);
+extern void sparc_1d(Py_ssize_t *, double *, double *, long *, double *, double *, double *);
 extern void destroy_plan(void);
 
 PyObject * jerk_metric(PyObject *NPY_UNUSED(self), PyObject *args){
@@ -50,7 +50,7 @@ PyObject * jerk_metric(PyObject *NPY_UNUSED(self), PyObject *args){
         double *dptr = (double *)PyArray_DATA(data);
         double *rptr = (double *)PyArray_DATA(res);
 
-        long stride = ddims[ndim-1];
+        npy_intp stride = ddims[ndim-1];
         int nrepeats = PyArray_SIZE(data) / stride;
 
         for (int i = 0; i < nrepeats; ++i){
@@ -108,7 +108,7 @@ PyObject * dimensionless_jerk_metric(PyObject *NPY_UNUSED(self), PyObject *args)
         double *dptr = (double *)PyArray_DATA(data);
         double *rptr = (double *)PyArray_DATA(res);
 
-        long stride = ddims[ndim-1];
+        npy_intp stride = ddims[ndim-1];
         int nrepeats = PyArray_SIZE(data) / stride;
 
         for (int i = 0; i < nrepeats; ++i){
@@ -167,7 +167,7 @@ PyObject * SPARC(PyObject *NPY_UNUSED(self), PyObject *args){
         double *dptr = (double *)PyArray_DATA(data);
         double *rptr = (double *)PyArray_DATA(res);
 
-        long stride = ddims[ndim-1];
+        npy_intp stride = ddims[ndim-1];
         int nrepeats = PyArray_SIZE(data) / stride;
 
         for (int i = 0; i < nrepeats; ++i){

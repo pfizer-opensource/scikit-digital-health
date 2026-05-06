@@ -15,7 +15,12 @@ movstat_lib = static_library(
         'stack.c',
         'moving_extrema.c',
     ],
-    c_args: numpy_nodepr_api,
+    c_args: [
+        numpy_nodepr_api,
+        '-fno-unsafe-math-optimizations',
+        '-frounding-math',
+        '-fsignaling-nans',
+    ],
     include_directories: [inc_np],
 )
 
