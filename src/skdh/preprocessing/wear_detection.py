@@ -26,6 +26,7 @@ from numpy import (
     isclose,
     asarray,
     ascontiguousarray,
+    minimum,
 )
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt
@@ -821,23 +822,31 @@ class AccelThresholdWearDetection(BaseProcess):
         # note that while this block starts at 0, the method uses centered blocks, which
         # means that the first block actually corresponds to a block starting
         # 22.5 minutes into the recording
-        acc_rsd = moving_sd(accel, n_wlen, n_wskip, axis=0, return_previous=False)
+        acc_rsd = moving_sd(accel, n_wlen, n_wskip, axis=0, trim=False, return_previous=False)
 
         # get the accelerometer range in each 60min window
-        acc_w_range = moving_max(accel, n_wlen, n_wskip, axis=0) - moving_min(
-            accel, n_wlen, n_wskip, axis=0
+        acc_w_range = moving_max(accel, n_wlen, n_wskip, axis=0, trim=False) - moving_min(
+            accel, n_wlen, n_wskip, axis=0, trim=False
         )
 
         nonwear = (
             sum((acc_rsd < self.sd_crit) & (acc_w_range < self.range_crit), axis=1) >= 2
         )
 
+        # fill the NAN values at the end based on the last non-NAN value
+        n1 = (accel.shape[0] - n_wlen) // n_wskip + 1  # number of full windows
+        n2 = (accel.shape[0] - 1) // n_wskip + 1  # number of window starts
+        nonwear[n1:n2] = nonwear[n1 - 1]
+
         # flip to wear starts/stops now
         wear_starts, wear_stops = self._modify_wear_times(
             nonwear, self.wskip, self.apply_setup_crit, self.ship_crit
         )
 
-        wear = concatenate((wear_starts, wear_stops)).reshape((2, -1)).T * n_wskip
+        wear = minimum(
+            concatenate((wear_starts, wear_stops)).reshape((2, -1)).T * n_wskip,
+            time.size - 1
+        )
 
         return {"wear": wear}
 
