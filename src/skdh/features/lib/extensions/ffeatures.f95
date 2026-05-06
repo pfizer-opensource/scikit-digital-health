@@ -300,7 +300,7 @@ subroutine dominant_freq_1d(n, x, fs, nfft, low_cut, hi_cut, df) bind(C, name="d
     y = 0._c_double
     y(:n) = x
     sp_hat = 0._c_double
-    call execute_real_forward(int(2 * nfft, c_size_t), y, 1.0_c_double, sp_hat, ier)
+    call execute_real_forward(2 * nfft, y, 1.0_c_double, sp_hat, ier)
 
     sp_norm = sp_hat(1:2 * nfft + 2:2)**2 + sp_hat(2:2 * nfft + 2:2)**2
     sp_norm = sp_norm / sum(sp_norm(ilcut:ihcut)) + 1.d-10
@@ -353,7 +353,7 @@ subroutine dominant_freq_value_1d(n, x, fs, nfft, low_cut, hi_cut, dfval) bind(C
     y = 0._c_double
     y(:n) = x
     sp_hat = 0._c_double
-    call execute_real_forward(int(2 * nfft, c_size_t), y, 1.0_c_double, sp_hat, ier)
+    call execute_real_forward(2 * nfft, y, 1.0_c_double, sp_hat, ier)
 
     sp_norm = sp_hat(1:2 * nfft + 2:2)**2 + sp_hat(2:2 * nfft + 2:2)**2
     sp_norm = sp_norm / sum(sp_norm(ilcut:ihcut)) + 1.d-10
@@ -405,7 +405,7 @@ subroutine power_spectral_sum_1d(n, x, fs, nfft, low_cut, hi_cut, pss) bind(C, n
     y = 0._c_double
     y(:n) = x
     sp_hat = 0._c_double
-    call execute_real_forward(int(2 * nfft, c_size_t), y, 1.0_c_double, sp_hat, ier)
+    call execute_real_forward(2 * nfft, y, 1.0_c_double, sp_hat, ier)
 
     sp_norm = sp_hat(1:2*nfft+2:2)**2 + sp_hat(2:2*nfft+2:2)**2
     sp_norm = sp_norm / sum(sp_norm(ilcut:ihcut)) + 1.d-10
@@ -470,7 +470,7 @@ subroutine range_power_sum_1d(n, x, fs, nfft, low_cut, hi_cut, demean, use_mod, 
     y = 0._c_double
     y(:n) = x
     sp_hat = 0._c_double
-    call execute_real_forward(int(2 * nfft, c_size_t), y, 1.0_c_double, sp_hat, ier)
+    call execute_real_forward(2 * nfft, y, 1.0_c_double, sp_hat, ier)
 
     if (use_mod == 1_c_int) then
         sp_norm = sqrt(sp_hat(1:2*nfft+2:2)**2 + sp_hat(2:2*nfft+2:2)**2)
@@ -535,7 +535,7 @@ subroutine spectral_entropy_1d(n, x, fs, nfft, low_cut, hi_cut, sEnt) bind(C, na
     y = 0._c_double
     y(:n) = x
     sp_hat = 0._c_double
-    call execute_real_forward(int(2 * nfft, c_size_t), y, 1.0_c_double, sp_hat, ier)
+    call execute_real_forward(2 * nfft, y, 1.0_c_double, sp_hat, ier)
 
     sp_norm = sp_hat(1:2*nfft+2:2)**2 + sp_hat(2:2*nfft+2:2)**2
     sp_norm = sp_norm / sum(sp_norm(ilcut:ihcut)) + 1.d-10
@@ -588,13 +588,13 @@ subroutine spectral_flatness_1d(n, x, fs, nfft, low_cut, hi_cut, sFlat) bind(C, 
     y = 0._c_double
     y(:n) = x
     sp_hat = 0._c_double
-    call execute_real_forward(int(2 * nfft, c_size_t), y, 1._c_double, sp_hat, ier)
+    call execute_real_forward(2 * nfft, y, 1._c_double, sp_hat, ier)
 
     sp_norm = sp_hat(1:2*nfft+2:2)**2 + sp_hat(2:2*nfft+2:2)**2
     sp_norm = sp_norm / sum(sp_norm(ilcut:ihcut)) + 1.d-10
 
     mean = sum(sp_norm(ilcut:ihcut)) / (ihcut - ilcut + 1)
-    call gmean(ihcut - ilcut + 1, sp_norm(ilcut:ihcut), sFlat)
+    call gmean(int(ihcut - ilcut + 1, c_size_t), sp_norm(ilcut:ihcut), sFlat)
     sFlat = 10._c_double * log(sFlat / mean) / log(10._c_double)
 end subroutine
 

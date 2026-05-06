@@ -90,7 +90,7 @@ contains
     !     Compute the geometric mean of a series
     ! 
     !     In
-    !     n     : integer(long), number of samples in x
+    !     n     : integer(size_t), number of samples in x
     !     x(n)  : real(double), array of values of length n
     ! 
     !     Out
