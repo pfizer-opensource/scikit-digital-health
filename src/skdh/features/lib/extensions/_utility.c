@@ -11,8 +11,8 @@ extern void mean_sd_1d(Py_ssize_t *, double *, double *, double *);
 extern void unique(Py_ssize_t *, double *, double *, long *, long *);
 extern void gmean(Py_ssize_t *, double *, double *);
 extern void embed_sort(Py_ssize_t *, long *, double *, long *, long *, long *);
-extern void hist(Py_ssize_t *, double *, long *, double *, double *, long *);
-extern void histogram(Py_ssize_t *, long *, double *, double *, long *);
+extern void hist(Py_ssize_t *, double *, Py_ssize_t *, double *, double *, long *);
+extern void histogram(Py_ssize_t *, Py_ssize_t *, double *, double *, long *);
 
 extern void insertion_sort_2d(long *, long *, double *, long *);
 extern void quick_argsort_(long *, double *, long *);
