@@ -856,7 +856,7 @@ subroutine sparc_1d(n, x, fs, padlevel, fc, amp_thresh, sal) bind(C, name="sparc
     sp_hat = 0._c_double
     y = 0._c_double
     y(:n) = x
-    call execute_real_forward(nfft, y, 1._c_double, sp_hat, ier)
+    call execute_real_forward(int(nfft, c_long), y, 1._c_double, sp_hat, ier)
     if (ier /= 0_c_long) return
 
     ! normalize the FFT response
