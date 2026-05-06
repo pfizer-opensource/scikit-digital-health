@@ -7,7 +7,7 @@
 !     Compute the autocorrelation of a signal with the specified lag
 ! 
 !     Input
-!     n            : integer(long)
+!     n            : integer(size_t)
 !     x(n)         : real(double), array to compute autocorrelation for
 !     lag          : integer(long), lag for the autocorrelation, in samples
 !     normalize    : integer(int), normalize the autocorrelation
@@ -19,30 +19,33 @@ subroutine autocorr_1d(n, x, lag, normalize, ac) bind(C, name="autocorr_1d")
     use, intrinsic :: iso_c_binding
     use utility, only : mean_sd_1d
     implicit none
-    integer(c_long), intent(in) :: n, lag
+    integer(c_size_t), intent(in) :: n
+    integer(c_long), intent(in) :: lag
     real(c_double), intent(in) :: x(n)
     integer(c_int), intent(in) :: normalize
     real(c_double), intent(out) :: ac
     ! local
-    integer(c_long) :: i
+    integer(c_size_t) :: i, st_lag
     real(c_double) :: mean1, mean2, std1, std2
+
+    st_lag = int(lag, c_size_t)
     
     ac = 0._c_double
     
     if (normalize == 1_c_int) then
-        call mean_sd_1d(n - lag, x(:n - lag), mean1, std1)
-        call mean_sd_1d(n - lag, x(lag + 1:), mean2, std2)
+        call mean_sd_1d(n - st_lag, x(:n - st_lag), mean1, std1)
+        call mean_sd_1d(n - st_lag, x(st_lag + 1:), mean2, std2)
         
-        do i=1_c_long, n - lag
-            ac = ac + (x(i) - mean1) * (x(i + lag) - mean2)
+        do i=1_c_size_t, n - st_lag
+            ac = ac + (x(i) - mean1) * (x(i + st_lag) - mean2)
         end do
         ac = ac / ((n - lag - 1) * std1 * std2)
     else
-        call mean_sd_1d(n - lag, x(:n - lag), mean1, std1)
-        call mean_sd_1d(n - lag, x(lag + 1:), mean2, std2)
+        call mean_sd_1d(n - st_lag, x(:n - st_lag), mean1, std1)
+        call mean_sd_1d(n - st_lag, x(st_lag + 1:), mean2, std2)
         
-        do i=1_c_long, n - lag
-            ac = ac + x(i) * x(i + lag)
+        do i=1_c_size_t, n - st_lag
+            ac = ac + x(i) * x(i + st_lag)
         end do
         ac = ac / (std1 * std2)
     end if
@@ -54,7 +57,7 @@ end subroutine
 !     Compute the complexity invariant distance metric for a signal
 ! 
 !     Input
-!     n            : integer(long)
+!     n            : integer(size_t)
 !     x(n)         : real(double), array to compute over
 !     normalize    : integer(int), normalize the complexity invariant distance
 ! 
@@ -65,12 +68,12 @@ subroutine cid_1d(n, x, normalize, cid) bind(C, name='cid_1d')
     use, intrinsic :: iso_c_binding
     use utility, only : mean_sd_1d
     implicit none
-    integer(c_long), intent(in) :: n
+    integer(c_size_t), intent(in) :: n
     real(c_double), intent(in) :: x(n)
     integer(c_int), intent(in) :: normalize
     real(c_double), intent(out) :: cid
     ! local
-    integer(c_long) :: i
+    integer(c_size_t) :: i
     real(c_double) :: mean, sd
 
     cid = 0._c_double;
@@ -104,7 +107,8 @@ subroutine permutation_entropy_1d(n, x, order, delay, normalize, pe) bind(C, nam
     use, intrinsic :: iso_c_binding
     use utility, only : embed_sort, unique
     implicit none
-    integer(c_long), intent(in) :: n, order, delay
+    integer(c_size_t), intent(in) :: n
+    integer(c_long), intent(in) :: order, delay
     real(c_double), intent(in) :: x(n)
     integer(c_int), intent(in) :: normalize
     real(c_double), intent(out) :: pe
@@ -116,7 +120,7 @@ subroutine permutation_entropy_1d(n, x, order, delay, normalize, pe) bind(C, nam
     real(c_double) :: unq_counts(n - (order - 1) * delay)
     real(c_double), parameter :: log2 = dlog(2._c_double)
 
-    nsi = n - (order - 1) * delay
+    nsi = int(n, c_long) - (order - 1) * delay
 
     call embed_sort(n, nsi, x, order, delay, sorted_idx)
 
@@ -126,7 +130,7 @@ subroutine permutation_entropy_1d(n, x, order, delay, normalize, pe) bind(C, nam
     end do
 
     unq_counts = 0._c_double
-    call unique(nsi, hashval, unq_vals, unq_counts, n_unq)
+    call unique(int(nsi, c_size_t), hashval, unq_vals, unq_counts, n_unq)
 
     unq_counts = unq_counts / sum(unq_counts)
 
@@ -143,7 +147,7 @@ end subroutine
 !     Compute the sample entropy of a signal
 ! 
 !     Input
-!     n      : integer(long)
+!     n      : integer(size_t)
 !     x(n)   : real(double), array to compute sample entropy on
 !     L      : integer(long), length of sets to compare
 !     r      : real(double), maximum set distance
@@ -155,7 +159,8 @@ subroutine sample_entropy_1d(n, x, L, r, samp_ent) bind(C, name="sample_entropy_
     use, intrinsic :: iso_c_binding
     use, intrinsic :: iso_fortran_env, only: stdout=>output_unit
     implicit none
-    integer(c_long), intent(in) :: n, L
+    integer(c_size_t), intent(in) :: n
+    integer(c_long), intent(in) :: L
     real(c_double), intent(in) :: x(n), r
     real(c_double), intent(out) :: samp_ent
     ! local
@@ -199,7 +204,7 @@ end subroutine
 !     Compute the signal entropy of a 1d signal
 ! 
 !     Input
-!     n      : integer(long)
+!     n      : integer(size_t)
 !     x(n)   : real(double), array to compute signal entropy for
 ! 
 !     Output
@@ -209,13 +214,13 @@ subroutine signal_entropy_1d(n, x, ent) bind(C, name="signal_entropy_1d")
     use, intrinsic :: iso_c_binding
     use utility, only : histogram, mean_sd_1d
     implicit none
-    integer(c_long), intent(in) :: n
+    integer(c_size_t), intent(in) :: n
     real(c_double), intent(out) :: x(n)
     real(c_double), intent(out) :: ent
     ! local
     real(c_double) :: d(3), nbias, cnt
     real(c_double) :: estimate, stdev, mean, logf
-    integer(c_long) :: i, sqrt_n
+    integer(c_size_t) :: i, sqrt_n
     integer(c_long) :: h(ceiling(sqrt(real(n))))
 
     sqrt_n = ceiling(sqrt(real(n, c_double)))
@@ -237,7 +242,7 @@ subroutine signal_entropy_1d(n, x, ent) bind(C, name="signal_entropy_1d")
     cnt = 0._c_double
     estimate = 0._c_double
 
-    do i = 1, int(d(3), c_long)
+    do i = 1, int(d(3), c_size_t)
         if (h(i) > 0) then
             logf = log(real(h(i), c_double))
         else
@@ -260,7 +265,7 @@ end subroutine
 !     Compute the dominant frequency of a signal, in the specified range
 ! 
 !     Input
-!     n        : integer(long)
+!     n        : integer(size_t)
 !     x(n)     : real(double), array to compute signal entropy for
 !     nfft     : integer(long), number of points to use in the FFT computation
 !     fs       : real(double), sampling frequency in Hz
@@ -274,7 +279,8 @@ subroutine dominant_freq_1d(n, x, fs, nfft, low_cut, hi_cut, df) bind(C, name="d
     use, intrinsic :: iso_c_binding
     use real_fft, only : execute_real_forward
     implicit none
-    integer(c_long) :: n, nfft
+    integer(c_size_t), intent(in) :: n
+    integer(c_long), intent(in) :: nfft
     real(c_double), intent(in) :: x(n), low_cut, hi_cut, fs
     real(c_double), intent(out) :: df
     ! local
@@ -294,7 +300,7 @@ subroutine dominant_freq_1d(n, x, fs, nfft, low_cut, hi_cut, df) bind(C, name="d
     y = 0._c_double
     y(:n) = x
     sp_hat = 0._c_double
-    call execute_real_forward(2 * nfft, y, 1.0_c_double, sp_hat, ier)
+    call execute_real_forward(int(2 * nfft, c_size_t), y, 1.0_c_double, sp_hat, ier)
 
     sp_norm = sp_hat(1:2 * nfft + 2:2)**2 + sp_hat(2:2 * nfft + 2:2)**2
     sp_norm = sp_norm / sum(sp_norm(ilcut:ihcut)) + 1.d-10
@@ -312,7 +318,7 @@ end subroutine
 !     Compute the dominant frequency value (spectral power) of a signal, in the specified range
 ! 
 !     Input
-!     n        : integer(long)
+!     n        : integer(size_t)
 !     x(n)     : real(double), array to compute signal entropy for
 !     nfft     : integer(long), number of points to use in the FFT computation
 !     fs       : real(double), sampling frequency in Hz
@@ -326,7 +332,8 @@ subroutine dominant_freq_value_1d(n, x, fs, nfft, low_cut, hi_cut, dfval) bind(C
     use, intrinsic :: iso_c_binding
     use real_fft, only : execute_real_forward
     implicit none
-    integer(c_long) :: n, nfft
+    integer(c_size_t), intent(in) :: n
+    integer(c_long), intent(in) :: nfft
     real(c_double), intent(in) :: x(n), low_cut, hi_cut, fs
     real(c_double), intent(out) :: dfval
     ! local
@@ -346,7 +353,7 @@ subroutine dominant_freq_value_1d(n, x, fs, nfft, low_cut, hi_cut, dfval) bind(C
     y = 0._c_double
     y(:n) = x
     sp_hat = 0._c_double
-    call execute_real_forward(2 * nfft, y, 1.0_c_double, sp_hat, ier)
+    call execute_real_forward(int(2 * nfft, c_size_t), y, 1.0_c_double, sp_hat, ier)
 
     sp_norm = sp_hat(1:2 * nfft + 2:2)**2 + sp_hat(2:2 * nfft + 2:2)**2
     sp_norm = sp_norm / sum(sp_norm(ilcut:ihcut)) + 1.d-10
@@ -361,7 +368,7 @@ end subroutine
 !     dominant frequency
 ! 
 !     Input
-!     n        : integer(long)
+!     n        : integer(size_t)
 !     x(n)     : real(double), array to compute signal entropy for
 !     nfft     : integer(long), number of points to use in the FFT computation
 !     fs       : real(double), sampling frequency in Hz
@@ -375,7 +382,8 @@ subroutine power_spectral_sum_1d(n, x, fs, nfft, low_cut, hi_cut, pss) bind(C, n
     use, intrinsic :: iso_c_binding
     use real_fft, only : execute_real_forward
     implicit none
-    integer(c_long), intent(in) :: n, nfft
+    integer(c_size_t), intent(in) :: n
+    integer(c_long), intent(in) :: nfft
     real(c_double), intent(in) :: x(n), fs, low_cut, hi_cut
     real(c_double), intent(out) :: pss
     ! local
@@ -397,7 +405,7 @@ subroutine power_spectral_sum_1d(n, x, fs, nfft, low_cut, hi_cut, pss) bind(C, n
     y = 0._c_double
     y(:n) = x
     sp_hat = 0._c_double
-    call execute_real_forward(2 * nfft, y, 1.0_c_double, sp_hat, ier)
+    call execute_real_forward(int(2 * nfft, c_size_t), y, 1.0_c_double, sp_hat, ier)
 
     sp_norm = sp_hat(1:2*nfft+2:2)**2 + sp_hat(2:2*nfft+2:2)**2
     sp_norm = sp_norm / sum(sp_norm(ilcut:ihcut)) + 1.d-10
@@ -421,7 +429,7 @@ end subroutine
 !     Compute the sum of the spectral power in the range specified.
 ! 
 !     Input
-!     n         : integer(long)
+!     n         : integer(c_size_t)
 !     x(n)      : real(double), array to compute signal entropy for
 !     nfft      : integer(long), number of points to use in the FFT computation
 !     fs        : real(double), sampling frequency in Hz
@@ -438,7 +446,8 @@ subroutine range_power_sum_1d(n, x, fs, nfft, low_cut, hi_cut, demean, use_mod, 
     use, intrinsic :: iso_c_binding
     use real_fft, only : execute_real_forward
     implicit none
-    integer(c_long), intent(in) :: n, nfft
+    integer(c_size_t), intent(in) :: n
+    integer(c_long), intent(in) :: nfft
     real(c_double), intent(in) :: x(n), fs, low_cut, hi_cut
     integer(c_int), intent(in) :: demean, use_mod, normalize
     real(c_double), intent(out) :: rps
@@ -461,7 +470,7 @@ subroutine range_power_sum_1d(n, x, fs, nfft, low_cut, hi_cut, demean, use_mod, 
     y = 0._c_double
     y(:n) = x
     sp_hat = 0._c_double
-    call execute_real_forward(2 * nfft, y, 1.0_c_double, sp_hat, ier)
+    call execute_real_forward(int(2 * nfft, c_size_t), y, 1.0_c_double, sp_hat, ier)
 
     if (use_mod == 1_c_int) then
         sp_norm = sqrt(sp_hat(1:2*nfft+2:2)**2 + sp_hat(2:2*nfft+2:2)**2)
@@ -489,7 +498,7 @@ end subroutine
 !     Compute the spectral entropy of the specified frequency range
 ! 
 !     Input
-!     n        : integer(long)
+!     n        : integer(size_t)
 !     x(n)     : real(double), array to compute signal entropy for
 !     nfft     : integer(long), number of points to use in the FFT computation
 !     fs       : real(double), sampling frequency in Hz
@@ -503,7 +512,8 @@ subroutine spectral_entropy_1d(n, x, fs, nfft, low_cut, hi_cut, sEnt) bind(C, na
     use, intrinsic :: iso_c_binding
     use real_fft, only : execute_real_forward
     implicit none
-    integer(c_long), intent(in) :: n, nfft
+    integer(c_size_t), intent(in) :: n
+    integer(c_long), intent(in) :: nfft
     real(c_double), intent(in) :: x(n), low_cut, hi_cut, fs
     real(c_double), intent(out) :: sEnt
     ! local
@@ -525,7 +535,7 @@ subroutine spectral_entropy_1d(n, x, fs, nfft, low_cut, hi_cut, sEnt) bind(C, na
     y = 0._c_double
     y(:n) = x
     sp_hat = 0._c_double
-    call execute_real_forward(2 * nfft, y, 1.0_c_double, sp_hat, ier)
+    call execute_real_forward(int(2 * nfft, c_size_t), y, 1.0_c_double, sp_hat, ier)
 
     sp_norm = sp_hat(1:2*nfft+2:2)**2 + sp_hat(2:2*nfft+2:2)**2
     sp_norm = sp_norm / sum(sp_norm(ilcut:ihcut)) + 1.d-10
@@ -542,7 +552,7 @@ end subroutine
 !     Compute the spectral flatness of the specified frequency range
 ! 
 !     Input
-!     n        : integer(long)
+!     n        : integer(size_t)
 !     x(n)     : real(double), array to compute signal entropy for
 !     nfft     : integer(long), number of points to use in the FFT computation
 !     fs       : real(double), sampling frequency in Hz
@@ -557,7 +567,8 @@ subroutine spectral_flatness_1d(n, x, fs, nfft, low_cut, hi_cut, sFlat) bind(C, 
     use real_fft, only : execute_real_forward
     use utility, only : gmean
     implicit none
-    integer(c_long), intent(in) :: n, nfft
+    integer(c_size_t), intent(in) :: n
+    integer(c_long), intent(in) :: nfft
     real(c_double), intent(in) :: x(n), low_cut, hi_cut, fs
     real(c_double), intent(out) :: sFlat
     ! local
@@ -577,7 +588,7 @@ subroutine spectral_flatness_1d(n, x, fs, nfft, low_cut, hi_cut, sFlat) bind(C, 
     y = 0._c_double
     y(:n) = x
     sp_hat = 0._c_double
-    call execute_real_forward(2 * nfft, y, 1._c_double, sp_hat, ier)
+    call execute_real_forward(int(2 * nfft, c_size_t), y, 1._c_double, sp_hat, ier)
 
     sp_norm = sp_hat(1:2*nfft+2:2)**2 + sp_hat(2:2*nfft+2:2)**2
     sp_norm = sp_norm / sum(sp_norm(ilcut:ihcut)) + 1.d-10
@@ -593,7 +604,7 @@ end subroutine
 !     Compute the jerk metric for a 1d signal
 ! 
 !     Input
-!     n      : integer(long)
+!     n      : integer(size_t)
 !     x(n)   : real(double), array to compute for
 !     fs     : real(double), sampling frequency, in Hz
 ! 
@@ -603,11 +614,11 @@ end subroutine
 subroutine jerk_1d(n, x, fs, jerk) bind(C, name="jerk_1d")
     use, intrinsic :: iso_c_binding
     implicit none
-    integer(c_long), intent(in) :: n
+    integer(c_size_t), intent(in) :: n
     real(c_double), intent(in) :: x(n), fs
     real(c_double), intent(out) :: jerk
     ! local
-    integer(c_long) :: i
+    integer(c_size_t) :: i
     real(c_double) :: amp, jsum, xold
 
     jsum = 0._c_double
@@ -629,7 +640,7 @@ end subroutine
 !     Compute the jerk metric, but dimensionless, for a signal
 ! 
 !     Input
-!     n      : integer(long), axis dimension
+!     n      : integer(size_t), axis dimension
 !     x(n)   : real(double), array to compute for
 !     stype  : integer(long), type of signal input. 1=velocity, 2=acceleration, 3=jerk
 ! 
@@ -639,11 +650,12 @@ end subroutine
 subroutine dimensionless_jerk_1d(n, x, stype, djerk) bind(C, name="dimensionless_jerk_1d")
     use, intrinsic :: iso_c_binding
     implicit none
-    integer(c_long), intent(in) :: n, stype
+    integer(c_size_t), intent(in) :: n
+    integer(c_long), intent(in) :: stype
     real(c_double), intent(in) :: x(n)
     real(c_double), intent(out) :: djerk
     ! local
-    integer(c_long) :: i
+    integer(c_size_t) :: i
     real(c_double) :: amp, jsum
 
     jsum = 0._c_double
@@ -685,7 +697,7 @@ end subroutine
 !     Compute the percentage of samples that lie within the specified range
 ! 
 !     Input
-!     n      : integer(long)
+!     n      : integer(size_t)
 !     x(n)   : real(double), array to compute for
 !     xmin   : real(double), range min value
 !     xmax   : real(double), range max value
@@ -696,11 +708,11 @@ end subroutine
 subroutine range_count_1d(n, x, xmin, xmax, rcp) bind(C, name="range_count_1d")
     use, intrinsic :: iso_c_binding
     implicit none
-    integer(c_long), intent(in) :: n
+    integer(c_size_t), intent(in) :: n
     real(c_double), intent(in) :: x(n), xmin, xmax
     real(c_double), intent(out) :: rcp
     ! local
-    integer(c_long) :: i
+    integer(c_size_t) :: i
 
     rcp = 0._c_double
     do i=1, n
@@ -718,7 +730,7 @@ end subroutine
 !     Compute the percentage of samples farther away than r * SD from the mean
 ! 
 !     Input
-!     n      : integer(long)
+!     n      : integer(size_t)
 !     x(n)   : real(double), array to compute for
 !     r      : real(double), factor to multiply SD by
 ! 
@@ -729,7 +741,7 @@ subroutine ratio_beyond_r_sigma_1d(n, x, r, rbrs) bind(C, name="ratio_beyond_r_s
     use, intrinsic :: iso_c_binding
     use utility, only : mean_sd_1d
     implicit none
-    integer(c_long), intent(in) :: n
+    integer(c_size_t), intent(in) :: n
     real(c_double), intent(in) :: x(n), r
     real(c_double), intent(out) :: rbrs
     ! local
@@ -748,7 +760,7 @@ end subroutine
 !     Compute the linear regression and the slope
 ! 
 !     Input
-!     n      : integer(long)
+!     n      : integer(size_t)
 !     y(n)   : real(double), array to compute for
 !     fs     : real(double), sampling frequency for the array
 ! 
@@ -758,11 +770,11 @@ end subroutine
 subroutine linear_regression_1d(n, y, fs, slope) bind(C, name="linear_regression_1d")
     use, intrinsic :: iso_c_binding
     implicit none
-    integer(c_long), intent(in) :: n
+    integer(c_size_t), intent(in) :: n
     real(c_double), intent(in) :: y(n), fs
     real(c_double), intent(out) :: slope
     ! local
-    integer(c_long) :: i
+    integer(c_size_t) :: i
     real(c_double) :: ssxm, ssxym, ky, Ex, Ey, Exy
 
     ! The variance of a time series with N elements and sampling frequency fs
@@ -788,7 +800,7 @@ subroutine linear_regression_1d(n, y, fs, slope) bind(C, name="linear_regression
     Ey = 0._c_double
     Exy = 0._c_double
 
-    do i=2, n
+    do i=2_c_size_t, n
         Ey = Ey + (y(i) - ky)
         Exy = Exy + ((i-1) / fs) * (y(i) - ky)
     end do
@@ -803,7 +815,7 @@ end subroutine
 !     Compute the spectral arc length measure of smoothness
 ! 
 !     Input
-!     n            : integer(long), axis dimension
+!     n            : integer(size_t), axis dimension
 !     x(n)         : real(double), array to compute for
 !     fs           : real(double), sampling frequency in Hz
 !     padlevel     : integer(long), amount of zero-padding for the FFT
@@ -818,11 +830,13 @@ subroutine sparc_1d(n, x, fs, padlevel, fc, amp_thresh, sal) bind(C, name="sparc
     use, intrinsic :: iso_c_binding
     use real_fft, only : execute_real_forward
     implicit none
-    integer(c_long), intent(in) :: n, padlevel
+    integer(c_size_t), intent(in) :: n
+    integer(c_long), intent(in) :: padlevel
     real(c_double), intent(in) :: x(n), fs, fc, amp_thresh
     real(c_double), intent(out) :: sal
     ! local
-    integer(c_long) :: nfft, i, ixf, inxi, inxf, ier
+    integer(c_size_t) :: nfft, i
+    integer(c_long) :: ixf, inxi, inxf, ier
     real(c_double) :: freq_factor
     real(c_double) :: Mf(2**(ceiling(log(real(n))/log(2.0)) + padlevel-1)+1)
     real(c_double) :: y(2**(ceiling(log(real(n))/log(2.0)) + padlevel))

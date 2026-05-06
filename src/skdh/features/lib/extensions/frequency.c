@@ -7,12 +7,12 @@
 #include <stdlib.h>
 #include <math.h>
 
-extern void dominant_freq_1d(long *, double *, double *, long *, double *, double *, double *);
-extern void dominant_freq_value_1d(long *, double *, double *, long *, double *, double *, double *);
-extern void power_spectral_sum_1d(long *, double *, double *, long *, double *, double *, double *);
-extern void range_power_sum_1d(long *, double *, double *, long *, double *, double *, int *, int *, int *, double *);
-extern void spectral_entropy_1d(long *, double *, double *, long *, double *, double *, double *);
-extern void spectral_flatness_1d(long *, double *, double *, long *, double *, double *, double *);
+extern void dominant_freq_1d(Py_ssize_t *, double *, double *, long *, double *, double *, double *);
+extern void dominant_freq_value_1d(Py_ssize_t *, double *, double *, long *, double *, double *, double *);
+extern void power_spectral_sum_1d(Py_ssize_t *, double *, double *, long *, double *, double *, double *);
+extern void range_power_sum_1d(Py_ssize_t *, double *, double *, long *, double *, double *, int *, int *, int *, double *);
+extern void spectral_entropy_1d(Py_ssize_t *, double *, double *, long *, double *, double *, double *);
+extern void spectral_flatness_1d(Py_ssize_t *, double *, double *, long *, double *, double *, double *);
 extern void destroy_plan(void);
 
 
@@ -66,7 +66,7 @@ PyObject * dominant_frequency(PyObject *NPY_UNUSED(self), PyObject *args){
         double *dptr = (double *)PyArray_DATA(data);
         double *rptr = (double *)PyArray_DATA(res);
 
-        long stride = ddims[ndim-1];
+        npy_intp stride = ddims[ndim-1];
         int nrepeats = PyArray_SIZE(data) / stride;
 
         for (int i = 0; i < nrepeats; ++i){
@@ -140,7 +140,7 @@ PyObject * dominant_frequency_value(PyObject *NPY_UNUSED(self), PyObject *args){
         double *dptr = (double *)PyArray_DATA(data);
         double *rptr = (double *)PyArray_DATA(res);
 
-        long stride = ddims[ndim-1];
+        npy_intp stride = ddims[ndim-1];
         int nrepeats = PyArray_SIZE(data) / stride;
 
         for (int i = 0; i < nrepeats; ++i){
@@ -215,7 +215,7 @@ PyObject * power_spectral_sum(PyObject *NPY_UNUSED(self), PyObject *args){
         double *dptr = (double *)PyArray_DATA(data);
         double *rptr = (double *)PyArray_DATA(res);
 
-        long stride = ddims[ndim-1];
+        npy_intp stride = ddims[ndim-1];
         int nrepeats = PyArray_SIZE(data) / stride;
 
         for (int i = 0; i < nrepeats; ++i){
@@ -298,7 +298,7 @@ PyObject * range_power_sum(PyObject *NPY_UNUSED(self), PyObject *args)
         double *dptr = (double *)PyArray_DATA(data);
         double *rptr = (double *)PyArray_DATA(res);
 
-        long stride = ddims[ndim-1];
+        npy_intp stride = ddims[ndim-1];
         int nrepeats = PyArray_SIZE(data) / stride;
 
         for (int i = 0; i < nrepeats; ++i)
@@ -376,7 +376,7 @@ PyObject * spectral_entropy(PyObject *NPY_UNUSED(self), PyObject *args){
         double *dptr = (double *)PyArray_DATA(data);
         double *rptr = (double *)PyArray_DATA(res);
 
-        long stride = ddims[ndim-1];
+        npy_intp stride = ddims[ndim-1];
         int nrepeats = PyArray_SIZE(data) / stride;
 
         for (int i = 0; i < nrepeats; ++i){
@@ -451,7 +451,7 @@ PyObject * spectral_flatness(PyObject *NPY_UNUSED(self), PyObject *args){
         double *dptr = (double *)PyArray_DATA(data);
         double *rptr = (double *)PyArray_DATA(res);
 
-        long stride = ddims[ndim-1];
+        npy_intp stride = ddims[ndim-1];
         int nrepeats = PyArray_SIZE(data) / stride;
 
         for (int i = 0; i < nrepeats; ++i){
