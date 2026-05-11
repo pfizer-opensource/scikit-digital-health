@@ -656,7 +656,7 @@ class ActivityLevelClassification(BaseProcess):
                 fs,
                 time[start:stop],
                 acc_metric,
-                'wake',
+                'sleep',
             )
     
         # make sure that any endpoints that were caching values between runs are reset
