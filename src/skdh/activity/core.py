@@ -196,6 +196,7 @@ class ActivityLevelClassification(BaseProcess):
         self.save_epochs = save_epoch_data
         self.epoch_data = {
             "time": [],
+            "state": [],
             "metric": [],
             "intensity": []
         }
@@ -543,6 +544,7 @@ class ActivityLevelClassification(BaseProcess):
             # compute sleeping hours activity endpoints
             self._compute_sleep_activity_endpoints(
                 res,
+                time,
                 accel,
                 fs,
                 iday,
@@ -604,6 +606,7 @@ class ActivityLevelClassification(BaseProcess):
                 fs,
                 time[start:stop],
                 acc_metric,
+                'wake',
             )
 
             for endpoint in self.wake_endpoints:
@@ -616,7 +619,7 @@ class ActivityLevelClassification(BaseProcess):
             endpoint.reset_cached()
 
     def _compute_sleep_activity_endpoints(
-        self, results, accel, fs, day_n, starts, stops, n_wlen, n_wlen_60, epm
+        self, results, time, accel, fs, day_n, starts, stops, n_wlen, n_wlen_60, epm
     ):
         if starts is None or stops is None:
             return  # don't initialize/compute any values if there is no sleep data
@@ -647,6 +650,15 @@ class ActivityLevelClassification(BaseProcess):
                     results, day_n, acc_metric, acc_metric_60, self.wlen, epm
                 )
 
+        # handle saving the epoch data
+            self._handle_epoch_data(
+                n_wlen,
+                fs,
+                time[start:stop],
+                acc_metric,
+                'wake',
+            )
+    
         # make sure that any endpoints that were caching values between runs are reset
         for endpoint in self.wake_endpoints:
             endpoint.reset_cached()
@@ -808,11 +820,12 @@ class ActivityLevelClassification(BaseProcess):
 
         pp.close()
 
-    def _handle_epoch_data(self, wlen, fs, time, metric):
+    def _handle_epoch_data(self, wlen, fs, time, metric, state):
         if self.save_epochs:
             self.epoch_data["time"].extend(
                 time[:-wlen+1:wlen]
             )
+            self.epoch_data["state"].extend(full(metric.size, state))
             self.epoch_data["metric"].extend(
                 metric
             )
