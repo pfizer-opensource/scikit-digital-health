@@ -49,7 +49,7 @@ Run a process starting with data ingestion
     # pipeline setup
     pipeline = skdh.Pipeline()
     pipeline.add(
-        skdh.io.ReadCsv(
+        skdh.io.ReadCSV(
             time_col_name='Timestamp UTC',
             column_names={'accel': ['Accelerometer X', 'Accelerometer Y', 'Accelerometer Z']},
             drop_duplicate_timestamps=False,
