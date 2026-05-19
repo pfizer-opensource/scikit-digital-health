@@ -151,8 +151,8 @@ def accel_with_nonwear():
                     [110, 140],  # w-30                NF
                     [141, 142],  # [nw-1][w-1][nw-2]    F: 1 < 0.8(3)
                     [144, 149],  # [nw-2][w-5][nw-4]   NF: 5 !< 0.3(6)
-                    [153, 155],  # [nw-4][w-2][nw-3]    F: 2 < 0.8(7)
-                    [158, 159],  # [nw-3][w-1][nw-1]    F: 1 < 0.8(4)
+                    [151, 155],  # [nw-2][w-4][nw-2]    NF: 4 !< 0.3(4)
+                    [157, 160],  # [nw-2][w-3][    ]    NF: 3 !< 0.8(2)
                 ]
             )
             * 3600
@@ -163,14 +163,18 @@ def accel_with_nonwear():
         for se in wss:
             a[se[0] : se[1]] += (rng.random((se[1] - se[0], 3)) - 0.5) * 0.5
 
-        starts = np.array([0, 3, 6, 9, 110, 144]) * 3600 * fs
-        stops = np.array([2, 5, 8, 70, 140, 149]) * 3600 * fs
+        starts = np.array([0, 3, 6, 9, 110, 144, 151, 157]) * 3600 * fs
+        stops = np.array([2, 5, 8, 70, 140, 149, 155, 160]) * 3600 * fs
 
         if app_setup_crit:
             starts = starts[1:]
             stops = stops[1:]
-        starts = starts[stops > (ship_crit[0] * 3600 * fs)]
-        stops = stops[stops > (ship_crit[0] * 3600 * fs)]
+
+        # shipping criteria
+        mask = ((stops - starts) <= 3 * 3600 * fs)
+        mask &= ((stops < ship_crit[0] * 3600 * fs) | (starts > (160 - ship_crit[1]) * 3600 * fs))
+        starts = starts[~mask]
+        stops = stops[~mask]
 
         wear = np.concatenate((starts, stops)).reshape((2, -1)).T
 
