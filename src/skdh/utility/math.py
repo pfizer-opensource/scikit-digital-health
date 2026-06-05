@@ -42,7 +42,7 @@ __all__ = [
 ]
 
 
-def moving_mean(a, w_len, skip, trim=True, axis=-1):
+def moving_mean(a, w_len, skip, req_points=1.0, trim=True, axis=-1):
     r"""
     Compute the moving mean.
 
@@ -54,6 +54,9 @@ def moving_mean(a, w_len, skip, trim=True, axis=-1):
         Window length in number of samples.
     skip : int
         Window start location skip in number of samples.
+    req_points : float, optional
+        Minimum fraction of points required to compute the mean. Default is 1.0.
+        If a float, is a proportion of the window length. If an int, is the number of points.
     trim : bool, optional
         Trim the ends of the result, where a value cannot be calculated. If False,
         these values will be set to NaN. Default is True.
@@ -132,6 +135,11 @@ def moving_mean(a, w_len, skip, trim=True, axis=-1):
     """
     if w_len <= 0 or skip <= 0:
         raise ValueError("`wlen` and `skip` cannot be less than or equal to 0.")
+    
+    if isinstance(req_points, float):
+        req_points = int(round(w_len * req_points))
+    if req_points < 0:
+        raise ValueError("`req_points` cannot be less than 0.")
 
     # move computation axis to end
     x = moveaxis(a, axis, -1)
@@ -140,7 +148,12 @@ def moving_mean(a, w_len, skip, trim=True, axis=-1):
     if w_len > x.shape[-1]:
         raise ValueError("Window length is larger than the computation axis.")
 
-    rmean = _extensions.moving_mean(x, w_len, skip, trim)
+    rmean = _extensions.moving_mean(x, w_len, skip, req_points)
+
+    # handle trim
+    if trim:
+        n = (x.shape[-1] - w_len) // skip + 1
+        rmean = rmean[..., :n]
 
     # move computation axis back to original place and return
     return moveaxis(rmean, -1, axis)

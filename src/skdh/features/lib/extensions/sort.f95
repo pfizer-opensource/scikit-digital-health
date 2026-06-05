@@ -74,11 +74,11 @@ contains
     !     idx(n)  : integer(8), index of values to be rearranged (inplace) to match the sorting of x
     ! --------------------------------------------------------------------
     recursive subroutine quick_argsort_(n, x, idx) bind(C, name="quick_argsort_")
-        integer(c_long), intent(in) :: n
+        integer(c_size_t), intent(in) :: n
         real(c_double), intent(inout) :: x(n)
         integer(c_long), intent(inout) :: idx(n)
         ! local
-        integer(c_long) :: i, j, k, l, g, itemp, ip1, ip2
+        integer(c_size_t) :: i, j, k, l, g, itemp, ip1, ip2
         real(c_double) :: temp, p1, p2
         
         ! use insertion sort on small arrays
@@ -202,10 +202,10 @@ contains
     !     x(n)  : real(8), array of values to sort (inplace)
     ! --------------------------------------------------------------------
     recursive subroutine quick_sort_(n, x) bind(C, name="quick_sort_")
-        integer(c_long), intent(in) :: n
+        integer(c_size_t), intent(in) :: n
         real(c_double), intent(inout) :: x(n)
     !f2py intent(hide) :: n
-        integer(c_long) :: i, j, k, l, g
+        integer(c_size_t) :: i, j, k, l, g
         real(c_double) :: temp, p1, p2
         
         ! use insertion sort on small arrays

@@ -97,13 +97,14 @@ contains
     ! axivity_read_header : read the header (first 1024 bytes) plus a little bit for error checking
     ! =============================================================================================
     subroutine axivity_read_header(flen, file, finfo, ierr) bind(C, name="axivity_read_header")
-        integer(c_long), intent(in) :: flen  ! length of the file name string
+        integer(c_size_t), intent(in) :: flen  ! length of the file name string
         character(kind=c_char), intent(in) :: file(flen)  ! file name
         type(FileInfo_t), intent(inout) :: finfo  ! file info storage structure
         integer(c_int), intent(inout) :: ierr  ! error tracking/returning
         ! local
         type(metadata) :: hdr
-        integer(c_long) :: itmp, i
+        integer(c_size_t) :: i
+        integer(c_long) :: itmp
         character(960) :: annotation_block
         character(flen) :: file_
         integer(c_int8_t) :: numAxesBps
@@ -111,7 +112,7 @@ contains
         integer(4) :: fstat_vals(13), fstat_err
 
         ! needed for converting c strings
-        do i=1_c_long, flen
+        do i=1_c_size_t, flen
             file_(i:i + 1) = file(i)
         end do
 

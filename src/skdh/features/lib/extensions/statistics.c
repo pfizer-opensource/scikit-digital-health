@@ -7,8 +7,8 @@
 #include <stdlib.h>
 
 
-extern void autocorr_1d(long *, double *, long *, int *, double *);
-extern void linear_regression_1d(long *, double *, double *, double *);
+extern void autocorr_1d(Py_ssize_t *, double *, long *, int *, double *);
+extern void linear_regression_1d(Py_ssize_t *, double *, double *, double *);
 
 
 PyObject * autocorrelation(PyObject *NPY_UNUSED(self), PyObject *args){
@@ -55,7 +55,7 @@ PyObject * autocorrelation(PyObject *NPY_UNUSED(self), PyObject *args){
         double *dptr = (double *)PyArray_DATA(data);
         double *rptr = (double *)PyArray_DATA(res);
 
-        long stride = ddims[ndim-1];
+        npy_intp stride = ddims[ndim-1];
         int nrepeats = PyArray_SIZE(data) / stride;
 
         for (int i = 0; i < nrepeats; ++i){
@@ -113,7 +113,7 @@ PyObject * linear_regression(PyObject *NPY_UNUSED(self), PyObject *args){
         double *dptr = (double *)PyArray_DATA(data);
         double *rptr = (double *)PyArray_DATA(res);
 
-        long stride = ddims[ndim-1];
+        npy_intp stride = ddims[ndim-1];
         int nrepeats = PyArray_SIZE(data) / stride;
 
         for (int i = 0; i < nrepeats; ++i){

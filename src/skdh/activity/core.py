@@ -71,6 +71,11 @@ class ActivityLevelClassification(BaseProcess):
         If True then count breaks in a bout towards the bout duration. If False
         then only count time spent above the threshold towards the bout duration.
         Only used if `bout_metric=1`. Default is False.
+    wear_wake_times_round : {None, int}, optional
+        A value in seconds to round the wear/wake start/end times to, relative to the
+        start of the day. For example, if 15 is passed, and the wear/wake period
+        starts at xx:yy:10, (and the day starts at 00:00:00), the start time will
+        be rounded to xx:yy:15.
     min_wear_time : int, optional
         Minimum wear time in hours for a day to be analyzed. Default is 10 hours.
     cutpoints : {str, dict, list}, optional
@@ -136,6 +141,7 @@ class ActivityLevelClassification(BaseProcess):
         bout_criteria=0.8,
         bout_metric=4,
         closed_bout=False,
+        wear_wake_times_round=None,
         min_wear_time=10,
         cutpoints="migueles_wrist_adult",
         day_window=(0, 24),
@@ -165,6 +171,7 @@ class ActivityLevelClassification(BaseProcess):
             bout_criteria=bout_criteria,
             bout_metric=bout_metric,
             closed_bout=closed_bout,
+            wear_wake_times_round=wear_wake_times_round,
             min_wear_time=min_wear_time,
             cutpoints=cutpoints_,
             day_window=day_window,
@@ -177,6 +184,7 @@ class ActivityLevelClassification(BaseProcess):
         self.boutcrit = bout_criteria
         self.boutmetric = bout_metric
         self.closedbout = closed_bout
+        self.wear_wake_times_round = wear_wake_times_round
         self.min_wear = min_wear_time
         self.cutpoints = cutpoints_
 
@@ -188,6 +196,7 @@ class ActivityLevelClassification(BaseProcess):
         self.save_epochs = save_epoch_data
         self.epoch_data = {
             "time": [],
+            "state": [],
             "metric": [],
             "intensity": []
         }
@@ -201,6 +210,10 @@ class ActivityLevelClassification(BaseProcess):
         self.wake_endpoints = [
             ept.IntensityGradient(state="wake"),
             ept.MaxAcceleration(self.max_acc_lens, state="wake"),
+            # M5hr, M10hr
+            ept.MaxAcceleration([300, 600], required_points=0.5, state="wake"),
+            # L5hr
+            ept.MinAcceleration([300], required_points=0.5, state="wake"),
         ]
         self.wake_endpoints += [
             ept.TotalIntensityTime(lvl, self.wlen, self.cutpoints, state="wake")
@@ -468,7 +481,7 @@ class ActivityLevelClassification(BaseProcess):
 
             # get the intersection of wear time and day
             dwear_starts, dwear_stops = get_day_index_intersection(
-                *self.wear_idx, True, day_start, day_stop  # include wear time
+                *self.wear_idx, True, day_start, day_stop, ends_round=self.wear_wake_times_round, fs=fs  # include wear time
             )
 
             # PLOTTING. handle here before returning for minimal wear hours, etc
@@ -502,6 +515,8 @@ class ActivityLevelClassification(BaseProcess):
                     (True, False),  # include wear time, exclude sleeping time
                     day_start,
                     day_stop,
+                    ends_round=self.wear_wake_times_round,
+                    fs=fs,
                 )
                 sleep_wear_starts, sleep_wear_stops = get_day_index_intersection(
                     (self.wear_idx[0], sleep_starts),
@@ -509,6 +524,8 @@ class ActivityLevelClassification(BaseProcess):
                     (True, True),  # now we want only sleep
                     day_start,
                     day_stop,
+                    ends_round=self.wear_wake_times_round,
+                    fs=fs,
                 )
 
                 res["N wear wake hours"][iday] = around(
@@ -527,6 +544,7 @@ class ActivityLevelClassification(BaseProcess):
             # compute sleeping hours activity endpoints
             self._compute_sleep_activity_endpoints(
                 res,
+                time,
                 accel,
                 fs,
                 iday,
@@ -588,6 +606,7 @@ class ActivityLevelClassification(BaseProcess):
                 fs,
                 time[start:stop],
                 acc_metric,
+                'wake',
             )
 
             for endpoint in self.wake_endpoints:
@@ -600,7 +619,7 @@ class ActivityLevelClassification(BaseProcess):
             endpoint.reset_cached()
 
     def _compute_sleep_activity_endpoints(
-        self, results, accel, fs, day_n, starts, stops, n_wlen, n_wlen_60, epm
+        self, results, time, accel, fs, day_n, starts, stops, n_wlen, n_wlen_60, epm
     ):
         if starts is None or stops is None:
             return  # don't initialize/compute any values if there is no sleep data
@@ -631,6 +650,15 @@ class ActivityLevelClassification(BaseProcess):
                     results, day_n, acc_metric, acc_metric_60, self.wlen, epm
                 )
 
+        # handle saving the epoch data
+            self._handle_epoch_data(
+                n_wlen,
+                fs,
+                time[start:stop],
+                acc_metric,
+                'sleep',
+            )
+    
         # make sure that any endpoints that were caching values between runs are reset
         for endpoint in self.wake_endpoints:
             endpoint.reset_cached()
@@ -762,7 +790,7 @@ class ActivityLevelClassification(BaseProcess):
                 start_hr -= 24
         # get day-sleep intersection
         day_sleep_starts, day_sleep_stops = get_day_index_intersection(
-            sleep_starts, sleep_stops, True, day_start, day_stop
+            sleep_starts, sleep_stops, True, day_start, day_stop, ends_round=self.wear_wake_times_round, fs=fs
         )
 
         sleep = []
@@ -792,11 +820,12 @@ class ActivityLevelClassification(BaseProcess):
 
         pp.close()
 
-    def _handle_epoch_data(self, wlen, fs, time, metric):
+    def _handle_epoch_data(self, wlen, fs, time, metric, state):
         if self.save_epochs:
             self.epoch_data["time"].extend(
                 time[:-wlen+1:wlen]
             )
+            self.epoch_data["state"].extend(full(metric.size, state))
             self.epoch_data["metric"].extend(
                 metric
             )

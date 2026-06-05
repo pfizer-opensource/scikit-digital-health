@@ -32,6 +32,29 @@ class TestGetDayIndexIntersection:
             assert allclose(p_starts, true_starts[i])
             assert allclose(p_stops, true_stops[i])
 
+    def test_round_15s(self, day_ends, sleep_ends, wear_ends, true_intersect_ends_15s):
+        day_start, day_stop = day_ends
+        sleep_starts, sleep_stops = sleep_ends
+        wear_starts, wear_stops = wear_ends
+        true_starts, true_stops = true_intersect_ends_15s
+
+        for i in range(1, 4):
+            p_starts, p_stops = get_day_index_intersection(
+                (sleep_starts[i], wear_starts),
+                (sleep_stops[i], wear_stops),
+                (False, True),
+                day_start,
+                day_stop,
+                fs=1.0,
+                ends_round=15,
+            )
+
+            assert p_starts.size == true_starts[i].size
+            assert p_stops.size == true_stops[i].size
+
+            assert allclose(p_starts, true_starts[i])
+            assert allclose(p_stops, true_stops[i])
+
     def test_sleep_only(self, day_ends, sleep_ends, true_sleep_only_ends):
         day_start, day_stop = day_ends
         sleep_starts, sleep_stops = sleep_ends

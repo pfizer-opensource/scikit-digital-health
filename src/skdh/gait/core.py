@@ -6,6 +6,7 @@ Copyright (c) 2023, Pfizer Inc. All rights reserved.
 """
 
 from collections.abc import Iterable
+from sys import exception
 from warnings import warn
 
 from numpy import ndarray, asarray, mean, diff, sum, nan
@@ -616,14 +617,18 @@ class GaitLumbar(BaseProcess):
 
             for ibout, bout in enumerate(gait_bouts):
                 # run the bout processing pipeline
-                bout_res = self.bout_pipeline.run(
-                    time=time_rs[bout],
-                    accel=accel_rs[bout],
-                    gyro=gyro_rs[bout] if gyro_rs is not None else None,
-                    fs=goal_fs,
-                    v_axis=v_axis,
-                    ap_axis=ap_axis,
-                )
+                try:
+                    bout_res = self.bout_pipeline.run(
+                        time=time_rs[bout],
+                        accel=accel_rs[bout],
+                        gyro=gyro_rs[bout] if gyro_rs is not None else None,
+                        fs=goal_fs,
+                        v_axis=v_axis,
+                        ap_axis=ap_axis,
+                    )
+                except Exception as e:
+                    warn(f"Caught error processing bout no. {ibout}: {e}")
+                    continue
 
                 # get the data we need
                 n_strides = bout_res["qc_initial_contacts"].size
