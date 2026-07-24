@@ -11,7 +11,7 @@ from numpy import maximum, abs, repeat, arctan, sqrt, pi
 from numpy.linalg import norm
 from scipy.signal import butter, sosfiltfilt
 
-from skdh.utility import moving_mean
+from skdh.utility import moving_mean, moving_max
 
 
 __all__ = [
@@ -98,6 +98,36 @@ def metric_enmo(accel, wlen, *args, take_abs=False, trim_zero=True, **kwargs):
         return moving_mean(maximum(enmo, 0), wlen, wlen)
     else:
         return moving_mean(enmo, wlen, wlen)
+
+
+def metric_enmo_met(accel, fs, *args, take_abs=False, trim_zero=True, **kwargs):
+    """
+    Compute the MET value based on euclidean norm minus 1. Works best when the 
+    accelerometer data has been calibrated so that devices at rest measure acceleration 
+    norms of 1g.
+
+    Parameters
+    ----------
+    accel : numpy.ndarray
+        (N, 3) array of acceleration values in g.
+    fs : float
+        Sampling frequency of `accel` in Hz.
+    take_abs : bool, optional
+        Use the absolute value of the difference between euclidean norm and 1g. Default is False.
+    trim_zero : bool, optional
+        Trim values to no less than 0. Default is True.
+
+    Returns
+    -------
+    met : numpy.ndarray
+        (N, ) array of metabolic equivalent of task (MET) values.
+    """
+    enmo_1s = metric_enmo(accel, int(fs), take_abs=take_abs, trim_zero=trim_zero)
+    enmo = moving_max(enmo_1s, int(fs * 60), int(fs * 60))
+
+    aee = -10.58 + 1.1176 * enmo + 2.9418 * sqrt(enmo) - 0.00059277 * enmo**2
+    met = aee / 71.255
+    return met
 
 
 def metric_bfen(accel, wlen, fs, low_cutoff=0.2, high_cutoff=15, **kwargs):

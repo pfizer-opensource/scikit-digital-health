@@ -193,3 +193,11 @@ _base_cutpoints["migueles_wrist_adult"] = {
     "light": 0.110,
     "moderate": 0.440,
 }
+
+_base_cutpoints["white_met"] = {
+    "metric": "metric_enmo_met",
+    "kwargs": {},
+    "sedentary": 1.5,
+    "light": 3.0,
+    "moderate": 6.0,
+}
