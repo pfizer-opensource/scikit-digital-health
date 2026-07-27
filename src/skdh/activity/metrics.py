@@ -25,7 +25,7 @@ __all__ = [
 ]
 
 
-def metric_anglez(accel, wlen, *args, **kwargs):
+def metric_anglez(accel, *, wlen, **kwargs):
     """
     Compute the angle between the accelerometer z axis and the horizontal plane.
 
@@ -51,7 +51,7 @@ def metric_anglez(accel, wlen, *args, **kwargs):
     return moving_mean(anglez, wlen, wlen)
 
 
-def metric_en(accel, wlen, *args, **kwargs):
+def metric_en(accel, *, wlen, **kwargs):
     """
     Compute the euclidean norm.
 
@@ -70,7 +70,7 @@ def metric_en(accel, wlen, *args, **kwargs):
     return moving_mean(norm(accel, axis=1), wlen, wlen)
 
 
-def metric_enmo(accel, wlen, *args, take_abs=False, trim_zero=True, **kwargs):
+def metric_enmo(accel, *, wlen, take_abs=False, trim_zero=True, **kwargs):
     """
     Compute the euclidean norm minus 1. Works best when the accelerometer data has been calibrated
     so that devices at rest measure acceleration norms of 1g.
@@ -100,7 +100,7 @@ def metric_enmo(accel, wlen, *args, take_abs=False, trim_zero=True, **kwargs):
         return moving_mean(enmo, wlen, wlen)
 
 
-def metric_enmo_met(accel, fs, *args, take_abs=False, trim_zero=True, **kwargs):
+def metric_enmo_met(accel, *, fs, take_abs=False, trim_zero=True, **kwargs):
     """
     Compute the MET value based on euclidean norm minus 1. Works best when the 
     accelerometer data has been calibrated so that devices at rest measure acceleration 
@@ -122,15 +122,15 @@ def metric_enmo_met(accel, fs, *args, take_abs=False, trim_zero=True, **kwargs):
     met : numpy.ndarray
         (N, ) array of metabolic equivalent of task (MET) values.
     """
-    enmo_1s = metric_enmo(accel, int(fs), take_abs=take_abs, trim_zero=trim_zero)
-    enmo = moving_max(enmo_1s, int(fs * 60), int(fs * 60))
+    enmo_1s = metric_enmo(accel, wlen=int(fs), take_abs=take_abs, trim_zero=trim_zero)
+    enmo = moving_max(enmo_1s, 60, 60)
 
     aee = -10.58 + 1.1176 * enmo + 2.9418 * sqrt(enmo) - 0.00059277 * enmo**2
     met = aee / 71.255
     return met
 
 
-def metric_bfen(accel, wlen, fs, low_cutoff=0.2, high_cutoff=15, **kwargs):
+def metric_bfen(accel, *,wlen, fs, low_cutoff=0.2, high_cutoff=15, **kwargs):
     """
     Compute the band-pass filtered euclidean norm.
 
@@ -160,7 +160,7 @@ def metric_bfen(accel, wlen, fs, low_cutoff=0.2, high_cutoff=15, **kwargs):
     return moving_mean(norm(sosfiltfilt(sos, accel, axis=0), axis=1), wlen, wlen)
 
 
-def metric_hfen(accel, wlen, fs, low_cutoff=0.2, trim_zero=True, **kwargs):
+def metric_hfen(accel, *, wlen, fs, low_cutoff=0.2, trim_zero=True, **kwargs):
     """
     Compute the high-pass filtered euclidean norm.
 
@@ -189,7 +189,7 @@ def metric_hfen(accel, wlen, fs, low_cutoff=0.2, trim_zero=True, **kwargs):
     return moving_mean(norm(sosfiltfilt(sos, accel, axis=0), axis=1), wlen, wlen)
 
 
-def metric_hfenplus(accel, wlen, fs, cutoff=0.2, trim_zero=True, **kwargs):
+def metric_hfenplus(accel, *, wlen, fs, cutoff=0.2, trim_zero=True, **kwargs):
     """
     Compute the high-pass filtered euclidean norm plus the low-pass filtered euclidean norm
     minus 1g.
@@ -225,7 +225,7 @@ def metric_hfenplus(accel, wlen, fs, cutoff=0.2, trim_zero=True, **kwargs):
         return moving_mean(acc_high + acc_low - 1, wlen, wlen)
 
 
-def metric_mad(accel, wlen, *args, **kwargs):
+def metric_mad(accel, *, wlen, **kwargs):
     """
     Compute the Mean Amplitude Deviation metric for acceleration.
 
