@@ -598,10 +598,10 @@ class ActivityLevelClassification(BaseProcess):
             # compute the desired acceleration metric
             metric_fn = get_metric(self.cutpoints["metric"])
             acc_metric = metric_fn(
-                accel[start:stop], n_wlen, fs, **self.cutpoints["kwargs"]
+                accel[start:stop], wlen=n_wlen, fs=fs, **self.cutpoints["kwargs"]
             )
             acc_metric_60 = metric_fn(
-                accel[start:stop], n_wlen_60, fs, **self.cutpoints["kwargs"]
+                accel[start:stop], wlen=n_wlen_60, fs=fs, **self.cutpoints["kwargs"]
             )
 
             # handle saving the epoch data
@@ -641,10 +641,10 @@ class ActivityLevelClassification(BaseProcess):
             metric_fn = get_metric(self.cutpoints["metric"])
             try:
                 acc_metric = metric_fn(
-                    accel[start:stop], n_wlen, fs, **self.cutpoints["kwargs"]
+                    accel[start:stop], wlen=n_wlen, fs=fs, **self.cutpoints["kwargs"]
                 )
                 acc_metric_60 = metric_fn(
-                    accel[start:stop], n_wlen_60, fs, **self.cutpoints["kwargs"]
+                    accel[start:stop], wlen=n_wlen_60, fs=fs, **self.cutpoints["kwargs"]
                 )
             except ValueError:  # if not enough points, just skip, value is already set
                 continue
@@ -722,7 +722,7 @@ class ActivityLevelClassification(BaseProcess):
 
         # compute the metric over 1 minute intervals
         metric_fn = get_metric(self.cutpoints["metric"])
-        acc_metric = metric_fn(accel, n60, **self.cutpoints["kwargs"])
+        acc_metric = metric_fn(accel, wlen=n60, **self.cutpoints["kwargs"])
 
         # add to second sub-axis
         ax[1].plot(
