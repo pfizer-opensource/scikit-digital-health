@@ -14,7 +14,7 @@ from skdh.activity.metrics import (
 def test_metric_anglez(get_linear_accel):
     x = get_linear_accel(scale=0.0).T
 
-    res = metric_anglez(x, 100)
+    res = metric_anglez(x, wlen=100)
 
     assert allclose(res, 90.0)
 
@@ -22,7 +22,7 @@ def test_metric_anglez(get_linear_accel):
 def test_metric_en(get_linear_accel):
     x = get_linear_accel(scale=0.1).T
 
-    res = metric_en(x, 100)
+    res = metric_en(x, wlen=100)
 
     assert res.shape == (5,)
     assert all(res > 0)
@@ -32,18 +32,18 @@ def test_metric_en(get_linear_accel):
 def test_metric_enmo(get_linear_accel):
     x = get_linear_accel(scale=0.5).T
 
-    res = metric_enmo(x, 100, take_abs=False, trim_zero=True)
+    res = metric_enmo(x, wlen=100, take_abs=False, trim_zero=True)
 
     assert res.shape == (5,)
     assert all(res >= 0.0)
 
-    res = metric_enmo(x, 100, take_abs=True, trim_zero=True)
+    res = metric_enmo(x, wlen=100, take_abs=True, trim_zero=True)
 
     assert all(res >= 0.0)
 
     # make sure we can get values that will actually be < 0
     x = get_linear_accel(scale=0.1).T
-    res = metric_enmo(sort(x, axis=1), 10, take_abs=False, trim_zero=False)
+    res = metric_enmo(sort(x, axis=1), wlen=10, take_abs=False, trim_zero=False)
 
     assert any(res < 0.0)
 
@@ -54,7 +54,7 @@ def test_metric_bfen(get_sin_signal, get_linear_accel):
 
     y[:, 2] += x
 
-    res = metric_bfen(y, 10, fs, low_cutoff=1.0, high_cutoff=15.0, trim_zero=False)
+    res = metric_bfen(y, wlen=10, fs=fs, low_cutoff=1.0, high_cutoff=15.0, trim_zero=False)
 
     z = abs(get_sin_signal(1.0, 5.0, 0.0)[1]).reshape((-1, 10))
     z_mm = mean(z, axis=1)
@@ -69,7 +69,7 @@ def test_metric_hfen(get_sin_signal, get_linear_accel):
 
     y[:, 2] += x
 
-    res = metric_hfen(y, 10, fs, low_cutoff=1.0, trim_zero=False)
+    res = metric_hfen(y, wlen=10, fs=fs, low_cutoff=1.0, trim_zero=False)
 
     z = abs(get_sin_signal(1.0, 5.0, 0.0)[1]).reshape((-1, 10))
     z_mm = mean(z, axis=1)
@@ -84,8 +84,8 @@ def test_metric_hfenplus(get_sin_signal, get_linear_accel):
 
     y[:, 2] += x
 
-    res = metric_hfenplus(y, 10, fs, cutoff=1.0, trim_zero=False)
-    res_tz = metric_hfenplus(y, 10, fs, cutoff=1.0, trim_zero=True)
+    res = metric_hfenplus(y, wlen=10, fs=fs, cutoff=1.0, trim_zero=False)
+    res_tz = metric_hfenplus(y, wlen=10, fs=fs, cutoff=1.0, trim_zero=True)
 
     z1 = abs(get_sin_signal(1.0, 5.0, 0.0)[1]).reshape((-1, 10))
     # no abs because the it would be abs(sin + 1) - 1 == sin_signal
@@ -108,7 +108,7 @@ def test_metric_mad(get_sin_signal, get_linear_accel):
     # moving mean of the signal results in the deviation
     # taking the moving mean of the abs of the deviation again results
     # in something very similar to a cos wave
-    res = metric_mad(y, 10)
+    res = metric_mad(y, wlen=10)
 
     # scale down to account for sampling frequency-ish factor
     # also make the window offset a bit to account for the double moving mean

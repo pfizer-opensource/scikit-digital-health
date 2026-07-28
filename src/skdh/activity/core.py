@@ -147,10 +147,14 @@ class ActivityLevelClassification(BaseProcess):
         day_window=(0, 24),
         save_epoch_data=False,
     ):
+        # handle specific case where we need minute long windows
+        if cutpoints == "white_met":
+            warn(f"`short_wlen` set to 60 seconds for 'white_met' cutpoints.")
+            short_wlen = 60
         # make sure that the short_wlen is a factor of 60, and if not send it to
         # nearest factor
         if (60 % short_wlen) != 0:
-            tmp = [1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30]
+            tmp = [1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60]
             short_wlen = tmp[argmin(abs(array(tmp) - short_wlen))]
             warn(f"`short_wlen` changed to {short_wlen} to be a factor of 60.")
         else:
@@ -594,10 +598,10 @@ class ActivityLevelClassification(BaseProcess):
             # compute the desired acceleration metric
             metric_fn = get_metric(self.cutpoints["metric"])
             acc_metric = metric_fn(
-                accel[start:stop], n_wlen, fs, **self.cutpoints["kwargs"]
+                accel[start:stop], wlen=n_wlen, fs=fs, **self.cutpoints["kwargs"]
             )
             acc_metric_60 = metric_fn(
-                accel[start:stop], n_wlen_60, fs, **self.cutpoints["kwargs"]
+                accel[start:stop], wlen=n_wlen_60, fs=fs, **self.cutpoints["kwargs"]
             )
 
             # handle saving the epoch data
@@ -637,10 +641,10 @@ class ActivityLevelClassification(BaseProcess):
             metric_fn = get_metric(self.cutpoints["metric"])
             try:
                 acc_metric = metric_fn(
-                    accel[start:stop], n_wlen, fs, **self.cutpoints["kwargs"]
+                    accel[start:stop], wlen=n_wlen, fs=fs, **self.cutpoints["kwargs"]
                 )
                 acc_metric_60 = metric_fn(
-                    accel[start:stop], n_wlen_60, fs, **self.cutpoints["kwargs"]
+                    accel[start:stop], wlen=n_wlen_60, fs=fs, **self.cutpoints["kwargs"]
                 )
             except ValueError:  # if not enough points, just skip, value is already set
                 continue
@@ -650,7 +654,7 @@ class ActivityLevelClassification(BaseProcess):
                     results, day_n, acc_metric, acc_metric_60, self.wlen, epm
                 )
 
-        # handle saving the epoch data
+            # handle saving the epoch data
             self._handle_epoch_data(
                 n_wlen,
                 fs,
@@ -658,7 +662,7 @@ class ActivityLevelClassification(BaseProcess):
                 acc_metric,
                 'sleep',
             )
-    
+
         # make sure that any endpoints that were caching values between runs are reset
         for endpoint in self.wake_endpoints:
             endpoint.reset_cached()
@@ -718,7 +722,7 @@ class ActivityLevelClassification(BaseProcess):
 
         # compute the metric over 1 minute intervals
         metric_fn = get_metric(self.cutpoints["metric"])
-        acc_metric = metric_fn(accel, n60, **self.cutpoints["kwargs"])
+        acc_metric = metric_fn(accel, wlen=n60, **self.cutpoints["kwargs"])
 
         # add to second sub-axis
         ax[1].plot(

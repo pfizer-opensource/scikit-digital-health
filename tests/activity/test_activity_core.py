@@ -79,7 +79,7 @@ class Test_update_date_results:
 class TestActivityLevelClassification:
     def test_init(self):
         # make sure wlen gets sent to factor of 60
-        swlen_opts = [(4, 4), (7, 6), (14, 15), (58, 30)]
+        swlen_opts = [(4, 4), (7, 6), (14, 15), (44, 30), (58, 60)]
         for wlen in swlen_opts:
             if wlen[0] != wlen[1]:
                 with pytest.warns(UserWarning):
