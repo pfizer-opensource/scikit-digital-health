@@ -65,8 +65,8 @@ class DominantFrequency(Feature):
         fs : float, optional
             Sampling frequency in Hz. If not provided, default is assumed to be 1Hz.
         axis : int, optional
-            Axis along which the signal entropy will be computed. Ignored if `signal` is a
-            pandas.DataFrame. Default is last (-1).
+            Axis along which the dominant frequency will be computed.
+            Ignored if `signal` is a pandas.DataFrame. Default is last (-1).
 
         Returns
         -------
@@ -125,8 +125,8 @@ class DominantFrequencyValue(Feature):
         fs : float, optional
             Sampling frequency in Hz. If not provided, default is assumed to be 1Hz.
         axis : int, optional
-            Axis along which the signal entropy will be computed. Ignored if `signal` is a
-            pandas.DataFrame. Default is last (-1).
+            Axis along which the dominant frequency value will be computed.
+            Ignored if `signal` is a pandas.DataFrame. Default is last (-1).
 
         Returns
         -------
@@ -187,8 +187,8 @@ class PowerSpectralSum(Feature):
         fs : float, optional
             Sampling frequency in Hz. If not provided, default is assumed to be 1Hz.
         axis : int, optional
-            Axis along which the signal entropy will be computed. Ignored if `signal` is a
-            pandas.DataFrame. Default is last (-1).
+            Axis along which the power spectral sum will be computed.
+            Ignored if `signal` is a pandas.DataFrame. Default is last (-1).
 
         Returns
         -------
@@ -266,12 +266,12 @@ class RangePowerSum(Feature):
         Parameters
         ----------
         signal : array-like
-            Array-like containing values to compute the power spectral sum for.
+            Array-like containing values to compute the range power sum for.
         fs : float, optional
             Sampling frequency in Hz. If not provided, default is assumed to be 1Hz.
         axis : int, optional
-            Axis along which the signal entropy will be computed. Ignored if `signal` is a
-            pandas.DataFrame. Default is last (-1).
+            Axis along which the range power sum will be computed.
+            Ignored if `signal` is a pandas.DataFrame. Default is last (-1).
 
         Returns
         -------
@@ -340,8 +340,8 @@ class SpectralFlatness(Feature):
         fs : float, optional
             Sampling frequency in Hz. If not provided, default is assumed to be 1Hz.
         axis : int, optional
-            Axis along which the signal entropy will be computed. Ignored if `signal` is a
-            pandas.DataFrame. Default is last (-1).
+            Axis along which the spectral flatness will be computed.
+            Ignored if `signal` is a pandas.DataFrame. Default is last (-1).
 
         Returns
         -------
@@ -401,8 +401,8 @@ class SpectralEntropy(Feature):
         fs : float, optional
             Sampling frequency in Hz. If not provided, default is assumed to be 1Hz.
         axis : int, optional
-            Axis along which the signal entropy will be computed. Ignored if `signal` is a
-            pandas.DataFrame. Default is last (-1).
+            Axis along which the spectral entropy will be computed.
+            Ignored if `signal` is a pandas.DataFrame. Default is last (-1).
 
         Returns
         -------

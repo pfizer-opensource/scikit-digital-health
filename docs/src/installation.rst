@@ -22,11 +22,11 @@ Both PyPI and Conda-Forge should have pre-built wheels for major distributions.
 
         ::
 
-            pip install git+ssh://git@github.com/PfizerRD/scikit-digital-health.git
+            pip install git+ssh://git@github.com/pfizer-opensource/scikit-digital-health.git
             # install from a specific tag
-            pip install git+ssh://git@github.com/PfizerRD/scikit-digital-health@0.9.10
+            pip install git+ssh://git@github.com/pfizer-opensource/scikit-digital-health@0.9.10
             # install from a specific branch
-            pip install git+ssh://git@github.com/PfizerRD/scikit-digital-health@development
+            pip install git+ssh://git@github.com/pfizer-opensource/scikit-digital-health@development
 
 Run-time requirements
 ^^^^^^^^^^^^^^^^^^^^^
@@ -70,7 +70,7 @@ Testing the Build
 ^^^^^^^^^^^^^^^^^
 
 In order to test a build, you will need to clone or download the source code from
-`GitHub <https://github.com/PfizerRD/scikit-digital-health>`_, as the tests are isolated
+`GitHub <https://github.com/pfizer-opensource/scikit-digital-health>`_, as the tests are isolated
 from access to the package source code. Additionally, the following are requirements
 to run the test suite:
 
