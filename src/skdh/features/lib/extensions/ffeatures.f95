@@ -266,7 +266,7 @@ end subroutine
 ! 
 !     Input
 !     n        : integer(size_t)
-!     x(n)     : real(double), array to compute signal entropy for
+!     x(n)     : real(double), array to compute dominant frequency for
 !     nfft     : integer(long), number of points to use in the FFT computation
 !     fs       : real(double), sampling frequency in Hz
 !     low_cut  : real(double), low frequency cutoff for the range to use
@@ -319,7 +319,7 @@ end subroutine
 ! 
 !     Input
 !     n        : integer(size_t)
-!     x(n)     : real(double), array to compute signal entropy for
+!     x(n)     : real(double), array to compute dominant frequency value for
 !     nfft     : integer(long), number of points to use in the FFT computation
 !     fs       : real(double), sampling frequency in Hz
 !     low_cut  : real(double), low frequency cutoff for the range to use
@@ -369,7 +369,7 @@ end subroutine
 ! 
 !     Input
 !     n        : integer(size_t)
-!     x(n)     : real(double), array to compute signal entropy for
+!     x(n)     : real(double), array to compute power spectral sum for
 !     nfft     : integer(long), number of points to use in the FFT computation
 !     fs       : real(double), sampling frequency in Hz
 !     low_cut  : real(double), low frequency cutoff for the range to use
@@ -430,7 +430,7 @@ end subroutine
 ! 
 !     Input
 !     n         : integer(c_size_t)
-!     x(n)      : real(double), array to compute signal entropy for
+!     x(n)      : real(double), array to compute the range power sum for
 !     nfft      : integer(long), number of points to use in the FFT computation
 !     fs        : real(double), sampling frequency in Hz
 !     low_cut   : real(double), low frequency cutoff for the range to use
@@ -499,7 +499,7 @@ end subroutine
 ! 
 !     Input
 !     n        : integer(size_t)
-!     x(n)     : real(double), array to compute signal entropy for
+!     x(n)     : real(double), array to compute spectral entropy for
 !     nfft     : integer(long), number of points to use in the FFT computation
 !     fs       : real(double), sampling frequency in Hz
 !     low_cut  : real(double), low frequency cutoff for the range to use
@@ -553,7 +553,7 @@ end subroutine
 ! 
 !     Input
 !     n        : integer(size_t)
-!     x(n)     : real(double), array to compute signal entropy for
+!     x(n)     : real(double), array to compute the spectral flatness for
 !     nfft     : integer(long), number of points to use in the FFT computation
 !     fs       : real(double), sampling frequency in Hz
 !     low_cut  : real(double), low frequency cutoff for the range to use

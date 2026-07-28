@@ -105,7 +105,7 @@ html_theme_options = {
     "icon_links": [
         {
             "name": "GitHub",
-            "url": f"https://github.com/PfizerRD/{project}",
+            "url": f"https://github.com/pfizer-opensource/{project}",
             "icon": "fab fa-github-square",
         },
     ],

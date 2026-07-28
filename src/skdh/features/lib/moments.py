@@ -43,8 +43,8 @@ class Mean(Feature):
         signal : array-like
             Array-like containing values to compute the mean for.
         axis : int, optional
-            Axis along which the signal entropy will be computed. Ignored if `signal` is a
-            pandas.DataFrame. Default is last (-1).
+            Axis along which the mean will be computed.
+            Ignored if `signal` is a pandas.DataFrame. Default is last (-1).
 
         Returns
         -------
@@ -76,8 +76,8 @@ class MeanCrossRate(Feature):
         signal : array-like
             Array-like containing values to compute the mean cross rate for.
         axis : int, optional
-            Axis along which the signal entropy will be computed. Ignored if `signal` is a
-            pandas.DataFrame. Default is last (-1).
+            Axis along which the mean cross rate will be computed.
+            Ignored if `signal` is a pandas.DataFrame. Default is last (-1).
 
         Returns
         -------
@@ -120,8 +120,8 @@ class StdDev(Feature):
         signal : array-like
             Array-like containing values to compute the standard deviation for.
         axis : int, optional
-            Axis along which the signal entropy will be computed. Ignored if `signal` is a
-            pandas.DataFrame. Default is last (-1).
+            Axis along which the standard deviation will be computed.
+            Ignored if `signal` is a pandas.DataFrame. Default is last (-1).
 
         Returns
         -------
@@ -153,8 +153,8 @@ class Skewness(Feature):
         signal : array-like
             Array-like containing values to compute the skewness for.
         axis : int, optional
-            Axis along which the signal entropy will be computed. Ignored if `signal` is a
-            pandas.DataFrame. Default is last (-1).
+            Axis along which the skewness will be computed.
+            Ignored if `signal` is a pandas.DataFrame. Default is last (-1).
 
         Returns
         -------
@@ -186,8 +186,8 @@ class Kurtosis(Feature):
         signal : array-like
             Array-like containing values to compute the kurtosis for.
         axis : int, optional
-            Axis along which the signal entropy will be computed. Ignored if `signal` is a
-            pandas.DataFrame. Default is last (-1).
+            Axis along which the kurtosis will be computed.
+            Ignored if `signal` is a pandas.DataFrame. Default is last (-1).
 
         Returns
         -------

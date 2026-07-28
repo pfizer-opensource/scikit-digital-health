@@ -50,8 +50,8 @@ class JerkMetric(Feature):
         fs : float, optional
             Sampling frequency in Hz. If not provided, default is 1.0Hz
         axis : int, optional
-            Axis along which the signal entropy will be computed. Ignored if
-            `signal` is a pandas.DataFrame. Default is last (-1).
+            Axis along which the jerk metric will be computed.
+            Ignored if `signal` is a pandas.DataFrame. Default is last (-1).
 
         Returns
         -------
@@ -138,8 +138,8 @@ class DimensionlessJerk(Feature):
             Array-like containing values to compute the dimensionless jerk
             metric for.
         axis : int, optional
-            Axis along which the signal entropy will be computed. Ignored if
-            `signal` is a pandas.DataFrame. Default is last (-1).
+            Axis along which the dimensionless jerk metric will be computed.
+            Ignored if `signal` is a pandas.DataFrame. Default is last (-1).
 
         Returns
         -------
@@ -206,8 +206,8 @@ class SPARC(Feature):
         fs : float, optional
             Sampling frequency in Hz. If not provided, default is 1.0Hz
         axis : int, optional
-            Axis along which the signal entropy will be computed. Ignored if
-            `signal` is a pandas.DataFrame. Default is last (-1).
+            Axis along which the SPARC will be computed.
+            Ignored if `signal` is a pandas.DataFrame. Default is last (-1).
 
         Returns
         -------
