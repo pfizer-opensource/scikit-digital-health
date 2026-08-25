@@ -36,10 +36,7 @@ class GaitLumbar(BaseProcess):
         20hz (for sampling rates <50hz but >20hz). Default is False.
     height_factor : float, optional
         The factor multiplied by height to obtain an estimate of leg length.
-        Default is 0.53 [4]_. Ignored if `leg_length` is `True`
-    provide_leg_length : bool, optional
-        If the actual leg length will be provided. Setting to true would have the same effect
-        as setting height_factor to 1.0 while providing leg length. Default is False.
+        Default is 0.53 [4]_.
     min_bout_time : float, optional
         Minimum time in seconds for a gait bout. Default is 8s (making a minimum
         of 3 3-second windows).
@@ -76,7 +73,7 @@ class GaitLumbar(BaseProcess):
         - `Wn`: [0.25, 7.5] - NOTE, this should be in Hz, not radians.
           fs will be passed into the filter setup at filter creation time.
         - `btype`: band
-        - `output`: sos - NOTE that this will always be set/overriden
+        - `output`: sos - NOTE that this will always be set/overridden
 
         See :func:`scipy.signal.butter` for full options.
     ic_prom_factor : float, optional
@@ -216,7 +213,6 @@ class GaitLumbar(BaseProcess):
         self,
         downsample=False,
         height_factor=0.53,
-        provide_leg_length=False,
         min_bout_time=8.0,
         max_bout_separation_time=0.5,
         gait_event_method="AP CWT",
@@ -239,7 +235,6 @@ class GaitLumbar(BaseProcess):
         super().__init__(
             downsample=downsample,
             height_factor=height_factor,
-            provide_leg_length=provide_leg_length,
             min_bout_time=min_bout_time,
             max_bout_separation_time=max_bout_separation_time,
             gait_event_method=gait_event_method,
@@ -262,10 +257,7 @@ class GaitLumbar(BaseProcess):
 
         self.downsample = downsample
 
-        if provide_leg_length:
-            self.height_factor = 1.0
-        else:
-            self.height_factor = height_factor
+        self.height_factor = height_factor
 
         self.min_bout_time = (min_bout_time,)
         self.max_bout_sep_time = max_bout_separation_time
@@ -422,6 +414,7 @@ class GaitLumbar(BaseProcess):
         gyro=None,
         fs=None,
         height=None,
+        leg_length=None,
         gait_bouts=None,
         gait_pred=True,
         v_axis=None,
@@ -430,7 +423,7 @@ class GaitLumbar(BaseProcess):
         **kwargs,
     ):
         """
-        predict(time, accel, *, gyro=None, fs=None, height=None, gait_pred=None, v_axis=None, ap_axis=None, tz_name=None)
+        predict(time, accel, *, gyro=None, fs=None, height=None, leg_length=None, gait_pred=None, v_axis=None, ap_axis=None, tz_name=None)
 
         Get the gait events and endpoints from a time series signal
 
@@ -449,9 +442,12 @@ class GaitLumbar(BaseProcess):
             Sampling frequency in Hz of the accelerometer data. If not provided,
             will be computed form the timestamps.
         height : float, optional
-            Either height (False) or leg length (True) of the subject who wore
-            the inertial measurement device, in meters, depending on `leg_length`.
-            If not provided, spatial endpoints will not be computed.
+            Subject's height. Multiplied by `height_factor` to get leg length.
+            Only used if `leg_length` is not provided.
+        leg_length : float, optional
+            Length of the subject's leg/Center of mass/sensor height, in meters. 
+            If provided, will be taken as the primary value for computing spatial
+            metrics.
         gait_bouts : numpy.ndarray, optional
             (N, 2) array of gait starts (column 1) and stops (column 2). Either this
             or `gait_pred` is required in order to have gait analysis be performed
@@ -511,6 +507,7 @@ class GaitLumbar(BaseProcess):
             gyro=gyro,
             fs=fs,
             height=height,
+            leg_length=leg_length,
             gait_bouts=gait_bouts,
             gait_pred=gait_pred,
             v_axis=v_axis,
@@ -519,12 +516,14 @@ class GaitLumbar(BaseProcess):
             **kwargs,
         )
 
-        if height is None:
-            warn("height not provided, not computing spatial metrics", UserWarning)
-            leg_length = None
-        else:
-            # height factor is set to 1 if providing leg length
-            leg_length = self.height_factor * height
+        if leg_length is None:
+            if height is None:
+                warn("height not provided, not computing spatial metrics", UserWarning)
+                # leg length is already set to none
+            else:
+                # height factor is set to 1 if providing leg length
+                leg_length = self.height_factor * height
+        # leg_length is not None -> we just use leg length
 
         # compute fs/delta t if necessary
         fs = 1 / mean(diff(time)) if fs is None else fs
