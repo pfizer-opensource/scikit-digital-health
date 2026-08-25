@@ -16,7 +16,6 @@ class TestGait:
         g = GaitLumbar(
             downsample=False,
             height_factor=0.53,
-            provide_leg_length=False,
             min_bout_time=8.0,
             max_bout_separation_time=0.5,
             gait_event_method="AP CWT",
@@ -46,7 +45,6 @@ class TestGait:
         g = GaitLumbar(
             downsample=True,
             height_factor=0.53,
-            provide_leg_length=False,
             min_bout_time=8.0,
             max_bout_separation_time=0.5,
             gait_event_method="v cwt",
@@ -75,7 +73,6 @@ class TestGait:
         g = GaitLumbar(
             downsample=False,
             height_factor=0.53,
-            provide_leg_length=False,
             min_bout_time=8.0,
             max_bout_separation_time=0.5,
             gait_event_method="AP CWT",
@@ -103,7 +100,6 @@ class TestGait:
         g = GaitLumbar(
             downsample=True,
             height_factor=0.53,
-            provide_leg_length=False,
             min_bout_time=8.0,
             max_bout_separation_time=0.5,
             gait_event_method="v cwt",
@@ -160,11 +156,6 @@ class TestGait:
 
         with pytest.raises(ValueError):
             g.add_endpoints(GaitLumbar)
-
-    def test_leg_length_factor(self):
-        g = GaitLumbar(provide_leg_length=True, height_factor=0.53)
-
-        assert g.height_factor == 1.0
 
     def test__handle_input_gait_predictions(self):
         # ====================================
