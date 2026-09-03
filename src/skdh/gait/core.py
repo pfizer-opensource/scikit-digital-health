@@ -568,8 +568,8 @@ class GaitLumbar(BaseProcess):
                 "Date",
                 "Processing Start Hour",
                 "Processing End Hour",
-                "Day Start Timestamp",
-                "Day End Timestamp",
+                "Day Start Datetime",
+                "Day End Datetime",
                 "Bout N",
                 "Bout Starts",
                 "Bout Duration",
@@ -580,7 +580,9 @@ class GaitLumbar(BaseProcess):
                 "FC opp foot",
                 "forward cycles",
                 # "delta h",  # handled in gait endpoints now
-                "IC Time",
+                "IC Timestamp",
+                "IC Rel Timestamp",
+                "IC Datetime",
                 "debug:mean step freq",
                 "debug:v axis est",
                 "debug:ap axis est",
@@ -632,7 +634,7 @@ class GaitLumbar(BaseProcess):
                 # get the data we need
                 n_strides = bout_res["qc_initial_contacts"].size
                 gait["IC"].extend(bout_res["qc_initial_contacts"])
-                gait["IC Time"].extend(time_rs[bout][bout_res["qc_initial_contacts"]])
+                gait["IC Timestamp"].extend(time_rs[bout][bout_res["qc_initial_contacts"]])
                 gait["FC"].extend(bout_res["qc_final_contacts"])
                 gait["FC opp foot"].extend(bout_res["qc_final_contacts_oppfoot"])
                 gait["forward cycles"].extend(bout_res["forward_cycles"])
@@ -675,10 +677,10 @@ class GaitLumbar(BaseProcess):
             # add date
             gait["Date"].extend([dtime.strftime("%Y-%m-%d")] * nvals)
             # add day start/end timestamps
-            gait["Day Start Timestamp"].extend(
+            gait["Day Start Datetime"].extend(
                 [str(self.convert_timestamps(time_rs[dstart]))] * nvals
             )
-            gait["Day End Timestamp"].extend(
+            gait["Day End Datetime"].extend(
                 [str(self.convert_timestamps(time_rs[dstop]))] * nvals
             )
 
@@ -711,6 +713,8 @@ class GaitLumbar(BaseProcess):
         gait.pop("forward cycles", None)
 
         # convert IC time to actual datetimes
-        gait["IC Time"] = self.convert_timestamps(gait["IC Time"])
+        gait["IC Datetime"] = self.convert_timestamps(gait["IC Timestamp"])
+        # get the relative IC timestamps
+        gait["IC Rel Timestamp"] = gait["IC Timestamp"] - gait["Bout Starts"]
 
         return gait
