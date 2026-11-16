@@ -58,6 +58,23 @@ class TestComputeWindowSamples:
             compute_window_samples(50.0, w_length, w_step)
 
     @pytest.mark.parametrize(
+        ("w_length", "message"),
+        (
+            (True, "window_length must be a positive number"),
+            ("5", "window_length must be a positive number"),
+            (0.001, "window_length must produce at least one sample"),
+        ),
+    )
+    def test_invalid_window_length_error(self, w_length, message):
+        with pytest.raises(ValueError, match=message):
+            compute_window_samples(50.0, w_length, 1)
+
+    @pytest.mark.parametrize("w_step", (True, "1"))
+    def test_invalid_window_step_type_error(self, w_step):
+        with pytest.raises(ValueError, match="window_step must be a positive int or float"):
+            compute_window_samples(50.0, 5.0, w_step)
+
+    @pytest.mark.parametrize(
         ("w_length", "w_step"),
         (
             (None, None),
