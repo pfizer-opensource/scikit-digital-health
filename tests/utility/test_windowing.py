@@ -1,5 +1,5 @@
 import pytest
-from numpy import asfortranarray
+from numpy import asfortranarray, float32, int32
 
 from skdh.utility.windowing import (
     DimensionError,
@@ -25,11 +25,37 @@ class TestComputeWindowSamples:
         assert pred_length == length
         assert pred_step == step
 
+    @pytest.mark.parametrize(
+        ("w_step"),
+        (float32(0.5), int32(25)),
+    )
+    def test_numpy_scalar_steps(self, w_step):
+        pred_length, pred_step = compute_window_samples(50.0, 5.0, w_step)
+
+        assert pred_length == 250
+        if isinstance(w_step, int32):
+            assert pred_step == 25
+        else:
+            assert pred_step == 125
+
     def test_float_range_error(self):
         with pytest.raises(ValueError):
             compute_window_samples(50.0, 5.0, 1.5)
         with pytest.raises(ValueError):
             compute_window_samples(50.0, 5.0, -1.5)
+
+    @pytest.mark.parametrize(
+        "w_length, w_step",
+        [
+            (0.0, 1),
+            (-1.0, 1),
+            (5.0, 0),
+            (5.0, -1),
+        ],
+    )
+    def test_invalid_window_parameters(self, w_length, w_step):
+        with pytest.raises(ValueError):
+            compute_window_samples(50.0, w_length, w_step)
 
     @pytest.mark.parametrize(
         ("w_length", "w_step"),
