@@ -5,6 +5,8 @@ Lukas Adamowicz
 Copyright (c) 2021. Pfizer Inc. All rights reserved.
 """
 
+from numbers import Integral, Real
+
 from numpy import require
 from numpy.lib.stride_tricks import as_strided
 
@@ -79,23 +81,34 @@ def compute_window_samples(fs, window_length, window_step):
     if window_step is None or window_length is None:
         return None, None
 
-    length_n = int(round(fs * window_length))
+    if isinstance(window_length, bool) or not isinstance(window_length, Real):
+        raise ValueError("window_length must be a positive number")
+    window_length = float(window_length)
+    if window_length <= 0:
+        raise ValueError("window_length must be positive")
 
-    if isinstance(window_step, int):
-        if window_step > 0:
-            step_n = window_step
-        else:
-            raise ValueError("window_step cannot be negative")
-    elif isinstance(window_step, float):
+    length_n = int(round(fs * window_length))
+    if length_n <= 0:
+        raise ValueError("window_length must produce at least one sample")
+
+    if isinstance(window_step, bool):
+        raise ValueError("window_step must be a positive int or float in (0.0, 1.0]")
+
+    if isinstance(window_step, Integral):
+        step_n = int(window_step)
+        if step_n <= 0:
+            raise ValueError("window_step cannot be zero or negative")
+    elif isinstance(window_step, Real):
+        window_step = float(window_step)
         if 0.0 < window_step < 1.0:
             step_n = int(round(length_n * window_step))
-
             step_n = max(min(step_n, length_n), 1)
-
         elif window_step == 1.0:
             step_n = length_n
         else:
             raise ValueError("float values for window_step must be in (0.0, 1.0]")
+    else:
+        raise ValueError("window_step must be a positive int or float in (0.0, 1.0]")
 
     return length_n, step_n
 
