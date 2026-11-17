@@ -123,10 +123,11 @@ def metric_enmo_met(accel, *, fs, take_abs=False, trim_zero=True, **kwargs):
         (N, ) array of metabolic equivalent of task (MET) values.
     """
     enmo_1s = metric_enmo(accel, wlen=int(fs), take_abs=take_abs, trim_zero=trim_zero)
-    enmo = moving_max(enmo_1s, 60, 60)
+    # model is defined for ENMO in milli-g
+    enmo = moving_max(enmo_1s, 60, 60) * 1000.0
 
     aee = -10.58 + 1.1176 * enmo + 2.9418 * sqrt(enmo) - 0.00059277 * enmo**2
-    met = aee / 71.255
+    met = aee / 71.225
     return met
 
 
