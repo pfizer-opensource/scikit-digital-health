@@ -1,4 +1,4 @@
-from numpy import allclose, sort, abs, mean, cos, pi, arange
+from numpy import allclose, sort, abs, mean, cos, pi, arange, tile, maximum, sqrt, concatenate
 
 from skdh.activity.metrics import (
     metric_anglez,
@@ -8,6 +8,7 @@ from skdh.activity.metrics import (
     metric_hfen,
     metric_hfenplus,
     metric_mad,
+    metric_enmo_met,
 )
 
 
@@ -114,3 +115,36 @@ def test_metric_mad(get_sin_signal, get_linear_accel):
     # also make the window offset a bit to account for the double moving mean
     truth = abs(1.5 * cos(2 * pi * 0.2 * arange(0.05, 5.05, 0.1)) / 100)
     assert allclose(res, truth, atol=1e-3)
+
+
+def test_metric_enmo_met(get_linear_accel):
+    # 500 samples at 100 Hz, tiled to 1 minute, with norm of exactly 1g
+    x = tile(get_linear_accel(scale=0.0).T, (12, 1))
+    fs = 100.0
+
+    # one minute each at 0, 50, 100, 200, and 400 mg ENMO
+    y = concatenate([x * (1 + enmo / 1000) for enmo in [0.0, 50.0, 100.0, 200.0, 400.0]])
+
+    res = metric_enmo_met(y, fs=fs)
+
+    # net METs from White et al., with ENMO in mg and 1 MET = 71.225 J/min/kg
+    assert res.shape == (5,)
+    assert allclose(res, [-0.14854, 0.90726, 1.75037, 3.24089, 5.62236], atol=1e-4)
+
+
+def test_metric_enmo_met_sin(get_sin_signal, get_linear_accel):
+    fs, x = get_sin_signal(0.5, 1.0, scale=0.0)
+    y = get_linear_accel(scale=0.0).T
+
+    y[:, 2] += x
+    # tile to 1 minute
+    y = tile(y, (12, 1))
+
+    res = metric_enmo_met(y, fs=fs)
+
+    # 1 Hz signal so each 1s window has the same ENMO, in mg
+    enmo = mean(maximum(x[:100], 0.0)) * 1000
+    aee = -10.58 + 1.1176 * enmo + 2.9418 * sqrt(enmo) - 0.00059277 * enmo**2
+
+    assert res.shape == (1,)
+    assert allclose(res, aee / 71.225)
